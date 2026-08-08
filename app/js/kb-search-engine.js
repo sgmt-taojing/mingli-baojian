@@ -503,7 +503,7 @@
     /* ───── 命中记录 ───── */
     async recordHit(query, hits) {
       try {
-        await fetch(this.hitLogApi, {
+        await fetch(this.hitLogApi, { signal: AbortSignal.timeout(15000),
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query, hits, source: 'kb-fts5', responseTime: 0 }),

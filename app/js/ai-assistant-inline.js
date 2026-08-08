@@ -180,7 +180,7 @@ function _kbHitCount(moduleId, kbEntryId){
     // 异步上报后端 kb_formal.hit_count（公网白名单 + 失败静默）
     if (kbEntryId) {
       try {
-        fetch(API + '/api/public/kb-hit', {
+        fetch(API + '/api/public/kb-hit', { signal: AbortSignal.timeout(15000),
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ entry_id: kbEntryId, app_endpoint: 'ai-assistant', user_query: (state.data?.s1 || '') + ' ' + (state.data?.s2 || '') }), signal: AbortSignal.timeout(15000) }).catch(() => {});
@@ -193,7 +193,7 @@ function _kbHitCount(moduleId, kbEntryId){
 // === 问卷 + 排盘结果自动落库（公网公开端点）===
 function _saveSurvey(module, data, baziData){
   try {
-    fetch(API + '/api/public/save-survey', {
+    fetch(API + '/api/public/save-survey', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ module, data, baziData: baziData || null, source: 'ai-assistant' }), signal: AbortSignal.timeout(15000) }).catch(() => {});
@@ -692,7 +692,7 @@ function _submitKbFeedback(fbId, score, query, module){
     module: module || '',
     session_id: sessionId
   };
-  fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
+  fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', { signal: AbortSignal.timeout(15000),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r){ return r.json(); }).then(function(j){
@@ -907,7 +907,7 @@ function _appendMemHint(text){
 async function _saveMem(sessionId, module, role, content, summary){
   try {
     if (!sessionId || !content) return;
-    await fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/save', {
+    await fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/save', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: sessionId, module: module || '', role: role || 'user', content: content.slice(0, 500), summary: (summary || '').slice(0, 100) }), signal: AbortSignal.timeout(15000) });
@@ -1116,7 +1116,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       const feMatch = userText.match(/([金木水火土])行/) || (state.data.fe || '');
       const gender = userText.match(/[男女]/) ? userText.match(/[男女]/)[0] : '';
       const concerns = (userText.match(/(事业|工作|财运|金钱|健康|身体|婚姻|感情|学业|学习|家庭|人际|朋友|精神|禅修|享福|福气|寿元|寿命|长命)/g) || []).slice(0, 4);
-      const liRes = await fetch(API + '/api/ai/lifeindex-report', {
+      const liRes = await fetch(API + '/api/ai/lifeindex-report', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1149,7 +1149,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       const feMatch = userText.match(/([金木水火土])行/) || (state.data.fe || '');
       const moodMatch = userText.match(/(焦虑|失眠|悲伤|愤怒|疲劳|烦闷|抑郁)/);
       const moodMap = { '焦虑': 'anxiety', '失眠': 'insomnia', '悲伤': 'sadness', '愤怒': 'anger', '疲劳': 'fatigue', '烦闷': 'anxiety', '抑郁': 'sadness' };
-      const mRes = await fetch(API + '/api/ai/music-report', {
+      const mRes = await fetch(API + '/api/ai/music-report', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1180,7 +1180,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
       const userText = Object.values(state.data || {}).join(' ');
       const liveM = userText.match(/(北京|上海|广州|深圳|杭州|成都|武汉|西安|南京|重庆|天津|苏州)/);
       const concerns = (userText.match(/(学业|职业|工作|事业|财运|感情|婚姻|健康|城市|风物|修养|人脉|创业|养老|传承|学习|睡眠|财务|退休|孩子)/g) || []).slice(0,4);
-      const lpRes = await fetch(API + '/api/ai/lifeplan-report', {
+      const lpRes = await fetch(API + '/api/ai/lifeplan-report', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1278,7 +1278,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     try { _agentStep('③ 多维推断', 'active', '正在分析格局趋势…'); } catch(_e){}
     let r;
     try {
-      r = await fetch(API + '/api/ai/public-chat?stream=1', {
+      r = await fetch(API + '/api/ai/public-chat?stream=1', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
         body: JSON.stringify({ messages: [...hist.slice(-8), {role:'user', content:prompt}], baziData, stream: true }),
@@ -1347,7 +1347,7 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     try {
       const _ac2 = new AbortController();
       const _to2 = setTimeout(function(){ _ac2.abort(); }, 15000);
-      const r2 = await fetch(API + '/api/ai/public-chat', {
+      const r2 = await fetch(API + '/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [...hist.slice(-8), {role:'user', content:prompt}], baziData }),
@@ -1455,7 +1455,7 @@ async function autoSavePaipan(reportText){
   try{
     const tok=localStorage.getItem('mlbj_token')||'';
     const hdr=tok?{'Authorization':'Bearer '+tok,'Content-Type':'application/json'}:{'Content-Type':'application/json'};
-    await fetch(API+'/api/paipan/save', {method:'POST',headers:hdr,body:JSON.stringify({
+    await fetch(API+'/api/paipan/save', {signal: AbortSignal.timeout(15000), method:'POST',headers:hdr,body:JSON.stringify({
       type:state.module||'unknown',
       inputData:state.data||{},
       resultData:{report:reportText.substring(0,5000)},
@@ -2136,7 +2136,7 @@ async function callAI(q){
     try {
       var _acOrch = new AbortController();
       var _toOrch = setTimeout(function(){ _acOrch.abort(); }, 12000);
-      var orchRes = await fetch(API + '/api/ai/orchestrate', {
+      var orchRes = await fetch(API + '/api/ai/orchestrate', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: q, module: state.module || 'freechat', ctx: { sessionId: localStorage.getItem('ml_session_id') || '' } }),
@@ -3880,7 +3880,7 @@ async function _paipanAsync(y,m,d,h){
     if(cached){return JSON.parse(cached);}
   }catch(e){console.warn("报告降级:",e.message);}
   try{
-    var resp=await fetch('/api/paipan/calculate', {
+    var resp=await fetch('/api/paipan/calculate', { signal: AbortSignal.timeout(15000),
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({year:y,month:m,day:d,hour:h,gender:'male'}), signal: AbortSignal.timeout(15000) });
     if(resp.ok){
@@ -4941,7 +4941,7 @@ function submitFeedback(type){
   const text=document.getElementById('feedbackText').value.trim();
   if(!text&&type!=='praise'){showToast('请填写反馈内容');return;}
   const token=localStorage.getItem('auth_token')||'';
-  fetch(API+'/api/feedback/submit', {
+  fetch(API+'/api/feedback/submit', { signal: AbortSignal.timeout(15000),
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':token?('Bearer '+token):''},
     body:JSON.stringify({type:type,content:text||'点赞鼓励',module:state.module||'general'}), signal: AbortSignal.timeout(15000) }).then(r=>r.json()).then(data=>{
@@ -5328,7 +5328,7 @@ window.fbReport = function(btn, val) {
 
   // 异步上报后端（白名单 + 失败静默）
   try {
-    fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
+    fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r){
@@ -5346,7 +5346,7 @@ window.fbReport = function(btn, val) {
   // W1-3: 反馈联动持久记忆系统（不阻塞主反馈流）
   try {
     if (sessionId2 && mod && mod !== 'unknown') {
-      fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/feedback', {
+      fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/feedback', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId2, module: mod, satisfaction: val > 0 ? 1 : -1, content: (reportText || '').slice(0, 500) }), signal: AbortSignal.timeout(15000) }).catch(function(){ /* 静默失败 */ });
@@ -5354,7 +5354,7 @@ window.fbReport = function(btn, val) {
   } catch(_e) { /* 静默 */ }
   // W1-3: 同步满意度到 agent_memory（静默失败，不影响主流程）
   try {
-    fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/feedback', {
+    fetch((typeof API !== 'undefined' ? API : '') + '/api/agent/memory/feedback', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: sessionId2, satisfaction: val }), signal: AbortSignal.timeout(15000) });
@@ -5392,7 +5392,7 @@ window.kbFbMini = function(btn, val) {
     session_id: sessionId3
   };
   try {
-    fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
+    fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(){

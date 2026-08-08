@@ -43,8 +43,7 @@ let sseSource = null;
 
 /* ============ API 封装 ============ */
 async function api(path, options = {}){
-  const r = await fetch(API_BASE + path, {
-    ...options,
+  const r = await fetch(API_BASE + path, {signal: AbortSignal.timeout(15000), ...options,
     headers: {
       'Content-Type': 'application/json',
       'X-User-Id': ME.id,

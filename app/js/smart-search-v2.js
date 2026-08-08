@@ -125,9 +125,7 @@
     try {
       const params = new URLSearchParams({ q: query, limit: '8' });
       if (module) params.set('module', module);
-      const res = await fetch(`${API}/api/kb-search?${params}`, {
-        signal: AbortSignal.timeout(3000),
-      });
+      const res = await fetch(`${API}/api/kb-search?${params}`, {signal: AbortSignal.timeout(3000)});
       const data = await res.json();
       if (data.code === 0 && data.data) {
         return Array.isArray(data.data) ? data.data : (data.data.results || []);

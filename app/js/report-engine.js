@@ -254,7 +254,7 @@
     // 服务端 FTS5 fallback（当本地无 _kbScore 或本地 score=0）
     if (!kbHit.score && apiBase) {
       try {
-        const r = await fetch(apiBase + '/api/public/kb-query', {method: 'POST',
+        const r = await fetch(apiBase + '/api/public/kb-query', { signal: AbortSignal.timeout(15000), method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ module: moduleId, query: flattenData(data).substring(0, 200), limit: 1 }), signal:AbortSignal.timeout(15000)});
         const j = await r.json();
@@ -287,7 +287,7 @@
 
       const baziData = (moduleId === 'bazi' || moduleId === 'name' || moduleId === 'number' || moduleId === 'face') ? data : null;
 
-      const r = await fetch(apiBase + '/api/ai/public-chat', {method: 'POST',
+      const r = await fetch(apiBase + '/api/ai/public-chat', { signal: AbortSignal.timeout(15000), method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...((hist || []).slice(-8)), { role: 'user', content: prompt }],
@@ -350,7 +350,7 @@
         return null;
       }
 
-      const r = await fetch(apiBase + endpoint, {method: 'POST',
+      const r = await fetch(apiBase + endpoint, { signal: AbortSignal.timeout(15000), method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload), signal:AbortSignal.timeout(15000)});
       const j = await r.json();
@@ -680,7 +680,7 @@
       const tok = localStorage.getItem('mlbj_token') || '';
       const hdr = tok ? { 'Authorization': '***' + tok, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
       const isBaziLike = (moduleId === 'bazi' || moduleId === 'name' || moduleId === 'number' || moduleId === 'face');
-      fetch(apiBase + '/api/paipan/save', {method: 'POST',
+      fetch(apiBase + '/api/paipan/save', { signal: AbortSignal.timeout(15000), method: 'POST',
         headers: hdr,
         body: JSON.stringify({
           type: moduleId,
@@ -733,7 +733,7 @@
       const moduleId = (global.state && global.state.module) || 'unknown';
       const tok = localStorage.getItem('mlbj_token') || '';
       const hdr = tok ? { 'Authorization': '***' + tok, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
-      fetch((global.API || DEFAULT_API) + '/api/feedback/report', {
+      fetch((global.API || DEFAULT_API) + '/api/feedback/report', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: hdr,
         body: JSON.stringify({ module: moduleId, value: val, ts: Date.now() }), signal: AbortSignal.timeout(15000) }).catch(() => {});

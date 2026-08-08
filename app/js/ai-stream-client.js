@@ -51,7 +51,7 @@
     
     try {
       // ── 方案 A：fetch + ReadableStream（SSE 兼容） ──
-      const res = await fetch(`${API_BASE}/api/ai/stream-chat`, {
+      const res = await fetch(`${API_BASE}/api/ai/stream-chat`, { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@
         // ── 方案 B：回退到传统 fetch POST ──
         console.warn('[AI Stream] SSE 降级到 POST:', e.message);
         try {
-          const res2 = await fetch(`${API_BASE}/api/ai/public-chat`, {
+          const res2 = await fetch(`${API_BASE}/api/ai/public-chat`, { signal: AbortSignal.timeout(15000),
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ messages, module }),
@@ -173,9 +173,7 @@
    */
   async function checkHealth() {
     try {
-      const res = await fetch(`${API_BASE}/api/ai/stream-health`, {
-        signal: AbortSignal.timeout(2000),
-      });
+      const res = await fetch(`${API_BASE}/api/ai/stream-health`, {signal: AbortSignal.timeout(2000)});
       return await res.json();
     } catch (_) {
       return { ok: false };
