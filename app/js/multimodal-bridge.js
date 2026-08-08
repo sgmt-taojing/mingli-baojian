@@ -10,9 +10,11 @@
  */
 
 function createMessage(type, content, metadata = {}, agent = 'assistant') {
+  if (!multimodalBridge._msgSeq) multimodalBridge._msgSeq = 0;
+  multimodalBridge._msgSeq++;
   try {
     return {
-      id: 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+      id: 'msg-' + Date.now() + '-' + (multimodalBridge._msgSeq % 100000).toString(36),
       type: type || 'text',
       content: content || '',
       metadata: {
@@ -435,7 +437,9 @@ function renderImageMessage(msg) {
 function renderDataMessage(msg) {
   const d = document.createElement('div');
   d.className = 'mb-msg mb-ai';
-  const chartId = 'mb-chart-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5);
+  if (!multimodalBridge._chartSeq) multimodalBridge._chartSeq = 0;
+  multimodalBridge._chartSeq++;
+  const chartId = 'mb-chart-' + Date.now() + '-' + (multimodalBridge._chartSeq % 100000).toString(36);
   const meta = msg.metadata || {};
   d.innerHTML = `<div class="mb-b"><div class="mb-data-label">📊 数据</div>${esc(msg.content)}<canvas id="${chartId}" class="mb-chart-canvas" width="280" height="160" style="margin-top:8px;width:100%;max-width:280px;border-radius:6px"></canvas></div>`;
   d.setAttribute('data-msg-id', msg.id);
@@ -454,7 +458,9 @@ function renderDataMessage(msg) {
 function renderChartMessage(msg) {
   const d = document.createElement('div');
   d.className = 'mb-msg mb-ai';
-  const chartId = 'mb-chart-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5);
+  if (!multimodalBridge._chartSeq) multimodalBridge._chartSeq = 0;
+  multimodalBridge._chartSeq++;
+  const chartId = 'mb-chart-' + Date.now() + '-' + (multimodalBridge._chartSeq % 100000).toString(36);
   const meta = msg.metadata || {};
   d.innerHTML = `<div class="mb-b"><div class="mb-data-label">📈 可视化</div><canvas id="${chartId}" class="mb-chart-canvas" width="280" height="180" style="margin-top:8px;width:100%;max-width:280px;border-radius:6px"></canvas></div>`;
   d.setAttribute('data-msg-id', msg.id);

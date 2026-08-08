@@ -39,8 +39,10 @@ const TOOL_ICON_MAP = {
  */
 function renderBubble({ type = 'ai', content = '', metadata = {}, animate = false }) {
   try {
+    if (!renderBubble._seq) renderBubble._seq = 0;
+    renderBubble._seq++;
     const cfg = MSG_TYPES[type] || MSG_TYPES.ai;
-    const id = 'sau-bub-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5);
+    const id = 'sau-bub-' + Date.now() + '-' + (renderBubble._seq % 100000).toString(36);
     const d = document.createElement('div');
     d.className = cfg.cls + (animate ? ' sau-animate-in' : '');
     d.setAttribute('data-msg-type', type);
@@ -112,7 +114,9 @@ function renderThinkingPanel({ steps = [], collapsed = false, onToggle = null })
 function renderToolCallCard({ tool = 'general', params = {}, status = 'calling', result = null, duration = null }) {
   try {
     const icon = TOOL_ICON_MAP[tool] || TOOL_ICON_MAP.general;
-    const id = 'sau-tool-' + Date.now() + '-' + Math.random().toString(36).slice(2, 4);
+    if (!renderTool._seq) renderTool._seq = 0;
+  renderTool._seq++;
+  const id = 'sau-tool-' + Date.now() + '-' + (renderTool._seq % 100000).toString(36);
     const statusLabel = { calling: '⏳ 调用中', success: '✅ 完成', error: '❌ 失败', timeout: '⏰ 超时' }[status] || '⏳ 调用中';
     const statusColor = { calling: '#a78bfa', success: '#27ae60', error: '#f44336', timeout: '#f59e0b' }[status] || '#a78bfa';
 
@@ -163,7 +167,8 @@ const SEASONAL_SUGGESTIONS = [
 function renderProactiveBanner({ suggestion = null, dismissible = true, onAction = null }) {
   try {
     const id = 'sau-banner-' + Date.now();
-    const sug = suggestion || SEASONAL_SUGGESTIONS[Math.floor(Math.random() * SEASONAL_SUGGESTIONS.length)];
+    var _bannerSeq = (typeof _bannerSeq==="number") ? ++_bannerSeq : 0;
+    const sug = suggestion || SEASONAL_SUGGESTIONS[_bannerSeq % SEASONAL_SUGGESTIONS.length];
     const cfg = CARD_COLORS[sug.type] || CARD_COLORS.tip;
     const icon = CARD_ICONS[sug.type] || CARD_ICONS.tip;
 
@@ -256,7 +261,7 @@ function streamText(element, text, options = {}) {
         i++;
         const chat = document.getElementById('chat');
         if (chat) chat.scrollTop = chat.scrollHeight;
-        setTimeout(type, speed + Math.random() * 15);
+        setTimeout(type, speed + (_typeJitter = (_typeJitter||0) + 1) * 3);
       } else {
         cursor.remove();
         if (options.onDone) { try { options.onDone(); } catch (e) {} }

@@ -286,7 +286,11 @@ function renderProactiveCard({ type = 'tip', title = '', body = '', action = nul
   try {
     const icon = CARD_ICONS[type] || CARD_ICONS.tip;
     const colors = CARD_COLORS[type] || CARD_COLORS.tip;
-    const id = 'ar-card-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+    const id = (function(){
+      if (!adaptiveRenderer._cardSeq) adaptiveRenderer._cardSeq = 0;
+      adaptiveRenderer._cardSeq++;
+      return 'ar-card-' + Date.now() + '-' + (adaptiveRenderer._cardSeq % 100000).toString(36);
+    })();
 
     let html = `<div class="ar-proactive-card" id="${id}" style="background:${colors.bg};border:1px solid ${colors.border}">`;
     html += `<div class="ar-card-glow" style="background:radial-gradient(ellipse at 30% 20%,${colors.accent}15,transparent 70%)"></div>`;
