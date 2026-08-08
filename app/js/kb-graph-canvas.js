@@ -39,15 +39,30 @@
   };
 
   // ── 力导引模拟器 ─────────────────────────────────────────
+  // ── 确定性初始坐标（黄金角螺旋分布，替代 Math.random）───
+  function deterministicInitialPos(i, total, width, height) {
+    const phi = (1 + Math.sqrt(5)) / 2;          // 黄金比例
+    const goldenAngle = 2 * Math.PI * (1 - 1/phi); // 黄金角 ≈ 137.508°
+    const radius = Math.sqrt(i / Math.max(total,1)) * Math.min(width, height) * 0.45;
+    const cx = width / 2, cy = height / 2;
+    return {
+      x: cx + radius * Math.cos(i * goldenAngle),
+      y: cy + radius * Math.sin(i * goldenAngle),
+    };
+  }
+
   class ForceSimulator {
     constructor(nodes, links, options) {
-      this.nodes = nodes.map(n => ({
-        ...n,
-        x: n.x || Math.random() * options.width,
-        y: n.y || Math.random() * options.height,
-        vx: 0, vy: 0,
-        fx: n.fx, fy: n.fy,
-      }));
+      this.nodes = nodes.map((n, i) => {
+        const init = deterministicInitialPos(i, nodes.length, options.width, options.height);
+        return {
+          ...n,
+          x: n.x || init.x,
+          y: n.y || init.y,
+          vx: 0, vy: 0,
+          fx: n.fx, fy: n.fy,
+        };
+      });
       this.links = links.map(l => ({
         source: typeof l.source === 'object' ? l.source : this.nodes.find(n => n.id === l.source) || l.source,
         target: typeof l.target === 'object' ? l.target : this.nodes.find(n => n.id === l.target) || l.target,

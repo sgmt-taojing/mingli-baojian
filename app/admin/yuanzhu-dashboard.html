@@ -165,7 +165,7 @@ async function api(path, opts) {
     opts.body = JSON.stringify(opts.body);
   }
   try {
-    const r = await fetch(path, { ...opts, signal: AbortSignal.timeout(10000) };
+    const r = await fetch(path, { ...opts, signal: AbortSignal.timeout(10000) });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return await r.json();
   } catch(e) {

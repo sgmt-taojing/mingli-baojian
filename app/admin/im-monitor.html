@@ -122,7 +122,7 @@ function auth(url) {
 
 async function fetchJson(url) {
   try {
-    const r = await fetch(auth(url), { headers: { 'Authorization': 'Bearer ' + TOKEN }, signal:AbortSignal.timeout(10000) };
+    const r = await fetch(auth(url), { headers: { 'Authorization': 'Bearer ' + TOKEN }, signal:AbortSignal.timeout(10000) });
     if(!r.ok) throw new Error('HTTP '+r.status);
     return await r.json();
   } catch(e){ console.warn('[fetchJson]',e.message); return {ok:false, error:'FETCH_FAILED', message:e.message}; }
