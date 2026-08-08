@@ -208,43 +208,83 @@
     if (!text || !text.trim()) return;
     addMessage('user', text.trim());
 
-    // Search KB first (KB-first strategy)
-    let kbResults = [];
-    try {
-      const q = encodeURIComponent(text.trim());
-      const resp = await fetch(API + '/api/public/kb/search-fts?q=' + q);
-      const data = await resp.json();
-      kbResults = (data.results || []).slice(0, 3);
-    } catch (e) {}
+    // R510: 优先 voice-command（意图解析）→ kb-match/AI 问答
+    const ctrl = new AbortController();
+    const to = setTimeout(function(){ctrl.abort();}, 12000);
 
-    // If KB has good matches, answer from KB
-    if (kbResults.length > 0 && kbResults[0].score > 0) {
-      showTyping();
-      hideTyping();
-      const top = kbResults[0];
-      const answer = formatKBAnswer(top, kbResults);
-      addMessage('bot', answer.text, { kbRef: answer.ref });
+    // 1) voice-command（短文本意图匹配）
+    let cmd = null;
+    try {
+      const r = await fetch(API + '/api/ai/voice-command', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text.trim() }), signal: ctrl.signal
+      });
+      const d = await r.json();
+      cmd = d && d.data ? d.data : null;
+    } catch (e) { /* 降级 */ }
+
+    if (cmd && cmd.intent === 'open' && cmd.target) {
+      clearTimeout(to);
+      addMessage('bot', '🎯 ' + (cmd.label || '打开页面') + '\n\n即将跳转...');
+      setTimeout(function(){ try { window.location.href = cmd.target; } catch(e){} }, 600);
+      return;
+    }
+    if (cmd && (cmd.intent === 'clear' || cmd.intent === 'close' || cmd.intent === 'mute')) {
+      clearTimeout(to);
+      if (cmd.intent === 'clear') {
+        state.history = [];
+        localStorage.removeItem('ai_voice_history');
+        if (state._msgContainer) state._msgContainer.innerHTML = '';
+      } else if (cmd.intent === 'close') {
+        close();
+      } else if (cmd.intent === 'mute' && state.autoTTS) {
+        state.autoTTS = false;
+      }
+      addMessage('bot', '✓ ' + (cmd.label || cmd.intent));
       return;
     }
 
-    // Fallback: call AI chat API
-    showTyping();
+    // 2) knowledge-qa（KB 优先问答）
+    let qa = null;
     try {
-      const resp = await fetch(API + '/api/ai/public-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text.trim(), context: 'voice-assistant' })
+      const r = await fetch(API + '/api/ai/knowledge-qa', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: text.trim() }), signal: ctrl.signal
       });
-      const data = await resp.json();
-      hideTyping();
-      if (data.ok || data.reply || data.response) {
-        const reply = data.reply || data.response || data.text || '收到您的消息，但暂时无法生成回复。';
+      const d = await r.json();
+      qa = d && d.data ? d.data : null;
+    } catch (e) { /* 降级 */ }
+
+    if (qa && qa.source === 'kb' && qa.reply) {
+      clearTimeout(to);
+      const top = qa.topEntry || {};
+      addMessage('bot', qa.reply, { kbRef: 'KB · ' + (top.module || '') + ' · 置信度 ' + (top.trust || qa.confidence || 0).toFixed(2) });
+      return;
+    }
+    if (qa && qa.source === 'kb-summary' && qa.hits && qa.hits.length > 0) {
+      clearTimeout(to);
+      const lines = qa.hits.map(function(h, i){ return (i+1) + '. 【' + (h.module||'') + '】' + h.title + '（trust ' + (h.trust||0).toFixed(2) + '）'; });
+      addMessage('bot', '🔍 找到 ' + qa.hits.length + ' 条相关知识：\n\n' + lines.join('\n') + '\n\n请说"打开知识库"或继续提问。');
+      return;
+    }
+
+    // 3) AI 兜底
+    try {
+      const r = await fetch(API + '/api/ai/public-chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{role:'user', content: text.trim()}], context: 'voice-assistant' }), signal: ctrl.signal
+      });
+      const d = await r.json();
+      clearTimeout(to);
+      const reply = (d.data && d.data.choices && d.data.choices[0] && d.data.choices[0].message && d.data.choices[0].message.content)
+        || d.reply || d.response || d.text || '收到您的消息，但暂时无法生成回复。';
+      if (reply && !/无效的 API Key|authentication_error/i.test(reply)) {
         addMessage('bot', reply);
       } else {
-        addMessage('bot', '抱歉，我暂时无法回复。请稍后再试。');
+        addMessage('bot', '⚠️ AI 服务暂时不可用，请稍后再试。');
       }
     } catch (e) {
-      hideTyping();
+      clearTimeout(to);
       addMessage('bot', '⚠️ 网络异常，请检查连接后重试。');
     }
   }
