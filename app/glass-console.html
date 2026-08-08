@@ -1014,14 +1014,18 @@ $('#sttStart').onclick = () => { if (!State.sttRec) return; State.sttRec.start()
 $('#sttStop').onclick = () => { if (State.sttRec) State.sttRec.stop(); };
 $('#sttUpload').onclick = async () => {
   const hint = $('#sttHint').value.trim();
-  const r = await fetch('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }) });
-  const d = await r.json();
-  if (d.ok) {
-    $('#sttIntent').textContent = '🎯 Intent: ' + (d.intent||'?') + (d.nextStep ? ' · ' + d.nextStep : '');
-    $('#sttKbRef').innerHTML = d.kb_refs ? '📚 KB: ' + d.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ') : '';
-    addHistory({ type:'stt', icon:'🎤', title: hint || '录音', text: d.intent + ' / ' + (d.nextStep||''), ts:Date.now() });
-  } else {
-    toast('音频上传失败', 'err');
+  try {
+    const r = await fetch('/api/glass/upload-audio', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }), signal: AbortSignal.timeout(15000) });
+    const d = await r.json();
+    if (d.ok) {
+      $('#sttIntent').textContent = '🎯 Intent: ' + (d.intent||'?') + (d.nextStep ? ' · ' + d.nextStep : '');
+      $('#sttKbRef').innerHTML = d.kb_refs ? '📚 KB: ' + d.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ') : '';
+      addHistory({ type:'stt', icon:'🎤', title: hint || '录音', text: d.intent + ' / ' + (d.nextStep||''), ts:Date.now() });
+    } else {
+      toast('音频上传失败', 'err');
+    }
+  } catch(e) {
+    toast('音频上传失败：' + (e && e.message || '网络异常') + '，请重试', 'err');
   }
 };
 setupSTT();

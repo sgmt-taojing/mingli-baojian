@@ -200,10 +200,16 @@ async function doPaipan(){
   const now = new Date();
   const currentAge = now.getFullYear() - +y;
   const payload = {year:+y,month:+m,day:+d,hour:+h,minute:30,sex:s,name,isLunar,leapMonth:leap,lng,targetYear,currentAge};
-  const [rJson, rSvg] = await Promise.all([
-    fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}),
-    fetch(API_BASE+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-  ]);
+  let rJson, rSvg;
+  try {
+    [rJson, rSvg] = await Promise.all([
+      fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(20000)})
+    ]);
+  } catch(e) {
+    showToast('排盘请求失败：' + (e && e.message || '网络异常') + '，请重试','err');
+    return;
+  }
   const data = await rJson.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   const svg = await rSvg.text();

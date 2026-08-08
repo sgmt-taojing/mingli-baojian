@@ -7,7 +7,7 @@ function toast(msg, type){const t=document.getElementById('toast');t.textContent
 function authH(){return TOKEN ? {'Authorization':'Bearer '+TOKEN,'Content-Type':'application/json'} : {'Content-Type':'application/json'}}
 
 async function api(path, opts){
-  const r = await fetch(API+path, Object.assign({headers:authH()}, opts||{}));
+  try {   const r = await fetch(API+path, Object.assign({headers:authH()}, opts||{})); } catch(e) { console.warn("[R514] fetch error:", e.message); }
   if(r.status===401){toast('未登录','err');return null}
   if(r.status===403){toast('权限不足','err');return null}
   const ct = r.headers.get('content-type')||'';
@@ -36,7 +36,14 @@ function previewMask(){
 async function doExport(fmt){
   const table = document.getElementById('selTable').value;
   const purpose = document.getElementById('iptPurpose').value || '未说明';
-  const r = await fetch(API+'/api/export/'+fmt, {method:'POST',headers:authH(),body:JSON.stringify({table,purpose})});
+  let r;
+  try {
+    r = await fetch(API+'/api/export/'+fmt, {method:'POST',headers:authH(),body:JSON.stringify({table,purpose}),signal:AbortSignal.timeout(20000)});
+  } catch(e) {
+    console.warn("[R514] fetch error:", e.message);
+    toast('导出请求失败：' + (e && e.message || '网络异常') + '，请重试', 'err');
+    return;
+  }
   if(r.status===401){toast('请先登录','err');return}
   if(r.status===403){toast('权限不足: '+table,'err');return}
   if(!r.ok){const e=await r.json();toast(e.error||'导出失败','err');return}

@@ -517,7 +517,8 @@ async function pushToDoctor() {
         syncToken: state.currentCase,
         master_id: 'master_local',
         annotations: fullText
-      })
+      }),
+      signal: AbortSignal.timeout(15000)
     });
 
     // Mark as reviewed
@@ -617,5 +618,7 @@ async function fetchDemoCase() {
   <div id="ai-assistant-mount"></div>
   <script src="js/ai-voice-assistant.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
 </body>
 </html>

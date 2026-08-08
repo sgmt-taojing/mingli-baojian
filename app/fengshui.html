@@ -4103,7 +4103,8 @@ async function generateFengshuiReport(){
     const r = await fetch('/api/paipan/fengshui/report', {
       method:'POST',
       headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15000)
     }).then(r=>r.json());
     
     if(!r.ok){

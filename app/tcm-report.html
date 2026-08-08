@@ -66,10 +66,10 @@
     <div class="field">
       <label for="pt-select">快速选择 <select id="pt-select" onchange="selectPatientForReport(this.value)" aria-label="选择已有患者"><option value="">— 选择患者 —</option></select></label>
     </div>
-    <div class="field"><label for="pt-name">姓名 <input type="text" id="pt-name" placeholder="患者姓名" maxlength="20" aria-label="患者姓名"></label></div>
+    <div class="field"><label for="pt-name">姓名 <input type="text" id="pt-name" placeholder="患者姓名" maxlength="20" required aria-label="患者姓名"></label></div>
     <div class="field-row">
       <div class="field"><label for="pt-age">性别<select id="pt-gender" aria-label="pt-gender"><option value="">—</option><option>男</option><option>女</option><option>其他</option></select></label></div>
-      <div class="field"><label for="pt-phone">年龄 <input type="number" id="pt-age" min="0" max="150" placeholder="岁" aria-label="岁"></label></div>
+      <div class="field"><label for="pt-age">年龄 <input type="number" id="pt-age" min="0" max="150" placeholder="0-150" required aria-label="患者年龄"></label></div>
     </div>
     <div class="field"><label for="pt-chief">联系电话 <input type="tel" id="pt-phone" placeholder="手机号" aria-label="手机号"></label></div>
     <div class="field"><label for="pt-date">主诉 <input type="text" id="pt-chief" placeholder="患者主诉症状" aria-label="患者主诉症状"></label></div>
@@ -302,5 +302,7 @@ function toast(msg){
 </script>
 
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
 </body>
 </html>

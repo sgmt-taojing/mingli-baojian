@@ -82,7 +82,7 @@ function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Aut
 function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}
 
 function loadContacts(){
-  fetch(API+'/api/clinic/emergency-contacts',{headers:authHeaders()})
+  fetch(API+'/api/clinic/emergency-contacts',{headers:authHeaders(),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", e.message); })
   .then(function(r){return r.json()}).then(function(d){
     var el=document.getElementById('contact-list');
     var list=d.contacts||d||[];
@@ -106,8 +106,7 @@ function addContact(){
   if(!name){showToast('请输入姓名');return}
   if(!/^1\d{10}$/.test(phone)){showToast('请输入正确的 11 位手机号');return}
   if(!rel){showToast('请选择关系');return}
-  fetch(API+'/api/clinic/emergency-contacts',{method:'POST',headers:authHeaders(),body:JSON.stringify({name:name,phone:phone,relation:rel})})
-  .then(function(r){return r.json()}).then(function(d){
+  fetch(API+'/api/clinic/emergency-contacts',{method:'POST',headers:authHeaders(),body:JSON.stringify({name:name,phone:phone,relation:rel}),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", e.message); })  .then(function(r){return r.json()}).then(function(d){
     if(d.ok){
       showToast('✅ 联系人已添加');
       document.getElementById('c-name').value='';
@@ -121,7 +120,7 @@ function addContact(){
 }
 
 function delContact(id){
-  fetch(API+'/api/clinic/emergency-contacts/'+id,{method:'DELETE',headers:authHeaders()})
+  fetch(API+'/api/clinic/emergency-contacts/'+id,{method:'DELETE',headers:authHeaders(),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", e.message); })
   .then(function(r){return r.json()}).then(function(d){
     if(d.ok){showToast('已删除');loadContacts()}
     else{showToast(d.error||'删除失败')}
@@ -135,5 +134,7 @@ if(token){loadContacts()}else{
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 紧急联系人仅用于 SOS 紧急通知</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
 </body>
 </html>

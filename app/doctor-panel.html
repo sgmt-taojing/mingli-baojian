@@ -307,12 +307,12 @@ function rejectCase(id){
   setTimeout(function(){if(card._rejectArmed){card._rejectArmed=false;showToast('驳回已取消')}},3000);
 }
 function doReject(id){
-  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:'',prescription:'',reviewComment:'医生驳回，请补充信息'})})
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:'',prescription:'',reviewComment:'医生驳回，请补充信息'}),signal:AbortSignal.timeout(15000)})
   .then(function(r){return r.json()}).then(function(d){
     var card=document.getElementById('card-'+id);
     if(card)card.classList.add('rejecting');
     setTimeout(function(){loadQueue()},400);
-  });
+  }).catch(function(err){ showToast('驳回失败：'+(err&&err.message||'网络异常')+'，请重试','err'); });
 }
 
 function submitEdit(id){
@@ -325,13 +325,13 @@ function submitEdit(id){
 }
 
 function submitDiagnosis(id,data,note){
-  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:data.diagnosis||'',prescription:data.prescription||'',reviewComment:data.doctor_comment||note||''})})
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:data.diagnosis||'',prescription:data.prescription||'',reviewComment:data.doctor_comment||note||''}),signal:AbortSignal.timeout(15000)})
   .then(function(r){return r.json()}).then(function(d){
     var card=document.getElementById('card-'+id);
     if(card)card.classList.add('accepting');
     showToast(d.ok||d.message?'✅ '+(d.message||'提交成功'):'⚠️ '+(d.error||'提交失败'));
     setTimeout(function(){loadQueue()},400);
-  });
+  }).catch(function(err){ showToast('提交失败：'+(err&&err.message||'网络异常')+'，请重试','err'); });
 }
 
 loadQueue();

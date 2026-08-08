@@ -155,10 +155,16 @@ async function doPaipan(){
   const currentAge = now.getFullYear() - +y;
   const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge};
   if(question) body.question = question;
-  const [r, rSvg] = await Promise.all([
-    fetch(API_BASE+'/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),
-    fetch(API_BASE+'/api/paipan/liuren/svg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
-  ]);
+  let r, rSvg;
+  try {
+    [r, rSvg] = await Promise.all([
+      fetch(API_BASE+'/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/liuren/svg',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+    ]);
+  } catch(e) {
+    showToast('排盘请求失败：' + (e && e.message || '网络异常') + '，请重试','err');
+    return;
+  }
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   const svg = await rSvg.text();

@@ -187,7 +187,7 @@ r.readAsDataURL(f);
 }
 
 async function getCsrf(){
-try{var r=await fetch(API+'/api/csrf',{credentials:'include'});var j=await r.json();return j.csrf_token||j.data&&j.data.csrf_token||''}catch(e){return ''}
+try{var r=await fetch(API+'/api/csrf',{credentials:'include',signal: AbortSignal.timeout(15000)});var j=await r.json();return j.csrf_token||j.data&&j.data.csrf_token||''}catch(e){return ''}
 }
 
 async function doOCR(){
@@ -328,7 +328,7 @@ else if(['血红蛋白','HGB','白细胞','WBC','红细胞','RBC','血小板','P
 
 try{
 var csrf=await getCsrf();
-var r=await fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include'});
+var r=await fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include',signal: AbortSignal.timeout(15000)});
 var j=await r.json();
 if(j.code===200){
 console.warn('✅ 已保存到康养人档案！');
@@ -346,7 +346,7 @@ ic.innerHTML='<div class="loading"><span class="spinner"></span> 正在融合四
 
 // R249: 使用统一报告解读引擎
 try{
-  var r=await fetch(API+'/api/wellness/profile/'+USER_ID);
+  var r=await fetch(API+'/api/wellness/profile/'+USER_ID,{signal: AbortSignal.timeout(15000)});
   var j=await r.json();
   var p=j.data||{};
 }catch(e){var p={}}
@@ -439,5 +439,7 @@ ic.innerHTML=h;
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
 </body>
 </html>

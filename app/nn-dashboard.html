@@ -195,8 +195,13 @@ const GATEWAY_FB = '/api/public/messiah-feedback';
 let SOLVE_SESSION = '';
 
 async function fetchJSON(url) {
-  const r = await fetch(url);
-  return r.json();
+  try {
+    const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    return await r.json();
+  } catch(e) {
+    console.warn('[fetchJSON]', e.message);
+    return { ok: false, error: 'NETWORK_ERROR' };
+  }
 }
 
 async function loadStatus() {
@@ -393,5 +398,7 @@ loadStatus();
 setInterval(loadStatus, 30000);
 </script>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
 </body>
 </html>

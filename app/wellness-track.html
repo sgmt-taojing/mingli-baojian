@@ -95,7 +95,7 @@ input,select,textarea{width:100%;padding:9px;background:var(--bg);border:1px sol
 
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
-var token=localS…tem('admin_token')||localStorage.getItem('token')||'';
+var token=localStem('admin_token')||localStorage.getItem('token')||'';
 var logs=[];
 
 function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;var csrf=getCsrfToken();if(csrf)h['x-csrf-token']=csrf;return h}

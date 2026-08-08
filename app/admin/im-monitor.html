@@ -121,8 +121,11 @@ function auth(url) {
 }
 
 async function fetchJson(url) {
-  const r = await fetch(auth(url), { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  return r.json();
+  try {
+    const r = await fetch(auth(url), { headers: { 'Authorization': 'Bearer ' + TOKEN }, signal:AbortSignal.timeout(10000) };
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  } catch(e){ console.warn('[fetchJson]',e.message); return {ok:false, error:'FETCH_FAILED', message:e.message}; }
 }
 
 function escapeHtml(s) {
@@ -288,5 +291,6 @@ setInterval(loadAll, 10000);
 <script src="../js/mobile-nav.js" defer></script>
 <script src="../js/error-interceptor.js"></script>
 <script src="../js/submit-guard.js"></script>
+<script src="../js/escape-html.js"></script>
 </body>
 </html>

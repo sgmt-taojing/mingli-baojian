@@ -105,10 +105,10 @@ function H(d){return Object.assign({},d,{headers:Object.assign({'Authorization':
 async function loadAll(){
   try{
     var [pRes,bRes,iRes]=await Promise.all([
-      fetch(API+'/api/profile/patients',H({})).then(r=>r.json()).catch(_=>({ok:false,patients:[]})),
-      fetch(API+'/api/profile/believers',H({})).then(r=>r.json()).catch(_=>({ok:false,believers:[]})),
-      fetch(API+'/api/profile/insights/global',H({})).then(r=>r.json()).catch(_=>({ok:false,insights:[]}))
-    ]);
+      fetch(API+'/api/profile/patients',H({signal: AbortSignal.timeout(15000)})).then(r=>r.json()).catch(_=>({ok:false,patients:[]})),
+      fetch(API+'/api/profile/believers',H({signal: AbortSignal.timeout(15000)})).then(r=>r.json()).catch(_=>({ok:false,believers:[]})),
+      fetch(API+'/api/profile/insights/global',H({signal: AbortSignal.timeout(15000)})).then(r=>r.json()).catch(_=>({ok:false,insights:[]}))
+    });
     patients=pRes.patients||[];
     believers=bRes.believers||[];
     insights=iRes.insights||[];
@@ -181,7 +181,8 @@ async function showPatient(uid){
   var rp=document.getElementById('rightPanel');
   rp.innerHTML='<div class="empty">加载患者档案...</div>';
   try{
-    var j=await fetch(API+'/api/profile/patient/'+uid,H({})).then(r=>r.json());
+    var j=await fetch(API+'/api/profile/patient/'+uid,H({signal: AbortSignal.timeout(15000),
+}).then(r=>r.json());
     if(!j.ok){rp.innerHTML='<div class="empty">'+esc(j.error||'加载失败')+'</div>';return}
     var p=j.profile,ins=j.insights||[];
     var html='<div class="panel-title">🩺 患者详情 #'+uid+'</div>';
@@ -222,7 +223,8 @@ async function showBeliever(uid){
   var rp=document.getElementById('rightPanel');
   rp.innerHTML='<div class="empty">加载信众档案...</div>';
   try{
-    var j=await fetch(API+'/api/profile/believer/'+uid,H({})).then(r=>r.json());
+    var j=await fetch(API+'/api/profile/believer/'+uid,H({signal: AbortSignal.timeout(15000),
+}).then(r=>r.json());
     if(!j.ok){rp.innerHTML='<div class="empty">'+esc(j.error||'加载失败')+'</div>';return}
     var b=j.insight,ins=j.insights||[];
     var html='<div class="panel-title">🌟 信众详情 #'+uid+'</div>';
@@ -260,7 +262,8 @@ async function triggerDistill(){
   if(!confirm('确认立即对所有档案执行全量蒸馏？\n（生产环境由 cron 每日 02:00 自动执行）'))return;
   toast('正在执行全量蒸馏...');
   try{
-    var j=await fetch(API+'/api/profile/distill-all',H({method:'POST',headers:Object.assign({'Authorization':'Bearer '+TOK,'Content-Type':'application/json'})})).then(r=>r.json());
+    var j=await fetch(API+'/api/profile/distill-all',H({method:'POST',headers:Object.assign({'Authorization':'Bearer '+TOK,'Content-Type':'application/json'})signal: AbortSignal.timeout(15000),
+}).then(r=>r.json());
     if(j.ok){toast('✅ '+(j.message||'蒸馏完成'));loadAll()}
     else toast('❌ '+(j.error||'失败'),true);
   }catch(e){toast('❌ '+e.message,true)}
@@ -276,5 +279,6 @@ loadAll();
 </script>
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
 </body>
 </html>

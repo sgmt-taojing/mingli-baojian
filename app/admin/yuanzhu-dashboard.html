@@ -164,8 +164,14 @@ async function api(path, opts) {
     opts.headers['Content-Type'] = 'application/json';
     opts.body = JSON.stringify(opts.body);
   }
-  const r = await fetch(path, opts);
-  return await r.json();
+  try {
+    const r = await fetch(path, { ...opts, signal: AbortSignal.timeout(10000) };
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } catch(e) {
+    console.warn('[api]', e.message);
+    return { ok: false, error: 'FETCH_FAILED', message: e.message };
+  }
 }
 
 window.loadStats = async function() {
@@ -284,5 +290,6 @@ loadStats();
   <script src="js/mobile-nav.js" defer></script>
 <script src="../js/error-interceptor.js"></script>
 <script src="../js/submit-guard.js"></script>
+<script src="../js/escape-html.js"></script>
 </body>
 </html>

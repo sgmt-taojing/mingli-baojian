@@ -75,7 +75,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;pad
 
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
-var token=localS…tem('admin_token')||localStorage.getItem('token')||'';
+var token=localStem('admin_token')||localStorage.getItem('token')||'';
 var caseId=new URLSearchParams(location.search).get('case')||'';
 
 function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}

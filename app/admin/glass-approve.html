@@ -44,7 +44,8 @@ button{padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:1
 <div id="list" class="list"></div>
 
 <script>
-const API = (path) => fetch('/api' + path, {credentials:'include'}).then(r=>r.json());
+const API = (path) => fetch('/api' + path, {credentials:'include'
+        signal: AbortSignal.timeout(15000),}.then(r=>r.json());
 async function load(){
   const status = document.getElementById('filter').value;
   const r = await API('/admin/glass/list?status=' + status);
@@ -60,7 +61,11 @@ async function load(){
     </div>`).join('') || '<div class="meta">无数据</div>';
 }
 async function decide(id, action){
-  await fetch('/api/admin/glass/decide', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body:JSON.stringify({id,action})});
+  try {
+    const r = await fetch('/api/admin/glass/decide', {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body:JSON.stringify({id,action}), signal:AbortSignal.timeout(10000)};
+    if(!r.ok){showToast('审核提交失败:'+r.status,'error');return;}
+    showToast('已提交','success');
+  } catch(e){console.warn('[decide]',e.message);showToast('网络异常，请稍后重试','error');return;}
   load();
 }
 load();
@@ -71,5 +76,6 @@ setInterval(load, 30000);
 <script src="../js/mobile-nav.js" defer></script>
 <script src="../js/error-interceptor.js"></script>
 <script src="../js/submit-guard.js"></script>
+<script src="../js/escape-html.js"></script>
 </body>
 </html>

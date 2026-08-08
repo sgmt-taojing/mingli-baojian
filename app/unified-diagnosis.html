@@ -529,6 +529,7 @@ function setupWSClient() {
       try { ws.send(JSON.stringify({ type: 'register', role: 'doctor' })); } catch(e){}
       // WS 连接成功 (unified-diagnosis)
     };
+
     ws.onmessage = (evt) => {
       try {
         const msg = JSON.parse(evt.data);
@@ -695,8 +696,9 @@ async function captureAll() {
         image: base64,
         modes: activeModes,
         user_context: userContext,
-        role: state.role
-      })
+        role: state.role,
+      }),
+      signal: AbortSignal.timeout(15000),
     });
     const data = await resp.json();
 
@@ -986,8 +988,8 @@ async function syncToMaster() {
       await fetch(API + '/api/public/sync-diagnosis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: state.syncToken, payload })
-      });
+        body: JSON.stringify({ token: state.syncToken, payload }),
+      signal: AbortSignal.timeout(15000)});
     }
 
     // Render master panel preview
@@ -1041,8 +1043,8 @@ async function pushMasterAnnotation() {
       await fetch(API + '/api/public/master-annotations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ syncToken: state.syncToken, annotations: annotation })
-      });
+        body: JSON.stringify({ syncToken: state.syncToken, annotations: annotation }),
+      signal: AbortSignal.timeout(15000)});
     }
     // Also append to doctor's prescription area
     const ta = document.getElementById('finalRx');
@@ -1100,7 +1102,7 @@ async function submitFeedback(rx) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    });
+    signal: AbortSignal.timeout(15000)});
     const data = await resp.json();
     if (data.ok) {
       const ind = document.getElementById('feedbackIndicator');
@@ -1120,12 +1122,14 @@ async function syncFinalToMaster() {
   if (!state.syncToken) return;
   const rx = document.getElementById('finalRx').value;
   try {
-    await fetch(API + '/api/public/sync-diagnosis', {
+    const r = await fetch(API + '/api/public/sync-diagnosis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: state.syncToken, payload: { finalRx: rx } })
+      body: JSON.stringify({ token: state.syncToken, payload: { finalRx: rx } }),
+      signal: AbortSignal.timeout(15000),
     });
-  } catch (e) {}
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+  } catch (e) { console.warn('[unified-diagnosis] sync failed', e); }
 }
 
 // ═══ Run vision diagnosis shortcut ═══

@@ -231,7 +231,7 @@ outcome:$('fu_outcome').value,
 prediction:'基于上周分析'
 };
 getCsrf().then(function(csrf){
-return fetch(API+'/api/wellness/analysis',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include'})
+return fetch(API+'/api/wellness/analysis',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},body:JSON.stringify(payload),credentials:'include',signal:AbortSignal.timeout(15000)})
 }).then(function(r){return r.json()}).then(function(d){
 if(d.code===200){
 console.warn('✅ 随访已提交'+(d.data.kb_entry_id?'并入库KB':''));
@@ -239,6 +239,9 @@ switchTab('history');
 }else{
 console.warn('提交失败: '+d.message);
 }
+}).catch(function(e){
+var fn=typeof showToast==='function'?showToast:function(m){console.warn(m);};
+fn('随访提交失败：'+(e&&e.message||'网络异常')+'，请重试');
 })
 }
 
