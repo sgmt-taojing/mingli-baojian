@@ -1278,10 +1278,14 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     try { _agentStep('③ 多维推断', 'active', '正在分析格局趋势…'); } catch(_e){}
     let r;
     try {
-      r = await fetch(API + '/api/ai/public-chat?stream=1', { signal: AbortSignal.timeout(15000),
+      // R481: 若有 baziData → 调 /api/ai/orchestrate（含 SSE 中间件兼容流式）
+      const streamEndpoint = baziData ? '/api/ai/orchestrate?stream=1' : '/api/ai/public-chat?stream=1';
+      r = await fetch(API + streamEndpoint, { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
-        body: JSON.stringify({ messages: [...hist.slice(-8), {role:'user', content:prompt}], baziData, stream: true }),
+        body: JSON.stringify(baziData 
+          ? { query: prompt, baziData, stream: true }
+          : { messages: [...hist.slice(-8), {role:'user', content:prompt}], stream: true }),
         signal: _ac.signal
       });
       clearTimeout(_to);
@@ -1347,10 +1351,14 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     try {
       const _ac2 = new AbortController();
       const _to2 = setTimeout(function(){ _ac2.abort(); }, 15000);
-      const r2 = await fetch(API + '/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
+      const fallbackEndpoint = baziData ? '/api/ai/orchestrate' : '/api/ai/public-chat';
+      const fallbackBody = baziData 
+        ? { query: prompt, baziData }
+        : { messages: [...hist.slice(-8), {role:'user', content:prompt}] };
+      const r2 = await fetch(API + fallbackEndpoint, { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...hist.slice(-8), {role:'user', content:prompt}], baziData }),
+        body: JSON.stringify(fallbackBody),
         signal: _ac2.signal
       });
       clearTimeout(_to2);
