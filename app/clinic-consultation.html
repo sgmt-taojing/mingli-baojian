@@ -817,6 +817,15 @@ function setChipActive(mode) {
   if (active) active.classList.add('active');
 }
 
+// 支持的视觉采集端点映射（face-ocr-server 实际端点）
+const VISUAL_ENDPOINTS = {
+  face: '/api/face/analyze',
+  eye: '/api/eye/analyze',
+  hand: '/api/hand/analyze',
+  // tongue/通用OCR通过通用端点回退
+  tongue: '/api/camera/upload'
+};
+
 window.startCamera = async function(mode) {
   captureMode = mode || 'face';
   setChipActive(captureMode);
@@ -866,12 +875,13 @@ window.captureWang = async function() {
     const fd = new FormData();
     fd.append('image', blob, mode + '-' + Date.now() + '.jpg');
     fd.append('mode', mode);
-    const r = await fetch(FACE_OCR + '/api/analyze', { method:'POST', body:fd }).catch(() => null);
+    const endpoint = VISUAL_ENDPOINTS[mode] || '/api/camera/upload';
+    const r = await fetch(FACE_OCR + endpoint, { method:'POST', body:fd }).catch(() => null);
     if (r && r.ok) {
       aiResult = await r.json();
       state.captureLog.push({
         mode, timestamp,
-        text: aiResult.text || aiResult.result || '',
+        text: aiResult.text || aiResult.result || aiResult.analysis || '',
         features: aiResult.features || aiResult.kb_features || [],
         kbMatches: aiResult.kb_matches || []
       });
@@ -926,10 +936,11 @@ window.captureAll = async function() {
           const fd = new FormData();
           fd.append('image', blob, mode + '-' + Date.now() + '.jpg');
           fd.append('mode', mode);
-          const r = await fetch(FACE_OCR + '/api/analyze', { method:'POST', body:fd }).catch(() => null);
+          const endpoint = VISUAL_ENDPOINTS[mode] || '/api/camera/upload';
+          const r = await fetch(FACE_OCR + endpoint, { method:'POST', body:fd }).catch(() => null);
           if (r && r.ok) {
             aiResult = await r.json();
-            state.captureLog.push({ mode, timestamp, text: aiResult.text||'', features: aiResult.features||[], kbMatches: aiResult.kb_matches||[] });
+            state.captureLog.push({ mode, timestamp, text: aiResult.text||aiResult.analysis||'', features: aiResult.features||aiResult.kb_features||[], kbMatches: aiResult.kb_matches||[] });
           }
         } catch(e) {}
         if (!aiResult || !aiResult.text) {
