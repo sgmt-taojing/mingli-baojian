@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/app/js/escape-html.js" defer></script>
 <meta charset="UTF-8">
 <meta name="description" content="反馈详情 · 易道智鉴平台">
 <meta name="keywords" content="反馈详情">
@@ -62,6 +63,7 @@ body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d
 @media print{body{background:#fff!important;color:#000!important}header.page-header-bar,.phb-back,.nav-bar,.back-link,.toast,.loading,.error-box,.login-prompt,nav,.no-print,footer,.btn,button,audio{display:none!important}.container{max-width:100%!important;margin:0!important;padding:8px!important}.meta-card,.content-card,.reply-card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;background:#fff!important}.meta-row .label{color:#666!important}.meta-row .value{color:#000!important}.content-card h2{color:#000!important}.reply-card{border:1px solid #ccc!important}.reply-card h2{color:#333!important}.reply-time{color:#666!important}.status-badge{border:1px solid #999!important}.ticket-header h1{color:#000!important;font-size:14px!important}.content-body,.reply-body{font-size:12px!important}.screenshot-box img{border:1px solid #ccc!important;max-width:100%!important}.rating-box .rating-stars span{color:#000!important}a{color:#000!important;text-decoration:none!important}}
 </style>
 <link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
 </head>
 <body class="theme-user">
 <header class="page-header-bar">
@@ -126,7 +128,7 @@ function loadTicket() {
   var token = localStorage.getItem('authToken');
   if (token) headers['Authorization'] = 'Bearer ' + token;
 
-  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, { headers: headers })
+  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, {signal: AbortSignal.timeout(15000),  headers: headers })
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code !== 0) {
@@ -229,7 +231,7 @@ function rateTicket(rating) {
   var headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
   // 用 update 端点存评分（扩展：rating 字段）
-  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, { headers: headers })
+  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, {signal: AbortSignal.timeout(15000),  headers: headers })
     .then(function(r) { return r.json(); })
     .then(function() {
       document.getElementById('ratingLabel').textContent = '✅ 已评分 ' + rating + ' 星，感谢您的反馈！';

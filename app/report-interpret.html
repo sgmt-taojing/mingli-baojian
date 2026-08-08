@@ -61,7 +61,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 .engine-tag.ok{color:var(--green);border-color:var(--green)}
 .engine-tag.warn{color:var(--orange);border-color:var(--orange)}
 .engine-tag.err{color:var(--red);border-color:var(--red)}
-*/
 @media(max-width:360px){body{padding:8px 6px 56px;font-size:13px}h1{font-size:18px}h2{font-size:15px}.container,.wrap,.content{padding:8px 6px}.card,.panel,.box{padding:10px 8px;margin-bottom:8px}.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;gap:8px}.stat-grid,.stat-row{grid-template-columns:1fr 1fr;gap:6px}.stat-card,.stat-item{padding:8px 6px}.btn,.button{font-size:12px;padding:6px 12px}.nav-bar,.tab-bar,.tabs{font-size:11px;gap:4px}.nav-bar a,.tab-btn{padding:4px 6px}.table{font-size:11px}.table th,.table td{padding:4px 6px}input,select,textarea{font-size:13px;padding:6px 8px}label{font-size:12px}.summary,.desc,.text{font-size:12px}.hero{padding:12px 8px}.hero h1{font-size:20px}}
 @media print{body{background:#fff!important;color:#000!important}header.page-header-bar,.phb-back,.topbar,.back-link,.tab-row,.btn-row,.quick-btns,.upload-area,nav,.no-print,footer,.btn,button{display:none!important}.container{max-width:100%!important;margin:0!important;padding:8px!important}.section{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;background:#fff!important}.section-title{color:#000!important}.tab-content{display:block!important}.input-row{grid-template-columns:1fr 1fr 1fr!important}.summary-row{grid-template-columns:repeat(4,1fr)!important}.summary-card{border:1px solid #ccc!important;background:#fff!important}.summary-num{color:#000!important}.summary-label{color:#666!important}.engine-tag{border:1px solid #999!important;color:#333!important}input,select,textarea{border:1px solid #999!important;background:#fff!important;color:#000!important}h1{color:#000!important;font-size:14px!important}a{color:#000!important;text-decoration:none!important}img{max-width:100%!important}}
 </style>
@@ -412,7 +411,7 @@ function renderPaipanReport(report){
 
 async function fetchProfile(){
   try{
-    var r = await fetch(API+'/api/wellness/profile/'+USER_ID);
+    var r = await fetch(API+'/api/wellness/profile/'+USER_ID, {signal: AbortSignal.timeout(15000)});
     var j = await r.json();
     window._profile = j.data || {};
   }catch(e){window._profile = {}}
@@ -634,7 +633,7 @@ async function ingestToKB(){
 
 async function fetchCsrf(){
   try{
-    var r = await fetch(API+'/api/csrf-token', {credentials:'include'});
+    var r = await fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000), credentials:'include'});
     var j = await r.json();
     return j.csrfToken || '';
   }catch(e){return ''}
@@ -672,7 +671,7 @@ async function loadStats(){
 
 async function loadHistory(){
   try{
-    var r = await fetch(API+'/api/wellness/ocr-anomalies?limit=5');
+    var r = await fetch(API+'/api/wellness/ocr-anomalies?limit=5', {signal: AbortSignal.timeout(15000)});
     var j = await r.json();
     var list = document.getElementById('historyList');
     if(j.data && j.data.anomalies && j.data.anomalies.length){

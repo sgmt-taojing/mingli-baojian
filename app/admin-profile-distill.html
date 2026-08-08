@@ -105,10 +105,10 @@ function H(d){return Object.assign({},d,{headers:Object.assign({'Authorization':
 async function loadAll(){
   try{
     var [pRes,bRes,iRes]=await Promise.all([
-      fetch(API+'/api/profile/patients',H({signal: AbortSignal.timeout(15000)})).then(r=>r.json()).catch(_=>({ok:false,patients:[]})),
-      fetch(API+'/api/profile/believers',H({signal: AbortSignal.timeout(15000)})).then(r=>r.json()).catch(_=>({ok:false,believers:[]})),
-      fetch(API+'/api/profile/insights/global',H({signal: AbortSignal.timeout(15000)})).then(r=>r.json()).catch(_=>({ok:false,insights:[]}))
-    });
+      fetch(API+'/api/profile/patients',H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).catch(function(_){return{ok:false,patients:[]}}),
+      fetch(API+'/api/profile/believers',H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).catch(function(_){return{ok:false,believers:[]}}),
+      fetch(API+'/api/profile/insights/global',H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).catch(function(_){return{ok:false,insights:[]}})
+    ]);
     patients=pRes.patients||[];
     believers=bRes.believers||[];
     insights=iRes.insights||[];
@@ -163,7 +163,7 @@ function renderGlobalList(){
   var lp=document.getElementById('leftPanel');
   if(!insights.length){lp.innerHTML='<div class="empty">暂无蒸馏洞察</div>';return}
   var grouped={};
-  insights.forEach(function(i){(grouped[i.source_type]=grouped[i.source_type]||[]).push(i)});
+  insights.forEach(function(i){var k=i.source_type||'patient';if(!grouped[k])grouped[k]=[];grouped[k].push(i)});
   var html='';
   Object.keys(grouped).forEach(function(k){
     html+='<div class="panel-title">'+(k==='patient'?'👤 患者蒸馏洞察':'🌟 信众蒸馏洞察')+'（'+grouped[k].length+'）</div>';
@@ -181,8 +181,7 @@ async function showPatient(uid){
   var rp=document.getElementById('rightPanel');
   rp.innerHTML='<div class="empty">加载患者档案...</div>';
   try{
-    var j=await fetch(API+'/api/profile/patient/'+uid,H({signal: AbortSignal.timeout(15000),
-}).then(r=>r.json());
+    var j=await fetch(API+'/api/profile/patient/'+uid,H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()});
     if(!j.ok){rp.innerHTML='<div class="empty">'+esc(j.error||'加载失败')+'</div>';return}
     var p=j.profile,ins=j.insights||[];
     var html='<div class="panel-title">🩺 患者详情 #'+uid+'</div>';
@@ -223,8 +222,7 @@ async function showBeliever(uid){
   var rp=document.getElementById('rightPanel');
   rp.innerHTML='<div class="empty">加载信众档案...</div>';
   try{
-    var j=await fetch(API+'/api/profile/believer/'+uid,H({signal: AbortSignal.timeout(15000),
-}).then(r=>r.json());
+    var j=await fetch(API+'/api/profile/believer/'+uid,H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()});
     if(!j.ok){rp.innerHTML='<div class="empty">'+esc(j.error||'加载失败')+'</div>';return}
     var b=j.insight,ins=j.insights||[];
     var html='<div class="panel-title">🌟 信众详情 #'+uid+'</div>';
@@ -262,8 +260,8 @@ async function triggerDistill(){
   if(!confirm('确认立即对所有档案执行全量蒸馏？\n（生产环境由 cron 每日 02:00 自动执行）'))return;
   toast('正在执行全量蒸馏...');
   try{
-    var j=await fetch(API+'/api/profile/distill-all',H({method:'POST',headers:Object.assign({'Authorization':'Bearer '+TOK,'Content-Type':'application/json'})signal: AbortSignal.timeout(15000),
-}).then(r=>r.json());
+var resp=await fetch(API+'/api/profile/distill-all',H({method:'POST',headers:Object.assign({'Authorization':'***'+TOK,'Content-Type':'application/json'}),signal:AbortSignal.timeout(15000)}));
+var j=await resp.json();
     if(j.ok){toast('✅ '+(j.message||'蒸馏完成'));loadAll()}
     else toast('❌ '+(j.error||'失败'),true);
   }catch(e){toast('❌ '+e.message,true)}

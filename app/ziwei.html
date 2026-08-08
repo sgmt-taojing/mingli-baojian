@@ -272,7 +272,7 @@ async function generateZiweiReport(){
     
     const body = { year, month, day, hour, gender, name, lunar, leapMonth: false };
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token').then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch(API_BASE+'/api/paipan/ziwei/report', {

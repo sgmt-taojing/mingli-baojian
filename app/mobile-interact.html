@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/app/js/escape-html.js" defer></script>
 <meta charset="UTF-8">
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/mobile-interact.html">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
@@ -226,6 +227,7 @@ body{
   .app-container{max-width:420px}
 }
 </style>
+  <script src="/app/js/submit-guard.js" defer></script>
 </head>
 <body>
 <header class="page-header-bar" data-theme="system">
@@ -913,9 +915,9 @@ function appendVoiceMessage(role, text, kbMatches) {
   // R472 · AI 回复后添加反馈按钮：👍 / 👎 一键闭环
   const feedbackHtml = role === 'ai' ? `
     <div class="msg-feedback" data-msg-idx="${msgIdx}" style="margin-top:6px;display:flex;gap:6px;font-size:12px">
-      <button class="fb-btn" data-score="5" data-idx="${msgIdx}" title="很准">👍</button>
-      <button class="fb-btn" data-score="3" data-idx="${msgIdx}" title="一般">😐</button>
-      <button class="fb-btn" data-score="1" data-idx="${msgIdx}" title="不准">👎</button>
+      <button class="fb-btn" data-score="5" data-idx="${msgIdx}" title="很准" aria-label="很准"><span aria-hidden="true">👍</span></button>
+      <button class="fb-btn" data-score="3" data-idx="${msgIdx}" title="一般" aria-label="一般"><span aria-hidden="true">😐</span></button>
+      <button class="fb-btn" data-score="1" data-idx="${msgIdx}" title="不准" aria-label="不准"><span aria-hidden="true">👎</span></button>
       <span class="fb-status" data-idx="${msgIdx}" style="opacity:0.6;font-size:11px;margin-left:4px"></span>
     </div>
   ` : '';

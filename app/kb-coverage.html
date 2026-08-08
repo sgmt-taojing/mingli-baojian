@@ -128,7 +128,7 @@ var AI_MOD_MAP = {
   'mingxiang':   {kb:['r45_palace_ext','r45_shishen_ext','r39_dual_core'], name:'明象'}
 };
 
-fetch(API + '/api/kb/quality-report')
+fetch(API + '/api/kb/quality-report', {signal: AbortSignal.timeout(15000)})
   .then(function(r){return r.json();})
   .then(function(j){
     var d = j.data || j;

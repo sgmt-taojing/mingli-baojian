@@ -209,7 +209,7 @@
 
   async function refreshStatus(){
     try{
-      var r = await fetch('http://127.0.0.1:8913/health');
+      var r = await fetch('http://127.0.0.1:8913/health', {signal: AbortSignal.timeout(15000)});
       var d = await r.json();
       engines.forEach(function(en){
         var badge = document.querySelector('#eng-' + en.id + ' .status');

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/app/js/escape-html.js" defer></script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta charset="UTF-8">
 <meta name="description" content="我的诊断报告 · 易道智鉴">
@@ -34,6 +35,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;pad
 </style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
 </head>
 <body class="theme-tcm">
 <header class="page-header-bar">
@@ -92,7 +94,7 @@ function init(){
 function login(){
   var phone=document.getElementById('login-phone').value.trim();
   if(!/^1\d{10}$/.test(phone)){showToast('请输入正确的手机号');return}
-  fetch(API+'/api/csrf-token').then(function(r){return r.json()}).then(function(csrf){
+  fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(csrf){
     return fetch(API+'/api/user/login',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.csrfToken},body:JSON.stringify({phone:phone})});
   }).then(function(r){return r.json()}).then(function(d){
     if(d.token){
@@ -107,7 +109,7 @@ function login(){
 }
 
 function loadReports(){
-  fetch(API+'/api/clinic/my-reports',{headers:authHeaders()})
+  fetch(API+'/api/clinic/my-reports', {signal: AbortSignal.timeout(15000), headers:authHeaders()})
   .then(function(r){return r.json()}).then(function(list){
     if(!Array.isArray(list)||!list.length){
       document.getElementById('empty-view').style.display='block';

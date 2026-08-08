@@ -305,7 +305,7 @@ var payload={
     last_report:h.substring(0,5000),last_report_date:new Date().toISOString()
 };
 var csrfReq=API+'/api/csrf';
-fetch(csrfReq,{credentials:'include'}).then(function(r){return r.json()}).then(function(cs){
+fetch(csrfReq, {signal: AbortSignal.timeout(15000), credentials:'include'}).then(function(r){return r.json()}).then(function(cs){
     var csrfToken=cs.csrf_token||cs.data&&cs.data.csrf_token||'';
     return fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(payload),credentials:'include'})
 }).then(function(r){return r.json()}).then(function(d){

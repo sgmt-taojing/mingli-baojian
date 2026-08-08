@@ -91,7 +91,7 @@ const API='http://127.0.0.1:8920';
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 async function load(){
   try{
-    const r=await fetch(API+'/api/kb/skeleton-scan');
+    const r=await fetch(API+'/api/kb/skeleton-scan', {signal: AbortSignal.timeout(15000)});
     const d=await r.json();
     const data=d.data||d;
     if(!data.summary){document.getElementById('loading').textContent='无数据';return}

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/app/js/escape-html.js" defer></script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta charset="UTF-8">
 <meta name="description" content="居家健康打卡 · 体征趋势 · 康养指导 · 易道智鉴">
@@ -39,6 +40,7 @@ input,select,textarea{width:100%;padding:9px;background:var(--bg);border:1px sol
 </style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
 </head>
 <body class="theme-tcm">
 <header class="page-header-bar">
@@ -101,13 +103,13 @@ var logs=[];
 function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;var csrf=getCsrfToken();if(csrf)h['x-csrf-token']=csrf;return h}
 function getCsrfToken(){try{var c=document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);return c?decodeURIComponent(c[1]):(localStorage.getItem('csrf_token')||'')}catch(e){return ''}}
 // 页面加载时主动获取 CSRF token（R472）
-(function(){try{fetch(API+'/api/csrf-token').then(function(r){return r.json()}).then(function(d){if(d&&d.csrfToken){localStorage.setItem('csrf_token',d.csrfToken);document.cookie='csrf_token='+encodeURIComponent(d.csrfToken)+';path=/;max-age=86400'}}).catch(function(){})}catch(e){}})()
+(function(){try{fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(d){if(d&&d.csrfToken){localStorage.setItem('csrf_token',d.csrfToken);document.cookie='csrf_token='+encodeURIComponent(d.csrfToken)+';path=/;max-age=86400'}}).catch(function(){})}catch(e){}})()
 function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
 
 function updateUnit(){}
 
 function loadLogs(filter){
-  fetch(API+'/api/clinic/wellness-logs',{headers:authHeaders()})
+  fetch(API+'/api/clinic/wellness-logs', {signal: AbortSignal.timeout(15000), headers:authHeaders()})
   .then(function(r){return r.json()}).then(function(d){
     logs=d.logs||[];
     renderLogs();
@@ -179,7 +181,7 @@ function submitLog(){
   if(isNaN(value)){showToast('请输入有效数值');return}
   var bodies={blood_pressure_sys:'mmHg',blood_pressure_dia:'mmHg',heart_rate:'bpm',weight:'kg',sleep_hours:'小时',blood_sugar:'mmol/L',temperature:'℃',spo2:'%',custom:''};
   var body={log_type:type,value:value,unit:bodies[type]||'',note:note};
-  fetch(API+'/api/clinic/wellness-log',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  fetch(API+'/api/clinic/wellness-log', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
   .then(function(r){return r.json()}).then(function(d){
     if(d.ok){showToast('✅ 打卡成功');document.getElementById('log-value').value='';document.getElementById('log-note').value='';loadLogs()}
     else{showToast(d.error||'记录失败')}

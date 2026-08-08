@@ -71,8 +71,8 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
 <div class="card">
 <div class="card-title"><span class="step-num">1</span>语音描述</div>
 <div class="hint">请自然描述：<br>① 哪里不舒服、多久了 ② 出生年月日时 ③ 想问什么事（事业/感情/健康）</div>
-<button class="rec-btn idle" id="rec-btn" onclick="toggleRecord()">
-  <span id="rec-icon">🎤</span>
+<button class="rec-btn idle" id="rec-btn" onclick="toggleRecord()" aria-label="开始录音">
+  <span id="rec-icon" aria-hidden="true">🎤</span>
 </button>
 <div class="timer" id="timer">00:00</div>
 <div class="hint" id="rec-hint">点击开始录音</div>
@@ -293,7 +293,7 @@ function submitConsult(){
   var y=document.getElementById('birth-year').value;
   if(y)body.birthYear=Number(y);
   
-  fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  fetch(API+'/api/clinic/submit-symptom', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
   .then(function(r){return r.json()}).then(function(d){
     if(d.ok||d.caseId){
       document.getElementById('result-info').innerHTML='✅ 问诊提交成功！<br>案例号：'+(d.caseId||'')+'<br>已进入周易大师分析队列，随后由中医医生辨证处方。';

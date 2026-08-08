@@ -133,7 +133,7 @@ let currentFilter='全部';
 
 async function init(){
   try{
-    const resp=await fetch('../knowledge/wangzhen-kb-data.json');
+    const resp=await fetch('../knowledge/wangzhen-kb-data.json', {signal: AbortSignal.timeout(15000)});
     if(!resp.ok) throw new Error('HTTP '+resp.status);
     allData=await resp.json();
     renderStats();
@@ -141,7 +141,7 @@ async function init(){
   }catch(e){
     // 尝试相对路径
     try{
-      const resp2=await fetch('knowledge/wangzhen-kb-data.json');
+      const resp2=await fetch('knowledge/wangzhen-kb-data.json', {signal: AbortSignal.timeout(15000)});
       allData=await resp2.json();
       renderStats();
       renderList();

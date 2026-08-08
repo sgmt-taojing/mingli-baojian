@@ -185,7 +185,7 @@ const gradeClass=g=>'g-'+g.replace('+','-plus');
 async function load(){
   document.getElementById('sub').textContent='加载中…';
   try{
-    const r=await fetch(API+'/api/kb/quality-report');
+    const r=await fetch(API+'/api/kb/quality-report', {signal: AbortSignal.timeout(15000)});
     const j=await r.json();
     DATA=j.data||j;
     renderSummary();

@@ -170,7 +170,7 @@ function paipanAndDraft(){
   
   // 后端精排（8911 代理，成功则覆盖）
   var body={year:y,month:m,day:d,hour:h};
-  fetch(API+'/api/paipan/calculate',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  fetch(API+'/api/paipan/calculate', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
   .then(function(r){return r.json()}).then(function(res){
     if(res&&res.ok){
       var c=res.chart||res.data||{};
@@ -302,7 +302,7 @@ function submitNote(){
   // 如果来自医生快速采集的关联案例 → 直接挂载批注到已有案例
   if(urlCaseId){
     var body2={caseId:Number(urlCaseId),masterAnalysis:noteText,analysisSummary:noteText.slice(0,300)};
-    fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify(body2)})
+    fetch(API+'/api/clinic/submit-diagnosis', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body2)})
     .then(function(r){return r.json()}).then(function(d){
       if(d.ok||d.message){
         showToast('✅ 批注已关联到案例 #'+urlCaseId);
@@ -322,7 +322,7 @@ function submitNote(){
       constitution:'',
       birthYear:Number(y),birthMonth:Number(m),birthDay:Number(d),birthHour:Number(h)
     };
-    fetch(API+'/api/clinic/submit-symptom',{method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+    fetch(API+'/api/clinic/submit-symptom', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
     .then(function(r){return r.json()}).then(function(d){
       if(d.ok||d.caseId){
         showToast('✅ 已提交批注案例 #'+(d.caseId||'')+'，AI 正在生成完整排盘报告');

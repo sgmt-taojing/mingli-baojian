@@ -155,7 +155,7 @@ async function loadAll(){
 
 async function loadProfile(){
   try{
-    var r = await fetch(API+'/api/wellness/profile/'+USER_ID);
+    var r = await fetch(API+'/api/wellness/profile/'+USER_ID, {signal: AbortSignal.timeout(15000)});
     var j = await r.json();
     var p = j.data || {};
     document.getElementById('stat-profile').textContent = p.name || '已建档';
@@ -171,7 +171,7 @@ async function loadProfile(){
 
 async function loadOcrAnomalies(){
   try{
-    var r = await fetch(API+'/api/wellness/ocr-anomalies?limit=20');
+    var r = await fetch(API+'/api/wellness/ocr-anomalies?limit=20', {signal: AbortSignal.timeout(15000)});
     var j = await r.json();
     var list = j.data.anomalies || [];
     document.getElementById('stat-ocr').textContent = list.length;
@@ -199,7 +199,7 @@ async function loadOcrAnomalies(){
 
 async function loadWeeklySummary(){
   try{
-    var r = await fetch(API+'/api/wellness/weekly-summary?user_id='+USER_ID+'&weeks=4');
+    var r = await fetch(API+'/api/wellness/weekly-summary?user_id='+USER_ID+'&weeks=4', {signal: AbortSignal.timeout(15000)});
     var j = await r.json();
     var weeks = j.data.analyses || [];
     var stats = j.data.stats || {};
@@ -226,7 +226,7 @@ async function loadWeeklySummary(){
 async function loadKbHealth(){
   // 统计 KB 健康度
   try{
-    var r = await fetch(API+'/api/kb/stats');
+    var r = await fetch(API+'/api/kb/stats', {signal: AbortSignal.timeout(15000)});
     var j = await r.json();
     window._kbStats = j.data || {};
   }catch(e){window._kbStats = {}}

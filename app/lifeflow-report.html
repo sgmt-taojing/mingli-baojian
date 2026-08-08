@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <script src="/app/js/escape-html.js" defer></script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
 
@@ -67,6 +68,7 @@ h3{font-size:.95rem;color:var(--yellow);margin:12px 0 6px}
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
 <link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
 </head>
 <body class="theme-zhouyi">
 <header class="page-header-bar">
@@ -181,10 +183,10 @@ aria-label="年" value="1990" min="1900" max="2100">
       targetMonth: parseInt(document.getElementById('inpTargetMonth').value) || 7
     };
     try {
-      var csrfResp = await fetch(API + '/api/csrf-token').then(function(r){return r.json();});
+      var csrfResp = await fetch(API + '/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(function(r){return r.json();});
       var headers = {'Content-Type':'application/json','x-csrf-token': csrfResp.csrfToken};
       if (API) headers['Origin'] = 'http://127.0.0.1:8914';
-      var resp = await fetch(API + '/api/ai/lifeflow-report', {
+      var resp = await fetch(API + '/api/ai/lifeflow-report', {signal: AbortSignal.timeout(15000), 
         method: 'POST', headers: headers, body: JSON.stringify(data)
       });
       var result = await resp.json();

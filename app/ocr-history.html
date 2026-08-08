@@ -229,7 +229,7 @@ let csrfToken = '';
 
 async function fetchCsrf() {
   try {
-    const r = await fetch('/api/csrf-token', { credentials:'same-origin' });
+    const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000),  credentials:'same-origin' });
     const d = await r.json();
     csrfToken = d.csrfToken || d.data?.csrfToken || '';
   } catch(e) { console.warn('csrf fetch fail', e.message); }

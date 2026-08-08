@@ -357,7 +357,7 @@ var OpsCenter = {
 
     this.services.forEach(function(svc){
       var start = Date.now();
-      fetch(svc.url, {mode:'cors', cache:'no-cache'}).then(function(r){
+      fetch(svc.url, {signal: AbortSignal.timeout(15000), mode:'cors', cache:'no-cache'}).then(function(r){
         var latency = Date.now() - start;
         results.push({name:svc.name, url:svc.url, port:svc.port, status:r.ok?'ok':'err', latency:latency, code:r.status});
       }).catch(function(e){
@@ -602,7 +602,7 @@ var OpsCenter = {
     
     // Ping 测试（测 8911 延迟）
     var start = Date.now();
-    fetch('http://127.0.0.1:8911/health', {cache:'no-cache'}).then(function(){
+    fetch('http://127.0.0.1:8911/health', {signal: AbortSignal.timeout(15000), cache:'no-cache'}).then(function(){
       var latency = Date.now() - start;
       html += '<b>本地服务延迟:</b> ' + latency + 'ms ' + (latency < 50 ? '✅' : latency < 200 ? '⚠️' : '❌') + '<br>';
       el.innerHTML = html;
