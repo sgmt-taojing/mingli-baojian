@@ -296,8 +296,9 @@ const CITY_LNGS = {
   '沈阳':123.43,'哈尔滨':126.63,'长春':125.32,'乌鲁木齐':87.62,'拉萨':91.13,'昆明':102.83,
   '香港':114.17,'台北':121.56,'海口':110.32,'兰州':103.83,'郑州':113.62,'福州':119.30
 };
-let curLng = 120, curCity = '默认';
-let conversationId = 'conv_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+function simpleHash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h).toString(36).slice(0,8)}
+let curLng = 120, curCity = '默认', _sessSeed = 'conv_' + simpleHash(Date.now() + location.href);
+let conversationId = _sessSeed + simpleHash(Date.now());
 
 /* Tab 切换 */
 function switchTab(tab) {
@@ -368,14 +369,14 @@ async function getCsrf() {
 
 async function collectBirth() {
   const raw = document.getElementById('birthInput').value.trim();
-  if (!raw) { alert('请先输入生辰，如：1990年5月20日下午2点半 男'); return; }
+  if (!raw) { const _err=document.getElementById('birth-err'); if(_err){_err.textContent='请先输入生辰，如：1990年5月20日下午2点半 男';_err.style.display=''} return; }
   const resultArea = document.getElementById('resultArea');
   resultArea.style.display = '';
   document.getElementById('chartBox').innerHTML = '<div class="loading"><div class="spinner"></div>七引擎并发排盘中…</div>';
   document.getElementById('flowGrid').innerHTML = '';
   document.getElementById('engineStrip').innerHTML = '';
   document.getElementById('chartTitle').textContent = '';
-  addBubble('user', raw);
+  const _err=document.getElementById('birth-err'); if(_err){_err.textContent='';_err.style.display='none'}
 
   try {
     const csrf = await getCsrf();

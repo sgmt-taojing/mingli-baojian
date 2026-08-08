@@ -185,7 +185,7 @@
   $('lngModal').addEventListener('click', e => { if (e.target === $('lngModal')) closeModal(); });
   $('lngConfirm').onclick = () => {
     const v = parseFloat($('lngCustom').value);
-    if (isNaN(v) || v < 73 || v > 135) { alert('请输入 73~135 之间的经度'); return; }
+    if (isNaN(v) || v < 73 || v > 135) { const el=document.getElementById('lng-err')||document.createElement('div'); el.id='lng-err'; el.textContent='请输入 73~135 之间的经度'; el.style.cssText='color:#ef4444;font-size:12px;margin-top:4px'; this.parentNode.appendChild(el); return; }
     state.lng = v; $('lngBtn').textContent = '📍 自定义经度（' + v + '°E）'; closeModal();
   };
 
