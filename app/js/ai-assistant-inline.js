@@ -624,7 +624,7 @@ function startModule(id){
         _chip.style.cssText = 'margin:0 0 12px;padding:8px 12px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:8px;font-size:12px;color:var(--gold);display:flex;align-items:center;gap:8px';
         const _avatar = _last.gender === '女' ? '👩' : (_last.gender === '男' ? '👨' : '🧑');
         const _when = _last.visits && _last.visits[0] ? new Date(_last.visits[0]).toLocaleDateString('zh-CN') : '上次';
-        _chip.innerHTML = '<span>' + _avatar + '</span><span><b>' + (_last.name||'缘主') + '</b> · ' + (_last.birth||'') + '</span><span style="margin-left:auto;opacity:.6;font-size:11px">' + _when + '做过「' + mod.name + '」</span>';
+        _chip.innerHTML = '<span>' + _avatar + '</span><span><b>' + esc(_last.name||'缘主') + '</b> · ' + esc(_last.birth||'') + '</span><span style="margin-left:auto;opacity:.6;font-size:11px">' + _when + '做过「' + mod.name + '」</span>';
         chat.appendChild(_chip);
       }
     }
