@@ -103,7 +103,8 @@ body { font-family: 'PingFang SC','Noto Serif SC',sans-serif; background: var(--
     <div class="badge">舌诊 · 面诊 · 手诊 · 眼诊 — 特征标准 + KB 映射 · 仅作参考</div>
   </div>
   <div class="entry-links" style="margin-top:0">
-    <a class="entry-link primary" href="camera-capture.html" target="_blank">📸 采集诊疗</a>
+    <button id="tongueCaptureBtn" class="entry-link primary" style="cursor:pointer;border:none;font-size:14px" title="拍舌→实时辨证">📸 拍舌辨证</button>
+    <button id="faceCaptureBtn" class="entry-link" style="cursor:pointer;border:none;font-size:14px" title="拍面→实时辨证">😊 拍面辨证</button>
     <a class="entry-link" href="clinic-consultation.html">🩺 问诊台</a>
   </div>
 </div>
@@ -121,6 +122,29 @@ body { font-family: 'PingFang SC','Noto Serif SC',sans-serif; background: var(--
   <div class="section" id="sec-tongue">
     <h2>👅 舌诊参考</h2>
     <p>舌色 / 舌形 / 苔色 / 苔质 / 舌下络脉 — 特征标准与 KB 映射</p>
+
+    <!-- R493b 实时拍舌/拍面辨证面板 -->
+    <div id="tongueLivePanel" style="display:none;background:rgba(176,69,69,.08);border:1px solid rgba(176,69,69,.3);border-radius:12px;padding:14px;margin:12px 0">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+        <div style="flex:0 0 240px">
+          <video id="tongueLiveVideo" autoplay playsinline style="width:240px;height:180px;background:#000;border-radius:8px;object-fit:cover"></video>
+          <canvas id="tongueLiveCanvas" style="display:none"></canvas>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button id="tongueShootBtn" class="entry-link primary" style="cursor:pointer;border:none;font-size:12px;flex:1;padding:6px">📸 拍摄</button>
+            <button id="tongueUploadBtn" class="entry-link" style="cursor:pointer;border:none;font-size:12px;flex:1;padding:6px">📁 上传</button>
+            <button id="tongueCloseBtn" class="entry-link" style="cursor:pointer;border:none;font-size:12px;flex:1;padding:6px">✖ 关闭</button>
+          </div>
+          <input type="file" id="tongueFileInput" accept="image/*" style="display:none">
+        </div>
+        <div style="flex:1;min-width:280px">
+          <div id="tongueResult" style="font-size:13px;line-height:1.7">
+            <div style="color:var(--muted);font-style:italic">⏳ 点击"拍摄"启动摄像头，或"上传"选择舌图</div>
+          </div>
+          <div id="tongueHistory" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+        </div>
+      </div>
+    </div>
+
 
     <h3 style="font-size:15px;color:var(--gold);margin:16px 0 8px;">舌色分类</h3>
     <table class="feature-table">
@@ -245,7 +269,8 @@ body { font-family: 'PingFang SC','Noto Serif SC',sans-serif; background: var(--
   </div>
 
 </div>
-<script src="js/error-interceptor.js" defer></script>
+<script src="js/visual-diagnosis.js" defer></script>
+  <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
 </body>
