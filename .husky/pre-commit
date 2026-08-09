@@ -1,67 +1,29 @@
 #!/bin/bash
-set -eu
-set -o pipefail
-cd "$(git rev-parse --show-toplevel)" || exit 0
-# 功能：
-#   1. 仅当 docs/*.md 有变更时跑 docs-lint.sh（快速检查，不阻塞）
-#   2. acorn 语法快扫（仅扫暂存区的 HTML 文件）
-#   3. 提示性输出（exit 0 不阻塞 commit）
-
-set -u
 cd "$(git rev-parse --show-toplevel)" || exit 0
 
-# --- 1. docs-lint 快速检查 ---
-DOCS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -c "^docs/" || true)
-if [ "$DOCS_CHANGED" -gt 0 ]; then
-  echo "📄 docs/ 有 $DOCS_CHANGED 个文件变更，运行 docs-lint..."
-  if [ -f scripts/docs-lint.sh ]; then
-    LINT_OUT=$(bash scripts/docs-lint.sh 2>/dev/null || true)
-    LINT_EXIT=$?
-    if [ $LINT_EXIT -ne 0 ]; then
-      echo "⚠️  docs-lint 发现问题（不阻塞 commit，但建议修复）："
-      echo "$LINT_OUT" | python3 -c "
-import json,sys
-try:
-  d=json.load(sys.stdin)
-  print(f'  命名一致率: {d.get(\"naming\",{}).get(\"upper_snake_pct\",\"?\")}%')
-  print(f'  失效链接: {d.get(\"links\",{}).get(\"broken\",\"?\")} 条')
-  print(f'  孤立文件: {d.get(\"orphans\",\"?\")} 个')
-except:
-  print('  (解析失败，详见 docs-lint.sh 输出)')
-" 2>/dev/null
-    else
-      echo "✅ docs-lint 通过"
-    fi
-  fi
+# --- 1. docs-lint ---
+DOCS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -c "^docs/" 2>/dev/null || echo "0")
+DOCS_CHANGED=${DOCS_CHANGED//[^0-9]/}
+DOCS_CHANGED=${DOCS_CHANGED:-0}
+if [ "$DOCS_CHANGED" -gt 0 ] 2>/dev/null; then
+  echo "📄 docs/ 变更 $DOCS_CHANGED 文件"
+  [ -f scripts/docs-lint.sh ] && bash scripts/docs-lint.sh 2>/dev/null
 fi
 
-# --- 2. acorn 快扫暂存区 HTML ---
-HTML_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -cE "^app/.*\.html$" || true)
-if [ "$HTML_CHANGED" -gt 0 ]; then
-  echo "🔍 app/*.html 有 $HTML_CHANGED 个文件变更，运行 acorn 快扫..."
-  SCAN_SCRIPT="$HOME/.openclaw-autoclaw/workspace/.openclaw/tmp/scan-all.js"
-  if [ -f "$SCAN_SCRIPT" ]; then
-    # 只扫暂存区的 HTML 文件
-    STAGED_HTML=$(git diff --cached --name-only --diff-filter=ACM | grep -E "^app/.*\.html$")
-    ERRORS=0
-    for f in $STAGED_HTML; do
-      OUT=$(node "$SCAN_SCRIPT" "$f" 2>&1 || true)
-      # 只匹配错误严重行（行首有 "❌" 才计真错误；避免 "0 个错误" "无错误" 误报）
-      ERR_LINE=$(echo "$OUT" | grep -E "^❌" | head -1)
-      if [ -n "$ERR_LINE" ]; then
-        echo "$ERR_LINE"
-        ERRORS=$((ERRORS+1))
-      fi
+# --- 2. acorn HTML 快扫 ---
+HTML_CHANGED=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -cE "^app/.*\.html$" 2>/dev/null || echo "0")
+HTML_CHANGED=${HTML_CHANGED//[^0-9]/}
+HTML_CHANGED=${HTML_CHANGED:-0}
+if [ "$HTML_CHANGED" -gt 0 ] 2>/dev/null; then
+  echo "🔍 app/*.html 变更 $HTML_CHANGED 文件，acorn 快扫..."
+  SCAN="$HOME/.openclaw-autoclaw/workspace/.openclaw/tmp/scan-all.js"
+  if [ -f "$SCAN" ]; then
+    git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E "^app/.*\.html$" | while read f; do
+      node "$SCAN" "$f" 2>/dev/null | grep "^❌" && echo "  ↑ $f"
     done
-    if [ $ERRORS -gt 0 ]; then
-      echo "❌ acorn 发现 $ERRORS 个 HTML 文件语法错误"
-      echo "   建议修复后再 commit（本次不强制阻塞）"
-    else
-      echo "✅ acorn 快扫通过（$HTML_CHANGED 个文件）"
-    fi
+    echo "✅ acorn 快扫完成"
   fi
 fi
 
-# --- 3. 提示 ---
-echo "🎯 pre-commit 检查完成（不阻塞）"
+echo "🎯 pre-commit 完成"
 exit 0
