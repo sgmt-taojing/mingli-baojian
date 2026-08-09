@@ -1,7 +1,6 @@
 // divination-modules-loader.js
-// R629: divination-core.js 拆分后的统一加载入口
+// R629-R639: divination-core.js 拆分后的统一加载入口
 // 用法：<script src="js/divination-modules-loader.js" defer></script>
-// 加载顺序：先加载核心，再按需加载子模块
 (function(global){
   const DIVINATION_MODULES = {
     // Phase 1: 独立无耦合
@@ -15,25 +14,13 @@
     'qimen-engine':   { path: 'js/qimen-engine.js',   size: '49KB', desc: '奇门遁甲引擎', phase: 3 },
     'yijing-engine':  { path: 'js/yijing-engine.js',  size: '14KB', desc: '易经解读引擎', phase: 3 },
     // Phase 4: 渲染增强
-    'bazi-renderer':  { path: 'js/bazi-renderer.js',  size: '21KB', desc: '八字V2渲染器', phase: 4 }
+    'bazi-renderer':  { path: 'js/bazi-renderer.js',  size: '21KB', desc: '八字V2渲染器', phase: 4 },
+    // Phase 5: 非核心模块（延迟加载）
+    'lifeplan-module':{ path: 'js/lifeplan-module.js', size: '40KB', desc: '人生规划模块', phase: 5 }
   };
   
   const loaded = new Set();
   const loading = new Map();
-  const callbacks = [];
-  
-  // 从 URL hash 推断需要的模块（轻量级预判）
-  function inferFromHash() {
-    const hash = global.location?.hash || '';
-    const needed = [];
-    if (hash.includes('qimen') || hash.includes('奇门')) needed.push('qimen-engine');
-    if (hash.includes('yijing') || hash.includes('易经')) needed.push('yijing-engine');
-    if (hash.includes('bazi') || hash.includes('八字')) {
-      needed.push('bazi-renderer', 'bazi-liunian');
-    }
-    if (hash.includes('almanac') || hash.includes('黄历')) needed.push('almanac-engine');
-    return needed;
-  }
   
   async function loadModule(modules) {
     const list = Array.isArray(modules) ? modules : [modules];

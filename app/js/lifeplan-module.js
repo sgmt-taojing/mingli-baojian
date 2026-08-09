@@ -1,9 +1,10 @@
 // lifeplan-module.js
 // R639: 人生规划模块（从 divination-core.js 拆分）
-// 包含：lpGetTenGodStrength / lpRecommendCareer / lpCalcChangsheng 等 16 个函数
-// 依赖：divination-core.js
+// 包含：lpGetTenGodStrength / lpRecommendCareer / lpCalcChangsheng 等 19 个函数
+// 依赖：divination-core.js（全局基础数据）
 // 用法：用户进入人生规划页面时动态加载
-(function(global){
+// <script src="js/lifeplan-module.js" defer></script>
+
 function lpGetTenGodStrength(baziData) {
   let result = {zhengGuan:0, qiSha:0, zhengYin:0, pianYin:0, shiShen:0, shangGuan:0, zhengCai:0, pianCai:0, biJian:0, jieCai:0};
   let dayStem = baziData.dayStem;
@@ -935,4 +936,156 @@ function lpRecommendHealth(baziData) {
 
 // 12. 职业方向细分（考公/国企/创业/合伙）
 function lpRecommendCareerDetailed(baziData) {
-})(typeof window !== "undefined" ? window : globalThis);
+  let strength = lpGetTenGodStrength(baziData);
+  let dayEle = baziData.dayWuxing || ELE[baziData.dayStem];
+  let xiEle = baziData.xiEle || '';
+  let dayun = baziData.dayun || [];
+  let result = {
+    government: null,    // 考公考编
+    soe: null,           // 国央企
+    startup: null,       // 创业
+    partnership: null    // 合伙
+  };
+
+  // 考公考编：正官+正印组合
+  let govScore = 0;
+  let govReasons = [];
+  if (strength.zhengGuan >= 2) { govScore += 3; govReasons.push('正官星有力，主端正守纪，天生适合体制内'); }
+  if (strength.zhengYin >= 2) { govScore += 3; govReasons.push('正印星有力，主学业根基扎实，考试运佳'); }
+  if (lpHasShensha(baziData, '天乙')) { govScore += 2; govReasons.push('命带天乙贵人，仕途多有贵人提携'); }
+  if (lpHasShensha(baziData, '文昌')) { govScore += 1; govReasons.push('命带文昌，利于考试竞考'); }
+  if (strength.shangGuan >= 2) { govScore -= 1; govReasons.push('伤官见官，体制内容易口舌是非，需注意收敛'); }
+  if (strength.biJian + strength.jieCai >= 4) { govScore -= 1; govReasons.push('比劫过旺，竞争压力大需多加努力'); }
+
+  let govDirections = LP_CITY_MAP[xiEle] ? LP_CITY_MAP[xiEle].direction : '喜用方位';
+  result.government = {
+    suitable: govScore >= 3,
+    score: govScore,
+    reasons: govReasons,
+    advice: govScore >= 3 ? '命局组合利考公考编，建议认真备考。重点方向：' + govDirections + '地区岗位竞争相对小。备考期间书桌朝' + govDirections + '。' : '命局考公意愿一般，如决心考公需加倍努力，可考虑基层岗位起步。',
+    direction: govDirections,
+    bestYears: lpFindDayunByShen(dayun, baziData.dayStem, ['正官', '七杀', '正印'])
+  };
+
+  // 国央企：正官+正财
+  let soeScore = 0;
+  let soeReasons = [];
+  if (strength.zhengGuan >= 2) { soeScore += 2; soeReasons.push('正官有力，适合有体制保障的大型企业'); }
+  if (strength.zhengCai >= 2) { soeScore += 2; soeReasons.push('正财有力，主稳定收入，适合国企薪酬体系'); }
+  if (strength.zhengYin >= 2) { soeScore += 1; soeReasons.push('正印护身，企业内易获上级赏识'); }
+  if (strength.qiSha >= 3) { soeScore -= 1; soeReasons.push('七杀偏旺，国企约束感强需适应'); }
+
+  let soeIndustries = [];
+  let soeEleMap = {
+    '木': ['林业集团', '中医药企业', '教育出版社', '环保集团'],
+    '火': ['能源集团', '电力公司', '文化传媒集团', '化工集团'],
+    '土': ['建筑集团', '房地产国企', '矿业集团', '农业集团'],
+    '金': ['银行', '金融机构', '机械制造', '汽车集团'],
+    '水': ['航运集团', '港口物流', '水务集团', '海洋渔业']
+  };
+  soeIndustries = soeEleMap[xiEle] || soeEleMap[dayEle] || [];
+  result.soe = {
+    suitable: soeScore >= 2,
+    score: soeScore,
+    reasons: soeReasons,
+    industries: soeIndustries,
+    advice: soeScore >= 2 ? '适合国央企发展，推荐行业：' + soeIndustries.slice(0, 3).join('、') + '。入行后注重人际积累与职称评定。' : '国央企适配度一般，可作为一种选择但不必强求。'
+  };
+
+  // 创业：七杀+食伤
+  let startupScore = 0;
+  let startupReasons = [];
+  if (strength.qiSha >= 2) { startupScore += 3; startupReasons.push('七杀有力，主果敢冒险，创业魄力十足'); }
+  if (strength.shiShen >= 2 || strength.shangGuan >= 2) { startupScore += 2; startupReasons.push('食伤有力，主创意与执行力，善于开拓'); }
+  if (strength.pianCai >= 2) { startupScore += 2; startupReasons.push('偏财有力，主偏门财路，适合非传统行业创业'); }
+  if (strength.biJian >= 2) { startupScore += 1; startupReasons.push('比肩助力，创业有同道中人支持'); }
+  if (strength.jieCai >= 3) { startupScore -= 2; startupReasons.push('劫财过旺，合伙创业易被骗，宜独资'); }
+  if (strength.zhengGuan >= 4) { startupScore -= 1; startupReasons.push('正官过旺，性格偏保守，创业需突破舒适区'); }
+
+  let startupIndustries = [];
+  let startupEleMap = {
+    '木': ['教育培训', '文化出版', '中医养生', '园林景观', '环保科技'],
+    '火': ['互联网/科技', '传媒影视', '餐饮连锁', '新能源', '直播电商'],
+    '土': ['建筑工程', '房地产开发', '农产品', '仓储物流', '矿业'],
+    '金': ['金融科技', '机械制造', '珠宝首饰', '汽车服务', '法律服务'],
+    '水': ['跨境电商', '旅游平台', '心理咨询', '水产养殖', '物流配送']
+  };
+  startupIndustries = startupEleMap[xiEle] || startupEleMap[dayEle] || [];
+
+  // 创业时机：食伤生财的大运
+  let startupYears = [];
+  for (let si = 0; si < dayun.length; si++) {
+    let dy = dayun[si];
+    let dyGanShen = dy.ganShen || '';
+    let dyZhiShen = dy.zhiShen || '';
+    if ((dyGanShen.indexOf('食神') >= 0 || dyGanShen.indexOf('伤官') >= 0) &&
+        (dyZhiShen.indexOf('财') >= 0 || dyZhiShen.indexOf('食神') >= 0 || dyZhiShen.indexOf('伤官') >= 0)) {
+      startupYears.push(Math.round(dy.ageStart) + '-' + Math.round(dy.ageEnd) + '岁（' + dy.yearStart + '-' + dy.yearEnd + '年）');
+    }
+    if ((dyZhiShen.indexOf('食神') >= 0 || dyZhiShen.indexOf('伤官') >= 0) &&
+        (dyGanShen.indexOf('财') >= 0)) {
+      startupYears.push(Math.round(dy.ageStart) + '-' + Math.round(dy.ageEnd) + '岁（' + dy.yearStart + '-' + dy.yearEnd + '年）');
+    }
+  }
+
+  result.startup = {
+    suitable: startupScore >= 3,
+    score: startupScore,
+    reasons: startupReasons,
+    industries: startupIndustries,
+    timing: startupYears.length > 0 ? startupYears : ['需结合大运流年具体分析，食伤生财之时为佳'],
+    advice: startupScore >= 3 ? '命局适合创业，建议行业：' + startupIndustries.slice(0, 3).join('、') + '。最佳创业时机：' + (startupYears[0] || '食伤旺的大运') + '。' : '创业需谨慎，建议先积累行业经验与人脉后再择机出手。'
+  };
+
+  // 合伙人推荐
+  let partnerInfo = LP_PARTNER_MAP[dayEle] || {best: [], ok: [], avoid: [], reason: ''};
+  let partnerWarnings = [];
+  if (strength.biJian + strength.jieCai >= 4) {
+    partnerWarnings.push('比劫过旺，合伙易生争执分赃不均，建议独资或绝对控股');
+  }
+  if (strength.jieCai >= 3) {
+    partnerWarnings.push('劫财偏旺，合伙需防被骗，重要财务条款必须白纸黑字写清楚');
+  }
+  if (strength.shangGuan >= 3) {
+    partnerWarnings.push('伤官偏旺，合伙中容易因言语得罪人，需注意沟通方式');
+  }
+
+  // 自由职业：偏财+偏印+伤官
+  let freelanceScore = 0;
+  let freelanceReasons = [];
+  if (strength.pianCai >= 2) { freelanceScore += 2; freelanceReasons.push('偏财有力，主不规则财路，适合自由职业收入模式'); }
+  if (strength.pianYin >= 2) { freelanceScore += 2; freelanceReasons.push('偏印有力，主非传统思维，适合独立创作与咨询'); }
+  if (strength.shangGuan >= 2) { freelanceScore += 2; freelanceReasons.push('伤官有力，主才华横溢，适合自由创作与技术服务'); }
+  if (strength.biJian + strength.jieCai <= 2) { freelanceScore += 1; freelanceReasons.push('比劫不旺，独立工作更高效，不受团队拖累'); }
+  if (strength.zhengGuan >= 4) { freelanceScore -= 1; freelanceReasons.push('正官偏旺，性格偏守规矩，自由职业需突破安逸心态'); }
+  let freelanceIndustries = [];
+  let freelanceEleMap = {
+    '木': ['自由撰稿人', '独立设计师', '中医顾问', '心理咨询师', '园艺师'],
+    '火': ['自媒体博主', '独立摄影师', '主播', '设计工作室', '培训机构独立讲师'],
+    '土': ['独立房产经纪', '农业合作社', '手工艺人', '独立造价师', '仓储顾问'],
+    '金': ['独立律师', '金融顾问', '独立审计师', '珠宝设计师', '机械技术顾问'],
+    '水': ['跨境电商卖家', '独立导游', '心理咨询师', '水产养殖', '物流顾问']
+  };
+  freelanceIndustries = freelanceEleMap[xiEle] || freelanceEleMap[dayEle] || [];
+  result.freelance = {
+    suitable: freelanceScore >= 3,
+    score: freelanceScore,
+    reasons: freelanceReasons,
+    industries: freelanceIndustries,
+    advice: freelanceScore >= 3 ? '命局适合自由职业，推荐方向：' + freelanceIndustries.slice(0, 3).join('、') + '。自由职业需自律，建议先积累行业资源再独立。' : '自由职业适配度一般，建议先在平台积累经验与人脉。'
+  };
+
+  result.partnership = {
+    dayEle: dayEle,
+    bestPartners: partnerInfo.best,
+    okPartners: partnerInfo.ok,
+    avoidPartners: partnerInfo.avoid,
+    reason: partnerInfo.reason,
+    warnings: partnerWarnings,
+    advice: partnerWarnings.length > 0 ? '合伙需谨慎：' + partnerWarnings.join('；') : '可以合伙，优先选择日主五行为' + partnerInfo.best.join('/') + '的合伙人，互补共赢。'
+  };
+
+  return result;
+}
+
+// 辅助：在大运中查找含特定十神的时段
