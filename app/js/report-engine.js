@@ -563,14 +563,18 @@
 
     if (hooks.onReportStart) try { hooks.onReportStart(); } catch (e) {}
 
-    // R520 · 4 步推理链状态注入（复用 _agentStep 可视化）
+    // R529 · 报告引擎与 Agent 思维链双通道同步（_agentStep → SuperAgentUI）
+    // 不创建额外面板，依赖 ai-assistant-inline.js 的 _agentStep + SuperAgentUI.emitStep
+    function _syncAgentStep(name, status, detail) {
+      try { if (typeof global._agentStep === 'function') global._agentStep(name, status, detail); } catch(_e){}
+    }
+
+    // R520 · 4 步推理链状态注入（通过 _syncAgentStep → _agentStep → SuperAgentUI）
     try {
-      if (typeof global._agentStep === 'function') {
-        global._agentStep('① 归集要素', 'done', '模块=' + moduleId);
-        global._agentStep('② 检索知识库', 'active', '');
-        global._agentStep('③ 多维推断', 'pending', '');
-        global._agentStep('④ 撰写报告', 'pending', '');
-      }
+      _syncAgentStep('① 归集要素', 'done', '模块=' + moduleId);
+      _syncAgentStep('② 检索知识库', 'active', '');
+      _syncAgentStep('③ 多维推断', 'pending', '');
+      _syncAgentStep('④ 撰写报告', 'pending', '');
     } catch (e) {}
 
     // 步骤 0：模块 KB 兜底（music/lifeindex/lifeplan 断网可用）
@@ -581,7 +585,8 @@
       if (hooks.onReportEnd) try { hooks.onReportEnd(fallback.html, { score: 0, source: 'local-module-reports', engine: 'local', fallback: true }); } catch (e) {}
       // 异步打点 + 推荐（不阻塞主流程）
       // R520 · 模块KB兜底路径：步骤2/3/4 done
-      try { if (typeof global._agentStep === 'function') { global._agentStep('② 检索知识库', 'done', '本地引擎'); global._agentStep('③ 多维推断', 'done', '跳过'); global._agentStep('④ 撰写报告', 'done', '兜底生成'); } } catch (e) {}
+      // R520 · 模块KB兜底路径：步骤2/3/4 done
+      try { _syncAgentStep('② 检索知识库', 'done', '本地引擎'); _syncAgentStep('③ 多维推断', 'done', '跳过'); _syncAgentStep('④ 撰写报告', 'done', '兜底生成'); } catch (e) {}
       fireAsync(apiBase, moduleId, data, adapter);
       return { text: fallback.html, source: 'local-module-reports' };
     }
@@ -594,11 +599,9 @@
     // R520 · KB 直答路径 → 2/3/4 全 done
     if (kbHit.score >= 0.7) {
       try {
-        if (typeof global._agentStep === 'function') {
-          global._agentStep('② 检索知识库', 'done', 'KB直答 ' + Math.round(kbHit.score * 100) + '%');
-          global._agentStep('③ 多维推断', 'done', 'KB直答跳过推断');
-          global._agentStep('④ 撰写报告', 'done', 'KB直答');
-        }
+        _syncAgentStep('② 检索知识库', 'done', 'KB直答 ' + Math.round(kbHit.score * 100) + '%');
+        _syncAgentStep('③ 多维推断', 'done', 'KB直答跳过推断');
+        _syncAgentStep('④ 撰写报告', 'done', 'KB直答');
       } catch (e) {}
       const text = '【来源：本地知识库（' + kbHit.source + ' · ' + kbHit.entryId + '，命中分 ' + kbHit.score + '）】\n\n' + (kbHit.snippet || '').substring(0, 4000);
       adapter.renderHeader(renderMetaBadge({ score: kbHit.score, source: kbHit.source, engine: kbHit.engine || 'fts5', fallback: !!kbHit.fallback }));
@@ -614,10 +617,8 @@
     // 步骤 3：KB+AI 润色 或 AI+KB 兜底
     // R520 · KB+AI 路径 → 步骤2 done + 步骤3 active
     try {
-      if (typeof global._agentStep === 'function') {
-        global._agentStep('② 检索知识库', 'done', kbHit.score >= 0.4 ? '命中 ' + Math.round(kbHit.score * 100) + '%' : '低命中转AI推断');
-        global._agentStep('③ 多维推断', 'active', moduleId === 'bazi' || moduleId === 'ziwei' ? '格局趋势分析...' : '多维推断中...');
-      }
+      _syncAgentStep('② 检索知识库', 'done', kbHit.score >= 0.4 ? '命中 ' + Math.round(kbHit.score * 100) + '%' : '低命中转AI推断');
+      _syncAgentStep('③ 多维推断', 'active', moduleId === 'bazi' || moduleId === 'ziwei' ? '格局趋势分析...' : '多维推断中...');
     } catch (e) {}
 
     let promptExtra = '';
@@ -668,7 +669,7 @@
       adapter.renderOps(renderOps(finalText));
       adapter.finish();
       // R520 · 步骤 3/4 done
-      try { if (typeof global._agentStep === 'function') { global._agentStep('③ 多维推断', 'done', '已推断'); global._agentStep('④ 撰写报告', 'done', '已生成'); } } catch (e) {}
+      try { _syncAgentStep('③ 多维推断', 'done', '已推断'); _syncAgentStep('④ 撰写报告', 'done', '已生成'); } catch (e) {}
       if (hooks.onReportEnd) try { hooks.onReportEnd(finalText, { score: kbHit.score, source: kbHit.source || 'AI' }); } catch (e) {}
       fireAsync(apiBase, moduleId, data, adapter, kbHit);
       return { text: finalText, source: 'ai-polished' };
