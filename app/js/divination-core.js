@@ -40940,3 +40940,12 @@ function _analyzeSixDimensions(birthYear, birthMonth, birthDay, birthHour, sex) 
 }
 
 try { window._analyzeSixDimensions = _analyzeSixDimensions; } catch(e) {}
+
+// ================================================================
+// R629: divination-core.js 模块化桥接
+// 如果新模块已加载（通过 divination-modules-loader.js），
+// 则使用新模块版本覆盖，实现按需加载。
+// ================================================================
+if (typeof DivinationModules !== 'undefined') {
+  console.info('[divination-core] 检测到模块加载器，子模块将按需加载');
+}
