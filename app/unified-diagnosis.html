@@ -193,7 +193,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
     <span class="role-label">视角：</span>
     <button class="role-btn active" data-role="patient" onclick="setRole('patient')">🧑 患者</button>
     <button class="role-btn" data-role="doctor" onclick="setRole('doctor')">👨‍⚕️ 中医</button>
-    <button class="role-btn" data-role="ai" onclick="setRole('ai')">🔮 AI知识库</button>
+    <button class="role-btn" data-role="ai" onclick="setRole('ai')">🔮 知识库</button>
     <button class="role-btn" data-role="master" onclick="setRole('master')">🧭 命理大师</button>
   </div>
 </header>
@@ -445,7 +445,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
       </div>
 
       <div class="adopt-bar">
-        <button onclick="adoptDiagnosis('kb')">📋 采纳AI知识库诊断</button>
+        <button onclick="adoptDiagnosis('kb')">📋 采纳知识库诊断</button>
         <button onclick="adoptDiagnosis('vision')">📋 采纳AI视觉诊断</button>
         <button onclick="adoptDiagnosis('both')">📋 两路综合采纳</button>
         <button onclick="adoptDiagnosis('master')">📋 采纳命理大师批注</button>
@@ -905,7 +905,7 @@ function copyToDoctor(source) {
   const ta = document.getElementById('finalRx');
   let text = '';
   if (source === 'kb' && state.lastKBResults) {
-    text = '【AI知识库诊断】\n';
+    text = '【知识库诊断】\n';
     text += '证型参考：' + state.lastKBResults.slice(0, 3).map(r => r.title).join('、') + '\n';
     const fangji = state.lastKBResults.find(r => r.title?.includes('汤') || r.title?.includes('丸'));
     if (fangji) text += '方剂参考：' + (fangji.snippet || fangji.title).substring(0, 200);

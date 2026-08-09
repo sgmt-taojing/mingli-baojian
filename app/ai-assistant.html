@@ -7,7 +7,7 @@
 
 <meta charset="UTF-8">
 <meta name="description" content="AI命理助手，24模块智能问答">
-<meta name="keywords" content="AI命理,智能助手,八字,中医,风水,知识问答">
+<meta name="keywords" content="命理咨询,知识助手,八字,中医,风水,知识问答">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#050608">
 <title>AI命理助手 · 易道智鉴</title>
@@ -43,7 +43,7 @@
 </header>
 
 <div class="flow-steps-wrap" style="padding:12px 24px 0">
-<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>输入问题</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>智能分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看结果</span></div></div>
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>输入问题</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>自动分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看结果</span></div></div>
 <div class="flow-hint">选择模块输入问题进行智能问答。</div>
 </div>
 <a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
@@ -95,7 +95,7 @@
     <span style="color:#c9a84c;font-weight:600;font-size:14px">需要更多信息才能为您服务</span>
     <button onclick="_dismissClarifyCard()" aria-label="跳过澄清" style="margin-left:auto;background:transparent;border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:2px 8px;color:#c9a84c;cursor:pointer;font-size:11px">跳过</button>
   </div>
-  <div id="clarify-intro" style="font-size:12px;color:var(--paper2,#ccc);margin-bottom:12px;opacity:.85">AI 智能识别到您的问题还需要补充一些信息才能给出准确回答：</div>
+  <div id="clarify-intro" style="font-size:12px;color:var(--paper2,#ccc);margin-bottom:12px;opacity:.85">自动识别到您的问题还需要补充一些信息才能给出准确回答：</div>
   <div id="clarify-questions"></div>
   <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
     <input type="text" id="clarify-free-input" placeholder="或直接输入补充信息..." aria-label="补充信息" style="flex:1;padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);border-radius:8px;color:#fff;font-size:13px;font-family:inherit" onkeypress="if(event.key==='Enter')_submitClarifyFreeInput()">
@@ -414,7 +414,7 @@ function toggleImmersive(){
 <script>
 document.addEventListener("DOMContentLoaded",function(){
   if(typeof FlowEngine!=="undefined"){
-    FlowEngine.steps("flowStepsContainer",["选择模块", "输入问题", "智能分析", "查看结果"],0);
+    FlowEngine.steps("flowStepsContainer",["选择模块", "输入问题", "自动分析", "查看结果"],0);
     var h=document.getElementById("flowHintContainer");
     if(h)h.innerHTML=FlowEngine.hint("选择需要咨询的模块，输入您的出生信息或问题，AI将给出参考建议。");
     var ql=document.getElementById("flowQuickLinks");
