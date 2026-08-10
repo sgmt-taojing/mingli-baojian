@@ -122,16 +122,29 @@ input:focus,textarea:focus{border-color:var(--accent)}
       <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
         <span id="dzText">📷 点击拍摄 / 上传照片</span>
         <img id="preview" class="hidden" alt="预览">
+        <video id="liveVideo" class="hidden" autoplay playsinline muted style="width:100%;max-height:160px;border-radius:8px"></video>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px;align-items:center">
+        <button class="btn ghost sm" id="liveCamBtn" onclick="toggleLiveCamera()">📹 连续采集模式（边拍边分析）</button>
+        <span id="liveCamState" style="font-size:11px;color:var(--dim)"></span>
+      </div>
+      <div id="liveVisionPanel" class="hidden" style="margin-top:8px;background:var(--card2);border:1px solid rgba(79,140,255,.35);border-radius:10px;padding:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px">📡 实时视觉分析（无等待流式）</div>
+        <div id="liveVisionResult" style="font-size:12px;color:var(--dim);line-height:1.7">启动连续采集后自动逐帧分析…</div>
       </div>
       <input type="file" id="fileInput" accept="image/*" capture="environment" class="hidden" onchange="handleFile(this)">
       <label>症状描述（文字）</label>
       <textarea id="pSymptoms" placeholder="如：舌苔黄腻，口苦口干，大便粘滞，烦躁易怒"></textarea>
       <label>病情勾选（多选）</label>
       <div class="chips" id="condChips"></div>
-      <label>穿戴设备语音转写（实时收音 / 粘贴识别结果）</label>
+      <label>穿戴设备语音转写（实时收音，边说边匹配知识库）</label>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn ghost sm" id="voiceBtn" onclick="toggleVoice()">🎙 开始收音</button>
         <span id="voiceStatus" style="font-size:11px;color:var(--dim)"></span>
+      </div>
+      <div id="voiceLivePanel" class="hidden" style="margin-top:8px;background:var(--card2);border:1px solid rgba(46,204,113,.35);border-radius:10px;padding:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">⚡ 实时知识匹配（边说边出，零等待）</div>
+        <div id="voiceLiveResult" style="font-size:12px;color:var(--dim);line-height:1.8">开始说话后自动匹配…</div>
       </div>
       <textarea id="pVoice" style="margin-top:8px" placeholder="点击🎙说话自动转写，或粘贴穿戴设备语音识别结果（如：最近总是感觉乏力，舌苔很厚）"></textarea>
       <button class="btn primary block" id="submitBtn" onclick="submitSession()">🚀 提交诊断（AI视觉 + AI知识库 并行）</button>
@@ -262,9 +275,11 @@ let currentRole = 'patient';
 let selectedConditions = new Set();
 let autopilotEnabled = false;
 
-// ═══ 语音实时收音（Web Speech API，浏览器原生，零依赖）═══
+// ═══ 语音实时收音 + 流式 KB 匹配（边说边出，零等待）═══
 let voiceRec = null;
 let voiceActive = false;
+let _kbDebounceTimer = null;
+let _lastLiveText = '';
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (SR) {
   voiceRec = new SR();
@@ -273,8 +288,10 @@ if (SR) {
   voiceRec.interimResults = true;
   voiceRec.onresult = (e) => {
     let finalText = '';
+    let interimText = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+      else interimText += e.results[i][0].transcript;
     }
     if (finalText) {
       const box = document.getElementById('pVoice');
@@ -282,6 +299,13 @@ if (SR) {
     }
     const vs = document.getElementById('voiceStatus');
     if (vs) vs.textContent = '🎙 正在聆听…';
+    // 流式 KB 匹配：interim + final 合并，防抖 300ms
+    const liveText = (interimText + finalText).trim();
+    if (liveText && liveText !== _lastLiveText) {
+      _lastLiveText = liveText;
+      clearTimeout(_kbDebounceTimer);
+      _kbDebounceTimer = setTimeout(() => liveKbMatch(liveText), 300);
+    }
   };
   voiceRec.onerror = (e) => {
     const vs = document.getElementById('voiceStatus');
@@ -297,6 +321,100 @@ if (SR) {
     const vs = document.getElementById('voiceStatus');
     if (vs) vs.textContent = '⏹ 收音结束';
   };
+}
+
+// 实时 KB 匹配请求（<200ms 端点）
+async function liveKbMatch(text) {
+  try {
+    const panel = document.getElementById('voiceLivePanel');
+    if (panel) panel.classList.remove('hidden');
+    const res = await fetch(API + '/api/collab/kb-live', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text.slice(0, 200) })
+    });
+    const d = await res.json();
+    if (d.code !== 0) return;
+    const data = d.data;
+    const box = document.getElementById('voiceLiveResult');
+    if (!box) return;
+    let html = `<span style="color:var(--dim)">“${escapeHtml(text)}”</span><br>`;
+    if (data.syndrome) {
+      html += `🧬 证型：<b style="color:var(--green)">${escapeHtml(data.syndrome)}</b> <span style="color:var(--dim)">(匹配分 ${(data.score * 100).toFixed(0)})</span><br>`;
+    }
+    if (data.formulas && data.formulas.length) {
+      html += `💊 方剂：${data.formulas.map(f => `<span class="formula" style="font-size:11px">${escapeHtml(f)}</span>`).join(' ')}<br>`;
+    }
+    if (data.kb && data.kb.length) {
+      html += `📚 KB：${data.kb.slice(0, 2).map(k => `<span style="color:var(--accent)">${escapeHtml(k.title.slice(0, 18))}</span>`).join(' · ')}`;
+    }
+    html += `<span style="color:var(--dim);font-size:10px">（${data.ms}ms）</span>`;
+    box.innerHTML = html;
+  } catch (_) { /* 静默降级 */ }
+}
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ═══ 视觉连续采集（视频流 → 定时抓帧 → 全链路分析 → 实时融合）═══
+let camStream = null;
+let camTimer = null;
+let _bestVision = null;
+async function toggleLiveCamera() {
+  const btn = document.getElementById('liveCamBtn');
+  const state = document.getElementById('liveCamState');
+  const video = document.getElementById('liveVideo');
+  const panel = document.getElementById('liveVisionPanel');
+  if (camStream) {
+    // 停止
+    camStream.getTracks().forEach(t => t.stop());
+    camStream = null;
+    clearInterval(camTimer);
+    camTimer = null;
+    video.classList.add('hidden');
+    btn.textContent = '📹 连续采集模式（边拍边分析）';
+    state.textContent = '已停止';
+    return;
+  }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    video.srcObject = camStream;
+    video.classList.remove('hidden');
+    panel.classList.remove('hidden');
+    btn.textContent = '⏹ 停止连续采集';
+    state.textContent = '● 采集中';
+    _bestVision = null;
+    // 每 2.5s 抓帧分析
+    camTimer = setInterval(async () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        const b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+        const res = await fetch(API + '/api/collab/vision-frame', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_b64: b64, mode: currentMode })
+        });
+        const d = await res.json();
+        if (d.code !== 0) return;
+        const r = d.data;
+        // 增量融合：保留置信度最高的帧结论
+        if (!_bestVision || (r.confidence || 0) > (_bestVision.confidence || 0)) {
+          _bestVision = r;
+        }
+        const box = document.getElementById('liveVisionResult');
+        const b = _bestVision;
+        box.innerHTML =
+          `<span style="color:var(--accent)">🧬 当前帧：${escapeHtml(r.syndrome || '—')}</span> <span style="color:var(--dim)">(${(r.confidence * 100).toFixed(0)}%)</span><br>` +
+          (r.formulas && r.formulas.length ? `💊 ${r.formulas.slice(0, 2).map(f => escapeHtml(f)).join(' + ')}<br>` : '') +
+          `🏆 最优帧：${escapeHtml(b.syndrome || '—')} <span style="color:var(--dim)">(${(b.confidence * 100).toFixed(0)}%)</span>` +
+          (b.kb && b.kb.length ? `<br>📚 ${b.kb.slice(0, 2).map(k => escapeHtml(k.title.slice(0, 16))).join(' · ')}` : '') +
+          `<span style="color:var(--dim);font-size:10px">（${r.ms}ms/帧）</span>`;
+      } catch (_) { /* 单帧失败跳过 */ }
+    }, 2500);
+  } catch (e) {
+    state.textContent = '⚠ 摄像头不可用: ' + (e.message || e.name || '权限拒绝');
+  }
 }
 function toggleVoice() {
   const vb = document.getElementById('voiceBtn');
