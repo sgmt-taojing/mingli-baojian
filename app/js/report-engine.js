@@ -7,7 +7,7 @@
  *  2. 三大模块断网兜底（music/lifeindex/lifeplan → _MODULE_REPORTS）
  *  3. 三模块后端结构化增强（lifeplan/lifeindex/music → /api/ai/*-report）
  *  4. 渲染层完全解耦 — 调用方传入 renderAdapter('chatBubble'|'drawer'|'inline'|'wechat')
- *  5. 操作按钮（保存/复制/复制 MD/👍/👎）与图谱智能推荐 — 引擎自动附加
+ *  5. 操作按钮（保存/复制/复制 MD/👍/👎）与图谱精准推荐 — 引擎自动附加
  *
  * 用法：
  *   await ReportEngine.generate({
@@ -408,7 +408,7 @@
   }
 
   /**
-   * 步骤 5：图谱智能推荐（异步 fetch /api/kb/recommend）
+   * 步骤 5：图谱精准推荐（异步 fetch /api/kb/recommend）
    */
   async function fetchRecommendations(apiBase, moduleId) {
     try {
@@ -443,9 +443,9 @@
    */
   function renderRecommendBlock(recs) {
     if (!recs || !recs.length) {
-      return '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span></div><div style="opacity:.6;font-size:12px">本次报告暂无图谱关联推荐</div>';
+      return '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱精准推荐</span></div><div style="opacity:.6;font-size:12px">本次报告暂无图谱关联推荐</div>';
     }
-    let h = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">为你发现 ' + recs.length + ' 个关联领域</span></div>';
+    let h = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱精准推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">为你发现 ' + recs.length + ' 个关联领域</span></div>';
     h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">';
     recs.forEach(r => {
       const pct = Math.round((r.score || 0) * 100);

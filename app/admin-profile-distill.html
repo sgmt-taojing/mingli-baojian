@@ -174,7 +174,7 @@ function renderGlobalList(){
     });
   });
   lp.innerHTML=html;
-  document.getElementById('rightPanel').innerHTML='<div class="empty">共 '+insights.length+' 条蒸馏洞察，已自动赋能医生/大师诊断</div>';
+  document.getElementById('rightPanel').innerHTML='<div class="empty">共 '+insights.length+' 条蒸馏洞察，已自动同步至诊断系统</div>';
 }
 
 async function showPatient(uid){
@@ -205,7 +205,7 @@ async function showPatient(uid){
       html+='</div>';
     }
     if(ins.length){
-      html+='<div><div style="font-size:12px;color:var(--gold);margin-bottom:6px">💡 蒸馏洞察（赋能医生）</div>';
+      html+='<div><div style="font-size:12px;color:var(--gold);margin-bottom:6px">💡 蒸馏洞察（辅助医生）</div>';
       ins.forEach(function(i){
         html+='<div class="insight"><div class="ins-title">'+esc(i.insight_title||'')+'</div>'+
           '<div class="ins-summary">'+esc(i.insight_summary||'')+'</div>'+
@@ -243,7 +243,7 @@ async function showBeliever(uid){
       html+='<div class="insight"><div class="ins-summary">'+esc(JSON.stringify(fp,null,2))+'</div></div></div>';
     }
     if(ins.length){
-      html+='<div><div style="font-size:12px;color:var(--gold);margin-bottom:6px">💡 蒸馏洞察（赋能大师）</div>';
+      html+='<div><div style="font-size:12px;color:var(--gold);margin-bottom:6px">💡 蒸馏洞察（辅助大师）</div>';
       ins.forEach(function(i){
         html+='<div class="insight"><div class="ins-title">'+esc(i.insight_title||'')+'</div>'+
           '<div class="ins-summary">'+esc(i.insight_summary||'')+'</div>'+

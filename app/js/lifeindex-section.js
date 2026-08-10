@@ -138,7 +138,7 @@ var NAV_DATA = {
     ]
   },
   ai: {
-    name: '智能分析', icon: '智', value: '人工智能辅助·智慧赋能决策',
+    name: '自动分析', icon: '智', value: '辅助决策参考',
     groups: [
       { name: '智能助手', items: [
         { icon:'AI', name:'AI命理助手', desc:'22模块智能问答', source:'', url:"javascript:window.location.href='ai-assistant.html'" },
@@ -146,8 +146,8 @@ var NAV_DATA = {
         { icon:'API', name:'API文档', desc:'OpenAPI 3.0文档', source:'', url:"javascript:window.location.href='api-docs.html'" },
         { icon:'眼', name:'智能眼镜', desc:'智能眼镜控制台', source:'', url:"javascript:window.location.href='glass-console.html'" }
       ]},
-      { name: '智能分析', items: [
-        { icon:'八', name:'八字命盘', desc:'AI八字智能分析', source:'', url:"javascript:showSection('bazi')" },
+      { name: '自动分析', items: [
+        { icon:'八', name:'八字命盘', desc:'AI八字自动分析', source:'', url:"javascript:showSection('bazi')" },
         { icon:'运', name:'运势分析', desc:'AI运势推演', source:'', url:"javascript:showSection('annual-fortune')" },
         { icon:'财', name:'财运分析', desc:'AI财运预测', source:'', url:"javascript:showSection('bazi')" },
         { icon:'情', name:'感情分析', desc:'AI感情推演', source:'', url:"javascript:showSection('bazi')" },
@@ -193,7 +193,7 @@ function initSectionFlow(sid){
   var stepsMap = {
     bazi: {steps:['填写信息','排盘演算','查看结果','深度分析'], hint:'填写出生日期和时辰，点击排盘演算按钮。'},
     zhanbu: {steps:['选择卜法','输入问题','起卦分析','查看解读'], hint:'选择占卜方式，心中默念所问之事。'},
-    yanzhi: {steps:['拍摄面相','智能分析','查看面相报告'], hint:'请在自然光下拍摄正面照。'},
+    yanzhi: {steps:['拍摄面相','自动分析','查看面相报告'], hint:'请在自然光下拍摄正面照。'},
     xingming: {steps:['输入姓名','选择性别','补充生辰','查看分析'], hint:'输入需要分析的姓名信息。'},
     tizhi: {steps:['填写问卷','AI辨识','查看体质','调养建议'], hint:'根据真实感受回答问题。'},
     fengshui: {steps:['输入宅向','选择元运','排盘分析','查看建议'], hint:'输入房屋坐向和建造年代。'},

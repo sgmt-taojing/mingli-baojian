@@ -1,10 +1,10 @@
 /**
- * 智能分析解读模块 - 易道智鉴
+ * 自动分析解读模块 - 易道智鉴
  * 在规则推演基础上叠加AI能力，提供自然语言深度解读
  * 
  * 功能：
  * 1. AI深度解读 - 对排盘结果进行自然语言解读
- * 2. 智能分析问答 - 针对排盘结果提问
+ * 2. 自动分析问答 - 针对排盘结果提问
  * 3. AI报告生成 - 生成完整命理报告
  * 
  * API: https://api.g2claw.com/v1/chat/completions
@@ -502,7 +502,7 @@ async function aiInterpret(type) {
 }
 
 /**
- * 智能分析问答 - 提问按钮触发
+ * 自动分析问答 - 提问按钮触发
  * @param {string} type - 排盘类型
  */
 async function aiAsk(type) {

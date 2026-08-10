@@ -51,7 +51,6 @@
       VoiceEngine.registerDefaultCommands();
     }
 
-    console.log('[VoiceEngine 集成] 已激活');
   }
 
   // ── 导出 ─────────────────────────────────────────

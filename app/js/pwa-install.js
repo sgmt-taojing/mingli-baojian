@@ -42,7 +42,6 @@
       deferredPrompt.preventDefault();
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      console.log('[PWA] install outcome:', outcome);
       dismissBanner();
     });
     
@@ -72,7 +71,6 @@
   window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     dismissBanner();
-    console.log('[PWA] app installed');
   });
   
   // 导出 API
@@ -82,5 +80,4 @@
     isAvailable: () => !!deferredPrompt
   };
   
-  console.info('[pwa-install] ready');
 })(typeof window !== 'undefined' ? window : globalThis);

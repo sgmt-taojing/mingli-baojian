@@ -1,4 +1,4 @@
-/* R37 · KB 智能推荐引擎 · 2026-07-26
+/* R37 · KB 精准推荐引擎 · 2026-07-26
    接入 /api/kb/recommend，在 divination-hub.html 主入口做即时推荐卡
    - tab 切换调不同 mod → 重新拉接口
    - score 高 → 优先显示

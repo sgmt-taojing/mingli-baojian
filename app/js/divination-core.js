@@ -3265,7 +3265,7 @@ function tzLocalStep2Fallback(){
   [{n:'八段锦·双手托天',d:'每日1次×15分钟，拉伸脊柱调理三焦',t:'改善代谢调节血脂'},{n:'五禽戏·鸟戏',d:'每日10分钟，模仿鹤展翅',t:'增强心肺'},{n:'站桩功',d:'每日10-20分钟自然站立',t:'培补元气'}].forEach(function(g){h+='<div style="background:rgba(255,255,255,.03);border-radius:6px;padding:10px;margin-bottom:6px"><b style="font-size:13px;color:var(--gold)">'+g.n+'</b><div style="font-size:11px;color:var(--paper2)">'+g.d+'</div><div style="font-size:11px;color:var(--gold)">✦ '+g.t+'</div></div>';});h+='</div>';
   h+='<div style="background:rgba(52,152,219,.06);border-left:3px solid var(--cyan2);padding:14px;border-radius:0 10px 10px 0;margin-bottom:12px"><div style="font-size:14px;color:var(--cyan2);font-weight:bold;margin-bottom:8px">🏠 起居</div><div style="font-size:12px;line-height:1.8">• <b>作息</b>：23点前睡足7-8小时 • <b>饮食</b>：早餐必吃、晚餐七分饱 • <b>运动</b>：每周3-5次×30分钟 • <b>穴位</b>：足三里/太冲/丰隆</div></div>';
   h+='<div style="background:rgba(201,168,76,.06);border-left:3px solid var(--gold);padding:12px 16px;border-radius:0 8px 8px 0"><div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:4px">📋 总结</div><div style="font-size:12px;line-height:1.7">以<b>「健脾祛湿+控饮食+运动」</b>为核心方向，坚持1-2月后复查。</div></div>';
-  h+='<div style="background:rgba(231,76,60,.04);border:1px solid rgba(231,76,60,.15);border-radius:8px;padding:10px 14px;margin-top:12px"><div style="font-size:11px;color:var(--cinn2);line-height:1.6">⚠️ 本方案由本地知识库生成（智能分析不可用降级），仅供养生参考。具体诊疗请咨询医师。</div></div>';
+  h+='<div style="background:rgba(231,76,60,.04);border:1px solid rgba(231,76,60,.15);border-radius:8px;padding:10px 14px;margin-top:12px"><div style="font-size:11px;color:var(--cinn2);line-height:1.6">⚠️ 本方案由本地知识库生成（自动分析不可用降级），仅供养生参考。具体诊疗请咨询医师。</div></div>';
   h+='</div>';d.innerHTML=h;d.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 // 手动输入指标分析
@@ -15997,7 +15997,7 @@ function _generateYearlySolutions(yearStar, currentYear, baziWuxing, mingGua) {
   return solutions;
 }
 function _analyzeFloorPlanAI(imageData, context) {
-  // 调用API代理进行户型图智能分析
+  // 调用API代理进行户型图自动分析
   let prompt = '你是一位拥有20年经验的专业风水师和户型分析师。请对用户提交的户型图进行专业、详细、有价值的分析。\n\n';
     prompt += '【识别要求】\n';
     prompt += '1. 房屋整体形状（方正/缺角/不规则/L形/T形等）\n';
@@ -16323,7 +16323,7 @@ function computeFengshuiPro() {
 
   // 6.4 户型方正（基于真实分析，不用Math.random）
   if (fengshuiImageData) {
-    // 有户型图：后续智能分析
+    // 有户型图：后续自动分析
     items.push({ name: '户型图', score: 0, desc: '已上传户型图，点击下方"深度分析"获取专业解读', isPending: true });
   } else {
     items.push({ name: '户型图', score: 0, desc: '未上传户型图，建议上传以获取精准分析', isPending: true });
@@ -16348,7 +16348,7 @@ function computeFengshuiPro() {
   // 8. 生成流年化解方案
   const yearlySolutions = _generateYearlySolutions(yearStar, currentYear, baziWuxing, mingGua);
 
-  // 9. 如果上传了户型图，启动智能分析
+  // 9. 如果上传了户型图，启动自动分析
   if (fengshuiImageData) {
     _analyzeFloorPlanAI(fengshuiImageData, { huxing: huxing, chaoxiang: chaoxiang, buildYear: buildYear, year: year, sex: sex, mingGua: mingGua, bazhai: bazhai });
   }
@@ -16427,7 +16427,7 @@ function renderFengshuiResultPro(data) {
   }
   html += '</div></div>';
 
-  // 智能分析区域（如果上传了户型图）
+  // 自动分析区域（如果上传了户型图）
   if (data.hasImage) {
     html += '<div id="fsAiStatus" class="rpt-is-9"></div>';
   }

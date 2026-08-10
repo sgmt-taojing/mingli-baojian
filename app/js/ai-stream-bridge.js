@@ -80,7 +80,6 @@
       try {
         localStorage.setItem('mbj_sse_enabled', enabled ? '1' : '0');
       } catch (_) { }
-      console.log('[AiStreamBridge] SSE 模式:', USE_SSE ? '开启' : '关闭');
       return USE_SSE;
     },
   };

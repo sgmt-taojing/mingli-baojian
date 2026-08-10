@@ -96,7 +96,7 @@
     [ERROR_CODES.RATE_LIMIT_GLOBAL]:{ text: t('error.429001', '请求过于频繁'),      type: 'warn' },
     [ERROR_CODES.RATE_LIMIT_KB]:    { text: t('error.429002', '知识库调用过快'),    type: 'warn' },
     [ERROR_CODES.SERVER_ERROR]:     { text: t('error.500001', '服务异常，请稍后再试'), type: 'error' },
-    [ERROR_CODES.AI_UNAVAILABLE]:   { text: t('error.503001', '智能分析暂时不可用，已切换知识库查阅'), type: 'info' },
+    [ERROR_CODES.AI_UNAVAILABLE]:   { text: t('error.503001', '自动分析暂时不可用，已切换知识库查阅'), type: 'info' },
     [ERROR_CODES.DB_UNAVAILABLE]:   { text: t('error.503002', '数据服务维护中'),    type: 'error' },
     [ERROR_CODES.NETWORK_ERROR]:    { text: t('error.504000', '网络异常，请检查连接'), type: 'error' },
     [ERROR_CODES.TIMEOUT]:          { text: t('error.504001', '请求超时，请稍后再试'), type: 'warn' },

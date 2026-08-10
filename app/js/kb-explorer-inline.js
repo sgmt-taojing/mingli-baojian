@@ -289,7 +289,7 @@ function switchTab(tab){
   currentTab = tab;
   document.querySelectorAll('.kbe-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   if(tab === 'recommend'){
-    document.getElementById('panelTitle').innerHTML = '智能推荐 <span class="panel-en">Smart Recommendations</span>';
+    document.getElementById('panelTitle').innerHTML = '精准推荐 <span class="panel-en">Smart Recommendations</span>';
     renderRecommendations();
     return;
   }
@@ -351,7 +351,7 @@ async function renderRecommendations(){
   if(!mod){
     const quickMods = ['bazi','ziwei','fengshui','qimen','zhongyi','tcm','nihaisha','shuhan'];
     let html = '<div class="kbe-empty"><div class="kbe-empty-icon">🧠</div>';
-    html += '<div style="margin-bottom:16px">选择模块查看图谱智能推荐</div>';
+    html += '<div style="margin-bottom:16px">选择模块查看图谱精准推荐</div>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:480px;margin:0 auto">';
     quickMods.forEach(m => {
       html += '<button onclick="recQuickPick(\''+m+'\')" style="padding:8px 18px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.3);border-radius:20px;color:var(--gold);cursor:pointer;font-size:13px;transition:.2s">' + m + '</button>';
@@ -360,7 +360,7 @@ async function renderRecommendations(){
     box.innerHTML = html;
     return;
   }
-  box.innerHTML = '<div class="kbe-loading">正在获取 ' + mod + ' 的智能推荐</div>';
+  box.innerHTML = '<div class="kbe-loading">正在获取 ' + mod + ' 的精准推荐</div>';
   try{
     const r = await fetch(API + '/api/kb/recommend?module=' + encodeURIComponent(mod) + '&limit=8', { signal: AbortSignal.timeout(15000) });
     const d = await r.json();

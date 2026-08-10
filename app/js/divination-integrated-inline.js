@@ -1552,7 +1552,7 @@ function showToast(msg){
 }
 
 // ═══════════════════════════════════════════════
-// 智能分析解读功能
+// 自动分析解读功能
 // ═══════════════════════════════════════════════
 let aiUploadedImageData = null;
 let aiInterpretHistory = JSON.parse(localStorage.getItem('aiInterpretHistory')||'[]');
@@ -1587,7 +1587,7 @@ function previewAIFile(file){
     document.getElementById('aiPreviewImg').src=ev.target.result;
     document.getElementById('aiPreviewImg').style.display='block';
     showToast('✅ 报告已上传，正在启动分析...');
-    // 自动触发智能分析
+    // 自动触发自动分析
     setTimeout(function(){ callLLMForAnalysis(); }, 500);
   };
   reader.readAsDataURL(file);

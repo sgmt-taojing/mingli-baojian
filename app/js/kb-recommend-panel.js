@@ -1,4 +1,4 @@
-// === R36: KB 智能推荐面板（基于 R35 /api/kb/recommend）===
+// === R36: KB 精准推荐面板（基于 R35 /api/kb/recommend）===
 // 用法：在报告生成后调用 attachRecommendPanel(chat, moduleId) 即自动渲染
 // 行为：异步拉取图谱关联推荐 → 渲染 chip → 点击埋点 hit_count + 跳模块
 
@@ -39,7 +39,7 @@
   function buildPanelHtml(rec, mod) {
     if (!rec || !rec.recommendations || rec.recommendations.length === 0) return '';
     let html = '<div class="kb-recommend-panel">';
-    html += '<div class="krp-title">🧠 图谱智能推荐 · 基于「' + (mod || '该模块') + '」</div>';
+    html += '<div class="krp-title">🧠 图谱精准推荐 · 基于「' + (mod || '该模块') + '」</div>';
     html += '<div class="krp-sub">基于知识库关联图谱、命中次数与知识量综合排序</div>';
     html += '<div class="krp-items">';
     rec.recommendations.forEach((r, idx) => {

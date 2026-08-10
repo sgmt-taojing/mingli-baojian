@@ -1854,13 +1854,13 @@ function showReport(text, meta){
     _fetchAndInjectInterpretation(state.module, state.data, d);
   }
 
-  // R40: 嵌入图谱智能推荐段落（位于报告主体与操作按钮之间）
+  // R40: 嵌入图谱精准推荐段落（位于报告主体与操作按钮之间）
   if (state.module) {
     const recBox = document.createElement('div');
     recBox.className = 'kbe-rec-block';
     recBox.id = 'recBlock-' + Date.now();
     recBox.style.cssText = 'margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(147,51,234,.06),rgba(201,168,76,.06));border:1px solid rgba(147,51,234,.25);border-radius:10px;font-size:13px;line-height:1.7';
-    recBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">基于关联权重+命中次数+模块大小</span></div>'
+    recBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱精准推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">基于关联权重+命中次数+模块大小</span></div>'
       + '<div style="opacity:.5;padding:8px 0">推荐加载中...</div>';
     d.appendChild(recBox);
     // 异步加载推荐
@@ -1869,10 +1869,10 @@ function showReport(text, meta){
       .then(dd => {
         const recs = (dd.data && dd.data.recommendations) || dd.recommendations || [];
         if(!recs.length){
-          recBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span></div><div style="opacity:.6;font-size:12px">本次报告暂无图谱关联推荐</div>';
+          recBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱精准推荐</span></div><div style="opacity:.6;font-size:12px">本次报告暂无图谱关联推荐</div>';
           return;
         }
-        let h = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱智能推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">为你发现 '+recs.length+' 个关联领域</span></div>';
+        let h = '<div style="display:flex;align-items:center;gap:8px;color:#9333ea;font-weight:600;margin-bottom:8px"><span style="font-size:16px">🧠</span><span>图谱精准推荐</span><span style="margin-left:auto;font-size:11px;color:var(--paper3);font-weight:normal">为你发现 '+recs.length+' 个关联领域</span></div>';
         h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">';
         recs.forEach((r, i) => {
           const pct = Math.round((r.score||0) * 100);

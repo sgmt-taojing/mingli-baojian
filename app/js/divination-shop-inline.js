@@ -1227,7 +1227,7 @@
             showCheckout();
         }
 
-        // 智能推荐
+        // 精准推荐
         function smartRecommend() {
             const userElement = document.getElementById('userElement').value;
             const userNeed = document.getElementById('userNeed').value;

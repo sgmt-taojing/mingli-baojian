@@ -138,7 +138,6 @@
       if (input.value.trim()) panel.style.display = 'block';
     });
 
-    console.log('[SmartSearchV2 全局接线] 已接管搜索框:', input.id);
     return true;
   }
 
