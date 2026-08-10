@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
+<script src="/i18n/i18n-engine.js"></script>
+<script src="/i18n/region-config.js"></script>
 <title>四方实时协作诊断 · 患者×AI视觉×AI知识库×医生</title>
 <style>
 :root{
@@ -96,9 +98,11 @@ input:focus,textarea:focus{border-color:var(--accent)}
 </head>
 <body>
 <div class="topbar">
-  <h1>🩺 四方实时协作诊断</h1>
-  <span class="sub">患者 × AI视觉 × AI知识库 × 医生 · 实时交互 · 处方医生审核</span>
+  <h1>🩺 <span data-i18n="collab.title">四方实时协作诊断</span></h1>
+  <span class="sub" data-i18n="collab.subtitle">患者 × AI视觉 × AI知识库 × 医生 · 实时交互 · 处方医生审核</span>
   <span id="connBadge" class="badge amber">● 未连接</span>
+  <select class="i18n-selector" id="i18nSelector" onchange="I18N.setLocale(this.value)" style="margin-left:8px;background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px"></select>
+  <select class="i18n-selector" id="regionSelector" onchange="switchRegion(this.value)" style="background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px"></select>
   <div class="role-switch">
     <button id="rolePatient" class="active" onclick="switchRole('patient')">🧑 患者端</button>
     <button id="roleDoctor" onclick="switchRole('doctor')">👨‍⚕️ 医生端</button>
@@ -106,6 +110,10 @@ input:focus,textarea:focus{border-color:var(--accent)}
 </div>
 
 <div class="container">
+  <!-- 合规免责声明（按地区显示） -->
+  <div id="disclaimerBanner" class="panel hidden" style="padding:10px 16px;margin:0 auto 8px;max-width:1500px;background:rgba(245,185,66,.08);border:1px solid rgba(245,185,66,.3);border-radius:10px;font-size:11px;color:var(--dim);text-align:center">
+    ⚠ <span id="disclaimerText"></span>
+  </div>
   <!-- ═══ 左栏：患者提交 / 医生队列 ═══ -->
   <div>
     <!-- 患者端 -->
@@ -875,6 +883,64 @@ async function openFromQueue(id) {
   await refreshSession(id);
   // 切到会话视图（保持医生面板）
   connectSSE(id, false);
+}
+
+// ═══ i18n + 合规分层初始化 ═══
+// 语言选择器
+const i18nSel = document.getElementById('i18nSelector');
+if (i18nSel) {
+  const supported = I18N.supported;
+  i18nSel.innerHTML = Object.entries(supported).map(([k, v]) =>
+    `<option value="${k}" ${k === I18N.locale ? 'selected' : ''}>${v}</option>`).join('');
+  i18nSel.value = I18N.locale;
+}
+
+// 地区选择器
+const regionSel = document.getElementById('regionSelector');
+if (regionSel) {
+  const rc = (typeof RegionConfig !== 'undefined') ? RegionConfig : null;
+  if (rc) {
+    const cur = rc.getRegion();
+    regionSel.innerHTML = Object.entries(rc.REGION_CONFIG).map(([k, v]) =>
+      `<option value="${k}" ${k === cur.code ? 'selected' : ''}>${v.name}</option>`).join('');
+    regionSel.value = cur.code;
+    applyRegion(cur.code);
+  }
+}
+
+function switchRegion(code) {
+  if (typeof RegionConfig === 'undefined') return;
+  RegionConfig.setRegion(code);
+  applyRegion(code);
+  // 地区语言包联动
+  const localeMap = { cn: 'zh-CN', sg: 'en-SG', jp: 'zh-CN', us: 'en-SG', eu: 'en-SG' };
+  if (localeMap[code]) {
+    I18N.setLocale(localeMap[code]);
+    if (i18nSel) i18nSel.value = localeMap[code];
+  }
+  toast('已切换地区：' + (RegionConfig.REGION_CONFIG[code]?.name || code));
+}
+
+function applyRegion(code) {
+  if (typeof RegionConfig === 'undefined') return;
+  const f = RegionConfig.filterFeatures(code);
+  // 免责声明
+  const banner = document.getElementById('disclaimerBanner');
+  const dt = document.getElementById('disclaimerText');
+  if (banner && dt) {
+    if (f.showDisclaimerEveryPage) {
+      banner.classList.remove('hidden');
+      dt.textContent = f.disclaimerText;
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+  // 处方功能开关
+  const rxArea = document.getElementById('rxArea');
+  if (rxArea) rxArea.style.display = f.showPrescription ? '' : 'none';
+  // autopilot 开关
+  const apToggle = document.getElementById('autoPilotToggle');
+  if (apToggle) apToggle.style.display = f.showAutopilot ? '' : 'none';
 }
 
 // 初始
