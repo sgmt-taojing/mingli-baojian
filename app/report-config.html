@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="报告模块配置 · 易道智鉴平台">
+<meta name="keywords" content="报告模块配置">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/report-config.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="var(--ink)">
+<meta property="og:title" content="报告模块配置 · 易道智鉴">
+<meta property="og:description" content="报告模块配置 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>报告模块配置 · 易道智鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/report-config-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">报告模块配置</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模板</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>配置参数</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>预览效果</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>保存生效</span></div></div>
+<div class="flow-hint">管理员配置报告模板，格式+内容+品牌。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+
+<!-- 导航栏 -->
+<div class="nav-bar">
+  <a href="divination-hub.html" class="nav-back">← 返回主平台</a>
+  <div class="nav-brand">易道智鉴</div>
+  <div style="width:80px"></div>
+</div>
+
+<!-- 跨文件导航栏 -->
+<div class="container">
+  <div class="page-header">
+    <h1>报告模块配置</h1>
+    <p>自定义排盘化解报告内容 · 按需选用</p>
+  </div>
+
+  <div class="info-box">
+    <strong>钉 使用说明</strong><br>
+    • 勾选需要的模块，排盘时将只显示已选模块的内容<br>
+    • 未配置时默认显示全部模块（全量输出）<br>
+    • 配置保存后立即生效，影响八字排盘和化解方案渲染<br>
+    • 点击"重置"可清除配置，恢复默认全量模式
+  </div>
+
+  <!-- 工具栏 -->
+  <div class="toolbar">
+    <button class="btn-select-all" onclick="selectAllModules()">成 全选</button>
+    <button class="btn-deselect-all" onclick="deselectAllModules()">⬜ 全不选</button>
+    <button class="btn-reset" onclick="resetConfig()">更 重置</button>
+    <button class="btn-save" onclick="saveConfig()">存 保存配置</button>
+  </div>
+
+  <!-- 模块列表 -->
+  <div class="module-list" id="moduleList"></div>
+
+  <!-- 预览 -->
+  <div class="preview-section">
+    <h3>表 当前配置预览</h3>
+    <div class="preview-list" id="previewList"></div>
+  </div>
+
+  <!-- 底部保存按钮 -->
+  <div class="toolbar" style="margin-top:30px">
+    <button class="btn-save" onclick="saveConfig()" style="padding:12px 40px;font-size:14px">存 保存配置</button>
+  </div>
+
+  <div style="text-align:center;padding:20px 0;color:var(--paper3);font-size:11px">
+    <div style="color:var(--gold);letter-spacing:4px;font-family:'Ma Shan Zheng',serif;font-size:14px">知命 · 改运 · 修心持善守静</div>
+    <div style="margin-top:4px">易道智鉴 · 仅供参考</div>
+  </div>
+</div>
+
+<div class="status-toast" id="statusToast"></div>
+
+<script src="js/ui-toast.js" defer></script>
+<script src="js/divination-core.js"></script>
+
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/report-config-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

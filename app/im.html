@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="站内消息 · 易道智鉴平台">
+<meta name="keywords" content="站内消息">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/im.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta property="og:title" content="站内消息 · 易道智鉴">
+<meta property="og:description" content="站内消息 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="站内消息">
+<title>站内消息 · 易道智鉴</title>
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/im-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-ops">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">站内消息</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择联系人</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>发送消息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看历史</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>管理会话</span></div></div>
+<div class="flow-hint">查看站内消息 · 易道智鉴，了解功能详情与使用方式。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+
+<!-- 顶栏 -->
+<header class="topbar">
+  <a class="back" href="divination-hub.html" title="返回首页">←</a>
+  <h1>站内消息</h1>
+  <ml-tap class="new-btn" id="newBtn" role="button" tabindex="0">＋ 新建</ml-tap>
+  <span class="badge" id="topBadge"></span>
+</header>
+
+<!-- 视图 Tab -->
+<nav class="tabs">
+  <div class="tab active" data-view="sessions">会话</div>
+  <div class="tab" data-view="directory">通讯录</div>
+</nav>
+
+<!-- 会话视图 -->
+<section class="view active" id="view-sessions">
+  <div class="session-list" id="sessionList">
+    <div class="loading"><span class="spinner"></span>加载会话中...</div>
+  </div>
+</section>
+
+<!-- 通讯录视图 -->
+<section class="view" id="view-directory">
+  <div class="directory" id="directoryList">
+    <div class="loading"><span class="spinner"></span>加载通讯录中...</div>
+  </div>
+</section>
+
+<!-- 聊天面板 -->
+<div class="chat" id="chatPanel">
+  <header class="chat-header">
+    <span class="back" id="chatBack">←</span>
+    <span class="title" id="chatTitle">会话</span>
+    <span class="ai-btn" id="aiBtn" style="display:none">光 召 AI</span>
+  </header>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-input">
+    <textarea id="msgInput" rows="1" placeholder="输入消息..." maxlength="4000" aria-label="输入消息..."></textarea>
+    <button class="send-btn" id="sendBtn">发送</button>
+  </div>
+</div>
+
+<script src="js/ui-toast.js"></script>
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/im-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-k 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-k 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.cross-nav,.flow-steps-wrap,.flow-steps,.flow-hint,.toast,.skip-link,.portal-nav{display:none!important}.topbar{position:static!important;background:#fff!important;border-bottom:1px solid #ddd!important}.topbar h1{color:#000!important}.tabs{border-bottom:1px solid #ddd!important}.tab.active{color:#000!important;border-bottom-color:#000!important}.tab{color:#333!important}.session-list{background:#fff!important}.chat{background:#fff!important;border:1px solid #ddd!important}.chat-header{background:#f5f5f5!important;border-bottom:1px solid #ddd!important}.chat-body{background:#fff!important;color:#000!important}.chat-input{display:none!important}.loading{color:#333!important}.badge{display:none!important}.back{display:none!important}.new-btn{display:none!important}
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

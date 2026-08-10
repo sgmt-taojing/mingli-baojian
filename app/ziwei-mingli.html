@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="description" content="">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050608">
+<meta name="robots" content="index, follow">
+<title>紫微命理师 · 易道智鉴</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/ziwei-mingli.html">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/page-header.css">
+<style>
+  :root {
+    --zw-gold: #c9a84c;
+    --zw-gold-dim: rgba(201,168,76,.15);
+    --zw-purple: #8b5cf6;
+    --zw-bg: #0c0e18;
+    --zw-card: #141828;
+    --zw-border: rgba(201,168,76,.14);
+    --zw-text: #e8dcc8;
+    --zw-muted: #8b7e6a;
+    --zw-user-bubble: rgba(139,92,246,.16);
+    --zw-ai-bubble: rgba(201,168,76,.07);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--zw-bg); color: var(--zw-text);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+  }
+  /* ── 顶部：标题 + 体系色徽章 ── */
+  .zw-top {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; background: rgba(12,14,24,.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--zw-border);
+  }
+  .zw-top-left { display: flex; align-items: center; gap: 10px; }
+  .zw-logo {
+    width: 36px; height: 36px; border-radius: 10px; flex: none;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--zw-gold), var(--zw-purple));
+    font-size: 18px; box-shadow: 0 2px 12px rgba(201,168,76,.25);
+  }
+  .zw-title { font-size: 18px; font-weight: 700; letter-spacing: 1px; color: #f2e8d0; }
+  .zw-title small { display: block; font-size: 10px; font-weight: 400; color: var(--zw-muted); letter-spacing: 2px; }
+  .zw-pill-tabs { display: flex; gap: 4px; background: rgba(255,255,255,.04); padding: 3px; border-radius: 999px; }
+  .zw-pill { padding: 6px 16px; border-radius: 999px; font-size: 13px; color: var(--zw-muted); cursor: pointer; border: none; background: transparent; }
+  .zw-pill.active { background: rgba(201,168,76,.18); color: var(--zw-gold); font-weight: 600; }
+  .zw-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px; font-size: 12px;
+    background: linear-gradient(90deg, rgba(201,168,76,.12), rgba(139,92,246,.10));
+    border: 1px solid rgba(201,168,76,.28); color: var(--zw-gold);
+  }
+  .zw-badge svg { width: 14px; height: 14px; }
+  /* ── 对话区 ── */
+  .zw-chat { max-width: 760px; margin: 0 auto; padding: 16px 14px 140px; }
+  .bubble-row { display: flex; margin: 10px 0; }
+  .bubble-row.user { justify-content: flex-end; }
+  .bubble-row.ai { justify-content: flex-start; }
+  .bubble {
+    max-width: 86%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.7;
+  }
+  .bubble.user {
+    background: var(--zw-user-bubble); border: 1px solid rgba(139,92,246,.25);
+    border-top-right-radius: 4px; color: #e6d9ff;
+  }
+  .bubble.ai {
+    background: var(--zw-ai-bubble); border: 1px solid var(--zw-border);
+    border-top-left-radius: 4px;
+  }
+  .bubble h3 { margin: 10px 0 6px; color: var(--zw-gold); font-size: 15px; }
+  .bubble h3:first-child { margin-top: 2px; }
+  .bubble ul { margin: 6px 0; padding-left: 18px; }
+  .bubble li { margin: 3px 0; }
+  /* 快捷提问 chips */
+  .chip-label { font-size: 12px; color: var(--zw-muted); margin: 14px 0 8px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 10px; background: rgba(255,255,255,.05);
+    border: 1px solid var(--zw-border); color: var(--zw-text); font-size: 13px;
+    cursor: pointer; transition: all .2s;
+  }
+  .chip:hover { background: rgba(201,168,76,.12); border-color: rgba(201,168,76,.4); }
+  .chip .arrow { color: var(--zw-gold); }
+  /* ── 底部采集栏 ── */
+  .zw-input-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    background: rgba(12,14,24,.95); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--zw-border); padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  }
+  .zw-input-inner { max-width: 760px; margin: 0 auto; display: flex; gap: 8px; align-items: center; }
+  .zw-input-inner input[type=text] {
+    flex: 1; min-width: 0; padding: 11px 14px; border-radius: 10px;
+    background: rgba(255,255,255,.05); border: 1px solid var(--zw-border);
+    color: var(--zw-text); font-size: 14px; outline: none;
+  }
+  .zw-input-inner input[type=text]:focus { border-color: rgba(201,168,76,.5); }
+  .zw-input-inner input::placeholder { color: var(--zw-muted); }
+  .zw-btn {
+    padding: 11px 18px; border-radius: 10px; border: none; cursor: pointer;
+    font-size: 14px; font-weight: 600; white-space: nowrap; transition: all .2s;
+  }
+  .zw-btn.primary { background: linear-gradient(135deg, var(--zw-gold), #a8893a); color: #141414; }
+  .zw-btn.primary:hover { filter: brightness(1.1); }
+  .zw-btn.ghost { background: rgba(255,255,255,.06); color: var(--zw-text); border: 1px solid var(--zw-border); }
+  .zw-btn.ghost:hover { border-color: rgba(201,168,76,.4); }
+  .zw-hint { max-width: 760px; margin: 6px auto 0; font-size: 11px; color: var(--zw-muted); text-align: center; }
+  /* ── 经度选择器弹窗 ── */
+  .zw-modal-mask {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .zw-modal-mask.show { display: flex; }
+  .zw-modal {
+    width: 100%; max-width: 480px; max-height: 82vh; overflow: auto;
+    background: var(--zw-card); border: 1px solid var(--zw-border);
+    border-radius: 16px; padding: 18px;
+  }
+  .zw-modal h3 { margin: 0 0 4px; color: var(--zw-gold); font-size: 16px; }
+  .zw-modal .sub { font-size: 12px; color: var(--zw-muted); margin-bottom: 12px; }
+  .city-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .city-item {
+    padding: 8px; text-align: center; border-radius: 8px; font-size: 12px;
+    background: rgba(255,255,255,.04); border: 1px solid var(--zw-border); cursor: pointer;
+  }
+  .city-item:hover, .city-item.sel { background: rgba(201,168,76,.14); border-color: rgba(201,168,76,.45); color: var(--zw-gold); }
+  .lng-custom { display: flex; gap: 8px; margin-top: 12px; align-items: center; }
+  .lng-custom input { width: 130px; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,.05); border: 1px solid var(--zw-border); color: var(--zw-text); font-size: 13px; }
+  .modal-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  /* ── 结果区 ── */
+  .zw-result { max-width: 760px; margin: 8px auto 0; padding: 0 14px 20px; }
+  .zw-result h2 { color: var(--zw-gold); font-size: 17px; display: flex; align-items: center; gap: 8px; }
+  .zw-result h2 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--zw-gold); box-shadow: 0 0 8px var(--zw-gold); }
+  .zw-chart-box {
+    background: var(--zw-card); border: 1px solid var(--zw-border); border-radius: 14px;
+    padding: 12px; overflow-x: auto; text-align: center;
+  }
+  .zw-chart-box svg { max-width: 100%; height: auto; }
+  .flow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
+  .flow-card {
+    background: var(--zw-card); border: 1px solid var(--zw-border); border-radius: 12px; padding: 12px;
+  }
+  .flow-card .fc-title { color: var(--zw-gold); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .flow-card .fc-body { font-size: 13px; line-height: 1.7; color: #cfc4ae; }
+  .engine-strip { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .engine-tag {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    border: 1px solid var(--zw-border); color: var(--zw-muted);
+  }
+  .engine-tag.ok { color: #7ee2a8; border-color: rgba(126,226,168,.3); }
+  .engine-tag.fail { color: #f28b82; border-color: rgba(242,139,130,.3); }
+  .loading {
+    text-align: center; padding: 30px; color: var(--zw-muted); font-size: 14px;
+  }
+  .loading .spinner {
+    width: 28px; height: 28px; margin: 0 auto 10px; border-radius: 50%;
+    border: 3px solid var(--zw-gold-dim); border-top-color: var(--zw-gold);
+    animation: zwspin 1s linear infinite;
+  }
+  @keyframes zwspin { to { transform: rotate(360deg); } }
+  .err-box {
+    padding: 12px 16px; border-radius: 10px; margin-top: 10px;
+    background: rgba(242,139,130,.08); border: 1px solid rgba(242,139,130,.3); color: #f2b8b3;
+    font-size: 13px;
+  }
+  .sys-chip {
+    text-align: center; font-size: 11px; color: var(--zw-muted); margin: 12px 0 4px;
+  }
+  .sys-chip::before, .sys-chip::after { content: " — "; color: var(--zw-border); }
+  @media(max-width:480px) {
+    .zw-badge .badge-text { display: none; }
+    .city-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body class="theme-zhouyi" data-kb-module="ziwei">
+<header class="page-header-bar" data-theme="divination">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#9c4dad"></span>
+    <span class="phb-title">紫微命理师</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
+<!-- ── 顶部：标题 + 体系色徽章 ── -->
+<header class="zw-top">
+  <div class="zw-top-left">
+    <div class="zw-logo">星</div>
+    <div class="zw-title">紫微命理师
+      <small>ZIWEI MASTER · AI SKILL</small>
+    </div>
+  </div>
+  <div class="zw-pill-tabs">
+    <button class="zw-pill active" id="tabChat" onclick="switchTab('chat')">对话</button>
+    <button class="zw-pill" id="tabStudio" onclick="switchTab('studio')">工作室</button>
+  </div>
+  <span class="zw-badge">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="badge-text">检测通过 · 体系认证</span>
+  </span>
+</header>
+
+<main id="panelChat">
+  <!-- ── 信众对话卡片区（微信样式气泡） ── -->
+  <div class="zw-chat" id="chatArea">
+    <div class="sys-chip" id="dateChip"></div>
+
+    <div class="bubble-row user">
+      <div class="bubble user">介绍一下「紫微命理师」可以帮我做什么？</div>
+    </div>
+
+    <div class="bubble-row ai">
+      <div class="bubble ai">
+        <h3>嘿，先认识一下我</h3>
+        <p>我是紫微命理师，专业不刻板，温和有边界。我相信命盘揭示的是趋势与倾向，而非定数判决。我适用于处于人生十字路口、想多一个判断维度的人，以及对传统文化有亲近感、信而不迷的人。我不会替代专业医疗、法律或金融建议，也拒绝精确预言具体事件。输入生辰，让我帮你读懂人生说明书。</p>
+        <h3>我能做什么？</h3>
+        <ul>
+          <li>生辰排盘与解析（紫微 14 主星 + 四化 + 大限）</li>
+          <li>流年大限运势追踪（流年 · 大限 · 小限三卡联动）</li>
+          <li>财运感情事业深度追问</li>
+          <li>七引擎交叉验证（八字 / 奇门 / 六壬 / 六爻 / 梅花 / 风水）</li>
+          <li>太极点转换六亲分析</li>
+        </ul>
+        <p style="font-size:13px;color:var(--zw-muted)">我将先天倾向与后天选择结合，提供坦诚且建设性的命理参考，助你在人生十字路口多一个判断维度。</p>
+      </div>
+    </div>
+
+    <div class="chip-label">可以试试这么问我：</div>
+    <div class="chips">
+      <button class="chip" onclick="quickAsk('帮我排盘看流年运势')">帮我排盘看流年运势 <span class="arrow">→</span></button>
+      <button class="chip" onclick="quickAsk('分析我的财运和事业方向')">分析我的财运和事业方向 <span class="arrow">→</span></button>
+      <button class="chip" onclick="quickAsk('看看我和对象的感情走势')">看看我和对象的感情走势 <span class="arrow">→</span></button>
+    </div>
+  </div>
+
+  <!-- ── 结果区：盘图 + 流年卡 ── -->
+  <div class="zw-result" id="resultArea" style="display:none">
+    <h2><span class="dot"></span> 命盘解读 <span id="chartTitle" style="font-size:12px;color:var(--zw-muted);font-weight:400"></span></h2>
+    <div class="engine-strip" id="engineStrip"></div>
+    <div class="zw-chart-box" id="chartBox"></div>
+    <div class="flow-grid" id="flowGrid"></div>
+  </div>
+</main>
+
+<main id="panelStudio" style="display:none">
+  <div class="zw-chat">
+    <div class="bubble-row ai">
+      <div class="bubble ai">
+        <h3>工作室 · Skill 配置</h3>
+        <p>紫微命理师 skill 已集成至 R474 升级版全栈引擎，可被私有模型调用。</p>
+        <ul>
+          <li><b>API</b>：<code>POST /api/skill/ziwei-mingli</code>（birthInput / lng / conversationId）</li>
+          <li><b>引擎库</b>：<code>server/skill-engine.js</code>（7 引擎并发 + SVG 盘图 + 流年卡）</li>
+          <li><b>交付形态</b>：JSON 盘数据 + SVG 盘图（图片化交付结论）</li>
+          <li><b>真太阳时</b>：经度 + EoT 时差校正，可回溯校正明细</li>
+        </ul>
+        <p style="font-size:13px;color:var(--zw-muted)">上游模型调用 skill 函数库时，只需传一段信众对话中的生辰原文即可。</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ── 底部：生辰采集栏 ── -->
+<footer class="zw-input-bar">
+  <div class="zw-input-inner">
+    <input  type="text" id="birthInput" placeholder="输入生辰，如：1990年5月20日下午2点半 男"
+           autocomplete="off" onkeydown="if(event.key==='Enter')collectBirth()" aria-label="输入生辰，如：1990年5月20日下午2点半 男">
+    <button class="zw-btn ghost" onclick="openLngModal()" title="选择出生地经度（真太阳时校正）">📍<span id="lngLabel" style="font-size:12px">120°E</span></button>
+    <button class="zw-btn primary" onclick="collectBirth()">采集排盘</button>
+  </div>
+  <div class="zw-hint">支持：农历/阳历 · 中文数字 · 地支时辰（如「未时」）· 男/女。排盘结果含盘图 + 流年卡。</div>
+</footer>
+
+<!-- ── 经度选择器弹窗 ── -->
+<div class="zw-modal-mask" id="lngModal" onclick="if(event.target===this)closeLngModal()">
+  <div class="zw-modal">
+    <h3>📍 出生地经度</h3>
+    <div class="sub">用于真太阳时校正（东经 120° 为标准，每偏 1° 差 4 分钟）</div>
+    <div class="city-grid" id="cityGrid"></div>
+    <div class="lng-custom">
+      <span style="font-size:13px;color:var(--zw-muted)">自定义经度</span>
+      <input  type="number" id="lngCustom" step="0.01" min="-180" max="180" placeholder="如 116.41" aria-label="如 116.41">
+      <span style="font-size:12px;color:var(--zw-muted)">°E</span>
+      <button class="zw-btn ghost" style="padding:8px 12px" onclick="applyCustomLng()">确定</button>
+    </div>
+    <div class="modal-foot">
+      <button class="zw-btn ghost" onclick="closeLngModal()">取消</button>
+      <button class="zw-btn primary" onclick="closeLngModal()">完成</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ 紫微命理师 skill 前端（R474 升华 Worker I） ============ */
+const CITY_LNGS = {
+  '北京':116.41,'上海':121.47,'广州':113.26,'深圳':114.06,'天津':117.19,'重庆':106.55,
+  '成都':104.07,'杭州':120.16,'南京':118.78,'武汉':114.30,'西安':108.94,'青岛':120.38,
+  '沈阳':123.43,'哈尔滨':126.63,'长春':125.32,'乌鲁木齐':87.62,'拉萨':91.13,'昆明':102.83,
+  '香港':114.17,'台北':121.56,'海口':110.32,'兰州':103.83,'郑州':113.62,'福州':119.30
+};
+function simpleHash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h).toString(36).slice(0,8)}
+let curLng = 120, curCity = '默认', _sessSeed = 'conv_' + simpleHash(Date.now() + location.href);
+let conversationId = _sessSeed + simpleHash(Date.now());
+
+/* Tab 切换 */
+function switchTab(tab) {
+  document.getElementById('panelChat').style.display = tab === 'chat' ? '' : 'none';
+  document.getElementById('panelStudio').style.display = tab === 'studio' ? '' : 'none';
+  document.getElementById('tabChat').classList.toggle('active', tab === 'chat');
+  document.getElementById('tabStudio').classList.toggle('active', tab === 'studio');
+}
+
+/* 经度选择器 */
+function openLngModal() {
+  const grid = document.getElementById('cityGrid');
+  grid.innerHTML = '';
+  Object.entries(CITY_LNGS).forEach(([city, lng]) => {
+    const el = document.createElement('div');
+    el.className = 'city-item' + (city === curCity ? ' sel' : '');
+    el.textContent = city;
+    el.onclick = () => {
+      curCity = city; curLng = lng;
+      document.getElementById('lngLabel').textContent = lng.toFixed(2) + '°E';
+      grid.querySelectorAll('.city-item').forEach(x => x.classList.remove('sel'));
+      el.classList.add('sel');
+    };
+    grid.appendChild(el);
+  });
+  document.getElementById('lngModal').classList.add('show');
+}
+function closeLngModal() { document.getElementById('lngModal').classList.remove('show'); }
+function applyCustomLng() {
+  const v = parseFloat(document.getElementById('lngCustom').value);
+  if (!isNaN(v) && v >= -180 && v <= 180) { curLng = v; curCity = '自定义';
+    document.getElementById('lngLabel').textContent = v.toFixed(2) + '°E'; }
+  document.getElementById('lngModal').classList.remove('show');
+}
+
+/* 聊天气泡工具 */
+function addBubble(role, html) {
+  const row = document.createElement('div');
+  row.className = 'bubble-row ' + role;
+  const b = document.createElement('div');
+  b.className = 'bubble ' + role;
+  b.innerHTML = html;
+  row.appendChild(b);
+  document.getElementById('chatArea').appendChild(row);
+  row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  return row;
+}
+
+/* 快捷提问 */
+function quickAsk(q) {
+  document.getElementById('birthInput').value = q;
+  document.getElementById('birthInput').focus();
+  addBubble('user', '你好，' + q);
+  addBubble('ai', '<p>好的！请把<b>出生年月日时 + 性别</b>发给我，例如：<br><code style="color:var(--zw-gold)">1990年5月20日下午2点半 男</code><br>我会自动校正真太阳时，排出紫微命盘并给出流年解读。</p>');
+}
+
+/* 核心：采集生辰 → 调 API → 渲染盘图 + 流年卡 */
+let _csrfToken = null;
+async function getCsrf() {
+  if (_csrfToken) return _csrfToken;
+  try {
+    const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000),  cache: 'no-store' });
+    const d = await r.json();
+    _csrfToken = d.csrfToken || '';
+  } catch (e) { _csrfToken = ''; }
+  return _csrfToken;
+}
+
+async function collectBirth() {
+  const raw = document.getElementById('birthInput').value.trim();
+  if (!raw) { const _err=document.getElementById('birth-err'); if(_err){_err.textContent='请先输入生辰，如：1990年5月20日下午2点半 男';_err.style.display=''} return; }
+  const resultArea = document.getElementById('resultArea');
+  resultArea.style.display = '';
+  document.getElementById('chartBox').innerHTML = '<div class="loading"><div class="spinner"></div>七引擎并发排盘中…</div>';
+  document.getElementById('flowGrid').innerHTML = '';
+  document.getElementById('engineStrip').innerHTML = '';
+  document.getElementById('chartTitle').textContent = '';
+  const _err=document.getElementById('birth-err'); if(_err){_err.textContent='';_err.style.display='none'}
+
+  try {
+    const csrf = await getCsrf();
+    const resp = await fetch('/api/skill/ziwei-mingli', { signal: AbortSignal.timeout(15000),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(csrf ? { 'x-csrf-token': csrf } : {}) },
+      body: JSON.stringify({ birthInput: raw, lng: curLng, conversationId }), signal: AbortSignal.timeout(15000) });
+    const data = await resp.json();
+    if (!resp.ok || !data.ok) {
+      document.getElementById('chartBox').innerHTML = '<div class="err-box">排盘失败：' + (data.error || resp.status) + '<br><small>' + (data.hint || '') + '</small></div>';
+      return;
+    }
+    renderResult(data);
+  } catch (e) {
+    document.getElementById('chartBox').innerHTML = '<div class="err-box">网络错误：' +esc(e.message)+'（请确认 API 服务 8920 端口已启动）</div>';
+  }
+}
+
+function renderResult(data) {
+  const chart = data.chart;
+  // 标题
+  document.getElementById('chartTitle').textContent =
+    chart.yearGanZhi + ' · ' + chart.wuxingJu + ' · 命主' + (chart.mingZhu || '—') + ' · ' + (chart.solarInfo && chart.solarInfo.applied ? '真太阳时已校正' : '未校正');
+  // 盘图
+  document.getElementById('chartBox').innerHTML = data.svg;
+  // 引擎状态条
+  const strip = document.getElementById('engineStrip');
+  const names = { ziwei:'紫微', bazi:'八字', qimen:'奇门', liuren:'六壬', liuyao:'六爻', meihua:'梅花', fengshui:'风水' };
+  ['ziwei','bazi','qimen','liuren','liuyao','meihua','fengshui'].forEach(k => {
+    const tag = document.createElement('span');
+    const ok = data.engines && data.engines[k] && data.engines[k].ok;
+    tag.className = 'engine-tag ' + (ok ? 'ok' : 'fail');
+    tag.textContent = (names[k] || k) + (ok ? ' ✓' : ' ✗');
+    tag.title = ok ? '排盘成功' : ((data.engines && data.engines[k] && data.engines[k].error) || '不可用');
+    strip.appendChild(tag);
+  });
+  // 流年卡
+  const grid = document.getElementById('flowGrid');
+  grid.innerHTML = '';
+  (data.flow.cards || []).forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'flow-card';
+    card.innerHTML = '<div class="fc-title">' + c.title + '</div><div class="fc-body">' + c.body + '</div>';
+    grid.appendChild(card);
+  });
+  // 回复气泡
+  const siHua = chart.siHua || {};
+  const ming = (chart.palaces || []).find(p => p.isMingGong) || {};
+  const stars = (ming.mainStars || []).join('、') || '无主星';
+  const hua = ['lu','quan','ke','ji'].map(k => siHua[k]).filter(Boolean).join('、');
+  addBubble('ai',
+    '<h3>📜 命盘已排好（' + (chart.solarInfo && chart.solarInfo.applied ? '真太阳时校正 ' + chart.solarInfo.correction_minutes + ' 分钟' : '标准时间') + '）</h3>' +
+    '<p>命宫坐 <b style="color:var(--zw-gold)">' + stars + '</b>，' + chart.wuxingJu + '，生年四化：' + (hua || '无') + '。' +
+    '大限从 <b>' + ((chart.daXian || [])[0] ? chart.daXian[0].startAge + ' 岁' : '—') + '</b> 起运。' +
+    '上方盘图可长按保存，流年卡见下方。</p>'
+  );
+  document.getElementById('birthInput').value = '';
+}
+
+/* 初始化 */
+(function init() {
+  const now = new Date();
+  document.getElementById('dateChip').textContent = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日';
+})();
+</script>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

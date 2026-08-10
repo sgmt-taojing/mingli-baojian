@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="自然查询路由测试 · 易道智鉴平台">
+<meta name="keywords" content="自然查询路由测试">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/test-parse-natural.html">
+<meta name="theme-color" content="#050608">
+<title>自然查询路由测试 · mlbj-v18 · 易道智鉴</title>
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/test-parse-natural-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-ai">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">自然查询路由测试</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>输入文本</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>解析意图</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看结果</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>调试优化</span></div></div>
+<div class="flow-hint">开发者测试自然语言解析，排盘意图识别准确率。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<h1>查 自然查询路由测试</h1>
+<div class="sub">识别模糊输入 → 自动路由到对应模块 (mlbj-v18 / parse-natural.js)</div>
+
+<div class="box">
+  <label for="in">输入测试：</label>
+  <input id="in" placeholder="试试：LIU套5815 / 13800138000 / 京A12345 / 刘青云 13579 / 算八字 / 犯太岁" value="LIU套5815" aria-label="试试：LIU套5815 / 13800138000 / 京A12345 / 刘青云 13579 / 算八字 / 犯太岁">
+  <button onclick="runtest()">分析</button>
+  <div class="grid">
+    <button onclick="document.getElementById('in').value='LIU套5815';runtest()">LIU套5815</button>
+    <button onclick="document.getElementById('in').value='13800138000';runtest()">13800138000</button>
+    <button onclick="document.getElementById('in').value='京A12345';runtest()">京A12345</button>
+    <button onclick="document.getElementById('in').value='刘青云 13579';runtest()">刘青云 13579</button>
+    <button onclick="document.getElementById('in').value='算八字';runtest()">算八字</button>
+    <button onclick="document.getElementById('in').value='犯太岁';runtest()">犯太岁</button>
+  </div>
+</div>
+
+<div class="box" id="result"></div>
+
+<div class="box">
+  <h3 style="color:#c9a84c;font-size:14px;margin-bottom:8px">图 批量测试 (15 用例)</h3>
+  <div id="batch"></div>
+  <div style="margin-top:8px;font-size:12px;color:#888">总命中：<span id="hitCount">0</span> / 15</div>
+</div>
+
+<script src="js/parse-natural.js"></script>
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/test-parse-natural-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5, user-scalable=yes">
+<meta name="theme-color" var(--ink)>
+<title>人生蓝图 · 易道智鉴</title>
+<meta name="description" content="人生规划蓝图：年龄阶段/12 领域矩阵/未来 5 年/行动清单。可分享、可打印。">
+<meta name="keywords" content="人生规划,蓝图,时间轴,领域矩阵,命运">
+
+<!-- R211: OG meta for WeChat/QQ share cards -->
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/lifeplan-detail.html">
+<meta property="og:title" content="人生规划蓝图 · 易道智鉴">
+<meta property="og:description" content="基于八字命理的人生规划蓝图：年龄阶段 / 12 领域矩阵 / 未来 5 年建议 / 行动清单。可分享、可打印。">
+<meta property="og:image" content="/favicon.svg">
+<meta property="og:url" content="">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="人生规划蓝图 · 易道智鉴">
+<meta name="twitter:description" content="基于八字命理的人生规划蓝图：年龄阶段 / 12 领域矩阵 / 未来 5 年建议 / 行动清单。">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+/* R41-B lifeplan-detail 4 阶段深度补强 CSS */
+.lp-stage-section { background: linear-gradient(135deg, #1a2332 0%, #0f1820 100%); border: 1px solid rgba(99,179,237,0.3); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.lp-stage-title { color: #63b3ed; font-size: 18px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.lp-stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.lp-stage-card { background: rgba(99,179,237,0.08); border: 1px solid rgba(99,179,237,0.2); border-radius: 8px; padding: 12px; }
+.lp-stage-card-title { color: #63b3ed; font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.lp-stage-card-content { color: #c5d1de; font-size: 13px; line-height: 1.6; }
+.lp-stage-tag { display: inline-block; padding: 2px 8px; background: rgba(99,179,237,0.15); border-radius: 4px; font-size: 11px; margin-right: 4px; margin-top: 4px; }
+
+.lp-stage-children { border-left: 4px solid #ffb44d; }
+.lp-stage-teen { border-left: 4px solid #c084fc; }
+.lp-stage-young { border-left: 4px solid #78c878; }
+.lp-stage-mid { border-left: 4px solid #f87171; }
+
+.lp-stage-timeline { display: flex; justify-content: space-between; margin: 20px 0; padding: 16px; background: rgba(99,179,237,0.05); border-radius: 8px; position: relative; }
+.lp-stage-timeline::before { content: ''; position: absolute; top: 50%; left: 5%; right: 5%; height: 2px; background: rgba(99,179,237,0.3); z-index: 0; }
+.lp-stage-timeline-item { text-align: center; position: relative; z-index: 1; background: rgba(26,35,50,0.95); padding: 8px; border-radius: 6px; min-width: 100px; }
+.lp-stage-timeline-age { color: #63b3ed; font-size: 16px; font-weight: 700; }
+.lp-stage-timeline-name { color: #8a9bb0; font-size: 11px; margin-top: 4px; }
+
+.lp-12-domain-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 16px 0; }
+.lp-12-domain { background: rgba(255,255,255,0.03); border: 1px solid rgba(99,179,237,0.15); border-radius: 6px; padding: 10px; text-align: center; }
+.lp-12-domain-name { color: #63b3ed; font-size: 12px; font-weight: 600; }
+.lp-12-domain-score { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.lp-12-domain-score.good { color: #78c878; }
+.lp-12-domain-score.mid { color: #ffb44d; }
+.lp-12-domain-score.bad { color: #f87171; }
+
+/* R440: API domain advice + timeline + 5-year plan styles */
+.r440-score-good { color: #78c878; }
+.r440-score-mid { color: #ffb44d; }
+.r440-score-bad { color: #f87171; }
+.r440-domain-card { transition: transform .15s; }
+.r440-domain-card:hover { transform: translateY(-2px); }
+details summary { outline: none; }
+details summary:hover { opacity: .8; }
+
+/* R200: unified print styles — consolidated from HTML inline + CSS file, removed duplicates */
+@media print {
+  @page { size: A4; margin: 15mm 12mm; }
+
+  /* reset dark theme to print-friendly */
+  body { background: #fff !important; color: #000 !important; font-size: 11pt; line-height: 1.6; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .wrap { max-width: 100% !important; }
+
+  /* hide interactive / non-printable elements */
+  .back-home, #input, .qr-modal, #printBtn, #qrBtn, .btn, .tools, .skip-link,
+  nav, header a[href="ai-assistant.html"], header a[href="divination-hub.html"],
+  .monthly-fate-btn, .ai-deep-btn { display: none !important; }
+
+  /* header */
+  header { text-align: center; padding: 8px 0 6px; border-bottom: 2px solid #333; margin-bottom: 10px; }
+  h1 { color: #000 !important; font-size: 20pt; letter-spacing: 2px; }
+  header p { color: #444 !important; font-size: 9pt; }
+  h2, h3 { color: #000 !important; }
+  h2 { font-size: 13pt; border-left: 3px solid #555; padding-left: 8px; margin: 12px 0 8px; }
+  a { text-decoration: none; color: #000 !important; }
+
+  /* cards & sections: white bg, visible borders */
+  .card, .lp-stage-section, .lp-stage-card, .lp-12-domain,
+  .tl-row, .fy-row, .dom, .st-row, .lp-dash, .lp-card,
+  .shichen-cell, .shichen-summary, .trend-summary, .ly-track, .ly-summary,
+  .lr-grid, .lr-summary, .lp-12-domain-card, .lp-8cell, .lp-stage-cell {
+    background: #fff !important; color: #000 !important;
+    border: 1px solid #999 !important; box-shadow: none !important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* banner: keep light tint */
+  .banner { background: #f8f4ec !important; border: 1px solid #ccc !important; break-after: avoid; page-break-after: avoid; }
+  .banner .age { color: #333 !important; }
+  .banner .stage { color: #555 !important; }
+  .banner .focus { color: #444 !important; }
+
+  /* gold-colored text → dark for print */
+  .card h2, .dom .num, .fy-y, .tl-age, .tl-core, .lp-card-score,
+  .lp-stage-title, .lp-stage-card-title, .lp-dash-title, .ts-title,
+  .ss-title, .shichen-cell .sc-time { color: #333 !important; }
+  .tl-risk { color: #8b2500 !important; }
+  .tl-advice { color: #1a5c1a !important; }
+  .dom .st, .kb-source, .lf-source, .lp-source { color: #555 !important; }
+
+  /* bar charts: solid fill for print */
+  .dom .bar { background: #ddd !important; }
+  .dom .bar-fill { background: #555 !important; }
+  .lp-card-bar { background: #ddd !important; }
+  .lp-card-fill { background: #555 !important; }
+
+  /* timeline: fix absolute positioning for print */
+  .lp-stage-timeline { background: #fff !important; position: static !important; display: flex !important; justify-content: space-between; padding: 8px 0; }
+  .lp-stage-timeline::before { display: none !important; }
+  .lp-stage-timeline-item { background: #fff !important; border: 1px solid #999 !important; }
+  .lp-stage-timeline-age { color: #333 !important; }
+  .lp-stage-timeline-name { color: #555 !important; }
+
+  /* stage section: single-column layout for A4 */
+  .lp-stage-section { border: 1px solid #999 !important; break-inside: avoid; page-break-inside: avoid; }
+  .lp-stage-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+  .lp-stage-card { border: 1px solid #bbb !important; break-inside: avoid; }
+  .lp-stage-card-content { color: #333 !important; }
+  .lp-stage-tag { background: #eee !important; color: #333 !important; }
+
+  /* 12-domain grid: 2 cols on A4 */
+  .doms { grid-template-columns: repeat(3, 1fr) !important; gap: 4px !important; }
+  .lp-12-domain-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+  /* dual dash: single column */
+  .lp-dash-dual { grid-template-columns: 1fr !important; }
+  .lp-8grid, .lp-stage { grid-template-columns: repeat(4, 1fr) !important; }
+
+  /* shichen grid: 4 cols */
+  .shichen-grid { grid-template-columns: repeat(4, 1fr) !important; }
+
+  /* ly/lr grids: keep 12/6 cols but ensure fit */
+  .ly-track, .lr-grid { overflow: visible !important; }
+
+  /* page-break rules */
+  .card, .report, .lp-stage-section { break-inside: avoid; page-break-inside: avoid; }
+  .tl-row, .fy-row, .dom, .st-row, .lp-stage-card, .lp-12-domain,
+  .lp-card, .shichen-cell, .future5 { break-inside: avoid; }
+  .banner { break-after: avoid; page-break-after: avoid; }
+
+  /* footer */
+  p[style*="text-align:center;font-size:11px"] { color: #666 !important; border-top: 1px solid #ccc; padding-top: 6px; }
+
+  /* dyun bar chart: simplify for print */
+  .dyun-track { overflow: visible !important; white-space: normal !important; }
+  .dyun-bar .b { opacity: 0.7 !important; }
+  .dyun-bar .a, .dyun-bar .n { color: #333 !important; }
+
+  /* summary boxes */
+  .summary, .ly-summary, .lr-summary, .trend-summary, .lp-verdict {
+    background: #f5f5f5 !important; border: 1px solid #ccc !important;
+  }
+  .trend-summary .ts-quote { background: #eee !important; border-left-color: #555 !important; }
+
+  /* KB links: show as text */
+  .tl-kb { background: #f0f0f0 !important; border-left-color: #555 !important; }
+  .tl-kb a { color: #333 !important; }
+
+  /* score colors: keep semantic but darker */
+  .lp-12-domain-score.good, .lp-card.health .lp-card-score { color: #1a5c1a !important; }
+  .lp-12-domain-score.mid { color: #8B6914 !important; }
+  .lp-12-domain-score.bad { color: #8b2500 !important; }
+  .lp-stage-card-title span { color: #333 !important; }
+
+  /* R441: print-mode — expand all <details> for print */
+  details { open: true; }
+  details > summary { list-style: none !important; display: none !important; }
+  details > div, details > .r440-domain-grid { display: block !important; }
+  details[open] > summary { display: none !important; }
+  .r440-domain-card { border: 1px solid #999 !important; break-inside: avoid; }
+  .r440-domain-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 4px !important; }
+  .fy-row { break-inside: avoid; border: 1px solid #ccc !important; padding: 4px 8px !important; }
+  .future5 { break-inside: avoid; border: 1px solid #ccc !important; }
+  .flow-steps-wrap, .page-header-bar { display: none !important; }
+  /* force details open via JS fallback: set open attribute */
+}
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: .85rem; }
+.btn-ghost:hover { border-color: #7c9eff; color: #7c9eff; }
+
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+  <script src="js/module-reports-kb.js" defer></script>
+  <script src="js/module-reports-kb-extended.js" defer></script>
+  <script src="js/kb-fallback-indicator.js" defer></script>
+<link rel="stylesheet" href="css/lifeplan-detail-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-kb-module="lifeplan" class="theme-zhouyi">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">人生蓝图</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看阶段</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>领域矩阵</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>时间轴分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>行动清单</span></div></div>
+<div class="flow-hint">查看人生蓝图 · 易道智鉴，了解功能详情与使用方式。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div class="wrap">
+  <header>
+    <h1>人生规划蓝图</h1>
+    <p>4 阶段 / 12 领域 / 48 子项 · 易道智鉴</p>
+    <div class="back-home"><a href="ai-assistant.html">← 返回 智能助手</a> | <a href="divination-hub.html">主平台</a></div>
+  </header>
+  <div class="card" id="input">
+    <h2>表 基础信息</h2>
+    <div class="row">
+      <div><label for="lName">姓名</label><input aria-label="姓名" type="text" id="lName" placeholder="例：缘主" maxlength="20"></div>
+      <div><label for="lAge">年龄</label><input aria-label="年龄" id="lAge" type="number" min="1" max="120" value="28"></div>
+      <div><label for="lSex">性别</label><select aria-label="性别" id="lSex"><option value="male">男</option><option value="female">女</option></select></div>
+      <div><label for="lResidence">现居地</label><input aria-label="居住地" id="lResidence" placeholder="例：上海"></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div><label for="lBirthYear">出生年</label><input aria-label="出生年" type="number" id="lBirthYear" placeholder="如：1990" min="1900" max="2100"></div>
+      <div><label for="lBirthMonth">月</label><input aria-label="出生月" type="number" id="lBirthMonth" placeholder="如：8" min="1" max="12"></div>
+      <div><label for="lBirthDay">日</label><input aria-label="出生日" type="number" id="lBirthDay" placeholder="如：15" min="1" max="31"></div>
+      <div><label for="lBirthHour">时辰</label><input aria-label="出生时辰" type="number" id="lBirthHour" placeholder="时(0-23)" min="0" max="23"></div>
+    </div>
+    <label for="lFocus">关注领域（逗号分隔）</label>
+    <input aria-label="关注领域" id="lFocus" placeholder="例：事业、财运、健康">
+    <label for="lExtra">补充情况（可选，影响领域加权）</label>
+    <textarea id="lExtra" placeholder="例：计划 30 岁前完成理财布局，金融行业从业5年" aria-label="补充信息"></textarea>
+    <button class="btn" id="genBtn" onclick="generate()">光 生成蓝图</button>
+    <button class="btn btn-ghost" id="printBtn" onclick="window.print()" title="打印蓝图">🖨️ 打印</button>
+    <!-- R95 -->
+    <div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(201,168,76,.2)">
+      <div style="font-size:.8rem;color:var(--gold);margin-bottom:6px">跳转到其他报告</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.75rem;padding:5px 10px">海 三维联动</button>
+        <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.75rem;padding:5px 10px">网 终身三维</button>
+        <button class="btn" onclick="LifeflowShare.gotoWithForm('monthly-report.html')" style="font-size:.75rem;padding:5px 10px;background:linear-gradient(135deg,#3b82f6,#2563eb)">历 逐月报告</button>
+      </div>
+    </div>
+  </div>
+  <div class="report" id="report"></div>
+  <p style="text-align:center;font-size:11px;opacity:.85;margin:24px 0;letter-spacing:1px">易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</p>
+</div>
+
+
+<!-- R41-B lifeplan-detail 4 阶段 HTML -->
+<h2 style="color:#63b3ed;margin:24px 0 12px">历 人生四阶段时间轴</h2>
+<div id="lp-stage-timeline" class="lp-stage-timeline"></div>
+
+<h2 style="color:#63b3ed;margin:24px 0 12px">标 四阶段·十二领域深度规划</h2>
+<div id="section-lp-children"></div>
+<div id="section-lp-teen"></div>
+<div id="section-lp-young"></div>
+<div id="section-lp-mid"></div>
+
+/* R41-B lifeplan-detail 4 阶段深度补强 JS */
+(function(){
+  window.LP_4STAGES = {
+    children: { // 学龄前 0-6 岁
+      name: "学龄前·孕育奠基",
+      emoji: "🍼",
+      ageRange: "0-6 岁",
+      color: "#ffb44d",
+      domains: {
+        study: { score: 60, tip: "天赋萌芽期,以游戏和感知探索为主,忌过早知识灌输" },
+        career: { score: 30, tip: "无职业概念,主要是亲子陪伴与早期启蒙" },
+        wealth: { score: 50, tip: "父母财力决定,孩子无直接财富关联" },
+        marriage: { score: 40, tip: "无婚姻概念,但父母关系深刻影响未来亲密关系模式" },
+        health: { score: 80, tip: "先天体质培育期,母乳喂养、规律作息、充足睡眠是关键" },
+        city: { score: 50, tip: "城市选择影响教育资源,但 6 岁前影响有限" },
+        culture: { score: 60, tip: "家庭文化氛围熏陶期,父母言行举止是最直接的文化输入" },
+        cultivation: { score: 70, tip: "性情养成期,关键期,性格底色基本在这一阶段奠定" },
+        network: { score: 50, tip: "亲子关系是首要关系,扩展与同龄玩伴初步社交" },
+        venture: { score: 20, tip: "无创业概念,父母可适度培养财商意识" },
+        elderly: { score: 50, tip: "无养老概念,但祖辈陪伴可建立家族情感纽带" },
+        legacy: { score: 60, tip: "家风、家训的耳濡目染期,耳濡目染胜过言传" }
+      },
+      advice: "这一阶段最重要的是:1. 充足的爱与安全感;2. 健康的体魄;3. 规律的生活节奏;4. 父母以身作则;5. 远离电子产品;6. 多接触自然。忌:过度早教、暴力教育、忽视陪伴、隔代抚养完全替代亲子关系。"
+    },
+    teen: { // 小学中学 6-18 岁
+      name: "小学中学·性格塑型",
+      emoji: "📚",
+      ageRange: "6-18 岁",
+      color: "#c084fc",
+      domains: {
+        study: { score: 85, tip: "学业核心期,学习方法、习惯养成、兴趣培养是关键。应试与素质并重。" },
+        career: { score: 40, tip: "开始有理想萌芽,可参加职业体验日、社会实践活动" },
+        wealth: { score: 30, tip: "无独立财富,但应建立零花钱管理与储蓄习惯" },
+        marriage: { score: 30, tip: "青春期对异性有朦胧好感,但应引导正确婚恋观,忌早恋影响学业" },
+        health: { score: 75, tip: "身高发育、近视防控、心理健康三大重点。保证睡眠、加强运动" },
+        city: { score: 60, tip: "城市教育资源差异开始显现,小升初、初升高是关键节点" },
+        culture: { score: 70, tip: "文化课与艺术修养并行,培养 1-2 项长期爱好" },
+        cultivation: { score: 75, tip: "三观形成期,父母与老师的引导至关重要。阅读经典、亲近自然" },
+        network: { score: 70, tip: "同学关系是重要人际关系,学会合作、分享、解决冲突" },
+        venture: { score: 40, tip: "可参加青少年创业大赛、科技创新活动,培养创新思维" },
+        elderly: { score: 50, tip: "开始理解生死与家族传承,可适度参与祖辈养老活动" },
+        legacy: { score: 65, tip: "明确家训、家规、家族故事,孩子建立家族认同感" }
+      },
+      advice: "这一阶段最重要的是:1. 培养独立学习能力;2. 建立 1-2 项运动爱好;3. 重视心理健康;4. 引导正确婚恋观;5. 培养时间管理与自律;6. 拓宽视野(旅行、阅读、社会实践)。忌:唯分数论、过度补课、忽视体育、沉迷游戏、家长控制欲过强。"
+    },
+    young: { // 大学/职场新人 18-28 岁
+      name: "大学职场·定位起步",
+      emoji: "🎓",
+      ageRange: "18-28 岁",
+      color: "#78c878",
+      domains: {
+        study: { score: 80, tip: "大学专业选择影响职业起点,但兴趣与天赋比热门更重要。可辅修、跨专业、考研" },
+        career: { score: 85, tip: "职业定位关键期。前 3 份工作决定职业方向。选对行业、跟对师傅、持续学习" },
+        wealth: { score: 60, tip: "开始有独立收入。理财第一课:储蓄、保险、必要基金。忌月光、过度消费" },
+        marriage: { score: 50, tip: "恋爱黄金期,但 28 岁前不应急婚。择偶看人品、上进心、原生家庭" },
+        health: { score: 70, tip: "身体巅峰期,但要警惕熬夜、饮食不规律、缺乏运动。年度体检必备" },
+        city: { score: 75, tip: "城市选择影响视野与机会。一线城市机会多但压力大,新一线性价比高" },
+        culture: { score: 70, tip: "深度阅读、专业考证、跨学科学习。专业+通识是核心竞争力" },
+        cultivation: { score: 75, tip: "世界观、价值观成熟期。多与高人交往,远离负能量圈子" },
+        network: { score: 75, tip: "弱关系决定机会。同学、同事、兴趣圈、行业社群都要经营" },
+        venture: { score: 70, tip: "创业尝试期。可副业起步,小成本试错,不宜过早All in" },
+        elderly: { score: 40, tip: "赡养祖辈是美德,也是家族情感纽带" },
+        legacy: { score: 60, tip: "思考人生意义,初步规划 5-10 年方向" }
+      },
+      advice: "这一阶段最重要的是:1. 选对行业与第一份工作;2. 建立深度专业能力;3. 储蓄与投资意识起步;4. 健康生活习惯固化;5. 拓展高质量人脉;6. 恋爱但不急婚;7. 持续学习+跨界视野。忌:频繁跳槽(每份<1年)、盲目创业、攀比消费、远离父母、拒绝学习。"
+    },
+    mid: { // 30-50 岁 中年成熟
+      name: "中年成熟·事业家庭双成",
+      emoji: "🏛️",
+      ageRange: "30-50 岁",
+      color: "#f87171",
+      domains: {
+        study: { score: 70, tip: "持续学习避免被淘汰。MBA、行业认证、新技能培训" },
+        career: { score: 90, tip: "事业黄金期,深耕行业或转型创业。35 岁前确定方向,40 岁前建立护城河" },
+        wealth: { score: 85, tip: "财富积累高峰期。资产配置:房产+股票+基金+保险+应急金。避免过度加杠杆" },
+        marriage: { score: 80, tip: "婚姻经营关键期。夫妻沟通、共同成长、保持新鲜感、处理好双方家庭关系" },
+        health: { score: 60, tip: "健康开始走下坡路。年度体检必备,警惕三高、颈椎、心理问题。坚持运动+饮食控制" },
+        city: { score: 70, tip: "可考虑置换改善型住房,或为子女教育换城市" },
+        culture: { score: 75, tip: "成为行业意见领袖,著书立说、传承经验" },
+        cultivation: { score: 85, tip: "精神成熟期。修身、齐家、参与公益、回馈社会" },
+        network: { score: 85, tip: "高端人脉变现期。同学会、行业大会、私董会,人脉即钱脉" },
+        venture: { score: 75, tip: "创业或投资的最佳年龄。资源、人脉、经验、胆识都到位" },
+        elderly: { score: 70, tip: "赡养父母是责任,也是给孩子做榜样。关注父母身心健康" },
+        legacy: { score: 80, tip: "传承家业、家风、家训。培养子女接班或独立,留下家族精神财富" }
+      },
+      advice: "这一阶段最重要的是:1. 事业护城河+财务自由;2. 婚姻保鲜+亲子教育;3. 健康管理+定期体检;4. 父母赡养+家风传承;5. 人脉深耕+跨界合作;6. 公益参与+社会贡献;7. 培养接班人+资产配置。忌:事业家庭失衡、过度投资、忽视健康、婚姻破裂、亲子关系淡漠。"
+    }
+  };
+
+  function renderLP4Stages() {
+    Object.entries(window.LP_4STAGES).forEach(([key, stage]) => {
+      const container = document.getElementById('section-lp-' + key);
+      if (!container) return;
+      let html = '<div class="lp-stage-section">';
+      html += '<div class="lp-stage-title">' + stage.emoji + ' ' + stage.name + ' (' + stage.ageRange + ')</div>';
+      html += '<div class="lp-stage-grid">';
+      Object.entries(stage.domains).forEach(([dk, dv]) => {
+        const scoreClass = dv.score >= 75 ? 'good' : dv.score >= 50 ? 'mid' : 'bad';
+        const domainNames = { study:'学业', career:'事业', wealth:'财运', marriage:'婚姻', health:'健康', city:'城市', culture:'文化', cultivation:'修养', network:'人脉', venture:'创业', elderly:'养老', legacy:'传承' };
+        html += '<div class="lp-stage-card">';
+        html += '<div class="lp-stage-card-title">' + (domainNames[dk] || dk) + ' <span class="lp-' + key + '-tag lp-stage-tag" style="color:' + stage.color + '">' + dv.score + '分</span></div>';
+        html += '<div class="lp-stage-card-content">' + dv.tip + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      html += '<div style="margin-top:16px;padding:12px;background:rgba(99,179,237,0.05);border-radius:8px;color:#c5d1de;font-size:13px;line-height:1.8"><strong style="color:' + stage.color + '">本阶段总纲:</strong> ' + stage.advice + '</div>';
+      html += '</div>';
+      container.innerHTML = html;
+    });
+    // 渲染时间轴
+    const timelineEl = document.getElementById('lp-stage-timeline');
+    if (timelineEl) {
+      let html = '';
+      const order = ['children','teen','young','mid'];
+      const ages = ['0-6 岁','6-18 岁','18-28 岁','30-50 岁'];
+      order.forEach((k, i) => {
+        const s = window.LP_4STAGES[k];
+        html += '<div class="lp-stage-timeline-item"><div class="lp-stage-timeline-age">' + s.emoji + ' ' + ages[i] + '</div><div class="lp-stage-timeline-name">' + s.name + '</div></div>';
+      });
+      timelineEl.innerHTML = html;
+    }
+  }
+  window.renderLP4Stages = renderLP4Stages;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderLP4Stages);
+  } else {
+    setTimeout(renderLP4Stages, 100);
+  }
+})();
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+
+<!-- ===== R33: 二维码分享模态（原生 <dialog> · ESC + click-out 自动 a11y）===== -->
+<dialog id="qrModal" class="qr-modal" aria-label="二维码分享">
+  <div class="qr-modal-content">
+    <button class="qr-modal-close" onclick="closeQrModal()" aria-label="关闭">关</button>
+    <h3>机 扫码查看此报告</h3>
+    <p class="qr-modal-hint">用微信/支付宝/系统相机扫描二维码，即可在手机上阅读完整报告</p>
+    <div class="qr-canvas-wrap">
+      <canvas id="qrCanvas" width="256" height="256"></canvas>
+    </div>
+    <p id="qrUrlText" class="qr-url-text"></p>
+    <div class="qr-modal-tools">
+      <button onclick="downloadQr()">存 保存二维码</button>
+      <button onclick="shareUrl()">复制链接</button>
+    </div>
+    <p class="qr-modal-footprint">包含所有输入参数（年龄/性别/居地/关注点）· 阅后即焚版友友分享</p>
+  </div>
+</dialog>
+
+
+  
+</main>
+  <script src="js/jieqi-table.js" defer></script>
+<script src="js/jieqi-hours.js" defer></script>
+<script src="js/jieqi-engine.js" defer></script>
+<script src="js/report-engine.js" defer></script>
+  <script src="js/report-render-adapters.js" defer></script>
+<script src="js/huajie-render.js" defer></script>
+<script src="js/lifeplan-detail-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-s 480+360 紧凑断点 (deduplicated — single copy) */
+@media(max-width:768px){
+  body{font-size:14px}
+  .container,.main,.body,.wrap{max-width:100%;padding:10px}
+  h1{font-size:20px}
+  h2{font-size:16px}
+  h3{font-size:14px}
+  .btn{padding:8px 12px;font-size:13px}
+  table{font-size:12px}
+  .lp-stage-grid{grid-template-columns:repeat(2,1fr)!important}
+}
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+  .lp-stage-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+<script>
+// R441: force-open all <details> before print, restore after
+(function(){
+  var beforePrint = function(){ document.querySelectorAll('details').forEach(function(d){ d.setAttribute('data-r441-was-open', d.open?'1':'0'); d.open = true; }); };
+  var afterPrint = function(){ document.querySelectorAll('details[data-r441-was-open]').forEach(function(d){ d.open = d.getAttribute('data-r441-was-open')==='1'; d.removeAttribute('data-r441-was-open'); }); };
+  if (window.matchMedia) {
+    var mq = window.matchMedia('print');
+    mq.addListener(function(m){ if(m.matches) beforePrint(); else afterPrint(); });
+  }
+  window.addEventListener('beforeprint', beforePrint);
+  window.addEventListener('afterprint', afterPrint);
+})();
+</script>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

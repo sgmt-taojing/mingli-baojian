@@ -1,0 +1,58 @@
+:root {
+      --ink:#080808;--paper:#f0e8d8;--gold:#c9a84c;--gold2:#e8cc7a;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper3:#a09080;--steel:#7f8c8d}
+    body {
+      font-family: 'Noto Serif SC', serif;
+      background: var(--ink); color: var(--paper);
+      margin: 0; padding: 20px; min-height: 100vh;
+    }
+    .header {
+      text-align: center; padding: 40px 0; border-bottom: 1px solid var(--ink3);
+    }
+    .header h1 { font-size: 28px; color: var(--gold); margin: 0 0 10px 0; }
+    .header p { color: var(--steel); margin: 0; }
+    .tools-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px; padding: 40px 0; max-width: 1200px; margin: 0 auto;
+    }
+    .tool-card {
+      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
+      padding: 30px; transition: all 0.3s; cursor: pointer;
+    }
+    .tool-card:hover {
+      border-color: var(--gold); transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(201,168,76,0.15);
+    }
+    .tool-icon { font-size: 48px; margin-bottom: 15px; }
+    .tool-title { font-size: 20px; color: var(--gold2); margin-bottom: 10px; }
+    .tool-desc { color: var(--paper3); line-height: 1.6; font-size: 14px; }
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--ink); border-top: 1px solid var(--ink4);
+      display: flex; justify-content: center; padding: 12px;
+    }
+    .nav-btn {
+      background: transparent; border: none; color: var(--steel);
+      padding: 10px 20px; cursor: pointer; transition: color 0.3s;
+    }
+    .nav-btn:hover { color: var(--gold); }
+/* R-P3-17.4 reflow（自动注入） */
+@media(max-width:768px){
+  h1{font-size:22px!important}h2{font-size:19px!important}
+  [style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{
+    grid-template-columns:repeat(2,1fr)!important
+  }
+  .wrap,.container,.main{max-width:100vw!important;overflow-x:hidden!important;padding:12px!important}
+}
+@media(max-width:480px){
+  body{font-size:13px}
+  [style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3")]{
+    grid-template-columns:1fr!important
+  }
+}
+@media(max-width:320px){
+  body{font-size:12px;padding:0!important}
+  h1{font-size:18px!important}h2{font-size:15px!important}
+  input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}
+}
+
+  

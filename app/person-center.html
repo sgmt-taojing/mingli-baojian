@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="身份管理中心 · 易道智鉴平台">
+<meta name="keywords" content="身份管理中心">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/person-center.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="身份管理中心 · 命理宝鉴">
+<meta property="og:description" content="身份管理中心 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>身份管理中心 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:100%;margin:0 auto}
+h1{color:var(--gold);font-size:20px;margin-bottom:16px;text-align:center}
+.nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:13px;margin-bottom:12px;padding:4px 10px;border:1px solid var(--border);border-radius:6px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.card-title{font-size:15px;font-weight:600;color:var(--gold);margin-bottom:10px}
+.identity-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.id-tab{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:13px;transition:all .2s}
+.id-tab.active{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-item{padding:8px 10px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.info-label{font-size:11px;color:var(--muted);margin-bottom:2px}
+.info-value{font-size:14px;color:var(--text)}
+.stat-row{display:flex;gap:10px;flex-wrap:wrap}
+.stat-box{flex:1;min-width:80px;text-align:center;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.stat-num{font-size:22px;font-weight:700;color:var(--gold)}
+.stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+.case-item{padding:10px;background:var(--bg);border-radius:6px;border:1px solid var(--border);margin-bottom:8px}
+.case-symptoms{font-size:13px;margin-bottom:4px}
+.case-diagnosis{font-size:12px;color:var(--muted)}
+.bridge-box{padding:12px;background:linear-gradient(135deg,rgba(159,122,234,.1),rgba(66,153,225,.1));border:1px solid rgba(159,122,234,.3);border-radius:8px;margin-top:10px}
+.bridge-title{font-size:13px;color:var(--purple);font-weight:600;margin-bottom:6px}
+.bridge-content{font-size:12px;color:var(--text);line-height:1.6}
+.btn{display:inline-block;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:12px;text-decoration:none}
+.btn-primary{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+.empty{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+@media(max-width:768px){.info-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.stat-num{font-size:18px}}
+@media(max-width:360px){.id-tab{padding:6px 10px;font-size:11px}}
+@media print{body{background:#fff!important;color:#000!important;padding:8px!important}header.page-header-bar,.phb-back,.nav-back,nav,.nav-bar,.no-print,footer,.btn,button,.id-tab{display:none!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}.card-title{color:#000!important}.info-grid{grid-template-columns:1fr 1fr!important}.info-item,.stat-box,.case-item{border:1px solid #ccc!important;background:#fff!important}.stat-num{color:#000!important}.bridge-box{background:none!important;border:1px solid #ddd!important}.bridge-title{color:#333!important}.empty{color:#666!important}a{color:#000!important;text-decoration:none!important}h1{color:#000!important;font-size:16px!important}}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body class="theme-user">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">身份管理中心</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+  <a href="sos.html" style="margin-left:auto;margin-right:8px;background:#dc2626;color:#fff;text-decoration:none;border-radius:16px;padding:4px 12px;font-size:12px;font-weight:600">🚨 SOS</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>登录认证</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看身份</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>设置偏好</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>保存生效</span></div></div>
+<div class="flow-hint">登录后管理个人身份、角色权限和系统偏好设置。</div>
+</div>
+<a href="divination-hub.html" class="nav-back">← 返回首页</a>
+<h1>名 身份管理中心</h1>
+<div class="identity-tabs">
+<div class="id-tab active" onclick="switchId('yuanzhu')">卦 缘主</div>
+<div class="id-tab" onclick="switchId('patient')">注 患者</div>
+<div class="id-tab" onclick="switchId('believer')">莲 信众</div>
+<div class="id-tab" onclick="switchId('wellness')">草 康养人</div>
+<div class="id-tab" onclick="switchId('full')">表 全部</div>
+</div>
+<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+<a href="wellness-track.html" style="flex:1;min-width:80px;text-align:center;padding:6px 8px;background:var(--green);color:#fff;border-radius:8px;text-decoration:none;font-size:11px;font-weight:600">📊 健康打卡</a>
+<a href="emergency-contacts.html" style="flex:1;min-width:80px;text-align:center;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-decoration:none;font-size:11px;color:var(--text)">👨‍👩‍👧 紧急联系人</a>
+<a href="patient-report.html" style="flex:1;min-width:80px;text-align:center;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-decoration:none;font-size:11px;color:var(--gold)">📋 我的报告</a>
+<a href="mobile-interact.html" style="flex:1;min-width:80px;text-align:center;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-decoration:none;font-size:11px;color:var(--cyan)">📱 拍照诊断</a>
+</div>
+<div id="content"><div class="empty">正在为您查阅典籍...</div></div>
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var uid=4;var p=new URLSearchParams(location.search);if(p.get('uid'))uid=parseInt(p.get('uid'));
+function fj(u){return fetch(u,{signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()}).then(function(d){return d.data||d}).catch(function(e){console.warn('[person-center] fetch fail:',u,e&&esc(e.message));return {error:e&&esc(e.message)||'network'}})}
+function switchId(id){currentId=id;document.querySelectorAll('.id-tab').forEach(function(t){t.classList.remove('active')});var t=document.querySelectorAll('.id-tab');for(var i=0;i<t.length;i++){var txt=t[i].textContent;var kw=id==='yuanzhu'?'缘':id==='patient'?'患':id==='believer'?'信':id==='wellness'?'康':id==='full'?'全':id;if(txt.indexOf(kw)>-1)t[i].classList.add('active')}render()}
+var c;var currentId='yuanzhu';
+function info(l,v){return '<div class="info-item"><div class="info-label">'+l+'</div><div class="info-value">'+escapeHtml(v||'-')+'</div></div>'}
+function stat(n,l){return '<div class="stat-box"><div class="stat-num">'+escapeHtml(n)+'</div><div class="stat-label">'+l+'</div></div>'}
+function render(){c=document.getElementById('content');c.innerHTML='<div class="empty">正在为您查阅典籍...</div>';
+if(currentId==='yuanzhu')renderY();else if(currentId==='patient')renderP();else if(currentId==='believer')renderB();else if(currentId==='wellness')renderW();else renderF()}
+function renderY(){fj(API+'/api/yuanzhu/profile/'+uid).then(function(d){var u=d.user||{},p=d.profile||{},h=d.paipan_history||[];var s='<div class="card"><div class="card-title">卦 缘主档案</div><div class="info-grid">'+info('姓名',u.name||'')+info('性别',u.sex||'')+info('出生',u.birth_date||'')+info('日主',p.day_master||u.day_stem||'')+info('喜神',p.xi_ele||u.xi_ele||'')+info('生肖',p.zodiac||u.zodiac||'')+'</div></div>';s+='<div class="card"><div class="card-title">统计</div><div class="stat-row">'+stat(p.paipan_count||h.length,'排盘')+stat(h.length,'历史')+stat(p.push_opt_in?'订阅':'未订','推送')+'</div></div>';s+='<div class="bridge-box"><div class="bridge-title">周易→中医桥接</div><div class="bridge-content"><a class="btn btn-primary" href="javascript:loadB()">查看方案</a></div><div id="br"></div></div>';c.innerHTML=s})}
+function loadB(){var e=document.getElementById('br');if(!e)return;e.innerHTML='正在为您查阅典籍...';fj(API+'/api/clinic/bridge/'+uid).then(function(d){var b=d.tcm_bridge||{};e.innerHTML='<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;font-size:12px"><b>'+d.element+'</b>→'+b.organ+' | '+b.recommendation+'<br>食疗:'+b.foods+'<br>中药:'+b.herbs+'<br>穴位:'+b.acupoint+'</div>'})}
+function renderP(){fj(API+'/api/patient/profile/'+uid).then(function(d){var u=d.user||{},cs=d.cases||[],s=d.stats||{};var h='<div class="card"><div class="card-title">注 患者档案</div><div class="info-grid">'+info('姓名',u.name||'')+info('性别',u.sex||'')+info('出生',u.birth_date||'')+'</div></div>';h+='<div class="card"><div class="card-title">图 诊疗统计</div><div class="stat-row">'+stat(s.total_cases||0,'诊疗')+stat(s.pending_cases||0,'待处理')+stat(s.completed_cases||0,'完成')+stat(s.follow_up_count||0,'复诊')+'</div></div>';if(cs.length>0){h+='<div class="card"><div class="card-title">表 诊疗记录</div>';cs.forEach(function(c){h+='<div class="case-item"><div class="case-symptoms">'+c.symptoms+'</div>'+(c.diagnosis?'<div class="case-diagnosis">辨证:'+c.diagnosis+'</div>':'')+(c.treatment_outcome?'<div class="case-diagnosis">疗效:'+c.treatment_outcome+'</div>':'')+'</div>'});h+='</div>'}c.innerHTML=h})}
+function renderB(){var c=document.getElementById('content');c.innerHTML='<div class="card"><div class="card-title">莲 信众档案</div><div class="empty">开发中<br>• 法事记录 • 祈福登记<br>• 符咒档案 • 功德积累</div></div>'}
+function renderW(){fj(API+'/api/wellness/profile/'+uid).then(function(d){var r=d.data||{};var h='<div class="card"><div class="card-title">草 康养人档案</div><div class="info-grid">'+info('姓名',r.name||'')+info('性别',r.sex||'')+info('年龄',r.age||'')+info('身高/体重',r.height||'')+info('出生',r.birth_date||'')+info('日主五行',r.day_element?(r.day_master+' / '+r.day_element):'')+'</div></div>';h+='<div class="card"><div class="card-title">警 风险等级</div>';var rl=r.risk_level||'normal';var rcl={high:'#f56565',mid:'#ed8936',normal:'#48bb78'}[rl]||'#48bb78';var rn={high:'高风险',mid:'中风险',normal:'正常'}[rl]||'正常';h+='<div style="padding:12px;background:'+rcl+'22;border-radius:8px;text-align:center"><div style="font-size:24px;color:'+rcl+'"><b>'+rn+'</b></div><div style="font-size:11px;color:var(--muted);margin-top:4px">综合日主五行+家族遗传+症状评估</div></div></div>';h+='<div class="card"><div class="card-title">因 家族遗传</div><div style="font-size:12px;line-height:1.6">'+(r.family_genetic||'无')+'</div></div>';if(r.bp)h+='<div class="card"><div class="card-title">诊 西医指标</div><div style="font-size:12px;line-height:1.8">血压:'+r.bp+' | 心率:'+r.hr+' | 血糖:'+r.glucose+' | 血脂:'+r.lipid+'<br>肝:'+r.liver+' | 肾:'+r.kidney+'</div></div>';h+='<div class="card"><div class="card-title">中医体质</div><div style="font-size:12px;line-height:1.6">怕冷热:'+(r.temp_pref||'')+' | 出汗:'+(r.sweat||'')+' | 食欲:'+(r.appetite||'')+'<br>睡眠:'+(r.sleep||'')+' | 大便:'+(r.bowel||'')+' | 情绪:'+(r.mood||'')+' | 精力:'+(r.energy||'')+'<br>当前症状:'+(r.symptoms||'无')+'</div></div>';h+='<a class="btn btn-primary" href="wellness-guide.html" style="display:block;padding:12px;background:var(--gold);color:var(--bg);text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:10px">更 重新生成健康预测</a>';
+h+='<a class="btn btn-primary" href="wellness-weekly.html" style="display:block;padding:12px;background:var(--green);color:#000;text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px">历 进入周分析中心</a>';
+h+='<a class="btn btn-primary" href="report-ocr.html" style="display:block;padding:12px;background:var(--purple);color:#fff;text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px">表 体检报告OCR</a><a class="btn" href="report-interpret.html" style="display:block;padding:12px;background:var(--orange);color:#fff;text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px">图 统一报告解读</a>';
+c.innerHTML=h}).catch(function(e){c.innerHTML='<div class="card"><div class="card-title">草 康养人档案</div><div class="empty">尚未创建康养人档案<br><br><a href="wellness-guide.html" class="btn btn-primary" style="display:inline-block;padding:10px 20px;background:var(--gold);color:var(--bg);border-radius:8px;text-decoration:none">开始健康评估 →</a></div></div>'})}
+function renderF(){fj(API+'/api/person/'+uid+'/full').then(function(d){var u=d.user||{},ids=d.identities||[];var h='<div class="card"><div class="card-title">表 统一档案</div><div class="info-grid">'+info('姓名',u.name||'')+info('身份',ids.join('/')||'无')+'</div></div>';if(d.yuanzhu)h+='<div class="card"><div class="card-title">卦 缘主</div><div class="info-grid">'+info('日主',d.yuanzhu.day_master||'')+info('喜神',d.yuanzhu.xi_ele||'')+'</div></div>';if(d.medical)h+='<div class="card"><div class="card-title">注 医疗 ('+(d.medical.cases||[]).length+'条)</div></div>';c.innerHTML=h})}
+render();
+</script>
+  <script src="js/mobile-nav.js" defer></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="报告解读中心 · 命理宝鉴">
+<meta property="og:description" content="统一报告解读：体检/生化/影像/手动录入，支持四维融合解读（西医+中医+命理+家族遗传）">
+<meta property="og:type" content="website">
+<title>报告解读中心 · 命理宝鉴</title>
+<meta name="description" content="统一报告解读：体检/生化/影像/手动录入，支持四维融合解读（西医+中医+命理+家族遗传）">
+<meta name="keywords" content="报告解读中心">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/report-interpret.html">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/report-interpret.css">
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;background:var(--bg);color:var(--text);margin:0;padding:0;font-size:14px}
+.topbar{background:linear-gradient(135deg,var(--bg-2),var(--bg));padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar h1{margin:0;font-size:18px;color:var(--gold)}
+.back-link{color:var(--text-muted);text-decoration:none;font-size:13px}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.section{background:var(--bg-2);border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid var(--border)}
+.section-title{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--gold)}
+.tab-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab-btn{padding:8px 14px;background:var(--bg);border:1px solid var(--border);border-radius:16px;cursor:pointer;font-size:13px;color:var(--text)}
+.tab-btn.active{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.tab-btn:hover:not(.active){border-color:var(--gold)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.input-grid{display:grid;gap:10px}
+.input-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:768px){.input-row{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.input-row{grid-template-columns:1fr}}
+.input-group{display:flex;flex-direction:column}
+.input-group label{font-size:13px;color:var(--text-muted);margin-bottom:4px}
+.input-group input,.input-group select,.input-group textarea{padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+.input-group textarea{min-height:80px;resize:vertical}
+.btn{padding:10px 16px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500}
+.btn:hover{background:var(--gold-2)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.quick-btn{padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--text-muted);cursor:pointer}
+.quick-btn:hover{border-color:var(--gold);color:var(--gold)}
+.upload-area{border:2px dashed var(--border);border-radius:8px;padding:30px;text-align:center;cursor:pointer;background:var(--bg);transition:all 0.2s}
+.upload-area:hover{border-color:var(--gold);background:var(--bg-2)}
+.upload-area.has-file{border-color:var(--green);background:var(--bg-2)}
+.upload-area p{margin:0 0 8px;color:var(--text-muted)}
+.upload-area .file-name{color:var(--green);font-weight:500}
+#preview{max-width:100%;max-height:300px;border-radius:4px;margin-top:10px;display:none}
+#interpretResult{margin-top:12px}
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:768px){.summary-row{grid-template-columns:repeat(2,1fr)}}
+.summary-card{background:var(--bg);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border)}
+.summary-num{font-size:24px;font-weight:600;color:var(--gold);font-family:monospace}
+.summary-label{font-size:12px;color:var(--text-muted);margin-top:4px}
+.engine-tag{display:inline-block;padding:3px 8px;background:var(--bg-2);border:1px solid var(--border);border-radius:10px;font-size:11px;color:var(--text-muted);margin-left:6px}
+.engine-tag.ok{color:var(--green);border-color:var(--green)}
+.engine-tag.warn{color:var(--orange);border-color:var(--orange)}
+.engine-tag.err{color:var(--red);border-color:var(--red)}
+@media(max-width:360px){body{padding:8px 6px 56px;font-size:13px}h1{font-size:18px}h2{font-size:15px}.container,.wrap,.content{padding:8px 6px}.card,.panel,.box{padding:10px 8px;margin-bottom:8px}.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;gap:8px}.stat-grid,.stat-row{grid-template-columns:1fr 1fr;gap:6px}.stat-card,.stat-item{padding:8px 6px}.btn,.button{font-size:12px;padding:6px 12px}.nav-bar,.tab-bar,.tabs{font-size:11px;gap:4px}.nav-bar a,.tab-btn{padding:4px 6px}.table{font-size:11px}.table th,.table td{padding:4px 6px}input,select,textarea{font-size:13px;padding:6px 8px}label{font-size:12px}.summary,.desc,.text{font-size:12px}.hero{padding:12px 8px}.hero h1{font-size:20px}}
+@media print{body{background:#fff!important;color:#000!important}header.page-header-bar,.phb-back,.topbar,.back-link,.tab-row,.btn-row,.quick-btns,.upload-area,nav,.no-print,footer,.btn,button{display:none!important}.container{max-width:100%!important;margin:0!important;padding:8px!important}.section{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;background:#fff!important}.section-title{color:#000!important}.tab-content{display:block!important}.input-row{grid-template-columns:1fr 1fr 1fr!important}.summary-row{grid-template-columns:repeat(4,1fr)!important}.summary-card{border:1px solid #ccc!important;background:#fff!important}.summary-num{color:#000!important}.summary-label{color:#666!important}.engine-tag{border:1px solid #999!important;color:#333!important}input,select,textarea{border:1px solid #999!important;background:#fff!important;color:#000!important}h1{color:#000!important;font-size:14px!important}a{color:#000!important;text-decoration:none!important}img{max-width:100%!important}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">报告解读中心</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择报告</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看解读</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>深度分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出解读</span></div></div>
+<div class="flow-hint">查看报告解读中心 · 命理宝鉴，了解功能详情与使用方式。</div>
+</div>
+<div class="topbar">
+  <h1>报告解读中心 · 统一引擎</h1>
+  <a href="divination-hub.html" class="back-link">← 返回</a>
+</div>
+
+<div class="container">
+
+<!-- R249 引擎说明 -->
+<div class="section">
+  <div class="section-title">标 一处解读，多处调用</div>
+  <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">
+    支持报告类型：体检报告 / 生化指标 / CT / MRI / X光 / 超声 / 血常规 / 手动录入。
+    引擎自动匹配 24 项生化指标 + 15 项影像模式 + 日主五行 + 家族遗传，输出<strong>四维融合解读</strong>。
+  </p>
+  <div class="summary-row">
+    <div class="summary-card"><div class="summary-num" id="stat-count">0</div><div class="summary-label">本周解读</div></div>
+    <div class="summary-card"><div class="summary-num" id="stat-abnormal">0</div><div class="summary-label">异常项</div></div>
+    <div class="summary-card"><div class="summary-num" id="stat-high">0</div><div class="summary-label">高风险</div></div>
+    <div class="summary-card"><div class="summary-num" id="stat-kb">0</div><div class="summary-label">KB入库</div></div>
+  </div>
+  <div style="margin-top:10px">
+    引擎状态：<span id="engine-status">检查中...</span>
+    <span class="engine-tag" id="tag-biochem">24项生化</span>
+    <span class="engine-tag" id="tag-imaging">15项影像</span>
+    <span class="engine-tag" id="tag-wuxing">5行器官</span>
+  </div>
+</div>
+
+<!-- 输入区 -->
+<div class="section">
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('upload')">拍 拍照OCR</button>
+    <button class="tab-btn" onclick="switchTab('manual')">✍️ 手动录入</button>
+    <button class="tab-btn" onclick="switchTab('blood')">注 血常规</button>
+    <button class="tab-btn" onclick="switchTab('imaging')">查 影像CT/MRI</button>
+    <button class="tab-btn" onclick="switchTab('risk')">警 风险加倍</button>
+  </div>
+
+  <!-- Tab 1: OCR 上传 -->
+  <div class="tab-content active" id="tab-upload">
+    <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+      <p>拍 点击或拖拽上传体检报告图片</p>
+      <p style="font-size:11px">支持 JPG / PNG / WEBP（≤10MB）</p>
+      <input aria-label="输入" type="file" id="fileInput" accept="image/*" style="display:none">
+      <img loading="lazy" id="preview" alt="报告预览图">
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="doOCR()">查 OCR 识别</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">夹 选择文件</button>
+    </div>
+    <div id="ocrText" style="margin-top:12px;padding:10px;background:var(--bg);border-radius:6px;font-size:12px;display:none">
+      <div style="color:var(--text-muted);margin-bottom:6px">OCR 识别文本：</div>
+      <div id="ocrTextContent" style="white-space:pre-wrap"></div>
+    </div>
+  </div>
+
+  <!-- Tab 2: 手动录入 -->
+  <div class="tab-content" id="tab-manual">
+    <div class="input-grid">
+      <div class="input-row">
+        <div class="input-group"><label>血压 (mmHg)</label><input aria-label="m bp" id="m-bp" placeholder="如：120/80"></div>
+        <div class="input-group"><label>心率 (bpm)</label><input aria-label="m hr" id="m-hr" placeholder="如：72"></div>
+        <div class="input-group"><label>空腹血糖 (mmol/L)</label><input aria-label="m glu" id="m-glu" placeholder="如：5.2"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-group"><label>总胆固醇</label><input aria-label="m tc" id="m-tc" placeholder="如：4.5"></div>
+        <div class="input-group"><label>甘油三酯</label><input aria-label="m tg" id="m-tg" placeholder="如：1.2"></div>
+        <div class="input-group"><label>LDL-C</label><input aria-label="m ldl" id="m-ldl" placeholder="如：2.8"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-group"><label>ALT (U/L)</label><input aria-label="m alt" id="m-alt" placeholder="如：25"></div>
+        <div class="input-group"><label>AST (U/L)</label><input aria-label="m ast" id="m-ast" placeholder="如：22"></div>
+        <div class="input-group"><label>尿酸 (μmol/L)</label><input aria-label="m ua" id="m-ua" placeholder="如：320"></div>
+      </div>
+      <div class="input-row">
+        <div class="input-group"><label>血红蛋白</label><input aria-label="m hgb" id="m-hgb" placeholder="如：135"></div>
+        <div class="input-group"><label>白细胞</label><input aria-label="m wbc" id="m-wbc" placeholder="如：6.5"></div>
+        <div class="input-group"><label>血小板</label><input aria-label="m plt" id="m-plt" placeholder="如：200"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="doManualInterpret()">卦 立即解读</button>
+      <button class="btn btn-ghost" onclick="clearManual()">删 清空</button>
+      <button class="btn btn-ghost" onclick="loadExample()">记 加载示例</button>
+    </div>
+  </div>
+
+  <!-- Tab 3: 血常规快捷 -->
+  <div class="tab-content" id="tab-blood">
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">点击下方快捷按钮快速录入血常规：</p>
+    <div class="quick-btns">
+      <button class="quick-btn" onclick="setBlood('hgb', 135)">安 血红蛋白正常</button>
+      <button class="quick-btn" onclick="setBlood('hgb', 90)">危 血红蛋白偏低</button>
+      <button class="quick-btn" onclick="setBlood('wbc', 6.5)">安 白细胞正常</button>
+      <button class="quick-btn" onclick="setBlood('wbc', 14)">危 白细胞偏高</button>
+      <button class="quick-btn" onclick="setBlood('plt', 220)">安 血小板正常</button>
+      <button class="quick-btn" onclick="setBlood('plt', 60)">危 血小板偏低</button>
+    </div>
+    <div class="input-row" style="margin-top:14px">
+      <div class="input-group"><label>血红蛋白 (g/L)</label><input aria-label="b hgb" id="b-hgb"></div>
+      <div class="input-group"><label>白细胞 (×10⁹/L)</label><input aria-label="b wbc" id="b-wbc"></div>
+      <div class="input-group"><label>血小板 (×10⁹/L)</label><input aria-label="b plt" id="b-plt"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="doBloodInterpret()">卦 解读血常规</button>
+    </div>
+  </div>
+
+  <!-- Tab 4: 影像报告 -->
+  <div class="tab-content" id="tab-imaging">
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">粘贴或输入影像报告内容（CT/MRI/X光/超声）：</p>
+    <div class="input-group">
+      <textarea id="imagingText" placeholder="例：胸部CT平扫显示右肺上叶可见一结节状密度影，直径约8mm，边界清。肝脏密度均匀，未见异常密度灶。&#10;影像诊断：右肺上叶小结节，建议随访。" aria-label="例：胸部CT平扫显示右肺上叶可见一结节状密度影，直径约8mm"></textarea>
+    </div>
+    <div class="quick-btns">
+      <button class="quick-btn" onclick="setImaging('胸部CT平扫示：右肺上叶可见一结节状密度影，直径约8mm，边界清。肝脏密度均匀，未见异常密度灶。'))">胸部CT（肺结节）</button>
+      <button class="quick-btn" onclick="setImaging('腹部B超：肝脏大小正常，包膜光滑，肝内回声细腻增强，符合脂肪肝声像图。'))">脂肪肝B超</button>
+      <button class="quick-btn" onclick="setImaging('腰椎MRI：L4-L5椎间盘突出，硬膜囊受压。'))">腰椎间盘突出</button>
+      <button class="quick-btn" onclick="setImaging('乳腺B超：双侧乳腺腺体回声不均，呈豹纹样改变，符合乳腺增生病像。'))">乳腺增生</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="doImagingInterpret()">卦 解读影像</button>
+    </div>
+  </div>
+
+  <!-- Tab 5: 风险加倍场景 -->
+  <div class="tab-content" id="tab-risk">
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">预置 5 个高风险场景，演示四维融合：</p>
+    <div class="quick-btns" style="flex-direction:column;align-items:stretch">
+      <button class="quick-btn" onclick="runScenario('high-bp')">危 火日主+家族高血压+本人血压160/100</button>
+      <button class="quick-btn" onclick="runScenario('dm-family')">危 土日主+家族糖尿病+本人血糖9.5</button>
+      <button class="quick-btn" onclick="runScenario('liver')">警 木日主+肝功能异常+CT肝囊肿</button>
+      <button class="quick-btn" onclick="runScenario('kidney')">警 水日主+尿酸480+肾结石</button>
+      <button class="quick-btn" onclick="runScenario('normal')">安 金日主+指标正常</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- 解读结果 -->
+<div class="section" id="resultSection" style="display:none">
+  <div class="section-title">卦 解读结果</div>
+  <div id="interpretResult"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="ingestToKB()">入 入库 KB</button>
+    <button class="btn btn-ghost" onclick="copyReport()">表 复制报告</button>
+    <button class="btn btn-ghost" onclick="window.print()">🖨️ 打印</button>
+  </div>
+</div>
+
+<!-- 历史记录 -->
+<div class="section">
+  <div class="section-title">典 解读历史（KB 召回）</div>
+  <div id="historyList" style="font-size:13px;color:var(--text-muted)">正在为您查阅典籍...</div>
+</div>
+
+</div>
+
+<script src="js/ocr-client.js"></script>
+<script src="js/report-interpret-engine.js"></script>
+<script>
+var API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+var USER_ID = 4;
+var currentResult = null;
+var parsedItems = [];
+
+// 引擎初始化
+window.addEventListener('DOMContentLoaded', function(){
+  // 引擎状态
+  if(window.ReportInterpret){
+    document.getElementById('engine-status').innerHTML = '✅ 已加载';
+    document.getElementById('tag-biochem').className = 'engine-tag ok';
+    document.getElementById('tag-imaging').className = 'engine-tag ok';
+    document.getElementById('tag-wuxing').className = 'engine-tag ok';
+  }
+  // 加载统计
+  loadStats();
+  loadHistory();
+  // 加载 profile
+  fetchProfile();
+  // 加载排盘报告（从 chart 页跳过来）
+  loadPaipanReport();
+});
+
+function loadPaipanReport(){
+  try{
+    var data = sessionStorage.getItem('lastReport');
+    var params = new URLSearchParams(location.search);
+    var module = params.get('module');
+    if(!data || !module) return;
+    var report = JSON.parse(data);
+    // 展示面板
+    var panel = document.getElementById('paipanReportPanel');
+    if(!panel){
+      // 动态创建
+      var container = document.querySelector('main, .container, body');
+      var div = document.createElement('div');
+      div.id = 'paipanReportPanel';
+      div.className = 'paipan-report-panel';
+      div.style.cssText = 'background:linear-gradient(135deg,rgba(255,180,77,.08),rgba(255,126,95,.05));border:1px solid rgba(255,180,77,.3);border-radius:12px;padding:20px;margin:20px 16px;color:#fff';
+      div.innerHTML = '<h2 style="color:#ffb44d;margin:0 0 12px">📜 '+(report.module||module).toUpperCase()+' · 排盘报告</h2>'+
+        '<div id="paipanReportContent"></div>';
+      container.insertBefore(div, container.firstChild);
+      panel = div;
+    }
+    panel.style.display = 'block';
+    var content = document.getElementById('paipanReportContent');
+    if(content) content.innerHTML = renderPaipanReport(report);
+    // 清掉以免重复渲染
+    sessionStorage.removeItem('lastReport');
+  }catch(e){console.warn('排盘报告加载失败',e);}
+}
+
+function renderPaipanReport(report){
+  if(!report) return '';
+  var html = '';
+  if(report.summary) html += '<div style="margin-bottom:12px"><strong style="color:#ffb44d">概要：</strong> '+report.summary+'</div>';
+  if(report.segments && Array.isArray(report.segments)){
+    report.segments.forEach(function(s){
+      var isSeg5 = s.id === 'seg5' || (s.title && s.title.indexOf('优化建议') >= 0);
+      var bg = isSeg5 ? 'rgba(201,162,39,0.06)' : 'rgba(255,255,255,.03)';
+      var border = isSeg5 ? '1px solid rgba(201,162,39,0.2)' : 'none';
+      html += '<div style="margin-bottom:10px;padding:10px;background:'+bg+';border:'+border+';border-radius:8px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+s.title+'</div><div style="font-size:13px;line-height:1.7;color:#e4e8ee;white-space:pre-wrap">'+s.content+'</div></div>';
+    });
+  }
+  // 化解板块独立渲染
+  if(report.huajie){
+    var h = report.huajie;
+    html += '<div style="margin-top:16px;padding:14px;background:linear-gradient(135deg,rgba(201,162,39,0.08),rgba(201,162,39,0.02));border:1px solid rgba(201,162,39,0.3);border-radius:10px">';
+    html += '<div style="font-size:16px;font-weight:bold;color:#c9a227;margin-bottom:10px;border-bottom:1px solid rgba(201,162,39,0.2);padding-bottom:8px">🌿 化解方案 · '+h.risk_label+'</div>';
+    // 段一
+    if(h.risk_traces && h.risk_traces.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">一、盘面问题溯源</div>';
+      h.risk_traces.forEach(function(t){
+        html += '<div style="font-size:13px;margin:4px 0;padding:4px 8px;background:rgba(255,255,255,.03);border-radius:4px">▸ <strong>'+(t['\u76d8\u9762\u7b26\u53f7']||'')+'</strong> → '+(t['\u73b0\u5b9e\u4f53\u611f']||'')+'<br><span style="font-size:11px;color:#aaa">'+(t['\u98ce\u9669\u7b49\u7ea7']||'')+'</span></div>';
+      });
+      html += '</div>';
+    }
+    // 段二
+    if(h.behavior_fixes && h.behavior_fixes.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#4caf50;font-weight:600;margin-bottom:6px">二、行为心性整改（最高优先级）</div>';
+      h.behavior_fixes.forEach(function(f){
+        html += '<div style="font-size:13px;margin:3px 0;padding-left:12px;border-left:2px solid #4caf50">'+f+'</div>';
+      });
+      html += '</div>';
+    }
+    // 段三
+    if(h.environment_cures){
+      var env = h.environment_cures;
+      html += '<div style="margin-bottom:10px"><div style="color:#8ab4d8;font-weight:600;margin-bottom:6px">三、环境与随身物品化解</div>';
+      if(env.home && env.home.length){
+        html += '<div style="font-size:12px;color:#aaa;margin:4px 0">🏠 居家布局</div>';
+        env.home.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+i+'</div>'; });
+      }
+      if(env.carry && env.carry.length){
+        html += '<div style="font-size:12px;color:#aaa;margin:4px 0">📿 随身物品</div>';
+        env.carry.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+i+'</div>'; });
+      }
+      if(env.cost_range) html += '<div style="font-size:12px;color:#888;margin-top:4px">💰 成本参考：'+env.cost_range+'</div>';
+      html += '</div>';
+    }
+    // 段四
+    if(h.execution_notes && h.execution_notes.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#ff9800;font-weight:600;margin-bottom:6px">四、执行须知</div>';
+      h.execution_notes.forEach(function(n){
+        var isHeading = n.indexOf('━━━') >= 0;
+        html += '<div style="font-size:'+(isHeading?'12px':'13px')+';margin:2px 0;'+(isHeading?'color:#c9a227;font-weight:600;border-top:1px solid rgba(201,162,39,0.15);padding-top:4px;margin-top:6px':'padding-left:12px')+'">'+n+'</div>';
+      });
+      html += '</div>';
+    }
+    // 分流指引
+    if(h.referrals && h.referrals.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#e91e63;font-weight:600;margin-bottom:6px">专业分流指引</div>';
+      h.referrals.forEach(function(ref){
+        html += '<div style="margin:8px 0;padding:8px;background:rgba(255,255,255,.03);border-radius:6px;border-left:3px solid #e91e63">';
+        html += '<div style="font-weight:600;font-size:14px">'+ref.type+'</div>';
+        html += '<div style="font-size:12px;color:#aaa;margin:2px 0">适用：'+(ref.condition||'')+'</div>';
+        html += '<div style="font-size:12px;color:#aaa;margin:2px 0">建议：'+(ref.action||'')+'</div>';
+        if(ref.timing) html += '<div style="font-size:12px;color:#ffb44d;margin:2px 0">⏰ 时机：'+ref.timing+'</div>';
+        // 就近推荐
+        if(ref.nearby && ref.nearby.length){
+          html += '<div style="font-size:12px;color:#aaa;margin:4px 0 1px">📍 就近推荐：</div>';
+          ref.nearby.forEach(function(n){
+            html += '<div style="font-size:12px;margin:1px 0;padding-left:12px">→ '+n.name+(n.city?' ('+n.city+')':'')+(n.specialty?' '+n.specialty:'')+(n.note||'')+'</div>';
+            if(n.transport) html += '<div style="font-size:11px;color:#666;padding-left:24px">交通：'+n.transport+'</div>';
+          });
+        }
+        // 科仪
+        if(ref.ceremony && ref.ceremony.length){
+          html += '<div style="font-size:12px;color:#aaa;margin:4px 0 1px">⛩️ 科仪推荐：</div>';
+          ref.ceremony.forEach(function(c){
+            html += '<div style="font-size:12px;margin:1px 0;padding-left:12px">→ '+c.name+' | '+c.purpose+' | '+c.duration+' | '+c.cost+'</div>';
+            if(c.note) html += '<div style="font-size:11px;color:#666;padding-left:24px">准备：'+c.note+'</div>';
+          });
+        }
+        // 安排
+        if(ref.arrangement) html += '<div style="font-size:12px;margin:3px 0;padding-left:12px">📋 安排：'+ref.arrangement+'</div>';
+        // 吉日
+        if(ref.dates && ref.dates.length){
+          html += '<div style="font-size:12px;color:#aaa;margin:4px 0 1px">📅 吉日候选：</div>';
+          ref.dates.slice(0,6).forEach(function(d){
+            var tag = d.recommended ? ' <span style="color:#c9a227">★</span>' : '';
+            html += '<div style="font-size:12px;margin:1px 0;padding-left:12px">→ '+d.date+' '+d.weekday+' '+d.ganzhi+(d.reason?' ('+d.reason+')':'')+tag+'</div>';
+          });
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    // 免责
+    if(h.disclaimer){
+      html += '<div style="font-size:11px;color:#666;margin-top:8px;padding:8px;background:rgba(0,0,0,.2);border-radius:4px;line-height:1.5">'+h.disclaimer+'</div>';
+    }
+    html += '</div>';
+  }
+  if(report.analysis) html += '<div style="margin-top:12px"><strong style="color:#ffb44d">解读：</strong><pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.7">'+report.analysis+'</pre></div>';
+  if(report.chart){
+    html += '<details style="margin-top:12px"><summary style="color:#8ab4d8;cursor:pointer">查看原始排盘数据</summary><pre style="background:rgba(0,0,0,.3);padding:10px;border-radius:6px;overflow:auto;font-size:11px;color:#aab">'+JSON.stringify(report.chart,null,2)+'</pre></details>';
+  }
+  if(!html && !report.huajie){
+    // 兜底：原始 JSON
+    html = '<pre style="background:rgba(0,0,0,.3);padding:12px;border-radius:6px;overflow:auto;font-size:11px">'+JSON.stringify(report,null,2)+'</pre>';
+  }
+  return html;
+}
+
+async function fetchProfile(){
+  try{
+    var r = await fetch(API+'/api/wellness/profile/'+USER_ID, {signal: AbortSignal.timeout(15000)});
+    var j = await r.json();
+    window._profile = j.data || {};
+  }catch(e){window._profile = {}}
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active')});
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// === Tab 1: OCR ===
+document.getElementById('fileInput').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    document.getElementById('preview').src = ev.target.result;
+    document.getElementById('preview').style.display = 'block';
+    document.getElementById('uploadArea').classList.add('has-file');
+    document.getElementById('uploadArea').querySelector('p').innerHTML = '<span class="file-name">'+file.name+'</span>';
+  };
+  reader.readAsDataURL(file);
+});
+
+async function doOCR(){
+  var file = document.getElementById('fileInput').files[0];
+  if(!file){showToast('请先选择图片', 'warn'); return}
+  showToast('🔍 OCR 识别中...');
+  try{
+    var reader = new FileReader();
+    reader.onload = async function(e){
+      var resp = await window.OCRClient.report(e.target.result);
+      if(resp.ok){
+        var text = resp.text || '';
+        document.getElementById('ocrText').style.display = 'block';
+        document.getElementById('ocrTextContent').textContent = text;
+        // 用引擎解析
+        parsedItems = [];
+        Object.keys(window.ReportInterpret.BIOCHEM_RANGES).forEach(function(label){
+          var re = new RegExp(label+'[^\\d]*?(\\d+(?:\\.\\d+)?(?:\\/\\d+)?)','g');
+          var m;
+          while((m = re.exec(text)) !== null){
+            parsedItems.push({label:label, value:m[1]});
+          }
+        });
+        // 用引擎解读
+        var result = window.ReportInterpret.interpret({
+          source: 'ocr',
+          items: parsedItems,
+          profile: window._profile,
+          userId: USER_ID
+        });
+        showResult(result);
+        showToast('✅ 识别完成（'+parsedItems.length+'项指标）');
+      } else {
+        showToast('⚠️ OCR 失败：'+resp.text);
+      }
+    };
+    reader.readAsDataURL(file);
+  } catch(err){
+    showToast('❌ OCR 错误：'+err.message);
+  }
+}
+
+// === Tab 2: 手动录入 ===
+function doManualInterpret(){
+  var items = [];
+  var fields = [
+    {el:'m-bp', label:'血压'},
+    {el:'m-hr', label:'心率'},
+    {el:'m-glu', label:'空腹血糖'},
+    {el:'m-tc', label:'总胆固醇'},
+    {el:'m-tg', label:'甘油三酯'},
+    {el:'m-ldl', label:'LDL-C'},
+    {el:'m-alt', label:'ALT'},
+    {el:'m-ast', label:'AST'},
+    {el:'m-ua', label:'尿酸'},
+    {el:'m-hgb', label:'血红蛋白'},
+    {el:'m-wbc', label:'白细胞'},
+    {el:'m-plt', label:'血小板'}
+  ];
+  fields.forEach(function(f){
+    var v = document.getElementById(f.el).value.trim();
+    if(v) items.push({label:f.label, value:v});
+  });
+  if(items.length === 0){showToast('请至少填写一项', 'warn'); return}
+  var result = window.ReportInterpret.manual(items, window._profile, USER_ID);
+  showResult(result);
+}
+
+function clearManual(){
+  ['m-bp','m-hr','m-glu','m-tc','m-tg','m-ldl','m-alt','m-ast','m-ua','m-hgb','m-wbc','m-plt'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+}
+
+function loadExample(){
+  document.getElementById('m-bp').value = '150/95';
+  document.getElementById('m-hr').value = '85';
+  document.getElementById('m-glu').value = '8.5';
+  document.getElementById('m-tg').value = '2.3';
+  document.getElementById('m-alt').value = '55';
+  document.getElementById('m-ua').value = '480';
+}
+
+// === Tab 3: 血常规 ===
+function setBlood(key, val){
+  document.getElementById('b-'+key).value = val;
+}
+
+function doBloodInterpret(){
+  var items = [];
+  var hgb = document.getElementById('b-hgb').value;
+  var wbc = document.getElementById('b-wbc').value;
+  var plt = document.getElementById('b-plt').value;
+  if(hgb) items.push({label:'血红蛋白', value:hgb});
+  if(wbc) items.push({label:'白细胞', value:wbc});
+  if(plt) items.push({label:'血小板', value:plt});
+  if(items.length === 0){showToast('请填写血常规', 'warn'); return}
+  var result = window.ReportInterpret.manual(items, window._profile, USER_ID);
+  showResult(result);
+}
+
+// === Tab 4: 影像 ===
+function setImaging(text){
+  document.getElementById('imagingText').value = text;
+}
+
+function doImagingInterpret(){
+  var text = document.getElementById('imagingText').value.trim();
+  if(!text){showToast('请输入影像内容', 'warn'); return}
+  var result = window.ReportInterpret.imaging(text, window._profile, USER_ID);
+  showResult(result);
+}
+
+// === Tab 5: 风险场景 ===
+function runScenario(name){
+  var scenarios = {
+    'high-bp': {
+      items:[{label:'血压',value:'160/100'},{label:'总胆固醇',value:'6.5'},{label:'LDL-C',value:'4.2'}],
+      profile:{day_master:'丙',day_element:'火',family_genetic:'高血压、心脏病',symptoms:'偶尔头晕',age:55,sex:'男'}
+    },
+    'dm-family': {
+      items:[{label:'空腹血糖',value:'9.5'},{label:'糖化血红蛋白',value:'8.2'},{label:'甘油三酯',value:'3.0'}],
+      profile:{day_master:'戊',day_element:'土',family_genetic:'糖尿病',symptoms:'口渴多饮',age:62,sex:'男'}
+    },
+    'liver': {
+      items:[{label:'ALT',value:'80'},{label:'AST',value:'65'},{label:'总胆红素',value:'28'}],
+      imaging:[{name:'肝囊肿',tcm:'肝郁脾虚',organ:'肝',action:'6个月B超复查',flag:'low'}],
+      profile:{day_master:'甲',day_element:'木',family_genetic:'无',symptoms:'易怒',age:48,sex:'男'}
+    },
+    'kidney': {
+      items:[{label:'尿酸',value:'480'},{label:'肌酐',value:'125'}],
+      imaging:[{name:'肾结石',tcm:'湿热瘀阻',organ:'肾',action:'多饮水+复查',flag:'mid'}],
+      profile:{day_master:'癸',day_element:'水',family_genetic:'高血压',symptoms:'腰痛',age:50,sex:'男'}
+    },
+    'normal': {
+      items:[{label:'血压',value:'120/75'},{label:'心率',value:'72'},{label:'空腹血糖',value:'5.5'}],
+      profile:{day_master:'庚',day_element:'金',family_genetic:'无',symptoms:'平和',age:35,sex:'男'}
+    }
+  };
+  var sc = scenarios[name];
+  if(!sc) return;
+  var result = window.ReportInterpret.interpret({
+    source: 'scenario',
+    items: sc.items,
+    imaging: sc.imaging,
+    profile: sc.profile,
+    userId: USER_ID
+  });
+  showResult(result);
+}
+
+// === 显示结果 ===
+function showResult(result){
+  currentResult = result;
+  document.getElementById('resultSection').style.display = 'block';
+  window.ReportInterpret.renderTo('interpretResult', result, {style:'card'});
+  document.getElementById('resultSection').scrollIntoView({behavior:'smooth'});
+  // 更新统计
+  loadStats();
+}
+
+// === 入库 KB ===
+async function ingestToKB(){
+  if(!currentResult){showToast('请先做一次解读', 'warn'); return}
+  var anomalies = [];
+  currentResult.items.forEach(function(it){
+    if(it.flag && it.flag.cls === 'flag-high') anomalies.push({label:it.label, value:it.value, flag:'high'});
+    else if(it.flag && it.flag.cls === 'flag-low') anomalies.push({label:it.label, value:it.value, flag:'low'});
+  });
+  if(anomalies.length === 0){showToast('无异常项，无需入库', 'warn'); return}
+
+  try{
+    var csrfToken = await fetchCsrf();
+    var resp = await fetch(API+'/api/wellness/ocr-anomaly', { signal: AbortSignal.timeout(15000),
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'x-csrf-token': csrfToken},
+      body: JSON.stringify({
+        user_id: USER_ID,
+        anomalies: anomalies,
+        report_date: new Date().toISOString().slice(0,10),
+        engine: 'r249-unified-engine'
+      }), signal: AbortSignal.timeout(15000) });
+    var j = await resp.json();
+    if(j.code === 200 && j.data && j.data.ingested){
+      showToast('✅ 已入库 KB：'+j.data.kb_entry_id);
+      loadHistory();
+    } else {
+      showToast('⚠️ '+(j.message || '入库失败'));
+    }
+  } catch(err){
+    showToast('❌ 入库失败：'+err.message);
+  }
+}
+
+async function fetchCsrf(){
+  try{
+    var r = await fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000), credentials:'include'});
+    var j = await r.json();
+    return j.csrfToken || '';
+  }catch(e){return ''}
+}
+
+function copyReport(){
+  if(!currentResult) return;
+  var lines = ['【报告解读中心·'+currentResult.severity+'】'];
+  currentResult.western.forEach(function(l){lines.push('西医：'+l.text)});
+  currentResult.tcm.forEach(function(l){lines.push('中医：'+l)});
+  currentResult.mingli.forEach(function(l){lines.push('命理：'+l)});
+  currentResult.family.forEach(function(l){lines.push('遗传：'+l)});
+  navigator.clipboard.writeText(lines.join('\n')).then(function(){showToast('📋 已复制');});
+}
+
+async function loadStats(){
+  var stats = JSON.parse(localStorage.getItem('_r249_stats') || '{"count":0,"abnormal":0,"high":0,"kb":0}');
+  document.getElementById('stat-count').textContent = stats.count;
+  document.getElementById('stat-abnormal').textContent = stats.abnormal;
+  document.getElementById('stat-high').textContent = stats.high;
+  document.getElementById('stat-kb').textContent = stats.kb;
+  // 更新
+  if(currentResult){
+    var cnt = currentResult.items.filter(function(i){return i.flag && (i.flag.cls==='flag-high' || i.flag.cls==='flag-low')}).length;
+    var high = currentResult.items.filter(function(i){return i.flag && i.flag.cls==='flag-high'}).length;
+    stats.count++;
+    stats.abnormal += cnt;
+    stats.high += high;
+    localStorage.setItem('_r249_stats', JSON.stringify(stats));
+    document.getElementById('stat-count').textContent = stats.count;
+    document.getElementById('stat-abnormal').textContent = stats.abnormal;
+    document.getElementById('stat-high').textContent = stats.high;
+  }
+}
+
+async function loadHistory(){
+  try{
+    var r = await fetch(API+'/api/wellness/ocr-anomalies?limit=5', {signal: AbortSignal.timeout(15000)});
+    var j = await r.json();
+    var list = document.getElementById('historyList');
+    if(j.data && j.data.anomalies && j.data.anomalies.length){
+      var html = '<div style="margin-bottom:8px">图 已入库 <b>'+j.data.count+'</b> 条 OCR 异常案例：</div>';
+      j.data.anomalies.forEach(function(a){
+        html += '<div style="padding:8px;background:var(--bg);border-radius:6px;margin-bottom:6px">';
+        html += '<div style="font-weight:500;color:var(--gold)">'+a.title+'</div>';
+        html += '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">'+a.entry_id+' · trust='+a.trust_score+'</div>';
+        html += '</div>';
+      });
+      list.innerHTML = html;
+    } else {
+      list.innerHTML = '<div style="color:var(--text-muted)">暂无入库案例</div>';
+    }
+  }catch(e){
+    document.getElementById('historyList').innerHTML = '<div style="color:var(--text-muted)">查阅失败：'+esc(esc(e.message))+'</div>';
+  }
+}
+
+function showToast(msg){
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--bg-2);border:1px solid var(--gold);color:var(--gold);padding:10px 16px;border-radius:6px;z-index:9999;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove()}, 3000);
+}
+</script>
+<script src="js/mobile-nav.js" defer></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

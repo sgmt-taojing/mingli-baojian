@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="商城管理后台 · 易道智鉴平台">
+<meta name="keywords" content="商城管理后台">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/admin-shop.html">
+<meta name="theme-color" content="#050608">
+<title>商城管理后台 · 易道智鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/admin-shop-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/divination-hub-inline.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">商城管理后台</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择商品</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>编辑信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>设置价格</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>上架管理</span></div></div>
+<div class="flow-hint">管理员管理商城后台，商品+订单+用户+统计。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div style="position:fixed;top:12px;right:12px;z-index:99998">
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
+</div>
+
+<!-- 顶部导航 -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">🛍️ 易道智鉴 <span class="sub">· 商城管理后台</span></div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline btn-sm" onclick="window._shopAdmin.exportData()">入 导出数据</button>
+      <button class="btn btn-outline btn-sm" onclick="window._shopAdmin.importData()">出 导入数据</button>
+      <button class="btn btn-outline btn-sm" onclick="window._shopAdmin.resetData()">更 重置</button>
+      <a href="divination-hub.html" class="btn btn-outline btn-sm">宅 返回主站</a>
+      <a href="admin.html" class="btn btn-outline btn-sm">图 主后台</a>
+    </div>
+  </div>
+</div>
+
+<!-- 管理导航 -->
+<div class="container">
+  <nav class="shop-admin-nav">
+    <a href="#" data-shop-section="dashboard" class="active">图 概览</a>
+    <a href="#" data-shop-section="products">箱 商品管理</a>
+    <a href="#" data-shop-section="categories">夹 分类管理</a>
+  </nav>
+
+  <!-- 仪表盘 -->
+  <section id="shop-section-dashboard" class="shop-admin-section active">
+    <div class="section-header">
+      <h2>图 商品概览</h2>
+    </div>
+    <div class="card-grid" id="shop-dashboard-stats"></div>
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="window._shopAdmin.openAddProduct()">加 新增商品</button>
+      <button class="btn btn-outline" onclick="window._shopAdmin.showSection('products')">箱 查看所有商品</button>
+    </div>
+  </section>
+
+  <!-- 商品管理 -->
+  <section id="shop-section-products" class="shop-admin-section">
+    <div class="section-header">
+      <div><h2>箱 商品管理</h2><p>管理所有商品的上架、编辑和删除</p></div>
+      <button class="btn btn-primary" onclick="window._shopAdmin.openAddProduct()">加 新增商品</button>
+    </div>
+    
+    <div class="toolbar">
+      <input  type="text" id="shop-search-input" placeholder="搜索商品名称、描述、标签..." aria-label="搜索商品名称、描述、标签...">
+      <select id="shop-category-filter" aria-label="商品分类筛选" onchange="window._shopAdmin.filterByCategory()">
+        <option value="all">全部分类</option>
+      </select>
+      <select id="shop-status-filter" aria-label="商品状态筛选" onchange="window._shopAdmin.filterByStatus()">
+        <option value="all">全部状态</option>
+        <option value="online">已上架</option>
+        <option value="offline">已下架</option>
+      </select>
+    </div>
+    
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>图片</th>
+            <th>名称</th>
+            <th>分类</th>
+            <th>价格</th>
+            <th>库存</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="shop-product-tbody"></tbody>
+      </table>
+    </div>
+    
+    <div id="shop-product-pagination" style="text-align:center;margin-top:1rem;color:var(--gray);font-size:.8rem">
+      <span id="shop-product-count"></span>
+    </div>
+  </section>
+
+  <!-- 商品表单 -->
+  <section id="shop-section-product-form" class="shop-admin-section">
+    <div class="section-header">
+      <div><h2 id="product-form-title">新增商品</h2></div>
+      <div>
+        <button class="btn btn-outline btn-sm" onclick="window._shopAdmin.showSection('products')">← 返回列表</button>
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="prod-name">商品名称 *</label>
+        <input aria-label="姓名" type="text" id="prod-name" placeholder="输入商品名称">
+      </div>
+      <div class="form-group">
+        <label for="prod-price">价格 *</label>
+        <input aria-label="prod price" type="text" id="prod-price" placeholder="如 ¥168 或 ¥168-588">
+      </div>
+    </div>
+    
+    <div class="form-row-3">
+      <div class="form-group">
+        <label for="prod-category">分类 *</label>
+        <select id="prod-category" aria-label="prod-category" onchange="window._shopAdmin.onCategoryChange()">
+          <option value="">-- 选择分类 --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="prod-subcategory">子分类</label>
+        <select id="prod-subcategory" aria-label="prod-subcategory">
+          <option value="">-- 选择子分类 --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="prod-status">状态</label>
+        <select id="prod-status" aria-label="prod-status">
+          <option value="online">上架</option>
+          <option value="offline">下架</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="form-row-3">
+      <div class="form-group">
+        <label for="prod-original-price">原价</label>
+        <input aria-label="prod original price" type="text" id="prod-original-price" placeholder="如 ¥298">
+      </div>
+      <div class="form-group">
+        <label for="prod-stock">库存</label>
+        <input type="number" id="prod-stock" aria-label="prod-stock" value="0" min="0">
+      </div>
+      <div class="form-group">
+        <label for="prod-sales">销量</label>
+        <input type="number" id="prod-sales" aria-label="prod-sales" value="0" min="0">
+      </div>
+    </div>
+    
+    <div class="form-row-3">
+      <div class="form-group">
+        <label for="prod-material">材质</label>
+        <input aria-label="prod material" type="text" id="prod-material" placeholder="如 纯铜精铸">
+      </div>
+      <div class="form-group">
+        <label for="prod-size">规格尺寸</label>
+        <input aria-label="prod size" type="text" id="prod-size" placeholder="如 高度8-15cm">
+      </div>
+      <div class="form-group">
+        <label for="prod-origin">产地/来源</label>
+        <input aria-label="prod origin" type="text" id="prod-origin" placeholder="如 浙江杭州">
+      </div>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="prod-author">作者/品牌</label>
+        <input aria-label="prod author" type="text" id="prod-author" placeholder="作者或品牌名称">
+      </div>
+      <div class="form-group">
+        <label for="prod-rating">评分</label>
+        <input type="number" id="prod-rating" aria-label="prod-rating" value="4.5" min="0" max="5" step="0.1" style="width:100px">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="prod-tags">标签（用逗号分隔）</label>
+      <input aria-label="prod tags" type="text" id="prod-tags" placeholder="如 招财, 补金, 镇宅">
+    </div>
+    
+    <div class="form-group">
+      <label for="prod-description">商品描述</label>
+      <textarea id="prod-description" rows="2" placeholder="简短描述商品" aria-label="简短描述商品"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="prod-effects">功效/特点</label>
+      <textarea id="prod-effects" rows="2" placeholder="功效描述" aria-label="功效描述"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="prod-suitable">适用人群</label>
+      <textarea id="prod-suitable" rows="2" placeholder="适用人群描述" aria-label="适用人群描述"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="prod-reason">推荐理由</label>
+      <textarea id="prod-reason" rows="2" placeholder="推荐理由" aria-label="推荐理由"></textarea>
+    </div>
+    
+    <!-- 图片上传 -->
+    <div class="form-group">
+      <label for="image-file-input">商品图片（最多5张，第一张为主图）</label>
+      <div class="upload-zone" id="image-drop-zone">
+        <div class="upload-icon">拍</div>
+        <div class="upload-text">拖拽图片到此处或点击上传</div>
+        <div class="upload-hint">支持 JPG/PNG/WebP，单张不超过5MB，最多5张</div>
+      </div>
+      <input type="file" id="image-file-input" aria-label="image-file-input" accept="image/*" multiple style="display:none">
+      <div class="image-previews" id="image-preview-container"></div>
+    </div>
+    
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="window._shopAdmin.saveProduct()">存 保存商品</button>
+      <button class="btn btn-outline" onclick="window._shopAdmin.showSection('products')">取消</button>
+    </div>
+  </section>
+
+  <!-- 分类管理 -->
+  <section id="shop-section-categories" class="shop-admin-section">
+    <div class="section-header">
+      <div><h2>夹 分类管理</h2><p>管理商品分类和子分类</p></div>
+      <button class="btn btn-primary" onclick="window._shopAdmin.openAddCategory()">加 新增分类</button>
+    </div>
+    <div id="shop-category-list"></div>
+  </section>
+
+  <!-- 分类表单 -->
+  <section id="shop-section-category-form" class="shop-admin-section">
+    <div class="section-header">
+      <div><h2 id="cat-form-title">新增分类</h2></div>
+      <button class="btn btn-outline btn-sm" onclick="window._shopAdmin.showSection('categories')">← 返回列表</button>
+    </div>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="cat-name">分类名称 *</label>
+        <input aria-label="姓名" type="text" id="cat-name" placeholder="如 命理化解吉祥物">
+      </div>
+      <div class="form-group">
+        <label for="cat-icon">图标（emoji）*</label>
+        <input aria-label="cat icon" type="text" id="cat-icon" placeholder="如 🔮" style="width:100px">
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label for="cat-desc">分类描述</label>
+      <textarea id="cat-desc" rows="2" placeholder="分类描述" aria-label="分类描述"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="cat-sub-list">子分类列表（每行一个，格式：id|名称|颜色|描述）</label>
+      <textarea id="cat-sub-list" rows="6" placeholder="jin|五行缺金|var(--metal)|补金增强决断力、财运&#10;mu|五行缺木|var(--jade)|补木增强生机、仁德&#10;shui|五行缺水|var(--cyan)|补水增强智慧、财运" aria-label="jin|五行缺金|var(--metal)|补金增强决断力、"></textarea>
+    </div>
+    
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="window._shopAdmin.saveCategory()">存 保存分类</button>
+      <button class="btn btn-outline" onclick="window._shopAdmin.showSection('categories')">取消</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>易道智鉴 · 商城管理后台 · v2026.06.29</p>
+    <p><a href="divination-hub.html">主站</a> | <a href="admin.html">主后台</a> | <a href="disclaimer.html">免责声明</a></p>
+  </footer>
+</div>
+
+<!-- 确认弹窗 -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <h3>警 确认操作</h3>
+    <p id="confirm-message"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline btn-sm" id="confirm-cancel">取消</button>
+      <button class="btn btn-danger btn-sm" id="confirm-ok">确认</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/admin-rbac-shared.js"></script>
+<script src="js/ui-toast.js" defer></script>
+<script src="js/toast-helper.js"></script>
+<script src="../knowledge/shop-data.js"></script>
+<script src="js/shop-admin.js"></script>
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-w 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-w 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+</style>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

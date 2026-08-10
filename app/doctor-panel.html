@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="医生端 · 卡片流审核工作台 · 易道智鉴平台">
+<meta name="keywords" content="医生端,审核工作台">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/doctor-panel.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="医生端 · 卡片流审核 · 易道智鉴">
+<meta property="og:description" content="医生端 · 卡片流审核工作台">
+<meta property="og:type" content="website">
+<title>医生端 · 卡片流审核 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:480px;margin:0 auto;min-height:100vh}
+h1{color:var(--gold);font-size:17px;margin-bottom:4px;text-align:center}
+.sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px}
+.nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:12px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+.bridge-box{padding:10px;background:linear-gradient(135deg,rgba(159,122,234,.1),rgba(66,153,225,.1));border:1px solid rgba(159,122,234,.3);border-radius:8px;margin:8px 0;font-size:12px;line-height:1.6}
+.form-group{margin-bottom:10px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+textarea,select,input{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+textarea{resize:vertical;min-height:60px}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.btn{display:block;width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn-secondary{background:var(--blue)}
+.btn-intake{background:var(--green);margin-bottom:6px;width:100%}
+.btn-reject{background:var(--red)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.case-list-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;cursor:pointer}
+.case-list-item.active{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.empty{text-align:center;padding:20px;color:var(--muted);font-size:13px}
+.queue-bar{position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:10;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;gap:8px;align-items:center;overflow-x:auto}
+.queue-chip{flex:0 0 auto;padding:6px 12px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-size:12px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.queue-chip.active{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
+.queue-chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.dot-pending{background:var(--blue)}.dot-doctor{background:var(--gold)}.dot-done{background:var(--green)}
+/* 卡片流 */
+.swipe-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px;transition:transform .2s,opacity .2s}
+.swipe-card.rejecting{transform:translateX(-120%);opacity:.3}
+.swipe-card.accepting{transform:translateX(120%);opacity:.3}
+.photo-strip{display:flex;gap:6px;overflow-x:auto;margin:10px 0;padding-bottom:6px}
+.photo-strip img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--border);flex:0 0 auto}
+.ai-draft{background:rgba(72,187,120,.08);border:1px solid rgba(72,187,120,.3);border-radius:8px;padding:10px;font-size:12px;line-height:1.6;margin:8px 0}
+.ai-draft .tag{display:inline-block;background:rgba(72,187,120,.2);color:var(--green);font-size:10px;padding:2px 8px;border-radius:10px;margin-bottom:6px}
+.kb-chip{display:inline-block;background:rgba(66,153,225,.12);color:var(--blue);font-size:10px;padding:2px 8px;border-radius:10px;margin:2px 4px 2px 0}
+.risk-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px}
+.risk-1{background:rgba(72,187,120,.15);color:var(--green)}
+.risk-2{background:rgba(236,201,75,.15);color:#ecc94b}
+.risk-3{background:rgba(245,101,101,.15);color:var(--red)}
+.swipe-actions{display:flex;gap:8px;margin-top:12px}
+.swipe-actions .btn{flex:1;margin-top:0;padding:10px;font-size:13px}
+.meta-line{font-size:11px;color:var(--muted);margin:2px 0}
+.edit-panel{display:none;margin-top:12px;border-top:1px dashed var(--border);padding-top:10px}
+.edit-panel.show{display:block}
+.stat-row{display:flex;gap:8px;margin-bottom:10px}
+.stat-box{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center}
+.stat-box .num{font-size:18px;font-weight:700;color:var(--gold)}
+.stat-box .lbl{font-size:10px;color:var(--muted)}
+@media(max-width:360px){body{padding:8px 6px}h1{font-size:15px}.card{padding:10px 8px}.card-title{font-size:12px}textarea,select,input{font-size:12px;padding:6px}.row{flex-direction:column;gap:0}.btn{padding:10px;font-size:13px}.case-list-item{padding:8px;font-size:12px}.empty{font-size:12px;padding:14px}.photo-strip img{width:64px;height:64px}}
+@media print{body{background:#fff!important;color:#000!important}.page-header-bar,.nav-back,.btn,.no-print,.queue-bar,.swipe-actions{display:none!important}.card,.swipe-card{break-inside:avoid;box-shadow:none!important;border:1px solid #ccc!important}h1,h2,h3{break-after:avoid}table{width:100%!important;font-size:11px}img{max-width:100%!important}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">医生端 · 卡片流审核</span>
+  </div>
+  <a class="phb-back" href="person-center.html">← 返回</a>
+</header>
+<main>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>待审队列</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">2</span><span>查看 AI 初稿</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">3</span><span>采纳/编辑</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">4</span><span>提交处方</span></div></div>
+<div class="flow-hint">一屏一张待审卡片 · 采纳即提交 · 修改留痕</div>
+</div>
+
+<!-- 紧急 SOS 横幅 -->
+<div id="sos-banner" style="display:none;background:linear-gradient(135deg,#7f1d1d,#991b1b);border:1px solid #f87171;border-radius:10px;padding:12px;margin-bottom:10px">
+  <div style="font-weight:700;color:#fca5a5;font-size:14px">🚨 紧急求助</div>
+  <div id="sos-banner-detail" style="font-size:12px;color:#fecaca;margin-top:4px"></div>
+  <a href="sos.html" style="display:inline-block;margin-top:8px;background:#dc2626;color:#fff;text-decoration:none;border-radius:16px;padding:6px 16px;font-size:12px;font-weight:600">立即响应</a>
+</div>
+
+<!-- 统计栏 -->
+<div class="stat-row">
+  <div class="stat-box"><div class="num" id="stat-pending">0</div><div class="lbl">待审</div></div>
+  <div class="stat-box"><div class="num" id="stat-done">0</div><div class="lbl">已处理</div></div>
+  <div class="stat-box"><div class="num" id="stat-total">0</div><div class="lbl">总数</div></div>
+  <div style="width:100%;text-align:right;font-size:10px;color:var(--muted);margin-top:2px"><span id="refresh-time">—</span> · <a href="#" onclick="loadQueue();return!1" style="color:var(--blue);text-decoration:none">🔄 刷新</a></div>
+</div>
+
+<!-- 快速采集入口 -->
+<a href="doctor-intake.html" style="display:block;padding:12px;background:linear-gradient(135deg,rgba(72,187,120,.15),rgba(66,153,225,.15));border:1px solid rgba(72,187,120,.4);border-radius:10px;text-decoration:none;margin-bottom:10px">
+  <div style="font-weight:700;color:var(--green);font-size:14px">⚡ 快速采集新患者</div>
+  <div style="font-size:11px;color:var(--muted);margin-top:2px">点选式问诊 → AI 辨证处方初稿 → 审核即处方</div>
+</a>
+
+<!-- 队列 chip 栏 -->
+<div class="queue-bar" id="queue-bar"></div>
+
+<!-- 卡片流 -->
+<div id="card-stream"><div class="empty">加载中...</div></div>
+
+<!-- 空状态 -->
+<div id="empty-state" style="display:none">
+  <div class="empty">🎉 全部处理完毕！</div>
+  <div class="empty" style="font-size:12px">新案例提交后会自动出现在这里</div>
+</div>
+
+</main>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
+var allCases=[];
+var currentCase=null;
+var stats={pending:0,done:0,total:0};
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+
+function showToast(msg){
+  var t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove()},2200);
+}
+
+function loadQueue(){
+  fetch(API+'/api/clinic/review-queue',{headers:authHeaders(),signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){document.getElementById('card-stream').innerHTML='<div class="empty">加载失败：'+(d.error||d.message||'请先登录')+'</div>';return}
+    allCases=d.queue||[];
+    renderStats();
+    renderQueueBar();
+    renderCards();
+  }).catch(function(e){
+    document.getElementById('card-stream').innerHTML='<div class="empty">网络错误：'+esc(esc(e.message))+'</div>';
+  })
+}
+
+function renderStats(){
+  stats.pending=allCases.filter(function(c){return c.status==='pending_doctor'||c.status==='pending_master'||c.status==='pending'}).length;
+  stats.done=allCases.filter(function(c){return c.status==='completed'||c.status==='approved'}).length;
+  stats.total=allCases.length;
+  document.getElementById('stat-pending').textContent=stats.pending;
+  document.getElementById('stat-done').textContent=stats.done;
+  document.getElementById('stat-total').textContent=stats.total;
+  var rt=document.getElementById('refresh-time');if(rt){var now=new Date();rt.textContent=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0')}
+}
+
+function renderQueueBar(){
+  var bar=document.getElementById('queue-bar');
+  var statuses=[];
+  allCases.forEach(function(c){if(statuses.indexOf(c.status)<0)statuses.push(c.status)});
+  var html='<div class="queue-chip active" onclick="filterQueue(\'\',this)">全部 ('+allCases.length+')</div>';
+  statuses.forEach(function(s){
+    var label=s==='pending_doctor'?'待医生':s==='pending_master'?'待大师':s==='completed'?'已完成':s==='approved'?'已批准':s;
+    var dot=s==='pending_doctor'?'dot-doctor':s==='pending_master'?'dot-pending':s==='completed'?'dot-done':'dot-pending';
+    html+='<div class="queue-chip" onclick="filterQueue(\''+s+'\',this)"><span class="dot '+dot+'"></span>'+label+' ('+allCases.filter(function(c){return c.status===s}).length+')</div>';
+  });
+  bar.innerHTML=html;
+}
+
+function filterQueue(status,el){
+  document.querySelectorAll('.queue-chip').forEach(function(c){c.classList.remove('active')});
+  el.classList.add('active');
+  var list=status?allCases.filter(function(c){return c.status===status}):allCases;
+  renderCards(list);
+}
+
+function riskLabel(c){
+  var s=(c.symptoms||'')+(c.constitution||'')+(c.aiDraft||'');
+  if(/癌|肿瘤|血光|自杀|急症|大出血|心梗|脑梗|晕厥/.test(s))return '<span class="risk-badge risk-3">⚠️ 高危</span>';
+  if(/久病|慢性|反复|多年|重症/.test(s))return '<span class="risk-badge risk-2">中度</span>';
+  return '<span class="risk-badge risk-1">常规</span>';
+}
+
+function renderCards(list){
+  var cards=list||allCases;
+  var el=document.getElementById('card-stream');
+  var emptyEl=document.getElementById('empty-state');
+  if(!cards.length){el.innerHTML='';emptyEl.style.display='block';return}
+  emptyEl.style.display='none';
+  var html='';
+  cards.forEach(function(c){
+    var photos=(c.photos||[]).map(function(p){return '<img src="'+(p.startsWith('http')?p:API+p)+'" alt="采集照片" loading="lazy" onerror="this.style.display=\'none\'">'}).join('');
+    var kb=(c.kbHits||[]).map(function(k){return '<span class="kb-chip">📚 '+k.title+' ('+k.trust+')</span>'}).join('');
+    html+='<div class="swipe-card" id="card-'+c.id+'" data-status="'+c.status+'">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<div style="font-weight:600;font-size:14px;color:var(--gold)">'+(c.caseNumber||('#'+c.id))+'</div>'+
+        riskLabel(c)+
+      '</div>'+
+      '<div class="meta-line">患者：'+(c.patientName||'匿名')+' '+(c.patientSex||'')+' '+(c.birthYear?('('+c.birthYear+'年生)'):'')+'</div>'+
+      '<div class="meta-line">状态：'+c.status+' · 提交：'+(c.createdAt||'').slice(0,16)+'</div>'+
+      '<div style="margin-top:8px;font-size:13px;line-height:1.6"><b>症状：</b>'+(c.symptoms||'—')+'</div>'+
+      '<div style="font-size:12px;color:var(--muted);margin-top:2px"><b>体质：</b>'+(c.constitution||'—')+'</div>'+
+      (photos?'<div class="photo-strip">'+photos+'</div>':'')+
+      (kb?'<div style="margin:6px 0">'+kb+'</div>':'')+
+      (c.aiDraft?'<div class="ai-draft"><span class="tag">🤖 AI 初稿'+(c.aiGenerated?'<b style="color:#48bb78"> · 自动生成</b>':'')+'</span><br>'+(c.aiDraft||'').slice(0,400)+'</div>':'')+
+      '<div class="swipe-actions no-print">'+
+        '<button class="btn btn-intake" onclick="quickIntake('+JSON.stringify({id:c.id,name:c.patientName||'',sex:c.patientSex||'',year:c.birthYear||'',birthDate:c.birthDate||'',birthHour:c.birthHour||'',symptoms:c.symptoms||'',constitution:c.constitution||''}).replace(/"/g,'&quot;')+')" title="一键带入患者信息到采集工具">⚡ 快速采集</button>'+
+        (c.status==='pending_doctor'||c.status==='pending'?
+          '<button class="btn btn-reject" onclick="rejectCase('+c.id+')">✕ 驳回</button>'+
+          '<button class="btn btn-secondary" onclick="openEdit('+c.id+')">✎ 编辑</button>'+
+          '<button class="btn" onclick="acceptCase('+c.id+')">✓ 采纳</button>'
+        :'<div style="text-align:center;color:var(--green);font-size:13px;padding:8px">✔ 已处理</div>')+
+      '</div>'+
+      '<div class="edit-panel" id="edit-'+c.id+'"></div>'+
+    '</div>';
+  });
+  el.innerHTML=html;
+}
+
+// ⚡ 一键带入采集工具（零重复输入）
+function quickIntake(p){
+  var qs=[];
+  if(p.name)qs.push('name='+encodeURIComponent(p.name));
+  if(p.sex)qs.push('sex='+encodeURIComponent(p.sex));
+  if(p.year)qs.push('year='+encodeURIComponent(p.year));
+  if(p.birthDate)qs.push('birthDate='+encodeURIComponent(p.birthDate));
+  if(p.birthHour!==undefined&&p.birthHour!==null&&p.birthHour!=='')qs.push('birthHour='+encodeURIComponent(p.birthHour));
+  if(p.symptoms)qs.push('symptoms='+encodeURIComponent(p.symptoms));
+  if(p.constitution)qs.push('constitution='+encodeURIComponent(p.constitution));
+  location.href='doctor-intake.html'+(qs.length?'?'+qs.join('&'):'');
+}
+
+// 打开编辑面板 → 卡片内联展开（零跳转）
+function openEdit(id){
+  var c=allCases.find(function(x){return x.id===id});
+  if(!c)return;
+  var card=document.getElementById('card-'+id);
+  var panel=document.getElementById('edit-'+id);
+  if(panel.classList.contains('show')){panel.classList.remove('show');panel.innerHTML='';if(card)card.classList.remove('expanded');return}
+  if(card)card.classList.add('expanded');
+  panel.innerHTML=
+    '<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:10px">'+
+    '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><span style="font-size:11px;color:var(--muted)">AI初稿已预填，可直接采纳或微调</span>'+
+    '<select style="width:auto;flex:1;padding:5px 8px;font-size:11px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text)" onchange="applyRxTemplate('+id+')" aria-label="处方模板">'+
+    '<option value="">💊 处方模板</option>'+
+    '<option value="逍遥散">逍遥散(肝郁)</option><option value="丹栀逍遥散">丹栀逍遥散(化火)</option>'+
+    '<option value="归脾汤">归脾汤(心脾)</option><option value="六味地黄丸">六味地黄(肾阴)</option>'+
+    '<option value="金匮肾气丸">金匮肾气(肾阳)</option><option value="四君子汤">四君子(脾虚)</option>'+
+    '<option value="二陈汤">二陈汤(痰湿)</option><option value="血府逐瘀汤">血府逐瘀(瘀血)</option>'+
+    '<option value="酸枣仁汤">酸枣仁汤(失眠)</option><option value="百合固金汤">百合固金(肺阴)</option>'+
+    '</select></div>'+
+    '<textarea id="diag-'+id+'" aria-label="辨证诊断" style="width:100%;min-height:80px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:12px;font-family:inherit;margin-bottom:6px">'+(c.diagnosis||c.aiDraft||'')+'</textarea>'+
+    '<label style="font-size:11px;color:var(--muted);margin-bottom:2px">处方</label>'+
+    '<textarea id="rx-'+id+'" aria-label="处方" style="width:100%;min-height:60px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px;font-size:12px;font-family:inherit;margin-bottom:6px">'+(c.prescription||'')+'</textarea>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+      '<button class="btn btn-reject" style="flex:1;padding:8px;font-size:12px;margin-top:0" onclick="rejectCase('+id+')">✕ 驳回</button>'+
+      '<button class="btn" style="flex:2;padding:8px;font-size:12px;margin-top:0" onclick="acceptCase('+id+')">✓ 采纳并提交</button>'+
+    '</div></div>';
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// 处方模板库
+var RX_TEMPLATES={
+  '逍遥散':'逍遥散加减。柴胡10g 当归10g 白芍15g 白术10g 茯苓15g 炙甘草6g 生姜3片 薄荷3g(后下)。水煎服，日一剂，分早晚两次温服。',
+  '丹栀逍遥散':'丹栀逍遥散加减。牡丹皮10g 栀子10g 柴胡10g 当归10g 白芍15g 白术10g 茯苓15g 炙甘草6g。水煎服，日一剂。',
+  '归脾汤':'归脾汤加减。党参15g 黄芪20g 白术10g 茯神15g 酸枣仁15g 龙眼肉10g 木香6g 炙甘草6g 当归10g 远志6g。水煎服，日一剂。',
+  '六味地黄丸':'六味地黄丸加减。熟地黄15g 山茱萸10g 山药15g 泽泻10g 牡丹皮10g 茯苓15g。水煎服，日一剂。',
+  '金匮肾气丸':'金匮肾气丸加减。熟地黄15g 山药15g 山茱萸10g 泽泻10g 茯苓15g 牡丹皮10g 附子6g(先煎) 桂枝6g。水煎服，日一剂。',
+  '四君子汤':'四君子汤加减。党参15g 白术10g 茯苓15g 炙甘草6g。水煎服，日一剂。',
+  '二陈汤':'二陈汤加减。陈皮10g 半夏10g(姜制) 茯苓15g 炙甘草6g。水煎服，日一剂。',
+  '血府逐瘀汤':'血府逐瘀汤加减。桃仁10g 红花6g 当归10g 川芎6g 赤芍10g 生地15g 柴胡6g 桔梗6g 牛膝10g 枳壳6g 甘草6g。水煎服，日一剂。',
+  '酸枣仁汤':'酸枣仁汤加减。酸枣仁20g(炒) 知母10g 川芎6g 茯苓15g 甘草6g。水煎服，日一剂，睡前温服。',
+  '百合固金汤':'百合固金汤加减。百合15g 生地黄15g 熟地黄15g 玄参10g 麦冬10g 当归10g 白芍10g 贝母10g 桔梗6g 甘草6g。水煎服，日一剂。'
+};
+
+function applyRxTemplate(id){
+  var sel=document.getElementById('rx-tpl-'+id);
+  var tpl=RX_TEMPLATES[sel.value];
+  if(tpl)document.getElementById('rx-'+id).value=tpl;
+}
+
+// 一键采纳：从内联 textarea 读值（展开了就取编辑后的，没展开用 AI 初稿）
+function acceptCase(id){
+  var c=allCases.find(function(x){return x.id===id});
+  if(!c)return;
+  var diagEl=document.getElementById('diag-'+id);
+  var rxEl=document.getElementById('rx-'+id);
+  var diagnosis=diagEl&&diagEl.value?diagEl.value.trim():c.diagnosis||c.aiDraft||'';
+  var prescription=rxEl&&rxEl.value?rxEl.value.trim():c.prescription||'';
+  if(!diagnosis){showToast('该案例无 AI 初稿，请先编辑填写');openEdit(id);return}
+  submitDiagnosis(id,{diagnosis:diagnosis,prescription:prescription},'采纳确认');
+}
+
+// 驳回：确认替换（去掉 confirm 弹框）
+function rejectCase(id){
+  showToast('确认驳回？3 秒内再点驳回即确认');
+  var card=document.getElementById('card-'+id);
+  if(card._rejectArmed){card._rejectArmed=false;doReject(id);return}
+  card._rejectArmed=true;
+  setTimeout(function(){if(card._rejectArmed){card._rejectArmed=false;showToast('驳回已取消')}},3000);
+}
+function doReject(id){
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:'',prescription:'',reviewComment:'医生驳回，请补充信息',signal:AbortSignal.timeout(15000)}),signal:AbortSignal.timeout(15000)})
+  .then(function(r){return r.json()}).then(function(d){
+    var card=document.getElementById('card-'+id);
+    if(card)card.classList.add('rejecting');
+    setTimeout(function(){loadQueue()},400);
+  }).catch(function(err){ showToast('驳回失败：'+(err&&err.message||'网络异常')+'，请重试','err'); });
+}
+
+function submitEdit(id){
+  var diag=document.getElementById('diag-'+id);
+  var rx=document.getElementById('rx-'+id);
+  submitDiagnosis(id,{
+    diagnosis:diag&&diag.value?diag.value:'',
+    prescription:rx&&rx.value?rx.value:''
+  },'医生编辑提交');
+}
+
+function submitDiagnosis(id,data,note){
+  fetch(API+'/api/clinic/submit-diagnosis',{method:'POST',headers:authHeaders(),body:JSON.stringify({caseId:id,diagnosis:data.diagnosis||'',prescription:data.prescription||'',reviewComment:data.doctor_comment||note||'',signal:AbortSignal.timeout(15000)}),signal:AbortSignal.timeout(15000)})
+  .then(function(r){return r.json()}).then(function(d){
+    var card=document.getElementById('card-'+id);
+    if(card)card.classList.add('accepting');
+    showToast(d.ok||d.message?'✅ '+(d.message||'提交成功'):'⚠️ '+(d.error||'提交失败'));
+    setTimeout(function(){loadQueue()},400);
+  }).catch(function(err){ showToast('提交失败：'+(err&&err.message||'网络异常')+'，请重试','err'); });
+}
+
+loadQueue();
+
+// === 商用效率：15s 自动轮询 + 新案例提醒 ===
+var lastCount=allCases.length;
+var pollTimer=setInterval(function(){
+  // 轻量轮询：只取数量变化，有新案例才重渲染
+  fetch(API+'/api/clinic/review-queue',{headers:authHeaders(),signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(d){
+    if(!d.ok||!d.queue)return;
+    var newCount=d.queue.length;
+    if(newCount>lastCount){
+      // 新案例到达：声音提醒 + 重渲染
+      try{
+        var ctx=new (window.AudioContext||window.webkitAudioContext)();
+        var osc=ctx.createOscillator();
+        var gain=ctx.createGain();
+        osc.connect(gain);gain.connect(ctx.destination);
+        osc.frequency.value=880;gain.gain.value=0.15;
+        osc.start();osc.stop(ctx.currentTime+0.4);
+      }catch(e){}
+      showToast('🔔 新案例到达 ('+(newCount-lastCount)+' 个)');
+      allCases=d.queue;
+      lastCount=newCount;
+      renderStats();renderQueueBar();renderCards();
+    }else{
+      lastCount=newCount;
+    }
+  }).catch(function(){});
+  // SOS 紧急事件检查
+  checkSOS();
+},15000);
+
+// 🚨 SOS 紧急事件检查（新紧急事件 → 红色横幅 + 警报音）
+var lastSOSId=0;
+function checkSOS(){
+  fetch(API+'/api/clinic/emergency-events',{headers:authHeaders(),signal:AbortSignal.timeout(15000)})
+  .then(function(r){return r.json()}).then(function(d){
+    if(!d.ok||!d.events||!d.events.length)return;
+    var latest=d.events[0];
+    if(latest.id>lastSOSId){
+      lastSOSId=latest.id;
+      document.getElementById('sos-banner').style.display='block';
+      document.getElementById('sos-banner-detail').textContent=(latest.detail||'紧急求助')+' · '+(latest.created_at||'').slice(0,16);
+      // 三次警报音
+      try{
+        var ctx=new (window.AudioContext||window.webkitAudioContext)();
+        for(var i=0;i<3;i++){
+          var osc=ctx.createOscillator();
+          var gain=ctx.createGain();
+          osc.connect(gain);gain.connect(ctx.destination);
+          osc.frequency.value=1200;gain.gain.value=0.2;
+          osc.start(ctx.currentTime+i*0.4);osc.stop(ctx.currentTime+i*0.4+0.3);
+        }
+      }catch(e){}
+      showToast('🚨 紧急求助到达！');
+    }
+  }).catch(function(){});
+}
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 处方需医生审核确认</footer>
+<script src="js/error-interceptor.js" defer></script>
+</body>
+</html>

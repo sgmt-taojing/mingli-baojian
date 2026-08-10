@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="商家后台 · 易道智鉴平台">
+<meta name="keywords" content="商家后台">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/merchant-dashboard.html">
+<meta name="robots" content="index, follow,noindex">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="商家后台 · 易道智鉴">
+<meta property="og:description" content="商家后台 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>商家后台 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+
+<link rel="stylesheet" href="css/merchant-dashboard-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<style>
+@media(max-width:360px){body{padding:8px 6px 56px;font-size:13px}h1{font-size:18px}h2{font-size:15px}.container,.wrap,.content{padding:8px 6px}.card,.panel,.box{padding:10px 8px;margin-bottom:8px}.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;gap:8px}.stat-grid,.stat-row{grid-template-columns:1fr 1fr;gap:6px}.stat-card,.stat-item{padding:8px 6px}.btn,.button{font-size:12px;padding:6px 12px}.nav-bar,.tab-bar,.tabs{font-size:11px;gap:4px}.nav-bar a,.tab-btn{padding:4px 6px}.table{font-size:11px}.table th,.table td{padding:4px 6px}input,select,textarea{font-size:13px;padding:6px 8px}label{font-size:12px}.summary,.desc,.text{font-size:12px}.hero{padding:12px 8px}.hero h1{font-size:20px}}
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
+</style>
+</head>
+<body data-need-admin="true" class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">商家后台</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看订单</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>管理商品</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>数据分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出报告</span></div></div>
+<div class="flow-hint">商户管理商品订单，销售数据+库存+评价。</div>
+</div>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
+<div style="position:fixed;top:12px;right:12px;z-index:99998">
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
+</div>
+
+<div id="loginBox" class="login-box">
+<h1>店 商家后台</h1>
+<div class="card" style="max-width:360px;margin:20px auto">
+<h3>机 商家登录</h3>
+<label for="loginPhone">手机号</label>
+<label for="loginPhone" class="sr-only">登录手机号</label>
+<input type="tel" id="loginPhone" placeholder="入驻时填写的手机号" aria-label="入驻时填写的手机号">
+<label for="loginCode">验证码（输入任意6位数字）</label>
+<label for="loginCode" class="sr-only">登录验证码</label>
+<input type="text" id="loginCode" placeholder="6位验证码" maxlength="6" aria-label="6位验证码">
+<button class="btn" style="width:100%" onclick="merchantLogin()">登录</button>
+<p style="font-size:11px;color:var(--paper3);margin-top:10px">还没入驻？<a href="merchant-apply.html" style="color:var(--gold)">申请入驻 →</a></p>
+</div>
+</div>
+
+<div id="dashboard" class="hidden">
+<h1 id="dashTitle">店 商家后台</h1>
+<!-- 业务页面替换（F-9 Web Components）：tab 容器 -->
+<ml-tab active="0" id="merchantTab" align="left">
+  <ml-tab-pane label="📊 概览" data-tab="overview"></ml-tab-pane>
+  <ml-tab-pane label="📦 商品" data-tab="products"></ml-tab-pane>
+  <ml-tab-pane label="📋 订单" data-tab="orders"></ml-tab-pane>
+  <ml-tab-pane label="💰 收入" data-tab="income"></ml-tab-pane>
+</ml-tab>
+<div class="tabs" id="legacyMerchantTabs">
+<ml-tap class="tab active" onclick="switchTab('overview',this)" style="display:block">图 概览</ml-tap>
+<ml-tap class="tab" onclick="switchTab('products',this)" style="display:block">箱 商品</ml-tap>
+<ml-tap class="tab" onclick="switchTab('orders',this)" style="display:block">表 订单</ml-tap>
+<ml-tap class="tab" onclick="switchTab('income',this)" style="display:block">财 收入</ml-tap>
+</div>
+
+<div id="tab-overview">
+<div class="stat">
+<div class="stat-item"><div class="stat-num" id="statProducts">0</div><div class="stat-label">在售商品</div></div>
+<div class="stat-item"><div class="stat-num" id="statOrders">0</div><div class="stat-label">总订单</div></div>
+<div class="stat-item"><div class="stat-num" id="statIncome">¥0</div><div class="stat-label">本月收入</div></div>
+</div>
+<div class="card">
+<h3>店 商家信息</h3>
+<div id="merchantInfo" style="font-size:12px;color:var(--paper3);line-height:2"></div>
+</div>
+</div>
+
+<div id="tab-products" class="hidden">
+<button class="btn" style="margin-bottom:12px" onclick="showAddProduct()">+ 新增商品</button>
+<div id="addProductForm" class="card hidden">
+<h3>新增商品</h3>
+<label for="pName">商品名称</label>
+<label for="pName" class="sr-only">商品名称</label>
+<input type="text" id="pName" placeholder="如：五台山开光貔貅" aria-label="如：五台山开光貔貅">
+<div class="row">
+<div><label for="pPrice">结缘价</label><input type="text" id="pPrice" placeholder="如：结缘 168" aria-label="如：结缘 168"></div>
+<div><label for="pStock">库存</label><input type="number" id="pStock" placeholder="99" aria-label="pStock"></div>
+</div>
+<label for="pPurpose">用途说明</label>
+<textarea id="pPurpose" placeholder="如：招财辟邪·镇宅护身" aria-label="如：招财辟邪·镇宅护身"></textarea>
+<label for="pProcess">制作过程</label>
+<textarea id="pProcess" placeholder="如：本寺僧人手工制作·开光加持" aria-label="如：本寺僧人手工制作·开光加持"></textarea>
+<div class="row">
+<div><label for="pSchool">派别</label><select id="pSchool" aria-label="pSchool"><option value="佛教">佛教</option><option value="道教">道教</option><option value="儒家">儒家</option><option value="民间">民间</option></select></div>
+<div><label for="pCat">分类</label><select id="pCat" aria-label="pCat"><option value="法器">法器</option><option value="吉祥物">吉祥物</option><option value="经典">经典</option><option value="茶饮">茶饮</option><option value="养生品">养生品</option></select></div>
+</div>
+<button class="btn" onclick="addProduct()">上架商品</button>
+</div>
+<div id="productList"></div>
+</div>
+
+<div id="tab-orders" class="hidden">
+<div id="orderList"></div>
+</div>
+
+<div id="tab-income" class="hidden">
+<div class="card">
+<h3>财 收入明细</h3>
+<div id="incomeDetail"></div>
+</div>
+</div>
+</div>
+
+<script src="js/admin-rbac-shared.js"></script>
+<script src="js/ui-toast.js" defer></script>
+<script src="js/toast-helper.js"></script>
+<!-- F-9 Web Components：toast + tab（已迁移；旧 ui-toast/toast-helper 保留兼容） -->
+<script src="components/toast.js"></script>
+<script src="components/tab.js"></script>
+
+<ml-toast id="merchantToast" position="top"></ml-toast>
+
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/merchant-dashboard-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

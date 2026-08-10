@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="KB 关系图谱 · 易道智鉴平台">
+<meta name="keywords" content="KB 关系图谱">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-graph-r68.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="KB 关系图谱 · R68 · 易道智鉴">
+<meta property="og:description" content="KB 关系图谱 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>KB 关系图谱 · R68 · 易道智鉴</title>
+<style>
+:root {
+  --gold: #c9a84c;
+  --gold2: #e6c873;
+  --paper: #e8e4d8;
+  --paper2: #c5c0b0;
+  --paper3: #9c9888;
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1e242e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg); color: var(--paper); padding: 16px; min-height: 100vh;
+}
+h1 { font-size: 22px; color: var(--gold2); margin-bottom: 8px; }
+.sub { font-size: 12px; color: var(--paper3); margin-bottom: 16px; }
+.top {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+  align-items: center;
+}
+.btn {
+  padding: 6px 12px; background: var(--bg3); border: 1px solid var(--gold);
+  color: var(--paper); border-radius: 6px; cursor: pointer; font-size: 13px;
+  transition: all .15s;
+}
+.btn:hover { background: var(--gold); color: var(--bg); }
+.btn.active { background: var(--gold); color: var(--bg); }
+.canvas-wrap {
+  background: var(--bg2); border: 1px solid var(--bg3); border-radius: 12px;
+  height: calc(100vh - 200px); min-height: 480px; position: relative; overflow: hidden;
+}
+canvas { width: 100%; height: 100%; display: block; }
+.detail {
+  position: fixed; top: 16px; right: 16px; width: 280px;
+  background: rgba(13,17,23,.96); border: 1px solid var(--gold);
+  border-radius: 10px; padding: 12px 14px; display: none;
+  font-size: 13px; max-height: 60vh; overflow-y: auto;
+}
+.detail.show { display: block; }
+.detail h3 { color: var(--gold2); margin-bottom: 6px; font-size: 15px; }
+.detail .row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed rgba(201,168,76,.15); }
+.detail .label { color: var(--paper3); font-size: 12px; }
+.detail .val { color: var(--gold2); font-weight: 600; }
+.legend {
+  display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11px;
+  color: var(--paper3); padding: 10px; background: var(--bg2); border-radius: 8px;
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+.tooltip {
+  position: absolute; background: rgba(0,0,0,.92); color: var(--gold2);
+  padding: 6px 10px; border-radius: 6px; font-size: 12px; pointer-events: none;
+  display: none; z-index: 100; border: 1px solid var(--gold);
+}
+@media (max-width: 768px) {
+  .detail { width: 240px; }
+  h1 { font-size: 18px; }
+}
+
+/* R-P3-17.4 通用 reflow */
+@media(max-width:768px){body{font-size:14px}h1{font-size:22px!important}h2{font-size:19px!important}[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{grid-template-columns:repeat(2,1fr)!important}.wrap,.container{padding:12px!important;max-width:100vw!important;overflow-x:hidden!important}.toolbar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}table{display:block!important;overflow-x:auto!important}.modal-box{width:calc(100vw - 24px)!important;max-width:100%!important;margin:12px!important}}
+@media(max-width:480px){body{font-size:13px}[style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3)"]{grid-template-columns:1fr!important}}
+@media(max-width:320px){body{font-size:12px;padding:0!important}h1{font-size:18px!important}input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back, .top, .btn,
+  a[style*="position:fixed"], [style*="position:fixed"],
+  .detail, .tooltip, #minimap, header, nav{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,span,div,a{color:#000!important}
+  .canvas-wrap{width:100%!important;height:auto!important;min-height:300px!important;border:1px solid #ccc!important;background:#fff!important}
+  canvas{max-width:100%!important;height:auto!important}
+  .legend{border:1px solid #ccc!important;background:#f8f8f8!important}
+  .legend-item{color:#000!important}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB 关系图谱</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择节点</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看关联</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>展开探索</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>发现知识</span></div></div>
+<div class="flow-hint">查看KB 关系图谱 · R68 · 易道智鉴，了解功能详情与使用方式。</div>
+</div>
+<h1>网 KB 关系图谱 · R68</h1>
+<div class="sub">54 模块 · 12828 条 · avg_trust 0.826 · 力导向布局 · 可拖拽 · 可缩放 · 节点大小=条目数 · 颜色=分类</div>
+
+<div class="top">
+  <button class="btn active" id="btn-force">力导向</button>
+  <button class="btn" id="btn-ring">圆 环形</button>
+  <button class="btn" id="btn-bazi">标 八字相关</button>
+  <button class="btn" id="btn-tcm">中医相关</button>
+  <button class="btn" id="btn-ziwei">星 紫微相关</button>
+  <button class="btn" id="btn-reset">更 重置</button>
+  <button class="btn" id="btn-export">存 导出 PNG</button>
+</div>
+
+<div class="canvas-wrap">
+  <canvas id="cv"></canvas>
+  <div class="tooltip" id="tip"></div>
+</div>
+
+<div class="legend">
+  <span class="legend-item"><span class="legend-dot" style="background:#e6c873"></span> 经典 (classical)</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#7fc8a9"></span> 实践 (practice)</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#d49b6b"></span> 中医 (tcm)</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#9eb3d4"></span> 路氏 (lushi)</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#c89bc0"></span> 舒晗 (shuhan)</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#b4b4b4"></span> 其他</span>
+  <span class="legend-item" style="margin-left:auto">节点大小 ∝ KB 条数 · 边 ∝ 模块相似度</span>
+</div>
+
+<div class="detail" id="detail">
+  <h3 id="d-name">—</h3>
+  <div class="row"><span class="label">分类</span><span class="val" id="d-cat">—</span></div>
+  <div class="row"><span class="label">条目数</span><span class="val" id="d-n">—</span></div>
+  <div class="row"><span class="label">平均信任分</span><span class="val" id="d-tr">—</span></div>
+  <div class="row"><span class="label">关联模块</span><span class="val" id="d-rel">—</span></div>
+  <div class="row"><span class="label">标签</span><span class="val" id="d-tags" style="font-size:11px">—</span></div>
+  <div style="margin-top:10px;text-align:right">
+    <button class="btn" id="d-jump">跳转 智能助手 →</button>
+  </div>
+</div>
+
+<script>
+// === 数据：54 模块的 KB 关系（本地硬编码 + 从 quality-report 推断）===
+// [TEST_DATA] 硬编码示例数据，上线前替换为真实API或动态加载
+const MODULES = [
+  {id:'bazi', name:'八字命理', n:612, cat:'classical', tr:0.92, tags:['四柱','日主','十神']},
+  {id:'ziwei', name:'紫微斗数', n:480, cat:'classical', tr:0.88, tags:['宫位','星曜','四化']},
+  {id:'qimen', name:'奇门遁甲', n:298, cat:'classical', tr:0.85, tags:['八门','九星','三奇']},
+  {id:'liuyao', name:'六爻', n:255, cat:'classical', tr:0.86, tags:['卦象','世应','六亲']},
+  {id:'meihua', name:'梅花易数', n:188, cat:'classical', tr:0.81, tags:['体用','卦象','时间']},
+  {id:'liuren', name:'大六壬', n:165, cat:'classical', tr:0.79, tags:['课式','三传','天乙']},
+  {id:'fengshui', name:'风水', n:340, cat:'classical', tr:0.87, tags:['峦头','理气','八宅']},
+  {id:'cezi', name:'测字', n:98, cat:'classical', tr:0.72, tags:['字形','拆字','意象']},
+  {id:'zeri', name:'择日', n:215, cat:'classical', tr:0.84, tags:['黄历','建除','神煞']},
+  {id:'xingming', name:'姓名学', n:142, cat:'practice', tr:0.78, tags:['五格','三才','八字']},
+  {id:'yunshi', name:'运势', n:325, cat:'practice', tr:0.83, tags:['流年','大运','神煞']},
+  {id:'caiyun', name:'财运', n:178, cat:'practice', tr:0.79, tags:['财星','流年','投资']},
+  {id:'ganqing', name:'感情', n:202, cat:'practice', tr:0.81, tags:['桃花','日主','合化']},
+  {id:'shiye', name:'事业', n:198, cat:'practice', tr:0.80, tags:['官星','驿马','流年']},
+  {id:'mobile', name:'手机号码', n:135, cat:'practice', tr:0.74, tags:['数理','卦象','吉凶']},
+  {id:'taisui', name:'太岁', n:168, cat:'classical', tr:0.82, tags:['值年','冲克','化解']},
+  {id:'huangli', name:'老黄历', n:268, cat:'practice', tr:0.85, tags:['宜忌','吉日','时辰']},
+  {id:'music', name:'五行音乐', n:158, cat:'practice', tr:0.76, tags:['宫商角徵羽','情绪','Edge-TTS']},
+  {id:'lifeindex', name:'人生指数', n:215, cat:'practice', tr:0.79, tags:['十维','五行','评分']},
+  {id:'lifeplan', name:'人生规划', n:328, cat:'practice', tr:0.82, tags:['时间轴','领域','行动']},
+  {id:'tcm-clinic', name:'中医临床', n:425, cat:'tcm', tr:0.89, tags:['辨证','方剂','舌脉']},
+  {id:'tcm-fangji', name:'方剂学', n:326, cat:'tcm', tr:0.91, tags:['君臣佐使','加减','经方']},
+  {id:'tcm-zhongfu', name:'中医脏腑', n:100, cat:'tcm', tr:0.85, tags:['五脏','气血','阴阳']},
+  {id:'shanghan-lun', name:'伤寒论', n:307, cat:'tcm', tr:0.93, tags:['六经','方证','传变']},
+  {id:'shuhan', name:'舒氏奇门', n:541, cat:'shuhan', tr:0.88, tags:['密宗天纪','奇门校正','化解']},
+  {id:'shuhan-mixun', name:'舒氏密训', n:285, cat:'shuhan', tr:0.84, tags:['天纪','天机','实战']},
+  {id:'nihaisha', name:'倪海厦', n:425, cat:'lushi', tr:0.90, tags:['人纪','天纪','经方']},
+  {id:'nihaisha-tianji', name:'倪氏天纪', n:312, cat:'lushi', tr:0.87, tags:['紫微','易经','风水']},
+  {id:'yanzhi', name:'颜痣', n:178, cat:'practice', tr:0.75, tags:['面相','部位','吉凶']},
+  {id:'faith', name:'信仰民俗', n:142, cat:'practice', tr:0.73, tags:['传统','民俗','祭祀']},
+  {id:'mantra', name:'咒语符咒', n:88, cat:'practice', tr:0.68, tags:['符咒','念诵','化解']},
+  {id:'classics', name:'经典原文', n:425, cat:'classical', tr:0.92, tags:['古文','原文','注释']},
+  {id:'zodiac', name:'生肖属相', n:198, cat:'classical', tr:0.81, tags:['十二支','合冲','刑害']},
+  {id:'rx-doctors', name:'名医案例', n:215, cat:'tcm', tr:0.86, tags:['医案','经验','辨证']},
+  {id:'rx-heritage', name:'中医传承', n:188, cat:'tcm', tr:0.83, tags:['师承','流派','典籍']},
+  {id:'shop', name:'商城', n:0, cat:'practice', tr:0, tags:['商品','服务','兑换']},
+  {id:'courses', name:'课程', n:0, cat:'practice', tr:0, tags:['视频','教学','套餐']},
+  {id:'divination-hub', name:'占卜中心', n:0, cat:'practice', tr:0, tags:['导航','入口','首页']},
+  {id:'my-yuanzhu', name:'我的助手', n:0, cat:'practice', tr:0, tags:['个人','推送','积分']},
+  {id:'ai-assistant', name:'智能助手', n:0, cat:'practice', tr:0, tags:['对话','KB','兜底']},
+  {id:'knowledge', name:'知识库', n:0, cat:'practice', tr:0, tags:['搜索','图谱','检索']},
+  {id:'almanac', name:'黄历', n:0, cat:'practice', tr:0, tags:['日历','宜忌','今日']},
+  {id:'camera', name:'摄像头', n:0, cat:'practice', tr:0, tags:['面扫','舌诊','采集']},
+  {id:'device-mgmt', name:'设备管理', n:0, cat:'practice', tr:0, tags:['蓝牙','USB','检测']},
+  {id:'shop-hub', name:'商城中心', n:0, cat:'practice', tr:0, tags:['商品','兑换','套餐']},
+  {id:'tcm-detail', name:'方剂详情', n:0, cat:'tcm', tr:0, tags:['组成','主治','加减']},
+  {id:'tcm-herb', name:'中药详情', n:0, cat:'tcm', tr:0, tags:['性味','归经','主治']},
+  {id:'herb-pair', name:'药对', n:0, cat:'tcm', tr:0, tags:['配伍','协同','经典']},
+  {id:'meridian', name:'经络', n:0, cat:'tcm', tr:0, tags:['十二经','穴位','循行']},
+  {id:'acupuncture', name:'针灸', n:304, cat:'tcm', tr:0.86, tags:['穴位','手法','主治']},
+  {id:'integrated', name:'综合分析', n:0, cat:'practice', tr:0, tags:['综合','多模','整合']},
+  {id:'wechat-hub', name:'公众号', n:0, cat:'practice', tr:0, tags:['文章','收藏','分享']},
+  {id:'fortune', name:'今日运势', n:0, cat:'practice', tr:0, tags:['每日','宜忌','今日']},
+  {id:'freechat', name:'自由对话', n:0, cat:'practice', tr:0, tags:['对话','问答','自由']},
+  {id:'feedback', name:'反馈', n:0, cat:'practice', tr:0, tags:['意见','建议','评价']},
+  {id:'history', name:'历史', n:0, cat:'practice', tr:0, tags:['对话','记录','回看']},
+];
+
+const CAT_COLOR = {
+  'classical':'#e6c873',
+  'practice':'#7fc8a9',
+  'tcm':'#d49b6b',
+  'lushi':'#9eb3d4',
+  'shuhan':'#c89bc0',
+  'other':'#b4b4b4'
+};
+
+// === 力导向布局（自实现，无依赖）===
+const canvas = document.getElementById('cv');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+function resize(){
+  const wrap = canvas.parentElement;
+  W = canvas.width = wrap.clientWidth;
+  H = canvas.height = wrap.clientHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// 节点位置
+const nodes = MODULES.map((m, i) => ({
+  ...m,
+  x: W/2 + Math.cos(i/MODULES.length*Math.PI*2)*Math.min(W,H)*0.3,
+  y: H/2 + Math.sin(i/MODULES.length*Math.PI*2)*Math.min(W,H)*0.3,
+  vx: 0, vy: 0, vz: 0, z: ((i || 0) % 30) / 100,
+  r: 8 + Math.min(28, m.n / 25),
+  drag: false
+}));
+
+// 边：根据 tags 共享相似度建边
+const edges = [];
+for (let i = 0; i < nodes.length; i++){
+  for (let j = i+1; j < nodes.length; j++){
+    const a = nodes[i], b = nodes[j];
+    if (a.n === 0 || b.n === 0) continue; // 跳过空模块
+    const common = (a.tags||[]).filter(t => (b.tags||[]).includes(t));
+    if (common.length > 0){
+      edges.push({a:i, b:j, w: common.length*0.4});
+    }
+  }
+}
+
+let layout = 'force';
+let focusMod = null;
+let dragging = null;
+let hoverNode = null;
+
+function step(){
+  // 中心引力
+  for (const n of nodes){
+    if (n.drag) continue;
+    const dx = W/2 - n.x;
+    const dy = H/2 - n.y;
+    n.vx += dx * 0.0008;
+    n.vy += dy * 0.0008;
+    // 节点斥力
+    for (const m of nodes){
+      if (m === n) continue;
+      const ddx = n.x - m.x;
+      const ddy = n.y - m.y;
+      const dist2 = ddx*ddx + ddy*ddy;
+      if (dist2 < 10000){
+        const dist = Math.sqrt(dist2) || 1;
+        const force = (n.r + m.r) * 30 / dist;
+        n.vx += ddx/dist * force * 0.05;
+        n.vy += ddy/dist * force * 0.05;
+      }
+    }
+    // 边拉力
+    for (const e of edges){
+      if (e.a === nodes.indexOf(n) || e.b === nodes.indexOf(n)){
+        const other = e.a === nodes.indexOf(n) ? nodes[e.b] : nodes[e.a];
+        const ddx = other.x - n.x;
+        const ddy = other.y - n.y;
+        const dist = Math.sqrt(ddx*ddx + ddy*ddy) || 1;
+        const target = 80 + (n.r + other.r) * 2;
+        n.vx += ddx/dist * (dist - target) * 0.005 * e.w;
+        n.vy += ddy/dist * (dist - target) * 0.005 * e.w;
+      }
+    }
+    n.vx *= 0.85; n.vy *= 0.85;
+    n.z = Math.max(0, Math.min(1, n.z + (Math.sin(Date.now()/1000 + nodes.indexOf(n)) * 0.001)));
+    n.x += n.vx; n.y += n.vy;
+    n.x = Math.max(n.r, Math.min(W-n.r, n.x));
+    n.y = Math.max(n.r, Math.min(H-n.r, n.y));
+  }
+}
+
+function draw(){
+  ctx.fillStyle = '#0d1117';
+  ctx.fillRect(0, 0, W, H);
+  // 边
+  for (const e of edges){
+    const a = nodes[e.a], b = nodes[e.b];
+    if (focusMod && (a.id !== focusMod && b.id !== focusMod)) continue;
+    ctx.strokeStyle = `rgba(201,168,76,${0.06 + e.w*0.18})`;
+    ctx.lineWidth = 0.5 + e.w * 0.8;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+  // 节点
+  for (const n of nodes){
+    if (focusMod && n.id !== focusMod && !edges.some(e => (e.a === nodes.indexOf(n) || e.b === nodes.indexOf(n)) && (nodes[e.a].id === focusMod || nodes[e.b].id === focusMod))) continue;
+    const c = CAT_COLOR[n.cat] || '#b4b4b4';
+    // 3D 透视：z 深度影响半径、亮度、阴影
+    const z = n.z || 0;
+    const scale3d = 1 + z * 0.5;
+    const r3d = n.r * scale3d;
+    const alpha3d = 0.45 + z * 0.55;
+    // 阴影
+    if (z > 0.1){
+      ctx.fillStyle = `rgba(0,0,0,${0.2 * z})`;
+      ctx.beginPath();
+      ctx.arc(n.x + 4*scale3d, n.y + 6*scale3d, r3d, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.fillStyle = c;
+    ctx.globalAlpha = alpha3d;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, r3d, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    // 边框
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // 标签
+    if (n.r > 12 || n === hoverNode || n.id === focusMod){
+      ctx.fillStyle = '#e8e4d8';
+      ctx.font = `${Math.max(10, Math.min(13, n.r/2))}px -apple-system,sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(n.name, n.x, n.y + n.r + 12);
+    }
+  }
+}
+
+function loop(){
+  if (layout === 'force') step();
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+
+// === 鼠标交互 ===
+function getNodeAt(x, y){
+  for (const n of nodes){
+    const d = Math.hypot(n.x - x, n.y - y);
+    if (d < n.r) return n;
+  }
+  return null;
+}
+
+canvas.addEventListener('mousemove', function(e){
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  if (dragging){
+    dragging.x = x; dragging.y = y;
+    dragging.vx = 0; dragging.vy = 0;
+  } else {
+    hoverNode = getNodeAt(x, y);
+    canvas.style.cursor = hoverNode ? 'pointer' : 'default';
+    if (hoverNode){
+      const tip = document.getElementById('tip');
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 12) + 'px';
+      tip.style.top = (e.clientY + 12) + 'px';
+      tip.innerHTML = `<b>${hoverNode.name}</b><br>${hoverNode.n} 条 · trust ${hoverNode.tr} · ${hoverNode.cat}`;
+    } else {
+      document.getElementById('tip').style.display = 'none';
+    }
+  }
+});
+
+canvas.addEventListener('mousedown', function(e){
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const n = getNodeAt(x, y);
+  if (n){ n.drag = true; dragging = n; }
+});
+
+canvas.addEventListener('mouseup', function(e){
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  if (dragging){
+    const moved = Math.hypot(dragging.x - x, dragging.y - y);
+    if (moved < 5){
+      // 点击
+      showDetail(dragging);
+    }
+    dragging.drag = false;
+    dragging = null;
+  }
+});
+
+// 缩放
+canvas.addEventListener('wheel', function(e){
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const factor = e.deltaY > 0 ? 0.9 : 1.1;
+  for (const n of nodes){
+    n.x = mx + (n.x - mx) * factor;
+    n.y = my + (n.y - my) * factor;
+  }
+}, {passive:false});
+
+function showDetail(n){
+  const d = document.getElementById('detail');
+  d.classList.add('show');
+  document.getElementById('d-name').textContent = n.name;
+  document.getElementById('d-cat').textContent = n.cat;
+  document.getElementById('d-n').textContent = n.n > 0 ? n.n : '（入口页）';
+  document.getElementById('d-tr').textContent = n.tr > 0 ? n.tr.toFixed(2) : '—';
+  const rels = edges.filter(e => e.a === nodes.indexOf(n) || e.b === nodes.indexOf(n));
+  document.getElementById('d-rel').textContent = rels.length > 0 ? rels.length + ' 个' : '无';
+  document.getElementById('d-tags').textContent = (n.tags||[]).join(' · ');
+  document.getElementById('d-jump').onclick = function(){
+    location.href = 'ai-assistant.html?module=' + n.id;
+  };
+}
+
+document.getElementById('btn-force').onclick = function(){ layout='force'; setActive(this); };
+document.getElementById('btn-ring').onclick = function(){ layout='ring'; setActive(this);
+  // 重排为环形
+  for (let i = 0; i < nodes.length; i++){
+    const a = i / nodes.length * Math.PI * 2;
+    nodes[i].x = W/2 + Math.cos(a) * Math.min(W,H)*0.35;
+    nodes[i].y = H/2 + Math.sin(a) * Math.min(W,H)*0.35;
+    nodes[i].vx = 0; nodes[i].vy = 0;
+  }
+};
+document.getElementById('btn-reset').onclick = function(){
+  for (let i = 0; i < nodes.length; i++){
+    const a = i / nodes.length * Math.PI * 2;
+    nodes[i].x = W/2 + Math.cos(a) * Math.min(W,H)*0.3;
+    nodes[i].y = H/2 + Math.sin(a) * Math.min(W,H)*0.3;
+    nodes[i].vx = 0; nodes[i].vy = 0;
+  }
+  focusMod = null;
+  setActive(document.getElementById('btn-force'));
+  layout = 'force';
+};
+document.getElementById('btn-bazi').onclick = function(){ focusMod='bazi'; setActive(this); };
+document.getElementById('btn-tcm').onclick = function(){ focusMod='tcm-clinic'; setActive(this); };
+document.getElementById('btn-ziwei').onclick = function(){ focusMod='ziwei'; setActive(this); };
+document.getElementById('btn-export').onclick = function(){
+  const a = document.createElement('a');
+  a.download = 'kb-graph-r68.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+};
+function setActive(el){
+  document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+</script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-n 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-n 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

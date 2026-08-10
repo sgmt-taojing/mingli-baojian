@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+    <meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-hit-dashboard.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KB 直答命中率 Dashboard · 命理宝鉴后台</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--line:#334155;--text:#e2e8f0;--muted:#94a3b8;--accent:#06b6d4;--accent2:#22d3ee;--warn:#f59e0b;--danger:#ef4444;--good:#10b981;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:var(--bg);color:var(--text);padding:20px;min-height:100vh}
+header{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+h1{font-size:22px;color:var(--accent2)}
+.range-bar{display:flex;gap:8px;align-items:center;margin-left:auto}
+.range-bar select{background:var(--card);border:1px solid var(--line);color:var(--text);padding:6px 12px;border-radius:6px;font-size:13px;cursor:pointer}
+.range-bar button{background:var(--accent);color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:13px}
+.range-bar button:hover{background:var(--accent2)}
+.back-link{font-size:12px;color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:5px 10px;border-radius:6px}
+.back-link:hover{color:var(--accent2);border-color:var(--accent2)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent)}
+.card.good::before{background:var(--good)}
+.card.warn::before{background:var(--warn)}
+.card.purple::before{background:var(--purple)}
+.card.danger::before{background:var(--danger)}
+.card .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.card .value{font-size:30px;font-weight:700;margin:8px 0 4px;color:var(--accent2)}
+.card .value.good{color:var(--good)}
+.card .value.warn{color:var(--warn)}
+.card .value.purple{color:var(--purple)}
+.card .sub{font-size:11px;color:var(--muted)}
+.card .sub-bar{height:6px;background:var(--bg);border-radius:3px;margin-top:8px;overflow:hidden}
+.card .sub-bar-fill{height:100%;border-radius:3px;transition:width .4s ease}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.panel-title{font-size:14px;color:var(--accent2);margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.panel-title .badge{font-size:11px;color:var(--muted);font-weight:400}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:860px){.two-col{grid-template-columns:1fr}}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px;color:var(--muted);border-bottom:1px solid var(--line);font-weight:600;font-size:12px}
+td{padding:8px;border-bottom:1px solid var(--line)}
+tr:hover td{background:rgba(6,182,212,.05)}
+
+.bar-chart{display:flex;align-items:flex-end;gap:3px;height:160px;padding:8px 0;border-bottom:1px solid var(--line);border-left:1px solid var(--line);position:relative}
+.bar-chart .bar{flex:1;background:linear-gradient(to top,var(--accent),var(--accent2));border-radius:3px 3px 0 0;min-height:2px;position:relative;transition:opacity .2s}
+.bar-chart .bar:hover{opacity:.7}
+.bar-chart .bar.zero{background:var(--line);min-height:2px}
+.bar-chart .bar .tip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:4px 8px;border-radius:4px;font-size:11px;white-space:nowrap;margin-bottom:4px;z-index:10}
+.bar-chart .bar:hover .tip{display:block}
+.bar-labels{display:flex;gap:3px;margin-top:4px;font-size:10px;color:var(--muted)}
+.bar-labels span{flex:1;text-align:center}
+
+.loading{text-align:center;padding:40px;color:var(--muted)}
+.error-msg{background:rgba(239,68,68,.1);border:1px solid var(--danger);border-radius:8px;padding:12px;color:var(--danger);margin-bottom:16px}
+.empty{color:var(--muted);font-style:italic;text-align:center;padding:20px}
+.refresh-info{font-size:11px;color:var(--muted);text-align:right;margin-top:10px}
+
+/* R-P3-17.4 通用 reflow */
+@media(max-width:768px){body{font-size:14px}h1{font-size:22px!important}h2{font-size:19px!important}[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{grid-template-columns:repeat(2,1fr)!important}.wrap,.container{padding:12px!important;max-width:100vw!important;overflow-x:hidden!important}.toolbar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}table{display:block!important;overflow-x:auto!important}.modal-box{width:calc(100vw - 24px)!important;max-width:100%!important;margin:12px!important}}
+@media(max-width:480px){body{font-size:13px}[style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3)"]{grid-template-columns:1fr!important}}
+@media(max-width:320px){body{font-size:12px;padding:0!important}h1{font-size:18px!important}input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+
+  <!-- R261 inline: kb-hit-dashboard-inline.css (6500 bytes) -->
+<style data-r261-inline="kb-hit-dashboard-inline.css">
+/* === Extracted from kb-hit-dashboard.html
+:root{
+  --ink:#0d1117;--ink2:#161b22;--ink3:#21262d;--ink4:#30363d;
+  --paper:#f0e6d2;--paper2:#d4c5a0;--paper3:#8b949e;
+  --gold:#c9a84c;--gold2:#e6c87a;--gold3:#9a7b30;
+  --cinn:#c9544b;--jade:#2ecc71;--cyan:#78c8f0;--warn:#e67e22;--danger:#f06060;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);min-height:100vh;line-height:1.6}
+
+.topbar{position:sticky;top:0;z-index:100;background:linear-gradient(135deg,var(--ink2),var(--ink3));border-bottom:2px solid var(--gold3);box-shadow:0 2px 20px rgba(201,168,76,.15)}
+.topbar-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.6rem 1.5rem;flex-wrap:wrap;gap:.5rem}
+.topbar-title{font-family:'Ma Shan Zheng',cursive;font-size:1.5rem;color:var(--gold2)}
+.topbar-title .sub{font-family:'Noto Serif SC';font-size:.8rem;color:var(--paper3);font-weight:300}
+.topbar-nav{display:flex;gap:.3rem;flex-wrap:wrap}
+.topbar-nav a{padding:.4rem .9rem;border-radius:6px;font-size:.85rem;color:var(--paper2);text-decoration:none;transition:all .2s}
+.topbar-nav a:hover{background:var(--gold3);color:var(--ink)}
+.topbar-nav a.active{background:var(--gold3);color:var(--ink)}
+
+.container{max-width:1400px;margin:0 auto;padding:1.5rem}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem}
+.grid-main{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem}
+@media(max-width:768px){.grid-main{grid-template-columns:1fr}}
+
+.card{background:linear-gradient(135deg,var(--ink2),var(--ink3));border:1px solid var(--ink4);border-radius:10px;padding:1.2rem;transition:all .25s}
+.card:hover{border-color:var(--gold3);box-shadow:0 4px 20px rgba(201,168,76,.1)}
+.card h3{font-size:1.05rem;color:var(--gold2);margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:center}
+.card h3 .badge{font-size:.7rem;padding:.2rem .5rem;border-radius:4px;background:var(--ink4);color:var(--paper3);font-weight:normal}
+
+.kpi{text-align:center;padding:1.5rem 1rem}
+.kpi .num{font-size:2.2rem;font-weight:700;color:var(--gold2);font-family:'Ma Shan Zheng',cursive}
+.kpi .label{font-size:.8rem;color:var(--paper3);margin-top:.3rem}
+.kpi .delta{font-size:.75rem;margin-top:.4rem}
+.kpi .delta.up{color:var(--jade)}
+.kpi .delta.down{color:var(--danger)}
+
+.section-header{margin-bottom:1.5rem;padding-bottom:.8rem;border-bottom:1px solid var(--ink4)}
+.section-header h2{font-size:1.6rem;color:var(--gold2);font-weight:500}
+.section-header p{color:var(--paper3);font-size:.85rem;margin-top:.3rem}
+
+/* 模块命中表格 */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{background:var(--ink);color:var(--gold2);padding:.6rem .5rem;text-align:left;border-bottom:2px solid var(--gold3);white-space:nowrap}
+td{padding:.5rem;border-bottom:1px solid var(--ink4);color:var(--paper2)}
+tr:hover td{background:rgba(201,168,76,.04)}
+.bar-cell{position:relative;min-width:120px}
+.bar-bg{background:var(--ink4);border-radius:4px;height:18px;overflow:hidden}
+.bar-fg{height:100%;border-radius:4px;transition:width .6s ease}
+.bar-fg.high{background:linear-gradient(90deg,var(--jade),#27ae60)}
+.bar-fg.mid{background:linear-gradient(90deg,var(--warn),#d35400)}
+.bar-fg.low{background:linear-gradient(90deg,var(--danger),#c0392b)}
+.bar-label{position:absolute;top:0;left:.5rem;line-height:18px;font-size:.7rem;color:var(--paper);text-shadow:0 0 3px rgba(0,0,0,.5)}
+
+/* 趋势图 */
+.chart-wrap{position:relative;height:180px;margin-top:.5rem}
+.chart-svg{width:100%;height:100%}
+
+/* 饼图 */
+.pie-wrap{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.pie-svg{flex-shrink:0}
+.pie-legend{flex:1;min-width:200px}
+.pie-legend-item{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;font-size:.8rem;cursor:pointer}
+.pie-legend-item .dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.pie-legend-item .val{margin-left:auto;color:var(--paper3);font-family:monospace}
+
+/* 路径分布 */
+.path-list{list-style:none}
+.path-item{display:flex;align-items:center;gap:.8rem;padding:.5rem 0;border-bottom:1px solid var(--ink4)}
+.path-item:last-child{border-bottom:none}
+.path-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.path-icon.kb{background:rgba(46,204,113,.15);color:var(--jade)}
+.path-icon.hybrid{background:rgba(230,126,34,.15);color:var(--warn)}
+.path-icon.ai{background:rgba(120,200,240,.15);color:var(--cyan)}
+.path-info{flex:1}
+.path-info .name{font-size:.85rem;color:var(--paper)}
+.path-info .desc{font-size:.7rem;color:var(--paper3)}
+.path-pct{font-size:1.1rem;font-weight:600;color:var(--gold2);font-family:monospace}
+
+/* 漏斗 */
+.funnel{display:flex;flex-direction:column;gap:.3rem}
+.funnel-stage{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;background:var(--ink);border-radius:6px;border:1px solid var(--ink4)}
+.funnel-stage .stage-num{font-size:1.2rem;font-weight:700;color:var(--gold2);min-width:48px;text-align:right}
+.funnel-stage .stage-label{flex:1;font-size:.8rem;color:var(--paper2)}
+.funnel-stage .stage-pct{font-size:.75rem;color:var(--paper3);font-family:monospace}
+.funnel-bar{height:4px;border-radius:2px;margin-top:.3rem}
+
+/* API 列表 */
+.api-list{list-style:none}
+.api-item{padding:.5rem 0;border-bottom:1px solid var(--ink4);font-family:monospace;font-size:.8rem}
+.api-item:last-child{border-bottom:none}
+.api-method{display:inline-block;padding:.1rem .4rem;border-radius:3px;font-size:.7rem;font-weight:600;margin-right:.5rem}
+.api-method.GET{background:rgba(46,204,113,.2);color:var(--jade)}
+.api-method.POST{background:rgba(120,200,240,.2);color:var(--cyan)}
+.api-status{float:right;font-size:.7rem}
+.api-status.ok{color:var(--jade)}
+.api-status.err{color:var(--danger)}
+
+.refresh-btn{background:var(--ink3);color:var(--gold2);border:1px solid var(--gold3);border-radius:6px;padding:.4rem .8rem;font-size:.8rem;cursor:pointer;transition:all .2s}
+.refresh-btn:hover{background:var(--gold3);color:var(--ink)}
+
+.empty-hint{color:var(--paper3);font-size:.85rem;text-align:center;padding:2rem}
+.empty-hint .icon{font-size:2rem;display:block;margin-bottom:.5rem;opacity:0.85}
+
+footer{text-align:center;color:var(--paper3);font-size:.75rem;padding:2rem 1rem;border-top:1px solid var(--ink4);margin-top:2rem}
+  </style>
+</head>
+<body data-need-admin="true" data-need-admin="true">
+<a href="divination-hub.html" style="position:fixed;top:12px;left:12px;z-index:9999;padding:8px 14px;background:#c9a227;color:#fff;border-radius:20px;font-size:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.15);opacity:.85">← 首页</a>
+
+<header>
+  <h1>🎯 KB 直答命中率 Dashboard</h1>
+  <a class="back-link" href="dashboard.html">← 可观测性仪表盘</a>
+  <div class="range-bar">
+    <select id="rangeSelect">
+      <option value="24h" selected>最近 24 小时</option>
+      <option value="7d">最近 7 天</option>
+      <option value="30d">最近 30 天</option>
+    </select>
+    <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px">
+      时段
+      <input type="range" id="hourRange" min="0" max="4" value="4" step="1" style="width:100px;accent-color:var(--accent)">
+      <span id="hourRangeLabel" style="min-width:60px;font-size:11px;color:var(--accent2)">全天</span>
+    </label>
+    <button onclick="loadData()">刷新</button>
+    <button onclick="exportJSON()" style="background:var(--card);border:1px solid var(--line)">导出 JSON</button>
+  </div>
+</header>
+
+<div id="errorBox" style="display:none" class="error-msg"></div>
+
+<!-- 4 卡片 -->
+<div class="grid">
+  <div class="card">
+    <div class="label">总命中次数</div>
+    <div class="value" id="kpi-total">—</div>
+    <div class="sub" id="kpi-total-sub">累计 KB 直答命中</div>
+  </div>
+  <div class="card good">
+    <div class="label">今日命中</div>
+    <div class="value good" id="kpi-today">—</div>
+    <div class="sub" id="kpi-today-sub">DATE('now','localtime')</div>
+  </div>
+  <div class="card purple">
+    <div class="label">命中模块数</div>
+    <div class="value purple" id="kpi-modules">—</div>
+    <div class="sub" id="kpi-modules-sub">选定时间窗内</div>
+  </div>
+  <div class="card warn">
+    <div class="label">平均延迟</div>
+    <div class="value warn" id="kpi-avgms">—</div>
+    <div class="sub">response_time 均值 (ms)</div>
+  </div>
+</div>
+
+<!-- 2 表格 -->
+<div class="two-col">
+  <div class="panel">
+    <div class="panel-title">🔝 TOP10 高频 Query <span class="badge" id="topq-badge">0 条</span></div>
+    <table>
+      <thead><tr><th>#</th><th>Query</th><th>次数</th></tr></thead>
+      <tbody id="topq-body"><tr><td colspan="3" class="empty">加载中…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <div class="panel-title">📊 按 Module 分布 <span class="badge" id="bymod-badge">0 个</span></div>
+    <table>
+      <thead><tr><th>#</th><th>Module</th><th>次数</th><th>占比</th></tr></thead>
+      <tbody id="bymod-body"><tr><td colspan="4" class="empty">加载中…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 24h 柱状图 -->
+<div class="panel">
+  <div class="panel-title">⏰ 最近 24h 命中趋势 <span class="badge" id="hourly-badge">0 次</span></div>
+  <div class="bar-chart" id="hourly-chart"><div class="empty">加载中…</div></div>
+  <div class="bar-labels" id="hourly-labels"></div>
+</div>
+
+<!-- 引擎分布饼图 + src_id 覆盖率 -->
+<div class="two-col">
+  <div class="panel">
+    <div class="panel-title">⚡ 检索引擎分布 (FTS5 vs LIKE) <span class="badge" id="engine-badge">0 次</span></div>
+    <div style="display:flex;align-items:center;gap:18px;padding:6px 0;flex-wrap:wrap">
+      <svg id="engine-pie" width="180" height="180" viewBox="0 0 180 180" aria-label="engine distribution pie" role="img" style="flex-shrink:0">
+        <circle cx="90" cy="90" r="60" fill="none" stroke="#334155" stroke-width="40"/>
+        <circle id="pie-fts5" cx="90" cy="90" r="60" fill="none" stroke="#10b981" stroke-width="40" stroke-dasharray="0 376.99" stroke-dashoffset="0" transform="rotate(-90 90 90)" style="transition:stroke-dasharray .5s ease"/>
+        <circle id="pie-likefb" cx="90" cy="90" r="60" fill="none" stroke="#f59e0b" stroke-width="40" stroke-dasharray="0 376.99" stroke-dashoffset="0" transform="rotate(-90 90 90)" style="transition:stroke-dasharray .5s ease"/>
+        <text id="pie-center" x="90" y="90" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="20" font-weight="700">0</text>
+        <text x="90" y="108" text-anchor="middle" dominant-baseline="middle" fill="#94a3b8" font-size="11">总请求</text>
+      </svg>
+      <div id="engine-legend" style="display:flex;flex-direction:column;gap:10px;min-width:160px">
+        <div style="font-size:11px;color:#94a3b8">暂无数据</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">📚 knowledge-models src_id 覆盖率 <span class="badge" id="src-badge">0 / 0</span></div>
+    <div style="padding:10px 0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">
+        <span style="font-size:12px;color:#94a3b8">已覆盖 unique src_id</span>
+        <span id="src-pct-text" style="font-size:24px;font-weight:700;color:var(--accent2)">0%</span>
+      </div>
+      <div style="height:18px;background:#0f172a;border-radius:9px;overflow:hidden;border:1px solid var(--line);position:relative">
+        <div id="src-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:9px;transition:width .5s ease"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#94a3b8">
+        <span>已覆盖 <b id="src-covered" style="color:var(--good)">0</b> 个 src_id</span>
+        <span>源总数 <b id="src-total" style="color:var(--warn)">0</b></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="refresh-info" id="refreshInfo">未加载</div>
+
+<script>
+const API_BASE = 'http://' + (location.hostname || '127.0.0.1') + ':8920';
+let lastData = null;
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.textContent = msg;
+  box.style.display = 'block';
+}
+function hideError() { document.getElementById('errorBox').style.display = 'none'; }
+
+async function loadData() {
+  hideError();
+  const range = document.getElementById('rangeSelect').value;
+  try {
+    const resp = await fetch(API_BASE + '/api/ai/kb-hit-stats?range=' + range,{signal:AbortSignal.timeout(15000)});
+    if (!resp.ok) { showError('HTTP ' + resp.status); return; }
+    const json = await resp.json();
+    if (!json.ok) { showError(json.message || '接口错误'); return; }
+    lastData = json.data;
+    render(json.data);
+    document.getElementById('refreshInfo').textContent = '更新于 ' + new Date().toLocaleTimeString('zh-CN') + ' · range=' + range;
+  } catch (e) {
+    showError('网络错误：' + e.message + '（确认 API 服务在 8920 端口）');
+  }
+}
+
+function render(d) {
+  // 4 卡片
+  document.getElementById('kpi-total').textContent = d.total ?? 0;
+  document.getElementById('kpi-today').textContent = d.today ?? 0;
+  const modCount = (d.byModule || []).length;
+  document.getElementById('kpi-modules').textContent = modCount;
+  document.getElementById('kpi-modules-sub').textContent = 'range=' + (d.range || '—') + ' · ' + (d.rangeHours || 0) + 'h';
+  document.getElementById('kpi-avgms').textContent = (d.avgMs ?? 0) + ' ms';
+
+  // TOP10 Query
+  const tq = d.topQueries || [];
+  document.getElementById('topq-badge').textContent = tq.length + ' 条';
+  const tqBody = document.getElementById('topq-body');
+  if (tq.length === 0) {
+    tqBody.innerHTML = '<tr><td colspan="3" class="empty">暂无数据</td></tr>';
+  } else {
+    tqBody.innerHTML = tq.map((r, i) => {
+      const q = String(r.query || '(空)').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+      return '<tr><td>' + (i + 1) + '</td><td>' + q + '</td><td>' + r.cnt + '</td></tr>';
+    }).join('');
+  }
+
+  // byModule
+  const bm = d.byModule || [];
+  document.getElementById('bymod-badge').textContent = bm.length + ' 个';
+  const bmBody = document.getElementById('bymod-body');
+  if (bm.length === 0) {
+    bmBody.innerHTML = '<tr><td colspan="4" class="empty">暂无数据（注意：表 schema 可能缺 module 字段填充）</td></tr>';
+  } else {
+    const total = bm.reduce((s, r) => s + r.cnt, 0);
+    bmBody.innerHTML = bm.map((r, i) => {
+      const m = String(r.module || '(未分类)').replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+      const pct = total > 0 ? Math.round(r.cnt * 100 / total) : 0;
+      return '<tr><td>' + (i + 1) + '</td><td>' + m + '</td><td>' + r.cnt + '</td><td>' + pct + '%</td></tr>';
+    }).join('');
+  }
+
+  // 24h 柱状图
+  const hh = d.hourlyHits || [];
+  const total24 = hh.reduce((s, h) => s + h.count, 0);
+  renderEnginePie(d.engineBreakdown || { fts5: 0, likeFallback: 0, other: 0 });
+  renderSrcCoverage(d.srcCoverage || { covered: 0, total: 0, pct: 0 });
+  document.getElementById('hourly-badge').textContent = total24 + ' 次';
+  const max = Math.max(1, ...hh.map(h => h.count));
+  const chart = document.getElementById('hourly-chart');
+  const labels = document.getElementById('hourly-labels');
+  if (hh.length === 0) {
+    chart.innerHTML = '<div class="empty">暂无数据</div>';
+    labels.innerHTML = '';
+  } else {
+    const hr = getHourRange();
+    const filtered = hr ? hh.filter(h => {
+      const hour = parseInt(h.hour, 10);
+      return hour >= hr[0] && hour < hr[1];
+    }) : hh;
+    const maxF = Math.max(1, ...filtered.map(h => h.count));
+    chart.innerHTML = hh.map(h => {
+      const hour = parseInt(h.hour, 10);
+      const inRange = !hr || (hour >= hr[0] && hour < hr[1]);
+      const pct = inRange ? Math.round(h.count * 100 / maxF) : 0;
+      const cls = !inRange ? 'bar zero' : (h.count === 0 ? 'bar zero' : 'bar');
+      const opacity = inRange ? '' : 'opacity:0.25;';
+      return '<div class="' + cls + '" style="height:' + Math.max(2, pct) + '%;' + opacity + '" title="' + h.hour + ':00 — ' + h.count + ' 次">' +
+             '<span class="tip">' + h.hour + ':00 · ' + h.count + ' 次</span></div>';
+    }).join('');
+    labels.innerHTML = hh.map(h => '<span>' + (h.hour % 6 === 0 ? h.hour : '') + '</span>').join('');
+    const filteredTotal = filtered.reduce((s, h) => s + h.count, 0);
+    document.getElementById('hourly-badge').textContent = filteredTotal + ' 次' + (hr ? ' (' + hr[0] + ':00-' + hr[1] + ':00)' : '');
+  }
+}
+
+function exportJSON() {
+  if (!lastData) { console.warn('请先加载数据'); return; }
+  const blob = new Blob([JSON.stringify(lastData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kb-hit-stats-' + (lastData.range || '7d') + '-' + Date.now() + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// R27-P1：渲染引擎分布饼图（纯 SVG，不引新依赖）
+function renderEnginePie(eb) {
+  var fts5 = eb.fts5 || 0;
+  var likeFb = eb.likeFallback || 0;
+  var other = eb.other || 0;
+  var total = fts5 + likeFb + other;
+  document.getElementById('engine-badge').textContent = total + ' 次';
+
+  var C = 2 * Math.PI * 60; // circumference = 376.99
+  var fts5Len = total > 0 ? (fts5 / total) * C : 0;
+  var likeFbLen = total > 0 ? (likeFb / total) * C : 0;
+  var otherLen = total > 0 ? (other / total) * C : 0;
+
+  // 第一段：fts5（从顶部开始）
+  var pieFts5 = document.getElementById('pie-fts5');
+  pieFts5.setAttribute('stroke-dasharray', fts5Len + ' ' + (C - fts5Len));
+  pieFts5.setAttribute('stroke-dashoffset', '0');
+
+  // 第二段：like-fallback（从 fts5 结束位置开始）
+  var pieLikeFb = document.getElementById('pie-likefb');
+  pieLikeFb.setAttribute('stroke-dasharray', likeFbLen + ' ' + (C - likeFbLen));
+  pieLikeFb.setAttribute('stroke-dashoffset', String(-fts5Len));
+
+  // 第三段：other（如果有，用另一个 circle）
+  // 简化：other 不画弧段（因为前两段补满即可）
+  if (other > 0) {
+    pieLikeFb.setAttribute('stroke-dasharray', (likeFbLen + otherLen) + ' ' + (C - likeFbLen - otherLen));
+  }
+
+  // 中心数字
+  document.getElementById('pie-center').textContent = total;
+
+  // 图例
+  var legend = document.getElementById('engine-legend');
+  if (total === 0) {
+    legend.innerHTML = '<div style="font-size:11px;color:#94a3b8">暂无数据</div>';
+  } else {
+    var pct = function(n) { return total > 0 ? Math.round(n * 100 / total) : 0; };
+    legend.innerHTML =
+      '<div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#10b981;display:inline-block"></span>' +
+      '<span style="font-size:13px;color:#e2e8f0">⚡ FTS5 <b style="color:#10b981">' + fts5 + '</b> (' + pct(fts5) + '%)</span></div>' +
+      '<div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#f59e0b;display:inline-block"></span>' +
+      '<span style="font-size:13px;color:#e2e8f0">🔄 LIKE Fallback <b style="color:#f59e0b">' + likeFb + '</b> (' + pct(likeFb) + '%)</span></div>' +
+      (other > 0 ?
+        '<div style="display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:3px;background:#a78bfa;display:inline-block"></span>' +
+        '<span style="font-size:13px;color:#e2e8f0">📖 Other <b style="color:#a78bfa">' + other + '</b> (' + pct(other) + '%)</span></div>' : '');
+  }
+}
+
+// R27-P1：渲染 src_id 覆盖率进度条
+function renderSrcCoverage(sc) {
+  var covered = sc.covered || 0;
+  var totalSrc = sc.total || 0;
+  var pct = sc.pct || 0;
+  document.getElementById('src-badge').textContent = covered + ' / ' + totalSrc;
+  document.getElementById('src-covered').textContent = covered;
+  document.getElementById('src-total').textContent = totalSrc;
+  document.getElementById('src-pct-text').textContent = pct + '%';
+  document.getElementById('src-bar').style.width = pct + '%';
+  // 颜色渐变：< 30% 红、30-70% 黄、> 70% 绿
+  var bar = document.getElementById('src-bar');
+  if (pct >= 70) bar.style.background = 'linear-gradient(90deg,#10b981,#22d3ee)';
+  else if (pct >= 30) bar.style.background = 'linear-gradient(90deg,#f59e0b,#fbbf24)';
+  else bar.style.background = 'linear-gradient(90deg,#ef4444,#f59e0b)';
+}
+
+function getHourRange() {
+  const v = parseInt(document.getElementById('hourRange').value, 10);
+  const ranges = {0:[0,6], 1:[6,12], 2:[12,18], 3:[18,24]};
+  return ranges[v] || null; // 4 = all
+}
+function updateHourRangeLabel() {
+  const v = parseInt(document.getElementById('hourRange').value, 10);
+  const labels = ['0:00-6:00', '6:00-12:00', '12:00-18:00', '18:00-24:00', '全天'];
+  document.getElementById('hourRangeLabel').textContent = labels[v];
+  // re-render chart without refetch
+  if (lastData) render(lastData);
+}
+document.getElementById('hourRange').addEventListener('input', updateHourRangeLabel);
+
+// auto-load
+loadData();
+setInterval(loadData, 60000);
+</script>
+  <script src="../js/admin-rbac-shared.js"></script>
+<script src="../js/admin-rbac-shared.js"></script>
+<script src="../js/mobile-nav.js" defer></script>
+<script src="../js/error-interceptor.js"></script>
+<script src="../js/submit-guard.js"></script>
+<script src="../js/escape-html.js"></script>
+</body>
+</html>

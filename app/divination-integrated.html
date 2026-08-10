@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta charset="UTF-8">
+<meta name="description" content="易道智鉴 · 易道智鉴平台">
+<meta name="keywords" content="易道智鉴">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/divination-integrated.html">
+<meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="易道智鉴 · 先进系统推演">
+<meta property="og:description" content="易道智鉴 · 易道智鉴平台">
+<meta property="og:type" content="website">
+  <title>易道智鉴 · 先进系统推演</title>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/a11y-fix.css">
+  
+<script src="js/ui-toast.js" defer></script>
+<script src="js/secure-storage.js"></script>
+<script src="components/toast.js"></script>
+<!-- F-9/S-2 错误拦截器（节点 #4.3） -->
+<script src="js/error-interceptor.js"></script>
+<script src="components/tab.js"></script>
+<link rel="stylesheet" href="css/divination-integrated-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+</head>
+
+<body class="theme-zhouyi">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">易道智鉴</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>输入信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>综合排盘</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看分析</span></div></div>
+<div class="flow-hint">信众查看体质调理方案，八字+中医综合分析。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
+<div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">主平台</a>
+  <a href="divination-almanac.html" class="file-nav-btn">历 黄历</a>
+  <a href="divination-integrated.html" class="file-nav-btn active">因 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn">医 中医诊疗</a>
+  <a href="tcm-symptom.html" class="file-nav-btn">诊 症状分析</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">莲 倪师知识库</a>
+  <a href="nihaisha-tool.html" class="file-nav-btn">研 倪师工具</a>
+  <a href="nihaisha-learning.html" class="file-nav-btn">经 倪师学堂</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">标 舒晗知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn">购 商城</a>
+  <a href="divination-membership.html" class="file-nav-btn">宝 会员</a>
+  <a href="wechat-hub.html" class="file-nav-btn">机 缘主工具</a>
+  <a href="ai-assistant.html" class="file-nav-btn">机 智能助手</a>
+  <a href="login.html" class="file-nav-btn">密 登录</a>
+</div>
+<div class="header">
+  <h1>易道智鉴 · 先进系统推演<span class="badge-ai" style="font-size:14px;vertical-align:middle">机AI解读</span></h1>
+  <p>易道智鉴 · 先进系统推演</p>
+</div>
+
+<div class="top-nav">
+  <a href="divination-hub.html">宅 命理宝鉴</a>
+  <a href="divination-integrated.html">因 体质调理</a>
+  <a href="divination-almanac.html">历 黄历</a>
+  <a href="divination-knowledge.html">知识库</a>
+  <a href="divination-shop.html">购 开运商城</a>
+  <a href="divination-membership.html">人 信众中心</a>
+</div>
+
+<div class="disclaimer-bar">
+  <strong>警 重要声明：</strong>本页面所有内容仅供传统文化研究参考，不构成医疗诊断、治疗建议或药物推荐。身体不适请及时就医，切勿自行用药。所有饮食/药膳建议须在专业医师指导下进行。
+</div>
+
+<div class="container">
+
+  <!-- ====== 养生篇Tab系统（已迁移到 <ml-tab> Web Component） ====== -->
+  <ml-tab id="mainTab" active="1">
+    <ml-tab-pane label="📐 五行总览" id="tab-overview">
+    <div class="section-title">量 五行 → 人体 → 调理 关系总览</div>
+    <div class="chain-container">
+      <div class="chain-title">点击任一环节，查看详细解释</div>
+      <div class="chain-row" id="chainRow"></div>
+      <div style="text-align:center;margin-top:10px">
+        <span style="display:inline-block;width:12px;height:12px;background:var(--jade);border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px;margin-right:14px">相生</span>
+        <span style="display:inline-block;width:12px;height:12px;background:var(--cinn2);border-radius:3px;margin:0 4px"></span><span style="color:var(--muted);font-size:12px">相克</span>
+      </div>
+    </div>
+    <div class="section-title">表 五行体质对照表</div>
+    <div class="detail-grid" id="detailGrid"></div>
+    </ml-tab-pane>
+    <ml-tab-pane label="📤 上传报告" id="tab-report">
+    
+    <!-- ====== 🤖 自动分析解读卡片 ====== -->
+    <div class="ai-interpret-card" id="aiInterpretCard">
+      <div class="ant-badge">对标蚂蚁阿福专业水准</div>
+      <h2>机 智能解读体检报告</h2>
+      <p class="subtitle">上传体检报告图片，AI知识库专业解读，给出食疗+运动+打卡方案</p>
+      
+      <!-- 上传区域 -->
+      <div class="ai-upload-zone" id="aiUploadZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleAIDrop(event)">
+        <label for="aiReportFile" class="sr-only">上传报告图片或 PDF（AI 解读用）</label>
+        <input type="file" accept="image/*,.pdf" id="aiReportFile" aria-label="aiReportFile" onchange="handleAIFileSelect(event)">
+        <div class="ai-upload-icon">诊</div>
+        <div class="ai-upload-text"><strong>拖拽报告图片到此处</strong> 或 <strong>点击上传</strong></div>
+        <div class="ai-upload-hint">支持 JPG / PNG（体检报告、血常规、肝肾功能、血糖血脂等）<br>上传即分析，AI自动解读</div>
+      </div>
+      
+      <!-- 图片预览（上传后隐藏上传区，显示预览+分析中） -->
+      <div class="ai-preview-wrap" id="aiPreviewWrap" style="display:none">
+        <img loading="lazy" id="aiPreviewImg" class="ai-preview-img" alt="报告预览">
+      </div>
+      
+      <!-- 分析中状态 -->
+      <div id="aiAnalyzingState" style="display:none;text-align:center;padding:40px 20px">
+        <div style="font-size:48px;margin-bottom:16px;animation:ai-pulse 1.5s infinite">机</div>
+        <div style="font-size:18px;color:var(--paper);font-weight:600;margin-bottom:8px">AI 正在解读您的体检报告...</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.7)" id="aiAnalyzingTip">正在分析各项指标，请稍候</div>
+        <div style="margin-top:20px;width:200px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;margin-left:auto;margin-right:auto;overflow:hidden">
+          <div style="width:30%;height:100%;background:var(--accent);border-radius:2px;animation:ai-progress 2s infinite"></div>
+        </div>
+      </div>
+      
+      <!-- AI解读结果区域 -->
+      <div id="aiResultArea" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 style="color:var(--paper);font-size:18px;margin:0">表 AI解读报告</h3>
+          <div style="display:flex;gap:8px">
+            <button onclick="reUploadReport()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--paper);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">更 重新上传</button>
+            <button onclick="exportAIResult()" style="background:var(--accent);border:none;color:var(--paper);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px">入 导出报告</button>
+          </div>
+        </div>
+        <div id="aiResultContent" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:24px;color:rgba(255,255,255,.9);line-height:1.8;font-size:14px"></div>
+      </div>
+      
+      <!-- 错误提示 -->
+      <div id="aiErrorState" style="display:none;text-align:center;padding:30px 20px">
+        <div style="font-size:36px;margin-bottom:12px">警</div>
+        <div style="color:var(--paper);font-size:16px;margin-bottom:8px" id="aiErrorMsg">分析失败</div>
+        <div style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:16px" id="aiErrorDetail"></div>
+        <button onclick="retryAIAnalysis()" style="background:var(--accent);border:none;color:var(--paper);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px">更 重试</button>
+        <button onclick="reUploadReport()" style="background:transparent;border:1px solid rgba(255,255,255,.3);color:var(--paper);padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px;margin-left:8px">出 重新上传</button>
+      </div>
+      
+
+    </div>
+    
+    <!-- ====== 原有上传报告模块 ====== -->
+    <div class="mod-banner">
+      <div class="mod-banner-icon">出</div>
+      <div>
+        <h2>上传检测报告（规则判断）</h2>
+        <p>上传体检报告/血常规/肝肾功能等图片，获取五行体质解读与个性化食疗建议</p>
+      </div>
+    </div>
+
+    <!-- 上传区 -->
+    <div class="card">
+      <div class="upload-zone" id="uploadZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleDrop(event)">
+        <label for="reportFile" class="sr-only">上传报告图片</label>
+        <input type="file" accept="image/*" id="reportFile" aria-label="reportFile" onchange="handleFileSelect(event)">
+        <div class="upload-icon">诊</div>
+        <div class="upload-text"><strong>拖拽图片到此处</strong> 或 <strong>点击上传</strong></div>
+        <div class="upload-hint">支持 JPG / PNG / PDF 截图（体检报告、血常规、肝肾功能、血糖血脂等）</div>
+        <img loading="lazy" id="previewImg" alt="预览">
+      </div>
+      <div style="margin-top:14px">
+        <div class="input-field" style="max-width:400px">
+          <label for="reportConstitution">五行体质类型（若已知）</label>
+          <select id="reportConstitution" aria-label="reportConstitution">
+            <option value="">— 自动推断（推荐）—</option>
+            <option value="阴虚">阴虚体质（火旺水亏）</option>
+            <option value="阳虚">阳虚体质（火弱水盛）</option>
+            <option value="气虚">气虚体质（土弱气不足）</option>
+            <option value="血虚">血虚体质（木耗血亏）</option>
+            <option value="痰湿">痰湿体质（土盛湿重）</option>
+            <option value="湿热">湿热体质（土湿热蕴）</option>
+            <option value="平和">平和体质（五行均衡）</option>
+          </select>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn" onclick="analyzeReport()">查 开始解读报告</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-wrap" id="reportLoading">
+      <div class="spinner"></div>
+      <div class="loading-text">报告已收到，专业解读中<span id="loadingDots">...</span></div>
+    </div>
+
+    <!-- 报告解读结果 -->
+    <div class="report-result" id="reportResult"></div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🤖 AI解读" id="tab-ai">
+    <div class="ai-interpret-card" style="margin-top:20px">
+      <div class="ant-badge">对标蚂蚁阿福专业水准</div>
+      <h2>机 智能解读体检报告</h2>
+      <p class="subtitle">上传体检报告图片，获取AI知识库专业解读（对标蚂蚁阿福App水准）</p>
+      
+      <div style="background:rgba(20,18,14,0.95);color:var(--text);border-radius:14px;padding:24px;margin-top:20px">
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div style="flex:1;min-width:280px">
+            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">表 使用说明</h4>
+            <div style="font-size:14px;line-height:2;color:var(--muted)">
+              <p>1️⃣ <strong>上传报告</strong>：拖拽或点击上传体检报告图片</p>
+              <p>2️⃣ <strong>自动分析</strong>：AI知识库自动解读，无需手动操作</p>
+              <p>3️⃣ <strong>查看结果</strong>：直接查看专业解读报告和调理方案</p>
+            </div>
+          </div>
+          <div style="flex:1;min-width:280px">
+            <h4 style="color:var(--title);margin-bottom:12px;font-size:16px">光 专业解读包含</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <span class="tag tag-primary">报告解读摘要</span>
+              <span class="tag tag-primary">研 各项指标解读</span>
+              <span class="tag tag-primary">中医体质辨识</span>
+              <span class="tag tag-success">食疗调理方案</span>
+              <span class="tag tag-success">运动调理方案</span>
+              <span class="tag tag-warn">表 21天打卡计划</span>
+              <span class="tag tag-danger">警 就医建议</span>
+            </div>
+            <div style="margin-top:16px;padding:14px;background:rgba(102,126,234,.06);border-radius:10px;border-left:3px solid var(--cyan2)">
+              <p style="font-size:13px;color:var(--muted);line-height:1.7">
+                <strong style="color:var(--title)">示 提示：</strong>上传图片后AI将自动分析，无需手动操作。本功能调用本地知识库API，需确保本机AI服务正在运行。如遇网络错误，请检查OpenClaw服务状态。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div style="margin-top:20px;text-align:center">
+          <button class="btn" onclick="switchTab('report')" style="background:linear-gradient(135deg,var(--cyan2),var(--violet));color:var(--paper);font-size:16px;padding:14px 36px">出 前往上传报告，开始AI解读</button>
+        </div>
+      </div>
+    </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🌿 食疗配方" id="tab-food">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">草</div>
+      <div>
+        <h2>食疗配方宝库</h2>
+        <p>按五行脏腑与体质分类推荐，附本周食疗计划与每日打卡联动</p>
+      </div>
+    </div>
+
+    <!-- 体质筛选 -->
+    <div class="card">
+      <div style="margin-bottom:12px">
+        <strong style="color:var(--title);font-size:14px">按体质筛选配方：</strong>
+      </div>
+      <div class="constitution-tabs" id="constTabs">
+        <button class="const-tab active" onclick="filterRecipes('all')">全部</button>
+        <button class="const-tab" onclick="filterRecipes('阴虚')">夜 阴虚</button>
+        <button class="const-tab" onclick="filterRecipes('阳虚')">日 阳虚</button>
+        <button class="const-tab" onclick="filterRecipes('气虚')">风 气虚</button>
+        <button class="const-tab" onclick="filterRecipes('血虚')">🩸 血虚</button>
+        <button class="const-tab" onclick="filterRecipes('痰湿')">湿 痰湿</button>
+        <button class="const-tab" onclick="filterRecipes('湿热')">热 湿热</button>
+        <button class="const-tab" onclick="filterRecipes('平和')">平 平和</button>
+      </div>
+      <div class="recipe-library" id="recipeLibrary"></div>
+    </div>
+
+    <!-- 本周食疗计划 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">历</div>
+        <div class="card-title">本周食疗计划</div>
+        <span class="card-badge" id="weekLabel"></span>
+      </div>
+      <div class="weekly-plan-grid" id="weeklyPlan"></div>
+      <div style="margin-top:14px;text-align:center">
+        <button class="btn-outline" onclick="applyWeeklyPlan()">表 一键导入本周食谱至今日打卡</button>
+      </div>
+    </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🏃 运动调理" id="tab-exercise">
+    <div class="exercise-module">
+      <div class="mod-header">
+        <div class="mod-icon">🏃</div>
+        <div>
+          <h2 class="mod-title">运动调理方案</h2>
+          <p style="font-size:13px;color:var(--muted);margin-top:2px">根据体质定制每周运动计划，附推荐运动库与禁忌提示</p>
+        </div>
+        <span class="ant-badge">对标蚂蚁阿福专业水准</span>
+      </div>
+      
+      <!-- 每周运动计划 -->
+      <div style="margin-bottom:24px">
+        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">历 本周运动计划表</h4>
+        <div class="exercise-week-grid" id="exerciseWeekGrid"></div>
+      </div>
+      
+      <!-- 推荐运动库 -->
+      <div style="margin-bottom:24px">
+        <h4 style="color:var(--title);font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px">箱 推荐运动类型库</h4>
+        <div class="exercise-library" id="exerciseLibrary"></div>
+      </div>
+      
+      <!-- 运动禁忌 -->
+      <div style="background:rgba(230,126,34,.06);border:1px solid rgba(230,126,34,.2);border-radius:12px;padding:18px">
+        <h4 style="color:var(--warn);font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px">警 运动禁忌（根据报告异常指标自动提示）</h4>
+        <div id="exerciseWarnings" style="font-size:13px;color:var(--muted);line-height:1.8">
+          <p>出 请先上传体检报告或完成AI解读，系统将根据您的指标自动提示运动禁忌。</p>
+        </div>
+      </div>
+      
+      <!-- 导入打卡按钮 -->
+      <div style="margin-top:20px;text-align:center">
+        <button class="btn btn-success" onclick="importExerciseToCheckin()">表 将本周运动计划导入今日打卡</button>
+      </div>
+    </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="✅ 每日打卡" id="tab-checkin">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">成</div>
+      <div>
+        <h2>每日养生打卡</h2>
+        <p>记录今日养生行为，培养健康习惯，追踪连续打卡成就</p>
+      </div>
+    </div>
+
+    <!-- 连续打卡徽章 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">冠</div>
+        <div class="card-title">连续打卡成就</div>
+      </div>
+      <div class="streak-panel" id="streakPanel"></div>
+      <div style="text-align:center;font-size:13px;color:var(--muted)" id="streakInfo">今日还未打卡</div>
+    </div>
+
+    <!-- 打卡日历进度 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">📆</div>
+        <div class="card-title">本月打卡日历</div>
+        <button class="btn-outline btn-sm" onclick="switchMonth(-1)" style="margin-left:auto" aria-label="上一个">◀</button>
+        <span id="calendarMonth" style="padding:4px 12px;font-size:13px;color:var(--title);font-weight:700"></span>
+        <button class="btn-outline btn-sm" onclick="switchMonth(1)" aria-label="播放">▶</button>
+      </div>
+      <div id="calendarGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center"></div>
+    </div>
+
+    <!-- 今日打卡表单 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">✍️</div>
+        <div class="card-title">今日打卡</div>
+        <span id="todayDate" style="margin-left:auto;font-size:13px;color:var(--muted)"></span>
+      </div>
+      <div class="checkin-form" id="checkinForm"></div>
+      <div class="checkin-submit" style="text-align:center">
+        <button class="btn btn-success" onclick="submitCheckin()" id="submitBtn">标 提交今日打卡</button>
+      </div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon">卷</div>
+        <div class="card-title">打卡历史</div>
+      </div>
+      <div class="history-list" id="historyList"></div>
+      <div class="export-row">
+        <button class="btn-outline btn-sm" onclick="exportCheckin()">出 导出打卡记录</button>
+        <button class="btn-outline btn-sm" onclick="shareCheckin()">机 截图分享</button>
+        <button class="btn-outline btn-sm" style="border-color:var(--danger);color:var(--danger)" onclick="clearHistory()">删 清空历史</button>
+      </div>
+    </div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🔮 八字分析" id="tab-bazi">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">卦</div>
+      <div>
+        <h2>八字体质分析</h2>
+        <p>输入生辰八字，推算五行缺失与先天体质弱点</p>
+      </div>
+    </div>
+    <div class="card" style="background:var(--card)">
+      <div class="input-row">
+        <div class="input-field">
+          <label for="baziDate">出生日期</label>
+          <input type="date" id="baziDate" value="1990-01-01" aria-label="baziDate">
+        </div>
+        <div class="input-field">
+          <label for="baziHour">出生时辰</label>
+          <select id="baziHour" aria-label="baziHour">
+            <option value="0">子时 23:00–01:00</option>
+            <option value="1">丑时 01:00–03:00</option>
+            <option value="2">寅时 03:00–05:00</option>
+            <option value="3">卯时 05:00–07:00</option>
+            <option value="4">辰时 07:00–09:00</option>
+            <option value="5">巳时 09:00–11:00</option>
+            <option value="6">午时 11:00–13:00</option>
+            <option value="7">未时 13:00–15:00</option>
+            <option value="8">申时 15:00–17:00</option>
+            <option value="9">酉时 17:00–19:00</option>
+            <option value="10">戌时 19:00–21:00</option>
+            <option value="11">亥时 21:00–23:00</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn" onclick="analyzeByBazi()">卦 分析体质</button>
+      </div>
+    </div>
+    <div class="result-area" id="resultAreaBazi" style="display:none"></div>
+    </ml-tab-pane>
+    <ml-tab-pane label="🔍 症状查询" id="tab-symptom">
+    <div class="mod-banner">
+      <div class="mod-banner-icon">查</div>
+      <div>
+        <h2>症状查询</h2>
+        <p>输入症状或选择常见症状，获取五行归因与调理方案</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="search-wrap" style="margin-bottom:14px">
+        <label for="diseaseSearch" class="sr-only">症状关键词搜索</label>
+        <input type="text" id="diseaseSearch" placeholder="如：失眠、头痛、胃胀、咳嗽…" onkeyup="filterDiseaseTags()" aria-label="如：失眠、头痛、胃胀、咳嗽…">
+        <button class="btn" onclick="analyzeByDisease()">查询</button>
+      </div>
+      <div style="margin-bottom:8px;font-size:13px;color:var(--muted)">常见症状（点击选择）：</div>
+      <div class="disease-tags" id="diseaseTags"></div>
+    </div>
+    <div class="result-area" id="resultAreaSymptom" style="display:none"></div>
+    </ml-tab-pane>
+  </ml-tab>
+</div>
+
+<!-- 通用结果展示区（八字+症状） -->
+<div class="container" style="display:none" id="sharedResult">
+  <div class="result-area" id="resultArea">
+    <div class="result-header">
+      <h2 id="resultTitle">分析结果</h2>
+    </div>
+    <div id="resultBody"></div>
+</div>
+
+<div class="container" id="detailSection">
+  <div class="section-title">表 五行体质对照表</div>
+  <div class="detail-grid" id="detailGrid2"></div>
+</div>
+
+
+
+<div class="legal-footer">
+  <strong>卷 法律风险规避声明</strong>
+  一、本平台（易道智鉴）为传统文化研究平台，所有内容仅供学术参考和文化交流，<strong>不构成任何形式的医疗建议、处方或诊断结论</strong>。<br>
+  二、中医五行学说为中华传统文化遗产，其体质分类与调理建议基于古籍文献整理，<strong>不可替代现代医学诊疗</strong>。<br>
+  三、平台推荐的食材、药膳、药方仅供了解传统养生文化，<strong>实际使用须在执业中医师/营养师指导下进行</strong>。<br>
+  四、用户因自行使用本平台信息产生的一切后果，平台方不承担法律责任。身体出现不适请<strong>立即就医</strong>。<br>
+  五、孕妇、哺乳期女性、婴幼儿、慢性病及重症患者<strong>严禁</strong>参照本平台建议自行调理。
+</div>
+
+<ml-toast id="appToast" position="top"></ml-toast>
+
+<div class="feature-nav-bar">
+  <div style="max-width:1100px;margin:0 auto;padding:14px 20px">
+    <div style="font-size:12px;color:var(--paper3);margin-bottom:10px;letter-spacing:2px">—— 易道智鉴 · 平台功能导航 ——</div>
+    <div class="feature-nav-cards">
+      <a class="fn-card" href="divination-hub.html">
+        <span class="fn-icon">宅</span>
+        <span class="fn-name">命理总览</span>
+        <span class="fn-desc">八字·六爻·风水·姓名</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-fengshui">
+        <span class="fn-icon">山</span>
+        <span class="fn-name">风水堪舆</span>
+        <span class="fn-desc">阳宅阴宅·方位布局</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-xingming">
+        <span class="fn-icon">✍️</span>
+        <span class="fn-name">改名取名</span>
+        <span class="fn-desc">八字配合·五格数理</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-company">
+        <span class="fn-icon">企</span>
+        <span class="fn-name">公司起名</span>
+        <span class="fn-desc">品牌命名·工商核名</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-cezi">
+        <span class="fn-icon">建</span>
+        <span class="fn-name">户型鉴别</span>
+        <span class="fn-desc">选房看宅·吉凶判断</span>
+      </a>
+      <a class="fn-card" href="divination-almanac.html">
+        <span class="fn-icon">历</span>
+        <span class="fn-name">黄历</span>
+        <span class="fn-desc">每日宜忌·时辰吉凶</span>
+      </a>
+      <a class="fn-card" href="divination-knowledge.html">
+        <span class="fn-icon">典</span>
+        <span class="fn-name">易学知识</span>
+        <span class="fn-desc">权威体系·通俗解读</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+</div>
+<script src="js/rbac-client.js"></script>
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/divination-integrated-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-o 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+  video,canvas,img{max-width:100%;height:auto}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-o 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+  video,canvas,img{max-width:100%;height:auto}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print,.sidebar,.filter-bar,.tab-btn{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table,.panel,.result-box{page-break-inside:avoid}
+  .container,main,.wrap{width:100%!important;margin:0!important;padding:0!important}
+  h1,h2,h3{page-break-after:avoid}
+  img{max-width:100%!important}
+  .print-full{display:block!important}
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

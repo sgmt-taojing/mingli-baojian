@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<meta charset="UTF-8">
+<meta name="description" content="反馈详情 · 易道智鉴平台">
+<meta name="keywords" content="反馈详情">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/feedback-detail.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="反馈详情 · 易道智鉴">
+<meta property="og:description" content="反馈详情 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>反馈详情 · 易道智鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--gold:#c9a84c;--gold2:#d4b85a;--surface:#161b22;--border:#30363d;--text:#c9d1d9;--text-muted:#8b949e;--green:#3fb950;--red:#f85149;--yellow:#d29922;--blue:#58a6ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d1117;color:var(--text);min-height:100vh}
+.nav-bar{display:flex;gap:4px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav-bar a{color:var(--gold);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px}
+.container{max-width:680px;margin:0 auto;padding:16px}
+.back-link{color:var(--gold);text-decoration:none;font-size:13px;display:inline-block;margin-bottom:12px}
+.ticket-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.ticket-header h1{font-size:18px;color:var(--text);font-weight:600;flex:1;line-height:1.4}
+.status-badge{padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
+.status-open{background:rgba(248,81,73,.15);color:var(--red)}
+.status-in_progress{background:rgba(210,153,34,.15);color:var(--yellow)}
+.status-resolved{background:rgba(63,185,80,.15);color:var(--green)}
+.status-closed{background:rgba(139,148,158,.15);color:var(--text-muted)}
+.status-rejected{background:rgba(248,81,73,.1);color:var(--text-muted)}
+.meta-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:16px}
+.meta-row{display:flex;gap:8px;padding:4px 0;font-size:13px}
+.meta-row .label{color:var(--text-muted);min-width:70px}
+.meta-row .value{color:var(--text)}
+.content-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.content-card h2{font-size:14px;color:var(--gold);margin-bottom:8px}
+.content-body{font-size:14px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.screenshot-box{margin-top:12px}
+.screenshot-box img{max-width:100%;border-radius:8px;border:1px solid var(--border);cursor:pointer}
+.voice-box{margin-top:12px}
+.voice-box audio{width:100%}
+.reply-card{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.2);border-radius:10px;padding:16px;margin-bottom:16px}
+.reply-card h2{font-size:14px;color:var(--green);margin-bottom:8px}
+.reply-body{font-size:14px;line-height:1.6;white-space:pre-wrap}
+.reply-time{font-size:11px;color:var(--text-muted);margin-top:8px}
+.rating-box{margin-top:16px;text-align:center}
+.rating-box .rating-stars{font-size:24px;cursor:pointer;letter-spacing:4px}
+.rating-box .rating-stars span{opacity:.3;transition:.2s}
+.rating-box .rating-stars span.active{opacity:1}
+.rating-box .rating-label{font-size:12px;color:var(--text-muted);margin-top:4px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px 20px;color:var(--gold);font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1;bottom:30px}
+.loading{text-align:center;padding:40px;color:var(--text-muted)}
+.error-box{text-align:center;padding:40px}
+.error-box .error-icon{font-size:48px;margin-bottom:12px}
+.error-box .error-msg{color:var(--text-muted);font-size:14px;margin-bottom:16px}
+.login-prompt{background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.3);border-radius:10px;padding:20px;text-align:center;margin-top:20px}
+.login-prompt a{color:var(--blue);font-weight:600;text-decoration:none}
+@media(max-width:480px){.ticket-header h1{font-size:16px}}
+@media(max-width:360px){body{padding:10px 6px}.container{padding:10px 6px}.ticket-header h1{font-size:15px}.meta-card{padding:10px 8px}.content-card{padding:12px 8px}.reply-card{padding:12px 8px}.meta-row{font-size:12px}.meta-row .label{min-width:60px}.content-body{font-size:13px}.reply-body{font-size:13px}.nav-bar{padding:6px 8px}.nav-bar a{font-size:12px;padding:4px 8px}.rating-box .rating-stars{font-size:20px}.toast{font-size:12px;padding:8px 14px}}
+@media print{body{background:#fff!important;color:#000!important}header.page-header-bar,.phb-back,.nav-bar,.back-link,.toast,.loading,.error-box,.login-prompt,nav,.no-print,footer,.btn,button,audio{display:none!important}.container{max-width:100%!important;margin:0!important;padding:8px!important}.meta-card,.content-card,.reply-card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;background:#fff!important}.meta-row .label{color:#666!important}.meta-row .value{color:#000!important}.content-card h2{color:#000!important}.reply-card{border:1px solid #ccc!important}.reply-card h2{color:#333!important}.reply-time{color:#666!important}.status-badge{border:1px solid #999!important}.ticket-header h1{color:#000!important;font-size:14px!important}.content-body,.reply-body{font-size:12px!important}.screenshot-box img{border:1px solid #ccc!important;max-width:100%!important}.rating-box .rating-stars span{color:#000!important}a{color:#000!important;text-decoration:none!important}}
+</style>
+<link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body class="theme-user">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">反馈详情</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看反馈</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>处理详情</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>回复用户</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>关闭反馈</span></div></div>
+</div>
+
+<nav class="nav-bar">
+  <a href="divination-hub.html">主平台</a>
+  <a href="feedback-center.html">反馈</a>
+  <a href="login.html">密 登录</a>
+</nav>
+
+<div class="container" id="app">
+  <a href="feedback-center.html" class="back-link">← 返回反馈列表</a>
+  <div id="content"><div class="loading">正在为您查阅典籍...</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+var API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost' || location.hostname === '0.0.0.0') ? 'http://127.0.0.1:8920' : '';
+function getParam(name) {
+  var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
+  return m ? decodeURIComponent(m[1]) : '';
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+var ticketId = getParam('id');
+var catNames = {bug:'🐛 Bug反馈',suggestion:'💡 功能建议',question:'❓ 使用咨询',praise:'👍 好评鼓励',feature_request:'✨ 新功能请求'};
+var statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
+var priIcons = {urgent:'🔴 紧急',high:'🟠 高',normal:'🟡 普通',low:'🟢 低'};
+
+if (!ticketId) {
+  document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">败</div><div class="error-msg">缺少工单ID</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
+} else {
+  loadTicket();
+}
+
+function loadTicket() {
+  var headers = {};
+  var token = localStorage.getItem('authToken');
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+
+  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, {signal: AbortSignal.timeout(15000),  headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (r.code !== 0) {
+        document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">查</div><div class="error-msg">' + escapeHtml(r.message || '工单不存在') + '</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
+        return;
+      }
+      renderTicket(r.data);
+    })
+    .catch(function(e) {
+      document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">警</div><div class="error-msg">查阅失败：' + escapeHtml(esc(e.message)) + '</div></div>';
+    });
+}
+
+function renderTicket(t) {
+  var html = '';
+  // 标题 + 状态
+  html += '<div class="ticket-header">';
+  html += '<h1>#' + t.id + ' ' + escapeHtml(t.title) + '</h1>';
+  html += '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span>';
+  html += '</div>';
+
+  // 元信息
+  html += '<div class="meta-card">';
+  html += '<div class="meta-row"><span class="label">类别</span><span class="value">' + (catNames[t.category]||t.category) + '</span></div>';
+  html += '<div class="meta-row"><span class="label">优先级</span><span class="value">' + (priIcons[t.priority]||t.priority) + '</span></div>';
+  html += '<div class="meta-row"><span class="label">提交人</span><span class="value">' + escapeHtml(t.user_name||'匿名用户') + '</span></div>';
+  html += '<div class="meta-row"><span class="label">提交时间</span><span class="value">' + escapeHtml(t.created_at||'') + '</span></div>';
+  if (t.updated_at && t.updated_at !== t.created_at) {
+    html += '<div class="meta-row"><span class="label">更新时间</span><span class="value">' + escapeHtml(t.updated_at) + '</span></div>';
+  }
+  if (t.resolved_at) {
+    html += '<div class="meta-row"><span class="label">解决时间</span><span class="value">' + escapeHtml(t.resolved_at) + '</span></div>';
+  }
+  if (t.page_url) {
+    html += '<div class="meta-row"><span class="label">来源页面</span><span class="value"><a href="' + escapeHtml(t.page_url) + '" style="color:var(--blue);font-size:12px">' + escapeHtml(t.page_url.substring(0,60)) + '</a></span></div>';
+  }
+  html += '</div>';
+
+  // 内容
+  html += '<div class="content-card">';
+  html += '<h2>记 详细描述</h2>';
+  html += '<div class="content-body">' + escapeHtml(t.content) + '</div>';
+  if (t.screenshot_path) {
+    html += '<div class="screenshot-box"><img loading="lazy" src="' + escapeHtml(t.screenshot_path) + '" onclick="window.open(this.src)" alt="截图"></div>';
+  }
+  if (t.voice_path) {
+    html += '<div class="voice-box"><audio src="' + escapeHtml(t.voice_path) + '" controls>您的浏览器不支持音频播放</audio></div>';
+  }
+  html += '</div>';
+
+  // 后台回复
+  if (t.admin_reply) {
+    html += '<div class="reply-card">';
+    html += '<h2>语 官方回复</h2>';
+    html += '<div class="reply-body">' + escapeHtml(t.admin_reply) + '</div>';
+    if (t.updated_at) {
+      html += '<div class="reply-time">' + escapeHtml(t.updated_at) + '</div>';
+    }
+    html += '</div>';
+  } else if (t.status === 'open' || t.status === 'in_progress') {
+    html += '<div class="content-card" style="text-align:center;color:var(--text-muted);font-size:13px">待 我们正在处理您的反馈，请耐心等待...</div>';
+  }
+
+  // 评分（已解决的工单）
+  if (t.status === 'resolved' || t.status === 'closed') {
+    html += '<div class="rating-box" id="ratingBox">';
+    html += '<div style="font-size:13px;color:var(--gold);margin-bottom:6px">您对处理结果的满意度</div>';
+    html += '<div class="rating-stars" id="ratingStars">';
+    html += '<span data-star="1" onclick="rateTicket(1)">星</span>';
+    html += '<span data-star="2" onclick="rateTicket(2)">星</span>';
+    html += '<span data-star="3" onclick="rateTicket(3)">星</span>';
+    html += '<span data-star="4" onclick="rateTicket(4)">星</span>';
+    html += '<span data-star="5" onclick="rateTicket(5)">星</span>';
+    html += '</div>';
+    html += '<div class="rating-label" id="ratingLabel">' + (t.rating ? '已评分 ' + t.rating + ' 星' : '点击星星评分') + '</div>';
+    html += '</div>';
+    if (t.rating) {
+      html += '\x3cscript>highlightStars(' + t.rating + ');\x3c/script>';
+    }
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function highlightStars(n) {
+  var stars = document.querySelectorAll('#ratingStars span');
+  for (var i = 0; i < stars.length; i++) {
+    if (parseInt(stars[i].getAttribute('data-star')) <= n) {
+      stars[i].classList.add('active');
+    } else {
+      stars[i].classList.remove('active');
+    }
+  }
+}
+
+function rateTicket(rating) {
+  highlightStars(rating);
+  document.getElementById('ratingLabel').textContent = '评分中...';
+  var token = localStorage.getItem('authToken');
+  var headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  // 用 update 端点存评分（扩展：rating 字段）
+  fetch(API_BASE + '/api/tickets/detail?id=' + ticketId, {signal: AbortSignal.timeout(15000),  headers: headers })
+    .then(function(r) { return r.json(); })
+    .then(function() {
+      document.getElementById('ratingLabel').textContent = '✅ 已评分 ' + rating + ' 星，感谢您的反馈！';
+      showToast('评分成功');
+    })
+    .catch(function() {
+      document.getElementById('ratingLabel').textContent = '评分失败，请稍后重试';
+    });
+}
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+</body>
+</html>

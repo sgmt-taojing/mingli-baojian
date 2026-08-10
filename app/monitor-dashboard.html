@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="运营监控大屏，平台健康状态">
+<meta name="keywords" content="运营监控,平台健康,API状态,服务监控">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/monitor-dashboard.html">
+<meta name="robots" content="index, follow,noindex">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="var(--ink)">
+<meta property="og:title" content="运营监控 · 易道智鉴">
+<meta property="og:description" content="运营监控大屏，平台健康状态">
+<meta property="og:type" content="website">
+<title>运营监控 · 易道智鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/monitor-dashboard-inline.css">
+<link rel="stylesheet" href="css/drill-drawer.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+</head>
+<body data-need-admin="true" class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">运营监控</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选维度</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>看指标</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>下钻详情</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>诊断处理</span></div></div>
+<div class="flow-hint">管理员监控系统健康，服务状态+KB质量+下钻诊断。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div style="position:fixed;top:12px;right:12px;z-index:99998">
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
+</div>
+
+<!-- ═══ 顶栏 ═══ -->
+<div class="topbar">
+<div class="topbar-inner">
+  <div class="topbar-title">易 易道智鉴 · <span class="sub">运营监控大屏</span></div>
+  <div class="topbar-nav">
+    <a class="active" onclick="switchPanel('overview')">总览</a>
+    <a onclick="switchPanel('performance')">性能</a>
+    <a onclick="switchPanel('functions')">功能</a>
+    <a onclick="switchPanel('flow')">流程</a>
+    <a onclick="switchPanel('trade')">交易</a>
+    <a onclick="switchPanel('roles')">角色</a>
+    <a onclick="switchPanel('kb')">典 KB体系</a>
+    <a onclick="switchPanel('alerts')">告警</a>
+  </div>
+  <div class="live-clock" id="liveClock">--:--:--</div>
+</div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 总览 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel active" id="panel-overview">
+
+  <!-- 核心指标 -->
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg> 在线用户</h3>
+      <div class="stat" id="ovOnline">--</div>
+      <div class="meta">实时 · 5分钟内活跃</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg> 今日PV/UV</h3>
+      <div class="stat" id="ovPVUV">--</div>
+      <div class="meta">页面浏览 / 独立访客</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg> 排盘次数</h3>
+      <div class="stat" id="ovDivination">--</div>
+      <div class="meta">7引擎总计</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> 今日收入</h3>
+      <div class="stat" id="ovRevenue">¥--</div>
+      <div class="meta">会员付费 + 商品订单</div>
+    </div>
+  </div>
+
+  <!-- 服务状态 + 系统健康 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>设 服务状态</h3>
+      <div id="svcStatusList"></div>
+    </div>
+    <div class="content-block">
+      <h3>心 系统健康度</h3>
+      <div id="healthMetrics"></div>
+    </div>
+  </div>
+
+  <!-- 功能热度 + 会员转化 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>热 功能热度排行</h3>
+      <div id="toolRanking"></div>
+    </div>
+    <div class="content-block">
+      <h3>更 会员转化漏斗</h3>
+      <div id="funnelChart"></div>
+    </div>
+  </div>
+
+  <!-- 24小时热力图 -->
+  <div class="content-block" style="margin-bottom:1rem">
+    <h3>时 24小时访问热力图</h3>
+    <div class="heatmap-grid" id="heatmapGrid"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:var(--gray-light)">
+      <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:59</span>
+    </div>
+  </div>
+
+  <!-- 近期告警 -->
+  <div class="content-block">
+    <h3>报 近期告警</h3>
+    <div id="alertList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 性能 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-performance">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>页面加载</h3>
+      <div class="stat" id="perfLoad">--<small> ms</small></div>
+      <div class="meta">DOM Ready</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>资源大小</h3>
+      <div class="stat" id="perfSize">--<small> KB</small></div>
+      <div class="meta">已加载总量</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>API延迟</h3>
+      <div class="stat" id="perfAPI">--<small> ms</small></div>
+      <div class="meta">排盘API平均</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>错误率</h3>
+      <div class="stat" id="perfErr">--<small> %</small></div>
+      <div class="meta">JS异常比例</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>图 页面加载耗时分布</h3>
+    <div id="loadTimeChart"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>箱 资源加载明细（Top 10）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>资源</th><th>类型</th><th>大小</th><th>耗时</th></tr></thead>
+          <tbody id="resourceTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="content-block">
+      <h3>电 API端点延迟</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>端点</th><th>平均</th><th>P95</th><th>状态</th></tr></thead>
+          <tbody id="apiLatencyTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>升 性能趋势（近7日）</h3>
+    <div id="perfTrend"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 功能 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-functions">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>总功能数</h3>
+      <div class="stat" id="funcTotal">--</div>
+      <div class="meta">页面+工具+引擎</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>活跃功能</h3>
+      <div class="stat" id="funcActive">--</div>
+      <div class="meta">今日有使用</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>闲置功能</h3>
+      <div class="stat" id="funcIdle">--</div>
+      <div class="meta">7天未使用</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>最热功能</h3>
+      <div class="stat" id="funcTop" style="font-size:1.2rem">--</div>
+      <div class="meta">今日使用最多</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>卦 7大排盘引擎使用统计</h3>
+    <div id="engineUsage"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>表 功能使用明细</h3>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="filterFunc('all',this)">全部</button>
+        <button class="tab-btn" onclick="filterFunc('engine',this)">排盘引擎</button>
+        <button class="tab-btn" onclick="filterFunc('tool',this)">工具</button>
+        <button class="tab-btn" onclick="filterFunc('page',this)">页面</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>功能</th><th>分类</th><th>今日</th><th>7日</th><th>30日</th><th>趋势</th></tr></thead>
+          <tbody id="funcDetailTable"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="content-block">
+      <h3>标 功能留存率</h3>
+      <div id="funcRetention"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 流程 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-flow">
+  <div class="card-grid cols-3" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>核心流程数</h3>
+      <div class="stat">5</div>
+      <div class="meta">排盘→分析→付费→分享→复购</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>流程完成率</h3>
+      <div class="stat" id="flowCompleteRate">--<small> %</small></div>
+      <div class="meta">端到端完成比例</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>平均流程时长</h3>
+      <div class="stat" id="flowAvgTime">--<small> min</small></div>
+      <div class="meta">从进入到完成</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>更 核心业务流程驱动</h3>
+    <div id="flowChainList"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>点 流程转化漏斗</h3>
+      <div id="flowFunnel"></div>
+    </div>
+    <div class="content-block">
+      <h3>秒 各阶段平均耗时</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>阶段</th><th>平均耗时</th><th>流失率</th><th>状态</th></tr></thead>
+          <tbody id="flowStageTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>🛤️ 用户行为路径 Top 10</h3>
+    <div id="userPathList"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 交易 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-trade">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>今日收入</h3>
+      <div class="stat" id="tradeToday">¥--</div>
+      <div class="meta">会员+商品+课程</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>本月收入</h3>
+      <div class="stat" id="tradeMonth">¥--</div>
+      <div class="meta">月度累计</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>订单数</h3>
+      <div class="stat" id="tradeOrders">--</div>
+      <div class="meta">今日订单</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>客单价</h3>
+      <div class="stat" id="tradeAOV">¥--</div>
+      <div class="meta">平均每单</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>财 收入构成</h3>
+      <div id="revenueBreakdown"></div>
+    </div>
+    <div class="content-block">
+      <h3>图 收入趋势（近30天）</h3>
+      <div id="revenueTrend"></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>表 最近交易流水</h3>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="filterTx('all',this)">全部</button>
+      <button class="tab-btn" onclick="filterTx('vip',this)">会员</button>
+      <button class="tab-btn" onclick="filterTx('shop',this)">商品</button>
+      <button class="tab-btn" onclick="filterTx('course',this)">课程</button>
+    </div>
+    <div id="txList"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="content-block">
+      <h3>冠 付费用户排行</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>用户</th><th>等级</th><th>累计消费</th></tr></thead>
+          <tbody id="topPayers"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="content-block">
+      <h3>升 会员等级分布</h3>
+      <div id="memberLevels"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: 角色 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-roles">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>总用户数</h3>
+      <div class="stat" id="roleTotal">--</div>
+      <div class="meta">注册总数</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>今日新增</h3>
+      <div class="stat" id="roleNew">--</div>
+      <div class="meta">新注册</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>活跃角色</h3>
+      <div class="stat" id="roleActive">--</div>
+      <div class="meta">今日有行为</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>角色种类</h3>
+      <div class="stat">6</div>
+      <div class="meta">访客/体验/会员/命理师/商户/管理员</div>
+    </div>
+  </div>
+
+  <div class="content-block" style="margin-bottom:1rem">
+    <h3>众 角色分布与行为画像</h3>
+    <div class="card-grid cols-3" id="roleCards"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+    <div class="content-block">
+      <h3>图 性别分布</h3>
+      <div id="genderDist"></div>
+    </div>
+    <div class="content-block">
+      <h3>图 年龄段分布</h3>
+      <div id="ageDist"></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>标 各角色功能偏好</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>角色</th><th>偏好功能1</th><th>偏好功能2</th><th>偏好功能3</th><th>日均使用</th><th>付费率</th></tr></thead>
+        <tbody id="rolePrefTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>示 改进建议</h3>
+    <div id="roleInsights"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- Panel: KB 体系监控 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-kb">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>典 KB 体系</h3>
+      <div class="stat" id="kbModels">--</div>
+      <div class="meta">已对齐知识模型</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>记 正式条目</h3>
+      <div class="stat" id="kbFormal" style="color:var(--gold2)">--</div>
+      <div class="meta">kb_formal</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>查 追溯率</h3>
+      <div class="stat" id="kbTrace" style="color:var(--jade2)">--%</div>
+      <div class="meta">source_ids 完整度</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>平 对齐状态</h3>
+      <div class="stat" id="kbAligned" style="color:var(--jade2)">--</div>
+      <div class="meta">17 模型 100% 对账</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>图 知识库数据全链路</h3>
+    <div id="kbPipeline" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;padding:1rem">
+      <div class="kb-step"><h4>来源 source_index</h4><div class="stat" id="kbSrc">--</div></div>
+      <div class="kb-step"><h4>暂存 kb_staging</h4><div class="stat" id="kbStg">--</div></div>
+      <div class="kb-step"><h4>正式 kb_formal</h4><div class="stat" id="kbFmt">--</div></div>
+      <div class="kb-step"><h4>审计 kb_audit</h4><div class="stat" id="kbAud">--</div></div>
+      <div class="kb-step"><h4>版本 kb_versions</h4><div class="stat" id="kbVer">--</div></div>
+      <div class="kb-step"><h4>命中 knowledge_trace</h4><div class="stat" id="kbHits">--</div></div>
+      <div class="kb-step"><h4>推送 model_push_log</h4><div class="stat" id="kbPush">--</div></div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>修 公开端点健康（8 条）</h3>
+    <table class="data-table" id="kbEndpoints">
+      <thead>
+        <tr><th>端点</th><th>方法</th><th>状态</th><th>用途</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Panel: 告警 -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="panel" id="panel-alerts">
+  <div class="card-grid cols-4" style="margin-bottom:1rem">
+    <div class="card" style="text-align:center">
+      <h3>严重</h3>
+      <div class="stat" id="alertCrit" style="color:var(--danger)">--</div>
+      <div class="meta">需立即处理</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>警告</h3>
+      <div class="stat" id="alertWarn" style="color:var(--amber)">--</div>
+      <div class="meta">需关注</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>通知</h3>
+      <div class="stat" id="alertInfo" style="color:var(--cyan2)">--</div>
+      <div class="meta">信息记录</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>系统状态</h3>
+      <div class="stat" id="alertStatus" style="color:var(--jade2)">正常</div>
+      <div class="meta">整体运行</div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <h3>报 告警列表</h3>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="filterAlert('all',this)">全部</button>
+      <button class="tab-btn" onclick="filterAlert('crit',this)">严重</button>
+      <button class="tab-btn" onclick="filterAlert('warn',this)">警告</button>
+      <button class="tab-btn" onclick="filterAlert('info',this)">通知</button>
+    </div>
+    <div id="alertFullList"></div>
+  </div>
+
+  <div class="content-block">
+    <h3>表 告警规则配置</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>规则</th><th>阈值</th><th>级别</th><th>状态</th></tr></thead>
+        <tbody id="alertRulesTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer style="text-align:center;padding:1.5rem;color:var(--gray-light);font-size:.82rem;border-top:1px solid var(--ink4);margin-top:2rem">
+  <p>易道智鉴 · 运营监控大屏 · v1.0 · 2026-07-18</p>
+  <p><a href="divination-hub.html">主站</a> | <a href="admin.html">后台管理</a> | <a href="index.html">首页</a></p>
+</footer>
+
+<script src="js/ui-toast.js" defer></script>
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/admin-rbac-shared.js" defer></script>
+<script src="js/monitor-dashboard-inline.js" defer></script>
+<script src="js/drill-drawer.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
+</style>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

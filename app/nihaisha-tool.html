@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="倪师智慧 · 易道智鉴平台">
+<meta name="keywords" content="倪师智慧">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/nihaisha-tool.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="倪师智慧·中医课程检索工具 · 易道智鉴">
+<meta property="og:description" content="倪师智慧 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>倪师智慧·中医课程检索工具 · 易道智鉴</title>
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/nihaisha-tool-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">倪师智慧</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择工具</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>输入信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>计算分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看结果</span></div></div>
+<div class="flow-hint">大师/学习者使用倪师工具，方剂检索+案例查询。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<!-- 导航栏 -->
+<div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">主平台</a>
+  <a href="divination-almanac.html" class="file-nav-btn">历 黄历</a>
+  <a href="divination-integrated.html" class="file-nav-btn">因 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn">医 中医诊疗</a>
+  <a href="tcm-symptom.html" class="file-nav-btn">诊 症状分析</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">莲 倪师知识库</a>
+  <a href="nihaisha-tool.html" class="file-nav-btn active">研 倪师工具</a>
+  <a href="nihaisha-learning.html" class="file-nav-btn">经 倪师学堂</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">标 舒晗知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn">购 商城</a>
+  <a href="divination-membership.html" class="file-nav-btn">宝 会员</a>
+  <a href="wechat-hub.html" class="file-nav-btn">机 缘主工具</a>
+  <a href="ai-assistant.html" class="file-nav-btn">机 智能助手</a>
+  <a href="login.html" class="file-nav-btn">密 登录</a>
+</div>
+<!-- 头部 -->
+<div class="header">
+  <h1>莲 倪师智慧·中医课程检索<span>nihaisha-nishi-tcm · 46模块全量知识库 · 自然语言检索</span></h1>
+</div>
+<div class="container">
+  <div class="warning">警 本工具仅供学习参考，不作为医疗诊断、处方或治疗建议。涉及健康问题请咨询专业医师。</div>
+  <!-- 搜索框 -->
+  <div class="search-box">
+    <input  type="text" id="searchInput" placeholder="输入症状、方剂、穴位、课程关键词...（如：感冒怕冷、桂枝汤、合谷穴）" aria-label="输入症状、方剂、穴位、课程关键词...（如：感冒怕冷、桂枝汤、合谷穴）">
+    <button onclick="doSearch()">查 检索</button>
+  </div>
+  <!-- 分类标签 -->
+  <div class="category-bar" id="categoryBar">
+    <button class="cat-tab active" data-cat="all">全部</button>
+    <button class="cat-tab" data-cat="course">经 课程模块</button>
+    <button class="cat-tab" data-cat="clinical">表 临床与方证</button>
+    <button class="cat-tab" data-cat="notes">记 学习笔记</button>
+    <button class="cat-tab" data-cat="other">其他</button>
+  </div>
+  <!-- 加载提示 -->
+  <div id="kbLoading" style="text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px">
+    <div style="display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px"></div>
+    <div>正在加载知识库，请稍候...</div>
+  </div>
+  
+  <!-- 模块卡片网格 -->
+  <div class="modules" id="modulesGrid"></div>
+  <!-- 搜索结果区域 -->
+  <div id="searchResults"></div>
+  <!-- 模块详情区域 -->
+  <div id="detailArea"></div>
+</div>
+<div class="footer">
+  nihaisha-nishi-tcm · 46个模块 · GitHub开源项目<br>
+  知识库来源：https://github.com/JuneYaooo/nihaisha-nishi-tcm · 移植时间：2026-07-18
+</div>
+<script src="js/ui-toast.js" defer></script>
+<script defer src="../knowledge/nihaisha-kb.js"></script>
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/nihaisha-tool-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-x 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-x 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<meta charset="UTF-8">
+<meta name="description" content="大六壬排盘，四课三传天将九宗">
+<meta name="keywords" content="大六壬排盘">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/liuren-chart.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="大六壬排盘 · 命理宝鉴">
+<meta property="og:description" content="大六壬排盘，四课三传天将九宗">
+<meta property="og:type" content="website">
+<title>大六壬排盘 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;--paper:#e8dcc8;--paper2:#b8a88a;--paper3:#8b7e6a;--red:#ef4444;--green:#10b981;--blue:#63b3ed;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+.lr-header{text-align:center;margin-bottom:12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.lr-title{font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.lr-meta{font-size:12px;color:var(--paper3);line-height:1.8}
+.lr-meta span{margin-right:8px}
+.lr-form{max-width:500px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.lr-form input{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
+.lr-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+.lr-section{max-width:600px;margin:0 auto 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px}
+.lr-section h3{color:var(--gold);font-size:13px;margin-bottom:8px}
+.lr-ke{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+.lr-ke-item{text-align:center;padding:8px 4px;background:rgba(255,255,255,.03);border-radius:4px;font-size:11px}
+.lr-ke-item .top{color:var(--gold);font-size:14px;font-weight:600}
+.lr-ke-item .bottom{color:var(--paper3);font-size:10px;margin-top:2px}
+.lr-chuan{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.lr-chuan-item{text-align:center;padding:10px 4px;border-radius:4px;font-size:11px}
+.lr-chuan-item.chu{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2)}
+.lr-chuan-item.zhong{background:rgba(78,201,176,.08);border:1px solid rgba(78,201,176,.2)}
+.lr-chuan-item.mo{background:rgba(99,179,237,.08);border:1px solid rgba(99,179,237,.2)}
+.lr-chuan-item .label{color:var(--paper3);font-size:9px}
+.lr-chuan-item .zhi{color:var(--gold);font-size:16px;font-weight:600;margin:2px 0}
+.lr-chuan-item .method{color:var(--paper3);font-size:9px}
+.lr-pan{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:400px;margin:0 auto}
+.lr-pan-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:9px;text-align:center;min-height:60px}
+.lr-pan-item .zhi{color:var(--gold);font-size:12px;font-weight:600}
+.lr-pan-item .tp{color:var(--jade);font-size:10px}
+.lr-pan-item .tj{color:var(--blue);font-size:9px}
+.lr-shensha{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.lr-shensha span{font-size:10px;padding:2px 6px;background:rgba(255,255,255,.05);border-radius:3px;color:var(--paper2)}
+@media(max-width:768px){.lr-pan{max-width:300px}.lr-ke{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:360px){.lr-pan-item{min-height:50px;padding:4px}.lr-ke{grid-template-columns:1fr}}
+@media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,.flow-steps-wrap,.flow-hint,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.lr-form,.back-home{display:none!important}main,.lr-section{width:100%!important;max-width:100%!important;margin:8px 0!important}.lr-section{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;background:#fff!important;color:#000!important}.lr-section h3{color:#000!important}.lr-header{background:#fff!important;border:1px solid #ddd!important}.lr-title{color:#000!important}.lr-meta{color:#333!important}.lr-ke-item{background:#f9f9f9!important;border:1px solid #eee!important}.lr-ke-item .top{color:#000!important}.lr-ke-item .bottom{color:#666!important}.lr-chuan-item.chu{background:#f9f9f9!important;border:1px solid #ddd!important}.lr-chuan-item.zhong{background:#f9f9f9!important;border:1px solid #ddd!important}.lr-chuan-item.mo{background:#f9f9f9!important;border:1px solid #ddd!important}.lr-chuan-item .zhi{color:#000!important}.lr-chuan-item .label{color:#666!important}.lr-chuan-item .method{color:#999!important}.lr-pan-item{background:#f9f9f9!important;border:1px solid #ddd!important;color:#000!important}.lr-pan-item .zhi{color:#000!important}.lr-pan-item .tp{color:#0a6e3a!important}.lr-pan-item .tj{color:#005!important}.lr-shensha span{background:#f5f5f5!important;color:#333!important}a{color:#000!important;text-decoration:none!important}}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body class="theme-zhouyi">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">大六壬</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>填写时辰</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>排盘布将</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>天地盘分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看课体</span></div></div>
+<div class="flow-hint">查看大六壬排盘 · 命理宝鉴，了解功能详情与使用方式。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+<div class="lr-header">
+  <div class="lr-title">大六壬排盘</div>
+<main>
+
+  <div id="lr-meta" class="lr-meta">请输入信息排盘</div>
+</div>
+<div class="lr-form">
+  <input aria-label="姓名" type="text" id="lr-name" placeholder="姓名(可选)" maxlength="20">
+  <select id="lr-sex" aria-label="性别"><option value="male">男</option><option value="female">女</option></select>
+  <input aria-label="年" type="number" id="lr-year" placeholder="年" value="2026" min="1900" max="2100">
+  <input aria-label="月" type="number" id="lr-month" placeholder="月" value="7" min="1" max="12">
+  <input aria-label="日" type="number" id="lr-day" placeholder="日" value="28" min="1" max="31">
+  <input aria-label="时" type="number" id="lr-hour" placeholder="时" value="14" min="0" max="23">
+  <input aria-label="占事" type="text" id="lr-question" placeholder="所问何事(可选)" maxlength="50">
+  <input aria-label="出生地经度" type="number" id="lr-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
+  <input aria-label="流年" type="number" id="lr-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年运势的目标年份">
+  <button onclick="doPaipan()">排盘</button>
+
+<button onclick="generateFullReport('liuren')" style="margin-top:12px;padding:10px 24px;background:linear-gradient(135deg,#ffb44d,#ff7e5f);color:#0f1820;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:2px">📜 出具大六壬报告</button>
+<script>
+async function generateFullReport(mod){
+  try{
+    const inputs = {};
+    document.querySelectorAll('input,select').forEach(el=>{
+      const m = el.id && el.id.match(/^[a-z]+-(.+)$/);
+      if(m) if(el.type==='number' && el.value) inputs[m[1]] = +el.value;
+        else inputs[m[1]] = el.value;
+    });
+    if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
+    if(inputs.leapMonth===undefined) inputs.leapMonth = false;
+    
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify({
+        ...inputs,
+        // 字段映射：前端字段名 → 后端期望字段名
+        query: inputs.question || inputs.query || '',
+        divinationTime: inputs.divinationTime || new Date().toISOString().slice(0,16).replace('T',' '),
+        publicOrPrivate: inputs.publicOrPrivate || '私事咨询',
+        gender: inputs.sex || inputs.gender || 'male',
+        questions: [inputs.question||''].filter(Boolean),
+        options: { name: inputs.name||'缘主' }
+      }), signal: AbortSignal.timeout(15000) }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||''));
+      return;
+    }
+    
+    // 保存报告到 sessionStorage，跳到报告展示页
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module='+mod+'&name='+encodeURIComponent(inputs.name||'缘主');
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+esc(e.message));
+    console.error(e);
+  }
+}
+</script>
+</div>
+<div id="lr-content" style="display:none"></div>
+<script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+async function doPaipan(){
+  const y=document.getElementById('lr-year').value;
+  const m=document.getElementById('lr-month').value;
+  const d=document.getElementById('lr-day').value;
+  const h=document.getElementById('lr-hour').value;
+  if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
+  const name = document.getElementById('lr-name').value || '';
+  const sex = document.getElementById('lr-sex').value;
+  const question = document.getElementById('lr-question').value || '';
+  const lngEl = document.getElementById('lr-lng');
+  const lng = lngEl ? (+lngEl.value || 121.47) : 121.47;
+  const tyEl = document.getElementById('lr-target-year');
+  const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
+  const now = new Date();
+  const currentAge = now.getFullYear() - +y;
+  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge};
+  if(question) body.question = question;
+  let r, rSvg;
+  try {
+    [r, rSvg] = await Promise.all([
+      fetch(API_BASE+'/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/liuren/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+    ]);
+  } catch(e) {
+    showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
+    return;
+  }
+  const data=await r.json();
+  if(!data.ok){showToast('排盘失败: '+data.error);return;}
+  const svg = await rSvg.text();
+  renderChart(data.chart);
+  renderSvg(svg);
+  renderFlow(data.flow, targetYear, currentAge);
+  if(data.interpretation) renderInterpretation(data.interpretation);
+}
+function renderChart(c){
+  document.getElementById('lr-meta').innerHTML=`${c.dayGanZhi}日 ${c.hourZhi}时 | 月将:${c.monthJiang} | ${c.isDaytime?'昼':'夜'}占 | 贵人:${c.guiren}`+
+    (c.isFuYin?' | 伏吟':'')+(c.isFanYin?' | 反吟':'');
+  const ct=document.getElementById('lr-content');
+  ct.style.display='block';
+  let html='';
+  // 四课
+  html+='<div class="lr-section"><h3>四课</h3><div class="lr-ke">';
+  for(const k of c.siKe){html+=`<div class="lr-ke-item"><div class="top">${k.top}</div><div class="bottom">${k.bottom}</div><div style="font-size:8px;color:var(--paper3)">第${k.course}课</div></div>`;}
+  html+='</div></div>';
+  // 三传
+  html+='<div class="lr-section"><h3>三传（'+c.sanChuan.method+'）</h3><div class="lr-chuan">';
+  html+=`<div class="lr-chuan-item chu"><div class="label">初传</div><div class="zhi">${c.sanChuan.chu}</div></div>`;
+  html+=`<div class="lr-chuan-item zhong"><div class="label">中传</div><div class="zhi">${c.sanChuan.zhong}</div></div>`;
+  html+=`<div class="lr-chuan-item mo"><div class="label">末传</div><div class="zhi">${c.sanChuan.mo}</div></div>`;
+  html+='</div></div>';
+  // 天盘
+  html+='<div class="lr-section"><h3>天盘地盘</h3><div class="lr-pan">';
+  const layout=[5,8,2,4,0,6,9,1,3]; // 中艮坤巽中兑坎震离（简化）
+  const dirs=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+  for(let i=0;i<12;i++){
+    const p=c.palaces[i];
+    if(!p) continue;
+    html+=`<div class="lr-pan-item"><div class="zhi">${p.zhi}</div><div class="tp">↑${p.tianpanZhi}</div><div class="tj">${p.tianjiang||''}</div></div>`;
+  }
+  html+='</div></div>';
+  // 神煞
+  if(c.shensha && Object.keys(c.shensha).length>0){
+    html+='<div class="lr-section"><h3>神煞</h3><div class="lr-shensha">';
+    for(const [k,v] of Object.entries(c.shensha)) html+=`<span>${k}:${v}</span>`;
+    html+='</div></div>';
+  }
+  ct.innerHTML=html;
+}
+
+function renderSvg(svg){
+  const old = document.getElementById('lr-svg-host');
+  if(old) old.remove();
+  const host = document.createElement('div');
+  host.id = 'lr-svg-host';
+  host.style.cssText = 'max-width:800px;margin:16px auto;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;padding:8px;text-align:center';
+  host.innerHTML = '<div style="font-size:12px;color:var(--gold,#c9a84c);margin-bottom:6px">📜 高清盘图（R474 SVG · 可右键保存 / 微信长按分享）</div>' + svg;
+  const content = document.getElementById('lr-content');
+  if(content) content.parentNode.insertBefore(host, content);
+}
+
+function renderFlow(flow, targetYear, currentAge){
+  const old = document.getElementById('lr-flow-host');
+  if(old) old.remove();
+  if(!flow) return;
+  const ln = flow.liuNian || {};
+  const xx = flow.xiaoXian || {};
+  const dx = flow.currentDaXian || {};
+  const host = document.createElement('div');
+  host.id = 'lr-flow-host';
+  host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+  host.innerHTML = `
+    <div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:8px">🌊 ${targetYear} 流年 · 现年 ${currentAge} 岁</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+      <div style="background:rgba(201,168,76,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--gold,#c9a84c)">流年</div>
+        <div>${ln.ganZhi||''}（${ln.shengXiao||''}）</div>
+        <div style="color:var(--paper3);margin-top:2px">${ln.naYin||''}</div>
+      </div>
+      <div style="background:rgba(78,201,176,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--jade,#4ec9b0)">小限</div>
+        <div>${xx.palaceName||''}宫</div>
+        <div style="color:var(--paper3);margin-top:2px">${xx.direction||''}</div>
+      </div>
+      <div style="background:rgba(99,179,237,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--blue,#63b3ed)">大限</div>
+        <div>${dx.startAge||''} - ${dx.endAge||''} 岁</div>
+        <div style="color:var(--paper3);margin-top:2px">${dx.ganZhi||''} · ${dx.palaceName||''}</div>
+      </div>
+    </div>`;
+  const content = document.getElementById('lr-content');
+  if(content) content.parentNode.insertBefore(host, content);
+  else document.body.appendChild(host);
+}
+
+function renderInterpretation(i){
+  if(!i) return;
+  const el=document.getElementById('paipan-interpretation')||(()=>{
+    const d=document.createElement('div');
+    d.id='paipan-interpretation';
+    d.style.cssText='margin:16px 0;padding:16px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:12px';
+    document.querySelector('.zw-grid,.qm-grid,.ly-grid,.lr-grid,.mh-grid,.fs-grid,main,body').appendChild(d);
+    return d;
+  })();
+  let h='<div style="font-size:15px;font-weight:600;color:var(--gold,#c9a84c);margin-bottom:8px">卷 断盘解读</div>';
+  if(i.summary) h+='<div style="font-size:13px;line-height:1.7;opacity:.9;margin-bottom:8px">'+i.summary+'</div>';
+  if(i.advice) h+='<div style="font-size:13px;line-height:1.7;opacity:.75">'+i.advice+'</div>';
+  if(i.guaJi) h+='<div style="font-size:12px;opacity:.6;margin-top:6px">卦象：'+i.guaJi+'</div>';
+  el.innerHTML=h;
+  el.style.display='block';
+}
+</script>
+  <script src="js/paipan-toast.js"></script>
+<script src="js/mobile-nav.js"></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+</body>
+</html>

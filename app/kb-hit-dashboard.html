@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="KB 命中仪表盘 · 易道智鉴平台">
+<meta name="keywords" content="KB 命中仪表盘">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-hit-dashboard.html">
+<meta name="theme-color" content="#050608">
+<title>KB 命中仪表盘 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/ai-assistant-inline.css">
+<style>
+  :root{--card-bg:rgba(13,17,23,.72);--card-border:rgba(201,168,76,.12);--good:#10b981;--warn:#c9a84c;--bad:#f59e0b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--paper);font-family:system-ui,-apple-system,sans-serif;padding:16px}
+  h1{font-size:18px;font-weight:600;margin:0 0 16px;color:var(--gold2)}
+  h1 span{font-size:11px;color:var(--paper3);font-weight:normal;margin-left:8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+  .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;padding:16px;transition:border-color .2s}
+  .card:hover{border-color:rgba(201,168,76,.3)}
+  .card-label{font-size:11px;color:var(--paper3);margin-bottom:4px}
+  .card-value{font-size:28px;font-weight:700;color:var(--gold2)}
+  .card-sub{font-size:11px;color:var(--paper3);margin-top:4px}
+  .section-title{font-size:14px;font-weight:600;color:var(--paper2);margin:20px 0 10px;border-bottom:1px solid var(--card-border);padding-bottom:6px}
+  .mod-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+  .mod-name{font-size:13px;color:var(--paper);min-width:80px}
+  .mod-bar-wrap{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden;position:relative}
+  .mod-bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+  .mod-count{font-size:12px;color:var(--gold2);font-weight:600;min-width:30px;text-align:right}
+  .engine-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .engine-card{text-align:center;padding:14px 8px;border-radius:8px;border:1px solid var(--card-border)}
+  .engine-icon{font-size:24px;margin-bottom:4px}
+  .engine-name{font-size:11px;color:var(--paper3)}
+  .engine-count{font-size:22px;font-weight:700}
+  .sparkline-wrap{margin-top:12px}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--paper3);font-size:13px}
+  .empty-state span{font-size:36px;display:block;margin-bottom:8px}
+  .back-link{display:inline-block;margin-bottom:16px;font-size:12px;color:var(--gold2);text-decoration:none;padding:4px 10px;border:1px solid var(--card-border);border-radius:4px}
+  .back-link:hover{background:rgba(201,168,76,.06)}
+  @media(max-width:768px){.grid{grid-template-columns:1fr 1fr}.engine-grid{grid-template-columns:1fr}}
+  @media(max-width:320px){.grid{grid-template-columns:1fr}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back,
+  a[style*="position:fixed"], [style*="position:fixed"], .back-link,
+  header, nav, .skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,span,div,a,td,th{color:#000!important}
+  .grid{width:100%!important;grid-template-columns:1fr!important}
+  .stat-card,.engine-card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid;page-break-inside:avoid}
+  table{width:100%!important;border-collapse:collapse;font-size:10pt!important}
+  th,td{padding:4px 6px!important;border:1px solid #ccc!important}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
+</style>
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB 命中仪表盘</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看命中</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>模块分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>趋势对比</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>优化建议</span></div></div>
+<div class="flow-hint">管理员监控KB命中率，模块/引擎/趋势分析。</div>
+</div>
+<h1>图 KB 命中仪表盘 <span>R53 · 实时统计</span></h1>
+<a class="back-link" href="ai-assistant.html">← 返回 智能助手</a>
+
+<div id="emptyState" class="empty-state" style="display:none">
+  <span>图</span>
+  还没有 KB 命中记录<br>
+  去 <a href="ai-assistant.html" style="color:var(--gold2)">智能助手</a> 提几个问题，这里会自动统计
+</div>
+
+<div id="dashboard" style="display:none">
+  <!-- 核心指标 -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-label">今日 KB 直答</div>
+      <div class="card-value" id="todayCount">0</div>
+      <div class="card-sub" id="todaySub">直答 = 命中分 ≥ 70%</div>
+    </div>
+    <div class="card">
+      <div class="card-label">命中率</div>
+      <div class="card-value" id="hitRate">0<span style="font-size:14px">%</span></div>
+      <div class="card-sub" id="hitRateSub">直答 / 总交互</div>
+    </div>
+    <div class="card">
+      <div class="card-label">累计 KB 直答</div>
+      <div class="card-value" id="totalCount">0</div>
+      <div class="card-sub" id="totalSub">全部时间</div>
+    </div>
+    <div class="card">
+      <div class="card-label">今日总交互</div>
+      <div class="card-value" id="eventsToday">0</div>
+      <div class="card-sub" id="eventsSub">含 KB+AI 润色 + 纯 AI</div>
+    </div>
+  </div>
+
+  <!-- 模块排行 -->
+  <div class="section-title">冠 模块命中排行（Top 10）</div>
+  <div id="modRanking"></div>
+
+  <!-- 引擎分布 -->
+  <div class="section-title">设 搜索引擎分布</div>
+  <div class="engine-grid" id="engineGrid"></div>
+
+  <!-- sparkline -->
+  <div class="section-title">升 命中分趋势（最近 50 次）</div>
+  <div id="sparkline" class="sparkline-wrap"></div>
+
+  <!-- R61 7天聚合 -->
+  <div class="section-title">历 最近 7 天聚合</div>
+  <div class="grid" id="weekGrid" style="grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px"></div>
+
+  <!-- R61 模块最佳命中分 Top 5 -->
+  <div class="section-title">标 模块最佳命中分（Top 5）</div>
+  <div id="topScores"></div>
+
+  <!-- R61 引擎切换历史 -->
+  <div class="section-title">引擎切换记录（最近 20 次）</div>
+  <div id="engineTimeline" style="font-size:11px;color:var(--paper3);font-family:monospace;background:rgba(255,255,255,.02);padding:10px;border-radius:6px;max-height:200px;overflow-y:auto"></div>
+</div>
+
+<script src="js/admin-rbac-shared.js"></script>
+<script>
+(function(){
+  'use strict';
+  // 同源读取 localStorage（与 ai-assistant.html 共享）
+  var KEY_PREFIX = '_kb_hit_count/';
+  var KEY_TODAY = '_kb_hit_today';
+  var EVT_PREFIX = '_kb_hit_events/';
+  var ENGINE_PREFIX = '_kb_engine_count/';
+
+  function safeGet(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+  function safeParse(s,f){ try{return JSON.parse(s)||f;}catch(e){return f;} }
+
+  function todayStr(){ return new Date().toDateString(); }
+  function ymd(){ var d=new Date(); return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
+
+  // 读取统计
+  var td = safeParse(safeGet(KEY_TODAY)||'{}',{});
+  var todayN = (td && td.date===todayStr()) ? (Number(td.count)||0) : 0;
+
+  var totalN = 0, topMod = null, topCnt = 0;
+  var byModule = [];
+  try{
+    for(var i=0;i<localStorage.length;i++){
+      var k = localStorage.key(i);
+      if(!k || k.indexOf(KEY_PREFIX)!==0) continue;
+      var sub = k.substring(KEY_PREFIX.length);
+      var v = parseInt(safeGet(k)||'0',10)||0;
+      if(sub==='_total'){ totalN=v; continue; }
+      byModule.push({name:sub, count:v});
+      if(v>topCnt){ topCnt=v; topMod=sub; }
+    }
+  }catch(e){}
+
+  byModule.sort(function(a,b){return b.count-a.count;});
+
+  // 引擎统计
+  var engines = {fts5:0, 'like-fallback':0, 'like-primary':0};
+  try{
+    for(var i2=0;i2<localStorage.length;i2++){
+      var ek = localStorage.key(i2);
+      if(!ek || ek.indexOf(ENGINE_PREFIX)!==0) continue;
+      var ename = ek.substring(ENGINE_PREFIX.length);
+      var ev = parseInt(safeGet(ek)||'0',10)||0;
+      engines[ename] = ev;
+    }
+  }catch(e){}
+
+  // 当日事件
+  var dayKey = EVT_PREFIX + ymd();
+  var events = safeParse(safeGet(dayKey)||'[]',[]);
+  var eventsToday = events.length;
+  var directToday = events.filter(function(e){return e.b==='direct';}).length;
+  var hitRate = eventsToday>0 ? Math.round(directToday*100/eventsToday) : 0;
+
+  // 判断是否有数据
+  var hasData = todayN>0 || totalN>0 || eventsToday>0;
+  if(!hasData){
+    document.getElementById('emptyState').style.display='block';
+    return;
+  }
+  document.getElementById('dashboard').style.display='block';
+
+  // 渲染核心指标
+  document.getElementById('todayCount').textContent = todayN;
+  document.getElementById('hitRate').innerHTML = hitRate + '<span style="font-size:14px">%</span>';
+  document.getElementById('totalCount').textContent = totalN;
+  document.getElementById('eventsToday').textContent = eventsToday;
+  document.getElementById('todaySub').textContent = '直答 = 命中分 ≥ 70%';
+  document.getElementById('hitRateSub').textContent = directToday + ' 直答 / ' + eventsToday + ' 总交互';
+  document.getElementById('totalSub').textContent = topMod ? ('最强模块：' + topMod + ' (' + topCnt + ')') : '—';
+  document.getElementById('eventsSub').textContent = '命中率 ' + hitRate + '%';
+
+  // 模块排行
+  var modRankingEl = document.getElementById('modRanking');
+  var top10 = byModule.slice(0, 10);
+  var maxCnt = top10.length>0 ? top10[0].count : 1;
+  top10.forEach(function(m, idx){
+    var pct = Math.round(m.count*100/maxCnt);
+    var color = idx<3 ? 'var(--gold2)' : 'rgba(201,168,76,' + (0.6-idx*0.04) + ')';
+    var row = document.createElement('div');
+    row.className = 'mod-row';
+    row.innerHTML =
+      '<span class="mod-name">' + (idx+1) + '. ' + m.name + '</span>' +
+      '<div class="mod-bar-wrap"><div class="mod-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+      '<span class="mod-count">' + m.count + '</span>';
+    modRankingEl.appendChild(row);
+  });
+
+  // 引擎分布
+  var engineGrid = document.getElementById('engineGrid');
+  var engineData = [
+    {name:'FTS5 全文搜索', icon:'⚡', count:engines.fts5||0, color:'var(--good)'},
+    {name:'LIKE 回退', icon:'🔄', count:engines['like-fallback']||0, color:'var(--warn)'},
+    {name:'热门直出', icon:'📖', count:engines['like-primary']||0, color:'var(--gold2)'}
+  ];
+  var engineTotal = engineData.reduce(function(s,e){return s+e.count;},0);
+  engineData.forEach(function(e){
+    var pct = engineTotal>0 ? Math.round(e.count*100/engineTotal) : 0;
+    var card = document.createElement('div');
+    card.className = 'engine-card';
+    card.innerHTML =
+      '<div class="engine-icon">' + e.icon + '</div>' +
+      '<div class="engine-name">' + e.name + '</div>' +
+      '<div class="engine-count" style="color:' + e.color + '">' + e.count + '</div>' +
+      '<div style="font-size:10px;color:var(--paper3);margin-top:2px">' + pct + '%</div>';
+    engineGrid.appendChild(card);
+  });
+
+  // Sparkline — 最近 50 次命中分
+  var sparklineEl = document.getElementById('sparkline');
+  var recentScores = events.slice(-50).map(function(e){return Number(e.s)||0;});
+  if(recentScores.length>0){
+    var w=320, h=60, pad=4;
+    var maxVal=1, minVal=0;
+    var stepX = recentScores.length>1 ? (w-2*pad)/(recentScores.length-1) : 0;
+    var pts = recentScores.map(function(s,i){
+      var x = pad + i*stepX;
+      var y = h - pad - (s-minVal)*(h-2*pad)/(maxVal-minVal);
+      return x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+
+    var avgScore = recentScores.reduce(function(s,v){return s+v;},0)/recentScores.length;
+    var avgY = h - pad - avgScore*(h-2*pad);
+
+    var svg = '<svg width="100%" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">';
+    // 70% 线
+    svg += '<line x1="0" y1="' + (h-pad-0.7*(h-2*pad)) + '" x2="' + w + '" y2="' + (h-pad-0.7*(h-2*pad)) + '" stroke="rgba(16,185,129,.3)" stroke-dasharray="3,3" stroke-width="0.5"/>';
+    // 40% 线
+    svg += '<line x1="0" y1="' + (h-pad-0.4*(h-2*pad)) + '" x2="' + w + '" y2="' + (h-pad-0.4*(h-2*pad)) + '" stroke="rgba(245,158,11,.2)" stroke-dasharray="3,3" stroke-width="0.5"/>';
+    // 平均线
+    svg += '<line x1="0" y1="' + avgY.toFixed(1) + '" x2="' + w + '" y2="' + avgY.toFixed(1) + '" stroke="rgba(201,168,76,.3)" stroke-dasharray="5,2" stroke-width="0.5"/>';
+    // 折线
+    svg += '<polyline points="' + pts + '" fill="none" stroke="var(--gold2)" stroke-width="1.5" stroke-linejoin="round"/>';
+    // 点
+    recentScores.forEach(function(s,i){
+      var x = pad + i*stepX;
+      var y = h - pad - s*(h-2*pad);
+      var fill = s>=0.7?'var(--good)':s>=0.4?'var(--warn)':'var(--bad)';
+      svg += '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="1.5" fill="'+fill+'"/>';
+    });
+    svg += '</svg>';
+    sparklineEl.innerHTML = svg +
+      '<div style="font-size:11px;color:var(--paper3);text-align:center;margin-top:6px">' +
+        '平均命中分 <b style="color:var(--gold2)">' + (Math.round(avgScore*100)) + '%</b>' +
+        ' · 🟢 ≥70% KB 直答 · 🟡 40-70% KB+ai · 🔴 <40% ai 兜底' +
+      '</div>';
+  }else{
+    sparklineEl.innerHTML = '<div style="color:var(--paper3);font-size:12px;text-align:center;padding:20px">暂无命中分记录</div>';
+  }
+
+  // === R61: 7 天聚合 ===
+  (function render7Day(){
+    var weekGrid = document.getElementById('weekGrid');
+    var days = [];
+    for(var i=6;i>=0;i--){
+      var d = new Date();
+      d.setDate(d.getDate()-i);
+      var key = EVT_PREFIX + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+      var evs = safeParse(safeGet(key)||'[]',[]);
+      var directs = evs.filter(function(e){return e.b==='direct';}).length;
+      var avg = evs.length>0 ? Math.round(evs.reduce(function(s,e){return s+(Number(e.s)||0);},0)/evs.length*100) : 0;
+      days.push({
+        label: ['日','一','二','三','四','五','六'][d.getDay()],
+        date: String(d.getMonth()+1)+'/'+String(d.getDate()),
+        count: evs.length,
+        directs: directs,
+        avg: avg
+      });
+    }
+    var maxCount = Math.max.apply(null, days.map(function(d){return d.count;})) || 1;
+    days.forEach(function(d){
+      var card = document.createElement('div');
+      var barH = Math.max(2, Math.round(d.count*40/maxCount));
+      var color = d.directs > 0 ? 'var(--good)' : (d.count > 0 ? 'var(--warn)' : 'rgba(255,255,255,.08)');
+      card.style.cssText = 'background:var(--card-bg);border:1px solid var(--card-border);border-radius:6px;padding:8px 4px;text-align:center';
+      card.innerHTML =
+        '<div style="font-size:10px;color:var(--paper3)">' + d.label + '</div>' +
+        '<div style="font-size:10px;color:var(--paper2);margin:2px 0">' + d.date + '</div>' +
+        '<div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin:4px 0">' +
+          '<div style="width:60%;height:' + barH + 'px;background:' + color + ';border-radius:2px 2px 0 0;transition:height .4s"></div>' +
+        '</div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--gold2)">' + d.count + '</div>' +
+        '<div style="font-size:9px;color:var(--paper3);margin-top:2px">直答 ' + d.directs + '</div>' +
+        '<div style="font-size:9px;color:' + (d.avg>=70?'var(--good)':d.avg>=40?'var(--warn)':'var(--paper3)') + '">均 ' + d.avg + '%</div>';
+      weekGrid.appendChild(card);
+    });
+  })();
+
+  // === R61: 模块最佳命中分 Top 5 ===
+  (function renderTopScores(){
+    var el = document.getElementById('topScores');
+    var allEvents = [];
+    try{
+      for(var i=0;i<localStorage.length;i++){
+        var k = localStorage.key(i);
+        if(!k || k.indexOf(EVT_PREFIX)!==0) continue;
+        var evs = safeParse(safeGet(k)||'[]',[]);
+        allEvents = allEvents.concat(evs);
+      }
+    }catch(e){}
+    // 按模块分组，找最高分
+    var byMod = {};
+    allEvents.forEach(function(e){
+      var m = e.m || 'freechat';
+      if(!byMod[m] || (Number(e.s)||0) > byMod[m].s) {
+        byMod[m] = {s: Number(e.s)||0, b: e.b, t: e.t};
+      }
+    });
+    var top5 = Object.keys(byMod).map(function(k){
+      return {name: k, best: byMod[k]};
+    }).sort(function(a,b){return b.best.s-a.best.s;}).slice(0,5);
+    if(top5.length === 0){
+      el.innerHTML = '<div style="color:var(--paper3);font-size:12px;text-align:center;padding:20px">尚无模块命中记录</div>';
+      return;
+    }
+    top5.forEach(function(m, idx){
+      var pct = Math.round(m.best.s*100);
+      var color = m.best.s>=0.7?'var(--good)':m.best.s>=0.4?'var(--warn)':'var(--bad)';
+      var row = document.createElement('div');
+      row.className = 'mod-row';
+      row.innerHTML =
+        '<span class="mod-name">' + (idx+1) + '. ' + m.name + '</span>' +
+        '<div class="mod-bar-wrap" style="position:relative">' +
+          '<div class="mod-bar-fill" style="width:' + pct + '%;background:' + color + '"></div>' +
+          '<span style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;color:' + color + '">' + pct + '%</span>' +
+        '</div>' +
+        '<span class="mod-count">' + (m.best.b==='direct'?'🎯':'·') + '</span>';
+      el.appendChild(row);
+    });
+  })();
+
+  // === R61: 引擎切换记录 ===
+  (function renderEngineTimeline(){
+    var el = document.getElementById('engineTimeline');
+    // 从 events 里推断 engine（事件结构里有 e 但 kb-hit-counter 没记 engine 在 event 上）
+    // 退而求其次：展示今日事件流（按时序）
+    var dayKey = EVT_PREFIX + ymd();
+    var events = safeParse(safeGet(dayKey)||'[]',[]);
+    if(events.length === 0){
+      el.innerHTML = '<div style="color:var(--paper3);text-align:center">今日尚无事件</div>';
+      return;
+    }
+    var last20 = events.slice(-20).reverse();
+    var html = '';
+    last20.forEach(function(e, idx){
+      var time = new Date(e.t||Date.now());
+      var hh = String(time.getHours()).padStart(2,'0');
+      var mm = String(time.getMinutes()).padStart(2,'0');
+      var ss = String(time.getSeconds()).padStart(2,'0');
+      var pct = Math.round((Number(e.s)||0)*100);
+      var icon = e.b==='direct'?'🎯':e.b==='augment'?'✨':'🤖';
+      var color = e.b==='direct'?'var(--good)':e.b==='augment'?'var(--warn)':'var(--paper3)';
+      html += '<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)">' +
+        '<span style="color:var(--paper3)">' + hh + ':' + mm + ':' + ss + '</span>' +
+        ' <span style="color:' + color + '">' + icon + '</span>' +
+        ' <span style="color:var(--gold2)">' + (e.m||'freechat') + '</span>' +
+        ' <span style="color:var(--paper2)">命中分 ' + pct + '%</span>' +
+        (e.b==='direct'?' <span style="color:var(--good);font-size:10px">[KB直答]</span>':'') +
+      '</div>';
+    });
+    el.innerHTML = html + '<div style="text-align:center;margin-top:8px;color:var(--paper3);font-size:10px">↑ 最近 20 次事件流（倒序）</div>';
+  })();
+
+})();
+</script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-m 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-m 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

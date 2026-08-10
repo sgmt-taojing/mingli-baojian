@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/company-section.html">
+<meta name="robots" content="noindex,nofollow">
+<title>section-company</title>
+</head>
+<body>
+<section class="section" id="section-company" role="tabpanel" aria-labelledby="tab-company">
+    <div class="section-header">
+    <span class="sh-symbol" style="color:var(--cyan)">🏢</span>
+    <h2 class="sh-title">公司取名（专业版）</h2>
+    <p class="sh-en">Company Name Generator Pro</p>
+    <p class="sh-desc">基于法人八字、三才五格、行业五行、康熙笔画，为您的公司生成专业级吉名。包含详细分析报告与经典出处。</p>
+  </div>
+  <!-- 公司取名输入 -->
+  <div class="input-card">
+    <h3>公司基本信息</h3>
+    <div class="input-row" style="flex-wrap:wrap;gap:8px">
+      <input type="text" id="companyName" class="input-field" placeholder="现有公司名（选填，用于分析吉凶）" style="max-width:220px" aria-label="现有公司名（选填，用于分析吉凶）">
+      <input type="text" id="companyMainBiz" class="input-field" placeholder="主营方向（选填）" style="max-width:180px" aria-label="主营方向（选填）">
+    </div>
+    <div class="input-row" style="flex-wrap:wrap;gap:8px">
+      <select id="companyIndustry" class="input-field" aria-label="companyIndustry">
+        <option value="tech">科技/互联网</option>
+        <option value="finance">金融/投资</option>
+        <option value="education">教育/培训</option>
+        <option value="health">医疗/健康</option>
+        <option value="culture">文化/传媒</option>
+        <option value="food">餐饮/食品</option>
+        <option value="service">服务/咨询</option>
+        <option value="manufacturing">制造/工业</option>
+        <option value="trade">贸易/电商</option>
+        <option value="estate">地产/建筑</option>
+        <option value="media">娱乐/媒体</option>
+        <option value="energy">能源/环保</option>
+        <option value="agriculture">农业/畜牧</option>
+        <option value="law">法律/律所</option>
+        <option value="logistics">物流/运输</option>
+        <option value="auto">汽车/出行</option>
+      </select>
+      <select id="companyWordCount" class="input-field" aria-label="companyWordCount">
+        <option value="2">2字</option>
+        <option value="3" selected>3字</option>
+        <option value="4">4字</option>
+      </select>
+      <select id="companyStyle" class="input-field" aria-label="companyStyle">
+        <option value="古典">古典雅致</option>
+        <option value="大气">大气磅礴</option>
+        <option value="简约">简约清新</option>
+        <option value="吉祥">吉祥如意</option>
+        <option value="国际">国际洋气</option>
+      </select>
+    </div>
+    <!-- 法人八字 -->
+    <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.12);border-radius:10px;padding:14px;margin-top:12px">
+      <h4 style="font-size:12px;color:var(--gold);margin-bottom:10px;letter-spacing:2px">🌟 法人生辰八字（关联八字取名）</h4>
+      <div class="input-row" style="flex-wrap:wrap;gap:8px">
+        <input type="text" id="companyFounderName" class="input-field" placeholder="法人姓名" style="max-width:140px" aria-label="法人姓名">
+        <select id="companyFounderSex" class="input-field" style="max-width:80px" aria-label="companyFounderSex">
+          <option value="">性别</option>
+          <option value="male">男</option>
+          <option value="female">女</option>
+        </select>
+        <select id="companyFounderCalendar" class="input-field" style="max-width:100px" aria-label="companyFounderCalendar">
+          <option value="solar">阳历</option>
+          <option value="lunar">农历</option>
+        </select>
+        <input type="date" id="companyFounderBazi" class="input-field" style="max-width:160px" title="法人出生日期" aria-label="companyFounderBazi">
+        <select id="companyFounderHour" class="input-field" style="max-width:120px" aria-label="companyFounderHour">
+          <option value="">时辰</option>
+          <option value="0">子时 23-01</option>
+          <option value="1">丑时 01-03</option>
+          <option value="2">寅时 03-05</option>
+          <option value="3">卯时 05-07</option>
+          <option value="4">辰时 07-09</option>
+          <option value="5">巳时 09-11</option>
+          <option value="6">午时 11-13</option>
+          <option value="7">未时 13-15</option>
+          <option value="8">申时 15-17</option>
+          <option value="9">酉时 17-19</option>
+          <option value="10">戌时 19-21</option>
+          <option value="11">亥时 21-23</option>
+        </select>
+      </div>
+      <div class="input-row" style="margin-top:8px;flex-wrap:wrap;gap:8px">
+        <select id="companyFounderBirthCity" class="input-field" style="max-width:160px" aria-label="companyFounderBirthCity">
+          <option value="">法人出生城市</option>
+          <option value="北京">北京</option>
+          <option value="上海">上海</option>
+          <option value="广州">广州</option>
+          <option value="深圳">深圳</option>
+          <option value="成都">成都</option>
+          <option value="重庆">重庆</option>
+          <option value="西安">西安</option>
+          <option value="武汉">武汉</option>
+          <option value="杭州">杭州</option>
+          <option value="南京">南京</option>
+          <option value="天津">天津</option>
+          <option value="青岛">青岛</option>
+          <option value="沈阳">沈阳</option>
+          <option value="长沙">长沙</option>
+          <option value="郑州">郑州</option>
+          <option value="其他">其他</option>
+        </select>
+        <select id="companyRegCity" class="input-field" style="max-width:160px" aria-label="companyRegCity">
+          <option value="">公司注册地</option>
+          <option value="北京">北京</option>
+          <option value="上海">上海</option>
+          <option value="广州">广州</option>
+          <option value="深圳">深圳</option>
+          <option value="成都">成都</option>
+          <option value="重庆">重庆</option>
+          <option value="西安">西安</option>
+          <option value="武汉">武汉</option>
+          <option value="杭州">杭州</option>
+          <option value="南京">南京</option>
+          <option value="天津">天津</option>
+          <option value="青岛">青岛</option>
+          <option value="沈阳">沈阳</option>
+          <option value="长沙">长沙</option>
+          <option value="郑州">郑州</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-row" style="margin-top:8px">
+      <select id="preferWuxing" class="input-field" aria-label="preferWuxing">
+        <option value="">喜用神（自动从八字推算）</option>
+        <option value="木">喜木</option>
+        <option value="火">喜火</option>
+        <option value="土">喜土</option>
+        <option value="金">喜金</option>
+        <option value="水">喜水</option>
+      </select>
+      <input type="text" id="avoidNumbers" class="input-field" placeholder="避免数字（选填，如012345）" aria-label="避免数字（选填，如012345）">
+    </div>
+    <button id="companyBtn" onclick="generateCompanyNamesEnhanced()" class="compute-btn" style="margin-top:16px">智能取名</button>
+  </div>
+  <!-- 法人八字分析结果 -->
+  <div id="companyBaziResult" style="display:none;margin-bottom:16px"></div>
+  <!-- 公司取名结果 -->
+  <div id="companyResult" class="result-card company-result" style="display:none;padding:20px;border-radius:12px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15)">
+    <div style="text-align:center;padding:16px 0;border-bottom:1px solid rgba(201,168,76,.1);margin-bottom:20px">
+      <h3 style="font-family:'Ma Shan Zheng',serif;font-size:24px;letter-spacing:4px;color:var(--gold);margin-bottom:8px">推荐公司名称</h3>
+      <p id="companyBannerMeta" style="font-size:12px;opacity:.95;letter-spacing:2px"></p>
+    </div>
+    <div id="companyNamesGrid"></div>
+  </div>
+  <!-- 行业五行参照表（默认隐藏，结果展示时显示） -->
+  <div id="industryWuxingTable" style="display:none;padding:20px;margin-top:16px;border-radius:12px;background:rgba(0,100,150,0.04);border:1px solid rgba(0,100,150,0.12)">
+    <h5 style="font-size:13px;letter-spacing:4px;color:var(--cyan);margin-bottom:16px">行业五行宜忌</h5>
+    <div id="industryWuxingContent"></div>
+  </div>
+  <!-- 康熙笔画参照 -->
+  <div id="kangxiStrokesRef" style="display:none;padding:20px;margin-top:16px;border-radius:12px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08)">
+    <h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">康熙笔画速查（部分）</h5>
+    <p style="font-size:11px;opacity:.95;line-height:2">木部:林(8) 松(8) 桐(10) 柏(9) 榕(14) | 火部:炎(8) 炬(9) 焰(12) 煌(13) | 土部:均(7) 垣(9) 增(15) 壑(17) | 金部:钧(9) 铭(14) 锦(16) 鑫(24) | 水部:泉(9) 涵(11) 溪(14) 瀚(20)</p>
+  </div>
+  </section>
+<script src="../js/error-interceptor.js"></script>
+<script src="../js/submit-guard.js"></script>
+<script src="../js/escape-html.js"></script>
+</body>
+</html>

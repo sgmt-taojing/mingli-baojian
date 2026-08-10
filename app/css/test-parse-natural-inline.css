@@ -1,0 +1,33 @@
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#eee;min-height:100vh;padding:20px;max-width:800px;margin:0 auto}
+h1{color:#c9a84c;margin-bottom:8px;font-size:24px}
+.sub{color:#888;font-size:13px;margin-bottom:20px}
+.box{background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:16px;margin:12px 0}
+input{width:100%;padding:12px;border:1px solid #c9a84c;background:rgba(0,0,0,.3);color:#fff;border-radius:8px;font-size:14px;margin:8px 0}
+button{padding:10px 16px;background:#c9a84c;color:#000;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+.row{padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.1);font-family:monospace;font-size:13px}
+.row b{color:#c9a84c}
+.row .ok{color:#7ad97a}
+.row .miss{color:#ff6b6b}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:12px 0}
+.grid button{font-size:12px;padding:8px}
+/* R-P3-17.4 reflow（自动注入） */
+@media(max-width:768px){
+  h1{font-size:22px!important}h2{font-size:19px!important}
+  [style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{
+    grid-template-columns:repeat(2,1fr)!important
+  }
+  .wrap,.container,.main{max-width:100vw!important;overflow-x:hidden!important;padding:12px!important}
+}
+@media(max-width:480px){
+  body{font-size:13px}
+  [style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3")]{
+    grid-template-columns:1fr!important
+  }
+}
+@media(max-width:320px){
+  body{font-size:12px;padding:0!important}
+  h1{font-size:18px!important}h2{font-size:15px!important}
+  input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}
+}
+

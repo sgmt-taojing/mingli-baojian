@@ -1,0 +1,2497 @@
+
+// API辅助
+const API_BASE = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' ? 'http://127.0.0.1:8920' : '';
+function getAuthToken(){
+  return localStorage.getItem('authToken')||'';
+}
+async function apiCall(url, method, body){
+  const token = getAuthToken();
+  try {
+    const res = await fetch(API_BASE + url, { signal: AbortSignal.timeout(15000),
+      method: method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? {'Authorization': '***' + token} : {})
+      },
+      body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(15000) });
+    if (!res.ok) return { error: 'HTTP_' + res.status };
+    return await res.json();
+  } catch(e) {
+    return { error: 'NETWORK_ERROR', message: e.message };
+  }
+}
+
+/* ===== DATA LAYER ===== */
+const STORAGE_KEY = 'tcm_clinic_cases';
+const VERSION_KEY = 'tcm_clinic_versions';
+
+const STATUS_LABELS = {
+  pending_master: '待分析',
+  pending_consultant: '待咨询',
+  collaborating: '协作中',
+  completed: '已咨询',
+  pushed: '已推送'
+};
+
+const STATUS_FLOW = ['pending_master','pending_consultant','collaborating','completed','pushed'];
+
+/* 60甲子 */
+const JIAZI = [];
+const TIANGAN = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const DIZHI = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+for(let i=0;i<60;i++){JIAZI.push(TIANGAN[i%10]+DIZHI[i%12])}
+
+/* 64卦 */
+const HEXAGRAMS = [
+  {name:'乾为天',lines:[1,1,1,1,1,1],organ:'肺/大肠',meaning:'刚健中正，需注意肺部及呼吸系统'},
+  {name:'坤为地',lines:[0,0,0,0,0,0],organ:'脾/胃',meaning:'柔顺承载，需注意脾胃消化系统'},
+  {name:'水雷屯',lines:[1,0,0,0,1,0],organ:'肾/肝',meaning:'初始困难，肝胆系统需调养'},
+  {name:'山水蒙',lines:[0,1,0,0,0,1],organ:'脾/心',meaning:'蒙昧待启，心脾两虚需注意'},
+  {name:'水天需',lines:[1,1,1,0,1,0],organ:'肾/肺',meaning:'等待时机，肺肾不足需温补'},
+  {name:'天水讼',lines:[0,1,0,1,1,1],organ:'肺/肾',meaning:'争讼不和，肺肾失调'},
+  {name:'地水师',lines:[0,1,0,0,0,0],organ:'脾/肾',meaning:'率师出征，脾肾气虚'},
+  {name:'水地比',lines:[0,0,0,0,1,0],organ:'肾/脾',meaning:'亲比团结，脾肾双补'},
+  {name:'风天小畜',lines:[1,1,1,1,1,0],organ:'肝/肺',meaning:'小有蓄积，肝肺气机需调畅'},
+  {name:'天泽履',lines:[0,1,1,1,1,1],organ:'肺/脾',meaning:'如履薄冰，脾肺气虚'},
+  {name:'地天泰',lines:[1,1,1,0,0,0],organ:'脾/肺',meaning:'天地交泰，气血调和为佳'},
+  {name:'天地否',lines:[0,0,0,1,1,1],organ:'脾/肺',meaning:'天地不交，气机郁滞'},
+  {name:'天火同人',lines:[1,0,1,1,1,1],organ:'肺/心',meaning:'与人和同，心肺需调'},
+  {name:'火天大有',lines:[1,1,1,1,0,1],organ:'心/肺',meaning:'大有收获，心火偏旺'},
+  {name:'地山谦',lines:[0,0,1,0,0,0],organ:'脾/脾',meaning:'谦虚卑退，脾胃虚弱'},
+  {name:'雷地豫',lines:[0,0,0,1,0,0],organ:'肝/脾',meaning:'愉悦和顺，肝脾调和'},
+  {name:'泽雷随',lines:[0,1,0,0,0,1],organ:'脾/肝',meaning:'随顺而行，肝脾需调'},
+  {name:'山风蛊',lines:[0,1,1,0,0,1],organ:'脾/肝',meaning:'积弊待治，肝脾湿热'},
+  {name:'地泽临',lines:[1,1,0,0,0,0],organ:'脾/脾',meaning:'面临对待，脾胃需温养'},
+  {name:'风地观',lines:[0,0,0,0,1,1],organ:'肝/脾',meaning:'观察审视，肝郁脾虚'},
+  {name:'火雷噬嗑',lines:[0,1,0,1,0,1],organ:'心/肝',meaning:'咬合障碍，心肝火旺'},
+  {name:'山火贲',lines:[1,0,1,0,0,1],organ:'脾/心',meaning:'文饰修饰，心脾两虚'},
+  {name:'山地剥',lines:[0,0,0,0,0,1],organ:'脾/脾',meaning:'剥落衰退，脾气大虚'},
+  {name:'地雷复',lines:[1,0,0,0,0,0],organ:'脾/肝',meaning:'一阳来复，肝脾渐调'},
+  {name:'天雷无妄',lines:[1,0,0,1,1,1],organ:'肺/肝',meaning:'无妄之灾，肝肺失调'},
+  {name:'山天大畜',lines:[1,1,1,0,0,1],organ:'脾/肺',meaning:'大有蓄积，脾肺气足'},
+  {name:'山雷颐',lines:[1,0,0,0,0,1],organ:'脾/肝',meaning:'颐养正道，肝脾需调'},
+  {name:'泽风大过',lines:[0,1,1,1,1,0],organ:'脾/肝',meaning:'大过失衡，肝脾不调'},
+  {name:'坎为水',lines:[0,1,0,0,1,0],organ:'肾/膀胱',meaning:'重险陷溺，肾阳不足'},
+  {name:'离为火',lines:[1,0,1,1,0,1],organ:'心/小肠',meaning:'光明附丽，心火偏旺'},
+  {name:'泽山咸',lines:[0,0,1,1,1,0],organ:'脾/脾',meaning:'感应相慕，脾胃调和'},
+  {name:'雷风恒',lines:[0,1,1,1,0,1],organ:'肝/肝',meaning:'恒久不变，肝气需疏'},
+  {name:'天山遁',lines:[0,0,1,1,1,1],organ:'脾/肺',meaning:'退避隐遁，肺脾两虚'},
+  {name:'雷天大壮',lines:[1,1,1,1,0,0],organ:'肝/肺',meaning:'刚壮盛旺，肝火偏旺'},
+  {name:'火地晋',lines:[0,0,0,1,0,1],organ:'心/脾',meaning:'晋升上进，心脾两虚'},
+  {name:'地火明夷',lines:[1,0,1,0,0,0],organ:'脾/心',meaning:'光明受伤，心脾不足'},
+  {name:'风火家人',lines:[1,0,1,0,1,1],organ:'肝/心',meaning:'家人内聚，肝心调和'},
+  {name:'火泽睽',lines:[1,1,0,1,0,1],organ:'心/脾',meaning:'乖违背离，心脾不调'},
+  {name:'水山蹇',lines:[0,0,1,0,1,0],organ:'肾/脾',meaning:'蹇难行阻，脾肾不足'},
+  {name:'雷水解',lines:[0,1,0,1,0,0],organ:'肝/肾',meaning:'解除困难，肝肾渐调'},
+  {name:'山泽损',lines:[1,1,0,0,0,1],organ:'脾/脾',meaning:'减损克制，脾胃需补'},
+  {name:'风雷益',lines:[1,0,0,0,1,1],organ:'肝/肝',meaning:'增益有益，肝气渐旺'},
+  {name:'泽天夬',lines:[1,1,1,1,1,0],organ:'脾/肺',meaning:'决断去除，肺脾需调'},
+  {name:'天风姤',lines:[0,1,1,1,1,1],organ:'肺/肝',meaning:'邂逅相遇，肝肺失调'},
+  {name:'泽地萃',lines:[0,0,0,1,1,0],organ:'脾/脾',meaning:'聚集合力，脾胃调和'},
+  {name:'地风升',lines:[0,1,1,0,0,0],organ:'脾/肝',meaning:'上升进取，肝脾渐旺'},
+  {name:'泽水困',lines:[0,1,0,1,1,0],organ:'脾/肾',meaning:'困穷待通，脾肾两虚'},
+  {name:'水风井',lines:[0,1,1,0,1,0],organ:'肾/肝',meaning:'井养不穷，肝肾需补'},
+  {name:'泽火革',lines:[1,0,1,1,1,0],organ:'脾/心',meaning:'变革改新，心脾需调'},
+  {name:'火风鼎',lines:[0,1,1,1,0,1],organ:'心/肝',meaning:'鼎新调和，肝心渐旺'},
+  {name:'震为雷',lines:[1,0,0,1,0,0],organ:'肝/胆',meaning:'震动奋起，肝胆火旺'},
+  {name:'艮为山',lines:[0,0,1,0,0,1],organ:'脾/胃',meaning:'静止安稳，脾胃需温'},
+  {name:'风山渐',lines:[0,0,1,0,1,1],organ:'肝/脾',meaning:'循序渐进，肝脾渐调'},
+  {name:'雷泽归妹',lines:[1,1,0,1,0,0],organ:'肝/脾',meaning:'归妹不正，肝脾失调'},
+  {name:'雷火丰',lines:[1,0,1,1,0,0],organ:'肝/心',meaning:'丰收盛大的，肝心火旺'},
+  {name:'火山旅',lines:[0,0,1,1,0,1],organ:'脾/心',meaning:'旅行在外，心脾两虚'},
+  {name:'巽为风',lines:[0,1,1,0,1,1],organ:'肝/胆',meaning:'随顺渗透，肝胆气滞'},
+  {name:'兑为泽',lines:[1,1,0,1,1,0],organ:'脾/肺',meaning:'喜悦相随，脾肺气虚'},
+  {name:'风水涣',lines:[0,1,0,0,1,1],organ:'肝/肾',meaning:'涣散流通，肝肾需补'},
+  {name:'水泽节',lines:[1,1,0,0,1,0],organ:'肾/脾',meaning:'节制有度，脾肾需调'},
+  {name:'风泽中孚',lines:[1,1,0,0,1,1],organ:'肝/脾',meaning:'诚信中正，肝脾调和'},
+  {name:'雷山小过',lines:[0,0,1,1,0,0],organ:'肝/脾',meaning:'小有过越，肝脾不调'},
+  {name:'水火既济',lines:[1,0,1,0,1,0],organ:'肾/心',meaning:'既济成功，心肾交泰'},
+  {name:'火水未济',lines:[0,1,0,1,0,1],organ:'心/肾',meaning:'未济待成，心肾不交'}
+];
+
+/* 周易术语过滤词表 */
+const FILTER_TERMS = ['八字','五行','天干','地支','卦象','大运','流年','日主','十神','七杀','正官','偏官','正印','偏印','比肩','劫财','食神','伤官','正财','偏财','甲子','乙丑','丙寅','丁卯','戊辰','己巳','庚午','辛未','壬申','癸酉','甲戌','乙亥','丙子','丁丑','戊寅','己卯','庚辰','辛巳','壬午','癸未','甲申','乙酉','丙戌','丁亥','戊子','己丑','庚寅','辛卯','壬辰','癸巳','甲午','乙未','丙申','丁酉','戊戌','己亥','庚子','辛丑','壬寅','癸卯','甲辰','乙巳','丙午','丁未','戊申','己酉','庚戌','辛亥','壬子','癸丑','甲寅','乙卯','丙辰','丁巳','戊午','己未','庚申','辛酉','壬戌','癸亥','木旺','火旺','土旺','金旺','水旺','木衰','火衰','土衰','金衰','水衰','偏盛','偏衰','乾卦','坤卦','震卦','巽卦','坎卦','离卦','艮卦','兑卦'];
+
+let currentRole = 'health';
+let currentCaseId = null;
+let currentCollabCaseId = null;
+let _casesCache = null;
+
+/* ===== STORAGE ===== */
+function loadCases(){
+  if(_casesCache) return _casesCache;
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){_casesCache = JSON.parse(raw); return _casesCache;}
+  }catch(e){console.warn(e.message)}
+  return null;
+}
+function saveCases(cases){
+  _casesCache = cases;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cases));
+}
+
+async function syncCasesFromAPI(){
+  try{
+    let data;
+    if(currentRole === 'patient'){
+      data = await apiCall('/api/clinic/my-reports','GET');
+    }else{
+      data = await apiCall('/api/clinic/assigned-cases','GET');
+    }
+    if(data && data.cases){
+      _casesCache = data.cases;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data.cases));
+      return data.cases;
+    }else if(data && data.error){
+      showToast('数据同步: ' + data.error);
+    }
+  }catch(e){
+    showToast('网络异常，使用本地缓存');
+  }
+  return null;
+}
+function loadVersions(){
+  try{return JSON.parse(localStorage.getItem(VERSION_KEY))||{}}catch(e){return {}}
+}
+function saveVersions(v){
+  localStorage.setItem(VERSION_KEY, JSON.stringify(v));
+}
+function addVersion(caseId, summary){
+  const v = loadVersions();
+  if(!v[caseId]) v[caseId] = [];
+  v[caseId].push({time:new Date().toISOString(),summary:summary});
+  saveVersions(v);
+}
+
+/* ===== INIT SAMPLE DATA ===== */
+/* ══════════════ HEALTH WORKBENCH (NEW) ══════════════ */
+
+// 中医 9 大体质（基于《中医体质分类与判定》标准）
+const TCM_TIZHI = [
+  {key:'pinghe',name:'平和质',desc:'体态适中、面色润泽、精力充沛 - 最理想体质',
+   features:['体形匀称','面色润泽','精力充沛','睡眠良好','胃纳佳'],
+   advice:'保持规律作息，饮食有节，可适当八段锦/太极巩固'},
+  {key:'qixu',name:'气虚质',desc:'容易疲劳、说话少气、容易感冒',
+   features:['容易疲劳','说话声低','易感冒','易出汗','舌淡有齿痕'],
+   advice:'补气健脾：山药、黄芪、大枣；避劳累；八段锦/太极；充足睡眠'},
+  {key:'yangxu',name:'阳虚质',desc:'怕冷、手脚凉、喜温恶寒',
+   features:['怕冷','手脚凉','喜温热','小便清长','大便溏薄'],
+   advice:'温阳散寒：生姜、桂圆、羊肉；艾灸关元/命门；避寒凉'},
+  {key:'yinxu',name:'阴虚质',desc:'手足心热、口干咽燥、喜冷饮',
+   features:['手足心热','口干咽燥','喜冷饮','盗汗','舌红少苔'],
+   advice:'滋阴润燥：麦冬、银耳、百合、梨；避辛辣；减少熬夜'},
+  {key:'tanshi',name:'痰湿质',desc:'体形肥胖、痰多、面油、舌苔厚腻',
+   features:['体形肥胖','痰多','面油腻','舌苔厚腻','身重困倦'],
+   advice:'化痰祛湿：薏米、冬瓜、荷叶；少糖油；增加运动'},
+  {key:'shire',name:'湿热质',desc:'面油有痤疮、口苦、尿黄',
+   features:['面油有痤疮','口苦','尿黄','舌苔黄腻','烦躁'],
+   advice:'清热利湿：绿豆、苦瓜、薏米；戒烟酒；避辛辣油腻'},
+  {key:'xueyu',name:'血瘀质',desc:'面色晦暗、易瘀斑、肤色暗沉',
+   features:['面色晦暗','易瘀斑','肤色暗','唇色紫暗','痛处固定'],
+   advice:'活血化瘀：山楂、玫瑰花、红花；多运动；保持心情舒畅'},
+  {key:'qiyu',name:'气郁质',desc:'情绪低落、敏感多虑、胸闷叹气',
+   features:['情绪低落','敏感多虑','胸闷叹气','咽部异物感','月经不调'],
+   advice:'疏肝解郁：陈皮、玫瑰、佛手；多户外活动；情绪疏导'},
+  {key:'tebing',name:'特禀质',desc:'过敏体质，易过敏、哮喘、荨麻疹',
+   features:['易过敏','哮喘','荨麻疹','鼻塞流涕','对气候敏感'],
+   advice:'益气固表：黄芪、灵芝；避过敏源；季节变换注意防护'}
+];
+
+// 节气养生（24 节气简化版）
+const SOLAR_TERMS = [
+  {name:'立春',season:'春',element:'木',advice:'养肝为主，宜辛甘温，少酸入肝。多食春芽、葱蒜；早起散步；忌郁怒。',
+   foods:'春笋、香椿、菠菜、荠菜',taboos:'油腻、生冷、酸味过多'},
+  {name:'雨水',season:'春',element:'木',advice:'湿气渐重，健脾祛湿并重。可食薏米、山药；注意保暖，勿受寒湿。',
+   foods:'薏米、山药、莲子、红枣',taboos:'寒凉、油腻'},
+  {name:'惊蛰',season:'春',element:'木',advice:'阳气升发，宜疏肝理气。多食梨润肺；早睡早起；适当运动。',
+   foods:'梨、银耳、蜂蜜、百合',taboos:'辛辣刺激、动怒'},
+  {name:'春分',season:'春',element:'木',advice:'阴阳平衡，调和五脏。饮食宜寒热均衡；户外踏青疏肝。',
+   foods:'时令蔬菜、豆制品',taboos:'大寒大热'},
+  {name:'清明',season:'春',element:'木',advice:'肝火易旺，宜清淡饮食。多食荠菜、青菜；忌食发物。',
+   foods:'荠菜、青菜、薄荷',taboos:'发物（如竹笋、羊肉）'},
+  {name:'谷雨',season:'春',element:'土',advice:'健脾化湿。春末夏初，湿热渐重，宜化湿清热。',
+   foods:'薏米、冬瓜、玉米',taboos:'肥甘厚腻'},
+  {name:'立夏',season:'夏',element:'火',advice:'养心为主，宜清淡。心火易亢，饮食宜苦寒。',
+   foods:'苦瓜、莲子心、绿豆',taboos:'辛辣、油腻'},
+  {name:'小满',season:'夏',element:'火',advice:'清热利湿为主。湿热交蒸，宜多饮温水，避高温。',
+   foods:'冬瓜、黄瓜、薏米',taboos:'冷饮、冰品'},
+  {name:'芒种',season:'夏',element:'火',advice:'养心健脾。梅雨湿热，宜化湿；饮食清淡。',
+   foods:'薏米、赤小豆、绿豆',taboos:'冷饮、油腻'},
+  {name:'夏至',season:'夏',element:'火',advice:'阳气极盛，宜养阴。避高温暴晒；多食酸味以固表。',
+   foods:'乌梅、番茄、酸梅汤',taboos:'热性食物、冰镇'},
+  {name:'小暑',season:'夏',element:'火',advice:'暑热渐重，养心安神。少动多静；及时补水。',
+   foods:'绿豆汤、莲子粥',taboos:'烈日下劳作'},
+  {name:'大暑',season:'夏',element:'火',advice:'防暑降温第一。宜静养；多食清暑利湿之品。',
+   foods:'绿豆、苦瓜、西瓜、荷叶',taboos:'热性食物、熬夜'},
+  {name:'立秋',season:'秋',element:'金',advice:'养肺为主，宜润燥。秋气燥，宜食梨、百合润肺。',
+   foods:'梨、百合、银耳、蜂蜜',taboos:'辛辣、干燥食物'},
+  {name:'处暑',season:'秋',element:'金',advice:'暑去凉来，润燥收敛。宜养肺润燥；早睡早起。',
+   foods:'银耳、莲子、芝麻',taboos:'辛辣、油炸'},
+  {name:'白露',season:'秋',element:'金',advice:'秋凉渐重，润燥养肺。注意保暖；防秋燥。',
+   foods:'梨、蜂蜜、核桃',taboos:'寒凉、生冷'},
+  {name:'秋分',season:'秋',element:'金',advice:'阴阳平衡，调补肺肾。饮食寒热均衡；登高望远舒肝。',
+   foods:'时令水果、坚果',taboos:'大寒大热'},
+  {name:'寒露',season:'秋',element:'金',advice:'深秋凉燥，重点润肺养阴。足部保暖。',
+   foods:'梨、苹果、银耳',taboos:'寒凉、辛辣'},
+  {name:'霜降',season:'秋',element:'金',advice:'秋末冬初，养肺固表。进补佳期，宜平补。',
+   foods:'柿子、栗子、鸭肉',taboos:'寒凉、熬夜'},
+  {name:'立冬',season:'冬',element:'水',advice:'养肾为主，宜温补。避寒保暖；早睡晚起。',
+   foods:'羊肉、核桃、黑芝麻',taboos:'生冷、寒凉'},
+  {name:'小雪',season:'冬',element:'水',advice:'温肾助阳。室内适度运动；食疗温补。',
+   foods:'羊肉、当归生姜羊肉汤',taboos:'冷饮、外寒'},
+  {name:'大雪',season:'冬',element:'水',advice:'补肾壮腰。温补为主；防寒保暖。',
+   foods:'羊肉、牛肉、桂圆',taboos:'寒凉、生冷'},
+  {name:'冬至',season:'冬',element:'水',advice:'阳气初生，宜养藏。冬至进补最佳；早睡养阴。',
+   foods:'饺子、羊肉汤、八珍汤',taboos:'熬夜、动怒'},
+  {name:'小寒',season:'冬',element:'水',advice:'大寒小寒冻一团，重在温肾。重点保暖头部脚部。',
+   foods:'羊肉、核桃、黑米',taboos:'寒凉、外出受寒'},
+  {name:'大寒',season:'冬',element:'水',advice:'冬藏转春养，阴阳交接。静养为主；食疗温补。',
+   foods:'八珍汤、当归生姜羊肉',taboos:'辛辣动火'}
+];
+
+// 获取当前节气
+function getCurrentSolarTerm(){
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  // 简化映射（按月份近似）
+  const termsByMonth = {
+    1:['小寒','大寒'],
+    2:['立春','雨水'],
+    3:['惊蛰','春分'],
+    4:['清明','谷雨'],
+    5:['立夏','小满'],
+    6:['芒种','夏至'],
+    7:['小暑','大暑'],
+    8:['立秋','处暑'],
+    9:['白露','秋分'],
+    10:['寒露','霜降'],
+    11:['立冬','小雪'],
+    12:['大雪','冬至']
+  };
+  const list = termsByMonth[month] || ['春分'];
+  return day < 15 ? list[0] : list[1];
+}
+
+// 切换健康工作台 tab
+let _healthTab = 'symptom';
+let _healthSelectedSymptoms = new Set();
+let _healthSelectedTizhi = null;
+
+function switchHealthTab(tab){
+  _healthTab = tab;
+  document.querySelectorAll('.health-input-tab').forEach(el=>{
+    el.classList.toggle('active', el.dataset.tab===tab);
+  });
+  renderHealthTab();
+}
+
+function renderHealthTab(){
+  const body = document.getElementById('healthTabBody');
+  if(!body) return;
+  const titles = {
+    symptom:'🩺 症状咨询 · 选择或输入症状，或开始深度问诊',
+    tizhi:'🌿 体质辨识 · 选择最接近您的体质',
+    season:'🌸 节气养生 · 当前时令建议',
+    food:'🥗 食疗药膳 · 对症食材',
+    doctor:'📜 名医名方 · 历代验方'
+  };
+  document.getElementById('healthCardTitle').textContent = titles[_healthTab];
+  if(_healthTab==='symptom'){
+    const symptoms = getKBSymptoms().slice(0, 30);
+    body.innerHTML = `
+      <div class="health-symptom-chips">
+        ${symptoms.map(s=>`<div class="symptom-chip ${_healthSelectedSymptoms.has(s.name)?'selected':''}" data-sym="${s.name}">${s.name}</div>`).join('')}
+      </div>
+      <textarea class="form-textarea" id="healthCustomInput" rows="3" placeholder="或描述您的具体症状（如：最近一周失眠多梦、腰膝酸软、手脚冰凉）" style="margin-top:10px" aria-label="或描述您的具体症状（如：最近一周失眠多梦、腰膝酸软、手脚冰凉）"></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runHealthSymptom()">🔍 即时咨询</button>
+        <button class="btn btn-primary" onclick="startConsult()" style="background:linear-gradient(135deg,var(--jade),var(--jade2))">🩺 深度问诊（望闻问切）</button>
+        <button class="btn btn-secondary btn-sm" onclick="clearHealthSelection()">清空选择</button>
+      </div>
+      <div id="consultBody" style="display:none;margin-top:16px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:16px"></div>
+      <div id="consultResult" style="display:none;margin-top:16px"></div>
+    `;
+    document.querySelectorAll('.symptom-chip').forEach(el=>{
+      el.onclick = ()=>{
+        const s = el.dataset.sym;
+        if(_healthSelectedSymptoms.has(s)) _healthSelectedSymptoms.delete(s);
+        else _healthSelectedSymptoms.add(s);
+        el.classList.toggle('selected');
+      };
+    });
+  } else if(_healthTab==='tizhi'){
+    body.innerHTML = `
+      <div class="health-tizhi-cards">
+        ${TCM_TIZHI.map(t=>`
+          <div class="tizhi-card ${_healthSelectedTizhi===t.key?'selected':''}" data-t="${t.key}">
+            <div class="t-name">${t.name}</div>
+            <div class="t-desc">${t.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runHealthTizhiEnhanced()">📋 生成体质报告（含命理）</button>
+      </div>
+    `;
+    document.querySelectorAll('.tizhi-card').forEach(el=>{
+      el.onclick = ()=>{
+        document.querySelectorAll('.tizhi-card').forEach(x=>x.classList.remove('selected'));
+        el.classList.add('selected');
+        _healthSelectedTizhi = el.dataset.t;
+      };
+    });
+  } else if(_healthTab==='season'){
+    const current = getCurrentSolarTerm();
+    const data = SOLAR_TERMS.find(s=>s.name===current) || SOLAR_TERMS[0];
+    body.innerHTML = `
+      <div style="text-align:center;padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;margin-bottom:12px">
+        <div style="font-family:'Ma Shan Zheng',serif;font-size:28px;color:var(--gold);letter-spacing:6px">${data.name}</div>
+        <div style="font-size:12px;color:var(--paper3);margin-top:4px">${data.season}季 · 五行属${data.element}</div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">节气切换</div>
+        <select class="form-select" id="healthSeasonSelect" onchange="renderHealthTab()" aria-label="healthSeasonSelect">
+          ${SOLAR_TERMS.map(s=>`<option value="${s.name}" ${s.name===current?'selected':''}>${s.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runHealthSeason()">🌿 查看养生方案</button>
+      </div>
+    `;
+  } else if(_healthTab==='food'){
+    body.innerHTML = `
+      <div style="font-size:13px;color:var(--paper3);margin-bottom:10px">选择您的症状/体质，系统推荐对症食材：</div>
+      <div class="health-symptom-chips">
+        ${['失眠','咳嗽','胃痛','便秘','乏力','月经不调','怕冷','水肿','头痛','脱发','皮肤瘙痒'].map(s=>`<div class="symptom-chip" data-foodsym="${s}">${s}</div>`).join('')}
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runHealthFoodEnhanced(document.querySelector('.symptom-chip[data-foodsym].selected')?.textContent||'')">🥗 推荐食疗（KB）</button>
+      </div>
+    `;
+    document.querySelectorAll('.symptom-chip[data-foodsym]').forEach(el=>{
+      el.onclick = ()=>el.classList.toggle('selected');
+    });
+  } else if(_healthTab==='doctor'){
+    body.innerHTML = `
+      <div style="font-size:13px;color:var(--paper3);margin-bottom:10px">搜索历代名医：</div>
+      <input type="text" class="form-input" id="healthDoctorSearch" placeholder="输入医家姓名/朝代/擅长..." style="margin-bottom:10px" aria-label="输入医家姓名/朝代/擅长...">
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="runHealthDoctorEnhanced()">📜 查询</button>
+      </div>
+      <div id="healthDoctorResult" style="margin-top:12px"></div>
+    `;
+  }
+}
+
+function clearHealthSelection(){
+  _healthSelectedSymptoms.clear();
+  _healthSelectedTizhi = null;
+  document.querySelectorAll('.symptom-chip.selected').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.tizhi-card.selected').forEach(el=>el.classList.remove('selected'));
+}
+
+function healthQuick(type){
+  switchHealthTab(type==='tizhi'?'tizhi':type==='season'?'season':type==='food'?'food':type==='doctor'?'doctor':'symptom');
+  document.getElementById('healthMainCard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ===== 报告生成函数 ===== */
+
+function runHealthSymptom(){
+  const custom = (document.getElementById('healthCustomInput')||{}).value || '';
+  const selected = Array.from(_healthSelectedSymptoms);
+  const allText = (selected.join(' ') + ' ' + custom).trim();
+  if(!allText){
+    showToast('请选择或输入症状');
+    return;
+  }
+  // 调用 KB
+  const kbSyms = getKBSymptoms();
+  const matches = [];
+  for(const k of kbSyms){
+    if(allText.includes(k.name) || k.name.includes(allText.slice(0,2))){
+      matches.push(k);
+    }
+  }
+  // 关键词匹配
+  const keywords = {
+    '怕冷':'阳虚','手脚凉':'阳虚','乏力':'气虚','疲劳':'气虚','盗汗':'阴虚','口干':'阴虚',
+    '痰多':'痰湿','肥胖':'痰湿','面油':'湿热','痤疮':'湿热','瘀斑':'血瘀','痛处固定':'血瘀',
+    '情绪':'气郁','叹气':'气郁','过敏':'特禀','哮喘':'特禀'
+  };
+  const tizhiHits = [];
+  for(const [kw, t] of Object.entries(keywords)){
+    if(allText.includes(kw) && !tizhiHits.includes(t)) tizhiHits.push(t);
+  }
+
+  const report = document.getElementById('healthReport');
+  const now = new Date().toLocaleString('zh-CN');
+  let html = `<div class="report-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);letter-spacing:3px">🩺 症状咨询报告</div>
+      <div style="font-size:11px;color:var(--paper3)">${now}</div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">📋</span> 您提供的信息</div>
+      <div class="report-section-body">
+        ${selected.length?'<div><b>已选症状：</b>'+selected.map(s=>'<span class="report-tag">'+s+'</span>').join('')+'</div>':''}
+        ${custom?'<div style="margin-top:6px"><b>补充说明：</b>'+escHtml(custom)+'</div>':''}
+      </div>
+    </div>`;
+
+  if(matches.length){
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">🔍</span> 知识库匹配（${matches.length} 条）</div>
+      <div class="report-section-body">
+        ${matches.slice(0,5).map(m=>`
+          <div class="kb-result-box">
+            <div class="kb-match-name">${m.name}<span class="kb-match-score">命中 ${Math.round(85+m.name.length%10)}%</span></div>
+            <div class="kb-match-desc">
+              <b>可能证候：</b>${(m.syndromes||[]).join('、')}<br>
+              <b>涉及脏腑：</b>${(m.organs||[]).join('、')} · <b>五行：</b>${m.element||'-'}<br>
+              <b>性质：</b>${m.nature||'-'} · <b>寒热：</b>${m.cold_hot||'-'} · <b>虚实：</b>${m.xu_shi||'-'}<br>
+              <b>鉴别要点：</b><br>
+              ${(m.differential||[]).map(d=>'· '+d).join('<br>')}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }
+
+  if(tizhiHits.length){
+    const tizhiMap = {'阳虚':'yangxu','气虚':'qixu','阴虚':'yinxu','痰湿':'tanshi','湿热':'shire','血瘀':'xueyu','气郁':'qiyu','特禀':'tebing'};
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">🌿</span> 倾向体质</div>
+      <div class="report-section-body">
+        <p>根据您描述的关键词，可能倾向以下体质：</p>
+        ${tizhiHits.map(h=>{
+          const t = TCM_TIZHI.find(x=>x.key===tizhiMap[h]);
+          if(!t) return '';
+          return `<div class="kb-result-box">
+            <div class="kb-match-name">${t.name} <span class="kb-match-score">信号 ${h}</span></div>
+            <div class="kb-match-desc">${t.desc}<br><b>特征：</b>${t.features.join('、')}<br><b>建议：</b>${t.advice}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // 五行推断
+  const wuxingScore = {木:0,火:0,土:0,金:0,水:0};
+  matches.forEach(m=>{
+    const e = m.element || '';
+    if(e.includes('木')) wuxingScore.木++;
+    if(e.includes('火')) wuxingScore.火++;
+    if(e.includes('土')) wuxingScore.土++;
+    if(e.includes('金')) wuxingScore.金++;
+    if(e.includes('水')) wuxingScore.水++;
+  });
+  if(Object.values(wuxingScore).some(v=>v>0)){
+    const max = Math.max(...Object.values(wuxingScore));
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">☯️</span> 五行倾向</div>
+      <div class="wuxing-result">
+        ${Object.entries(wuxingScore).map(([k,v])=>`<div class="wx-pill ${v===max&&max>0?'strong':v===0?'weak':''}">${k} ${v}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  // 行动清单
+  html += `<div class="report-section">
+    <div class="report-section-title"><span class="icon">✅</span> 养生建议清单</div>
+    <ul class="action-checklist">
+      <li>保证充足睡眠（建议 23:00 前入睡），规律作息</li>
+      <li>饮食清淡易消化，避免生冷油腻辛辣</li>
+      <li>每日适度运动（散步、八段锦、太极 30 分钟）</li>
+      <li>保持心情舒畅，避免情绪波动过大</li>
+      <li>建议中医师面诊辨证施治，本报告仅供养生参考</li>
+      ${selected.includes('失眠')?'<li>失眠建议：避免晚间饮茶/咖啡，可睡前热水泡脚或饮温牛奶</li>':''}
+      ${selected.includes('怕冷')||tizhiHits.includes('阳虚')?'<li>阳虚调理：艾灸关元、命门；多食生姜、桂圆、羊肉</li>':''}
+      ${selected.includes('咳嗽')?'<li>咳嗽注意：避风寒；多饮温水；雪梨、川贝润肺</li>':''}
+    </ul>
+  </div>`;
+
+  html += `<div style="font-size:11px;color:var(--paper3);text-align:center;padding:8px;opacity:.85">⚠️ 本报告基于中医养生理论，<b>不构成医疗诊断</b>，如有疾病请及时就医</div></div>`;
+
+  report.innerHTML = html;
+  report.scrollIntoView({behavior:'smooth',block:'start'});
+  showToast('✅ 报告已生成');
+}
+
+function runHealthTizhi(){
+  if(!_healthSelectedTizhi){
+    showToast('请先选择一种体质');
+    return;
+  }
+  const t = TCM_TIZHI.find(x=>x.key===_healthSelectedTizhi);
+  if(!t) return;
+  const report = document.getElementById('healthReport');
+  let html = `<div class="report-card">
+    <div style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:4px;margin-bottom:8px">🌿 ${t.name} · 体质报告</div>
+    <div style="font-size:13px;color:var(--paper2);line-height:1.8;margin-bottom:12px">${t.desc}</div>
+
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">🔍</span> 主要特征</div>
+      <div class="report-section-body">
+        ${t.features.map(f=>'<span class="report-tag">'+f+'</span>').join('')}
+      </div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">💪</span> 调理建议</div>
+      <div class="report-section-body">${t.advice}</div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">🥗</span> 推荐食材</div>
+      <div class="report-section-body">${getFoodsByTizhi(t.key)}</div>
+    </div>
+
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">⚠️</span> 日常注意</div>
+      <div class="report-section-body">${getTizhiWarnings(t.key)}</div>
+    </div>
+  </div>`;
+  report.innerHTML = html;
+  report.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function getFoodsByTizhi(key){
+  const map = {
+    pinghe:'<span class="report-tag">山药</span><span class="report-tag">小米</span><span class="report-tag">莲子</span><span class="report-tag">核桃</span><span class="report-tag">苹果</span>',
+    qixu:'<span class="report-tag">黄芪</span><span class="report-tag">山药</span><span class="report-tag">大枣</span><span class="report-tag">人参</span><span class="report-tag">鸡肉</span>',
+    yangxu:'<span class="report-tag">生姜</span><span class="report-tag">桂圆</span><span class="report-tag">羊肉</span><span class="report-tag">韭菜</span><span class="report-tag">核桃</span>',
+    yinxu:'<span class="report-tag">麦冬</span><span class="report-tag">银耳</span><span class="report-tag">百合</span><span class="report-tag">梨</span><span class="report-tag">桑葚</span>',
+    tanshi:'<span class="report-tag">薏米</span><span class="report-tag">冬瓜</span><span class="report-tag">荷叶</span><span class="report-tag">白萝卜</span><span class="report-tag">玉米须</span>',
+    shire:'<span class="report-tag">绿豆</span><span class="report-tag">苦瓜</span><span class="report-tag">薏米</span><span class="report-tag">莲子心</span><span class="report-tag">菊花</span>',
+    xueyu:'<span class="report-tag">山楂</span><span class="report-tag">玫瑰花</span><span class="report-tag">红花</span><span class="report-tag">黑木耳</span><span class="report-tag">醋</span>',
+    qiyu:'<span class="report-tag">陈皮</span><span class="report-tag">玫瑰</span><span class="report-tag">佛手</span><span class="report-tag">柑橘</span><span class="report-tag">薄荷</span>',
+    tebing:'<span class="report-tag">黄芪</span><span class="report-tag">灵芝</span><span class="report-tag">大枣</span><span class="report-tag">乌梅</span><span class="report-tag">蜂蜜</span>'
+  };
+  return map[key] || map.pinghe;
+}
+
+function getTizhiWarnings(key){
+  const map = {
+    pinghe:'保持现状即可。饮食有节，起居有常，不妄作劳。',
+    qixu:'避劳累受寒；少食生冷油腻；不宜剧烈运动，宜温和锻炼。',
+    yangxu:'避寒凉（冷饮/空调）；冬季注意保暖；忌食生冷。',
+    yinxu:'避辛辣燥热；减少熬夜；忌烟酒；多饮水。',
+    tanshi:'少糖油盐；增加运动；忌久坐久卧。',
+    shire:'戒烟酒；少辛辣油腻；保持大便通畅。',
+    xueyu:'忌寒凉；多运动促进血液循环；保持心情舒畅。',
+    qiyu:'多户外活动；培养兴趣爱好；忌独处。',
+    tebing:'避过敏源；季节变换注意防护；增强体质。'
+  };
+  return map[key] || '';
+}
+
+function runHealthSeason(){
+  const sel = document.getElementById('healthSeasonSelect').value;
+  const data = SOLAR_TERMS.find(s=>s.name===sel);
+  if(!data) return;
+  const report = document.getElementById('healthReport');
+  report.innerHTML = `<div class="report-card">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-family:'Ma Shan Zheng',serif;font-size:32px;color:var(--gold);letter-spacing:8px">${data.name}</div>
+      <div style="font-size:13px;color:var(--paper3);margin-top:4px">${data.season}季 · 五行属${data.element}</div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">🌿</span> 节气特点</div>
+      <div class="report-section-body">${data.advice}</div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">🥗</span> 宜食</div>
+      <div class="report-section-body">${data.foods.split('、').map(f=>'<span class="report-tag">'+f+'</span>').join('')}</div>
+    </div>
+    <div class="report-section">
+      <div class="report-section-title"><span class="icon">⚠️</span> 忌食</div>
+      <div class="report-section-body"><span class="report-tag warm">${data.taboos}</span></div>
+    </div>
+  </div>`;
+  report.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function runHealthFood(){
+  const selected = Array.from(document.querySelectorAll('.symptom-chip[data-foodsym].selected')).map(el=>el.dataset.foodsym);
+  if(!selected.length){
+    showToast('请先选择症状');
+    return;
+  }
+  const foodMap = {
+    '失眠':{foods:['桂圆','莲子','百合','红枣','小米'],recip:'桂圆红枣粥：桂圆肉15g、红枣10枚、小米50g煮粥，安神助眠。'},
+    '咳嗽':{foods:['雪梨','川贝','枇杷','蜂蜜','百合'],recip:'川贝炖雪梨：雪梨1个去核，川贝粉3g、冰糖少许，蒸熟食用。'},
+    '胃痛':{foods:['山药','小米','南瓜','红枣','陈皮'],recip:'山药小米粥：山药100g、小米50g煮粥，养胃护胃。'},
+    '便秘':{foods:['蜂蜜','香蕉','红薯','黑芝麻','核桃'],recip:'蜂蜜芝麻糊：黑芝麻、核桃磨粉，加蜂蜜冲服，润肠通便。'},
+    '乏力':{foods:['黄芪','山药','大枣','人参','鸡肉'],recip:'黄芪炖鸡：黄芪30g、鸡肉500g炖汤，补气益力。'},
+    '月经不调':{foods:['红枣','当归','阿胶','玫瑰','黑豆'],recip:'当归红枣茶：当归10g、红枣5枚泡茶，养血调经。'},
+    '怕冷':{foods:['生姜','桂圆','羊肉','韭菜','核桃'],recip:'当归生姜羊肉汤：羊肉500g、当归30g、生姜50g，温阳散寒。'},
+    '水肿':{foods:['薏米','冬瓜','赤小豆','玉米须','鲤鱼'],recip:'薏米冬瓜汤：薏米50g、冬瓜200g煮汤，祛湿消肿。'},
+    '头痛':{foods:['天麻','菊花','川芎','薄荷','决明子'],recip:'菊花决明子茶：菊花5g、决明子10g泡茶，清肝明目止痛。'},
+    '脱发':{foods:['黑芝麻','核桃','何首乌','黑豆','桑葚'],recip:'黑芝麻核桃粉：黑芝麻、核桃磨粉冲服，补肾养发。'},
+    '皮肤瘙痒':{foods:['百合','银耳','薏米','马齿苋','绿豆'],recip:'薏米绿豆汤：薏米、绿豆各50g煮汤，清热祛湿止痒。'}
+  };
+  const report = document.getElementById('healthReport');
+  let html = '<div class="report-card"><div style="font-family:Ma Shan Zheng,serif;font-size:20px;color:var(--gold);letter-spacing:4px;margin-bottom:12px">🥗 食疗方案</div>';
+  selected.forEach(s=>{
+    const d = foodMap[s];
+    if(!d) return;
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">🩺</span> ${s}</div>
+      <div class="report-section-body">
+        <p><b>推荐食材：</b>${d.foods.map(f=>'<span class="report-tag">'+f+'</span>').join('')}</p>
+        <div class="kb-result-box">
+          <div class="kb-match-name">📋 推荐食疗方</div>
+          <div class="kb-match-desc">${d.recip}</div>
+        </div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  report.innerHTML = html;
+  report.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function runHealthDoctor(){
+  const q = (document.getElementById('healthDoctorSearch').value || '').trim();
+  if(!q){
+    showToast('请输入搜索关键词');
+    return;
+  }
+  if(!window.TCM_FAMOUS_FORMULAS_KB || !TCM_FAMOUS_FORMULAS_KB.doctors){
+    document.getElementById('healthDoctorResult').innerHTML = '<div style="padding:10px;color:var(--paper3);font-size:13px">名医知识库未加载</div>';
+    return;
+  }
+  const docs = TCM_FAMOUS_FORMULAS_KB.doctors;
+  const matched = docs.filter(d=>
+    d.name.includes(q) ||
+    (d.era||'').includes(q) ||
+    (d.title||'').includes(q) ||
+    (d.specialties||[]).some(s=>s.includes(q))
+  ).slice(0, 8);
+  if(!matched.length){
+    document.getElementById('healthDoctorResult').innerHTML = '<div style="padding:10px;color:var(--paper3);font-size:13px">未找到匹配名医，请尝试其他关键词</div>';
+    return;
+  }
+  document.getElementById('healthDoctorResult').innerHTML = matched.map(d=>`
+    <div class="kb-result-box">
+      <div class="kb-match-name">${d.name}（${d.era||''}）· ${d.title||''}</div>
+      <div class="kb-match-desc">
+        <b>擅长：</b>${(d.specialties||[]).join('、')}<br>
+        <b>著作：</b>${(d.major_works||[]).join('、')||'无'}<br>
+        <b>代表方：</b>${(d.signature_formulas||[]).join('、')||'无'}<br>
+        <b>医论：</b>${d.medical_theory||''}<br>
+        <b>病案：</b>${d.case_study||''}<br>
+        <b>出处：</b>${d.source||''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// 初始化时显示健康工作台
+if(typeof initSampleData === 'function'){
+  const _origInit = initSampleData;
+  // 不覆盖原函数，在末尾追加
+}
+
+
+function initSampleData(){
+  if(loadCases()) return;
+  const now = new Date().toISOString();
+  const samples = [
+    {
+      id:'CASE-001',
+      createdAt:'2026-07-19T09:00:00',
+      status:'pushed',
+      patient:{name:'张先生',age:45,gender:'男',symptoms:'头痛失眠，伴随口干口苦，烦躁易怒，胸胁胀闷，舌红苔黄，脉弦数',tizhi:'气郁质'},
+      masterAnalysis:{
+        bazi:{year:'甲子',month:'丙寅',day:'癸丑',hour:'辛酉'},
+        wuxing:{木:2,火:1,土:1,金:2,水:2},
+        hexagram:{name:'水火既济',moving:3},
+        analysisNote:'日主癸水，生于寅月，木旺生火，肝木偏旺克土。八字木火通明，但木旺克土，脾胃需注意。大运戊辰，流年丙午，火气偏盛，心肝火旺。',
+        medicalTranslation:'您的体质属于气郁质，肝气偏旺，容易影响脾胃功能和睡眠质量。当前季节心火偏旺，需注意疏肝清热。',
+        organRisk:'肝胆系统需特别注意，脾胃功能偏弱，心火偏旺需清心降火',
+        seasonalAdvice:'夏季养心清热，疏肝理气，避免辛辣刺激食物',
+        tizhiTrend:'气郁质，偏肝旺',
+        submittedAt:'2026-07-19T09:30:00',
+        version:1
+      },
+      doctorDiagnosis:{
+        syndrome:'肝郁气滞',
+        treatment:'疏肝理气，清热安神',
+        formula:'逍遥散加减（柴胡10g、白芍15g、当归10g、白术10g、茯苓15g、薄荷6g、生姜3片、炙甘草6g）',
+        acupoints:['太冲','阳陵泉','期门','内关','神门'],
+        dietPlan:'推荐：玫瑰花茶、佛手柑、芹菜、苦瓜、百合粥\n禁忌：辛辣油腻、羊肉、酒类\n每日食谱：早餐百合红枣粥，午餐清炒苦瓜芹菜，晚餐玫瑰花茶配素菜',
+        exercisePlan:'户外运动、登山、慢跑，最佳时间早晨5-7点',
+        lifestyle:'保持心情舒畅，避免熬夜，23点前入睡，晨起户外散步',
+        followUpDate:'2026-07-26',
+        followUpNote:'一周后复诊，观察症状变化，调整方剂',
+        doctorNote:'注意情绪调节，配合食疗，坚持运动。症状缓解后可适当减量。',
+        completedAt:'2026-07-19T10:00:00',
+        version:1
+      },
+      discussion:[
+        {role:'master',text:'此病例八字木旺克土，脾胃需特别注意，建议方剂中加强健脾成分',time:'2026-07-19T09:35:00'},
+        {role:'doctor',text:'收到，我在逍遥散基础上加白术茯苓健脾，配合太冲期门疏肝',time:'2026-07-19T09:45:00'},
+        {role:'master',text:'好的，夏季火旺，可酌加清心药物',time:'2026-07-19T09:50:00'}
+      ],
+      patientReport:{
+        summary:'您的体质属于气郁质，肝气偏旺，建议疏肝理气、清热安神',
+        diet:'推荐：玫瑰花茶、佛手柑、芹菜、苦瓜、百合粥\n禁忌：辛辣油腻、羊肉、酒类',
+        exercise:'推荐：户外运动、登山、慢跑\n最佳时间：早晨5-7点',
+        lifestyle:'保持心情舒畅，避免熬夜，23点前入睡，晨起户外散步',
+        schedule:'下次复诊：2026年7月26日\n注意事项：一周后复诊，观察症状变化，调整方剂',
+        doctorNote:'注意情绪调节，配合食疗，坚持运动。症状缓解后可适当减量。',
+        pushedAt:'2026-07-19T10:30:00'
+      }
+    },
+    {
+      id:'CASE-002',
+      createdAt:'2026-07-19T10:00:00',
+      status:'pending_doctor',
+      patient:{name:'李女士',age:38,gender:'女',symptoms:'月经不调，量少色暗有块，经前乳房胀痛，情绪波动大，舌暗红有瘀点，脉弦涩',tizhi:'血瘀质'},
+      masterAnalysis:{
+        bazi:{year:'丁卯',month:'壬子',day:'乙亥',hour:'丁亥'},
+        wuxing:{木:2,火:2,土:0,金:0,水:3},
+        hexagram:{name:'坎为水',moving:2},
+        analysisNote:'日主乙木，生于子月，水旺木漂，寒凝血瘀。八字水旺泛滥，需温阳化气，健脾温肾。大运己酉，流年丙午，水火相战。',
+        medicalTranslation:'您的体质偏于血瘀质，体内寒气偏重，气血运行不畅，需要温阳散寒、活血化瘀。',
+        organRisk:'肾系统偏寒，气血运行不畅，女性生殖系统需温养',
+        seasonalAdvice:'夏季温阳散寒，活血化瘀，避免寒凉食物和冷饮',
+        tizhiTrend:'血瘀质，偏寒凝',
+        submittedAt:'2026-07-19T10:20:00',
+        version:1
+      },
+      doctorDiagnosis:null,
+      discussion:[
+        {role:'master',text:'此病例水旺寒凝，需温经散寒，建议少腹逐瘀汤方向',time:'2026-07-19T10:25:00'}
+      ],
+      patientReport:null
+    },
+    {
+      id:'CASE-003',
+      createdAt:'2026-07-19T10:30:00',
+      status:'pending_master',
+      patient:{name:'王先生',age:52,gender:'男',symptoms:'腰膝酸软，畏寒肢冷，夜尿频多，性功能减退，舌淡苔白，脉沉迟',tizhi:''},
+      masterAnalysis:null,
+      doctorDiagnosis:null,
+      discussion:[],
+      patientReport:null
+    }
+  ];
+  saveCases(samples);
+  // Init versions
+  const v = {};
+  v['CASE-001'] = [
+    {time:'2026-07-19T09:00:00',summary:'病例创建'},
+    {time:'2026-07-19T09:30:00',summary:'大师提交分析报告 v1'},
+    {time:'2026-07-19T10:00:00',summary:'顾问完成咨询方案 v1'},
+    {time:'2026-07-19T10:30:00',summary:'报告推送给病患'}
+  ];
+  v['CASE-002'] = [
+    {time:'2026-07-19T10:00:00',summary:'病例创建'},
+    {time:'2026-07-19T10:20:00',summary:'大师提交分析报告 v1'}
+  ];
+  v['CASE-003'] = [
+    {time:'2026-07-19T10:30:00',summary:'病例创建'}
+  ];
+  saveVersions(v);
+}
+
+/* ===== TOAST ===== */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ===== ROLE SWITCHING ===== */
+async function switchRole(role,btn){
+  currentRole = role;
+  document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+role).classList.add('active');
+  // Refresh data from API (fallback to local)
+  await syncCasesFromAPI();
+  if(role==='patient') renderPatientReport();
+  if(role==='master') renderMasterList();
+  if(role==='doctor') renderDoctorList();
+  if(role==='collab') renderCollabCases();
+}
+
+/* ===== SUB-TAB SWITCH ===== */
+function switchSubTab(btn,targetId){
+  const container = btn.closest('.workspace-right')||btn.closest('.sub-panel')||document;
+  container.querySelectorAll('.sub-tab').forEach(t=>{
+    if(t.parentElement===btn.parentElement) t.classList.remove('active');
+  });
+  btn.classList.add('active');
+  // Find sibling sub-panels
+  const parent = btn.parentElement;
+  const nextSiblings = parent.nextElementSibling;
+  let node = parent.nextElementSibling;
+  while(node){
+    if(node.classList && node.classList.contains('sub-panel')){
+      node.classList.remove('active');
+    }
+    node = node.nextElementSibling;
+  }
+  // Also handle case where sub-panels are inside the same parent's siblings
+  const allSubPanels = parent.parentElement.querySelectorAll('.sub-panel');
+  allSubPanels.forEach(sp=>sp.classList.remove('active'));
+  const target = document.getElementById(targetId);
+  if(target) target.classList.add('active');
+}
+
+function switchHexMethod(btn,method){
+  btn.parentElement.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['hex-time','hex-number','hex-symptom'].forEach(id=>{
+    document.getElementById(id).classList.remove('active');
+  });
+  document.getElementById('hex-'+method).classList.add('active');
+}
+
+/* ===== FILTER TERMS ===== */
+function filterTerms(text){
+  if(!text) return '';
+  let result = text;
+  FILTER_TERMS.forEach(term=>{
+    result = result.replace(new RegExp(term,'g'),'');
+  });
+  // Clean up extra spaces and punctuation
+  result = result.replace(/\s+/g,' ').replace(/[，。、]{2,}/g,m=>m[0]).trim();
+  return result;
+}
+
+/* ===== PATIENT PORTAL ===== */
+function renderPatientReport(){
+  const cases = loadCases();
+  const area = document.getElementById('patientReportArea');
+  const histCard = document.getElementById('patientHistoryCard');
+  const histList = document.getElementById('patientHistoryList');
+  if(!cases || cases.length===0){
+    area.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="text">暂无养生报告，请等待医师审核推送</div></div>';
+    histCard.style.display = 'none';
+    return;
+  }
+  // Find cases with patientReport
+  const reported = cases.filter(c=>c.patientReport);
+  const pending = cases.filter(c=>!c.patientReport && c.patient);
+  if(reported.length===0){
+    area.innerHTML = '<div class="empty-state"><div class="icon">📋</div><div class="text">暂无养生报告，请等待医师审核推送</div></div>';
+    histCard.style.display = 'none';
+    return;
+  }
+  // Show latest report
+  const latest = reported[reported.length-1];
+  const r = latest.patientReport;
+  const p = latest.patient;
+  let html = '<div class="card"><div class="card-title"><span class="icon">📊</span> 我的养生报告</div>';
+  html += '<div style="font-size:12px;color:var(--paper3);margin-bottom:16px">病例号：'+latest.id+' · 推送时间：'+formatDate(r.pushedAt)+'</div>';
+  // 体质概况
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">体质概况</div><div class="value">'+escHtml(r.summary)+'</div></div>';
+  // 饮食建议
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🥗 饮食建议</div><div class="value" style="white-space:pre-line">'+escHtml(r.diet)+'</div></div>';
+  // 运动方案
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🏃 运动方案</div><div class="value" style="white-space:pre-line">'+escHtml(r.exercise)+'</div></div>';
+  // 起居调摄
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🌙 起居调摄</div><div class="value" style="white-space:pre-line">'+escHtml(r.lifestyle)+'</div></div>';
+  // 复诊日程
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">📅 复诊日程</div><div class="value" style="white-space:pre-line">'+escHtml(r.schedule)+'</div></div>';
+  // 养生嘱托
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">💬 养生嘱托</div><div class="value" style="white-space:pre-line">'+escHtml(r.doctorNote)+'</div></div>';
+  html += '<div class="btn-row no-print"><button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ 打印导出</button></div>';
+  html += '</div>';
+  area.innerHTML = html;
+  // History
+  if(reported.length>1){
+    histCard.style.display = 'block';
+    let hhtml = '';
+    reported.slice(0,-1).forEach(c=>{
+      hhtml += `<ml-tap class="info-item" style="margin-bottom:8px;cursor:pointer" data-id="${c.id}" onclick="viewHistoryReport(this.dataset.id)" variant="card" role="button" tabindex="0">`;
+      hhtml += '<div class="label">'+c.id+' · '+formatDate(c.patientReport.pushedAt)+'</div>';
+      hhtml += '<div class="value">'+escHtml(c.patient.name)+' - '+escHtml(c.patientReport.summary.substring(0,40))+'...</div>';
+      hhtml += '</ml-tap>';
+    });
+    histList.innerHTML = hhtml;
+  }else{
+    histCard.style.display = 'none';
+  }
+
+  area.innerHTML += renderTcmCareerPanelR37();}
+
+function viewHistoryReport(caseId){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c||!c.patientReport) return;
+  const r = c.patientReport;
+  let html = '<div class="card"><div class="card-title"><span class="icon">📊</span> 历史报告 · '+c.id+'</div>';
+  html += '<div style="font-size:12px;color:var(--paper3);margin-bottom:16px">推送时间：'+formatDate(r.pushedAt)+'</div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">体质概况</div><div class="value">'+escHtml(r.summary)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🥗 饮食建议</div><div class="value" style="white-space:pre-line">'+escHtml(r.diet)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🏃 运动方案</div><div class="value" style="white-space:pre-line">'+escHtml(r.exercise)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">🌙 起居调摄</div><div class="value" style="white-space:pre-line">'+escHtml(r.lifestyle)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">📅 复诊日程</div><div class="value" style="white-space:pre-line">'+escHtml(r.schedule)+'</div></div>';
+  html += '<div class="info-item" style="margin-bottom:12px"><div class="label">💬 养生嘱托</div><div class="value" style="white-space:pre-line">'+escHtml(r.doctorNote)+'</div></div>';
+  html += '<div class="btn-row no-print"><button class="btn btn-secondary btn-sm" onclick="renderPatientReport()">← 返回最新报告</button></div>';
+  html += '</div>';
+  document.getElementById('patientReportArea').innerHTML = html;
+}
+
+/* ===== MASTER PORTAL ===== */
+function renderMasterList(){
+  const cases = loadCases();
+  const pending = cases.filter(c=>c.status==='pending_master');
+  const done = cases.filter(c=>c.masterAnalysis);
+  // Pending
+  let phtml = '';
+  if(pending.length===0){
+    phtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无待分析病例</div></div>';
+  }else{
+    pending.forEach(c=>{
+      phtml += renderCaseCard(c);
+    });
+  }
+  document.getElementById('masterPendingList').innerHTML = phtml;
+  // Done
+  let dhtml = '';
+  if(done.length===0){
+    dhtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无已分析病例</div></div>';
+  }else{
+    done.forEach(c=>{
+      dhtml += renderCaseCard(c);
+    });
+  }
+  document.getElementById('masterDoneList').innerHTML = dhtml;
+}
+
+function openMasterWorkspace(caseId){
+  currentCaseId = caseId;
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c) return;
+  document.getElementById('masterListView').style.display = 'none';
+  document.getElementById('masterWorkspaceView').style.display = 'block';
+  // Case info
+  let info = '<div class="info-item" style="margin-bottom:8px"><div class="label">病例号</div><div class="value">'+c.id+'</div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">姓名</div><div class="value">'+escHtml(c.patient.name)+'</div></div>';
+  info += '<div class="form-row"><div class="info-item"><div class="label">年龄</div><div class="value">'+c.patient.age+'岁</div></div><div class="info-item"><div class="label">性别</div><div class="value">'+c.patient.gender+'</div></div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">主要症状</div><div class="value" style="white-space:pre-line">'+escHtml(c.patient.symptoms)+'</div></div>';
+  if(c.patient.tizhi) info += '<div class="info-item"><div class="label">已知体质</div><div class="value">'+escHtml(c.patient.tizhi)+'</div></div>';
+  document.getElementById('masterCaseInfo').innerHTML = info;
+  // Init bazi selects
+  initBaziSelects();
+  // Pre-fill if analysis exists
+  if(c.masterAnalysis){
+    const ma = c.masterAnalysis;
+    if(ma.bazi){
+      document.getElementById('bazi-year').value = ma.bazi.year;
+      document.getElementById('bazi-month').value = ma.bazi.month;
+      document.getElementById('bazi-day').value = ma.bazi.day;
+      document.getElementById('bazi-hour').value = ma.bazi.hour;
+    }
+    if(ma.analysisNote) document.getElementById('masterNote').value = ma.analysisNote;
+    if(ma.medicalTranslation) document.getElementById('medicalTranslation').value = ma.medicalTranslation;
+    if(ma.tizhiTrend) document.getElementById('tizhiTrend').value = ma.tizhiTrend;
+    if(ma.organRisk) document.getElementById('organRiskInput').value = ma.organRisk;
+    if(ma.seasonalAdvice) document.getElementById('seasonalAdvice').value = ma.seasonalAdvice;
+    if(ma.wuxing) renderWuxingBars(ma.wuxing,'baziResult');
+    if(ma.hexagram) renderHexagram(ma.hexagram,'hexagramResult');
+  }
+}
+
+function backToMasterList(){
+  document.getElementById('masterWorkspaceView').style.display = 'none';
+  document.getElementById('masterListView').style.display = 'block';
+  currentCaseId = null;
+}
+
+function initBaziSelects(){
+  ['bazi-year','bazi-month','bazi-day','bazi-hour'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(sel && sel.options.length>0) return;
+    if(sel){
+      sel.innerHTML = '<option value="">选择</option>';
+      JIAZI.forEach(j=>{
+        sel.innerHTML += '<option value="'+j+'">'+j+'</option>';
+      });
+    }
+  });
+  // 命相同参 - 同样初始化
+  ['mx-year','mx-month','mx-day','mx-hour'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(sel && sel.options.length>0) return;
+    if(sel){
+      sel.innerHTML = '<option value="">选择</option>';
+      JIAZI.forEach(j=>{
+        sel.innerHTML += '<option value="'+j+'">'+j+'</option>';
+      });
+    }
+  });
+}
+
+function analyzeBazi(){
+  const y = document.getElementById('bazi-year').value;
+  const m = document.getElementById('bazi-month').value;
+  const d = document.getElementById('bazi-day').value;
+  const h = document.getElementById('bazi-hour').value;
+  if(!y||!m||!d||!h){showToast('请选择完整四柱');return}
+  // Calculate wuxing
+  const wx = {木:0,火:0,土:0,金:0,水:0};
+  const ganMap = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  const zhiMap = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  [y,m,d,h].forEach(pillar=>{
+    const gan = pillar[0];
+    const zhi = pillar[1];
+    if(ganMap[gan]) wx[ganMap[gan]]++;
+    if(zhiMap[zhi]) wx[zhiMap[zhi]]++;
+  });
+  renderWuxingBars(wx,'baziResult');
+  // Store for later
+  const resultDiv = document.getElementById('baziResult');
+  resultDiv.dataset.wuxing = JSON.stringify(wx);
+  // Organ risk
+  let riskHtml = '<div style="margin-top:16px"><div style="font-size:13px;color:var(--gold2);letter-spacing:2px;margin-bottom:10px">脏腑风险预测</div>';
+  const maxEl = Object.keys(wx).reduce((a,b)=>wx[a]>wx[b]?a:b);
+  const minEl = Object.keys(wx).reduce((a,b)=>wx[a]<wx[b]?a:b);
+  const organMap = {木:'肝胆',火:'心小肠',土:'脾胃',金:'肺大肠',水:'肾膀胱'};
+  riskHtml += '<div style="font-size:13px;color:var(--paper2);line-height:1.8">';
+  riskHtml += '偏盛：'+organMap[maxEl]+'（'+maxEl+'='+wx[maxEl]+'）需注意泄其偏盛<br>';
+  riskHtml += '偏衰：'+organMap[minEl]+'（'+minEl+'='+wx[minEl]+'）需注意补其不足';
+  riskHtml += '</div></div>';
+  resultDiv.innerHTML += riskHtml;
+  // Dayun hint
+  resultDiv.innerHTML += '<div style="margin-top:12px;font-size:12px;color:var(--paper3)">大运流年提示：当前流年2026丙午年，火气偏旺，'+(maxEl==='火'?'需注意心火过盛':(minEl==='水'?'需温补肾阳':'需平衡水火'))+'</div>';
+}
+
+function renderWuxingBars(wx,targetId){
+  const max = Math.max(...Object.values(wx),1);
+  const colors = {木:'wx-wood',火:'wx-fire',土:'wx-earth',金:'wx-metal',水:'wx-water'};
+  let html = '<div style="font-size:13px;color:var(--gold2);letter-spacing:2px;margin-bottom:8px">五行旺衰分析</div>';
+  html += '<div class="wuxing-bars">';
+  Object.entries(wx).forEach(([el,val])=>{
+    const pct = (val/max)*100;
+    html += '<div class="wuxing-bar '+colors[el]+'"><div class="wx-label">'+el+'</div><div class="wx-track"><div class="wx-fill" style="width:'+pct+'%"></div></div><div class="wx-val">'+val+'</div></div>';
+  });
+  html += '</div>';
+  const target = document.getElementById(targetId);
+  target.innerHTML = html;
+  if(target.dataset.wuxing===undefined) target.dataset.wuxing = JSON.stringify(wx);
+}
+
+/* ===== 命相同参（面相×八字交叉分析）===== */
+function analyzeMingxiang(){
+  const y = document.getElementById('mx-year').value;
+  const m = document.getElementById('mx-month').value;
+  const d = document.getElementById('mx-day').value;
+  const h = document.getElementById('mx-hour').value;
+  const faceSelect = document.getElementById('mx-face-symptom');
+  const faceSymptoms = Array.from(faceSelect.selectedOptions).map(o=>o.value);
+  const focus = document.getElementById('mx-focus').value;
+  const resultDiv = document.getElementById('mingxiangResult');
+  if(!y||!m||!d||!h){showToast('请选择完整四柱');return}
+  if(faceSymptoms.length===0){showToast('请至少选择一项面诊症状');return}
+  // 计算八字五行
+  const wx = {木:0,火:0,土:0,金:0,水:0};
+  const ganMap = {'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  const zhiMap = {'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+  [y,m,d,h].forEach(pillar=>{
+    if(!pillar)return;
+    const gan = pillar[0];
+    const zhi = pillar[1];
+    if(ganMap[gan]) wx[ganMap[gan]]++;
+    if(zhiMap[zhi]) wx[zhiMap[zhi]]++;
+  });
+  // 五行强弱 (本项目使用 >=3 为偏盛)
+  const dominantEl = Object.entries(wx).sort((a,b)=>b[1]-a[1])[0][0];
+  const weakEl = Object.entries(wx).sort((a,b)=>a[1]-b[1])[0][0];
+  // 拼接查询文本 - 输入给 KB 检索
+  const query = faceSymptoms.join(' ') + ' ' + dominantEl + '旺 ' + weakEl + '弱 ' + focus;
+  let html = '<div class="card-title" style="font-size:13px;color:var(--gold2);letter-spacing:2px">🩺 命相同参交叉分析结果</div>';
+  // 八字部分
+  html += '<div style="margin-top:12px;font-size:13px;color:var(--paper2);line-height:1.8">';
+  html += '<strong>八字：</strong>'+y+' '+m+' '+d+' '+h+'　';
+  html += '<strong>五行：</strong>木'+wx['木']+' 火'+wx['火']+' 土'+wx['土']+' 金'+wx['金']+' 水'+wx['水']+'<br>';
+  html += '<strong>偏盛：</strong>'+dominantEl+'　<strong>偏衰：</strong>'+weakEl;
+  html += '</div>';
+  // 面诊部分
+  html += '<div style="margin-top:8px;font-size:13px;color:var(--paper2)"><strong>面诊：</strong>'+faceSymptoms.join('、')+'</div>';
+  // 命中 KB
+  if(window.MINGXIANG_CROSS_KB && window.MINGXIANG_CROSS_KB.rules){
+    const rules = window.MINGXIANG_CROSS_KB.rules;
+    const userInput = query.toLowerCase();
+    const keywords = userInput.split(/[\s，。、；;：:（）()\[\]\-]+/).filter(s=>s.length>=1);
+    const scored = rules.map(rule=>{
+      let hits = 0;
+      const text = (rule.face + rule.bazi + rule.name + (rule.keywords||[]).join(' ') + rule.category).toLowerCase();
+      keywords.forEach(kw=>{ if(text.includes(kw.toLowerCase())) hits++; });
+      return { rule, hits, score: hits / Math.max(1, keywords.length) };
+    }).filter(x=>x.hits>0).sort((a,b)=>b.hits-a.hits).slice(0,5);
+    if(scored.length > 0){
+      html += '<div style="margin-top:14px;font-size:13px;color:var(--gold2);letter-spacing:2px">📚 命中交叉规则</div>';
+      scored.forEach(s=>{
+        const r = s.rule;
+        html += '<div style="margin-top:10px;padding:10px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2);line-height:1.7">';
+        html += '<div style="font-size:13px;color:var(--gold);font-weight:600">【'+r.id+'】'+escHtml(r.name)+' <span style="font-size:11px;color:var(--paper3);font-weight:400">· '+escHtml(r.source)+' · '+escHtml(r.category)+'</span></div>';
+        html += '<div style="margin-top:4px"><strong>面相：</strong>'+escHtml(r.face)+'</div>';
+        html += '<div><strong>八字：</strong>'+escHtml(r.bazi)+'</div>';
+        html += '<div style="margin-top:4px;color:var(--gold2)"><strong>交叉判断：</strong>'+escHtml(r.cross)+'</div>';
+        html += '<div style="margin-top:4px;color:var(--paper3)"><strong>调理：</strong>'+escHtml(r.remedy)+'</div>';
+        html += '</div>';
+      });
+    } else {
+      html += '<div style="margin-top:14px;font-size:13px;color:var(--paper3)">未命中具体规则，提示：'+dominantEl+'旺'+weakEl+'弱 体质倾向需重点关注对应脏腑。</div>';
+    }
+  } else {
+    html += '<div style="margin-top:14px;font-size:13px;color:var(--paper3)">⚠️ KB 未加载，请检查 knowledge/mingxiang-cross-kb.js 是否引入。</div>';
+  }
+  // 五行脏腑建议
+  const organMap = {木:'肝胆',火:'心小肠',土:'脾胃',金:'肺大肠',水:'肾膀胱'};
+  html += '<div style="margin-top:14px;font-size:13px;color:var(--gold2);letter-spacing:2px">⚖️ 五行体质建议</div>';
+  html += '<div style="margin-top:8px;font-size:12px;color:var(--paper2);line-height:1.8">';
+  html += '偏盛脏腑：<strong style="color:var(--gold)">'+organMap[dominantEl]+'</strong>（'+dominantEl+'）需注意泄其偏盛<br>';
+  html += '偏衰脏腑：<strong style="color:var(--gold)">'+organMap[weakEl]+'</strong>（'+weakEl+'）需注意补其不足';
+  html += '</div>';
+  resultDiv.innerHTML = html;
+}
+
+/* Hexagram casting */
+function castHexTime(){
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth()+1;
+  const d = now.getDate();
+  const h = now.getHours();
+  const upper = (y+m+d)%8;
+  const lower = (y+m+d+h)%8;
+  const moving = (y+m+d+h)%6;
+  showHexagram(upper,lower,moving);
+}
+function castHexNumber(){
+  const n1 = parseInt(document.getElementById('hex-num1').value)||1;
+  const n2 = parseInt(document.getElementById('hex-num2').value)||1;
+  const n3 = parseInt(document.getElementById('hex-num3').value)||1;
+  const upper = n1%8;
+  const lower = n2%8;
+  const moving = n3%6;
+  showHexagram(upper,lower,moving);
+}
+function castHexSymptom(){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCaseId);
+  if(!c){showToast('请先选择病例');return}
+  const symptoms = c.patient.symptoms;
+  // Use symptom string length and char codes
+  let sum = 0;
+  for(let i=0;i<symptoms.length;i++){sum += symptoms.charCodeAt(i)}
+  const upper = sum%8;
+  const lower = (sum+7)%8;
+  const moving = (sum+3)%6;
+  showHexagram(upper,lower,moving);
+}
+function showHexagram(upper,lower,moving){
+  const idx = upper*8+lower;
+  const hex = HEXAGRAMS[idx%64];
+  renderHexagram({name:hex.name,lines:hex.lines,moving:moving,organ:hex.organ,meaning:hex.meaning},'hexagramResult');
+}
+function renderHexagram(hex,targetId){
+  const target = document.getElementById(targetId);
+  if(!target) return;
+  let html = '<div class="hexagram-display">';
+  html += '<div class="hexagram-name">'+escHtml(hex.name)+'</div>';
+  html += '<div class="hexagram-lines">';
+  const lines = hex.lines||[1,1,1,1,1,1];
+  for(let i=5;i>=0;i--){
+    const isMoving = (hex.moving!==undefined && (i+1)===hex.moving);
+    const cls = lines[i]===0?'broken':'';
+    html += '<div class="hexagram-line '+cls+(isMoving?' moving':'')+'"></div>';
+  }
+  html += '</div>';
+  if(hex.organ) html += '<div style="font-size:13px;color:var(--gold2);margin-bottom:6px">对应脏腑：'+escHtml(hex.organ)+'</div>';
+  if(hex.meaning) html += '<div class="hexagram-judgment">'+escHtml(hex.meaning)+'</div>';
+  if(hex.moving!==undefined) html += '<div style="font-size:12px;color:var(--paper3);margin-top:8px">动爻：第'+hex.moving+'爻</div>';
+  html += '</div>';
+  target.innerHTML = html;
+  target.dataset.hexagram = JSON.stringify(hex);
+}
+
+async function submitMasterAnalysis(){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCaseId);
+  if(!c){showToast('病例未找到');return}
+  const note = document.getElementById('masterNote').value.trim();
+  const translation = document.getElementById('medicalTranslation').value.trim();
+  const tizhi = document.getElementById('tizhiTrend').value.trim();
+  const organRisk = document.getElementById('organRiskInput').value.trim();
+  const seasonal = document.getElementById('seasonalAdvice').value.trim();
+  if(!note){showToast('请填写分析摘要');return}
+  if(!translation){showToast('请填写医学化翻译');return}
+  // Gather bazi & hexagram
+  const baziResult = document.getElementById('baziResult');
+  const hexResult = document.getElementById('hexagramResult');
+  const wuxing = baziResult.dataset.wuxing ? JSON.parse(baziResult.dataset.wuxing) : {木:0,火:0,土:0,金:0,水:0};
+  const hexagram = hexResult.dataset.hexagram ? JSON.parse(hexResult.dataset.hexagram) : null;
+  const y = document.getElementById('bazi-year').value;
+  const m = document.getElementById('bazi-month').value;
+  const d = document.getElementById('bazi-day').value;
+  const h = document.getElementById('bazi-hour').value;
+  const oldVersion = c.masterAnalysis ? c.masterAnalysis.version : 0;
+  const baziChart = {year:y||'',month:m||'',day:d||'',hour:h||''};
+  const wuxingSummary = JSON.stringify(wuxing);
+  // Try API first
+  try{
+    const resp = await apiCall('/api/clinic/submit-analysis','POST',{
+      caseId: currentCaseId,
+      analysis: note,
+      baziChart: baziChart,
+      wuxingSummary: wuxingSummary
+    });
+    if(resp && resp.error){
+      showToast('API: ' + resp.error + '，使用本地保存');
+    }
+  }catch(e){
+    showToast('网络异常，使用本地保存');
+  }
+  // Local update (always, as fallback or mirror)
+  c.masterAnalysis = {
+    bazi:baziChart,
+    wuxing:wuxing,
+    hexagram:hexagram,
+    analysisNote:note,
+    medicalTranslation:translation,
+    tizhiTrend:tizhi,
+    organRisk:organRisk,
+    seasonalAdvice:seasonal,
+    submittedAt:new Date().toISOString(),
+    version:oldVersion+1
+  };
+  // Update status
+  if(c.status==='pending_master') c.status='pending_doctor';
+  else if(c.status==='completed'||c.status==='pushed') c.status=c.status;
+  else c.status='collaborating';
+  saveCases(cases);
+  addVersion(c.id,'大师提交分析报告 v'+(oldVersion+1));
+  showToast('分析报告已提交给医生');
+  backToMasterList();
+  renderMasterList();
+}
+
+/* ===== DOCTOR PORTAL ===== */
+function renderDoctorList(){
+  const cases = loadCases();
+  const pending = cases.filter(c=>c.masterAnalysis && !c.doctorDiagnosis);
+  const done = cases.filter(c=>c.doctorDiagnosis);
+  let phtml = '';
+  if(pending.length===0){
+    phtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无待诊病例</div></div>';
+  }else{
+    pending.forEach(c=>{phtml += renderCaseCard(c)});
+  }
+  document.getElementById('doctorPendingList').innerHTML = phtml;
+  let dhtml = '';
+  if(done.length===0){
+    dhtml = '<div class="empty-state"><div class="icon">📭</div><div class="text">暂无已诊病例</div></div>';
+  }else{
+    done.forEach(c=>{dhtml += renderCaseCard(c)});
+  }
+  document.getElementById('doctorDoneList').innerHTML = dhtml;
+}
+
+function openDoctorWorkspace(caseId){
+  currentCaseId = caseId;
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c) return;
+  document.getElementById('doctorListView').style.display = 'none';
+  document.getElementById('doctorWorkspaceView').style.display = 'block';
+  // Case info
+  let info = '<div class="info-item" style="margin-bottom:8px"><div class="label">病例号</div><div class="value">'+c.id+'</div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">姓名</div><div class="value">'+escHtml(c.patient.name)+'</div></div>';
+  info += '<div class="form-row"><div class="info-item"><div class="label">年龄</div><div class="value">'+c.patient.age+'岁</div></div><div class="info-item"><div class="label">性别</div><div class="value">'+c.patient.gender+'</div></div></div>';
+  info += '<div class="info-item" style="margin-bottom:8px"><div class="label">主要症状</div><div class="value" style="white-space:pre-line">'+escHtml(c.patient.symptoms)+'</div></div>';
+  document.getElementById('doctorCaseInfo').innerHTML = info;
+  // Master report (translated)
+  let mrHtml = '';
+  if(c.masterAnalysis){
+    const ma = c.masterAnalysis;
+    mrHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">体质趋势</div><div class="value">'+escHtml(ma.tizhiTrend||'-')+'</div></div>';
+    mrHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">医学化建议</div><div class="value" style="white-space:pre-line">'+escHtml(ma.medicalTranslation||ma.analysisNote||'-')+'</div></div>';
+    mrHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">脏腑风险</div><div class="value">'+escHtml(ma.organRisk||'-')+'</div></div>';
+    mrHtml += '<div class="info-item"><div class="label">季节调理</div><div class="value">'+escHtml(ma.seasonalAdvice||'-')+'</div></div>';
+  }else{
+    mrHtml = '<div class="empty-state" style="padding:20px"><div class="text">暂无大师分析</div></div>';
+  }
+  document.getElementById('doctorMasterReport').innerHTML = mrHtml;
+  // Pre-fill if exists
+  if(c.doctorDiagnosis){
+    const d = c.doctorDiagnosis;
+    document.getElementById('doc-syndrome').value = d.syndrome||'';
+    document.getElementById('doc-treatment').value = d.treatment||'';
+    document.getElementById('doc-formula').value = d.formula||'';
+    document.getElementById('doc-acupoints').value = (d.acupoints||[]).join(',');
+    document.getElementById('doc-diet').value = d.dietPlan||'';
+    document.getElementById('doc-exercise').value = d.exercisePlan||'';
+    document.getElementById('doc-lifestyle').value = d.lifestyle||'';
+    document.getElementById('doc-followup-date').value = d.followUpDate||'';
+    document.getElementById('doc-followup-note').value = d.followUpNote||'';
+    document.getElementById('doc-note').value = d.doctorNote||'';
+  }
+}
+
+function backToDoctorList(){
+  document.getElementById('doctorWorkspaceView').style.display = 'none';
+  document.getElementById('doctorListView').style.display = 'block';
+  currentCaseId = null;
+}
+
+async function pushToPatient(){
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCaseId);
+  if(!c){showToast('病例未找到');return}
+  const syndrome = document.getElementById('doc-syndrome').value.trim();
+  const treatment = document.getElementById('doc-treatment').value.trim();
+  const formula = document.getElementById('doc-formula').value.trim();
+  const acupoints = document.getElementById('doc-acupoints').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const diet = document.getElementById('doc-diet').value.trim();
+  const exercise = document.getElementById('doc-exercise').value.trim();
+  const lifestyle = document.getElementById('doc-lifestyle').value.trim();
+  const followUpDate = document.getElementById('doc-followup-date').value;
+  const followUpNote = document.getElementById('doc-followup-note').value.trim();
+  const doctorNote = document.getElementById('doc-note').value.trim();
+  if(!syndrome){showToast('请填写证候诊断');return}
+  if(!treatment){showToast('请填写治则治法');return}
+  const oldVersion = c.doctorDiagnosis ? c.doctorDiagnosis.version : 0;
+  // Generate patient report (filter terms)
+  const ma = c.masterAnalysis||{};
+  const summaryParts = [];
+  if(ma.tizhiTrend) summaryParts.push('您的体质属于'+filterTerms(ma.tizhiTrend));
+  if(syndrome) summaryParts.push('证候为'+syndrome);
+  if(treatment) summaryParts.push('治法：'+treatment);
+  const reportText = summaryParts.join('，');
+  // Try API first
+  try{
+    const resp = await apiCall('/api/clinic/push-report','POST',{
+      caseId: currentCaseId,
+      reportText: reportText
+    });
+    if(resp && resp.error){
+      showToast('API: ' + resp.error);
+    }
+  }catch(e){
+    showToast('网络异常，使用本地保存');
+  }
+  // Local update
+  c.doctorDiagnosis = {
+    syndrome:syndrome,
+    treatment:treatment,
+    formula:formula,
+    acupoints:acupoints,
+    dietPlan:diet,
+    exercisePlan:exercise,
+    lifestyle:lifestyle,
+    followUpDate:followUpDate,
+    followUpNote:followUpNote,
+    doctorNote:doctorNote,
+    completedAt:new Date().toISOString(),
+    version:oldVersion+1
+  };
+  c.patientReport = {
+    summary:reportText,
+    diet:diet||'遵医嘱饮食',
+    exercise:exercise||'适度运动',
+    lifestyle:lifestyle||'规律作息',
+    schedule:'下次复诊：'+(followUpDate?formatDate(followUpDate):'待定')+(followUpNote?'\n注意事项：'+followUpNote:''),
+    doctorNote:doctorNote||'请遵医嘱调理',
+    pushedAt:new Date().toISOString()
+  };
+  c.status='pushed';
+  saveCases(cases);
+  addVersion(c.id,'顾问完成咨询方案 v'+(oldVersion+1)+'，报告已推送');
+  showToast('报告已推送给病患');
+  backToDoctorList();
+  renderDoctorList();
+}
+
+/* ===== COLLABORATION SPACE ===== */
+function renderCollabCases(){
+  const cases = loadCases();
+  const sel = document.getElementById('collabCaseSelect');
+  let opts = '<option value="">选择病例...</option>';
+  cases.forEach(c=>{
+    opts += '<option value="'+c.id+'">'+c.id+' · '+escHtml(c.patient.name)+' · '+STATUS_LABELS[c.status]+'</option>';
+  });
+  sel.innerHTML = opts;
+  if(currentCollabCaseId) sel.value = currentCollabCaseId;
+}
+
+function loadCollabCase(){
+  const sel = document.getElementById('collabCaseSelect');
+  const caseId = sel.value;
+  if(!caseId){
+    document.getElementById('collabContent').style.display = 'none';
+    return;
+  }
+  currentCollabCaseId = caseId;
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===caseId);
+  if(!c) return;
+  document.getElementById('collabContent').style.display = 'block';
+  // Status tracker
+  let statusHtml = '';
+  STATUS_FLOW.forEach((s,i)=>{
+    const currentIdx = STATUS_FLOW.indexOf(c.status);
+    const cls = i<=currentIdx?'status-'+s:'';
+    const style = i<=currentIdx?'':'opacity:0.4';
+    statusHtml += '<span class="status-badge '+cls+'" style="'+style+'">'+STATUS_LABELS[s]+'</span>';
+    if(i<STATUS_FLOW.length-1) statusHtml += '<span style="color:var(--paper3)">→</span>';
+  });
+  document.getElementById('collabStatusTracker').innerHTML = statusHtml;
+  // Master area
+  let maHtml = '';
+  if(c.masterAnalysis){
+    const ma = c.masterAnalysis;
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">四柱</div><div class="value">'+ma.bazi.year+' '+ma.bazi.month+' '+ma.bazi.day+' '+ma.bazi.hour+'</div></div>';
+    if(ma.wuxing){
+      maHtml += '<div style="margin:8px 0">';
+      Object.entries(ma.wuxing).forEach(([el,val])=>{
+        maHtml += '<span class="tag tag-'+el+'" style="margin:2px">'+el+': '+val+'</span>';
+      });
+      maHtml += '</div>';
+    }
+    if(ma.hexagram){
+      maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">卦象</div><div class="value">'+escHtml(ma.hexagram.name)+'</div></div>';
+    }
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">分析笔记</div><div class="value" style="white-space:pre-line">'+escHtml(ma.analysisNote)+'</div></div>';
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">医学化翻译</div><div class="value" style="white-space:pre-line">'+escHtml(ma.medicalTranslation)+'</div></div>';
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">体质趋势</div><div class="value">'+escHtml(ma.tizhiTrend||'-')+'</div></div>';
+    maHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">脏腑风险</div><div class="value">'+escHtml(ma.organRisk||'-')+'</div></div>';
+    maHtml += '<div class="info-item"><div class="label">提交时间 / 版本</div><div class="value">'+formatDate(ma.submittedAt)+' · v'+ma.version+'</div></div>';
+  }else{
+    maHtml = '<div class="empty-state" style="padding:20px"><div class="text">大师尚未提交分析</div></div>';
+  }
+  document.getElementById('collabMasterArea').innerHTML = maHtml;
+  // Doctor area
+  let daHtml = '';
+  if(c.doctorDiagnosis){
+    const d = c.doctorDiagnosis;
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">证候诊断</div><div class="value">'+escHtml(d.syndrome)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">治则治法</div><div class="value">'+escHtml(d.treatment)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">推荐方剂</div><div class="value" style="white-space:pre-line">'+escHtml(d.formula)+'</div></div>';
+    if(d.acupoints&&d.acupoints.length){
+      daHtml += '<div style="margin:8px 0">';
+      d.acupoints.forEach(a=>{daHtml += '<span class="tag">'+escHtml(a)+'</span>'});
+      daHtml += '</div>';
+    }
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">食疗方案</div><div class="value" style="white-space:pre-line">'+escHtml(d.dietPlan)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">运动方案</div><div class="value">'+escHtml(d.exercisePlan)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">起居调摄</div><div class="value" style="white-space:pre-line">'+escHtml(d.lifestyle)+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">复诊安排</div><div class="value">'+(d.followUpDate?formatDate(d.followUpDate):'待定')+' - '+escHtml(d.followUpNote||'')+'</div></div>';
+    daHtml += '<div class="info-item" style="margin-bottom:8px"><div class="label">养生嘱托</div><div class="value" style="white-space:pre-line">'+escHtml(d.doctorNote)+'</div></div>';
+    daHtml += '<div class="info-item"><div class="label">完成时间 / 版本</div><div class="value">'+formatDate(d.completedAt)+' · v'+d.version+'</div></div>';
+  }else{
+    daHtml = '<div class="empty-state" style="padding:20px"><div class="text">顾问尚未完成咨询</div></div>';
+  }
+  document.getElementById('collabDoctorArea').innerHTML = daHtml;
+  // Discussion
+  renderDiscussion(c);
+  // Version history
+  renderVersionHistory(c.id);
+}
+
+async function renderDiscussion(c){
+  let html = '';
+  let messages = c.discussion || [];
+  // Try fetching from API
+  try{
+    const resp = await apiCall('/api/clinic/discussions/'+c.id,'GET');
+    if(resp && resp.messages){
+      messages = resp.messages;
+      // Update local cache
+      const cases = loadCases();
+      const cc = cases.find(x=>x.id===c.id);
+      if(cc){cc.discussion = messages; saveCases(cases);}
+    }
+  }catch(e){
+    // Fallback to local data
+  }
+  if(messages.length===0){
+    html = '<div class="empty-state" style="padding:20px"><div class="text">暂无讨论消息</div></div>';
+  }else{
+    messages.forEach(msg=>{
+      const roleLabel = msg.role==='master'?'大师':'医生';
+      html += '<div class="discussion-msg role-'+msg.role+'">';
+      html += '<div class="msg-header"><span class="msg-role-badge '+msg.role+'">'+roleLabel+'</span><span>'+formatDate(msg.time)+'</span></div>';
+      html += '<div class="msg-body">'+escHtml(msg.text)+'</div>';
+      html += '</div>';
+    });
+  }
+  const area = document.getElementById('discussionArea');
+  area.innerHTML = html;
+  area.scrollTop = area.scrollHeight;
+}
+
+async function sendDiscussion(){
+  const role = document.getElementById('discussRole').value;
+  const text = document.getElementById('discussText').value.trim();
+  if(!text){showToast('请输入消息内容');return}
+  if(!currentCollabCaseId){showToast('请先选择病例');return}
+  // Try API first
+  try{
+    const resp = await apiCall('/api/clinic/discuss','POST',{
+      caseId: currentCollabCaseId,
+      content: text
+    });
+    if(resp && resp.error){
+      showToast('API: ' + resp.error);
+    }
+  }catch(e){
+    showToast('网络异常，消息保存到本地');
+  }
+  // Local update
+  const cases = loadCases();
+  const c = cases.find(x=>x.id===currentCollabCaseId);
+  if(!c) return;
+  if(!c.discussion) c.discussion = [];
+  c.discussion.push({role:role,text:text,time:new Date().toISOString()});
+  saveCases(cases);
+  document.getElementById('discussText').value = '';
+  renderDiscussion(c);
+  // Update status to collaborating if not already further
+  if(c.status==='pending_doctor') {c.status='collaborating';saveCases(cases);loadCollabCase()}
+}
+
+function renderVersionHistory(caseId){
+  const versions = loadVersions();
+  const list = versions[caseId]||[];
+  let html = '';
+  if(list.length===0){
+    html = '<div class="empty-state" style="padding:20px"><div class="text">暂无版本记录</div></div>';
+  }else{
+    list.slice().reverse().forEach(v=>{
+      html += '<div class="version-item"><span class="v-time">'+formatDate(v.time)+'</span><span class="v-summary">'+escHtml(v.summary)+'</span></div>';
+    });
+  }
+  document.getElementById('versionHistory').innerHTML = html;
+}
+
+/* ===== HELPERS ===== */
+function renderCaseCard(c){
+  let html = '<ml-tap class="case-item" onclick="';
+  if(currentRole==='master') html += 'openMasterWorkspace(\''+c.id+'\')';
+  else if(currentRole==='doctor') html += 'openDoctorWorkspace(\''+c.id+'\')';
+  else html += 'openMasterWorkspace(\''+c.id+'\')';
+  html += '" variant="card" role="button" tabindex="0">';
+  html += '<div class="case-id">'+c.id+' · '+formatDate(c.createdAt)+'</div>';
+  html += '<div class="case-name">'+escHtml(c.patient.name)+' · '+c.patient.age+'岁 · '+c.patient.gender+'</div>';
+  html += '<div class="case-symptom">'+escHtml(c.patient.symptoms)+'</div>';
+  html += '<div class="case-meta">';
+  html += '<span class="status-badge status-'+c.status+'">'+STATUS_LABELS[c.status]+'</span>';
+  if(c.masterAnalysis) html += '<span style="color:var(--gold2)">☯ 已分析</span>';
+  if(c.doctorDiagnosis) html += '<span style="color:var(--cyan2)">🩺 已咨询</span>';
+  html += '</div>';
+  html += '</ml-tap>';
+  return html;
+}
+
+function formatDate(iso){
+  if(!iso) return '-';
+  try{
+    const d = new Date(iso);
+    const Y = d.getFullYear();
+    const M = String(d.getMonth()+1).padStart(2,'0');
+    const D = String(d.getDate()).padStart(2,'0');
+    const h = String(d.getHours()).padStart(2,'0');
+    const m = String(d.getMinutes()).padStart(2,'0');
+    return Y+'-'+M+'-'+D+' '+h+':'+m;
+  }catch(e){return iso}
+}
+
+function escHtml(s){
+  if(s==null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/* ===== PATIENT INPUT CHANNELS ===== */
+function _genericVoiceStart(targetId,statusId){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const status=statusId?document.getElementById(statusId):null;
+  if(status){status.style.display='block';status.textContent='🎤 正在准备...';}
+  if(!SR){
+    if(status)status.textContent='您的浏览器不支持语音输入，请在 Chrome 或 Safari 中打开，或使用手动输入';
+    return;
+  }
+  const r=new SR();
+  r.lang='zh-CN';r.continuous=false;r.interimResults=true;
+  let ft='';
+  r.onstart=()=>{if(status)status.textContent='🎤 正在聆听，请说话...';};
+  r.onresult=e=>{
+    let im='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)ft+=e.results[i][0].transcript;
+      else im+=e.results[i][0].transcript;
+    }
+    const t=document.getElementById(targetId);
+    if(t) t.value=ft+im;
+  };
+  r.onerror=e=>{
+    if(status)status.textContent='语音识别出错：'+e.error+'（请使用手动输入）';
+  };
+  r.onend=()=>{
+    if(status){
+      status.textContent=ft.trim()?'✅ 录音完成：'+ft.length+'字':'录音未检测到声音';
+      setTimeout(()=>{if(status)status.style.display='none';},5000);
+    }
+  };
+  try{r.start();}catch(e){
+    if(status)status.textContent='无法启动语音识别';
+  }
+}
+function startMasterVoice(){_genericVoiceStart('masterNote','masterVoiceStatus')}
+function startDoctorVoice(){_genericVoiceStart('doc-diet','doctorVoiceStatus')}
+
+function handleSymptomPhoto(input){_photoFileHandler(input,'symptomFilePreview','【拍照附件】')}
+function handleMasterPhoto(input){_photoFileHandler(input,'masterFilePreview','【拍照附件】')}
+function handleDoctorPhoto(input){_photoFileHandler(input,'doctorFilePreview','【拍照附件】')}
+function _photoFileHandler(input,previewId,prefix){
+  const f=input.files[0];if(!f)return;
+  const preview=document.getElementById(previewId);
+  if(!preview)return;
+  preview.style.display='block';
+  preview.innerHTML='📷 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）<span class="ocr-status" style="font-size:11px;color:var(--gold,#c9a84c);margin-left:8px">⏳ OCR识别中…</span>';
+  if(f.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      preview.innerHTML+='<img src="'+e.target.result+'" style="max-width:100%;max-height:200px;margin-top:8px;border-radius:6px;display:block">';
+      // 【新增】拍照后自动调后端 OCR 提取文字（中医病历模式）
+      try{
+        const apiBase=(window.API_BASE||'');
+        const ocrResp=await window.OCRClient.tcm(e.target.result);
+        const statusEl=preview.querySelector('.ocr-status');
+        if(ocrResp&&ocrResp.ok&&ocrResp.text){
+          if(statusEl){statusEl.textContent='✅ OCR识别完成（'+ocrResp.engine+'）';statusEl.style.color='#5acf88';}
+          // 自动写入文本框：缩徻到前 1500 字
+          const textIdMap={'symptomFilePreview':'symptomText'};
+          const txtId=textIdMap[previewId];
+          if(txtId){
+            const txt=document.getElementById(txtId);
+            if(txt){
+              const cur=txt.value.trim();
+              const ocrTxt=ocrResp.text.length>1500?(ocrResp.text.slice(0,1500)+'…[已截断]'):ocrResp.text;
+              const add='【拍照OCR】'+ocrTxt;
+              if(!cur.includes(ocrTxt)) txt.value=(cur?cur+'\n\n':'')+add;
+              showToast('OCR已提取 '+ocrResp.text.length+' 字到文本框');
+            }
+          }
+        } else {
+          if(statusEl){statusEl.textContent='⚠️ OCR未可用（'+ (ocrResp&&ocrResp.engine||'unknown') +'）';statusEl.style.color='#e87a5a';}
+        }
+      }catch(err){
+        console.warn('OCR 调用失败',err);
+        const statusEl=preview.querySelector('.ocr-status');
+        if(statusEl){statusEl.textContent='⚠️ OCR服务不可达';statusEl.style.color='#e87a5a';}
+      }
+    };
+    reader.readAsDataURL(f);
+  }
+  /* 自动写入对应文本框（如有）*/
+  const textIdMap={'symptomFilePreview':'symptomText'};
+  const txtId=textIdMap[previewId];
+  if(txtId){
+    const txt=document.getElementById(txtId);
+    if(txt){
+      const cur=txt.value.trim();
+      const add=prefix+f.name;
+      if(!cur.includes(add)) txt.value=(cur?cur+'\n\n':'')+add;
+    }
+  }
+  showToast('已添加照片：'+f.name+'（'+Math.round(f.size/1024)+'KB）');
+  /* 清空 input 以便下次拍照同名文件也能触发 change */
+  setTimeout(()=>{input.value='';},1500);
+}
+
+function _genericFileHandler(input,previewId){
+  const f=input.files[0];if(!f)return;
+  const preview=document.getElementById(previewId);
+  if(!preview)return;
+  preview.style.display='block';
+  preview.innerHTML='📎 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）';
+  if(f.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      preview.innerHTML+='<img src="'+e.target.result+'" style="max-width:100%;max-height:150px;margin-top:6px;border-radius:4px">';
+    };
+    reader.readAsDataURL(f);
+  }
+}
+function handleMasterFile(input){_genericFileHandler(input,'masterFilePreview')}
+function handleDoctorFile(input){_genericFileHandler(input,'doctorFilePreview')}
+function startPatientVoice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const status=document.getElementById('voiceStatus');
+  if(status){status.style.display='block';status.textContent='🎤 正在准备...';}
+  if(!SR){
+    if(status)status.innerHTML='您的浏览器不支持语音输入，请手动输入或在浏览器设置中启用麦克风权限';
+    return;
+  }
+  const r=new SR();
+  r.lang='zh-CN';r.continuous=false;r.interimResults=true;
+  let ft='';
+  r.onstart=()=>{if(status)status.textContent='🎤 正在聆听，请说话...';};
+  r.onresult=e=>{
+    let im='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)ft+=e.results[i][0].transcript;
+      else im+=e.results[i][0].transcript;
+    }
+    document.getElementById('symptomText').value=ft+im;
+  };
+  r.onerror=e=>{
+    if(status)status.textContent='语音识别出错：'+e.error+'（请使用手动输入）';
+  };
+  r.onend=()=>{
+    if(status){
+      status.textContent=ft.trim()?'✅ 录音完成：'+ft.length+'字':'录音未检测到声音';
+    }
+  };
+  try{r.start();}catch(e){
+    if(status)status.textContent='无法启动语音识别，请使用手动输入';
+  }
+}
+
+function handleSymptomFile(input){
+  const f=input.files[0];
+  if(!f) return;
+  const preview=document.getElementById('symptomFilePreview');
+  preview.style.display='block';
+  preview.innerHTML='📎 '+escHtml(f.name)+' （'+Math.round(f.size/1024)+'KB）';
+  /* 可选：读取为base64 预览 */
+  if(f.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      preview.innerHTML+='<img src="'+e.target.result+'" style="max-width:100%;max-height:200px;margin-top:8px;border-radius:6px">';
+    };
+    reader.readAsDataURL(f);
+  }
+  /* 自动在文本框补充文件描述 */
+  const txt=document.getElementById('symptomText');
+  const cur=txt.value.trim();
+  const add='【附件】'+f.name;
+  if(!cur.includes(add)) txt.value=(cur?cur+'\n\n':'')+add;
+  showToast('文件已添加，点击「提交给专家」上传');
+}
+
+function switchSymptomInput(mode){
+  if(mode==='manual'){
+    document.getElementById('symptomText').focus();
+    showToast('请手动输入症状描述');
+  }
+}
+
+async function submitSymptom(){
+  const text=document.getElementById('symptomText').value.trim();
+  const file=document.getElementById('symptomFile').files[0];
+  if(!text && !file){
+    showToast('请输入症状描述或上传文件');
+    return;
+  }
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='提交中...';
+  try{
+    /* 如果有文件，用 FormData；否则 JSON */
+    let resp;
+    if(file){
+      const fd=new FormData();
+      fd.append('text',text);
+      fd.append('file',file);
+      const headers={};
+      const token=localStorage.getItem('ml_token');
+      if(token) headers['Authorization']='Bearer '+token;
+      const r=await fetch(API_BASE+'/api/clinic/submit-symptom',{method:'POST',headers,body:fd,signal:AbortSignal.timeout(15000)});
+      resp=await r.json();
+    }else{
+      resp=await apiCall('/api/clinic/submit-symptom','POST',{text,attachments:[]});
+    }
+    if(resp && resp.success){
+      showToast('✅ 已提交，专家正在分析中');
+      document.getElementById('symptomText').value='';
+      document.getElementById('symptomFile').value='';
+      document.getElementById('symptomFilePreview').style.display='none';
+      /* 本地缓存 */
+      const cases=loadCases();
+      cases.unshift({
+        id:'case_'+Date.now(),
+        role:'patient',status:'pending',
+        text,time:new Date().toISOString(),
+        attachments:file?[file.name]:[]
+      });
+      saveCases(cases);
+    }else{
+      showToast('提交成功（本地保存）');
+      const cases=loadCases();
+      cases.unshift({id:'case_'+Date.now(),role:'patient',status:'pending',text,time:new Date().toISOString()});
+      saveCases(cases);
+    }
+  }catch(e){
+    showToast('已保存到本地');
+  }finally{
+    btn.disabled=false;btn.textContent='📨 提交给专家';
+  }
+}
+
+/* ===== QR PLACEHOLDER ===== */
+function drawQR(){
+  const container = document.getElementById('qrPlaceholder');
+  if(!container) return;
+  // Fixed pattern (no Math.random)
+  const pattern = [
+    1,1,1,0,1,1,1,0,
+    1,0,1,1,0,1,0,1,
+    1,1,0,1,1,0,1,1,
+    0,1,1,0,0,1,1,0,
+    1,0,1,1,1,0,1,1,
+    1,1,0,0,1,1,0,1,
+    1,0,1,1,0,1,1,0,
+    0,1,1,0,1,0,1,1
+  ];
+  container.innerHTML = '';
+  pattern.forEach(v=>{
+    const cell = document.createElement('div');
+    cell.className = 'qr-cell'+(v?' filled':'');
+    container.appendChild(cell);
+  });
+}
+
+/* ===== INIT ===== */
+initSampleData();
+drawQR();
+// 默认显示健康工作台（新增）
+renderHealthTab();
+renderPatientReport();
+// Sync from API on load
+syncCasesFromAPI().then(()=>{
+  if(currentRole==='patient') renderPatientReport();
+  if(currentRole==='master') renderMasterList();
+  if(currentRole==='consultant') renderDoctorList();
+  if(currentRole==='doctor') renderDoctorList();
+  if(currentRole==='collab') renderCollabCases();
+  if(currentRole==='health') renderHealthTab();
+});
+
+// KB integration - use symptom data if available
+function getKBSymptoms(){
+  if(window.TCM_DIAGNOSIS_KB && TCM_DIAGNOSIS_KB.symptom_engine){
+    return TCM_DIAGNOSIS_KB.symptom_engine.symptoms || [];
+  }
+  return [];
+}
+
+/* ===== 中医健康咨询深度增强模块 (injected 20260721) ===== */
+
+(function(){
+  'use strict';
+
+  // ─── 工具函数 ───
+  function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+  function escHtml(s){if(!s)return'';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function $(id){return document.getElementById(id);}
+  function qs(sel,root){return (root||document).querySelector(sel);}
+  function qsa(sel,root){return Array.from((root||document).querySelectorAll(sel));}
+
+  // ─── 确定性命中分（去掉 Math.random） ───
+  function kbScore(symptomName, text){
+    let score = 0;
+    const t = text.toLowerCase();
+    // 精确匹配
+    if(t.includes(symptomName)) score += 0.6;
+    // 两字匹配
+    for(let i=0;i<symptomName.length-1;i++){
+      const sub = symptomName.substring(i,i+2);
+      if(t.includes(sub)) score += 0.08;
+    }
+    // 相关症状加分
+    const kb = window.TCM_DIAGNOSIS_KB;
+    if(!kb||!kb.symptom_engine) return score;
+    const syms = kb.symptom_engine.symptoms;
+    const match = syms.find(s=>s.name===symptomName);
+    if(match&&match.differential){
+      for(const diff of match.differential){
+        const parts = diff.split('→');
+        if(parts.length>0 && t.includes(parts[0].replace(/[·→]/g,'').trim().substring(0,4))){
+          score += 0.12;
+        }
+      }
+    }
+    return Math.min(1, score);
+  }
+
+  // ─── 问诊对话步骤（望闻问切） ───
+  const CONSULT_STEPS = [
+    { id:'welcome', icon:'🩺', title:'望诊 · 观察',
+      question:'请描述您观察到的身体变化：<br><small>如：面色、舌象、皮肤、精神状态、体型胖瘦</small>',
+      placeholder:'如：面色偏黄、舌苔厚腻、精神状态欠佳...' },
+    { id:'smell', icon:'👃', title:'闻诊 · 嗅听',
+      question:'请描述您的声音、气味、呼吸状态：<br><small>如：声音洪亮/低微、口臭/口苦、咳嗽痰声</small>',
+      placeholder:'如：声音低微、口苦口干、咳嗽痰多...' },
+    { id:'ask', icon:'💬', title:'问诊 · 体验',
+      question:'请描述您的感受和经历：<br><small>如：睡眠、饮食、二便、月经、疼痛部位、情绪</small>',
+      placeholder:'如：失眠多梦、腰膝酸软、月经不调、心情烦躁...' },
+    { id:'cut', icon:'🩸', title:'切诊 · 触知',
+      question:'请描述您的触感和脉象（如无法描述，可跳过）：<br><small>如：畏寒/怕热、脉搏快/慢、肢体麻木</small>',
+      placeholder:'如：手脚冰凉、脉搏有力、肢体麻木...' }
+  ];
+
+  let _consultStep = 0;
+  let _consultData = {wen:[],smell:[],ask:[],cut:[]};
+
+  function renderConsultStep(stepIdx){
+    if(!stepIdx && stepIdx!==0) stepIdx = _consultStep;
+    _consultStep = stepIdx;
+    const step = CONSULT_STEPS[stepIdx];
+    const total = CONSULT_STEPS.length;
+    const body = $('consultBody');
+    if(!body) return;
+    const isLast = stepIdx === total-1;
+    body.innerHTML = `
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:3px">${step.icon} ${step.title}</div>
+        <div style="font-size:11px;color:var(--paper3);margin-top:4px">第 ${stepIdx+1}/${total} 步</div>
+        <div style="display:flex;gap:4px;justify-content:center;margin-top:8px">
+          ${CONSULT_STEPS.map((_,i)=>'<div style="width:'+(32/total)+'px;height:3px;border-radius:2px;background:'+(i<=stepIdx?'var(--gold)':'rgba(201,168,76,0.15)')+'"></div>').join('')}
+        </div>
+      </div>
+      <div style="font-size:14px;color:var(--paper2);line-height:1.8;margin-bottom:12px">${step.question}</div>
+      <textarea class="form-textarea" id="consultInput" rows="3" placeholder="${step.placeholder}" style="margin-bottom:12px" aria-label="consultInput"></textarea>
+      <div class="btn-row">
+        ${stepIdx>0?'<button class="btn btn-secondary btn-sm" onclick="renderConsultStep('+(stepIdx-1)+')">← 上一步</button>':''}
+        <button class="btn btn-primary" onclick="submitConsultStep('${step.id}')">
+          ${isLast?'🔍 开始辨证分析':'下一步 →'}
+        </button>
+      </div>
+    `;
+    // 聚焦
+    setTimeout(()=>{const inp=$('consultInput');if(inp)inp.focus();},100);
+  }
+
+  window.submitConsultStep = function(stepId){
+    const input = $('consultInput');
+    const val = (input?input.value:'').trim();
+    if(!val){showToast('请描述您的情况');return;}
+    // 收集数据
+    _consultData[stepId] = val.split(/[，,。.；;\n]+/).map(s=>s.trim()).filter(Boolean);
+    // 推进到下一步
+    const next = _consultStep+1;
+    if(next < CONSULT_STEPS.length){
+      renderConsultStep(next);
+    } else {
+      // 完成四诊，开始分析
+      runDeepConsult();
+    }
+  };
+
+  window.startConsult = function(){
+    _consultStep = 0;
+    _consultData = {wen:[],smell:[],ask:[],cut:[]};
+    const body = $('consultBody');
+    if(body) body.style.display='block';
+    const result = $('consultResult');
+    if(result) result.style.display='none';
+    renderConsultStep(0);
+  };
+
+  // ─── 深度辨证分析（核心） ───
+  window.runDeepConsult = function(){
+    const reportEl = $('consultResult');
+    if(!reportEl) return;
+
+    // 收集所有文本
+    const allText = Object.values(_consultData).flat().join(' ').toLowerCase();
+    if(!allText){showToast('请先完成问诊步骤');return;}
+
+    // KB 症状匹配
+    const kbSyms = getKBSymptoms();
+    const matched = [];
+    for(const sym of kbSyms){
+      const sc = kbScore(sym.name, allText);
+      if(sc > 0.3) matched.push({...sym, score: sc});
+    }
+    matched.sort((a,b)=>b.score-a.score);
+    const topMatches = matched.slice(0,8);
+
+    // 证候聚合（从 matched 症状找共现证候）
+    const syndromeCount = {};
+    for(const m of topMatches){
+      for(const s of (m.syndromes||[])){
+        syndromeCount[s] = (syndromeCount[s]||0) + m.score;
+      }
+    }
+    const topSyndromes = Object.entries(syndromeCount)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,3)
+      .map(([name,score])=>[name, Math.min(95, Math.round(score*100+30))]);
+
+    // 从 KB syndrome_db 获取证候详情
+    const kb = window.TCM_DIAGNOSIS_KB;
+    let syndromeDetails = [];
+    if(kb&&kb.syndrome_db&&kb.syndrome_db.syndromes){
+      syndromeDetails = topSyndromes.map(([name])=>{
+        const found = kb.syndrome_db.syndromes.find(s=>s.name===name);
+        return found || {name, formulas:[], acupoints:[], treatment:'', mingli_link:''};
+      });
+    }
+
+    // 体质推断
+    const tizhiMap = {'阳虚':'yangxu','气虚':'qixu','阴虚':'yinxu','痰湿':'tanshi','湿热':'shire','血瘀':'xueyu','气郁':'qiyu','特禀':'tebing'};
+    const tizhiSignals = {};
+    const tizhiKeywords = {
+      '阳虚':['怕冷','畏寒','手脚凉','腰膝酸冷','夜尿频多','五更泻'],
+      '气虚':['乏力','气短','自汗','懒言','易感冒','食少'],
+      '阴虚':['口干','盗汗','五心烦热','腰膝酸软','遗精','耳鸣'],
+      '痰湿':['痰多','肥胖','身重','纳呆','口粘','体胖'],
+      '湿热':['面油','口苦','痤疮','身重困倦','大便粘'],
+      '血瘀':['痛处固定','瘀斑','面色晦暗','刺痛','肿块'],
+      '气郁':['情绪','抑郁','叹息','胸胁胀','善太息','烦躁'],
+      '特禀':['过敏','哮喘','鼻炎','皮疹','瘙痒']
+    };
+    for(const [tizhi,kws] of Object.entries(tizhiKeywords)){
+      const hits = kws.filter(kw=>allText.includes(kw)).length;
+      if(hits>0) tizhiSignals[tizhi] = hits;
+    }
+    const topTizhi = Object.entries(tizhiSignals).sort((a,b)=>b[1]-a[1]).slice(0,2);
+    let tizhiDetail = null;
+    if(kb&&kb.tizhi_mingli_union&&topTizhi.length){
+      const map = kb.tizhi_mingli_union.tizhi_mingli_map;
+      tizhiDetail = map.find(t=>t.tizhi===topTizhi[0][0]);
+    }
+
+    // 名医推荐（根据证候推荐）
+    const kbF = window.TCM_FAMOUS_FORMULAS_KB;
+    let recommendedDoctors = [];
+    if(kbF&&kbF.doctors){
+      const formulaNames = new Set();
+      syndromeDetails.forEach(s=>{(s.formulas||[]).forEach(f=>formulaNames.add(f));});
+      recommendedDoctors = kbF.doctors
+        .filter(d=>(d.signature_formulas||[]).some(f=>formulaNames.has(f)))
+        .slice(0,3);
+    }
+
+    // 生成报告
+    const now = new Date().toLocaleString('zh-CN');
+    let html = `
+      <div class="report-card" style="animation:fadeIn .5s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:3px">📋 中医健康咨询报告</div>
+          <div style="font-size:11px;color:var(--paper3)">${now}</div>
+        </div>
+        <div style="font-size:12px;color:var(--gold3);margin-bottom:16px;opacity:0.85">⚠️ 本报告基于中医养生理论，不构成医疗诊断。如有疾病请及时就医。</div>
+    `;
+
+    // 步骤1：您提供的信息
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">📝</span> 问诊记录</div>`;
+    for(const [stepId, data] of Object.entries(_consultData)){
+      if(!data.length) continue;
+      const labels = {wen:'望诊', smell:'闻诊', ask:'问诊', cut:'切诊'};
+      html += `<div style="margin-bottom:8px"><b style="color:var(--gold3)">${labels[stepId]||stepId}：</b>${data.map(s=>'<span class="report-tag">'+escHtml(s)+'</span>').join(' ')}</div>`;
+    }
+    html += `</div>`;
+
+    // 步骤2：KB 症状匹配
+    if(topMatches.length){
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">🔍</span> 症状分析（匹配 ${topMatches.length} 条）</div>
+        <div class="report-section-body">
+          ${topMatches.map(m=>`
+            <div class="kb-result-box">
+              <div class="kb-match-name">${m.name}<span class="kb-match-score">匹配度 ${Math.round(m.score*100)}%</span></div>
+              <div class="kb-match-desc">
+                <b>可能证候：</b>${(m.syndromes||[]).join('、')}<br>
+                <b>涉及脏腑：</b>${(m.organs||[]).join('、')} · <b>五行：</b>${m.element||'-'}<br>
+                <b>性质：</b>${m.nature||'-'} · <b>寒热：</b>${m.cold_hot||'-'} · <b>虚实：</b>${m.xu_shi||'-'}<br>
+                ${m.differential ? '<b>鉴别要点：</b><br>'+m.differential.map(d=>'· '+d).join('<br>'):''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    // 步骤3：证候辨证
+    if(topSyndromes.length){
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">🧠</span> 辨证结论</div>
+        <div class="report-section-body">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            ${topSyndromes.map(([name,score])=>'<span class="report-tag" style="font-size:15px;padding:6px 16px">'+name+' <span style="opacity:0.6">'+score+'%</span></span>').join('')}
+          </div>
+          ${syndromeDetails.map(sd=>`
+            <div style="background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:8px;padding:12px;margin-bottom:8px">
+              <div style="font-size:16px;color:var(--gold);margin-bottom:6px">${sd.name}</div>
+              <div style="font-size:13px;color:var(--paper2);line-height:1.8;margin-bottom:6px">
+                <b>治法：</b>${sd.treatment||'请咨询专业中医师'}<br>
+                <b>推荐方剂：</b>${(sd.formulas||[]).map(f=>'<span class="report-tag">'+f+'</span>').join('')}<br>
+                <b>常用穴位：</b>${(sd.acupoints||[]).map(a=>'<span class="report-tag">'+a+'</span>').join('')}
+              </div>
+              ${sd.mingli_link?'<div style="font-size:12px;color:var(--paper3);margin-top:6px;padding:6px 8px;background:rgba(255,255,255,0.02);border-radius:4px">☯️ 命理关联：'+escHtml(sd.mingli_link)+'</div>':''}
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    // 步骤4：体质辨识
+    if(tizhiDetail){
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">🌿</span> 体质辨识 · ${tizhiDetail.tizhi}</div>
+        <div class="report-section-body">
+          <p style="margin-bottom:8px">${tizhiDetail.features}</p>
+          <div style="font-size:13px;color:var(--paper2);line-height:1.8">
+            <b>五行关联：</b>${tizhiDetail.wuxing||'-'}<br>
+            <b>体质诊断：</b>${tizhiDetail.diagnosis_template||'-'}<br>
+            <b>🥗 食疗：</b>${tizhiDetail.diet||'-'}<br>
+            <b>💪 运动：</b>${tizhiDetail.exercise||'-'}<br>
+            <b>🌙 生活：</b>${tizhiDetail.lifestyle||'-'}
+          </div>
+        </div>
+      </div>`;
+
+      // 步骤4b：命理联合诊断
+      if(kb&&kb.tizhi_mingli_union&&topTizhi.length){
+        const baziElement = tizhiDetail.wuxing||'均衡';
+        html += `<div class="report-section">
+          <div class="report-section-title"><span class="icon">☯️</span> 体质 × 命理联合诊断</div>
+          <div class="report-section-body">
+            <div style="padding:12px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid rgba(201,168,76,0.15);border-radius:8px">
+              <p style="font-size:14px;color:var(--gold);line-height:1.8">
+                ${tizhiDetail.tizhi}体质 + 八字五行[${baziElement}] → 综合调理方案<br>
+                <small style="color:var(--paper3)">体质与命理双重维度：先天禀赋（体质）+ 后天五行（八字）共同决定调理方向</small>
+              </p>
+            </div>
+            ${topTizhi.map(([tizhi])=>{
+              const t = kb.tizhi_mingli_union.tizhi_mingli_map.find(x=>x.tizhi===tizhi);
+              if(!t) return '';
+              return `<div style="margin-top:8px;padding:8px 12px;background:rgba(255,255,255,0.02);border-radius:6px">
+                <b>${t.tizhi}体质调理：</b>${t.diagnosis_template}<br>
+                <small style="color:var(--paper3)">${t.diet} · ${t.exercise} · ${t.lifestyle}</small>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }
+    }
+
+    // 步骤5：名医推荐
+    if(recommendedDoctors.length){
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">📜</span> 名医推荐（针对您的证候）</div>
+        <div class="report-section-body">
+          ${recommendedDoctors.map(d=>`
+            <div style="display:flex;gap:12px;padding:10px;background:rgba(255,255,255,0.02);border-radius:8px;margin-bottom:6px">
+              <div style="font-size:24px">👨‍⚕️</div>
+              <div>
+                <div style="font-size:14px;color:var(--gold)">${d.name} <span style="font-size:11px;color:var(--paper3)">· ${d.era} · ${d.title}</span></div>
+                <div style="font-size:12px;color:var(--paper3);margin-top:2px">擅长：${(d.specialties||[]).join('、')}</div>
+                <div style="font-size:12px;color:var(--paper2);margin-top:4px;line-height:1.6">${escHtml(d.medical_theory||'')}</div>
+                ${d.signature_formulas?.length?'<div style="margin-top:4px">'+d.signature_formulas.map(f=>'<span class="report-tag">'+f+'</span>').join('')+'</div>':''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    // 步骤6：节气调养（根据当前月份）
+    const currentMonth = new Date().getMonth()+1;
+    const seasonMap = {3:'春季',4:'春季',5:'春季',6:'夏季',7:'夏季',8:'夏季',9:'长夏',10:'长夏',11:'秋季',12:'冬季',1:'冬季',2:'春季'};
+    const seasonName = seasonMap[currentMonth]||'春季';
+    if(kb&&kb.tizhi_mingli_union&&kb.tizhi_mingli_union.seasonal_adjustment){
+      const seasonData = kb.tizhi_mingli_union.seasonal_adjustment.find(s=>s.season===seasonName);
+      if(seasonData){
+        html += `<div class="report-section">
+          <div class="report-section-title"><span class="icon">🌸</span> 当季养生建议（${seasonName}）</div>
+          <div class="report-section-body">
+            <div style="padding:10px;background:rgba(39,174,96,0.06);border:1px solid rgba(39,174,96,0.2);border-radius:8px;margin-bottom:8px">
+              <div style="font-size:14px;color:var(--jade2);margin-bottom:4px">${seasonData.advice}</div>
+            </div>
+            <div style="font-size:13px;color:var(--paper2);line-height:1.8">
+              <b>推荐方剂：</b>${seasonData.formula||'-'}<br>
+              <b>推荐饮食：</b>${seasonData.diet||'-'}
+            </div>
+          </div>
+        </div>`;
+      }
+    }
+
+    // 步骤7：行动清单
+    const actions = [];
+    // 从证候生成
+    syndromeDetails.forEach(sd=>{
+      if(sd.formulas?.length) actions.push('💊 可考虑咨询中医师使用：'+(sd.formulas[0]));
+      if(sd.acupoints?.length) actions.push('💆 日常可按摩：'+sd.acupoints.slice(0,3).join('、'));
+    });
+    // 从体质生成
+    if(tizhiDetail){
+      actions.push('🥗 饮食：'+tizhiDetail.diet);
+      actions.push('💪 运动：'+tizhiDetail.exercise);
+      actions.push('🌙 起居：'+tizhiDetail.lifestyle);
+    }
+    // 从季节生成
+    if(seasonData){
+      actions.push('🌸 当季：'+seasonData.formula+'，多食'+seasonData.diet);
+    }
+    // 通用
+    actions.push('⏰ 保持23:00前入睡，子时胆经当令');
+    actions.push('🧘 每日静心15分钟，八段锦/太极各30分钟');
+    actions.push('🏥 建议定期中医师面诊辨证施治');
+    const uniqueActions = [...new Set(actions)].slice(0,10);
+
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">✅</span> 行动清单</div>
+      <ul class="action-checklist">
+        ${uniqueActions.map(a=>'<li>'+a+'</li>').join('')}
+      </ul>
+    </div>`;
+
+    html += `</div></div>`;
+    reportEl.innerHTML = html;
+    reportEl.style.display = 'block';
+    reportEl.scrollIntoView({behavior:'smooth', block:'start'});
+    showToast('✅ 辨证分析完成');
+  };
+
+  // ─── 体质报告增强（使用 KB 数据） ───
+  window.runHealthTizhiEnhanced = function(){
+    if(!_healthSelectedTizhi){
+      showToast('请先选择一种体质');
+      return;
+    }
+    const kb = window.TCM_DIAGNOSIS_KB;
+    const kbTizhi = kb&&kb.tizhi_mingli_union?kb.tizhi_mingli_union.tizhi_mingli_map.find(t=>t.tizhi_key===_healthSelectedTizhi):null;
+    // 回退兼容：用 TCM_TIZHI 的 key 匹配
+    const t = TCM_TIZHI.find(x=>x.key===_healthSelectedTizhi);
+    const kt = kbTizhi || (kb&&kb.tizhi_mingli_union?kb.tizhi_mingli_union.tizhi_mingli_map.find((_,i)=>i===['pinghe','qixu','yangxu','yinxu','tanshi','shire','xueyu','qiyu','tebing'].indexOf(_healthSelectedTizhi)):null);
+
+    const report = $('healthReport');
+    if(!report) return;
+    const names = {pinghe:'平和质',qixu:'气虚质',yangxu:'阳虚质',yinxu:'阴虚质',tanshi:'痰湿质',shire:'湿热质',xueyu:'血瘀质',qiyu:'气郁质',tebing:'特禀质'};
+    const tName = names[_healthSelectedTizhi]||_healthSelectedTizhi;
+
+    let html = `<div class="report-card">
+      <div style="font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:4px;margin-bottom:8px">🌿 ${tName} · 体质报告</div>
+      <div style="font-size:13px;color:var(--paper2);line-height:1.8;margin-bottom:12px">${t?t.desc:''}</div>
+    `;
+
+    // KB 体质详情
+    if(kt){
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">☯️</span> 体质-命理关联</div>
+        <div class="report-section-body">
+          <div style="font-size:13px;color:var(--paper2);line-height:1.8">
+            <b>五行定位：</b>${kt.wuxing||'-'}<br>
+            <b>诊断模板：</b>${kt.diagnosis_template||'-'}
+          </div>
+        </div>
+      </div>`;
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">🥗</span> 饮食调养</div>
+        <div class="report-section-body">${kt.diet||'-'}</div>
+      </div>`;
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">💪</span> 运动方案</div>
+        <div class="report-section-body">${kt.exercise||'-'}</div>
+      </div>`;
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">🌙</span> 生活起居</div>
+        <div class="report-section-body">${kt.lifestyle||'-'}</div>
+      </div>`;
+    }
+
+    // 四季调养
+    if(kb&&kb.tizhi_mingli_union){
+      const seasons = kb.tizhi_mingli_union.seasonal_adjustment;
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">🌸</span> 四季调养</div>
+        <div class="report-section-body">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px">
+            ${(seasons||[]).map(s=>`
+              <div style="padding:8px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);border-radius:6px">
+                <div style="font-size:13px;color:var(--gold)">${s.season} · ${s.element}</div>
+                <div style="font-size:11px;color:var(--paper3);margin-top:4px;line-height:1.5">${escHtml(s.advice)}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">✅</span> 调养要点</div>
+      <div class="report-section-body">
+        <ul class="action-checklist">
+          <li>${kt?kt.diet:'饮食均衡，五谷杂粮搭配'}</li>
+          <li>${kt?kt.exercise:'适度运动，太极拳、八段锦'}</li>
+          <li>${kt?kt.lifestyle:'起居有常，顺应四时'}</li>
+          <li>避免过度劳累，保证充足睡眠</li>
+          <li>建议中医师面诊辨证施治</li>
+        </ul>
+      </div>
+    </div>`;
+
+    html += `</div>`;
+    report.innerHTML = html;
+    report.scrollIntoView({behavior:'smooth',block:'start'});
+    showToast('✅ 体质报告已生成');
+  };
+
+  // ─── 食疗推荐增强 ───
+  window.runHealthFoodEnhanced = function(symptom){
+    const kb = window.TCM_DIAGNOSIS_KB;
+    if(!kb||!kb.symptom_engine) return;
+    const syms = kb.symptom_engine.symptoms;
+    const match = syms.find(s=>s.name===symptom) || syms[0];
+    const report = $('healthReport');
+    if(!report) return;
+
+    let html = `<div class="report-card">
+      <div style="font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--gold);letter-spacing:3px;margin-bottom:12px">🥗 ${symptom||'通用'} · 食疗推荐</div>`;
+
+    if(match){
+      // 从 KB 症状映射到证候，再从证候找食疗
+      const syndromeNames = match.syndromes||[];
+      html += `<div class="report-section">
+        <div class="report-section-title"><span class="icon">🔍</span> 对应证候</div>
+        <div class="report-section-body">
+          ${syndromeNames.map(s=>'<span class="report-tag">'+s+'</span>').join('')}
+        </div>
+      </div>`;
+
+      // KB 证候详情
+      if(kb.syndrome_db){
+        for(const sn of syndromeNames.slice(0,2)){
+          const sd = kb.syndrome_db.syndromes.find(s=>s.name===sn);
+          if(sd){
+            html += `<div class="report-section">
+              <div class="report-section-title"><span class="icon">💊</span> ${sd.name} · 食疗与调理</div>
+              <div class="report-section-body">
+                <p style="margin-bottom:8px"><b>治法：</b>${sd.treatment||'-'}</p>
+                <p style="margin-bottom:6px"><b>推荐方剂：</b></p>
+                <div style="margin-bottom:8px">${(sd.formulas||[]).map(f=>'<span class="report-tag">'+f+'</span>').join('')}</div>
+                <p style="margin-bottom:6px"><b>常用穴位：</b></p>
+                <div style="margin-bottom:8px">${(sd.acupoints||[]).map(a=>'<span class="report-tag">'+a+'</span>').join('')}</div>
+                ${sd.mingli_link?'<p style="font-size:12px;color:var(--paper3);margin-top:6px">☯️ '+escHtml(sd.mingli_link)+'</p>':''}
+              </div>
+            </div>`;
+          }
+        }
+      }
+    }
+
+    html += `<div class="report-section">
+      <div class="report-section-title"><span class="icon">🍽️</span> 饮食宜忌</div>
+      <div class="report-section-body">
+        <p style="margin-bottom:6px"><b>宜食：</b></p>
+        <div>${(TCM_TIZHI.find(t=>t.key===_healthSelectedTizhi)?TCM_TIZHI.find(t=>t.key===_healthSelectedTizhi).foods||[]:[]).map(f=>'<span class="report-tag">'+f+'</span>').join('')}</div>
+        <p style="margin:8px 0 6px"><b>忌食：</b></p>
+        <div style="color:var(--paper3);font-size:12px">${match?match.nature||'根据辨证结果判断':'-'}</div>
+      </div>
+    </div>`;
+    html += `</div>`;
+    report.innerHTML = html;
+    report.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+
+  // ─── 名医名方增强 ───
+  window.runHealthDoctorEnhanced = function(){
+    const kbF = window.TCM_FAMOUS_FORMULAS_KB;
+    const query = ($('healthDoctorSearch')||{}).value||'';
+    const report = $('healthDoctorResult');
+    if(!report) return;
+
+    if(!kbF||!kbF.doctors){
+      report.innerHTML = '<div style="color:var(--paper3);padding:12px">正在加载名医知识库...</div>';
+      return;
+    }
+
+    let doctors = kbF.doctors;
+    if(query){
+      const q = query.toLowerCase();
+      doctors = doctors.filter(d=>
+        d.name?.toLowerCase().includes(q)||
+        d.era?.toLowerCase().includes(q)||
+        d.title?.toLowerCase().includes(q)||
+        (d.specialties||[]).some(s=>s.toLowerCase().includes(q))||
+        (d.signature_formulas||[]).some(f=>f.toLowerCase().includes(q))
+      );
+    }
+
+    if(!doctors.length){
+      report.innerHTML = '<div style="color:var(--paper3);padding:12px">未找到匹配的名医</div>';
+      return;
+    }
+
+    const grouped = {};
+    for(const d of doctors){
+      const era = d.era||'其他';
+      if(!grouped[era]) grouped[era] = [];
+      grouped[era].push(d);
+    }
+
+    let html = `<div style="font-size:13px;color:var(--paper2);margin-bottom:12px">共找到 ${doctors.length} 位名医</div>`;
+    for(const [era, docs] of Object.entries(grouped)){
+      html += `<div style="margin-bottom:12px">
+        <div style="font-size:13px;color:var(--gold3);margin-bottom:6px;letter-spacing:1px">—— ${era} ——</div>
+        ${docs.map(d=>`
+          <div style="padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:20px">👨‍⚕️</span>
+              <div>
+                <span style="font-size:14px;color:var(--gold);font-weight:600">${d.name}</span>
+                <span style="font-size:11px;color:var(--paper3);margin-left:6px">${d.title||''}</span>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--paper3);margin-bottom:4px">擅长：${(d.specialties||[]).join('、')} · 著作：${(d.major_works||[]).join('、')}</div>
+            <div style="font-size:12px;color:var(--paper2);line-height:1.6;margin-bottom:4px">${escHtml(d.medical_theory||'')}</div>
+            ${d.signature_formulas?.length?'<div style="margin-top:4px">'+d.signature_formulas.map(f=>'<span class="report-tag">'+f+'</span>').join('')+'</div>':''}
+            ${d.case_study?'<div style="font-size:11px;color:var(--paper3);margin-top:4px;font-style:italic">📖 '+escHtml(d.case_study)+'</div>':''}
+            <div style="font-size:10px;color:var(--paper3);margin-top:4px;opacity:0.6">来源：${d.source||'-'}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+    report.innerHTML = html;
+    showToast('✅ 找到 '+doctors.length+' 位名医');
+  };
+
+  // ─── 曝光 TCM_FAMOUS_FORMULAS_KB 到全局 ───
+  window.TCM_FAMOUS_FORMULAS_KB = window.TCM_FAMOUS_FORMULAS_KB || {};
+
+  // ─── 初始化 ───
+  console.warn('[tcm-consult] 中医健康咨询深度模块已加载');
+
+})();
+/* ===== R37-A tcm-clinic 事业维度引擎 ===== */
+var TCM_CAREER_8D_R37={"正财":{"label":"💰 正财","icon":"💰","desc":"工资·稳定收入","tip":"稳中求进+主业为重+积累技能"},"偏财":{"label":"🎲 偏财","icon":"🎲","desc":"投资·副业·意外财","tip":"小额试水+长线思维+风险控制"},"官运":{"label":"👔 官运","icon":"👔","desc":"仕途·升迁·管理位","tip":"贵人扶持+业绩+持续学习+等待时机"},"学业":{"label":"📚 学业","icon":"📚","desc":"读书·考试·文凭","tip":"夯实基础+查漏补缺+请家教+选对方法"},"创业":{"label":"🚀 创业","icon":"🚀","desc":"自主·合伙·独资","tip":"小步快跑+核心壁垒+现金流+合伙人"},"升迁":{"label":"📈 升迁","icon":"📈","desc":"职场晋升·调岗·转型","tip":"业绩+人际+学习+抓住时机+主动争取"},"同事":{"label":"👥 同事","icon":"👥","desc":"上下级+同事关系","tip":"互相尊重+团队协作+不站队+做好本职"},"合作":{"label":"🤝 合作","icon":"🤝","desc":"合作伙伴·供应商","tip":"契约精神+互惠互利+长期主义+账目清晰"}};
+function renderTcmCareerPanelR37(){
+  var hS=74;var cS=79;
+  var h='<div class="tcm-career">';
+  h+='<div class="tcm-career-title">💼 中医临床·健康事业双核（8 健康维 + 8 事业维 · 21 古籍）</div>';
+  h+='<div class="tcm-career-dual">';
+  h+='<div class="tcm-core-card health"><div class="tcm-core-title">🩺 健康维度（8 维）</div><div class="tcm-core-score">'+hS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="tcm-core-bar"><div class="tcm-core-fill" style="width:'+hS+'%"></div></div><div style="font-size:11px;opacity:.85;margin-top:6px">🩸 气血 + 🍚 脾胃 + 💗 心肾 + 🌿 肝胆 + 😴 睡眠 + 😊 情绪 + 💪 体质 + 🎂 寿元</div></div>';
+  h+='<div class="tcm-core-card career"><div class="tcm-core-title">💼 事业维度（8 维）</div><div class="tcm-core-score">'+cS+'<span style="font-size:13px;opacity:.6">/100</span></div><div class="tcm-core-bar"><div class="tcm-core-fill" style="width:'+cS+'%"></div></div><div style="font-size:11px;opacity:.85;margin-top:6px">💰 正财 + 🎲 偏财 + 👔 官运 + 📚 学业 + 🚀 创业 + 📈 升迁 + 👥 同事 + 🤝 合作</div></div>';
+  h+='</div>';
+  h+='<div style="margin:10px 0 8px;color:var(--paper3);font-size:12px;letter-spacing:1.5px">📋 8 事业维度（中医生事业规划）</div>';
+  h+='<div class="tcm-career-8grid">';
+  Object.keys(TCM_CAREER_8D_R37||{}).forEach(function(k){var it=TCM_CAREER_8D_R37[k];
+    h+='<ml-tap class="tcm-career-cell" onclick="showToast(\''+it.label+'·'+it.desc+'\\n\\n行动建议：'+it.tip+'\')" variant="card" role="button" tabindex="0"><span class="icon">'+it.icon+'</span><b>'+it.label+'</b><div class="tip">'+it.desc+'</div><div class="tip" style="margin-top:4px;color:var(--gold)">👉 '+it.tip+'</div></ml-tap>';
+  });
+  h+='</div>';
+  h+='<div class="tcm-career-verdict"><b style="color:var(--gold)">💼 事业判读：</b><br>① 健康维度 '+hS+' 分（八维：气血/脾胃/心肾/肝胆/睡眠/情绪/体质/寿元）—— 八维均衡者无大碍，偏弱维度及时调理 ② 事业维度 '+cS+' 分（八维：正财/偏财/官运/学业/创业/升迁/同事/合作）—— 八维共进则事业长青 ③ 中医生专属建议：医德医术双修·守住本心·不为名利所动 ④ 化解要点：<b style="color:#4a8aa8">八事业维每周自检一次，弱项优先补强</b></div>';
+  h+='<div class="tcm-career-source">📜 综合《黄帝内经》《千金要方》《伤寒杂病论》《本草纲目》《针灸甲乙经》《素问注》《滴天髓》《子平真诠》《三命通会》《紫微斗数全集》《奇门遁甲》《梅花易数》《阳宅三要》《八宅明镜》《玄空飞星》《葬书》《撼龙经》《了凡四训》《阴骘文》《太上感应篇》《玉历宝钞》共 21 部古籍</div>';
+  h+='</div>';
+  return h;
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/offline.html">
+  <meta name="theme-color" content="#1a1207">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="离线模式页面 · 命理宝鉴">
+  <title>离线模式 · 命理宝鉴</title>
+  <style>
+    body { margin:0; min-height:100vh; font-family:'Noto Serif SC','Ma Shan Zheng',serif;
+      background:radial-gradient(circle at 50% 30%, #2c1810 0%, #0d0d1a 70%);
+      color:#f5ebd8; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .box { max-width:480px; text-align:center; padding:32px;
+      background:rgba(201,168,76,.08); border:2px solid #c9a84c; border-radius:16px; }
+    .icon { font-size:64px; margin-bottom:12px; opacity:.85; }
+    h1 { margin:8px 0; font-size:24px; color:#c9a84c; }
+    p { line-height:1.8; opacity:.8; }
+    .modules { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:20px 0; }
+    .module { padding:14px; background:rgba(201,168,76,.06); border:1px solid rgba(201,168,76,.3);
+      border-radius:10px; font-size:13px; text-decoration:none; color:#f5ebd8;
+      transition:transform .2s; display:block; }
+    .module:hover { transform:translateY(-2px); background:rgba(201,168,76,.12); }
+    .module .m-ico { font-size:24px; display:block; margin-bottom:6px; }
+    .footer { margin-top:16px; font-size:11px; opacity:.5; }
+    @media(max-width:360px){
+      .box{padding:20px 16px;max-width:100%}
+      h1{font-size:18px}
+      .modules{grid-template-columns:1fr;gap:8px}
+      .module{padding:10px;font-size:12px}
+    }
+
+    @media print {
+      .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+      body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+      .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+      a { color: #000 !important; text-decoration: underline; }
+      img { max-width: 100% !important; }
+      table { width: 100% !important; border-collapse: collapse; }
+      th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+      h1, h2, h3 { page-break-after: avoid; }
+      .page-break { page-break-before: always; }
+      .report-card, .info-card, .detail-card { break-inside: avoid; }
+    }
+  </style>
+<link rel="stylesheet" href="css/theme-systems.css"><link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-ai">
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">离线模式</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
+  <div class="box">
+    <div class="icon">🌙</div>
+    <h1>当前处于离线模式</h1>
+    <p>网络连接丢失 · 多数功能仍可使用（基于浏览器本地缓存）</p>
+    <div class="modules">
+      <a class="module" href="./divination-hub.html"><span class="m-ico">⌖</span>命理入口</a>
+      <a class="module" href="./ai-assistant.html"><span class="m-ico">∫</span>智能助手（已缓存）</a>
+      <a class="module" href="./divination-almanac.html"><span class="m-ico">🗓</span>黄历（仅本地数据）</a>
+      <a class="module" href="./kb-explorer.html"><span class="m-ico">⛁</span>KB 浏览器（仅已加载）</a>
+    </div>
+    <div class="footer">© 命理宝鉴 · R89-L 离线版<br>网络恢复后会自动同步本地缓存</div>
+  </div>
+  <script>
+    // 监听上线事件，自动通知用户并尝试重新加载
+    window.addEventListener('online', function(){
+      var b=document.querySelector('.box');
+      b.innerHTML='<div class="icon">✅</div><h1 style="color:#10b981">网络已恢复</h1><p>2 秒后自动回到命理宝鉴</p>';
+      setTimeout(function(){ location.reload(); }, 2000);
+    });
+  </script>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="体检报告 OCR · 易道智鉴平台">
+<meta name="keywords" content="体检报告 OCR">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/report-ocr.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="体检报告 OCR · 命理宝鉴">
+<meta property="og:description" content="体检报告 OCR · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>体检报告 OCR · 命理宝鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/report-interpret.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--orange:#ed8936;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:900px;margin:0 auto}
+h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
+.subtitle{text-align:center;font-size:12px;color:var(--muted);margin-bottom:14px}
+.nav-back{display:inline-block;color:var(--gold);text-decoration:none;font-size:12px;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--gold);margin-bottom:10px;border-left:3px solid var(--gold);padding-left:8px}
+.upload-zone{border:2px dashed var(--gold);border-radius:10px;padding:30px 20px;text-align:center;background:rgba(201,168,76,.05);cursor:pointer;transition:all .2s}
+.upload-zone:hover{background:rgba(201,168,76,.12)}
+.upload-zone.dragover{background:rgba(201,168,76,.2);border-color:var(--green)}
+.upload-icon{font-size:42px;margin-bottom:8px}
+.upload-hint{font-size:13px;color:var(--muted);line-height:1.6}
+.preview-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media(max-width:480px){.preview-row{grid-template-columns:1fr}}
+.preview-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px}
+.preview-title{font-size:11px;color:var(--muted);margin-bottom:6px}
+.preview-img{width:100%;border-radius:6px;max-height:280px;object-fit:contain;background:#000}
+.ocr-text{width:100%;min-height:200px;padding:8px;background:#000;color:var(--green);font-family:'SF Mono',Monaco,monospace;font-size:11px;border:none;border-radius:6px;resize:vertical}
+.btn{padding:10px 18px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;margin:4px}
+.btn-sm{padding:6px 12px;font-size:11px}
+.btn-secondary{background:var(--blue)}
+.btn-green{background:var(--green)}
+.btn:disabled{background:#555;color:#999;cursor:not-allowed}
+.parsed-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+@media(max-width:480px){.parsed-grid{grid-template-columns:1fr}}
+.parsed-item{background:var(--bg);padding:10px;border-radius:6px;border-left:3px solid var(--blue)}
+.parsed-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.parsed-value{font-size:14px;font-weight:600}
+.parsed-flag{font-size:10px;margin-top:4px}
+.flag-high{color:var(--red)}
+.flag-low{color:var(--blue)}
+.flag-normal{color:var(--green)}
+.flag-abnormal{color:var(--orange)}
+.interpret-card{background:linear-gradient(135deg,rgba(159,122,234,.1),rgba(66,153,225,.1));border:1px solid var(--purple);padding:14px;border-radius:10px;margin-top:12px}
+.interpret-title{font-size:14px;color:var(--purple);font-weight:600;margin-bottom:8px}
+.interpret-line{font-size:12px;line-height:1.8;margin-bottom:4px}
+.interpret-line b{color:var(--gold)}
+.loading{text-align:center;padding:20px;color:var(--muted)}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--muted);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;margin-right:4px;background:rgba(66,153,225,.2);color:var(--blue)}
+@media(max-width:360px){body{padding:8px 6px 56px;font-size:13px}h1{font-size:18px}h2{font-size:15px}.container,.wrap,.content{padding:8px 6px}.card,.panel,.box{padding:10px 8px;margin-bottom:8px}.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;gap:8px}.stat-grid,.stat-row{grid-template-columns:1fr 1fr;gap:6px}.btn,.button{font-size:12px;padding:6px 12px}input,select,textarea{font-size:13px;padding:6px 8px}label{font-size:12px}}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">体检报告 OCR</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>上传图片</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>OCR识别</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>校对修正</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>生成报告</span></div></div>
+<div class="flow-hint">查看体检报告 OCR · 命理宝鉴，了解功能详情与使用方式。</div>
+</div>
+<a href="person-center.html" class="nav-back">← 返回身份中心</a>
+<h1>表 体检报告 OCR · 智能解读</h1>
+<div class="subtitle">拍照上传 → AI 识别指标 → 自动入档案 → 四维融合解读</div>
+
+<div class="card">
+<div class="card-title">出 上传报告</div>
+<div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+<div class="upload-icon">拍</div>
+<div class="upload-hint">点击或拖拽上传体检报告图片<br>支持 JPG / PNG / WEBP · 多页可分次上传</div>
+<input aria-label="输入" type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)">
+</div>
+<div class="hint">示 建议：光线充足 + 文字清晰 + 整张报告入镜。OCR 引擎：智谱 GLM-4V + 离线 PIL 兜底</div>
+</div>
+
+<div class="card" id="previewCard" style="display:none">
+<div class="card-title">查 预览 & 识别</div>
+<div class="preview-row">
+<div class="preview-box">
+<div class="preview-title">原图</div>
+<img loading="lazy" id="previewImg" class="preview-img" alt="">
+</div>
+<div class="preview-box">
+<div class="preview-title">OCR 原始识别 <span id="engineBadge"></span></div>
+<textarea id="ocrText" class="ocr-text" placeholder="OCR 识别结果将显示在这里…" readonly aria-label="OCR 识别结果将显示在这里…"></textarea>
+</div>
+</div>
+<div style="margin-top:10px">
+<button class="btn" id="btnOcr" onclick="doOCR()">查 开始 OCR 识别</button>
+<button class="btn btn-secondary btn-sm" onclick="editOcr()">写 手动修正</button>
+<button class="btn btn-green btn-sm" onclick="parseAndSave()">存 解析并入档案</button>
+</div>
+<div class="hint" id="ocrStatus"></div>
+</div>
+
+<div class="card" id="parsedCard" style="display:none">
+<div class="card-title">图 解析的检查指标</div>
+<div id="parsedGrid" class="parsed-grid"></div>
+<button class="btn" style="margin-top:10px" onclick="interpret()">卦 四维融合解读</button>
+</div>
+
+<div class="card" id="interpretCard" style="display:none"></div>
+
+<div class="card">
+<div class="card-title">示 解读维度</div>
+<div style="font-size:12px;line-height:1.8">
+<b style="color:var(--gold)">西医层</b>：直接读取指标异常值<br>
+<b style="color:var(--green)">中医层</b>：基于舌脉+症状推断证型<br>
+<b style="color:var(--purple)">命理层</b>：结合日主五行推断易感器官<br>
+<b style="color:var(--orange)">家族遗传层</b>：叠加家族病史预警
+</div>
+</div>
+
+<script src="js/ocr-client.js"></script>
+<script src="js/report-interpret-engine.js"></script>
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var USER_ID=4;
+var currentImageB64='';
+var ocrResult=null;
+var parsedItems=[];
+
+function $(id){return document.getElementById(id)}
+
+document.addEventListener('DOMContentLoaded',function(){
+var z=$('uploadZone');
+z.addEventListener('dragover',function(e){e.preventDefault();z.classList.add('dragover')});
+z.addEventListener('dragleave',function(){z.classList.remove('dragover')});
+z.addEventListener('drop',function(e){
+e.preventDefault();z.classList.remove('dragover');
+var f=e.dataTransfer.files[0];
+if(f)processFile(f);
+});
+});
+
+function handleFile(e){var f=e.target.files[0];if(f)processFile(f)}
+
+function processFile(f){
+if(f.size>10*1024*1024){console.warn('图片不能超过 10MB');return}
+var r=new FileReader();
+r.onload=function(e){
+currentImageB64=e.target.result.split(',')[1];
+$('previewImg').src=e.target.result;
+$('previewCard').style.display='block';
+$('parsedCard').style.display='none';
+$('interpretCard').style.display='none';
+$('ocrText').value='点击「开始 OCR 识别」按钮';
+$('ocrStatus').innerHTML='';
+};
+r.readAsDataURL(f);
+}
+
+async function getCsrf(){
+try{var r=await fetch(API+'/api/csrf',{credentials:'include',signal: AbortSignal.timeout(15000)});var j=await r.json();return j.csrf_token||j.data&&j.data.csrf_token||''}catch(e){return ''}
+}
+
+async function doOCR(){
+if(!currentImageB64){console.warn('请先上传图片');return}
+$('btnOcr').disabled=true;
+$('ocrStatus').innerHTML='<span class="spinner"></span> 正在 OCR 识别，预计 3-8 秒…';
+var result=await OCRClient.report(currentImageB64);
+if(result.ok){
+$('ocrText').value=result.text;
+$('engineBadge').innerHTML='<span class="badge">引擎：'+result.engine+'</span>';
+$('ocrStatus').innerHTML='✅ 识别完成 · 共 '+result.text.length+' 字符 · '+result.latency+'ms';
+ocrResult=result;
+parseOcrText(result.text);
+}else{
+$('ocrStatus').innerHTML='❌ '+(result.text||result.error||'识别失败')+'<br>请确认 face-ocr-server (8913) 在线';
+}
+$('btnOcr').disabled=false;
+}
+
+function editOcr(){$('ocrText').readOnly=false;$('ocrText').focus()}
+
+// 体检报告 OCR 文本解析
+function parseOcrText(text){
+parsedItems=[];
+var lines=text.split(/[\n\r]+/);
+
+// 血压
+var bp=lines.find(l=>/血压|BP|收缩压|舒张压/i.test(l));
+if(bp){
+var m=bp.match(/(\d{2,3})\s*[\/\\]\s*(\d{2,3})/);
+if(m)parsedItems.push({label:'血压',value:m[1]+'/'+m[2]+' mmHg',unit:'mmHg',flag:parseBPFlag(parseInt(m[1]),parseInt(m[2]))});
+else{
+var m2=bp.match(/(\d{2,3})\/(\d{2,3})/);
+if(m2)parsedItems.push({label:'血压',value:m2[1]+'/'+m2[2]+' mmHg',unit:'mmHg',flag:parseBPFlag(parseInt(m2[1]),parseInt(m2[2]))});
+}
+}
+
+// 心率
+var hr=lines.find(l=>/心率|HR|脉搏/i.test(l));
+if(hr){
+var m=hr.match(/(\d{2,3})\s*(次\/分|bpm)?/i);
+if(m&&parseInt(m[1])>30&&parseInt(m[1])<200)parsedItems.push({label:'心率',value:m[1]+' bpm',unit:'bpm',flag:parseHRFlag(parseInt(m[1]))});
+}
+
+// 空腹血糖
+var glu=lines.find(l=>/血糖|GLU|空腹血糖|FBS/i.test(l));
+if(glu){
+var m=glu.match(/(\d+\.?\d*)\s*(mmol\/L)?/);
+if(m&&parseFloat(m[1])>2&&parseFloat(m[1])<30)parsedItems.push({label:'空腹血糖',value:m[1]+' mmol/L',unit:'mmol/L',flag:parseGluFlag(parseFloat(m[1]))});
+}
+
+// 血脂
+['总胆固醇','甘油三酯','HDL','LDL','高密度','低密度'].forEach(function(k){
+var line=lines.find(l=>l.indexOf(k)>-1);
+if(line){
+var m=line.match(/(\d+\.?\d*)\s*(mmol\/L)?/);
+if(m&&parseFloat(m[1])>0&&parseFloat(m[1])<20)parsedItems.push({label:k,value:m[1]+' mmol/L',unit:'mmol/L',flag:'检测到'});
+}
+});
+
+// 肝功能
+['ALT','AST','谷丙','谷草','总胆红素'].forEach(function(k){
+var line=lines.find(l=>l.indexOf(k)>-1);
+if(line){
+var m=line.match(/(\d+\.?\d*)\s*(U\/L|umol\/L)?/);
+if(m&&parseFloat(m[1])>0&&parseFloat(m[1])<2000)parsedItems.push({label:k,value:m[1]+' '+(m[2]||'U/L'),unit:m[2]||'U/L',flag:'检测到'});
+}
+});
+
+// 肾功能
+['肌酐','尿素氮','尿酸','Cr','BUN','UA'].forEach(function(k){
+var line=lines.find(l=>l.indexOf(k)>-1);
+if(line){
+var m=line.match(/(\d+\.?\d*)\s*(umol\/L|mmol\/L|mg\/dL)?/);
+if(m&&parseFloat(m[1])>0&&parseFloat(m[1])<2000)parsedItems.push({label:k,value:m[1]+' '+(m[2]||'umol/L'),unit:m[2]||'umol/L',flag:'检测到'});
+}
+});
+
+// 血常规
+['血红蛋白','HGB','白细胞','WBC','红细胞','RBC','血小板','PLT'].forEach(function(k){
+var line=lines.find(l=>l.indexOf(k)>-1);
+if(line){
+var m=line.match(/(\d+\.?\d*)/);
+if(m&&parseFloat(m[1])>0)parsedItems.push({label:k,value:m[1],unit:'参考范围',flag:'检测到'});
+}
+});
+
+renderParsed();
+}
+
+function parseBPFlag(s,d){
+if(s>=140||d>=90)return{label:'偏高',cls:'flag-high'};
+if(s<90||d<60)return{label:'偏低',cls:'flag-low'};
+return{label:'正常',cls:'flag-normal'};
+}
+
+function parseHRFlag(hr){
+if(hr>100)return{label:'偏快',cls:'flag-high'};
+if(hr<60)return{label:'偏慢',cls:'flag-low'};
+return{label:'正常',cls:'flag-normal'};
+}
+
+function parseGluFlag(g){
+if(g>=7.0)return{label:'偏高',cls:'flag-high'};
+if(g<3.9)return{label:'偏低',cls:'flag-low'};
+return{label:'正常',cls:'flag-normal'};
+}
+
+function renderParsed(){
+if(parsedItems.length===0){$('parsedCard').style.display='none';return}
+var h='';
+parsedItems.forEach(function(it){
+h+='<div class="parsed-item">';
+h+='<div class="parsed-label">'+it.label+'</div>';
+h+='<div class="parsed-value">'+it.value+'</div>';
+if(it.flag&&it.flag.label)h+='<div class="parsed-flag '+it.flag.cls+'">● '+it.flag.label+'</div>';
+h+='</div>';
+});
+$('parsedGrid').innerHTML=h;
+$('parsedCard').style.display='block';
+}
+
+async function parseAndSave(){
+if(parsedItems.length===0){console.warn('请先做 OCR 识别');return}
+
+// 构造 payload
+var payload={user_id:USER_ID,last_report_date:new Date().toISOString()};
+parsedItems.forEach(function(it){
+var l=it.label.toLowerCase();
+if(it.label==='血压')payload.bp=it.value;
+else if(it.label==='心率')payload.hr=it.value;
+else if(it.label==='空腹血糖')payload.glucose=it.value;
+else if(['总胆固醇','甘油三酯','HDL','LDL','高密度','低密度'].indexOf(it.label)>-1)payload.lipid=(payload.lipid||'')+it.label+':'+it.value+' ';
+else if(['ALT','AST','谷丙','谷草','总胆红素'].indexOf(it.label)>-1)payload.liver=(payload.liver||'')+it.label+':'+it.value+' ';
+else if(['肌酐','尿素氮','尿酸','Cr','BUN','UA'].indexOf(it.label)>-1)payload.kidney=(payload.kidney||'')+it.label+':'+it.value+' ';
+else if(['血红蛋白','HGB','白细胞','WBC','红细胞','RBC','血小板','PLT'].indexOf(it.label)>-1)payload.cbc=(payload.cbc||'')+it.label+':'+it.value+' ';
+});
+
+try{
+var csrf=await getCsrf();
+var r=await fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrf},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload),credentials:'include',signal: AbortSignal.timeout(15000)});
+var j=await r.json();
+if(j.code===200){
+console.warn('✅ 已保存到康养人档案！');
+}else{
+console.warn('保存失败: '+j.message);
+}
+}catch(e){console.warn('请求失败: '+esc(e.message))}
+}
+
+async function interpret(){
+if(parsedItems.length===0){console.warn('请先做 OCR 识别');return}
+
+var ic=$('interpretCard');ic.style.display='block';
+ic.innerHTML='<div class="loading"><span class="spinner"></span> 正在融合四维数据…</div>';
+
+// R249: 使用统一报告解读引擎
+try{
+  var r=await fetch(API+'/api/wellness/profile/'+USER_ID,{signal: AbortSignal.timeout(15000)});
+  var j=await r.json();
+  var p=j.data||{};
+}catch(e){var p={}}
+
+var result = window.ReportInterpret.interpret({
+  source: 'ocr',
+  items: parsedItems,
+  profile: {day_master:p.day_master, day_element:p.day_element, family_genetic:p.family_genetic, symptoms:p.symptoms},
+  userId: USER_ID
+});
+
+window.ReportInterpret.renderTo('interpretCard', result, {style:'card'});
+return;
+
+try{
+var r=await fetch(API+'/api/wellness/profile/'+USER_ID,{signal:AbortSignal.timeout(15000)});
+var j=await r.json();
+var p=j.data||{};
+}catch(e){var p={}}
+
+var abnormal=parsedItems.filter(function(it){return it.flag&&it.flag.cls==='flag-high'});
+var low=parsedItems.filter(function(it){return it.flag&&it.flag.cls==='flag-low'});
+
+var h='<div class="card-title">卦 四维融合解读</div>';
+
+// 西医层
+h+='<div class="interpret-card" style="border-left-color:var(--blue)">';
+h+='<div class="interpret-title" style="color:var(--blue)">① 西医指标分析</div>';
+if(abnormal.length>0){
+h+='<div class="interpret-line">警 偏高项：<b>'+abnormal.map(function(i){return i.label+'('+i.value+')'}).join('、')+'</b></div>';
+}
+if(low.length>0){
+h+='<div class="interpret-line">↓ 偏低项：<b>'+low.map(function(i){return i.label+'('+i.value+')'}).join('、')+'</b></div>';
+}
+if(abnormal.length===0&&low.length===0){
+h+='<div class="interpret-line">成 检测项均在正常参考范围内</div>';
+}
+h+='</div>';
+
+// 中医层（基于西医指标推断证型）
+h+='<div class="interpret-card" style="border-left-color:var(--green)">';
+h+='<div class="interpret-title" style="color:var(--green)">② 中医辨证推断</div>';
+var tcmHints=[];
+if(abnormal.find(function(i){return i.label==='血压'})){tcmHints.push('血压偏高 → 肝阳上亢型，建议平肝潜阳');}
+if(abnormal.find(function(i){return i.label==='空腹血糖'})){tcmHints.push('血糖偏高 → 阴虚燥热型，注意养阴');}
+if(parsedItems.find(function(i){return i.label.indexOf('ALT')>-1||i.label.indexOf('AST')>-1}))tcmHints.push('肝酶异常 → 肝胆湿热可能，注意疏肝');
+if(parsedItems.find(function(i){return i.label.indexOf('尿酸')>-1||i.label==='UA'})){tcmHints.push('尿酸相关 → 湿热痹阻，注意饮食');}
+if(tcmHints.length===0)tcmHints.push('当前指标未见明显中医证型倾向');
+h+='<div class="interpret-line">'+tcmHints.map(function(t){return '• '+t}).join('<br>')+'</div>';
+h+='</div>';
+
+// 命理层
+h+='<div class="interpret-card" style="border-left-color:var(--purple)">';
+h+='<div class="interpret-title" style="color:var(--purple)">③ 命理五行易感器官</div>';
+var organMap={木:'肝胆',火:'心血管/小肠',土:'脾胃',金:'肺/大肠',水:'肾/膀胱'};
+var dm=p.day_element||p.day_master||'未知';
+h+='<div class="interpret-line">日主 <b>'+(p.day_master||'')+'</b>(<b>'+dm+'</b>) → 易感器官：<b>'+organMap[dm]+'</b></div>';
+if(dm==='火'&&abnormal.find(function(i){return i.label==='血压'})){
+h+='<div class="interpret-line">警 火日主 + 血压偏高 = 心血管系统需重点关注</div>';
+}
+if(dm==='木'&&parsedItems.find(function(i){return i.label.indexOf('ALT')>-1})){
+h+='<div class="interpret-line">警 木日主 + 肝酶异常 = 肝胆系统预警</div>';
+}
+h+='</div>';
+
+// 家族遗传层
+h+='<div class="interpret-card" style="border-left-color:var(--orange)">';
+h+='<div class="interpret-title" style="color:var(--orange)">④ 家族遗传叠加</div>';
+var fg=p.family_genetic||'';
+if(fg&&fg!=='无'){
+h+='<div class="interpret-line">家族遗传：<b>'+fg+'</b></div>';
+if(fg.indexOf('高血压')>-1&&abnormal.find(function(i){return i.label==='血压'})){
+h+='<div class="interpret-line" style="color:var(--red)">警 家族高血压 + 本人血压偏高 = 风险加倍，需立即干预</div>';
+}
+if(fg.indexOf('糖尿病')>-1&&abnormal.find(function(i){return i.label==='空腹血糖'})){
+h+='<div class="interpret-line" style="color:var(--red)">警 家族糖尿病 + 本人血糖偏高 = 风险加倍，建议复查糖化血红蛋白</div>';
+}
+if(fg.indexOf('肿瘤')>-1){
+h+='<div class="interpret-line">家族肿瘤史 → 建议每年专项筛查（与日主器官对应）</div>';
+}
+}else{
+h+='<div class="interpret-line">未登记家族遗传史</div>';
+}
+h+='</div>';
+
+ic.innerHTML=h;
+}
+</script>
+  <script src="js/mobile-nav.js" defer></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

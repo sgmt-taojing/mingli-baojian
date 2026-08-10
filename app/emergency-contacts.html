@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="紧急联系人管理 · 一键呼叫家属 · 易道智鉴">
+<meta name="keywords" content="紧急联系人,SOS,家属">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/emergency-contacts.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<title>紧急联系人 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:520px;margin:0 auto;min-height:100vh}
+h1{color:var(--gold);font-size:17px;margin-bottom:4px;text-align:center}
+.sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;padding:9px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;margin-bottom:8px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px}
+.btn-red{background:var(--red);color:#fff}
+.contact-item{display:flex;justify-content:space-between;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin:8px 0}
+.contact-item .info{flex:1}
+.contact-item .name{font-weight:600;font-size:14px}
+.contact-item .phone{font-size:12px;color:var(--muted);margin-top:2px}
+.contact-item .rel{font-size:11px;color:var(--blue);margin-top:2px}
+.contact-item .del{background:var(--red);border:none;border-radius:6px;padding:6px 12px;color:#fff;font-size:12px;cursor:pointer}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:20px}
+.sos-tip{background:linear-gradient(135deg,rgba(220,38,38,.12),rgba(201,168,76,.08));border:1px solid rgba(220,38,38,.4);border-radius:10px;padding:12px;font-size:12px;line-height:1.8;margin-bottom:12px}
+@media(max-width:360px){body{padding:8px 6px}.card{padding:10px 8px}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">紧急联系人</span>
+  </div>
+  <a class="phb-back" href="person-center.html">← 返回</a>
+</header>
+<main>
+
+<div class="sos-tip">
+🚨 <b>紧急情况提醒</b>：设置紧急联系人后，触发 SOS 时将自动通知家属。紧急情况下请优先拨打 <b style="color:#f87171">120</b>。
+</div>
+
+<div class="card">
+<div class="card-title">我的紧急联系人</div>
+<div id="contact-list"><div class="empty">加载中...</div></div>
+</div>
+
+<div class="card">
+<div class="card-title">新增联系人</div>
+<label>姓名</label>
+<input id="c-name" placeholder="例如：妈妈 / 李叔叔" aria-label="姓名">
+<label>手机号</label>
+<input id="c-phone" type="tel" placeholder="11 位手机号" aria-label="手机号" inputmode="numeric">
+<label>关系</label>
+<select id="c-rel" aria-label="关系">
+  <option value="">选择关系</option>
+  <option>配偶</option><option>子女</option><option>父母</option><option>兄弟姐妹</option><option>其他亲属</option><option>邻居</option><option>护工</option>
+</select>
+<button class="btn" onclick="addContact()">➕ 添加联系人</button>
+</div>
+
+<div style="text-align:center;margin-top:8px">
+<a href="sos.html" style="display:inline-block;background:var(--red);color:#fff;text-decoration:none;border-radius:20px;padding:10px 28px;font-size:14px;font-weight:600">🚨 前往 SOS 页面</a>
+</div>
+
+</main>
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localStorage('admin_token')||localStorage.getItem('token')||'';
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}
+
+function loadContacts(){
+  fetch(API+'/api/clinic/emergency-contacts',{headers:authHeaders(),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", esc(e.message)); })
+  .then(function(r){return r.json()}).then(function(d){
+    var el=document.getElementById('contact-list');
+    var list=d.contacts||d||[];
+    if(!Array.isArray(list)||!list.length){
+      el.innerHTML='<div class="empty">暂无联系人，请添加</div>';
+      return;
+    }
+    el.innerHTML=list.map(function(c){
+      return '<div class="contact-item"><div class="info"><div class="name">'+c.name+'</div><div class="phone">📞 '+c.phone+'</div><div class="rel">'+c.relation+'</div></div>'+
+        '<button class="del" onclick="delContact('+c.id+')">删除</button></div>';
+    }).join('');
+  }).catch(function(){
+    document.getElementById('contact-list').innerHTML='<div class="empty">加载失败，请先登录</div>';
+  });
+}
+
+function addContact(){
+  var name=document.getElementById('c-name').value.trim();
+  var phone=document.getElementById('c-phone').value.trim();
+  var rel=document.getElementById('c-rel').value;
+  if(!name){showToast('请输入姓名');return}
+  if(!/^1\d{10}$/.test(phone)){showToast('请输入正确的 11 位手机号');return}
+  if(!rel){showToast('请选择关系');return}
+  fetch(API+'/api/clinic/emergency-contacts',{method:'POST',headers:authHeaders(),body:JSON.stringify({name:name,phone:phone,relation:rel,signal:AbortSignal.timeout(15000)}),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", esc(e.message)); })  .then(function(r){return r.json()}).then(function(d){
+    if(d.ok){
+      showToast('✅ 联系人已添加');
+      document.getElementById('c-name').value='';
+      document.getElementById('c-phone').value='';
+      document.getElementById('c-rel').value='';
+      loadContacts();
+    }else{
+      showToast(d.error||'添加失败');
+    }
+  }).catch(function(){showToast('网络错误')});
+}
+
+function delContact(id){
+  fetch(API+'/api/clinic/emergency-contacts/'+id,{method:'DELETE',headers:authHeaders(),signal: AbortSignal.timeout(15000)}).catch(function(e){ console.warn("[R514] emergency-contacts fetch error:", esc(e.message)); })
+  .then(function(r){return r.json()}).then(function(d){
+    if(d.ok){showToast('已删除');loadContacts()}
+    else{showToast(d.error||'删除失败')}
+  }).catch(function(){showToast('网络错误')});
+}
+
+if(token){loadContacts()}else{
+  document.getElementById('contact-list').innerHTML='<div class="empty">请先登录：<a href="person-center.html" style="color:var(--gold)">前往登录</a></div>';
+}
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 紧急联系人仅用于 SOS 紧急通知</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

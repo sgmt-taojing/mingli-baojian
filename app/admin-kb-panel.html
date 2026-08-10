@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="KB 知识库管理面板 - 命理宝鉴 · 易道智鉴平台">
+<meta name="keywords" content="KB 知识库管理面板 - 命理宝鉴">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/admin-kb-panel.html">
+<meta name="theme-color" content="#050608">
+<title>KB 知识库管理面板 - 命理宝鉴</title>
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/admin-kb-panel-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" class="theme-ops">
+<!-- R504: 新诊疗中心入口 -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a></div>
+
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB 知识库管理面板 - 命理宝鉴</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看条目</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>编辑内容</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>保存生效</span></div></div>
+<div class="flow-hint">管理员管理知识库后台，条目审核+批量操作。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<h1>典 KB 知识库管理面板</h1>
+<p class="kb-meta">实时统计 · 自动同步 · 命中追踪</p>
+<div class="tabs">
+  <ml-tap class="tab active" onclick="loadStats()" style="display:block">总览</ml-tap>
+  <ml-tap class="tab" onclick="loadSearch()" style="display:block">搜索</ml-tap>
+  <ml-tap class="tab" onclick="loadHits()" style="display:block">命中统计</ml-tap>
+</div>
+<input  id="searchBox" class="search-box" placeholder="搜索 KB 条目..." style="display:none" aria-label="搜索 KB 条目...">
+<div id="statsPanel">
+  <div class="kb-grid" id="kbGrid">正在为您查阅典籍...</div>
+</div>
+<div id="searchPanel" style="display:none"></div>
+<div id="hitsPanel" style="display:none"></div>
+
+  <script src="js/admin-rbac-shared.js"></script>
+<script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/admin-kb-panel-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-q 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-q 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print {
+  body { background: #fff !important; }
+  .no-print, header, nav, footer, .navbar, .sidebar, .back-btn, .phb-back, button { display: none !important; }
+  main, .main-content, .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 8px !important; }
+  a { text-decoration: none !important; color: #000 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+  .card, .panel { border: 1px solid #ddd !important; page-break-inside: avoid; }
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+
+  <!-- R505b AI 语音助手 -->
+  <div id="ai-assistant-mount"></div>
+  <script src="js/ai-voice-assistant.js" defer></script>
+  <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

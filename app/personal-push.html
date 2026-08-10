@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="千人千面 · 易道智鉴平台">
+<meta name="keywords" content="千人千面">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/personal-push.html">
+<meta name="theme-color" content="#050608">
+<title>千人千面 · 居家个性化推送 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root{--jade:#27ae60;--gold:#c9a84c;--cinn:#c0392b;--blue:#4a9eff;--orange:#e67e22;--violet:#8e44ad}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFont,"STKaiti",serif;min-height:100vh;padding:16px 16px 80px}
+.header{text-align:center;padding:20px 0;border-bottom:1px solid rgba(46,204,113,.15);margin-bottom:20px}
+.header h1{font-size:22px;color:var(--gold);letter-spacing:4px;margin-bottom:6px}
+.header p{font-size:13px;color:#8b8fa3;letter-spacing:2px}
+.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.panel{background:#141821;border:1px solid #252a36;border-radius:12px;padding:16px;margin-bottom:12px}
+.panel h2{font-size:14px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.panel h2 .badge{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,.15);color:var(--gold)}
+.face-box{background:#000;border-radius:12px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:10px}
+.face-box video{width:100%;height:100%;object-fit:cover;border-radius:12px}
+.face-box .placeholder{color:#555;font-size:13px;text-align:center;line-height:1.8}
+.face-result{display:none;margin-top:10px}
+.face-result.show{display:block}
+.constitution-card{padding:12px;border:1px solid #252a36;border-radius:8px;margin-bottom:8px;transition:all .3s}
+.constitution-card.active{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.constitution-card .ct-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.constitution-card .ct-desc{font-size:11px;color:#8b8fa3}
+.interest-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.interest-bar .label{font-size:12px;width:60px;flex-shrink:0}
+.interest-bar .bar{flex:1;height:8px;border-radius:4px;background:#1a1d27;overflow:hidden}
+.interest-bar .fill{height:100%;border-radius:4px;transition:width .5s}
+.interest-bar .pct{font-size:11px;color:#8b8fa3;width:30px;text-align:right}
+.push-item{padding:12px;border:1px solid #252a36;border-radius:8px;margin-bottom:8px;transition:all .2s}
+.push-item:hover{border-color:var(--jade);background:rgba(46,204,113,.04)}
+.push-item .push-time{font-size:10px;color:#8b8fa3}
+.push-item .push-title{font-size:13px;font-weight:600;color:var(--gold);margin:2px 0}
+.push-item .push-desc{font-size:11px;color:#8b8fa3;line-height:1.6}
+.push-item .push-tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:3px;margin-right:4px;margin-top:4px}
+.tag-constitution{background:rgba(46,204,113,.12);color:var(--jade)}
+.tag-current{background:rgba(230,126,34,.12);color:var(--orange)}
+.tag-kb{background:rgba(74,158,255,.12);color:var(--blue)}
+.btn{padding:8px 14px;border:1px solid #252a36;border-radius:6px;background:#1a1d27;color:#e4e6ed;font-size:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn:hover{border-color:var(--jade);background:rgba(46,204,113,.08)}
+.btn-primary{border-color:var(--jade);background:rgba(46,204,113,.12);color:var(--jade)}
+.controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.news-ticker{background:rgba(230,126,34,.06);border:1px solid rgba(230,126,34,.2);border-radius:8px;padding:10px;margin-bottom:10px;font-size:12px;color:var(--orange)}
+.news-ticker .label{font-size:10px;color:#8b8fa3;margin-bottom:4px}
+#faceCanvas{display:none}
+.snapshot-preview{width:100%;max-width:200px;border-radius:8px;margin-top:8px}
+@media(max-width:360px){body{padding:8px 6px 56px;font-size:13px}h1{font-size:18px}h2{font-size:15px}.container,.wrap,.content{padding:8px 6px}.card,.panel,.box{padding:10px 8px;margin-bottom:8px}.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;gap:8px}.stat-grid,.stat-row{grid-template-columns:1fr 1fr;gap:6px}.btn,.button{font-size:12px;padding:6px 12px}input,select,textarea{font-size:13px;padding:6px 8px}label{font-size:12px}}
+@media print{
+  .page-header-bar,.phb-back,.btn,button,.no-print,header,footer,.controls,.news-ticker,.skip-link{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt;line-height:1.5;padding:0!important}
+  .header h1{color:black!important;font-size:18pt}
+  .header p{color:#333!important}
+  .layout{display:block!important}
+  .panel{background:white!important;border:1px solid #ccc!important;box-shadow:none!important;color:black!important;page-break-inside:avoid}
+  .panel h2{color:black!important}
+  .push-item{background:white!important;border:1px solid #ccc!important;color:black!important}
+  .push-item .push-title{color:black!important}
+  .push-item .push-desc{color:#333!important}
+  .push-item .push-time{color:#666!important}
+  .constitution-card{background:white!important;border:1px solid #ccc!important;color:black!important}
+  .interest-bar .label{color:black!important}
+  .interest-bar .bar{background:#ddd!important}
+  .interest-bar .fill{background:#666!important}
+  .face-box{display:none!important}
+  h1,h2,h3{page-break-after:avoid;color:black!important}
+  a[href]:after{content:" ("attr(href)")";font-size:9pt;color:#666}
+  img{max-width:100%!important}
+  .print-only{display:block!important}
+}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-user">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">千人千面</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看推送</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>历史记录</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>设置偏好</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>管理订阅</span></div></div>
+<div class="flow-hint">个人管理推送设置，定制每日运势+养生+节日提醒。</div>
+</div>
+<div class="header">
+  <h1>面 千人千面 · 居家个性化推送</h1>
+  <p>面诊体质画像 · 兴趣取向学习 · 时事关联推荐 · KB 知识驱动</p>
+</div>
+
+<div class="layout">
+  <!-- 左栏：人脸画像 + 体质分析 -->
+  <div>
+    <div class="panel">
+      <h2>拍 面诊体质采集 <span class="badge">千人千面基础</span></h2>
+      <div class="face-box" id="faceBox">
+        <div class="placeholder">点击"开启摄像头"采集面部图像<br>AI 将分析面色→五行体质→个性化推送</div>
+      </div>
+      <div class="controls">
+        <button class="btn btn-primary" onclick="startFace()">拍 开启摄像头</button>
+        <button class="btn" onclick="captureFace()" id="captureBtn" disabled>拍 采集体质</button>
+        <button class="btn" onclick="simulateFace()">机 模拟体质</button>
+      </div>
+      
+      <div class="face-result" id="faceResult">
+        <div style="margin-top:10px">
+          <h2 style="font-size:13px;color:var(--gold);margin-bottom:8px">草 体质画像</h2>
+          <div class="constitution-card" id="ctWood">
+            <div class="ct-title">树 木旺体质（肝）</div>
+            <div class="ct-desc">面色青·易怒·头痛·高血压倾向 · 推送方向：疏肝理气</div>
+          </div>
+          <div class="constitution-card" id="ctFire">
+            <div class="ct-title">热 火旺体质（心）</div>
+            <div class="ct-desc">面色赤·心烦·失眠·口疮 · 推送方向：清心降火</div>
+          </div>
+          <div class="constitution-card" id="ctEarth">
+            <div class="ct-title">土弱体质（脾）</div>
+            <div class="ct-desc">面色黄·消化不良·乏力 · 推送方向：健脾益气</div>
+          </div>
+          <div class="constitution-card" id="ctMetal">
+            <div class="ct-title">⚔️ 金弱体质（肺）</div>
+            <div class="ct-desc">面色白·易感冒·咳嗽 · 推送方向：补肺固表</div>
+          </div>
+          <div class="constitution-card" id="ctWater">
+            <div class="ct-title">湿 水弱体质（肾）</div>
+            <div class="ct-desc">面色黑·腰酸·怕冷 · 推送方向：温肾助阳</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>图 兴趣取向画像 <span class="badge">自动学习</span></h2>
+      <div id="interestProfile">
+        <div class="interest-bar"><span class="label">中医</span><div class="bar"><div class="fill" style="width:78%;background:var(--jade)"></div></div><span class="pct">78%</span></div>
+        <div class="interest-bar"><span class="label">养生</span><div class="bar"><div class="fill" style="width:65%;background:var(--gold)"></div></div><span class="pct">65%</span></div>
+        <div class="interest-bar"><span class="label">八字</span><div class="bar"><div class="fill" style="width:52%;background:var(--blue)"></div></div><span class="pct">52%</span></div>
+        <div class="interest-bar"><span class="label">风水</span><div class="bar"><div class="fill" style="width:30%;background:var(--violet)"></div></div><span class="pct">30%</span></div>
+        <div class="interest-bar"><span class="label">心理</span><div class="bar"><div class="fill" style="width:15%;background:var(--orange)"></div></div><span class="pct">15%</span></div>
+      </div>
+      <p style="font-size:10px;color:#555;margin-top:8px">基于点击/停留/收藏行为自动学习 · 每7天更新 · 本地存储</p>
+    </div>
+  </div>
+
+  <!-- 右栏：个性化推送 -->
+  <div>
+    <div class="panel">
+      <h2>信 个性化推送 <span class="badge" id="pushCount">0 条</span></h2>
+      
+      <div class="news-ticker">
+        <div class="label">历 今日时事关联</div>
+        <div id="currentEvents">大暑节气 · 高温预警 · 三伏天 · 空气质量良好</div>
+      </div>
+
+      <div id="pushList">
+        <div class="push-item">
+          <div class="push-time">晨 晨推 · 06:00</div>
+          <div class="push-title">待生成 — 请先采集体质画像</div>
+          <div class="push-desc">完成面诊采集后，系统将根据您的体质+兴趣+时事自动生成个性化推送</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" onclick="generatePush()">更 生成推送</button>
+        <button class="btn" onclick="refreshEvents()">历 刷新时事</button>
+        <button class="btn" onclick="saveProfile()">存 保存画像</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>脑 AI 推送策略说明</h2>
+      <div style="font-size:12px;color:#8b8fa3;line-height:1.8">
+        <p><b style="color:var(--gold)">三维度画像：</b></p>
+        <p>1️⃣ 体质画像：面诊AI → 面色 → 五行体质 → 脏腑强弱 → 疾病倾向</p>
+        <p>2️⃣ 兴趣取向：点击/停留/收藏 → 权重排序 → 偏好领域</p>
+        <p>3️⃣ 时事关联：社会热点 × 健康风险 × 用户体质 → 关联推荐</p>
+        <p style="margin-top:8px"><b style="color:var(--gold)">推送规则：</b></p>
+        <p>晨 晨推 = 体质养生 + 当日节气 + 时事关联</p>
+        <p>暮推 = 当日健康摘要 + 异常预警</p>
+        <p>草 节气推 = 养生方案 + 饮食运动</p>
+        <p style="margin-top:8px"><b style="color:var(--gold)">千人千面核心：</b></p>
+        <p>同样节气，木旺→疏肝理气，火旺→清心降火，水弱→温肾助阳</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<canvas id="faceCanvas"></canvas>
+<script src="js/mobile-nav.js" defer></script>
+<script>
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+let videoStream = null;
+let userProfile = { constitution: null, faceColor: null, interests: { '中医':78, '养生':65, '八字':52, '风水':30, '心理':15 } };
+
+function startFace(){
+  const box = document.getElementById('faceBox');
+  if(videoStream){
+    videoStream.getTracks().forEach(t=>t.stop());
+    videoStream = null;
+    box.innerHTML = '<div class="placeholder">摄像头已关闭</div>';
+    document.getElementById('captureBtn').disabled = true;
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:320,height:240}})
+    .then(stream=>{
+      videoStream = stream;
+      box.innerHTML = '<video autoplay playsinline muted></video>';
+      box.querySelector('video').srcObject = stream;
+      document.getElementById('captureBtn').disabled = false;
+    })
+    .catch(e=>{var f=document.getElementById('faceBox');if(f)f.innerHTML='<div class=\'placeholder\' style=\'color:#c0392b\'>摄像头开启失败：'+esc(esc(e.message))+'</div>';console.warn('[摄像头]',esc(e.message));});
+}
+
+function captureFace(){
+  const video = document.querySelector('#faceBox video');
+  if(!video) return;
+  const canvas = document.getElementById('faceCanvas');
+  canvas.width = 160; canvas.height = 120;
+  canvas.getContext('2d').drawImage(video, 0, 0, 160, 120);
+  
+  // 发送到 8913 面诊
+  const b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+  fetch(API+'/api/face/analyze',{method:'POST', headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify({image:b64, mode:'face'})})
+    .then(r=>r.json())
+    .then(d=>{
+      const result = d.data || d;
+      analyzeConstitution(result);
+    })
+    .catch(()=>{
+      // 离线兜底：用像素分析面色
+      const ctx = canvas.getContext('2d');
+      const data = ctx.getImageData(0,0,80,80).data;
+      let r=0,g=0,b=0;
+      for(let i=0;i<data.length;i+=4){r+=data[i];g+=data[i+1];b+=data[i+2];}
+      const n=data.length/4;
+      r=Math.round(r/n); g=Math.round(g/n); b=Math.round(b/n);
+      analyzeConstitution({offline:true, avgColor:{r,g,b}});
+    });
+}
+
+function simulateFace(){
+  // 模拟面诊 — 随机选一个体质（确定性）
+  const types = ['wood','fire','earth','metal','water'];
+  const type = types[Math.floor(Date.now()/3600000) % 5];
+  analyzeConstitution({simulated:true, type:type});
+}
+
+function analyzeConstitution(result){
+  let type = 'wood';
+  let color = '青';
+  let desc = '';
+  
+  if(result.simulated){
+    type = result.type;
+  } else if(result.offline && result.avgColor){
+    const {r,g,b} = result.avgColor;
+    if(g > r && g > b) type = 'wood'; // 偏绿→木
+    else if(r > g && r > b) type = 'fire'; // 偏红→火
+    else if(r > 180 && g > 160 && b < 120) type = 'earth'; // 偏黄→土
+    else if(b > r && b > g) type = 'metal'; // 偏白→金
+    else type = 'water'; // 偏暗→水
+  } else if(result.organs){
+    // API 返回结果
+    type = result.constitution || 'wood';
+  }
+  
+  const profiles = {
+    wood: { color:'青', name:'木旺体质（肝）', desc:'易怒头痛高血压·推送疏肝理气', tea:'玫瑰花茶', food:'绿色蔬菜酸味', exercise:'太极晨练', advice:'少动怒多散步' },
+    fire: { color:'赤', name:'火旺体质（心）', desc:'心烦失眠口疮·推送清心降火', tea:'莲子心茶', food:'苦瓜绿豆', exercise:'冥想午休', advice:'少熬夜多静心' },
+    earth: { color:'黄', name:'土弱体质（脾）', desc:'消化不良乏力·推送健脾益气', tea:'山药茯苓茶', food:'小米粥山药', exercise:'散步揉腹', advice:'饮食有节' },
+    metal: { color:'白', name:'金弱体质（肺）', desc:'易感冒咳嗽·推送补肺固表', tea:'百合雪梨饮', food:'银耳百合', exercise:'慢跑深呼吸', advice:'注意保暖' },
+    water: { color:'黑', name:'水弱体质（肾）', desc:'腰酸怕冷·推送温肾助阳', tea:'核桃黑芝麻', food:'黑色食物', exercise:'泡脚早睡', advice:'避免劳累' },
+  };
+  
+  const p = profiles[type];
+  userProfile.constitution = type;
+  userProfile.faceColor = p.color;
+  
+  // 高亮对应体质卡
+  document.querySelectorAll('.constitution-card').forEach(c=>c.classList.remove('active'));
+  const cardMap = {wood:'ctWood', fire:'ctFire', earth:'ctEarth', metal:'ctMetal', water:'ctWater'};
+  const card = document.getElementById(cardMap[type]);
+  if(card) card.classList.add('active');
+  
+  document.getElementById('faceResult').classList.add('show');
+  
+  // 生成推送
+  generatePush();
+}
+
+function generatePush(){
+  if(!userProfile.constitution){
+    var fl=document.getElementById('faceResult');if(fl){fl.classList.add('show');fl.innerHTML='<div style=\'color:#e67e22;padding:10px\'>警 请先采集体质画像（摄像头或模拟）</div>';}return;
+    return;
+  }
+  
+  const events = document.getElementById('currentEvents').textContent;
+  const ct = userProfile.constitution;
+  
+  // 根据 KB 查询 + 体质 + 时事 生成推送
+  const pushes = [];
+  
+  // 晨推：体质养生
+  const ctInfo = {
+    wood: { tea:'玫瑰花茶疏肝', exercise:'太极·晨练·广步于庭', tip:'今日宜疏肝理气，少动怒' },
+    fire: { tea:'莲子心茶清心', exercise:'冥想·午休·静心', tip:'今日宜清心降火，少熬夜' },
+    earth: { tea:'山药茯苓健脾', exercise:'散步·揉腹·八段锦', tip:'今日宜健脾益气，饮食有节' },
+    metal: { tea:'百合雪梨润肺', exercise:'慢跑·深呼吸·六字诀', tip:'今日宜补肺固表，注意保暖' },
+    water: { tea:'核桃黑芝麻温肾', exercise:'泡脚·早睡·搓腰', tip:'今日宜温肾助阳，避免劳累' },
+  };
+  
+  const info = ctInfo[ct];
+  pushes.push({
+    time:'🌅 晨推 · 06:00',
+    title:'【'+userProfile.faceColor+'色体质】'+info.tip,
+    desc:'推荐：'+info.tea+' · '+info.exercise,
+    tags:['体质推送','tag-constitution']
+  });
+  
+  // 时事关联推送
+  if(events.includes('高温')){
+    pushes.push({
+      time:'☀️ 时事预警 · 实时',
+      title:'高温预警 · 体质关联提醒',
+      desc: ct==='fire'?'火旺体质注意防暑降温，避免午间外出，多饮绿豆汤':'注意防暑，午间减少外出，多饮水',
+      tags:['时事关联','tag-current']
+    });
+  }
+  if(events.includes('三伏')){
+    pushes.push({
+      time:'🌿 节气养生 · 今日',
+      title:'三伏天养生方案',
+      desc: ct==='earth'?'脾虚者三伏宜艾灸中脘足三里':ct==='metal'?'肺弱者三伏贴敷大椎肺俞':'三伏天冬病夏治，适当出汗排毒',
+      tags:['KB知识','tag-kb']
+    });
+  }
+  
+  // 兴趣关联推送
+  const topInterest = Object.entries(userProfile.interests).sort((a,b)=>b[1]-a[1])[0];
+  if(topInterest && topInterest[1] > 50){
+    pushes.push({
+      time:'📚 兴趣推荐 · 个性化',
+      title:'您可能关心：'+topInterest[0]+'深度内容',
+      desc:'基于您最近7天的浏览偏好，为您精选'+topInterest[0]+'领域知识',
+      tags:['兴趣推荐','tag-kb']
+    });
+  }
+  
+  // 暮推
+  pushes.push({
+    time:'🌇 暮推 · 18:00',
+    title:'今日健康摘要',
+    desc:'体质状态：'+userProfile.faceColor+'色体质 · 建议：'+info.tip+' · 明日继续关注',
+    tags:['健康日报','tag-constitution']
+  });
+  
+  // 渲染
+  const list = document.getElementById('pushList');
+  list.innerHTML = pushes.map(p=>`
+    <div class="push-item">
+      <div class="push-time">${p.time}</div>
+      <div class="push-title">${p.title}</div>
+      <div class="push-desc">${p.desc}</div>
+      <div>${p.tags.map(t=>`<span class="push-tag ${t.startsWith('tag-')?t:'tag-kb'}">${t.replace('tag-','')}</span>`).join('')}</div>
+    </div>
+  `).join('');
+  
+  document.getElementById('pushCount').textContent = pushes.length + ' 条';
+}
+
+function refreshEvents(){
+  const events = ['大暑节气·高温预警·三伏天', '寒潮来袭·降温10度·大风', '空气污染·PM2.5超标·口罩提醒', '流感高发·注意预防·增强免疫', '中秋佳节·团圆聚餐·饮食注意'];
+  const idx = Math.floor(Date.now()/3600000) % events.length;
+  document.getElementById('currentEvents').textContent = events[idx];
+  generatePush();
+}
+
+function saveProfile(){
+  localStorage.setItem('_personal_profile', JSON.stringify(userProfile));
+  var btn=event.target;var old=btn.textContent;btn.textContent='✅ 已保存';btn.style.borderColor='#27ae60';setTimeout(function(){btn.textContent=old;btn.style.borderColor='';},2000);
+}
+
+// 加载已保存的画像
+try{
+  const saved = localStorage.getItem('_personal_profile');
+  if(saved){
+    userProfile = JSON.parse(saved);
+    if(userProfile.constitution) analyzeConstitution({simulated:true, type:userProfile.constitution});
+  }
+}catch(e){}
+</script>
+
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

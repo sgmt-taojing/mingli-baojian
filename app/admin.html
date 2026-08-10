@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="易道智鉴 · 易道智鉴平台">
+<meta name="keywords" content="易道智鉴">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/admin.html">
+<meta name="theme-color" content="#050608">
+<title>易道智鉴 · 后台管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/admin-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<!-- R257 修真：删掉 divination-hub.css(152K) + divination-hub-inline.css(168K) — 320KB hub CSS 能覆盖 admin 自己的 .section/.topbar/.card-grid 样式导致页面变形 -->
+<style>
+  /* === 必要的 hub 风格小补丁 (从 hub 提取，不依赖大文件) === */
+  .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  .skip-link:focus{position:fixed;top:8px;left:8px;width:auto;height:auto;background:var(--gold3);color:var(--ink);padding:8px 16px;z-index:99999;border-radius:4px}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+<style>
+.toast-msg{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 20px;border-radius:8px;color:#fff;font-size:14px;opacity:0;transition:opacity .3s;max-width:360px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.toast-msg.show{opacity:1}
+.toast-msg.success{background:#2d7a46}
+.toast-msg.error{background:#c0392b}
+.toast-msg.info{background:#2c3e50}
+</style>
+<script>function showToast(msg,type){type=type||'info';var t=document.createElement('div');t.className='toast-msg '+type;t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},300)},3500)}</script>
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-ops">
+<!-- R504: 新诊疗中心入口 -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a><a href="master-workstation.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🧭 命理大师工作台</a></div>
+
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">易道智鉴</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>管理数据</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看日志</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>系统配置</span></div></div>
+<div class="flow-hint">管理员后台总览，服务+KB+用户+设备+安全。</div>
+</div>
+<a href="#main-content" class="skip-link">跳到主要内容</a>
+<main id="main-content" role="main">
+<div style="position:fixed;top:12px;right:12px;z-index:99998">
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-title">易 易道智鉴 <span class="sub">· 后台管理</span></div>
+    <nav class="topbar-nav">
+      <a href="monitor-dashboard.html" style="color:var(--gold-bright);font-weight:600">屏 监控大屏</a>
+      <a href="#" role="button" data-section="dashboard" class="active">图 运营大屏</a>
+      <a href="#" role="button" data-section="users">众 用户管理</a>
+      <a href="admin/yuanzhu-dashboard.html" style="color:var(--gold-bright);font-weight:600">莲 缘主推送大盘</a>
+      <a href="#" role="button" data-section="feedback">建议反馈</a>
+      <a href="admin-tickets.html" style="color:#f85149;font-weight:600">票 工单管理</a>
+      <a href="#" role="button" data-section="engine">修 引擎测试台</a>
+      <a href="#" role="button" data-section="knowledge">知识库管理</a>
+      <a href="#" role="button" data-section="guide">跪 信众指导中心</a>
+      <a href="#" role="button" data-section="content">记 内容管理</a>
+      <a href="#" role="button" data-section="stats">升 数据统计</a>
+      <a href="#" role="button" data-section="monitor">图 系统监控</a>
+      <a href="#" role="button" data-section="gzh">信 公众号采集</a>
+      <a href="admin-shop.html">🛍️ 商城管理</a>
+      <a href="admin/im-monitor.html" style="color:#22d3ee;font-weight:600">语 站内消息</a>
+      <a href="admin/glass-approve.html" style="color:#06b6d4;font-weight:600">🕶️ 眼镜审核</a>
+      <a href="divination-hub.html">宅 返回主站</a>
+    </nav>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 0. 运营监控大屏 -->
+<section id="section-dashboard" class="section active">
+  <div class="section-header">
+    <h2>图 运营监控大屏</h2>
+    <p>实时数据 · 用户画像 · 转化漏斗 · 收入统计</p>
+  </div>
+
+  <!-- 实时数据卡片 -->
+  <div class="card-grid" style="margin-bottom:1.5rem">
+    <div class="card" style="text-align:center">
+      <h3>安 在线人数</h3>
+      <div class="stat" id="dashOnline">--</div>
+      <div class="meta">实时</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>机 今日访问</h3>
+      <div class="stat" id="dashVisits">--</div>
+      <div class="meta">PV / UV</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>卦 今日测评</h3>
+      <div class="stat" id="dashDivination">--</div>
+      <div class="meta">次数</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>财 今日收入</h3>
+      <div class="stat" id="dashRevenue">¥--</div>
+      <div class="meta">会员付费</div>
+    </div>
+  </div>
+
+  <!-- 功能热度排行 -->
+  <div class="content-block" style="margin-bottom:1.5rem">
+    <h3>热 功能热度排行</h3>
+    <div id="toolRanking" style="margin-top:.8rem"></div>
+  </div>
+
+  <!-- 会员转化漏斗 -->
+  <div class="content-block" style="margin-bottom:1.5rem">
+    <h3>更 会员转化漏斗</h3>
+    <div id="conversionFunnel" style="margin-top:.8rem"></div>
+  </div>
+
+  <!-- 用户画像 -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem">
+    <div class="content-block">
+      <h3>人 性别分布</h3>
+      <div id="genderDist"></div>
+    </div>
+    <div class="content-block">
+      <h3>图 年龄段分布</h3>
+      <div id="ageDist"></div>
+    </div>
+  </div>
+
+  <!-- 收入统计 -->
+  <div class="content-block" style="margin-bottom:1.5rem">
+    <h3>财 收入统计</h3>
+    <div style="display:flex;gap:.5rem;margin-bottom:.8rem">
+      <button class="btn btn-outline btn-sm" onclick="loadRevenueStats('day')">日</button>
+      <button class="btn btn-outline btn-sm" onclick="loadRevenueStats('week')">周</button>
+      <button class="btn btn-outline btn-sm" onclick="loadRevenueStats('month')">月</button>
+    </div>
+    <div id="revenueChart"></div>
+  </div>
+
+  <!-- 热门测评结果 -->
+  <div class="content-block" style="margin-bottom:1.5rem">
+    <h3>表 热门测评类型</h3>
+    <div id="hotDivination"></div>
+  </div>
+
+  <!-- 用户行为路径 -->
+  <div class="content-block">
+    <h3>🛤️ 用户行为路径</h3>
+    <div id="userPath"></div>
+  </div>
+</section>
+
+<!-- 0b. 用户管理 -->
+<section id="section-users" class="section">
+  <div class="section-header">
+    <h2>众 用户管理</h2>
+    <p>用户列表 · 会员管理 · 试用次数</p>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="userSearch" placeholder="搜索手机号/姓名..." oninput="filterUsers()" aria-label="搜索手机号/姓名...">
+    <select id="userLevelFilter" onchange="filterUsers()" aria-label="userLevelFilter">
+      <option value="">全部等级</option>
+      <option value="free">初缘</option>
+      <option value="monthly">常修</option>
+      <option value="yearly">精进</option>
+      <option value="lifetime">明道</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>手机号</th><th>会员等级</th><th>积分</th><th>功德值</th><th>测评次数</th><th>注册时间</th><th>最近活跃</th><th>操作</th></tr></thead>
+      <tbody id="userTableBody"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:1rem">
+    <h3 style="color:var(--gold2);margin-bottom:.5rem">会员管理操作</h3>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="btn btn-primary btn-sm" onclick="showUserAction('open')">开通会员</button>
+      <button class="btn btn-outline btn-sm" onclick="showUserAction('renew')">续费会员</button>
+      <button class="btn btn-outline btn-sm" onclick="showUserAction('refund')">退款</button>
+      <button class="btn btn-outline btn-sm" onclick="showUserAction('reset')">重置试用次数</button>
+    </div>
+  </div>
+</section>
+
+<!-- 0c. 建议反馈管理 -->
+<section id="section-feedback" class="section">
+  <div class="section-header">
+    <h2>建议反馈管理</h2>
+    <p>用户反馈 · 积分奖励 · 纠错核实 · 智慧化优化</p>
+  </div>
+
+  <!-- 统计概览 -->
+  <div class="card-grid" style="margin-bottom:1.5rem">
+    <div class="card">
+      <h3>图 总反馈数</h3>
+      <div class="stat" id="fbStatTotal">0</div>
+      <div class="meta">全部用户</div>
+    </div>
+    <div class="card">
+      <h3>成 采纳率</h3>
+      <div class="stat" id="fbStatAdoption">0%</div>
+      <div class="meta">已采纳/总数</div>
+    </div>
+    <div class="card">
+      <h3>待 待处理</h3>
+      <div class="stat" id="fbStatPending" style="color:var(--amber)">0</div>
+      <div class="meta">需审核</div>
+    </div>
+    <div class="card">
+      <h3>财 已发积分</h3>
+      <div class="stat" id="fbStatPointsIssued">0</div>
+      <div class="meta">累计奖励</div>
+    </div>
+  </div>
+
+  <!-- 常见问题 -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3 style="font-family:'ZCOOL XiaoWei';color:var(--gold2);margin-bottom:.8rem">热 最常见反馈对象</h3>
+    <div id="fbTopIssues"></div>
+  </div>
+
+  <!-- 模块权重优化建议 -->
+  <div class="card" style="margin-bottom:1.5rem">
+    <h3 style="font-family:'ZCOOL XiaoWei';color:var(--gold2);margin-bottom:.8rem">脑 智慧化权重优化</h3>
+    <div id="fbModuleWeights"></div>
+  </div>
+
+  <div class="search-bar">
+    <select id="fbStatusFilter" onchange="filterFeedback()" aria-label="fbStatusFilter">
+      <option value="">全部状态</option>
+      <option value="pending">待处理</option>
+      <option value="adopted">已采纳</option>
+      <option value="ignored">已忽略</option>
+    </select>
+    <select id="fbTypeFilter" onchange="filterFeedback()" aria-label="fbTypeFilter">
+      <option value="">全部类型</option>
+      <option value="like">点赞</option>
+      <option value="dislike">点踩</option>
+      <option value="suggest">建议</option>
+      <option value="correct">纠错</option>
+    </select>
+    <select id="fbTargetFilter" onchange="filterFeedback()" aria-label="fbTargetFilter">
+      <option value="">全部对象</option>
+      <option value="daily_push">今日推送</option>
+      <option value="bazi">八字排盘</option>
+      <option value="qimen">奇门排盘</option>
+      <option value="other">其他功能</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>反馈ID</th><th>类型</th><th>对象</th><th>内容</th><th>积分</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+      <tbody id="feedbackTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 积分发放记录 -->
+  <div class="card" style="margin-top:1.5rem">
+    <h3 style="font-family:'ZCOOL XiaoWei';color:var(--gold2);margin-bottom:.8rem">表 积分发放记录</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>用户</th><th>反馈类型</th><th>基础积分</th><th>连续奖励</th><th>总积分</th><th>时间</th></tr></thead>
+        <tbody id="fbPointsLogBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 1. 引擎测试台 -->
+<section id="section-engine" class="section">
+  <div class="section-header">
+    <h2>修 引擎测试台</h2>
+    <p>各排盘引擎调试入口 — 输入参数验证输出正确性</p>
+  </div>
+  <div class="engine-grid" id="engineGrid"></div>
+  <div class="test-panel">
+    <h3 style="font-family:'ZCOOL XiaoWei';color:var(--gold2);margin-bottom:.8rem">排盘测试</h3>
+    <div class="form-row">
+      <label for="engineType">引擎</label>
+      <select id="engineType" aria-label="engineType"><option value="bazi">八字排盘</option><option value="ziwei">紫微斗数</option><option value="qimen">奇门遁甲</option><option value="liuyao">六爻排盘</option><option value="meihua">梅花易数</option><option value="liuren">六壬神课</option></select>
+    </div>
+    <div class="form-row">
+      <label for="paipanYear">年份</label><input type="number" id="paipanYear" value="1990" min="1900" max="2100" aria-label="paipanYear">
+      <label for="paipanMonth">月份</label><input type="number" id="paipanMonth" value="6" min="1" max="12" aria-label="paipanMonth">
+      <label for="paipanDay">日期</label><input type="number" id="paipanDay" value="15" min="1" max="31" aria-label="paipanDay">
+    </div>
+    <div class="form-row">
+      <label for="paipanHour">时辰</label><input type="number" id="paipanHour" value="12" min="0" max="23" aria-label="paipanHour">
+      <label for="paipanMinute">分钟</label><input type="number" id="paipanMinute" value="0" min="0" max="59" aria-label="paipanMinute">
+      <label for="paipanSex">性别</label>
+      <select id="paipanSex" aria-label="paipanSex"><option value="male">男</option><option value="female">女</option></select>
+    </div>
+    <div class="form-row">
+      <label for="paipanLunar">农历</label><input type="checkbox" id="paipanLunar" aria-label="paipanLunar">
+      <label for="paipanLng">经度</label><input type="number" id="paipanLng" placeholder="如:116.4" step="0.01" style="width:80px" aria-label="如:116.4">
+    </div>
+    <div class="form-row">
+      <button class="btn btn-primary" onclick="runPaipanTest()">电 执行排盘</button>
+      <button class="btn btn-outline" onclick="clearPaipanResult()">清除</button>
+      <span id="paipanStatus" style="font-size:.8rem;color:var(--gray-light)"></span>
+    </div>
+    <div id="paipanResult">等待执行排盘...</div>
+  </div>
+</section>
+
+<!-- 2. 知识库管理 -->
+<!-- R505c: R502 CRUD 管理面板（用户偏好/收藏/搜索历史） -->
+  <section class="section">
+    <div class="section-header">
+      <h2>⚙️ R502 CRUD 管理面板</h2>
+      <p>用户偏好 / 收藏 / 搜索历史 / 动态配置 — 实时 CRUD</p>
+    </div>
+    <div style="display:flex;gap:8px;margin:8px 0">
+      <button class="btn btn-outline" onclick="loadUserPreferences()">查 偏好</button>
+      <button class="btn btn-outline" onclick="loadUserFavorites()">★ 收藏</button>
+      <button class="btn btn-outline" onclick="loadSearchHistory()">🔍 历史</button>
+      <button class="btn btn-outline" onclick="loadConfig()">动态配置</button>
+      <button class="btn btn-outline" onclick="loadAllR502Stats()">总览</button>
+    </div>
+    <div id="r502Stats" style="background:rgba(201,168,76,.06);padding:12px;border-radius:8px;margin:8px 0;font-size:13px"></div>
+    <div id="r502List"></div>
+  </section>
+
+  <section id="section-knowledge" class="section">
+  <div class="section-header">
+    <h2>知识库管理</h2>
+    <p>16领域知识库统计 · 卡片数 · 总字符数 · 达标率</p>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="kbSearch" placeholder="搜索知识内容（如：天干、五行、格局、观音...）" oninput="searchKnowledge()" aria-label="搜索知识内容（如：天干、五行、格局、观音...）">
+    <button class="btn btn-outline" onclick="exportKbStats()">导出统计</button>
+  </div>
+  <div class="card-grid" id="kbStatsGrid"></div>
+  <div id="kbSearchResult" style="margin-top:1rem"></div>
+  <div id="kbPendingList" style="margin-top:1.5rem"></div>
+</section>
+
+<!-- 3. 信众指导中心 -->
+<section id="section-guide" class="section">
+  <div class="section-header">
+    <h2>跪 信众指导中心</h2>
+    <p>从实战出发 — 每日修行 · 参拜指导 · 养生时辰 · 节气养生 · 经文诵读 · 禁忌提醒</p>
+  </div>
+
+  <div class="guide-card">
+    <h3>晨 每日修行指引</h3>
+    <div id="dailyPracticeContent"><p style="color:var(--gray-light);font-size:.85rem">正在为您查阅典籍...</p></div>
+    <div class="faith-tabs" style="margin-top:1rem" id="dpTabs">
+      <ml-tap class="faith-tab active" onclick="switchDailyPractice('ru',this)" style="display:block">儒家</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchDailyPractice('dao',this)" style="display:block">道家</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchDailyPractice('fo',this)" style="display:block">佛家</ml-tap>
+    </div>
+  </div>
+
+  <div class="guide-card">
+    <h3>拜 参拜指导手册</h3>
+    <div class="faith-tabs" id="worshipTabs">
+      <ml-tap class="faith-tab active" onclick="switchWorshipGuide('general',this)" style="display:block">通用礼仪</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchWorshipGuide('buddhist',this)" style="display:block">佛教</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchWorshipGuide('taoist',this)" style="display:block">道教</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchWorshipGuide('confucian',this)" style="display:block">儒家</ml-tap>
+    </div>
+    <div id="worshipGuideContent"></div>
+  </div>
+
+  <div class="guide-card">
+    <h3>时 养生时辰指引</h3>
+    <p style="font-size:.8rem;color:var(--gray-light);margin-bottom:.8rem">12时辰对应脏腑经络 · 养生建议 · 宜忌事项</p>
+    <div class="table-wrap">
+      <table class="shichen-table">
+        <thead><tr><th>时辰</th><th>时间</th><th>经络</th><th>脏腑</th><th>养生建议</th><th>宜</th><th>忌</th></tr></thead>
+        <tbody id="shichenBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="guide-card">
+    <h3>草 节气养生指导</h3>
+    <p style="font-size:.8rem;color:var(--gray-light);margin-bottom:.8rem">24节气养生重点 · 食疗方 · 功法建议</p>
+    <div class="jieqi-grid" id="jieqiGrid"></div>
+  </div>
+
+  <div class="guide-card">
+    <h3>经 经文诵读指引</h3>
+    <div class="faith-tabs" id="scriptureTabs">
+      <ml-tap class="faith-tab active" onclick="switchScripture('buddhist',this)" style="display:block">佛教</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchScripture('taoist',this)" style="display:block">道教</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchScripture('confucian',this)" style="display:block">儒家</ml-tap>
+    </div>
+    <div id="scriptureContent"></div>
+  </div>
+
+  <div class="guide-card">
+    <h3>警 信众禁忌提醒</h3>
+    <div class="faith-tabs" id="tabooTabs">
+      <ml-tap class="faith-tab active" onclick="switchTaboo('buddhist',this)" style="display:block">佛教禁忌</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchTaboo('taoist',this)" style="display:block">道教禁忌</ml-tap>
+      <ml-tap class="faith-tab" onclick="switchTaboo('confucian',this)" style="display:block">儒家禁忌</ml-tap>
+    </div>
+    <div id="tabooContent"></div>
+  </div>
+</section>
+
+<!-- 4. 内容管理 -->
+<section id="section-content" class="section">
+  <div class="section-header">
+    <h2>记 内容管理</h2>
+    <p>每日口诀 · 智慧语录 · 生肖运势</p>
+  </div>
+  <div class="content-block">
+    <h3>卷 每日口诀管理</h3>
+    <div class="search-bar">
+      <input type="text" id="koujueSearch" placeholder="搜索口诀名称或内容..." oninput="searchKoujue()" aria-label="搜索口诀名称或内容...">
+      <select id="koujueCategory" onchange="filterKoujue()" aria-label="koujueCategory"><option value="">全部分类</option></select>
+      <span id="koujueCount" style="font-size:.8rem;color:var(--gray-light)"></span>
+    </div>
+    <div id="koujueList" style="max-height:500px;overflow-y:auto"></div>
+  </div>
+  <div class="content-block">
+    <h3>语 智慧语录管理</h3>
+    <div class="search-bar">
+      <input type="text" id="quoteSearch" placeholder="搜索语录..." oninput="searchQuotes()" aria-label="搜索语录...">
+      <select id="quoteCategory" onchange="filterQuotes()" aria-label="quoteCategory"><option value="">全部分类</option></select>
+      <span id="quoteCount" style="font-size:.8rem;color:var(--gray-light)"></span>
+    </div>
+    <div id="quoteList" style="max-height:500px;overflow-y:auto"></div>
+  </div>
+  <div class="content-block">
+    <h3>龙 生肖运势管理 — 2025乙巳蛇年</h3>
+    <div id="zodiacList"></div>
+  </div>
+</section>
+
+<!-- 4b. 数据统计 -->
+<section id="section-stats" class="section">
+  <div class="section-header">
+    <h2>升 数据统计</h2>
+    <p>功能使用 · 付费转化 · 用户留存</p>
+  </div>
+  <div class="card-grid" style="margin-bottom:1.5rem">
+    <div class="card" style="text-align:center">
+      <h3>图 总测评次数</h3>
+      <div class="stat" id="statTotalUsage">--</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>尊 付费用户</h3>
+      <div class="stat" id="statPaidUsers">--</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>更 转化率</h3>
+      <div class="stat" id="statConversionRate">--%</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>历 7日留存</h3>
+      <div class="stat" id="statRetention">--%</div>
+    </div>
+  </div>
+  <div class="content-block" style="margin-bottom:1.5rem">
+    <h3>图 功能使用统计</h3>
+    <div id="usageStats" style="margin-top:.8rem"></div>
+  </div>
+  <div class="content-block" style="margin-bottom:1.5rem">
+    <h3>财 付费转化分析</h3>
+    <div id="paidConversion" style="margin-top:.8rem"></div>
+  </div>
+  <div class="content-block">
+    <h3>更 用户留存分析</h3>
+    <div id="retentionAnalysis" style="margin-top:.8rem"></div>
+  </div>
+</section>
+
+<!-- 5. 系统监控 -->
+<section id="section-monitor" class="section">
+  <div class="section-header">
+    <h2>图 系统监控</h2>
+    <p>服务状态 · 文件统计 · 最近变更</p>
+  </div>
+  <div class="monitor-grid" id="monitorGrid"></div>
+  <div class="content-block" style="margin-top:1.5rem">
+    <h3>夹 文件统计</h3>
+    <div id="fileStats"></div>
+  </div>
+  <div class="content-block">
+    <h3>更 最近变更</h3>
+    <div id="recentChanges"></div>
+  </div>
+</section>
+
+<section id="section-gzh" class="section">
+  <div class="section-header">
+    <h2>信 公众号关注与采集</h2>
+    <p>自动关注佛道儒/名山/术数类公众号，采集内容喂给知识库自进化系统</p>
+  </div>
+  <div id="gzhManagePanel"></div>
+</section>
+
+</div>
+
+<footer>
+  <p>易道智鉴 · 后台管理系统 · v2026.06.27</p>
+  <p><a href="divination-hub.html">主站</a> | <a href="disclaimer.html">免责声明</a> | <a href="knowledge-panel.html">知识面板</a></p>
+</footer>
+
+<script src="js/ui-toast.js" defer></script>
+<script src="js/toast-helper.js"></script>
+<script src="../knowledge/authoritative-knowledge-base.js"></script>
+<script src="../knowledge/zodiac-complete.js"></script>
+<script src="../knowledge/wisdom-quotes.js"></script>
+<script src="../knowledge/gzh-collect-system.js"></script>
+<script src="../knowledge/koujue-database-full.js"></script>
+<script src="../knowledge/faith-knowledge-base.js"></script>
+<script src="../knowledge/faith-guide.js"></script>
+
+
+
+<!-- DEV-STANDARDS-FOOTER START -->
+<div id="dev-standards-footer" style="background:#0b1726;color:#cbd5e1;padding:32px 24px 48px;border-top:1px solid #1e293b;font-family:ui-sans-serif,-apple-system,'Segoe UI',sans-serif;">
+  <div style="max-width:1240px;margin:0 auto;">
+    <h2 style="font-size:20px;color:#e2e8f0;margin:0 0 16px">典 平台开发规范（mingli-baojian-dev-standard）</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;">
+      <div style="background:#0f172a;padding:16px;border-radius:8px;border:1px solid #1e293b;">
+        <div style="color:#60a5fa;font-size:13px;margin-bottom:6px">三端差异化</div>
+        <div style="color:#cbd5e1;font-size:13px;line-height:1.6">PC=办公大屏 / H5=移动办公 / 小程序=微信生态。<br>
+          <a href="divination-hub.html" style="color:#93c5fd;text-decoration:none">排盘入口</a> ·
+          <a href="admin.html" style="color:#93c5fd;text-decoration:none">管理后台</a></div>
+      </div>
+      <div style="background:#0f172a;padding:16px;border-radius:8px;border:1px solid #1e293b;">
+        <div style="color:#60a5fa;font-size:13px;margin-bottom:6px">API 设计</div>
+        <div style="color:#cbd5e1;font-size:13px;line-height:1.6">资源复数 + v1 标准（旧路径 307 重定向）。<br>
+          <a href="docs/API_V1_MIGRATION.md" style="color:#93c5fd;text-decoration:none">API_V1_MIGRATION</a> ·
+          <a href="docs/API_STANDARD.md" style="color:#93c5fd;text-decoration:none">API_STANDARD</a></div>
+      </div>
+      <div style="background:#0f172a;padding:16px;border-radius:8px;border:1px solid #1e293b;">
+        <div style="color:#60a5fa;font-size:13px;margin-bottom:6px">错误响应</div>
+        <div style="color:#cbd5e1;font-size:13px;line-height:1.6">全员 <code style="background:#020617;padding:1px 6px;border-radius:4px">apiResponse()</code> + 错误码表。<br>
+          <a href="docs/ERROR_CODE_TABLE.md" style="color:#93c5fd;text-decoration:none">ERROR_CODE_TABLE</a></div>
+      </div>
+      <div style="background:#0f172a;padding:16px;border-radius:8px;border:1px solid #1e293b;">
+        <div style="color:#60a5fa;font-size:13px;margin-bottom:6px">Skill 注册</div>
+        <div style="color:#cbd5e1;font-size:13px;line-height:1.6"><code style="background:#020617;padding:1px 6px;border-radius:4px">~/.openclaw/skills/mingli-baojian-dev-standard/</code><br>
+          路径铁律见 docs/STANDARDS_BACKLOG.md</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;font-size:12px;color:#64748b">系统启动：<code style="background:#020617;padding:2px 8px;border-radius:4px">node server/api-server-v2.js</code> · 端口 <code style="background:#020617;padding:2px 8px;border-radius:4px">8920</code></div>
+  </div>
+</div>
+<!-- DEV-STANDARDS-FOOTER END -->
+
+</main>
+<script src="js/admin-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-g 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.admin-main{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  table{font-size:11px}
+  .btn{padding:6px 10px;font-size:12px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.admin-main{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  table{font-size:10px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+}
+</style>
+
+<style>
+/* R98-g 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.admin-main{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  table{font-size:11px}
+  .btn{padding:6px 10px;font-size:12px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.admin-main{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  table{font-size:10px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+}
+@media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+</style>
+
+  <!-- R505b AI 语音助手 -->
+  <div id="ai-assistant-mount"></div>
+  <script src="js/ai-voice-assistant.js" defer></script>
+
+  <!-- R505c: R502 CRUD 管理面板调用脚本 -->
+  <script>
+    const R502_API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8920' : '';
+    const R502_USER_ID = (() => { try { return localStorage.getItem('yuanzhu_id') || 'admin_demo'; } catch (e) { return 'admin_demo'; } })();
+
+    function r502ListCard(title, items, type) {
+      const escape = s => String(s || '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+      if (!items || !items.length) return '<div style="padding:8px;color:rgba(255,255,255,.4);font-size:12px">暂无数据</div>';
+      return '<div style="margin:8px 0;background:rgba(255,255,255,.04);padding:12px;border-radius:8px">' +
+        '<h3 style="margin:0 0 8px 0;font-size:14px">' + escape(title) + ' (' + items.length + ')</h3>' +
+        items.slice(0, 20).map(it => {
+          const data = JSON.stringify(it).replace(/'/g, '&apos;');
+          const delBtn = '<button class="btn btn-outline" style="padding:2px 8px;font-size:11px" onclick="r502Delete(\'' + type + '\',\'' + escape(it.id || it.user_id || it.key || '') + '\')">删</button>';
+          return '<div style="display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px">' +
+            '<span style="flex:1;color:rgba(255,255,255,.7)">' + escape(JSON.stringify(it).slice(0, 200)) + '</span>' +
+            delBtn + '</div>';
+        }).join('') + '</div>';
+    }
+
+    function r502Delete(type, id) {
+      if (!confirm('确认删除？')) return;
+      const url = type === 'favorites' ? R502_API + '/api/user/favorites/' + encodeURIComponent(id) :
+                  type === 'preferences' ? R502_API + '/api/user/preferences/' + encodeURIComponent(id) :
+                  type === 'history' ? R502_API + '/api/user/search-history/' + encodeURIComponent(id) :
+                  R502_API + '/api/public/config/' + encodeURIComponent(id);
+      fetch(url,{method: 'DELETE',signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(d => {
+        if (d.ok) { showToast('已删除', 'success'); setTimeout(() => location.reload(), 800); } else { showToast('失败: ' + (d.error || '未知错误'), 'error'); }
+      }).catch(e => showToast('错误: ' + esc(e.message), 'error'));
+    }
+
+    async function loadUserPreferences() {
+      try {
+      const r = await fetch(R502_API + '/api/user/preferences?user_id=' + R502_USER_ID, { signal: AbortSignal.timeout(8000) });
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '📋 偏好: ' + d.count + ' 条 · 用户=' + R502_USER_ID;
+      document.getElementById('r502List').innerHTML = r502ListCard('用户偏好', d.preferences || [], 'preferences');
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">偏好加载失败: ' + (esc(e.message) || '网络错误') + '</div>'; }
+    }
+    async function loadUserFavorites() {
+      try {
+      const r = await fetch(R502_API + '/api/user/favorites?user_id=' + R502_USER_ID, { signal: AbortSignal.timeout(8000) });
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '★ 收藏: ' + d.count + ' 条';
+      document.getElementById('r502List').innerHTML = r502ListCard('收藏', d.favorites || [], 'favorites');
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">收藏加载失败: ' + (esc(e.message) || '网络错误') + '</div>'; }
+    }
+    async function loadSearchHistory() {
+      try {
+      const r = await fetch(R502_API + '/api/user/search-history?user_id=' + R502_USER_ID, { signal: AbortSignal.timeout(8000) });
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '🔍 历史: ' + d.count + ' 条';
+      document.getElementById('r502List').innerHTML = r502ListCard('搜索历史', d.history || [], 'history');
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">历史加载失败: ' + (esc(e.message) || '网络错误') + '</div>'; }
+    }
+    async function loadConfig() {
+      try {
+      const r = await fetch(R502_API + '/api/public/config', { signal: AbortSignal.timeout(8000) });
+      const d = await r.json();
+      document.getElementById('r502Stats').innerHTML = '⚙️ 配置: ' + d.count + ' 项';
+      document.getElementById('r502List').innerHTML = r502ListCard('系统配置', d.configs || [], 'config');
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">配置加载失败: ' + (esc(e.message) || '网络错误') + '</div>'; }
+    }
+    async function loadAllR502Stats() {
+      try {
+      const [p, f, h, c] = await Promise.all([
+        fetch(R502_API + '/api/user/preferences?user_id=' + R502_USER_ID, { signal: AbortSignal.timeout(8000) }).then(r => r.json()),
+        fetch(R502_API + '/api/user/favorites?user_id=' + R502_USER_ID, { signal: AbortSignal.timeout(8000) }).then(r => r.json()),
+        fetch(R502_API + '/api/user/search-history?user_id=' + R502_USER_ID, { signal: AbortSignal.timeout(8000) }).then(r => r.json()),
+        fetch(R502_API + '/api/public/config', { signal: AbortSignal.timeout(8000) }).then(r => r.json()),
+      ]);
+      document.getElementById('r502Stats').innerHTML =
+        '<b>R502 总览</b> · 偏好 ' + (p.count||0) + ' · 收藏 ' + (f.count||0) + ' · 搜索历史 ' + (h.count||0) + ' · 配置 ' + (c.count||0);
+      document.getElementById('r502List').innerHTML =
+        r502ListCard('偏好', p.preferences, 'preferences') +
+        r502ListCard('收藏', f.favorites, 'favorites') +
+        r502ListCard('搜索历史', h.history, 'history') +
+        r502ListCard('配置', c.configs, 'config');
+      } catch (e) { document.getElementById('r502List').innerHTML = '<div style="padding:12px;color:#ff9d5c">R502 总览加载失败: ' + (esc(e.message) || '网络错误') + '</div>'; }
+    }
+
+    // 默认加载总览
+    setTimeout(() => { try { loadAllR502Stats(); } catch(e){} }, 500);
+  </script>
+  <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

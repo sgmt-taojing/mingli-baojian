@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="通知日志 · 易道智鉴平台">
+<meta name="keywords" content="通知日志">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/admin-notify.html">
+<meta name="theme-color" content="#050608">
+<title>通知日志 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/tokens.css">
+<style>
+  body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;margin:0;padding:20px}
+  .container{max-width:900px;margin:0 auto}
+  h1{font-size:1.5rem;margin:0 0 8px}
+  .subtitle{color:var(--text-secondary);font-size:.85rem;margin-bottom:20px}
+  .filter-bar{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .filter-bar select,.filter-bar button{padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:.85rem;cursor:pointer}
+  .filter-bar button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .log-list{display:flex;flex-direction:column;gap:8px}
+  .log-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+  .log-item.CRITICAL{border-left:4px solid #e53e3e}
+  .log-item.WARN{border-left:4px solid #dd6b20}
+  .log-item.OK,.log-item.INFO{border-left:4px solid #38a169}
+  .log-header{display:flex;align-items:center;gap:8px;font-size:.85rem}
+  .sev-badge{padding:2px 8px;border-radius:6px;font-size:.7rem;font-weight:700;color:#fff}
+  .sev-badge.CRITICAL{background:#e53e3e}
+  .sev-badge.WARN{background:#dd6b20}
+  .sev-badge.OK,.sev-badge.INFO{background:#38a169}
+  .log-title{font-weight:600;font-size:.95rem}
+  .log-msg{color:var(--text-secondary);font-size:.82rem}
+  .log-meta{font-size:.7rem;color:var(--text-tertiary);display:flex;gap:12px}
+  .empty{text-align:center;padding:40px;color:var(--text-secondary)}
+  .stats{display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 20px;text-align:center;min-width:80px}
+  .stat-num{font-size:1.6rem;font-weight:700}
+  .stat-label{font-size:.7rem;color:var(--text-secondary)}
+  @media(max-width:480px){
+    body{padding:12px}
+    h1{font-size:1.2rem}
+    .filter-bar{flex-direction:column;gap:8px}
+    .filter-bar select,.filter-bar button{width:100%}
+    .stat-card{min-width:60px;padding:8px 12px}
+    .stat-num{font-size:1.2rem}
+    .log-item{padding:10px 12px}
+  }
+  @media(max-width:360px){
+    body{padding:8px 6px;font-size:12px}
+    h1{font-size:1.05rem}
+    .subtitle{font-size:.75rem;margin-bottom:12px}
+    .stats{gap:8px}
+    .stat-card{min-width:48px;padding:6px 8px}
+    .stat-num{font-size:1rem}
+    .stat-label{font-size:.65rem}
+    .filter-bar select,.filter-bar button{padding:5px 8px;font-size:.75rem}
+    .log-item{padding:8px 10px;border-radius:8px}
+    .log-header{font-size:.75rem;gap:4px;flex-wrap:wrap}
+    .sev-badge{padding:1px 6px;font-size:.65rem}
+    .log-title{font-size:.85rem}
+    .log-msg{font-size:.72rem}
+    .log-meta{font-size:.65rem;gap:8px;flex-wrap:wrap}
+  }
+@media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">通知日志</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择通知</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>编辑内容</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>选择受众</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>发送通知</span></div></div>
+<div class="flow-hint">管理员管理通知模板与推送规则。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+<div class="container">
+  <h1>通知日志</h1>
+  <p class="subtitle">运维告警通道（notify-admin）历史记录</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="filter-bar">
+    <select id="sev-filter" aria-label="严重程度筛选">
+      <option value="">全部级别</option>
+      <option value="CRITICAL">危 CRITICAL</option>
+      <option value="WARN">警 WARN</option>
+      <option value="OK">成 OK</option>
+      <option value="INFO">ℹ️ INFO</option>
+    </select>
+    <button class="primary" onclick="loadLogs()">更 刷新</button>
+  </div>
+
+  <div class="log-list" id="log-list">
+    <div class="empty">加载中…</div>
+  </div>
+</div>
+
+<script src="js/admin-rbac-shared.js"></script>
+<script>
+const API = window.location.port === '8914' ? 'http://127.0.0.1:8920' : '';
+let allItems = [];
+
+async function loadLogs() {
+  const sev = document.getElementById('sev-filter').value;
+  const url = sev
+    ? `${API}/api/public/notify-admin/list?limit=100&severity=${sev}`
+    : `${API}/api/public/notify-admin/list?limit=100`;
+  try {
+    const r = await fetch(url, {signal: AbortSignal.timeout(15000)});
+    const d = await r.json();
+    allItems = d.items || [];
+    renderStats();
+    renderList();
+  } catch(e) {
+    document.getElementById('log-list').innerHTML = '<div class="empty">警 查阅失败</div>';
+  }
+}
+
+function renderStats() {
+  const counts = { CRITICAL: 0, WARN: 0, OK: 0, INFO: 0 };
+  allItems.forEach(i => { counts[i.severity] = (counts[i.severity] || 0) + 1; });
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num" style="color:#e53e3e">${counts.CRITICAL}</div><div class="stat-label">CRITICAL</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#dd6b20">${counts.WARN}</div><div class="stat-label">WARN</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#38a169">${counts.OK}</div><div class="stat-label">OK</div></div>
+    <div class="stat-card"><div class="stat-num">${allItems.length}</div><div class="stat-label">TOTAL</div></div>
+  `;
+}
+
+function renderList() {
+  if (!allItems.length) {
+    document.getElementById('log-list').innerHTML = '<div class="empty">空 暂无通知记录</div>';
+    return;
+  }
+  document.getElementById('log-list').innerHTML = allItems.map(i => `
+    <div class="log-item ${i.severity}">
+      <div class="log-header">
+        <span class="sev-badge ${i.severity}">${i.severity}</span>
+        <span class="log-title">${esc(i.title)}</span>
+      </div>
+      ${i.message ? `<div class="log-msg">${esc(i.message)}</div>` : ''}
+      <div class="log-meta">
+        <span>信 ${esc(i.source)}</span>
+        <span>时 ${esc(i.ts)}</span>
+        <span>网 ${esc(i.ip)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+
+document.getElementById('sev-filter').addEventListener('change', loadLogs);
+loadLogs();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

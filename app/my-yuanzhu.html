@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="我的助手 · 易道智鉴平台">
+<meta name="keywords" content="我的助手">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/my-yuanzhu.html">
+<meta name="theme-color" content="#080808">
+<title>我的助手 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+
+<link rel="stylesheet" href="css/my-yuanzhu-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-user">
+
+
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">我的助手</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>看档案</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>缘主管理</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>历史记录</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出数据</span></div></div>
+<div class="flow-hint">大师管理缘主档案，查看历史记录并导出数据。</div>
+</div>
+<a href="#main-content" class="skip-link">跳到主内容</a>
+<main id="main-content">
+<div class="top">
+  <h1>我的助手</h1>
+  <div style="flex:1"></div>
+  <a href="ai-assistant.html" style="font-size:12px;color:var(--gold);text-decoration:none">机 智能助手</a>
+</div>
+
+<div class="tabs" id="legacyYuanzhuTabs">
+  <div class="tab on" data-tab="profile">人 个人</div>
+  <div class="tab" data-tab="yuanzhu">助手</div>
+  <div class="tab" data-tab="push">推 推送</div>
+  <div class="tab" data-tab="points">标 积分</div>
+  <div class="tab" data-tab="reports">表 病历</div>
+  <div class="tab" data-tab="shop">🛍️ 商城</div>
+  <div class="tab" data-tab="kb">知识</div>
+  <div class="tab" data-tab="voices">麦 语音</div>
+  <div class="tab" data-tab="music">音 音乐</div>
+  <div class="tab" data-tab="lifeindex">图 生命指数</div>
+  <div class="tab" data-tab="lifeplan">图 人生规划</div>
+  <div class="tab" data-tab="kb-dash">升 KB Dashboard</div>
+</div>
+
+<div class="body">
+  <div id="content"><div class="loading">正在为您查阅典籍...</div></div>
+</div>
+
+<script src="js/ui-toast.js" defer></script>
+<!-- F-9 Web Components：toast + tab（已迁移；保留旧 ui-toast 以兼容） -->
+<script src="components/toast.js"></script>
+<!-- F-9/S-2 错误拦截器（节点 #4.3） -->
+<script src="js/error-interceptor.js"></script>
+<script src="components/tab.js"></script>
+<!-- 自然查询路由（识别 "LIU套5815" 等模糊输入） -->
+<script src="js/parse-natural.js" defer></script>
+
+<ml-toast id="yuanzhuToast" position="top"></ml-toast>
+
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/my-yuanzhu-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-h 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-h 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

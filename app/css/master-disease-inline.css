@@ -1,0 +1,234 @@
+/* 紫微断疾病生死 大师专用端设计
+   - 暗紫微底（与玄学主题契合）
+   - 严肃金红配色（生死主题警示）
+   - 大字号 + 大按钮（大师端一致性）
+*/
+:root{
+  --ink:#1a0810;       /* 深紫黑 */
+  --ink2:#3a1828;
+  --paper:#fff8e7;
+  --paper2:#f0e4c8;
+  --paper3:#a09070;
+  --gold:#c9a84c;
+  --gold2:#e8cc7a;
+  --cinn:#a52a2a;
+  --cinn2:#dc2626;
+  --danger:#dc2626;
+  --warn:#d97706;
+  --ok:#16a34a;
+  --purple:#7c3aed;
+  --blue:#2563eb;
+  --font:'Noto Serif SC','Source Han Serif SC','SimSun',serif;
+  --fs-body:20px;
+  --fs-title:28px;
+  --fs-h1:36px;
+  --fs-btn:22px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:var(--fs-body)}
+body{
+  font-family:var(--font);
+  background:linear-gradient(135deg,var(--ink) 0%,#2a0a1f 100%);
+  color:var(--paper);
+  min-height:100vh;
+  line-height:1.7;
+  padding-bottom:100px;
+}
+.top{
+  background:linear-gradient(135deg,#0a0008 0%,var(--ink2) 100%);
+  color:var(--gold2);
+  padding:24px 20px;
+  text-align:center;
+  border-bottom:4px double var(--gold);
+  position:sticky;top:0;z-index:100;
+}
+.top h1{font-size:var(--fs-h1);font-weight:900;letter-spacing:8px;color:var(--cinn2);text-shadow:0 0 20px rgba(220,38,38,0.5)}
+.top .sub{font-size:16px;color:var(--gold);margin-top:8px;letter-spacing:4px}
+.top .warn{font-size:14px;color:var(--warn);margin-top:4px;font-weight:700}
+/* Tab */
+.tabs{
+  display:flex;background:rgba(0,0,0,0.4);
+  border-bottom:2px solid var(--gold);
+  position:sticky;top:120px;z-index:95;
+}
+.tab{
+  flex:1;padding:16px;background:none;border:none;
+  font-size:18px;font-family:var(--font);
+  color:var(--paper3);cursor:pointer;
+  border-bottom:4px solid transparent;
+  letter-spacing:2px;transition:all .2s;
+}
+.tab:hover{color:var(--gold)}
+.tab.active{color:var(--cinn2);border-bottom-color:var(--cinn2);font-weight:700}
+/* 主区 */
+.main{max-width:1100px;margin:0 auto;padding:24px 20px}
+/* 双栏 */
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:1024px){.layout{grid-template-columns:1fr}}
+.col{
+  background:rgba(255,248,231,0.04);
+  border:2px solid var(--gold);
+  border-radius:16px;
+  padding:24px;
+  margin-bottom:16px;
+  backdrop-filter:blur(8px);
+}
+.col h2{
+  font-size:var(--fs-title);
+  color:var(--gold);
+  margin-bottom:16px;padding-bottom:12px;
+  border-bottom:2px solid var(--cinn2);
+  display:flex;align-items:center;gap:8px;
+  letter-spacing:3px;
+}
+.col h2 .num{
+  background:var(--cinn2);color:#fff;
+  width:36px;height:36px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;
+}
+/* 字段 */
+.f-row{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:center;margin:12px 0}
+.f-row label{font-weight:700;color:var(--gold);font-size:18px}
+.input{
+  font-size:18px;padding:10px 14px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--gold);
+  border-radius:8px;
+  color:var(--paper);
+  font-family:var(--font);
+  min-height:48px;width:100%;
+}
+.input:focus{outline:none;border-color:var(--cinn2);background:rgba(220,38,38,0.1)}
+select.input option{background:var(--ink);color:var(--paper)}
+/* 大按钮 */
+.btn-big{
+  display:block;width:100%;
+  min-height:72px;padding:16px;
+  font-size:var(--fs-btn);font-family:var(--font);
+  font-weight:700;border:none;border-radius:14px;
+  cursor:pointer;margin:12px 0;letter-spacing:4px;
+  transition:all .2s;
+}
+.btn-primary{background:linear-gradient(135deg,var(--cinn2),#7f1d1d);color:#fff;box-shadow:0 4px 0 #450a0a}
+.btn-primary:active{transform:translateY(3px);box-shadow:0 1px 0 #450a0a}
+.btn-primary:hover{filter:brightness(1.15)}
+.btn-secondary{background:rgba(255,248,231,0.08);color:var(--gold);border:2px solid var(--gold)}
+.btn-success{background:var(--ok);color:#fff}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn-row .btn-big{flex:1;min-width:140px;margin:0}
+/* 报告区 */
+.report{
+  background:rgba(0,0,0,0.4);
+  border:3px double var(--cinn2);
+  border-radius:14px;
+  padding:24px;margin:16px 0;
+  max-height:600px;overflow-y:auto;
+}
+.report h3{
+  font-size:22px;color:var(--cinn2);
+  margin:20px 0 12px;
+  padding-bottom:8px;
+  border-bottom:1px dashed var(--gold);
+  letter-spacing:3px;
+}
+.report h3:first-child{margin-top:0}
+.report p{font-size:18px;margin:8px 0;line-height:1.8}
+.report table{width:100%;border-collapse:collapse;margin:12px 0;font-size:17px}
+.report th{background:rgba(201,168,76,0.2);color:var(--gold2);padding:10px;font-size:18px;letter-spacing:2px}
+.report td{padding:8px 10px;border-bottom:1px solid rgba(201,168,76,0.15);color:var(--paper2)}
+.report .danger{color:var(--cinn2);font-weight:700}
+.report .warn{color:var(--warn);font-weight:700}
+.report .ok{color:var(--ok);font-weight:700}
+.report .row-flex{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.report .pill{
+  background:rgba(201,168,76,0.15);
+  color:var(--gold2);padding:6px 14px;
+  border-radius:16px;font-size:16px;font-weight:700;
+  border:1px solid var(--gold);
+}
+.report .pill.cinn{background:rgba(220,38,38,0.2);color:var(--cinn2);border-color:var(--cinn2)}
+/* 紧急警告 */
+.emergency{
+  background:linear-gradient(135deg,#7f1d1d,#450a0a);
+  border:3px solid var(--cinn2);
+  border-radius:14px;padding:20px;margin:16px 0;
+  font-size:20px;color:#fff;
+  animation:pulse 2s infinite;
+  box-shadow:0 0 30px rgba(220,38,38,0.5);
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 30px rgba(220,38,38,0.5)}50%{box-shadow:0 0 50px rgba(220,38,38,0.9)}}
+.emergency .icon{font-size:48px;display:block;text-align:center;margin-bottom:8px}
+/* 时间轴 */
+.timeline{
+  position:relative;padding:0 0 0 30px;margin:16px 0;
+  border-left:3px solid var(--gold);
+}
+.timeline-item{position:relative;padding:8px 0 16px}
+.timeline-item::before{
+  content:'';position:absolute;
+  left:-38px;top:14px;width:18px;height:18px;
+  background:var(--gold);border-radius:50%;
+  border:3px solid var(--ink);
+}
+.timeline-item .age{color:var(--gold);font-weight:900;font-size:20px;letter-spacing:3px}
+.timeline-item .event{color:var(--paper2);font-size:18px;margin-top:4px}
+.timeline-item .risk{
+  display:inline-block;padding:2px 10px;border-radius:10px;
+  font-size:14px;font-weight:700;margin-left:8px;
+}
+.risk-h{background:var(--cinn2);color:#fff}
+.risk-m{background:var(--warn);color:#fff}
+.risk-l{background:var(--ok);color:#fff}
+/* tab-panel */
+.tab-panel{display:none;animation:fadeIn .3s}
+.tab-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+/* loading */
+.spinner{
+  width:60px;height:60px;border:6px solid rgba(201,168,76,0.2);
+  border-top-color:var(--gold2);border-radius:50%;
+  animation:spin 1s linear infinite;margin:24px auto;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none}
+/* 浮动 */
+.float-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,0.85);padding:12px 20px;
+  display:flex;gap:8px;z-index:90;
+  border-top:2px solid var(--gold);
+  backdrop-filter:blur(12px);
+}
+.float-bar .btn-big{min-height:52px;font-size:18px;flex:1;margin:0}
+/* toast */
+.toast{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.95);color:var(--gold2);
+  padding:18px 32px;border-radius:14px;
+  font-size:18px;z-index:1000;display:none;
+  border:2px solid var(--gold);
+  letter-spacing:3px;max-width:80%;text-align:center;
+}
+.toast.show{display:block;animation:in .3s}
+@keyframes in{from{opacity:0;transform:translate(-50%,-40%)}to{opacity:1;transform:translate(-50%,-50%)}}
+/* R40-B master-disease 双核 + 事业 */
+.mdd-career{padding:18px;background:linear-gradient(135deg,rgba(74,138,168,.08),rgba(0,0,0,.2));border-radius:12px;margin:14px 0;border:1px dashed #4a8aa8}
+.mdd-career-title{font-size:15px;color:#4a8aa8;letter-spacing:3px;margin-bottom:10px;font-weight:700;display:flex;align-items:center;gap:8px}
+.mdd-career-subtitle{font-size:11px;opacity:0.85;margin-bottom:12px;letter-spacing:1px}
+.mdd-career-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.mdd-career-cell{padding:12px 10px;background:rgba(74,138,168,.08);border-radius:8px;border:1px solid var(--line);font-size:11px;line-height:1.8;text-align:center;transition:.2s}
+.mdd-career-cell:hover{background:rgba(74,138,168,.18);border-color:#4a8aa8;transform:translateY(-2px)}
+.mdd-career-cell .icon{font-size:22px;display:block;margin-bottom:4px}
+.mdd-career-cell b{font-size:11px;color:#4a8aa8;display:block;margin-bottom:4px;letter-spacing:1.5px}
+.mdd-career-cell .tip{font-size:10px;opacity:0.85;line-height:1.7}
+.mdd-career-verdict{margin-top:14px;padding:12px;background:rgba(0,0,0,.3);border-radius:8px;border:1px dashed #4a8aa8;font-size:12px;line-height:2}
+.mdd-career-source{font-size:10px;opacity:0.85;margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);letter-spacing:1px;text-align:right}
+.mdd-career .health-section{margin-top:18px;padding:14px;background:rgba(74,154,110,.08);border-radius:10px;border:1px dashed #4a9a6e}
+.mdd-career .health-title{font-size:14px;color:#4a9a6e;letter-spacing:2px;margin-bottom:10px;font-weight:600}
+.mdd-career .health-8grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mdd-career .health-cell{padding:8px;background:rgba(74,154,110,.06);border-radius:6px;border:1px solid var(--line);font-size:10px;text-align:center}
+.mdd-career .health-cell .icon{font-size:16px;display:block;margin-bottom:2px}
+.mdd-career .health-cell b{font-size:10px;color:#4a9a6e;display:block}
+@media(max-width:768px){.mdd-career-8grid,.mdd-career .health-8grid{grid-template-columns:repeat(2,1fr)}}

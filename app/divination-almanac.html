@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="易道智鉴 · 易道智鉴平台">
+<meta name="keywords" content="易道智鉴">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/divination-almanac.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="易道智鉴 · 先进系统推演">
+<meta property="og:description" content="易道智鉴 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>易道智鉴 · 先进系统推演</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/divination-almanac-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+</head>
+
+<body class="theme-zhouyi">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">易道智鉴</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择日期</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看宜忌</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>黄历详情</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>择吉参考</span></div></div>
+<div class="flow-hint">信众查看每日黄历，宜忌+冲煞+吉时+方位。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">主平台</a>
+  <a href="divination-almanac.html" class="file-nav-btn active">历 黄历</a>
+  <a href="divination-integrated.html" class="file-nav-btn">因 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn">医 中医诊疗</a>
+  <a href="tcm-symptom.html" class="file-nav-btn">诊 症状分析</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">莲 倪师知识库</a>
+  <a href="nihaisha-tool.html" class="file-nav-btn">研 倪师工具</a>
+  <a href="nihaisha-learning.html" class="file-nav-btn">经 倪师学堂</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">标 舒晗知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn">购 商城</a>
+  <a href="divination-membership.html" class="file-nav-btn">宝 会员</a>
+  <a href="wechat-hub.html" class="file-nav-btn">机 缘主工具</a>
+  <a href="ai-assistant.html" class="file-nav-btn">机 智能助手</a>
+  <a href="login.html" class="file-nav-btn">密 登录</a>
+</div>
+<!-- 个人八字录入 -->
+<div id="personalPanel" style="max-width:900px;margin:12px auto;padding:0 20px">
+  <details style="background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:10px 16px">
+    <summary style="cursor:pointer;font-size:12px;letter-spacing:3px;color:var(--gold);opacity:.85">圆 录入您的八字（获取个性化黄历）</summary>
+    <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px">
+      <input class="input-field" type="text" id="userName" placeholder="姓名" style="font-size:12px;padding:6px 8px" aria-label="姓名">
+      <input class="input-field" type="date" id="userBirthDate" placeholder="出生日期" style="font-size:12px;padding:6px 8px" aria-label="出生日期">
+      <select class="input-field" id="userBirthHour" style="font-size:12px;padding:6px 8px" aria-label="userBirthHour">
+        <option value="">时辰</option>
+        <option value="0">子时 23-1</option><option value="2">丑时 1-3</option>
+        <option value="4">寅时 3-5</option><option value="6">卯时 5-7</option>
+        <option value="8">辰时 7-9</option><option value="10">巳时 9-11</option>
+        <option value="12">午时 11-13</option><option value="14">未时 13-15</option>
+        <option value="16">申时 15-17</option><option value="18">酉时 17-19</option>
+        <option value="20">戌时 19-21</option><option value="22">亥时 21-23</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:4px;font-size:11px;opacity:.85;cursor:pointer" for="userSex-male"><input type="radio" name="userSex" value="male" style="accent-color:var(--gold)" aria-label="男命" id="userSex-male">男</label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:11px;opacity:.85;cursor:pointer" for="userSex-female"><input type="radio" name="userSex" value="female" style="accent-color:var(--gold)" aria-label="女命" id="userSex-female">女</label>
+      <input class="input-field" type="text" id="userBirthplace" placeholder="出生地" style="font-size:12px;padding:6px 8px" aria-label="出生地">
+      <input class="input-field" type="text" id="userResidence" placeholder="现居地" style="font-size:12px;padding:6px 8px" aria-label="现居地">
+      <input class="input-field" type="text" id="userOccupation" placeholder="职业/行业" style="font-size:12px;padding:6px 8px" aria-label="职业/行业">
+      <button class="compute-btn" style="padding:6px 12px;font-size:11px" onclick="saveUserBazi()">保存</button>
+      <button class="compute-btn" style="padding:6px 12px;font-size:11px;background:rgba(255,255,255,.05)" onclick="clearUserBazi()">清除</button>
+    </div>
+    <div id="userBaziStatus" style="font-size:10px;opacity:.85;margin-top:6px;letter-spacing:2px"></div>
+  </details>
+</div>
+<div class="container">
+  <header class="header">
+    <div style="margin-bottom:6px"><a href="divination-hub.html" style="color:var(--gold);text-decoration:none;font-size:12px;letter-spacing:2px">← 返回主平台</a> &nbsp;|&nbsp; <a href="divination-integrated.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">体质</a> &nbsp;|&nbsp; <a href="divination-knowledge.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">知识库</a> &nbsp;|&nbsp; <a href="divination-membership.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">会员</a> &nbsp;|&nbsp; <a href="divination-shop.html" style="color:var(--paper3);text-decoration:none;font-size:12px;letter-spacing:2px">商城</a></div>
+    <div class="header-brand">易道智鉴 · 先进系统推演</div>
+    <h1 class="header-title">黄 历 三 视 角</h1>
+    <p class="header-sub">儒 · 道 · 释 一 日 三 观</p>
+    <p style="font-size:13px;color:var(--gold2);letter-spacing:5px;margin-top:12px;opacity:.85">知命 · 改运 · 修心持善守静</p>
+    <p style="font-size:11px;color:var(--paper3);margin-top:6px;opacity:.95">九紫离火运 (2024-2043) · 正神位正南 · 零神位正北</p>
+  </header>
+
+  <!-- 日期选择 -->
+  <div class="date-picker">
+    <input type="date" id="almanacDate" onchange="updateAlmanac()" aria-label="almanacDate">
+  </div>
+
+  <!-- 黄历信息 -->
+  <div class="almanac-info" id="almanacInfo"></div>
+
+  <!-- 三视角 Tab -->
+  <div class="view-tabs">
+    <button class="view-tab ru-tab active" onclick="switchView('ru')"><span class="tab-emoji">经</span>儒家视角</button>
+    <button class="view-tab dao-tab" onclick="switchView('dao')"><span class="tab-emoji">道</span>道家视角</button>
+    <button class="view-tab fo-tab" onclick="switchView('fo')"><span class="tab-emoji">莲</span>佛家视角</button>
+  </div>
+
+  <!-- 视角内容 -->
+  <div class="view-content" id="viewContent"></div>
+
+  <!-- 时辰选择 -->
+  <div class="shichen-picker" id="shichenPicker">
+    <p class="shichen-label">点击查看十二时辰解读</p>
+    <div class="shichen-grid" id="shichenGrid"></div>
+  </div>
+
+  <!-- 时辰解读 -->
+  <div class="shichen-view" id="shichenView"></div>
+
+  <!-- 每日建议 -->
+  <div class="daily-advice" id="dailyAdvice"></div>
+</div>
+
+<!-- 返回主 hub 的链接 -->
+<div class="back-link">
+  <a href="divination-hub.html">← 返回易道智鉴</a>
+</div>
+
+<script src="js/ui-toast.js" defer></script>
+
+
+<div class="feature-nav-bar">
+  <div style="max-width:900px;margin:0 auto;padding:0 20px">
+    <div class="feature-nav-title">—— 易道智鉴 · 平台功能导航 ——</div>
+    <div class="feature-nav-cards">
+      <a class="fn-card" href="divination-hub.html">
+        <span class="fn-icon">宅</span>
+        <span class="fn-name">命理总览</span>
+        <span class="fn-desc">八字·六爻·风水·姓名</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-fengshui">
+        <span class="fn-icon">山</span>
+        <span class="fn-name">风水堪舆</span>
+        <span class="fn-desc">阳宅阴宅·方位布局</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-xingming">
+        <span class="fn-icon">✍️</span>
+        <span class="fn-name">改名取名</span>
+        <span class="fn-desc">八字配合·五格数理</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-company">
+        <span class="fn-icon">企</span>
+        <span class="fn-name">公司起名</span>
+        <span class="fn-desc">品牌命名·工商核名</span>
+      </a>
+      <a class="fn-card" href="divination-hub.html#section-cezi">
+        <span class="fn-icon">建</span>
+        <span class="fn-name">户型鉴别</span>
+        <span class="fn-desc">选房看宅·吉凶判断</span>
+      </a>
+      <a class="fn-card" href="divination-integrated.html">
+        <span class="fn-icon">因</span>
+        <span class="fn-name">体质调理</span>
+        <span class="fn-desc">中医五行·辨证论治</span>
+      </a>
+      <a class="fn-card" href="divination-knowledge.html">
+        <span class="fn-icon">典</span>
+        <span class="fn-name">易学知识</span>
+        <span class="fn-desc">权威体系·通俗解读</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script defer src="../knowledge/festival-knowledge-base.js"></script>
+<script defer src="../knowledge/faith-content.js"></script>
+<script defer src="js/daily-knowledge.js"></script>
+<!-- 智能助手浮动按钮 -->
+<a href="ai-assistant.html" style="position:fixed;bottom:20px;right:20px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;font-size:24px;text-decoration:none;box-shadow:0 4px 16px rgba(201,168,76,0.3)">机</a>
+
+<!-- R40-D H5 5 页面双核速查最小注入 -->
+<script src="../knowledge/r39-dual-core-kb.js"></script>
+<div class="r40-mini" style="padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(0,0,0,.2));border:1px dashed var(--gold);border-radius:10px;margin:20px">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <span style="font-size:18px">诊💼</span>
+    <b style="font-size:12px;color:var(--gold);letter-spacing:2px">双核速查（R40-D）</b>
+    <span style="font-size:10px;opacity:.95">基于 R39-B 双核 KB（2108 条）</span>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:10px">
+    <input type="text" id="r40MiniQuery" placeholder="输入关键词，如：气血、正财、紫微、田宅" style="flex:1;padding:6px 10px;background:rgba(0,0,0,.3);color:var(--paper);border:1px solid var(--line);border-radius:6px;font-size:12px" aria-label="输入关键词，如：气血、正财、紫微、田宅">
+    <button onclick="r40MiniSearch()" style="padding:6px 14px;background:var(--gold);color:#000;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">查询</button>
+  </div>
+  <div id="r40MiniResult" style="font-size:11px;line-height:1.8;min-height:30px"></div>
+</div>
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/divination-almanac-inline.js" defer></script>
+<script src="js/almanac-heatmap-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(e){console.warn('[SW]', e);});
+  });
+  function _r89LBadge(){
+    var b = document.getElementById('r89NetBadge');
+    if(!b) return;
+    if(!navigator.onLine){ b.textContent='⚠️ 离线'; b.style.background='#ef4444'; b.style.display='block'; }
+    else { b.textContent='🟢 在线'; b.style.background='#10b981'; setTimeout(function(){ if(navigator.onLine) b.style.display='none'; }, 2000); }
+  }
+  window.addEventListener('online', _r89LBadge);
+  window.addEventListener('offline', _r89LBadge);
+  document.addEventListener('DOMContentLoaded', _r89LBadge);
+}
+</script>
+<span id="r89NetBadge" style="display:none;position:fixed;top:8px;right:8px;padding:4px 10px;background:#ef4444;color:#fff;border-radius:10px;font-size:11px;font-weight:600;z-index:9999;font-family:monospace;box-shadow:0 2px 8px rgba(0,0,0,.3)"></span>
+
+<style>
+/* R98-g 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  table{font-size:11px}
+  .btn{padding:6px 10px;font-size:12px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  table{font-size:10px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+}
+</style>
+
+<style>
+/* R98-g 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  table{font-size:11px}
+  .btn{padding:6px 10px;font-size:12px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  table{font-size:10px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+}
+@media print{body{background:#fff!important;color:#000!important}.nav-bar,.feature-nav-bar,.back-link,.compute-btn,.no-print{display:none!important}.container,.header,.wrap{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}.almanac-info,.daily-advice,.fn-card,.card{break-inside:avoid;box-shadow:none!important;border:1px solid #ccc!important}h1,h2,h3{break-after:avoid}table{width:100%!important;font-size:11px}img{max-width:100%!important}}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

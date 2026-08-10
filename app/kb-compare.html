@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="KB 模块对比 · 易道智鉴平台">
+<meta name="keywords" content="KB 模块对比">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-compare.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="KB 模块对比 · R69 · 易道智鉴">
+<meta property="og:description" content="KB 模块对比 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>KB 模块对比 · R69 · 易道智鉴</title>
+<style>
+:root{--gold:#c9a84c;--gold2:#e6c873;--paper:#e8e4d8;--paper3:#9c9888;--bg:#0d1117;--bg2:#161b22;--bg3:#1e242e;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--paper);padding:16px;min-height:100vh;}
+h1{font-size:20px;color:var(--gold2);margin-bottom:4px;}
+.sub{font-size:12px;color:var(--paper3);margin-bottom:14px;}
+.top{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center;}
+.sel{padding:8px 12px;background:var(--bg3);border:1px solid var(--gold);color:var(--paper);border-radius:8px;font-size:13px;min-width:160px;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bg3);}
+th{color:var(--gold);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;}
+td{color:var(--paper);}
+tr:hover td{background:rgba(201,168,76,.04);}
+.badge{display:inline-block;padding:2px 7px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:10px;color:var(--gold2);font-size:11px;margin:2px 3px;}
+.badge.same{background:rgba(127,200,169,.15);border-color:rgba(127,200,169,.4);color:#7fc8a9;}
+.badge.diff{background:rgba(212,155,107,.1);border-color:rgba(212,155,107,.3);color:#d49b6b;}
+.score-bar{display:flex;gap:2px;align-items:center;}
+.score-bar .track{flex:1;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;}
+.score-bar .fill{height:100%;background:var(--gold2);border-radius:3px;}
+.btn{padding:6px 14px;background:var(--bg3);border:1px solid var(--gold);color:var(--paper);border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;}
+.btn:hover{background:var(--gold);color:var(--bg);}
+.empty{text-align:center;padding:60px 20px;color:var(--paper3);font-size:14px;}
+.matrix{display:grid;gap:2px;margin-top:14px;}
+.matrix-cell{padding:6px 8px;font-size:11px;border-radius:4px;cursor:pointer;text-align:center;white-space:nowrap;}
+.matrix-cell:hover{opacity:.8;}
+@media(max-width:768px){th,td{padding:6px 8px;font-size:11px;}.sel{min-width:120px;}}
+
+/* R-P3-17.4 通用 reflow */
+@media(max-width:768px){body{font-size:14px}h1{font-size:22px!important}h2{font-size:19px!important}[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{grid-template-columns:repeat(2,1fr)!important}.wrap,.container{padding:12px!important;max-width:100vw!important;overflow-x:hidden!important}.toolbar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}table{display:block!important;overflow-x:auto!important}.modal-box{width:calc(100vw - 24px)!important;max-width:100%!important;margin:12px!important}}
+@media(max-width:480px){body{font-size:13px}[style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3)"]{grid-template-columns:1fr!important}}
+@media(max-width:320px){body{font-size:12px;padding:0!important}h1{font-size:18px!important}input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back, .top, .btn, .sel,
+  a[style*="position:fixed"], [style*="position:fixed"], .mobile-nav,
+  header, nav, .kbe-search, .toolbar, .filters, .skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,td,th,span,div,a,label{color:#000!important}
+  table{width:100%!important;font-size:10pt!important;border-collapse:collapse}
+  th,td{padding:4px 6px!important;border:1px solid #ccc!important;color:#000!important}
+  .table-wrap{overflow-x:visible!important}
+  .matrix-cell{padding:4px 6px!important}
+  .badge{border:1px solid #ccc!important;color:#000!important}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  .card,tr,li{break-inside:avoid;page-break-inside:avoid}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
+</style>
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB 模块对比</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>对比数据</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>差异分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出结果</span></div></div>
+<div class="flow-hint">管理员对比知识库版本差异，模块/条目/质量趋势。</div>
+</div>
+<h1>平 KB 模块对比 · R69</h1>
+<div class="sub">两两并排对比：标签重叠 · 条目数 · trust · 模型源</div>
+
+<div class="top">
+  <label style="font-size:12px;color:var(--paper3)">模块 A</label>
+  <select class="sel" id="selA" aria-label="模块 A"><option value="">— 选择 —</option></select>
+  <label style="font-size:12px;color:var(--paper3)">模块 B</label>
+  <select class="sel" id="selB" aria-label="模块 B"><option value="">— 选择 —</option></select>
+  <button class="btn" id="btnSwap">⇄ 互换</button>
+  <button class="btn" id="btnRand">骰 随机</button>
+</div>
+
+<div id="result"></div>
+
+<script>
+// 数据来源：与 ai-assistant-inline.js 中的 KB_SOURCES 对齐
+var cmpState = window.cmpState = window.cmpState || {};
+
+const MODULES = [
+  {id:'bazi',name:'八字',n:612,cat:'classical',tr:.92,tags:['四柱','日主','十神'],src:'BAZI_KB'},
+  {id:'ziwei',name:'紫微',n:480,cat:'classical',tr:.88,tags:['宫位','星曜','四化'],src:'ZIWEI_KB'},
+  {id:'qimen',name:'奇门',n:298,cat:'classical',tr:.85,tags:['八门','九星','三奇'],src:'QIMEN_KB'},
+  {id:'liuyao',name:'六爻',n:255,cat:'classical',tr:.86,tags:['卦象','世应','六亲'],src:'LIUYAO_KB'},
+  {id:'meihua',name:'梅花',n:188,cat:'classical',tr:.81,tags:['体用','卦象','时间'],src:'MEIHUA_KB'},
+  {id:'liuren',name:'六壬',n:165,cat:'classical',tr:.79,tags:['课式','三传','天乙'],src:'LIUREN_KB'},
+  {id:'fengshui',name:'风水',n:340,cat:'classical',tr:.87,tags:['峦头','理气','八宅'],src:'FENGSHUI_KB'},
+  {id:'zeri',name:'择日',n:215,cat:'classical',tr:.84,tags:['黄历','建除','神煞'],src:'ZERI_KB'},
+  {id:'taisui',name:'太岁',n:168,cat:'classical',tr:.82,tags:['值年','冲克','化解'],src:null},
+  {id:'huangli',name:'老黄历',n:268,cat:'practice',tr:.85,tags:['宜忌','吉日','时辰'],src:null},
+  {id:'yunshi',name:'运势',n:325,cat:'practice',tr:.83,tags:['流年','大运','神煞'],src:'SHUHAN_KB'},
+  {id:'caiyun',name:'财运',n:178,cat:'practice',tr:.79,tags:['财星','流年','投资'],src:'SHUHAN_KB'},
+  {id:'ganqing',name:'感情',n:202,cat:'practice',tr:.81,tags:['桃花','日主','合化'],src:'SHUHAN_KB'},
+  {id:'shiye',name:'事业',n:198,cat:'practice',tr:.80,tags:['官星','驿马','流年'],src:'SHUHAN_KB'},
+  {id:'xingming',name:'姓名',n:142,cat:'practice',tr:.78,tags:['五格','三才','八字'],src:null},
+  {id:'yanzhi',name:'颜痣',n:178,cat:'practice',tr:.75,tags:['面相','部位','吉凶'],src:'YANZHI_KB'},
+  {id:'zodiac',name:'生肖',n:198,cat:'classical',tr:.81,tags:['十二支','合冲','刑害'],src:'ZODIAC_KB'},
+  {id:'classics',name:'经典',n:425,cat:'classical',tr:.92,tags:['古文','原文','注释'],src:'CLASSICS_KB'},
+  {id:'zhongyi',name:'中医',n:405,cat:'tcm',tr:.91,tags:['辨证','方剂','舌脉'],src:'TCM_KB'},
+  {id:'tcm-fangji',name:'方剂学',n:326,cat:'tcm',tr:.91,tags:['君臣佐使','加减','经方'],src:null},
+  {id:'tcm-zhongfu',name:'中医脏腑',n:100,cat:'tcm',tr:.85,tags:['五脏','气血','阴阳'],src:'TCM_KB'},
+  {id:'shanghan-lun',name:'伤寒论',n:307,cat:'tcm',tr:.93,tags:['六经','方证','传变'],src:null},
+  {id:'shuhan',name:'舒氏奇门',n:541,cat:'shuhan',tr:.88,tags:['密宗天纪','奇门校正','化解'],src:'SHUHAN_KB'},
+  {id:'shuhan-mixun',name:'舒氏密训',n:285,cat:'shuhan',tr:.84,tags:['天纪','天机','实战'],src:null},
+  {id:'nihaisha',name:'倪海厦',n:425,cat:'lushi',tr:.90,tags:['人纪','天纪','经方'],src:'NIHAISHA_KB'},
+  {id:'nihaisha-tianji',name:'倪氏天纪',n:312,cat:'lushi',tr:.87,tags:['紫微','易经','风水'],src:null},
+  {id:'acupuncture',name:'针灸',n:304,cat:'tcm',tr:.86,tags:['穴位','手法','主治'],src:null},
+  {id:'music',name:'五行音乐',n:158,cat:'practice',tr:.76,tags:['宫商角徵羽','情绪','Edge-TTS'],src:null},
+  {id:'lifeindex',name:'人生指数',n:215,cat:'practice',tr:.79,tags:['十维','五行','评分'],src:null},
+  {id:'lifeplan',name:'人生规划',n:328,cat:'practice',tr:.82,tags:['时间轴','领域','行动'],src:null},
+  {id:'mobile',name:'手机号码',n:135,cat:'practice',tr:.74,tags:['数理','卦象','吉凶'],src:null},
+  {id:'mantra',name:'咒语',n:88,cat:'practice',tr:.68,tags:['符咒','念诵','化解'],src:'MANTRA_KB'},
+  {id:'faith',name:'信仰',n:142,cat:'practice',tr:.73,tags:['传统','民俗','祭祀'],src:'FAITH_KB'},
+];
+
+function buildSelect(id, selId){
+  const sel = document.getElementById(selId);
+  MODULES.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id; opt.textContent = m.name + ' (' + m.n + ')';
+    sel.appendChild(opt);
+  });
+}
+buildSelect('A','selA'); buildSelect('B','selB');
+if (MODULES.length > 1) document.getElementById('selB').value = MODULES[1].id;
+
+function overlap(a, b){
+  const setA = new Set(a.tags||[]);
+  return (b.tags||[]).filter(t => setA.has(t));
+}
+
+function render(){
+  const aId = document.getElementById('selA').value;
+  const bId = document.getElementById('selB').value;
+  const box = document.getElementById('result');
+  if (!aId || !bId){
+    box.innerHTML = '<div class="empty">选择两个模块开始对比</div>';
+    return;
+  }
+  const a = MODULES.find(m=>m.id===aId);
+  const b = MODULES.find(m=>m.id===bId);
+  if (!a || !b){ box.innerHTML=''; return; }
+  const com = overlap(a, b);
+  const jac = com.length / (a.tags.length + b.tags.length - com.length || 1);
+  const nDiff = Math.abs(a.n - b.n);
+  const trDiff = Math.abs(a.tr - b.tr);
+
+  function badgeList(tags, ref){
+    return (tags||[]).map(t=>'<span class="badge '+(ref.has(t)?'same':'diff')+'">'+t+'</span>').join('');
+  }
+  const bTags = new Set(b.tags||[]);
+
+  box.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>维度</th><th>${a.name} <small>(${a.id})</small></th><th></th><th>${b.name} <small>(${b.id})</small></th></tr></thead>
+        <tbody>
+          <tr><td>分类</td><td>${a.cat}</td><td>—</td><td>${b.cat}</td></tr>
+          <tr><td>KB 模型源</td><td>${a.src||'（内嵌）'}</td><td>—</td><td>${b.src||'（内嵌）'}</td></tr>
+          <tr><td>条目数</td><td><strong>${a.n}</strong></td><td>差 ${nDiff}</td><td><strong>${b.n}</strong></td></tr>
+          <tr><td>平均 trust</td><td>${a.tr.toFixed(2)}</td><td>差 ${trDiff.toFixed(2)}</td><td>${b.tr.toFixed(2)}</td></tr>
+          <tr><td>共享标签</td><td colspan="3">${com.length ? com.join(' · ') : '<span style="opacity:.85">无</span>'}</td></tr>
+          <tr><td>标签集</td><td>${badgeList(a.tags, bTags)}</td><td></td><td>${badgeList(b.tags, new Set(a.tags||[]))}</td></tr>
+          <tr><td>Jaccard</td><td colspan="3">
+            <div class="score-bar"><div class="track"><div class="fill" style="width:${Math.round(jac*100)}%;background:${jac>.3?'#7fc8a9':jac>.1?'#c9a84c':'#d49b6b'}"></div></div><span style="font-size:12px;margin-left:6px;color:var(--paper3)">${(jac*100).toFixed(1)}%</span></div>
+          </td></tr>
+          <tr><td>操作</td>
+            <td><button class="btn" onclick="location.href='ai-assistant.html?module=${a.id}'">打开 ${a.name}</button></td>
+            <td></td>
+            <td><button class="btn" onclick="location.href='ai-assistant.html?module=${b.id}'">打开 ${b.name}</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px">
+      <div style="font-size:12px;color:var(--paper3);margin-bottom:6px">重叠矩阵热力图（颜色深浅 = Jaccard 相似度）</div>
+      <div class="matrix" id="mat"></div>
+    </div>`;
+
+  // 热力矩阵（只显示 top-12 模块加速渲染）
+  const top = MODULES.slice(0, 12);
+  const mat = document.getElementById('mat');
+  mat.style.gridTemplateColumns = '110px repeat('+top.length+', 1fr)';
+  // 表头
+  mat.innerHTML = '<div></div>' + top.map(m=>'<div style="color:var(--gold);font-size:10px;text-align:center">'+m.name+'</div>').join('');
+  top.forEach(row=>{
+    mat.innerHTML += '<div style="color:var(--paper3);font-size:10px;text-align:right;padding-right:4px">'+row.name+'</div>';
+    top.forEach(col=>{
+      if (row.id === col.id){
+        mat.innerHTML += '<div class="matrix-cell" style="background:var(--gold);color:var(--bg)">1.0</div>';
+      } else {
+        const j = overlap(row,col).length / (row.tags.length + col.tags.length - overlap(row,col).length || 1);
+        const bg = j > .3 ? 'rgba(127,200,169,.35)' : j > .1 ? 'rgba(201,168,76,.25)' : 'rgba(212,155,107,.12)';
+        mat.innerHTML += '<div class="matrix-cell" style="background:'+bg+';color:var(--paper)" title="'+row.name+' vs '+col.name+'">'+(j*100).toFixed(0)+'%</div>';
+      }
+    });
+  });
+}
+
+document.getElementById('selA').addEventListener('change', render);
+document.getElementById('selB').addEventListener('change', render);
+document.getElementById('btnSwap').onclick = function(){
+  const a = document.getElementById('selA');
+  const tmp = a.value; a.value = document.getElementById('selB').value;
+  document.getElementById('selB').value = tmp;
+  render();
+};
+document.getElementById('btnRand').onclick = function(){
+  const i = cmpState.i = ((cmpState.i||0) + 1) % MODULES.length;
+  let j = (i + 1) % MODULES.length;
+  if (j===i) j=(j+1)%MODULES.length;
+  document.getElementById('selA').value = MODULES[i].id;
+  document.getElementById('selB').value = MODULES[j].id;
+  render();
+};
+render();
+</script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-m 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-m 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<meta charset="UTF-8">
+<meta name="description" content="工单管理 · 易道智鉴平台">
+<meta name="keywords" content="工单管理">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/admin-tickets.html">
+<meta name="theme-color" content="#050608">
+<title>工单管理 · 命理宝鉴后台</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--gold:#c9a84c;--gold2:#d4b85a;--surface:#161b22;--border:#30363d;--text:#c9d1d9;--text-muted:#8b949e;--green:#3fb950;--red:#f85149;--yellow:#d29922;--blue:#58a6ff;--purple:#a78bfa}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d1117;color:var(--text)}
+.nav-bar{display:flex;gap:4px;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.nav-bar a{color:var(--gold);text-decoration:none;font-size:13px;padding:6px 12px;border-radius:6px}
+.nav-bar a.active{background:rgba(201,168,76,.2)}
+.container{max-width:1280px;margin:0 auto;padding:16px}
+h1{font-size:20px;color:var(--gold);margin-bottom:16px}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid var(--border)}
+.tab-btn{padding:8px 16px;background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;border-bottom:2px solid transparent;transition:.2s}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px}
+.stat-card .stat-val{font-size:22px;font-weight:700;color:var(--gold2)}
+.stat-card .stat-label{font-size:11px;color:var(--text-muted);margin-top:2px}
+.section-title{font-size:15px;color:var(--gold);margin:20px 0 10px;display:flex;align-items:center;gap:6px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px}
+.chart-bar{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.chart-bar .bar-label{width:90px;font-size:12px;color:var(--text-muted);text-align:right;flex-shrink:0}
+.chart-bar .bar-track{flex:1;height:18px;background:rgba(255,255,255,.04);border-radius:4px;overflow:hidden}
+.chart-bar .bar-fill{height:100%;border-radius:4px;transition:width .5s;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;font-size:10px;color:#fff}
+.bar-bug{background:var(--red)}.bar-sug{background:var(--blue)}.bar-q{background:var(--yellow)}.bar-feat{background:var(--purple)}.bar-praise{background:var(--green)}
+.word-cloud{display:flex;flex-wrap:wrap;gap:6px}
+.word-tag{padding:3px 10px;border-radius:12px;font-size:12px;cursor:pointer;transition:.2s}
+.filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.filters select,.filters input{padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px}
+.filters input{flex:1;min-width:200px}
+table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:8px;overflow:hidden}
+th,td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;font-size:12px}
+th{background:rgba(201,168,76,.06);color:var(--gold);font-weight:600;white-space:nowrap}
+tr:hover{background:rgba(255,255,255,.02)}
+tr.selected{background:rgba(201,168,76,.08)}
+.status-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+.status-open{background:rgba(248,81,73,.15);color:var(--red)}
+.status-in_progress{background:rgba(210,153,34,.15);color:var(--yellow)}
+.status-resolved{background:rgba(63,185,80,.15);color:var(--green)}
+.status-closed{background:rgba(139,148,158,.15);color:var(--text-muted)}
+.status-rejected{background:rgba(248,81,73,.1);color:var(--text-muted)}
+.checkbox-cell{width:30px;text-align:center}
+.pagination{display:flex;gap:4px;margin-top:10px;justify-content:center}
+.pagination button{padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px}
+.pagination button.active{background:var(--gold);color:#1a1a2e;border-color:var(--gold)}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+.batch-bar{display:none;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:10px;margin-bottom:10px;align-items:center;gap:8px;flex-wrap:wrap}
+.batch-bar.show{display:flex}
+.batch-bar select,.batch-bar button{padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;cursor:pointer}
+.batch-bar button{background:var(--gold);color:#1a1a2e;border:none;font-weight:600}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:flex-start;z-index:9999;padding:20px;overflow-y:auto}
+.modal.show{display:flex}
+.modal-content{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:640px;width:100%;margin:auto}
+.modal-content h2{color:var(--gold);margin-bottom:12px;font-size:16px}
+.modal-content .field{margin-bottom:10px}
+.modal-content .field label{display:block;font-size:12px;color:var(--text-muted);margin-bottom:2px}
+.modal-content .field input,.modal-content .field textarea,.modal-content .field select{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px}
+.modal-content .field textarea{min-height:60px;resize:vertical}
+.modal-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.modal-actions button{padding:8px 14px;border:none;border-radius:6px;cursor:pointer;font-size:13px}
+.btn-primary{background:var(--gold);color:#1a1a2e;font-weight:600}
+.btn-secondary{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)!important}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.reply-box{background:rgba(63,185,80,.05);border:1px solid rgba(63,185,80,.2);border-radius:6px;padding:10px;margin-top:8px;font-size:13px;white-space:pre-wrap}
+.screenshot-thumb{max-width:100%;border-radius:6px;margin-top:6px;cursor:pointer}
+.tag-input{display:flex;flex-wrap:wrap;gap:4px;padding:6px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;min-height:36px}
+.tag-chip{padding:2px 8px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:10px;font-size:11px;color:var(--gold);display:flex;align-items:center;gap:4px}
+.tag-chip .tag-remove{cursor:pointer;opacity:.6}
+.tag-suggest{padding:3px 8px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--text-muted);cursor:pointer}
+.tag-suggest:hover{border-color:var(--gold);color:var(--gold)}
+@media(max-width:768px){.stat-grid{grid-template-columns:repeat(2,1fr)}table{font-size:11px}th,td{padding:6px 4px}.grid-2{grid-template-columns:1fr}}
+@media(max-width:360px){body{padding:8px 4px}h1{font-size:17px}.nav-bar{padding:6px 4px}.nav-bar a{font-size:11px;padding:4px 6px}.container{padding:8px 4px}.tab-btn{font-size:12px;padding:6px 8px}.stat-grid{grid-template-columns:1fr}.stat-card{padding:8px 6px}.stat-card .stat-val{font-size:18px}.section-title{font-size:13px}table{font-size:10px}th,td{padding:4px 3px}.btn{font-size:11px;padding:4px 8px}}
+@media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+</style>
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">工单管理</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看工单</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>处理请求</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>回复用户</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>关闭工单</span></div></div>
+</div>
+
+<nav class="nav-bar">
+  <a href="admin.html">宅 后台</a>
+  <a href="admin-tickets.html" class="active">票 工单管理</a>
+  <a href="admin-kb-panel.html">知识库</a>
+  <a href="monitor-portal.html">图 监控</a>
+  <a href="divination-hub.html">宅 主站</a>
+</nav>
+
+<div class="container">
+  <h1>票 站内工单管理系统</h1>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('dashboard')">统计看板</button>
+    <button class="tab-btn" onclick="switchTab('list')">票 工单列表</button>
+    <button class="tab-btn" onclick="switchTab('search')">搜索</button>
+  </div>
+
+  <!-- Tab 1: 统计看板 -->
+  <div class="tab-content active" id="tab-dashboard">
+    <div class="stat-grid" id="statGrid"></div>
+
+    <div class="grid-2">
+      <div>
+        <div class="section-title">图 问题类别分布</div>
+        <div class="card" id="categoryChart"></div>
+      </div>
+      <div>
+        <div class="section-title">电 优先级分布</div>
+        <div class="card" id="priorityChart" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="section-title">记 关键词词云</div>
+        <div class="card">
+          <div class="word-cloud" id="wordCloud"></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">文 反馈来源页面</div>
+        <div class="card" id="pageChart"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="section-title">众 用户角色分布</div>
+        <div class="card" id="roleChart"></div>
+      </div>
+      <div>
+        <div class="section-title">签 标签使用统计</div>
+        <div class="card" id="tagChart"></div>
+      </div>
+    </div>
+
+    <div class="section-title">升 趋势分析</div>
+    <div class="card" style="max-height:300px;overflow-y:auto" id="trendChart"></div>
+
+    <div class="section-title">历 周度解决率</div>
+    <div class="card" id="weeklyChart"></div>
+
+    <div class="section-title">热 活跃反馈用户</div>
+    <div class="card" id="topUsers"></div>
+  </div>
+
+  <!-- Tab 2: 工单列表 -->
+  <div class="tab-content" id="tab-list">
+    <div class="filters">
+      <select id="filterStatus" onchange="loadTickets()" aria-label="按状态筛选">
+        <option value="">全部状态</option>
+        <option value="open">待处理</option>
+        <option value="in_progress">处理中</option>
+        <option value="resolved">已解决</option>
+        <option value="closed">已关闭</option>
+        <option value="rejected">已拒绝</option>
+      </select>
+      <select id="filterCategory" onchange="loadTickets()" aria-label="按分类筛选">
+        <option value="">全部类别</option>
+        <option value="bug">虫 Bug</option>
+        <option value="suggestion">示 建议</option>
+        <option value="question">问 咨询</option>
+        <option value="feature_request">光 新功能</option>
+        <option value="praise">赞 好评</option>
+      </select>
+      <select id="filterPriority" onchange="loadTickets()" aria-label="按优先级筛选">
+        <option value="">全部优先级</option>
+        <option value="urgent">危 紧急</option>
+        <option value="high">警 高</option>
+        <option value="normal">警 普通</option>
+        <option value="low">安 低</option>
+      </select>
+      <button class="btn-secondary" onclick="exportCSV()" style="padding:6px 12px;font-size:12px;border-radius:6px;cursor:pointer">入 导出CSV</button>
+      <span id="totalCount" style="font-size:12px;color:var(--text-muted);margin-left:auto"></span>
+    </div>
+
+    <div class="batch-bar" id="batchBar">
+      <span id="batchCount" style="font-size:12px;color:var(--gold)">已选 0 项</span>
+      <select id="batchAction" aria-label="批量操作">
+        <option value="">批量操作...</option>
+        <option value="set_status:open">设为待处理</option>
+        <option value="set_status:in_progress">设为处理中</option>
+        <option value="set_status:resolved">设为已解决</option>
+        <option value="set_status:rejected">设为已拒绝</option>
+        <option value="set_priority:high">设为高优先级</option>
+        <option value="set_priority:normal">设为普通</option>
+      </select>
+      <button onclick="executeBatch()">执行</button>
+      <button onclick="clearSelection()" style="background:var(--border)">取消</button>
+    </div>
+
+    <table>
+      <thead><tr>
+        <th class="checkbox-cell"><input aria-label="selectAll" type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+        <th>ID</th><th>类别</th><th>优先级</th><th>标题</th><th>用户</th><th>状态</th><th>标签</th><th>时间</th><th>操作</th>
+      </tr></thead>
+      <tbody id="ticketsBody"></tbody>
+    </table>
+    <div class="pagination" id="pagination"></div>
+  </div>
+
+  <!-- Tab 3: 搜索 -->
+  <div class="tab-content" id="tab-search">
+    <div class="filters">
+      <input aria-label="搜索" type="text" id="searchInput" placeholder="搜索标题、内容、回复、用户名..." maxlength="100" onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="btn-primary" onclick="doSearch()" style="padding:6px 16px;border:none;border-radius:6px;cursor:pointer">搜索</button>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+<!-- 工单详情 Modal -->
+<div class="modal" id="ticketModal">
+  <div class="modal-content">
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
+    <div class="field" style="margin-top:12px">
+      <label>添加标签</label>
+      <div class="tag-input" id="tagInput"></div>
+      <div id="tagSuggestions" style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap"></div>
+    </div>
+    <div class="field">
+      <label>后台回复</label>
+      <textarea id="adminReply" placeholder="输入回复内容..." aria-label="管理员回复"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">关闭</button>
+      <button class="btn-primary" onclick="updateTicket('in_progress')">开始处理</button>
+      <button class="btn-green" onclick="updateTicket('resolved')">标记解决</button>
+      <button class="btn-red" onclick="updateTicket('rejected')">拒绝</button>
+      <button class="btn-primary" onclick="saveReply()">保存回复+标签</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+var API = '';
+var currentPage = 1;
+var totalPages = 1;
+var currentTicketId = null;
+var selectedIds = new Set();
+var ticketTags = [];
+
+// --- 登录检查（R429: 兼容 admin_token + authToken） ---
+function getAdminToken() {
+  return localStorage.getItem('admin_token') || getAdminToken() || '';
+}
+function checkAdminLogin() {
+  var token = getAdminToken();
+  if (!token) {
+    document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#0d1117;color:#c9d1d9;font-family:system-ui,sans-serif"><div style="font-size:48px;margin-bottom:16px">密</div><h2 style="color:#c9a84c;margin-bottom:8px">需要管理员登录</h2><p style="color:#8b949e;font-size:14px;margin-bottom:24px">请先登录管理员账号</p><a href="admin.html" style="padding:10px 24px;background:#c9a84c;color:#1a1a2e;text-decoration:none;border-radius:8px;font-weight:600">前往登录</a></div>';
+    return false;
+  }
+  return true;
+}
+try { if (!checkAdminLogin()) throw new Error('NOT_LOGGED_IN'); } catch(e) {}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+// --- 统计看板 ---
+function loadStats() {
+  if (!checkAdminLogin()) return;
+  fetch(API + '/api/admin/tickets/stats?days=30', { signal: AbortSignal.timeout(15000),
+    headers: { 'Authorization': 'Bearer ' + getAdminToken() }, signal: AbortSignal.timeout(15000) })
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (r.code !== 0) { if (r.error === '请先登录') checkAdminLogin(); return; }
+      renderStats(r.data);
+    })
+    .catch(function(e) { });
+}
+
+function renderStats(d) {
+  // 概览
+  var o = d.overview || {};
+  var resolveRate = o.total ? Math.round((o.resolved + (o.closed||0)) / o.total * 100) : 0;
+  var grid = document.getElementById('statGrid');
+  grid.innerHTML = [
+    {v:o.total||0,l:'总工单',c:'var(--gold2)'},
+    {v:o.open_count||0,l:'待处理',c:'var(--red)'},
+    {v:o.in_progress||0,l:'处理中',c:'var(--yellow)'},
+    {v:o.resolved||0,l:'已解决',c:'var(--green)'},
+    {v:resolveRate+'%',l:'解决率',c:'var(--gold2)'},
+    {v:d.avgResolveMinutes||'-',l:'平均解决(分)',c:'var(--blue)'},
+    {v:d.responseStats?.replied||0,l:'已回复',c:'var(--green)'},
+    {v:d.responseStats?.avgResponseMinutes||'-',l:'平均响应(分)',c:'var(--blue)'},
+  ].map(function(s) {
+    return '<div class="stat-card"><div class="stat-val" style="color:'+s.c+'">'+s.v+'</div><div class="stat-label">'+s.l+'</div></div>';
+  }).join('');
+
+  // 类别
+  var catColors = {bug:'var(--red)',suggestion:'var(--blue)',question:'var(--yellow)',feature_request:'var(--purple)',praise:'var(--green)'};
+  var catNames = {bug:'🐛 Bug',suggestion:'💡 建议',question:'❓ 咨询',feature_request:'✨ 新功能',praise:'👍 好评'};
+  var maxCat = Math.max.apply(null, d.byCategory.map(function(c){return c.cnt;}).concat([1]));
+  document.getElementById('categoryChart').innerHTML = d.byCategory.map(function(c) {
+    var rate = c.resolve_rate ? c.resolve_rate + '%' : '0%';
+    return '<div class="chart-bar"><span class="bar-label">'+(catNames[c.category]||c.category)+'</span>' +
+      '<div class="bar-track"><div class="bar-fill bar-'+c.category.substring(0,4)+'" style="width:'+Math.max(c.cnt/maxCat*100,5)+'%">'+c.cnt+'</div></div>' +
+      '<span style="font-size:11px;color:var(--text-muted);width:40px">'+rate+'</span></div>';
+  }).join('') || '<div style="color:var(--text-muted);font-size:13px">暂无数据</div>';
+
+  // 优先级
+  var priNames = {urgent:'🔴 紧急',high:'🟠 高',normal:'🟡 普通',low:'🟢 低'};
+  var priColors = {urgent:'var(--red)',high:'var(--yellow)',normal:'var(--gold)',low:'var(--green)'};
+  document.getElementById('priorityChart').innerHTML = d.byPriority.map(function(p) {
+    return '<div class="stat-card" style="min-width:90px"><div class="stat-val" style="color:'+(priColors[p.priority]||'var(--gold)')+';font-size:18px">'+p.cnt+'</div><div class="stat-label">'+(priNames[p.priority]||p.priority)+'</div><div style="font-size:10px;color:var(--green);margin-top:2px">已解决 '+p.resolved+'</div></div>';
+  }).join('') || '<div style="color:var(--text-muted)">暂无</div>';
+
+  // 词云
+  var maxWord = Math.max.apply(null, d.topWords.map(function(w){return w.count;}).concat([1]));
+  document.getElementById('wordCloud').innerHTML = d.topWords.map(function(w) {
+    var size = 11 + Math.round(w.count / maxWord * 12);
+    var opacity = 0.4 + w.count / maxWord * 0.6;
+    return '<span class="word-tag" style="font-size:'+size+'px;opacity:'+opacity+';background:rgba(201,168,76,'+ (0.05 + w.count/maxWord*0.15) +');border:1px solid rgba(201,168,76,'+(0.1+w.count/maxWord*0.3)+');color:var(--gold)" onclick="searchWord(\''+w.word+'\')">'+w.word+' <b style="font-size:10px">'+w.count+'</b></span>';
+  }).join('') || '<div style="color:var(--text-muted);font-size:13px">暂无关键词</div>';
+
+  // 来源页面
+  document.getElementById('pageChart').innerHTML = d.byPageUrl.map(function(p) {
+    return '<div class="chart-bar"><span class="bar-label" style="width:120px;font-size:11px">'+p.page.substring(0,20)+'</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(p.cnt/6*100,5)+'%;background:'+(p.bugs>p.cnt/2?'var(--red)':'var(--gold)')+'">'+p.cnt+'</div></div>' +
+      '<span style="font-size:10px;color:var(--text-muted)">虫'+p.bugs+'</span></div>';
+  }).join('') || '<div style="color:var(--text-muted)">暂无</div>';
+
+  // 角色
+  document.getElementById('roleChart').innerHTML = d.byRole.map(function(r) {
+    return '<div class="chart-bar"><span class="bar-label">'+r.user_role+'</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:'+Math.max(r.cnt/6*100,5)+'%;background:var(--blue)">'+r.cnt+'</div></div>' +
+      '<span style="font-size:10px;color:var(--text-muted)">虫'+r.bugs+' 💡'+r.suggestions+'</span></div>';
+  }).join('') || '<div style="color:var(--text-muted)">暂无</div>';
+
+  // 标签
+  document.getElementById('tagChart').innerHTML = d.tagStats.map(function(t) {
+    return '<span class="word-tag" style="background:'+t.color+'20;border:1px solid '+t.color+'60;color:'+t.color+'">'+t.name+' ('+t.ticket_count+')</span>';
+  }).join('') || '<div style="color:var(--text-muted)">暂无标签</div>';
+
+  // 趋势
+  document.getElementById('trendChart').innerHTML = d.dailyTrend.map(function(t) {
+    return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(48,54,61,.3);font-size:11px">' +
+      '<span style="color:var(--text-muted)">'+t.date+'</span>' +
+      '<span>升 总'+t.cnt+' · 🐛'+(t.bugs||0)+' · 💡'+(t.suggestions||0)+' · ✨'+(t.features||0)+' · ❓'+(t.questions||0)+' · 👍'+(t.praise||0)+'</span>' +
+      '<span style="color:var(--green)">成'+(t.resolved_on_day||0)+'</span></div>';
+  }).join('') || '<div style="color:var(--text-muted)">暂无数据</div>';
+
+  // 周度解决率
+  document.getElementById('weeklyChart').innerHTML = d.weeklyResolve.map(function(w) {
+    var rate = w.total ? Math.round(w.resolved / w.total * 100) : 0;
+    return '<div class="chart-bar"><span class="bar-label" style="width:80px">'+w.week+'</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:'+rate+'%;background:var(--green)">'+w.resolved+'/'+w.total+'</div></div>' +
+      '<span style="font-size:10px;color:var(--text-muted)">'+rate+'%</span></div>';
+  }).join('') || '<div style="color:var(--text-muted)">暂无数据</div>';
+
+  // 用户排行
+  document.getElementById('topUsers').innerHTML = (d.topUsers||[]).map(function(u) {
+    return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(48,54,61,.3);font-size:12px">' +
+      '<span style="color:var(--text)">'+u.user_name+'</span>' +
+      '<span style="color:var(--text-muted)">'+u.cnt+' 条 · '+u.categories+'</span></div>';
+  }).join('') || '<div style="color:var(--text-muted)">暂无用户数据</div>';
+}
+
+// --- 工单列表 ---
+function loadTickets() {
+  if (!checkAdminLogin()) return;
+  var status = document.getElementById('filterStatus').value;
+  var category = document.getElementById('filterCategory').value;
+  var priority = document.getElementById('filterPriority').value;
+  var params = new URLSearchParams({ page: currentPage, pageSize: 20 });
+  if (status) params.set('status', status);
+  if (category) params.set('category', category);
+  if (priority) params.set('priority', priority);
+
+  fetch(API + '/api/admin/tickets/list?' + params, { signal: AbortSignal.timeout(15000),
+    headers: { 'Authorization': 'Bearer ' + getAdminToken() }, signal: AbortSignal.timeout(15000) })
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (r.code !== 0) return;
+      var catIcons = {bug:'🐛',suggestion:'💡',question:'❓',praise:'👍',feature_request:'✨'};
+      var statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
+      var priIcons = {urgent:'🔴',high:'🟠',normal:'🟡',low:'🟢'};
+      document.getElementById('totalCount').textContent = '共 ' + r.data.total + ' 条';
+      document.getElementById('ticketsBody').innerHTML = r.data.tickets.map(function(t) {
+        var checked = selectedIds.has(t.id) ? 'checked' : '';
+        return '<tr>' +
+          '<td class="checkbox-cell"><input aria-label="'+t.id+'" type="checkbox" data-id="'+t.id+'" '+checked+' onchange="toggleSelect('+t.id+',this.checked)"></td>' +
+          '<td>#'+t.id+'</td>' +
+          '<td>'+(catIcons[t.category]||'')+' '+(t.category||'').substring(0,6)+'</td>' +
+          '<td>'+(priIcons[t.priority]||'')+'</td>' +
+          '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;color:var(--blue)" onclick="viewTicket('+t.id+')">'+t.title+'</td>' +
+          '<td>'+(t.user_name||'-')+'</td>' +
+          '<td><span class="status-badge status-'+t.status+'">'+(statusNames[t.status]||t.status)+'</span></td>' +
+          '<td style="font-size:10px">'+(t.tags||'')+'</td>' +
+          '<td style="white-space:nowrap">'+(t.created_at||'').substring(0,16)+'</td>' +
+          '<td><button class="btn-secondary" onclick="viewTicket('+t.id+')" style="padding:3px 6px;font-size:11px;border:1px solid var(--border);border-radius:4px;cursor:pointer">查看</button></td>' +
+          '</tr>';
+      }).join('') || '<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--text-muted)">暂无工单</td></tr>';
+      totalPages = r.data.totalPages;
+      renderPagination();
+    });
+}
+
+function renderPagination() {
+  var p = document.getElementById('pagination');
+  if (totalPages <= 1) { p.innerHTML = ''; return; }
+  var h = '<button onclick="goPage('+(currentPage-1)+')"'+(currentPage<=1?' disabled':'')+'>上一页</button>';
+  for (var i = 1; i <= totalPages; i++) {
+    if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2)
+      h += '<button class="'+(i===currentPage?'active':'')+'" onclick="goPage('+i+')">'+i+'</button>';
+    else if (Math.abs(i - currentPage) === 3) h += '<span style="padding:4px">...</span>';
+  }
+  h += '<button onclick="goPage('+(currentPage+1)+')"'+(currentPage>=totalPages?' disabled':'')+'>下一页</button>';
+  p.innerHTML = h;
+}
+function goPage(p) { currentPage = p; loadTickets(); }
+
+// --- 批量操作 ---
+function toggleAll(cb) {
+  document.querySelectorAll('input[type=checkbox][data-id]').forEach(function(c) {
+    c.checked = cb.checked;
+    toggleSelect(parseInt(c.getAttribute('data-id')), cb.checked);
+  });
+}
+function toggleSelect(id, checked) {
+  if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  document.getElementById('batchCount').textContent = '已选 ' + selectedIds.size + ' 项';
+  document.getElementById('batchBar').classList.toggle('show', selectedIds.size > 0);
+}
+function clearSelection() {
+  selectedIds.clear();
+  document.querySelectorAll('input[type=checkbox][data-id]').forEach(function(c) { c.checked = false; });
+  document.getElementById('selectAll').checked = false;
+  document.getElementById('batchBar').classList.remove('show');
+}
+function executeBatch() {
+  var action = document.getElementById('batchAction').value;
+  if (!action || selectedIds.size === 0) return;
+  var parts = action.split(':');
+  fetch(API + '/api/admin/tickets/batch-update', { signal: AbortSignal.timeout(15000),
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAdminToken() },
+    body: JSON.stringify({ ids: Array.from(selectedIds), action: parts[0], value: parts[1] }), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(r) {
+    if (r.code === 0) { showToast('批量更新 ' + r.data.updated + ' 条'); clearSelection(); loadTickets(); loadStats(); }
+    else showToast('失败：' + (r.message||''));
+  });
+}
+
+// --- 搜索 ---
+function doSearch() {
+  var q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  fetch(API + '/api/admin/tickets/search?q=' + encodeURIComponent(q), { signal: AbortSignal.timeout(8000) })
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      var box = document.getElementById('searchResults');
+      if (r.code === 0 && r.data.results.length > 0) {
+        box.innerHTML = '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">找到 '+r.data.total+' 条结果</div>' +
+          r.data.results.map(function(t) {
+            return '<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="viewTicket('+t.id+')">' +
+              '<div style="display:flex;justify-content:space-between"><b style="color:var(--text)">'+t.title+'</b><span class="status-badge status-'+t.status+'">'+t.status+'</span></div>' +
+              '<div style="font-size:12px;color:var(--text-muted);margin-top:4px">'+(t.content||'').substring(0,80)+'...</div>' +
+              '<div style="font-size:11px;color:var(--text-muted);margin-top:4px">#'+t.id+' · '+t.user_name+' · '+(t.created_at||'').substring(0,16)+'</div>' +
+              '</div>';
+          }).join('');
+      } else {
+        box.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)">未找到匹配工单</div>';
+      }
+    })
+    .catch(function(e) {
+      var box = document.getElementById('searchResults');
+      if (box) box.innerHTML = '<div style="text-align:center;padding:30px;color:#ff9d5c">搜索失败：' + (e && esc(e.message) || '网络错误') + '，请重试</div>';
+    });
+}
+function searchWord(word) {
+  switchTab('search');
+  document.getElementById('searchInput').value = word;
+  doSearch();
+  // 模拟点击 tab
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn')[2].classList.add('active');
+  document.getElementById('tab-search').classList.add('active');
+}
+
+// --- 工单详情 ---
+function viewTicket(id) {
+  currentTicketId = id;
+  fetch(API + '/api/tickets/detail?id=' + id, { signal: AbortSignal.timeout(15000),
+    headers: { 'Authorization': 'Bearer ' + getAdminToken() }, signal: AbortSignal.timeout(15000) })
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (r.code !== 0) return;
+      var t = r.data;
+      var catNames = {bug:'🐛 Bug',suggestion:'💡 建议',question:'❓ 咨询',praise:'👍 好评',feature_request:'✨ 新功能'};
+      var statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决',closed:'已关闭',rejected:'已拒绝'};
+      document.getElementById('modalTitle').textContent = '#' + t.id + ' · ' + t.title;
+      document.getElementById('modalBody').innerHTML =
+        '<div class="field"><label>类别/优先级</label><div>'+(catNames[t.category]||t.category)+' · '+(t.priority||'')+'</div></div>' +
+        '<div class="field"><label>提交人</label><div>'+(t.user_name||'匿名')+' ('+(t.user_role||'free')+')</div></div>' +
+        '<div class="field"><label>提交时间</label><div>'+t.created_at+'</div></div>' +
+        (t.page_url?'<div class="field"><label>来源</label><div style="font-size:11px;word-break:break-all">'+t.page_url+'</div></div>':'') +
+        '<div class="field"><label>详细内容</label><div style="background:rgba(255,255,255,.04);padding:10px;border-radius:6px;white-space:pre-wrap;word-break:break-word">'+(t.content||'')+'</div></div>' +
+        (t.screenshot_path?'<div class="field"><label>截图</label><img loading="lazy" class="screenshot-thumb" src="'+t.screenshot_path+'" alt="工单截图" onclick="window.open(this.src)"></div>':'') +
+        (t.voice_path?'<div class="field"><label>语音</label><audio src="'+t.voice_path+'" controls style="width:100%"></audio></div>':'') +
+        (t.admin_reply?'<div class="field"><label>后台回复</label><div class="reply-box">'+t.admin_reply+'</div></div>':'');
+      document.getElementById('adminReply').value = t.admin_reply || '';
+      ticketTags = t.tags ? t.tags.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [];
+      renderTagInput();
+      loadTagSuggestions();
+      document.getElementById('ticketModal').classList.add('show');
+    });
+}
+
+function renderTagInput() {
+  var box = document.getElementById('tagInput');
+  box.innerHTML = ticketTags.map(function(tag, i) {
+    return '<span class="tag-chip">'+tag+' <span class="tag-remove" onclick="removeTag('+i+')">关</span></span>';
+  }).join('') + '<input aria-label="输入标签" type="text" id="tagInputField" maxlength="30" placeholder="输入标签后回车" style="border:none;background:transparent;color:var(--text);font-size:12px;outline:none;flex:1;min-width:80px" onkeydown="if(event.key===\'Enter\'){addTag(this.value);this.value=\'\';}">';
+}
+function addTag(tag) {
+  tag = tag.trim();
+  if (tag && ticketTags.indexOf(tag) === -1) ticketTags.push(tag);
+  renderTagInput();
+}
+function removeTag(i) { ticketTags.splice(i, 1); renderTagInput(); }
+function loadTagSuggestions() {
+  fetch(API + '/api/tickets/tags',{signal:AbortSignal.timeout(15000)})
+    .then(function(r) { return r.json(); })
+    .then(function(r) {
+      if (r.code === 0) {
+        document.getElementById('tagSuggestions').innerHTML = r.data.tags.filter(function(t) {
+          return ticketTags.indexOf(t.name) === -1;
+        }).map(function(t) {
+          return '<span class="tag-suggest" onclick="addTag(\''+t.name+'\')">'+t.name+'</span>';
+        }).join('');
+      }
+    });
+}
+
+function closeModal() { document.getElementById('ticketModal').classList.remove('show'); }
+
+function updateTicket(status) {
+  if (!currentTicketId) return;
+  doUpdate({ id: currentTicketId, status: status });
+}
+
+function saveReply() {
+  if (!currentTicketId) return;
+  var reply = document.getElementById('adminReply').value.trim();
+  doUpdate({ id: currentTicketId, admin_reply: reply, tags: ticketTags.join(','), status: 'in_progress' });
+}
+
+function doUpdate(body) {
+  fetch(API + '/api/admin/tickets/update', { signal: AbortSignal.timeout(15000),
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAdminToken() },
+    body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(function(r) { return r.json(); }).then(function(r) {
+    if (r.code === 0) { showToast('✅ 已更新'); closeModal(); loadTickets(); loadStats(); }
+    else showToast('❌ ' + (r.message||''));
+  });
+}
+
+function exportCSV() {
+  var status = document.getElementById('filterStatus').value;
+  var url = API + '/api/admin/tickets/export';
+  if (status) url += '?status=' + status;
+  // 用 fetch + Blob 下载
+  fetch(url,{headers: { 'Authorization': '***' + getAdminToken() },signal:AbortSignal.timeout(15000)})
+    .then(function(r) { return r.blob(); })
+    .then(function(blob) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'tickets-' + new Date().toISOString().slice(0,10) + '.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);border-radius:8px;padding:10px 20px;color:var(--gold);font-size:13px;z-index:99999';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 2500);
+}
+
+// 初始化
+loadStats();
+loadTickets();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+</body>
+</html>

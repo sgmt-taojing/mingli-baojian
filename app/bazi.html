@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="index, follow" data-r308-public>
+
+<meta charset="UTF-8">
+<meta name="description" content="四柱八字命盘排盘，十神格局大运流年分析">
+<meta name="keywords" content="八字,四柱,十神,格局,大运,流年,命盘">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/bazi.html">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="八字命盘 · 易道智鉴">
+<meta property="og:description" content="四柱八字命盘排盘，十神格局大运流年分析">
+<meta property="og:type" content="website">
+<title>八字命盘 · 易道智鉴</title>
+
+<style>
+
+/* R-P3-17.4 通用 reflow */
+@media(max-width:768px){body{font-size:14px}h1{font-size:22px!important}h2{font-size:19px!important}[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{grid-template-columns:repeat(2,1fr)!important}.wrap,.container{padding:12px!important;max-width:100vw!important;overflow-x:hidden!important}.toolbar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}table{display:block!important;overflow-x:auto!important}.modal-box{width:calc(100vw - 24px)!important;max-width:100%!important;margin:12px!important}}
+@media(max-width:480px){body{font-size:13px}[style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3)"]{grid-template-columns:1fr!important}}
+@media(max-width:320px){body{font-size:12px;padding:0!important}h1{font-size:18px!important}input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}}
+
+</style>
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/divination-hub-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body class="theme-zhouyi" data-kb-module="bazi">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">八字命盘</span>
+  </div>
+<main>
+
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>填写信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>排盘演算</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看命盘</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>深度分析</span></div></div>
+<div class="flow-hint">填写出生年月日时，点击排盘演算。</div>
+</div>
+<nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
+  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">主平台</a>
+  <a href="ziwei.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">星 紫微斗数</a>
+  <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">望诊工作台</a>
+  <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">医 中医诊疗</a>
+</nav>
+
+<script src="js/module-reports-kb.js" defer></script>
+<script src="js/kb-fallback-indicator.js" defer></script>
+<section class="section" id="section-bazi" role="tabpanel" aria-labelledby="tab-bazi">
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--cyan)">星</span>
+    <h2 class="sh-title">八字命盘 · 运势详解</h2>
+    <p class="sh-en">Four Pillars · Destiny & Fortune</p>
+    <p class="sh-desc">年柱映祖荫，月柱观父母，日干为本人，时柱知晚景。阴阳五行定命局，十神生克论人生。</p>
+  </div>
+
+  <div id="baziFlowSteps"></div>
+<div class="flow-hint">请填写出生信息，系统将自动排盘。姓名可选填，核心是出生日期和时辰。</div>
+    <div class="input-card">
+    <h3>命主基本信息</h3>
+    <div class="input-row">
+      <input type="text" class="input-field" id="baziName" placeholder="姓名" maxlength="20" aria-label="姓名">
+      <input type="date" class="input-field" id="baziDate" aria-label="baziDate">
+      <!-- 农历输入区域(默认隐藏) -->
+      <div id="lunarInputArea" style="display:none;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin:8px 0;padding:12px;background:rgba(201,168,76,.04);border-radius:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:12px;letter-spacing:2px">农历年</span>
+          <input type="number" class="input-field" id="lunarYear" placeholder="年" min="1900" max="2050" style="width:90px" oninput="onLunarInput()" aria-label="年">
+          <span style="font-size:12px;opacity:.95">年</span>
+          <input type="number" class="input-field" id="lunarMonth" placeholder="月" min="1" max="13" style="width:70px" oninput="onLunarInput()" aria-label="月">
+          <span style="font-size:12px;opacity:.95">月</span>
+          <input type="number" class="input-field" id="lunarDay" placeholder="日" min="1" max="30" style="width:70px" oninput="onLunarInput()" aria-label="日">
+          <span style="font-size:12px;opacity:.95">日</span>
+          <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;margin-left:4px;color:var(--cinn)" for="lunarLeapMonth">
+            <input type="checkbox" id="lunarLeapMonth" aria-label="lunarLeapMonth"> 闰月
+          </label>
+        </div>
+        <!-- 农历月份天数辅助 -->
+        <div style="font-size:11px;text-align:center;margin-top:6px">农历每月29或30天，大小月不固定。以上为手动输入方式。</div>
+        <!-- 农历日期预览 -->
+        <div id="lunarPreview" style="text-align:center;font-size:12px;color:var(--gold);margin-top:6px;min-height:18px"></div>
+      </div>
+      <!-- 日历模式切换 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:12px;opacity:.95">历法</span>
+        <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="baziHour">
+          <input type="radio" name="calendarMode" value="solar" checked onchange="onCalendarModeChange()" aria-label="公历输入"> 公历
+        </label>
+        <label style="font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px" for="baziHour">
+          <input type="radio" name="calendarMode" value="lunar" onchange="onCalendarModeChange()" aria-label="农历输入"> 农历
+        </label>
+        <span id="calendarHint" style="font-size:11px;color:var(--gold);margin-left:4px">当前:公历输入</span>
+      </div>
+      <select class="input-field" id="baziHour" onchange="onShichenChange()" aria-label="选项baziHour">
+        <option value="">时辰(选填)</option>
+        <option value="23">子时 23:00-01:00(夜半)</option>
+        <option value="1">丑时 01:00-03:00(鸡鸣)</option>
+        <option value="3">寅时 03:00-05:00(平旦)</option>
+        <option value="5">卯时 05:00-07:00(日出)</option>
+        <option value="7">辰时 07:00-09:00(食时)</option>
+        <option value="9">巳时 09:00-11:00(隅中)</option>
+        <option value="11">午时 11:00-13:00(日中)</option>
+        <option value="13">未时 13:00-15:00(日昳)</option>
+        <option value="15">申时 15:00-17:00(晡时)</option>
+        <option value="17">酉时 17:00-19:00(日入)</option>
+        <option value="19">戌时 19:00-21:00(黄昏)</option>
+        <option value="21">亥时 21:00-23:00(人定)</option>
+      </select>
+      <p class="input-hint" id="shichenHint">警 时辰按<b>农历</b>计算，每个时辰相当于2小时。以上时间对应农历时辰，公历时间仅作参考。</p>
+      <p class="input-hint" style="cursor:pointer;color:var(--gold);font-size:11px"><ml-tap type="text" tabindex="0" role="button" aria-label="时辰对照表点击展开" on:tap="toggleShichenTable()" on:keydown="if(event.key==='Enter'||event.key===' ')toggleShichenTable()">表 时辰对照表(点击展开)</ml-tap></p>
+      <!-- 时辰对照表(默认隐藏) -->
+      <div id="shichenTable" style="display:none;margin-top:8px;padding:12px;background:rgba(201,168,76,.04);border-radius:8px;font-size:12px;line-height:1.8">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>子时</b> 23:00-01:00<br><span class="op-90">夜半·胆经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>丑时</b> 01:00-03:00<br><span class="op-90">鸡鸣·肝经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>寅时</b> 03:00-05:00<br><span class="op-90">平旦·肺经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>卯时</b> 05:00-07:00<br><span class="op-90">日出·大肠经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>辰时</b> 07:00-09:00<br><span class="op-90">食时·胃经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>巳时</b> 09:00-11:00<br><span class="op-90">隅中·脾经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>午时</b> 11:00-13:00<br><span class="op-90">日中·心经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>未时</b> 13:00-15:00<br><span class="op-90">日昳·小肠经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>申时</b> 15:00-17:00<br><span class="op-90">晡时·膀胱经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>酉时</b> 17:00-19:00<br><span class="op-90">日入·肾经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>戌时</b> 19:00-21:00<br><span class="op-90">黄昏·心包经当令</span></div>
+          <div style="padding:4px 8px;background:rgba(201,168,76,.08);border-radius:4px"><b>亥时</b> 21:00-23:00<br><span class="op-90">人定·三焦经当令</span></div>
+        </div>
+        <p style="margin-top:8px;font-size:11px">注:农历以子时(23:00)为一日之始，与公历0:00为一日之始不同。排盘时请以出生地地方时为准。</p>
+      </div>
+      <select class="input-field" id="baziSex" aria-label="选项baziSex">
+        <option value="male">男</option>
+        <option value="female">女</option>
+      </select>
+      <input type="number" class="input-field" id="baziLng" placeholder="出生地经度(可选,如116.4)" step="0.1" min="-180" max="180" style="width:180px" aria-label="出生地经度(可选,如116.4)">
+      <input type="number" class="input-field" id="baziTargetYear" placeholder="流年(默认今年)" min="1900" max="2100" style="width:160px" aria-label="流年(默认今年)" title="查流年运势的目标年份">
+      <select class="input-field" id="baziZishi" style="width:160px" aria-label="选项baziZishi">
+        <option value="normal">子时流派: 不换日</option>
+        <option value="late">子时流派: 晚子换日</option>
+      </select>
+      <select class="input-field" id="baziDayunMode" style="width:160px" title="大运排法流派" aria-label="选项baziDayunMode">
+        <option value="standard">大运排法: 标准起运</option>
+        <option value="precise">大运排法: 精确起运(按分钟)</option>
+      </select>
+      <select class="input-field" id="baziLiuchun" style="width:160px" title="年柱切换标准" aria-label="选项baziLiuchun">
+        <option value="lichun">年柱: 立春切换</option>
+        <option value="zhengshuo">年柱: 正月初一切换</option>
+      </select>
+      <input type="text" class="input-field" id="baziBirthplace" placeholder="出生地(可选,如北京)" maxlength="20" style="width:160px" aria-label="出生地(可选,如北京)">
+      <input type="text" class="input-field" id="baziResidence" placeholder="居住地(可选,如上海)" maxlength="20" style="width:160px" aria-label="居住地(可选,如上海)">
+    </div>
+
+    <!-- 📋 专业全量信息折叠面板 (统一档案 · 跨模块共用) -->
+    <div style="text-align:center;margin-top:6px">
+      <button type="button" class="pro-expand-toggle" id="proExpandToggle" onclick="toggleProPanel()">
+        <span class="rich-icon" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gold)"></span>
+        📋 专业全量信息（22 模块共用）
+        <span id="proProgressInline" class="pro-progress-text">0%</span>
+        <span class="toggle-icon">▼</span>
+      </span>
+    </div>
+    <div class="pro-panel" id="proPanel">
+      <div class="pro-progress">
+        <div class="pro-progress-bar"><div class="pro-progress-fill" id="proProgressFill" style="width:0"></div></div>
+        <span class="pro-progress-text" id="proProgressText">0%</span>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">表</span> 时辰精确化</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label for="pf_timeUnknown">是否时辰不详</label><select class="pf-input" id="pf_timeUnknown" aria-label="选项pf_timeUnknown"><option value="0">否</option><option value="1">是（按中天 12:00）</option></select></div>
+        <div class="pro-field"><label for="pf_minute">出生分钟（精确起运）</label><input class="pf-input" id="pf_minute" type="number" placeholder="如 28" min="0" max="59" aria-label="如 28"></div>
+        <div class="pro-field"><label for="pf_realTime">地方时（24h）</label><input class="pf-input" id="pf_realTime" placeholder="自动算出" aria-label="自动算出"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">点</span> 出生地理</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label for="pf_bpFull">出生地（完整行政区）</label><input class="pf-input" id="pf_bpFull" placeholder="如：北京市朝阳区国贸" aria-label="如：北京市朝阳区国贸"></div>
+        <div class="pro-field"><label for="pf_bpProvince">出生省份</label><input class="pf-input" id="pf_bpProvince" placeholder="如：北京" aria-label="如：北京"></div>
+        <div class="pro-field"><label for="pf_bpCity">出生城市</label><input class="pf-input" id="pf_bpCity" placeholder="如：朝阳" aria-label="如：朝阳"></div>
+        <div class="pro-field"><label for="pf_bpLng">经度（真太阳时）</label><input class="pf-input" id="pf_bpLng" type="number" step="0.01" placeholder="如 116.46" aria-label="如 116.46"></div>
+        <div class="pro-field"><label for="pf_bpLat">纬度（五行方位）</label><input class="pf-input" id="pf_bpLat" type="number" step="0.01" placeholder="如 39.92" aria-label="如 39.92"></div>
+        <div class="pro-field"><label for="pf_bpAlt">海拔（胎息体质）</label><input class="pf-input" id="pf_bpAlt" type="number" placeholder="米" aria-label="米"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">宅</span> 现居地（流年方位）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label for="pf_rsFull">现居完整地址</label><input class="pf-input" id="pf_rsFull" placeholder="如：上海市浦东新区世纪大道" aria-label="如：上海市浦东新区世纪大道"></div>
+        <div class="pro-field"><label for="pf_rsProvince">现居省份/直辖市</label><input class="pf-input" id="pf_rsProvince" placeholder="如：上海" aria-label="如：上海"></div>
+        <div class="pro-field"><label for="pf_rsMovedAt">迁居年份</label><input class="pf-input" id="pf_rsMovedAt" type="number" placeholder="如 2024" aria-label="如 2024"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">👨‍👩‍👧</span> 家庭（合盘/家庭排盘）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label for="pf_faName">父亲姓名</label><input class="pf-input" id="pf_faName" placeholder="姓氏" aria-label="姓氏"></div>
+        <div class="pro-field"><label for="pf_faDate">父亲生日（合盘）</label><input class="pf-input" id="pf_faDate" type="date" aria-label="pf_faDate"></div>
+        <div class="pro-field"><label for="pf_moName">母亲姓名</label><input class="pf-input" id="pf_moName" placeholder="姓氏" aria-label="姓氏"></div>
+        <div class="pro-field"><label for="pf_moDate">母亲生日（合盘）</label><input class="pf-input" id="pf_moDate" type="date" aria-label="pf_moDate"></div>
+        <div class="pro-field"><label for="pf_spName">配偶姓名</label><input class="pf-input" id="pf_spName" placeholder="姓氏" aria-label="姓氏"></div>
+        <div class="pro-field"><label for="pf_spDate">配偶生日（合盘）</label><input class="pf-input" id="pf_spDate" type="date" aria-label="pf_spDate"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">💼</span> 职业（企业视角）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label for="pf_industry">所属行业</label>
+          <select class="pf-input" id="pf_industry" aria-label="选项pf_industry">
+            <option value="">-- 请选择 --</option>
+            <option value="互联网/IT">互联网/IT</option>
+            <option value="金融">金融</option>
+            <option value="制造">制造</option>
+            <option value="教育">教育</option>
+            <option value="医疗">医疗</option>
+            <option value="法律">法律</option>
+            <option value="传媒">传媒</option>
+            <option value="服务">服务</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div class="pro-field"><label for="pf_position">岗位</label><input class="pf-input" id="pf_position" placeholder="如：产品经理" aria-label="如：产品经理"></div>
+        <div class="pro-field"><label for="pf_isEntrepreneur">是否创业者</label><select class="pf-input" id="pf_isEntrepreneur" aria-label="选项pf_isEntrepreneur"><option value="0">否</option><option value="1">是</option></select></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">草</span> 健康（中医/体质）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label for="pf_tizhi">中医体质</label>
+          <select class="pf-input" id="pf_tizhi" aria-label="选项pf_tizhi">
+            <option value="">-- 未测过 --</option>
+            <option value="平和">平和质</option>
+            <option value="气虚">气虚质</option>
+            <option value="阳虚">阳虚质</option>
+            <option value="阴虚">阴虚质</option>
+            <option value="痰湿">痰湿质</option>
+            <option value="湿热">湿热质</option>
+            <option value="血瘀">血瘀质</option>
+            <option value="气郁">气郁质</option>
+            <option value="特禀">特禀质</option>
+          </select>
+        </div>
+        <div class="pro-field"><label for="pf_height">身高（cm）</label><input class="pf-input" id="pf_height" type="number" placeholder="175" aria-label="pf_height"></div>
+        <div class="pro-field"><label for="pf_weight">体重（kg）</label><input class="pf-input" id="pf_weight" type="number" placeholder="68" aria-label="pf_weight"></div>
+        <div class="pro-field" style="grid-column:1/-1"><label for="pf_chronic">慢性病/过敏（逗号分隔）</label><input class="pf-input" id="pf_chronic" placeholder="如：高血压,青霉素过敏" aria-label="如：高血压,青霉素过敏"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">✍️</span> 起名（姓名学）</div>
+      <div class="pro-grid">
+        <div class="pro-field"><label for="pf_surname">姓氏（用于起名）</label><input class="pf-input" id="pf_surname" placeholder="如：李" aria-label="如：李"></div>
+        <div class="pro-field"><label for="pf_genChar">辈分字</label><input class="pf-input" id="pf_genChar" placeholder="如：弘" aria-label="如：弘"></div>
+        <div class="pro-field"><label for="pf_isCompound">是否复姓</label><select class="pf-input" id="pf_isCompound" aria-label="选项pf_isCompound"><option value="0">否</option><option value="1">是（如欧阳）</option></select></div>
+        <div class="pro-field"><label for="pf_avoidChars">避讳字</label><input class="pf-input" id="pf_avoidChars" placeholder="如：梓,梓" aria-label="如：梓,梓"></div>
+      </div>
+
+      <div class="pro-section-title"><span class="sec-icon">标</span> 关心维度（多选）</div>
+      <div class="pro-concerns" id="pf_concerns"></div>
+      <p class="pro-hint">选中的关心维度会同步调整各模块的报告重点（如健康、运业、婚姻）。</p>
+
+      <div class="pro-btns">
+        <button class="pro-btn pro-btn-secondary" onclick="loadProFields()">↻ 从档案载入</button>
+        <button class="pro-btn pro-btn-primary" onclick="saveProFields()">存 保存全量信息</button>
+        <button class="pro-btn pro-btn-secondary" onclick="applyPro2Bazi()">↪ 录入八字段</button>
+      </div>
+      <div class="pro-saved-tip" id="proSavedTip">成 已保存到本地档案</div>
+    </div>
+
+    <p class="input-hint">出生日期为公历。时辰不填则按中午12:00计算。经度用于真太阳时校正。</p>
+    <button class="compute-btn" style="background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.35);color:#d4b06a;font-weight:700;font-size:15px;padding:12px 40px;letter-spacing:4px" onclick="playSound('success');computeBazi()" id="baziBtn">排 盘 演 命</button>
+    <button class="compute-btn" style="background:linear-gradient(135deg,#9b59b6,#6c3483);color:#fff;border:none;font-size:13px;padding:12px 30px;letter-spacing:2px;margin-top:8px" onclick="generateBaziReport()">📜 出具八字报告</button>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
+      <button class="compute-btn" style="background:transparent;border:1px solid rgba(201,168,76,.15);font-size:12px;padding:8px 16px;opacity:.6" onclick="runBaziEnhancedFortune()">升 运势 + 健康深度增强</button>
+    </div>
+    <div style="text-align:center;margin-top:6px;font-size:11px;color:var(--fg3)">钉 排盘后点击此按钮，生成今年/明年运势、健康专题、当日运势、企业主视角</div>
+<div id="baziQuickLinks"></div>
+  </div>
+
+  <div class="result" id="baziResult">
+    <div class="result-banner">
+      <h2 class="rb-name" id="baziNameOut"></h2>
+      <p class="rb-meta" id="baziMetaOut"></p>
+      <div class="rb-tags" id="baziTagsOut"></div>
+    </div>
+
+    <!-- 1. 四柱命盘 (始终展开) -->
+    <div class="bazi-new-module" id="pillarModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title" onclick="toggleBaziModule(this)" class="d-block"☰ 四柱命盘 · 天干地支 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body">
+        <div class="pillar-chart">
+      <div class="pillar-header">
+        <div class="ph-col">年柱</div>
+        <div class="ph-col">月柱</div>
+        <div class="ph-col">日柱</div>
+        <div class="ph-col">时柱</div>
+      </div>
+      <div class="pillar-row">
+        <div class="pr-col">
+          <p class="pr-label">天干 · 地支</p>
+          <p class="pr-gan gan-甲" id="bz0g"></p>
+          <p class="pr-zhi zhi-子" id="bz0z"></p>
+          <p class="pr-ele" id="bz0e"></p>
+          <p class="pr-na" id="bz0n"></p>
+        </div>
+        <div class="pr-col">
+          <p class="pr-label">天干 · 地支</p>
+          <p class="pr-gan gan-甲" id="bz1g"></p>
+          <p class="pr-zhi zhi-子" id="bz1z"></p>
+          <p class="pr-ele" id="bz1e"></p>
+          <p class="pr-na" id="bz1n"></p>
+        </div>
+        <div class="pr-col">
+          <p class="pr-label">天干 · 地支</p>
+          <p class="pr-gan gan-甲" id="bz2g"></p>
+          <p class="pr-zhi zhi-子" id="bz2z"></p>
+          <p class="pr-ele" id="bz2e"></p>
+          <p class="pr-na" id="bz2n"></p>
+        </div>
+        <div class="pr-col">
+          <p class="pr-label">天干 · 地支</p>
+          <p class="pr-gan gan-甲" id="bz3g"></p>
+          <p class="pr-zhi zhi-子" id="bz3z"></p>
+          <p class="pr-ele" id="bz3e"></p>
+          <p class="pr-na" id="bz3n"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYSIS -->
+    <div class="analysis-grid" id="baziAnalysisGrid"></div>
+
+      </div>
+      </div><!-- /bazi-module-body -->
+    </div><!-- /pillarModule -->
+
+    <!-- 2. 五行力量分布 (始终展开) -->
+    <div class="bazi-new-module" id="wuxingModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title" onclick="toggleBaziModule(this)" class="d-block"🔥 五行力量分布 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body">
+        <div class="analysis-card" style="margin-bottom:16px">
+          <h5>五行力量分布</h5>
+          <div class="ele-bar" id="eleBar"></div>
+          <div class="ele-legend" id="eleLegend"></div>
+        </div>
+      </div><!-- /bazi-module-body -->
+    </div><!-- /wuxingModule -->
+
+    <!-- 3. 日主十神·命格 (始终展开) -->
+    <div class="bazi-new-module" id="shishenModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title" onclick="toggleBaziModule(this)" class="d-block"⭐ 日主十神 · 命格 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body">
+        <div class="analysis-card" style="margin-bottom:16px" id="tenGodsCard">
+          <h5>日主十神 · 命格</h5>
+          <div class="ten-gods-grid" id="tenGodsGrid"></div>
+        </div>
+        <div class="shishen-note">
+          <strong>十神释义：</strong>十神以日干为我，按五行生克关系而定。<strong>正官</strong>—克我者（异性），主约柬、事业；<strong>偏官(七杀)</strong>—克我者（同性），主权柄、压力；<strong>正印</strong>—生我者（异性），主学识、贵人；<strong>偏印(枭神)</strong>—生我者（同性），主偏才、孤克；<strong>比肩</strong>—同我者（同性），主竞争、独立；<strong>劫财</strong>—同我者（异性），主争夺、耗散；<strong>食神</strong>—我生者（同性），主才华、福禄；<strong>伤官</strong>—我生者（异性），主才辩、克官；<strong>正财</strong>—我克者（异性），主稳定收入、妻财；<strong>偏财</strong>—我克者（同性），主横财、父缘。
+        </div>
+      </div><!-- /bazi-module-body -->
+    </div><!-- /shishenModule -->
+
+    <!-- 4. 纳音五行 (折叠) -->
+    <div class="bazi-new-module" id="nayinModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"📜 纳音五行 · 六十甲子 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="analysis-card" style="margin-top:0">
+          <div class="shensha-grid" id="nayinGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 神煞分析 (折叠) -->
+    <div class="bazi-new-module" id="shenshaModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"⭐ 神煞分析 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="analysis-card" style="margin-top:0">
+          <div class="shensha-grid" id="shenshaGrid"></div>
+        </div>
+        <div class="pro-note" style="margin-top:12px">
+          <p><strong>天乙贵人：</strong>命中最大的吉神，主化解灾厄、得贵人相助。<strong>太极贵人：</strong>主聪明智慧、对神秘学有缘。<strong>文昌：</strong>主科名、学业功名。<strong>驿马：</strong>主动迁、出行、变化。<strong>桃花：</strong>主人缘、异性缘、才艺。<strong>华盖：</strong>主孤高、宗教、艺术气质。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. 命局分析·格局 (折叠) -->
+    <div class="bazi-new-module" id="gejuModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"⚖️ 命局分析 · 格局 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="huajie-alert" style="margin-top:0" id="gejuBox">
+          <div class="alert-title">命局分析</div>
+          <p>格局:<strong id="gejuName"></strong></p>
+          <p style="margin-top:8px" id="gejuDesc"></p>
+        </div>
+        <div class="geju-note">
+          <strong>格局释义：</strong>格局是八字命理的核心框架，以月令所藏天干透出定格。<strong>正官格</strong>—月令正官透干，主循规蹈矩、仕途有望；<strong>偏官格(七杀格)</strong>—月令七杀透干，主权柄武职、需制化方吉；<strong>食神格</strong>—月令食神透干，主才秀福厚；<strong>伤官格</strong>—月令伤官透干，主才辩超群、需配印方贵；<strong>正财格/偏财格</strong>—月令财星透干，主理财有道；<strong>正印格/偏印格</strong>—月令印星透干，主学识深厚。此外尚有从格（从强、从弱、从旺）等特殊格局。
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. 合冲刑害 (折叠) -->
+    <div class="bazi-new-module" id="hechongModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"🔗 合冲刑害 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="analysis-card" style="margin-top:0">
+          <div class="shensha-grid" id="hechongGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. 大运流年 (折叠) -->
+    <div class="bazi-new-module" id="dayunModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"🔮 大运流年 · 十年一运 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="analysis-card" style="margin-bottom:16px;margin-top:0" id="dayunCard">
+          <h5 style="font-size:15px;letter-spacing:4px;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:8px">
+            🔮 大运流年 · 十年一运
+            <span style="font-size:11px;opacity:.95;letter-spacing:1px;font-weight:normal">(起运年龄:<span id="qiyunAgeOut"></span>岁)</span>
+          </h5>
+          <div id="dayunTimeline" style="position:relative;padding:20px 0;margin-bottom:20px">
+            <div id="dayunList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"></div>
+          </div>
+          <div id="dayunDetail" style="display:none;margin-top:16px;padding:20px;background:rgba(201,168,76,.04);border-radius:8px;border:1px solid rgba(201,168,76,.1)">
+            <h6 style="color:var(--gold);letter-spacing:3px;margin-bottom:12px" id="dayunDetailTitle"></h6>
+            <div id="dayunDetailContent"></div>
+          </div>
+        </div>
+        <div class="dayun-note">
+          <strong>大运计算法：</strong>大运以月令为基准，阳年男命、阴年女命顺行；阴年男命、阳年女命逆行。起运年龄 = 从生日到下一个（或上一个）节气的天数 ÷ 3，所得即起运岁数。每运管十年，依次排列。大运天干管前五年，地支管后五年，天干地支共参十年运程。
+        </div>
+      </div>
+    </div>
+
+    <!-- 命格深度解读 -->
+    <div id="baziDimensionBox"></div>
+
+    <!-- 9. 流年逐月运势 (折叠) -->
+    <div class="bazi-new-module" id="liuYueModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" id="liuYueTitle" class="d-block"📅 流年逐月运势详解 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="liu-yue-grid" id="liuYueGrid"></div>
+      </div>
+    </div>
+
+    <!-- 10. 60甲子流年纵览 (折叠) -->
+    <div class="bazi-new-module" id="liuNianOverviewModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"📆 60甲子流年纵览 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="ln-nav-bar" id="lnNavBar"></div>
+        <div class="liu-nian-list" id="liuNianList"></div>
+        <div style="padding:8px 14px;font-size:11px;letter-spacing:1px;border-top:1px solid rgba(201,168,76,.06)">
+          📌 60年一甲子循环，天干地支周而复始。本命年（虚岁12/24/36/48/60）标注红色，当前年份高亮金色。点击上方按钮可跳跃定位。
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. 喜用神忌神详解 (折叠) -->
+    <div class="bazi-new-module" id="xiJiExplainModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"📖 用神与忌神 · 白话详解 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="xi-ji-explain-content" id="xiJiExplainContent"></div>
+        <div class="yongshen-note">
+          <strong>用神取法：</strong><strong>扶抑法</strong>—日主弱则扶之（印绶、比劫），日主强则抑之（官杀、食伤、财星）；<strong>调候法</strong>—寒暖燥湿失衡时，以调候为先，如冬生火命需暖、夏生水命需凉；<strong>通关法</strong>—两行交战时取中间五行通关，如木土交战取火通关；<strong>从格法</strong>—日主极弱无助从其旺势，或极强无制从其强势，从格不取扶抑。
+        </div>
+      </div>
+    </div>
+
+    <!-- 12. 开运化解方案 (折叠) -->
+    <div class="bazi-new-module" id="huajieModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"🛡️ 开运化解方案 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="huajie-full-content" id="huajieFullContent"></div>
+        <div class="geju-note" style="margin-top:8px">
+          <strong>专业提示：</strong>化解方案须依据命局用神量身定制。同一神煞在不同命局中吉凶不同，不可套用通用化解法。例如身弱见七杀需印绶化杀生身，身强见七杀则需食神制杀。建议结合命盘整体格局综合论断。
+        </div>
+      </div>
+    </div>
+
+    
+    <!-- R41-A 双核速查·化解4宫 (迁移/福德/兄弟/田宅) -->
+    <div class="bazi-new-module" id="huajie4Module">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"🛡️ 化解4宫 · 迁移福德兄弟田宅 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="dh-huajie4-grid">
+          <div class="dh-huajie4-card">
+            <div class="dh-huajie4-head">
+              <span class="dh-huajie4-icon">飞</span>
+              <span class="dh-huajie4-title">迁移宫化解</span>
+              <span class="dh-huajie4-score">85分</span>
+            </div>
+            <div class="dh-huajie4-body">
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">主星</span><span class="dh-huajie4-val">天机 + 文昌</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">吉方</span><span class="dh-huajie4-val">东南·正南</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">凶方</span><span class="dh-huajie4-val">正北</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">物品</span><span class="dh-huajie4-val">马形摆件·指南针</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">择日</span><span class="dh-huajie4-val">驿马日·巳午时</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">属相</span><span class="dh-huajie4-val">寅午戌·三合贵人</span></div>
+              <div class="dh-huajie4-tips"><b>化解要点：</b>出行前一日正南方点香一柱，可保行程平安顺遂。长期出门者宜在客厅东南角摆铜马。</div>
+              <div class="dh-huajie4-classic">《紫微斗数全书·迁移》："迁移有吉星照命，主出行获利、动中得福。"</div>
+            </div>
+          </div>
+          <div class="dh-huajie4-card">
+            <div class="dh-huajie4-head">
+              <span class="dh-huajie4-icon">拜</span>
+              <span class="dh-huajie4-title">福德宫化解</span>
+              <span class="dh-huajie4-score warn">62分</span>
+            </div>
+            <div class="dh-huajie4-body">
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">主星</span><span class="dh-huajie4-val">天同 + 天梁</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">吉方</span><span class="dh-huajie4-val">正西·西南</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">凶方</span><span class="dh-huajie4-val">正东</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">物品</span><span class="dh-huajie4-val">佛像·太极图·香炉</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">择日</span><span class="dh-huajie4-val">初一十五·辰时</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">属相</span><span class="dh-huajie4-val">亥卯未·三合贵人</span></div>
+              <div class="dh-huajie4-tips"><b>化解要点：</b>精神修养宫偏弱（62分），建议每日静坐15分钟，西南方为精神归位处。</div>
+              <div class="dh-huajie4-classic">《太上感应篇》："祸福无门，惟人自召。善恶之报，如影随形。"</div>
+            </div>
+          </div>
+          <div class="dh-huajie4-card">
+            <div class="dh-huajie4-head">
+              <span class="dh-huajie4-icon">👫</span>
+              <span class="dh-huajie4-title">兄弟宫化解</span>
+              <span class="dh-huajie4-score">88分</span>
+            </div>
+            <div class="dh-huajie4-body">
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">主星</span><span class="dh-huajie4-val">紫微 + 天府</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">吉方</span><span class="dh-huajie4-val">正东·东南</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">凶方</span><span class="dh-huajie4-val">正西</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">物品</span><span class="dh-huajie4-val">双鱼摆件·兄弟合影</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">择日</span><span class="dh-huajie4-val">成日·寅卯时</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">属相</span><span class="dh-huajie4-val">申子辰·三合贵人</span></div>
+              <div class="dh-huajie4-tips"><b>化解要点：</b>兄弟和睦主贵人相助。正东方为兄弟宫位，摆放铜质鼠或龙形摆件。</div>
+              <div class="dh-huajie4-classic">《颜氏家训》："兄弟同居，难处之时，正见真情。"</div>
+            </div>
+          </div>
+          <div class="dh-huajie4-card">
+            <div class="dh-huajie4-head">
+              <span class="dh-huajie4-icon">宅</span>
+              <span class="dh-huajie4-title">田宅宫化解</span>
+              <span class="dh-huajie4-score warn">68分</span>
+            </div>
+            <div class="dh-huajie4-body">
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">主星</span><span class="dh-huajie4-val">武曲 + 七杀</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">吉方</span><span class="dh-huajie4-val">正北·东北</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">凶方</span><span class="dh-huajie4-val">正南</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">物品</span><span class="dh-huajie4-val">泰山石敢当·葫芦</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">择日</span><span class="dh-huajie4-val">满日·子时</span></div>
+              <div class="dh-huajie4-row"><span class="dh-huajie4-key">属相</span><span class="dh-huajie4-val">巳酉丑·三合贵人</span></div>
+              <div class="dh-huajie4-tips"><b>化解要点：</b>田宅宫主家宅根基。东北方放泰山石敢当可镇宅化煞，正南避免红色装饰。</div>
+              <div class="dh-huajie4-classic">《阳宅三要》："宅者，人之根本也。根本固则枝叶荣。"</div>
+            </div>
+          </div>
+        </div>
+        <div class="geju-note" style="margin-top:8px">
+          <strong>化解心法：</strong>① 趋吉——找准吉方吉时吉物 ② 避凶——远离凶方凶时凶色 ③ 借力——借助天乙贵人三合局 ④ 内修——心存善念福报自来。四宫化解，五维一体。
+        </div>
+      </div>
+    </div>
+
+<!-- 13. 开运指南 (折叠) -->
+    <div class="bazi-new-module" id="kaiyunModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"✨ 开运指南 · 佩饰数字方位 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="kaiyun-content" id="kaiyunContent"></div>
+      </div>
+    </div>
+
+    <!-- 14. 人生阶段解读 (折叠) -->
+    <div class="bazi-new-module" id="lifeStageModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block"🌱 人生阶段解读 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="life-stage-grid" id="lifeStageGrid"></div>
+      </div>
+    </div>
+
+    <!-- 15. 经典出处 (折叠) -->
+    <div class="bazi-new-module" id="classicRefModule">
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block" aria-label="经典出处 · 命理名著引用">卷 经典出处 · 命理名著引用 <span class="toggle-icon">▼</span></ml-tap>
+      <div class="bazi-module-body collapsed">
+        <div class="classic-ref-content" id="classicRefContent"></div>
+      </div>
+    </div>
+
+    <!-- 🏥 健康预测模块 -->
+    <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="display:block;border-color:rgba(39,174,96,.3)" aria-label="健康预测 · 疾病预防预警">医 健康预测 · 疾病预防预警 <span class="toggle-icon">▼</span></ml-tap>
+    <div class="bazi-module-body collapsed">
+      <div style="padding:12px;background:rgba(39,174,96,.04);border:1px solid rgba(39,174,96,.12);border-radius:8px;margin-bottom:10px">
+        <p style="font-size:13px;color:var(--jade2);line-height:1.8;margin:0">基于八字命理+十二长生+五行+大运流年，提供7大板块疾病预防预警分析。</p>
+        <p style="font-size:11px;opacity:.95;margin-top:6px">警 仅供养生保健参考，不构成医疗诊断</p>
+        <button class="compute-btn" onclick="runHealthForecast()" id="healthForecastBtn" style="margin-top:10px;padding:8px 24px;font-size:13px;background:rgba(39,174,96,.12);border:1px solid rgba(39,174,96,.3);color:var(--jade2);border-radius:20px;cursor:pointer">医 生成健康预测</button>
+      </div>
+      <div id="healthForecastResult"></div>
+    </div>
+
+    <div class="back-row">
+      <button class="export-btn" onclick="exportBaziReport('html')">导出HTML</button>
+      <button class="export-btn" onclick="exportBaziReport('pdf')" style="background:rgba(46,204,113,.15);border-color:rgba(46,204,113,.3)">文 导出PDF</button>
+      <button class="export-btn" onclick="exportBaziReport('word')" style="background:rgba(52,152,219,.15);border-color:rgba(52,152,219,.3)">记 导出Word</button>
+      <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
+    </div>
+    <!-- 会员年度提醒 -->
+    <div class="member-annual-notice" id="memberAnnualNotice" class="d-none">
+      <div class="annual-notice-header">
+        <span class="annual-notice-icon">警</span>
+        <h3 class="annual-notice-title">下年度重要提醒</h3>
+      </div>
+      <div class="annual-notice-content" id="annualNoticeContent"></div>
+    </div>
+
+    <!-- 排盘增强报告：运势 + 健康 + 企业主视角 -->
+    <div id="baziEnhancedResult" class="result" style="margin-top:18px">
+      <div style="padding:24px;text-align:center;color:var(--fg3);font-size:13px">
+        🌟 <b>点击上方"运势+健康 深度增强"按钮</b>生成今年/明年运势精解、健康专题、当日运势、企业主视角判读
+      </div>
+    </div>
+    <div id="baziHealthContainer" style="margin-top:14px"></div>
+</section>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-i 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-i 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table{page-break-inside:avoid}
+  .container,main{width:100%!important;margin:0!important;padding:0!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</button>
+
+<script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+function toggleProPanel(){
+  var p = document.getElementById('proPanel');
+  if(p) p.classList.toggle('d-none');
+}
+function loadProFields(){
+  var s = localStorage.getItem('mlbj_pro_fields');
+  if(!s){ showToast('暂无保存的档案'); return; }
+  try {
+    var d = JSON.parse(s);
+    Object.keys(d).forEach(function(k){
+      var el = document.getElementById(k);
+      if(el) el.value = d[k];
+    });
+    toast('已载入档案');
+  } catch(e){ showToast('档案解析失败'); }
+}
+function saveProFields(){
+  var d = {};
+  document.querySelectorAll('[id^="pro_"]').forEach(function(el){
+    d[el.id] = el.value;
+  });
+  localStorage.setItem('mlbj_pro_fields', JSON.stringify(d));
+  toast('已保存全量信息');
+}
+function applyPro2Bazi(){
+  var name = document.getElementById('pro_name');
+  if(name){ var n = document.getElementById('baziName'); if(n) n.value = name.value; }
+  toast('已录入八字段');
+}
+function toggleBaziModule(el){
+  var body = el.nextElementSibling;
+  if(body){
+    body.classList.toggle('d-none');
+    el.classList.toggle('collapsed');
+  }
+}
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+// R180: Safe fallbacks for functions defined in divination-core.js (not loaded standalone)
+if(typeof showToast!=='function'){window.showToast=function(msg,type){var t=document.createElement('div');t.className='toast'+(type?' toast-'+type:'');t.textContent=msg;t.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(8,8,8,.92);color:#c9a84c;padding:10px 20px;border-radius:8px;border:1px solid rgba(201,168,76,.3);z-index:9999;font-size:14px';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);};}
+if(typeof playSound!=='function'){window.playSound=function(t){try{var c=new(window.AudioContext||window.webkitAudioContext)();var o=c.createOscillator();var g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=t==='error'?200:t==='success'?600:440;g.gain.setValueAtTime(0.08,c.currentTime);o.start();o.stop(c.currentTime+0.12);}catch(e){}};}
+if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='divination-hub.html#'+(n||'');}catch(e){history.back();}};}
+if(typeof runBaziEnhancedFortune!=='function'){window.runBaziEnhancedFortune=function(){try{var r=document.getElementById('baziResult')||document.getElementById('proResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:16px;padding:14px;background:rgba(124,77,255,0.06);border-radius:10px;border:1px solid rgba(124,77,255,0.15)\"><h5 style=\"color:#7c4dff;margin-bottom:8px\">星 运势+健康深度增强</h5><p style=\"font-size:13px;color:var(--paper2)\">年度精解+企业视角增强报告。完整增强分析请在主页八字模块中使用。</p></div>');}if(typeof toast==='function')toast('增强报告已生成（简化版）');}catch(e){console.warn('[runBaziEnhancedFortune]',e);}};}
+if(typeof runHealthForecast!=='function'){window.runHealthForecast=function(){try{var r=document.getElementById('healthForecastResult')||document.getElementById('baziResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:12px;padding:14px;background:rgba(39,174,96,0.06);border-radius:10px;border:1px solid rgba(39,174,96,0.15)\"><h5 style=\"color:var(--jade2);margin-bottom:8px\">医 健康预测</h5><p style=\"font-size:13px;color:var(--paper2)\">基于八字五行强弱分析的健康趋势预测。完整健康预测请在主页使用。</p></div>');}if(typeof toast==='function')toast('健康预测已生成（简化版）');}catch(e){console.warn('[runHealthForecast]',e);}};}
+if(typeof exportBaziReport!=='function'){window.exportBaziReport=function(fmt){try{var data=document.querySelector('.result-section')||document.body;var html=`<!DOCTYPE html><html lang="zh-CN"><head><meta charset=UTF-8><title>八字报告</title><link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+</head><body class="theme-zhouyi">`+data.innerHTML+`
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("baziFlowSteps",["填写信息","排盘演算","查看结果","深度分析"],0);
+    var ql=document.getElementById("baziQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([
+      {name:"紫微斗数",icon:"🌌",url:"ziwei.html"},
+      {name:"奇门遁甲",icon:"🔮",url:"qimen-chart.html"},
+      {name:"人生蓝图",icon:"🧭",url:"lifeplan-detail.html"},
+      {name:"体质辨识",icon:"🌿",url:"tizhi.html"}
+    ]);
+  }
+});
+<\/script>
+\x3cscript src="js/flow-engine.js">\x3c/script>
+\x3cscript src="js/error-interceptor.js" defer>\x3c/script>
+</body></html>`;var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bazi-report.'+(fmt||'html');a.click();if(typeof toast==='function')toast('已导出'+(fmt||'html'));}catch(e){if(typeof toast==='function')toast('导出失败: '+esc(e.message));}};}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("baziFlowSteps",["填写信息","排盘演算","查看结果","深度分析"],0);
+    var ql=document.getElementById("baziQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([
+      {name:"紫微斗数",icon:"🌌",url:"ziwei.html"},
+      {name:"奇门遁甲",icon:"🔮",url:"qimen-chart.html"},
+      {name:"人生蓝图",icon:"🧭",url:"lifeplan-detail.html"},
+      {name:"体质辨识",icon:"🌿",url:"tizhi.html"}
+    ]);
+  }
+});
+
+async function generateBaziReport(){
+  try{
+    const name = document.getElementById('baziName')?.value || '缘主';
+    const dateStr = document.getElementById('baziDate')?.value || '1990-06-15';
+    const hour = +(document.getElementById('baziHour')?.value || 10);
+    const gender = document.getElementById('baziSex')?.value || 'male';
+    const birthplace = document.getElementById('baziBirthplace')?.value || '';
+    const residence = document.getElementById('baziResidence')?.value || '';
+    
+    const parts = dateStr.split('-');
+    const body = {
+      year: +parts[0], month: +parts[1], day: +parts[2],
+      hour, gender, name, birthplace, residence, lunar: false
+    };
+    
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch(API_BASE+'/api/paipan/bazi/report', { signal: AbortSignal.timeout(15000),
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||r.message||''));
+      return;
+    }
+    
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module=bazi&name='+encodeURIComponent(name);
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+esc(e.message));
+  }
+}
+</script>
+<script src="js/flow-engine.js"></script>
+<script>
+// R474-G: 补漏修真 — bazi.html 独立页 computeBazi：真太阳时(lng) + 流年(targetYear) + SVG 盘图
+(function(){
+  var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+  var GAN_ELE={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+  var ZHI_ELE={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+
+  function renderBaziBasic(data, meta){
+    // 四柱：Python 返回 pillars = {年:丙午, 月:甲午, 日:辛巳, 时:丁酉}
+    var pillars = data.pillars || (data.chart && data.chart.pillars) || {};
+    var names = ['年','月','日','时'];
+    for(var i=0;i<4;i++){
+      var gz = pillars[names[i]] || '';
+      var g = gz.charAt(0), z = gz.charAt(1) || '';
+      var ge = document.getElementById('bz'+i+'g');
+      var ze = document.getElementById('bz'+i+'z');
+      var ee = document.getElementById('bz'+i+'e');
+      var ne = document.getElementById('bz'+i+'n');
+      if(ge) ge.textContent = g;
+      if(ze) ze.textContent = z;
+      if(ee) ee.textContent = (GAN_ELE[g]||'') + ' · ' + (ZHI_ELE[z]||'');
+      if(ne) ne.textContent = i===2 ? '日主' : (data.gan_shen ? (data.gan_shen[names[i]]||'') : '');
+    }
+    var nameOut = document.getElementById('baziNameOut');
+    if(nameOut) nameOut.textContent = meta.name + ' 命盘';
+    var metaOut = document.getElementById('baziMetaOut');
+    if(metaOut){
+      var m = '公历'+meta.year+'年'+meta.month+'月'+meta.day+'日 '+meta.hour+'时 · '+(meta.sex==='female'?'女':'男')+'命';
+      if(data.input && data.input.true_solar) m += ' · 真太阳时: ' + data.input.true_solar;
+      if(data.input && data.input.correction) m += ' · ' + data.input.correction;
+      metaOut.textContent = m;
+    }
+    var tags = document.getElementById('baziTagsOut');
+    if(tags && data.day_master) tags.innerHTML = '<span class="rb-tag">'+data.day_master+'</span><span class="rb-tag">'+meta.targetYear+'年流年</span>';
+    var result = document.getElementById('baziResult');
+    if(result){ result.classList.add('visible'); result.style.display = 'block'; }
+  }
+
+  function renderBaziSvg(svg){
+    var old = document.getElementById('bazi-svg-host');
+    if(old) old.remove();
+    if(!svg) return;
+    var host = document.createElement('div');
+    host.id = 'bazi-svg-host';
+    host.style.cssText = 'max-width:800px;margin:16px auto;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;padding:8px;text-align:center';
+    host.innerHTML = '<div style="font-size:12px;color:var(--gold,#c9a84c);margin-bottom:6px">📜 高清盘图（R474 SVG · 可右键保存 / 微信长按分享）</div>' + svg;
+    var target = document.getElementById('pillarModule') || document.getElementById('baziResult');
+    if(target) target.parentNode.insertBefore(host, target);
+  }
+
+  function renderBaziFlow(flow, targetYear, currentAge){
+    var old = document.getElementById('bazi-flow-host');
+    if(old) old.remove();
+    if(!flow) return;
+    var ln = flow.liuNian || {};
+    var dx = flow.currentDaXian || {};
+    var host = document.createElement('div');
+    host.id = 'bazi-flow-host';
+    host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+    host.innerHTML = `
+      <div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:8px">🌊 ${targetYear} 流年 · 现年 ${currentAge} 岁</div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:11px">
+        <div style="background:rgba(201,168,76,.08);padding:8px;border-radius:6px">
+          <div style="color:var(--gold,#c9a84c)">流年</div>
+          <div>${ln.ganzhi||''}（${ln.ganShen||''}）</div>
+          <div style="color:var(--paper3);margin-top:2px">虚岁 ${ln.age||''} · ${Array.isArray(ln.zhiShen)?ln.zhiShen.join('、'):(ln.zhiShen||'')}</div>
+        </div>
+        <div style="background:rgba(99,179,237,.08);padding:8px;border-radius:6px">
+          <div style="color:var(--blue,#63b3ed)">当前大运</div>
+          <div>${dx.ganzhi||''}（${dx.ganShen||''}）</div>
+          <div style="color:var(--paper3);margin-top:2px">${dx.startAge||''} - ${dx.endAge||''} 岁 · ${dx.startYear||''}年起</div>
+        </div>
+      </div>`;
+    var target = document.getElementById('dayunModule') || document.getElementById('baziResult');
+    if(target) target.parentNode.insertBefore(host, target);
+  }
+
+  window.computeBazi = async function(){
+    try{
+      var name = (document.getElementById('baziName')||{}).value || '有缘人';
+      var dateStr = (document.getElementById('baziDate')||{}).value;
+      var hourVal = (document.getElementById('baziHour')||{}).value;
+      if(!dateStr){ showToast('请输入出生日期'); return; }
+      var parts = dateStr.split('-').map(Number);
+      var year = parts[0], month = parts[1], day = parts[2];
+      var hour = hourVal ? parseInt(hourVal) : 12;
+      var sex = (document.getElementById('baziSex')||{}).value || 'male';
+      var lngEl = document.getElementById('baziLng');
+      var lng = lngEl && lngEl.value ? parseFloat(lngEl.value) : null;
+      var minuteEl = document.getElementById('pf_minute');
+      var minute = minuteEl && minuteEl.value ? parseInt(minuteEl.value) : 0;
+      var tyEl = document.getElementById('baziTargetYear');
+      var targetYear = tyEl && tyEl.value ? parseInt(tyEl.value) : new Date().getFullYear();
+      var currentAge = targetYear - year + 1;
+      var body = { year:year, month:month, day:day, hour:hour, minute:minute, sex:sex, lng:lng, targetYear:targetYear, currentAge:currentAge };
+      showToast('排盘中…');
+      var [r, rSvg] = await Promise.all([
+        fetch(API_BASE+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body)}),
+        fetch(API_BASE+'/api/paipan/calculate/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(Object.assign({}, body, {format:'json'}))})
+      ]);
+      var data = await r.json().catch(function(){ return {ok:false,error:'响应解析失败'}; });
+      if(data.ok === false){ showToast('排盘失败: '+(data.error||'')); return; }
+      var svgJson = await rSvg.json().catch(function(){ return null; });
+      var svg = svgJson && svgJson.svg ? svgJson.svg : '';
+      renderBaziBasic(data, {name:name, year:year, month:month, day:day, hour:hour, sex:sex, targetYear:targetYear});
+      renderBaziSvg(svg);
+      renderBaziFlow(data.flow, targetYear, currentAge);
+      showToast('排盘完成 ✓');
+    }catch(e){
+      console.error('[computeBazi]', e);
+      showToast('排盘失败: '+esc(e.message));
+    }
+  };
+})();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+</body>
+</html>

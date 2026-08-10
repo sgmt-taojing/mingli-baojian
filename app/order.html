@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="index, follow">
+<title>订单中心 - 明历宝剑</title>
+<link rel="canonical" href="https://mingli-baojian.app/order.html">
+<meta name="description" content="命理宝鉴订单管理">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f5f6f9;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+  .page-header-bar {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 48px 20px 32px;
+    text-align: center;
+    position: relative;
+  }
+  .page-header-bar h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .page-header-bar .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 6px;
+  }
+  .back-btn {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .back-btn:hover { background: rgba(255,255,255,0.25); }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .order-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: 1px solid rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .order-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 14px 14px 0 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .order-card:hover::before { opacity: 1; }
+  .order-card:active { transform: scale(0.97); }
+  .order-card .icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .order-card .label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 4px;
+  }
+  .order-card .desc {
+    font-size: 12px;
+    color: #8a8a9a;
+    line-height: 1.5;
+  }
+  .order-card .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff4757;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .order-card.full {
+    grid-column: 1 / -1;
+  }
+  .order-card.c1::before { background: #e94560; }
+  .order-card.c2::before { background: #0f3460; }
+  .order-card.c3::before { background: #16c79a; }
+  .order-card.c4::before { background: #f5a623; }
+  .order-card.c5::before { background: #7c5cfc; }
+  .order-card.c6::before { background: #00b4d8; }
+
+  .section-title {
+    font-size: 13px;
+    color: #8a8a9a;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+  .section {
+    margin-bottom: 22px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 14px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 400px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
+</style>
+    <script src="/app/js/escape-html.js" defer></script>
+</head>
+<body>
+
+<div class="page-header-bar">
+  <button class="back-btn" onclick="history.back()" aria-label="返回">‹</button>
+  <h1>订单中心</h1>
+  <p class="subtitle">管理您的所有服务订单</p>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-title">我的订单</div>
+    <div class="card-grid">
+      <div class="order-card c1" onclick="goTo('order-all')">
+        <span class="icon">📋</span>
+        <div class="label">全部订单</div>
+        <div class="desc">查看所有订单记录</div>
+      </div>
+      <div class="order-card c2" onclick="goTo('order-pending')">
+        <span class="icon">⏳</span>
+        <div class="label">待付款</div>
+        <div class="desc">等待支付的订单</div>
+        <span class="badge" style="display:none" id="badge-pending">0</span>
+      </div>
+      <div class="order-card c3" onclick="goTo('order-paid')">
+        <span class="icon">✅</span>
+        <div class="label">已付款</div>
+        <div class="desc">待服务/进行中</div>
+      </div>
+      <div class="order-card c4" onclick="goTo('order-refund')">
+        <span class="icon">🔄</span>
+        <div class="label">退款/售后</div>
+        <div class="desc">退款申请与售后</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">服务中心</div>
+    <div class="card-grid">
+      <div class="order-card c5" onclick="goTo('order-invoice')">
+        <span class="icon">📑</span>
+        <div class="label">发票管理</div>
+        <div class="desc">申请发票 / 查看记录</div>
+      </div>
+      <div class="order-card c6" onclick="goTo('admin-tickets')">
+        <span class="icon">🎫</span>
+        <div class="label">工单系统</div>
+        <div class="desc">问题反馈 / 售后工单</div>
+      </div>
+      <div class="order-card c1 full" onclick="goTo('admin-orders')">
+        <span class="icon">🏪</span>
+        <div class="label">商户订单管理</div>
+        <div class="desc">管理员 / 商户端订单处理入口</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  const API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+
+  function toast(msg, dur) {
+    dur = dur || 2000;
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(function() { el.classList.remove('show'); }, dur);
+  }
+
+  async function loadPendingCount() {
+    try {
+      var token = localStorage.getItem('token') || localStorage.getItem('auth_token') || '';
+      if (!token) return;
+      var headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      var url = (API || '') + '/api/orders?status=pending&limit=1';
+      var r = await fetch(url, { headers: headers, signal: AbortSignal.timeout(10000) });
+      var data = await r.json();
+      if (data && data.count > 0) {
+        var badge = document.getElementById('badge-pending');
+        if (badge) {
+          badge.textContent = data.count > 99 ? '99+' : data.count;
+          badge.style.display = 'inline-block';
+        }
+      }
+    } catch (e) {
+      // silent - order count is optional
+    }
+  }
+
+  async function goTo(page) {
+    var mapping = {
+      'order-all':       'order-list.html?status=all',
+      'order-pending':   'order-list.html?status=pending',
+      'order-paid':      'order-list.html?status=paid',
+      'order-refund':    'order-list.html?status=refund',
+      'order-invoice':   'order-invoice.html',
+      'admin-tickets':   'admin-tickets.html',
+      'admin-orders':    'admin/orders.html'
+    };
+    var target = mapping[page];
+    if (target) {
+      window.location.href = target;
+    } else {
+      toast('该功能即将上线');
+    }
+  }
+
+  loadPendingCount();
+})();
+</script>
+
+</body>
+</html>

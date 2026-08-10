@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/admin-profile-distill.html">
+<meta name="description" content="画像蒸馏后台 · 命理宝鉴">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>画像蒸馏 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/admin-glass.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0a0e1a;--card:#131826;--border:#1f2940;--text:#d8dde8;--muted:#8893a8;--accent:#48bb78;--warn:#ed8936;--danger:#f56565}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);padding:0;min-height:100vh}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+.hero{background:linear-gradient(135deg,#1a2238 0%,#0e1424 100%);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;right:0;width:240px;height:240px;background:radial-gradient(circle,rgba(201,168,76,0.15) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-size:22px;color:var(--gold);margin-bottom:6px;position:relative}
+.hero .sub{color:var(--muted);font-size:13px;position:relative}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat .num{font-size:24px;color:var(--gold);font-weight:700}
+.stat .lbl{font-size:12px;color:var(--muted);margin-top:4px}
+.tabs{display:flex;gap:8px;margin-bottom:12px;background:var(--card);border-radius:10px;padding:6px;border:1px solid var(--border)}
+.tab{flex:1;padding:10px;text-align:center;border-radius:8px;cursor:pointer;color:var(--muted);font-size:13px;transition:.15s}
+.tab.active{background:linear-gradient(135deg,var(--gold) 0%,#b8933d 100%);color:#0a0e1a;font-weight:600}
+.btn{cursor:pointer;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:500;transition:.15s}
+.btn-primary{background:var(--gold);color:#0a0e1a}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-ghost{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:768px){.grid2{grid-template-columns:1fr}.stats-row{grid-template-columns:repeat(2,1fr)}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.panel-title{font-size:14px;color:var(--gold);margin-bottom:10px;font-weight:600;display:flex;align-items:center;gap:6px}
+.list-item{padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:6px;cursor:pointer;transition:.15s;border:1px solid transparent}
+.list-item:hover{border-color:var(--gold);background:rgba(201,168,76,0.08)}
+.list-item .name{font-size:14px;color:var(--text);font-weight:500}
+.list-item .meta{font-size:11px;color:var(--muted);margin-top:3px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;margin-right:4px}
+.badge-distilled{background:rgba(72,187,120,0.2);color:var(--accent)}
+.badge-ready{background:rgba(237,137,54,0.2);color:var(--warn)}
+.badge-pending{background:rgba(136,147,168,0.2);color:var(--muted)}
+.sym-bar{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
+.sym-bar .name{width:90px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sym-bar .bar{flex:1;height:8px;background:rgba(201,168,76,0.1);border-radius:4px;overflow:hidden}
+.sym-bar .fill{height:100%;background:linear-gradient(90deg,var(--gold) 0%,#e6c66e 100%);border-radius:4px}
+.sym-bar .count{color:var(--gold);font-weight:600;min-width:24px;text-align:right}
+.insight{padding:10px;border-radius:8px;background:rgba(72,187,120,0.08);border-left:3px solid var(--accent);margin-bottom:6px;font-size:12px;line-height:1.6}
+.insight .ins-title{color:var(--accent);font-weight:600;margin-bottom:4px}
+.insight .ins-summary{color:var(--text)}
+.detail{display:none}
+.detail.show{display:block}
+.empty{text-align:center;color:var(--muted);padding:20px;font-size:12px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;z-index:1000;display:none;font-size:13px}
+.toast.err{background:var(--danger)}
+</style>
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html">
+<div class="page-header-bar">
+  <span class="phb-dot" style="background:#c9a84c"></span>
+  <span class="phb-title">画像蒸馏</span>
+  <a href="admin.html" class="phb-back">← 返回后台</a>
+</div>
+<div class="wrap">
+  <div class="hero">
+    <h1>📊 画像蒸馏后台</h1>
+    <div class="sub">患者长程症状趋势 + 信众持续关注领域，自动蒸馏为医生/大师的诊断决策辅助</div>
+  </div>
+
+  <div class="stats-row" id="statsRow">
+    <div class="stat"><div class="num" id="sPat">-</div><div class="lbl">患者档案</div></div>
+    <div class="stat"><div class="num" id="sBel">-</div><div class="lbl">信众档案</div></div>
+    <div class="stat"><div class="num" id="sDist">-</div><div class="lbl">已蒸馏洞察</div></div>
+    <div class="stat"><div class="num" id="sCas">-</div><div class="lbl">活跃案例</div></div>
+  </div>
+
+  <div style="margin-bottom:16px">
+    <button class="btn btn-primary" onclick="triggerDistill()">⚡ 立即全量蒸馏</button>
+    <button class="btn btn-ghost" onclick="loadAll()">🔄 刷新数据</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="patient" onclick="switchTab('patient',this)">👤 患者画像</div>
+    <div class="tab" data-tab="believer" onclick="switchTab('believer',this)">🌟 信众画像</div>
+    <div class="tab" data-tab="global" onclick="switchTab('global',this)">💡 全局洞察池</div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel" id="leftPanel"><div class="empty">加载中...</div></div>
+    <div class="panel" id="rightPanel"><div class="empty">选择档案查看详情</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var API='http://localhost:8920';
+var TOK=localStorage.getItem('admin_token')||localStorage.getItem('token')||'test-token';
+var patients=[],believers=[],insights=[],currentTab='patient';
+
+function H(d){return Object.assign({},d,{headers:Object.assign({'Authorization':'Bearer '+TOK},(d.headers||{}))})}
+
+async function loadAll(){
+  try{
+    var [pRes,bRes,iRes]=await Promise.all([
+      fetch(API+'/api/profile/patients',H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).catch(function(_){return{ok:false,patients:[]}}),
+      fetch(API+'/api/profile/believers',H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).catch(function(_){return{ok:false,believers:[]}}),
+      fetch(API+'/api/profile/insights/global',H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()}).catch(function(_){return{ok:false,insights:[]}})
+    ]);
+    patients=pRes.patients||[];
+    believers=bRes.believers||[];
+    insights=iRes.insights||[];
+    document.getElementById('sPat').textContent=patients.length;
+    document.getElementById('sBel').textContent=believers.length;
+    document.getElementById('sDist').textContent=insights.length;
+    var cases=new Set();
+    insights.forEach(function(i){(i.source_case_ids||'').split(',').forEach(function(c){if(c.trim())cases.add(c.trim())})});
+    document.getElementById('sCas').textContent=cases.size;
+    if(currentTab==='patient')renderPatientList();
+    else if(currentTab==='believer')renderBelieverList();
+    else renderGlobalList();
+  }catch(e){toast('加载失败: '+esc(e.message),true)}
+}
+
+function switchTab(tab,el){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  el.classList.add('active');
+  if(tab==='patient')renderPatientList();
+  else if(tab==='believer')renderBelieverList();
+  else renderGlobalList();
+}
+
+function renderPatientList(){
+  var lp=document.getElementById('leftPanel');
+  if(!patients.length){lp.innerHTML='<div class="empty">暂无患者档案</div>';return}
+  lp.innerHTML='<div class="panel-title">👤 患者档案列表（'+patients.length+'）</div>'+patients.map(function(p){
+    var syms=(p.top_symptoms||[]).slice(0,3).map(function(s){return s.symptom||s}).join('、')||'无';
+    var cls=p.distill_status==='distilled'?'distilled':p.distill_status==='ready'?'ready':'pending';
+    return '<div class="list-item" onclick="showPatient('+p.user_id+')">'+
+      '<div class="name">'+esc(p.user_name||'匿名')+' <span class="badge badge-'+cls+'">'+p.distill_status+'</span></div>'+
+      '<div class="meta">📞 '+esc(p.phone||'-')+' · '+esc(p.sex||'-')+' · 访问 '+p.visit_count+' 次 · 完成 '+p.completed_count+' 例</div>'+
+      '<div class="meta">🩺 高频症状: '+esc(syms)+(p.day_master?' · 日主 '+esc(p.day_master):'')+'</div></div>';
+  }).join('');
+}
+
+function renderBelieverList(){
+  var lp=document.getElementById('leftPanel');
+  if(!believers.length){lp.innerHTML='<div class="empty">暂无信众档案</div>';return}
+  lp.innerHTML='<div class="panel-title">🌟 信众档案列表（'+believers.length+'）</div>'+believers.map(function(b){
+    var concerns=(b.top_concerns||[]).slice(0,3).map(function(c){return c.keyword||c}).join('、')||'无';
+    var cls=b.distill_status==='distilled'?'distilled':b.distill_status==='ready'?'ready':'pending';
+    return '<div class="list-item" onclick="showBeliever('+b.user_id+')">'+
+      '<div class="name">'+esc(b.user_name||'匿名')+' <span class="badge badge-'+cls+'">'+b.distill_status+'</span></div>'+
+      '<div class="meta">📞 '+esc(b.user_name||'-')+' · '+esc(b.sex||'-')+' · 排盘 '+b.paipan_count+' 次</div>'+
+      '<div class="meta">🔮 关注: '+esc(concerns)+'</div></div>';
+  }).join('');
+}
+
+function renderGlobalList(){
+  var lp=document.getElementById('leftPanel');
+  if(!insights.length){lp.innerHTML='<div class="empty">暂无蒸馏洞察</div>';return}
+  var grouped={};
+  insights.forEach(function(i){var k=i.source_type||'patient';if(!grouped[k])grouped[k]=[];grouped[k].push(i)});
+  var html='';
+  Object.keys(grouped).forEach(function(k){
+    html+='<div class="panel-title">'+(k==='patient'?'👤 患者蒸馏洞察':'🌟 信众蒸馏洞察')+'（'+grouped[k].length+'）</div>';
+    grouped[k].forEach(function(i){
+      html+='<div class="insight"><div class="ins-title">['+esc(i.insight_type)+'] '+esc(i.insight_title)+'</div>'+
+        '<div class="ins-summary">'+esc(i.insight_summary||'')+'</div>'+
+        '<div style="margin-top:4px;font-size:10px;color:var(--muted)">来源: '+esc(i.user_name||'#'+i.source_user_id)+' · 置信度 '+i.confidence+'</div></div>';
+    });
+  });
+  lp.innerHTML=html;
+  document.getElementById('rightPanel').innerHTML='<div class="empty">共 '+insights.length+' 条蒸馏洞察，已自动赋能医生/大师诊断</div>';
+}
+
+async function showPatient(uid){
+  var rp=document.getElementById('rightPanel');
+  rp.innerHTML='<div class="empty">加载患者档案...</div>';
+  try{
+    var j=await fetch(API+'/api/profile/patient/'+uid,H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()});
+    if(!j.ok){rp.innerHTML='<div class="empty">'+esc(j.error||'加载失败')+'</div>';return}
+    var p=j.profile,ins=j.insights||[];
+    var html='<div class="panel-title">🩺 患者详情 #'+uid+'</div>';
+    html+='<div style="font-size:12px;color:var(--muted);margin-bottom:10px">访问 '+p.visit_count+' 次 · 完成 '+p.completed_count+' 例';
+    if(p.day_master)html+=' · 日主 '+esc(p.day_master)+'（'+esc(p.day_element||'')+'）';
+    if(p.last_distilled_at)html+=' · 上次蒸馏: '+esc(p.last_distilled_at);
+    html+='</div>';
+    if((p.top_symptoms||[]).length){
+      var max=Math.max.apply(null,(p.top_symptoms||[]).map(function(s){return s.count||1}));
+      html+='<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">📊 高频症状</div>';
+      (p.top_symptoms||[]).slice(0,8).forEach(function(s){
+        html+='<div class="sym-bar"><div class="name">'+esc(s.symptom||'')+'</div><div class="bar"><div class="fill" style="width:'+((s.count||1)/max*100)+'%"></div></div><div class="count">'+s.count+'</div></div>';
+      });
+      html+='</div>';
+    }
+    if((p.effective_rxs||[]).length){
+      html+='<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">💊 有效处方</div>';
+      (p.effective_rxs||[]).slice(0,5).forEach(function(r){
+        html+='<div class="insight"><div class="ins-summary">'+esc(r.rx_name||JSON.stringify(r))+'</div></div>';
+      });
+      html+='</div>';
+    }
+    if(ins.length){
+      html+='<div><div style="font-size:12px;color:var(--gold);margin-bottom:6px">💡 蒸馏洞察（赋能医生）</div>';
+      ins.forEach(function(i){
+        html+='<div class="insight"><div class="ins-title">'+esc(i.insight_title||'')+'</div>'+
+          '<div class="ins-summary">'+esc(i.insight_summary||'')+'</div>'+
+          (i.actionable_advice?'<div style="margin-top:4px;color:var(--gold);font-size:11px">▶ 行动建议: '+esc(i.actionable_advice)+'</div>':'')+
+          '<div style="margin-top:4px;font-size:10px;color:var(--muted)">置信度 '+i.confidence+'</div></div>';
+      });
+      html+='</div>';
+    }else{html+='<div class="empty">暂无蒸馏洞察，点击上方"立即全量蒸馏"</div>'}
+    rp.innerHTML=html;
+  }catch(e){rp.innerHTML='<div class="empty">'+esc(esc(e.message))+'</div>'}
+}
+
+async function showBeliever(uid){
+  var rp=document.getElementById('rightPanel');
+  rp.innerHTML='<div class="empty">加载信众档案...</div>';
+  try{
+    var j=await fetch(API+'/api/profile/believer/'+uid,H({signal:AbortSignal.timeout(15000)})).then(function(r){return r.json()});
+    if(!j.ok){rp.innerHTML='<div class="empty">'+esc(j.error||'加载失败')+'</div>';return}
+    var b=j.insight,ins=j.insights||[];
+    var html='<div class="panel-title">🌟 信众详情 #'+uid+'</div>';
+    html+='<div style="font-size:12px;color:var(--muted);margin-bottom:10px">排盘 '+b.paipan_count+' 次';
+    if(b.last_distilled_at)html+=' · 上次蒸馏: '+esc(b.last_distilled_at);
+    html+='</div>';
+    if((b.top_concerns||[]).length){
+      var max=Math.max.apply(null,(b.top_concerns||[]).map(function(c){return c.count||1}));
+      html+='<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">🔮 关注领域</div>';
+      (b.top_concerns||[]).slice(0,8).forEach(function(c){
+        html+='<div class="sym-bar"><div class="name">'+esc(c.keyword||'')+'</div><div class="bar"><div class="fill" style="width:'+((c.count||1)/max*100)+'%"></div></div><div class="count">'+c.count+'</div></div>';
+      });
+      html+='</div>';
+    }
+    var fp=b.fate_profile||{};
+    if(Object.keys(fp).length){
+      html+='<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--gold);margin-bottom:6px">⚖️ 命理画像</div>';
+      html+='<div class="insight"><div class="ins-summary">'+esc(JSON.stringify(fp,null,2))+'</div></div></div>';
+    }
+    if(ins.length){
+      html+='<div><div style="font-size:12px;color:var(--gold);margin-bottom:6px">💡 蒸馏洞察（赋能大师）</div>';
+      ins.forEach(function(i){
+        html+='<div class="insight"><div class="ins-title">'+esc(i.insight_title||'')+'</div>'+
+          '<div class="ins-summary">'+esc(i.insight_summary||'')+'</div>'+
+          (i.actionable_advice?'<div style="margin-top:4px;color:var(--gold);font-size:11px">▶ 行动建议: '+esc(i.actionable_advice)+'</div>':'')+
+          '<div style="margin-top:4px;font-size:10px;color:var(--muted)">置信度 '+i.confidence+'</div></div>';
+      });
+      html+='</div>';
+    }else{html+='<div class="empty">暂无蒸馏洞察</div>'}
+    rp.innerHTML=html;
+  }catch(e){rp.innerHTML='<div class="empty">'+esc(esc(e.message))+'</div>'}
+}
+
+async function triggerDistill(){
+  if(!confirm('确认立即对所有档案执行全量蒸馏？\n（生产环境由 cron 每日 02:00 自动执行）'))return;
+  toast('正在执行全量蒸馏...');
+  try{
+var resp=await fetch(API+'/api/profile/distill-all',H({method:'POST',headers:Object.assign({'Authorization':'***'+TOK,'Content-Type':'application/json'}),signal:AbortSignal.timeout(15000)}));
+var j=await resp.json();
+    if(j.ok){toast('✅ '+(j.message||'蒸馏完成'));loadAll()}
+    else toast('❌ '+(j.error||'失败'),true);
+  }catch(e){toast('❌ '+esc(e.message),true)}
+}
+
+function toast(msg,err){
+  var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' err':'');t.style.display='block';
+  setTimeout(function(){t.style.display='none'},2500);
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])})}
+
+loadAll();
+</script>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

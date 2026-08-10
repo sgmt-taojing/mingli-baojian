@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="KB 知识体系审计 · 命理宝鉴">
+<meta property="og:description" content="R57 KB 知识体系审计报告 — 32 文件 10.97MB · 4 层级">
+<meta property="og:type" content="website">
+<title>KB 知识体系审计 · 命理宝鉴</title>
+<meta name="description" content="R57 KB 知识体系审计报告 — 32 文件 10.97MB · 4 层级">
+<meta name="keywords" content="KB 知识体系审计">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-audit.html">
+<style>
+:root{--gold:#c9a84c;--gold-dim:#a88c3a;--ink:#0d1117;--paper:#1a1f2e;--card:#222838;--border:#333a4d}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:#e0d8c8;font-family:system-ui,-apple-system,sans-serif;line-height:1.6;min-height:100vh}
+
+.wrap{max-width:1200px;margin:0 auto;padding:20px 16px 80px}
+h1{font-size:1.5rem;color:var(--gold);text-align:center;margin:20px 0 4px}
+.sub{text-align:center;color:#888;font-size:.85rem;margin-bottom:24px}
+
+/* Summary Cards */
+.summary{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+.s-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;text-align:center;min-width:90px;flex:1 1 auto;max-width:160px}
+.s-card .val{font-size:1.6rem;font-weight:700;color:var(--gold)}
+.s-card .lbl{font-size:.72rem;color:#888;margin-top:2px;line-height:1.3}
+.s-card.highlight{background:linear-gradient(135deg,rgba(201,168,76,.12),var(--card));border-color:var(--gold-dim)}
+
+/* Section */
+.section{margin:24px 0}
+.section h2{font-size:1.05rem;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section h2 .badge{font-size:.7rem;background:var(--card);border:1px solid var(--border);padding:2px 8px;border-radius:20px;color:#aaa;font-weight:400}
+
+/* Level Cards */
+.level-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.level-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.level-name{font-size:1rem;font-weight:600;color:#e0d8c8}
+.level-meta{font-size:.78rem;color:#888;margin-left:auto}
+.level-bar{height:8px;border-radius:4px;background:#333;overflow:hidden;display:flex;margin-bottom:10px}
+.level-bar .seg{height:100%;transition:width .4s}
+.lb{background:#c9a84c}.ls{background:#c0c0c0}.lg{background:#10b981}.lw{background:#888}
+
+.file-list{display:flex;flex-direction:column;gap:6px}
+.file-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.03);border-radius:6px;font-size:.8rem;flex-wrap:wrap}
+.file-name{color:#ccc;font-family:monospace;flex:1;min-width:120px;word-break:break-all}
+.file-size{color:var(--gold);font-weight:600;min-width:60px;text-align:right}
+.file-entries{color:#888;font-size:.72rem;min-width:60px;text-align:right}
+.file-flag{font-size:.7rem;padding:1px 6px;border-radius:4px;font-weight:600}
+.flag-warn{background:rgba(244,67,54,.12);color:#f44336;border:1px solid rgba(244,67,54,.2)}
+.flag-ok{background:rgba(16,185,129,.08);color:#10b981;border:1px solid rgba(16,185,129,.15)}
+
+/* Recommendations */
+.rec-list{display:flex;flex-direction:column;gap:8px}
+.rec-item{display:flex;gap:10px;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;font-size:.85rem;line-height:1.6}
+.rec-p0{border-left:3px solid #ef4444}
+.rec-p1{border-left:3px solid #f59e0b}
+.rec-p2{border-left:3px solid #10b981}
+.rec-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px}
+.rec-body{flex:1}
+.rec-body .title{font-weight:600;color:#e0d8c8;margin-bottom:2px}
+.rec-body .desc{color:#999;font-size:.78rem}
+.rec-effort{font-size:.7rem;color:#888;margin-top:4px}
+
+/* Source Distribution */
+.source-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.source-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px}
+.source-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.source-info{flex:1;min-width:0}
+.source-name{font-size:.8rem;color:#ccc;font-weight:500}
+.source-size{font-size:.7rem;color:#888}
+.source-pct{font-size:.75rem;color:var(--gold);font-weight:600;text-align:right;min-width:40px}
+
+/* Quality Score */
+.q-score{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center;padding:20px;background:var(--card);border:1px solid var(--border);border-radius:12px}
+.q-ring{width:100px;height:100px;border-radius:50%;border:4px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative}
+.q-ring::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:4px solid transparent;border-top-color:var(--gold);transform:rotate(-45deg)}
+.q-val{font-size:1.8rem;font-weight:700;color:var(--gold)}
+.q-lbl{font-size:.65rem;color:#888}
+.q-details{display:flex;gap:16px;flex-wrap:wrap}
+.q-item{text-align:center;padding:8px 14px;background:rgba(255,255,255,.03);border-radius:8px}
+.q-item .num{font-size:1.2rem;font-weight:700;color:var(--gold)}
+.q-item .lbl{font-size:.7rem;color:#888}
+
+/* Footer */
+.footer{text-align:center;padding:32px 16px;color:#666;font-size:.75rem;border-top:1px solid var(--border);margin-top:40px}
+
+@media(max-width:480px){
+  .s-card{min-width:70px;padding:10px;max-width:120px}
+  .s-card .val{font-size:1.2rem}
+  h1{font-size:1.2rem}
+  .level-head{flex-direction:column;align-items:flex-start}
+  .level-meta{margin-left:0}
+}
+
+/* R-P3-17.4 通用 reflow */
+@media(max-width:768px){body{font-size:14px}h1{font-size:22px!important}h2{font-size:19px!important}[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{grid-template-columns:repeat(2,1fr)!important}.wrap,.container{padding:12px!important;max-width:100vw!important;overflow-x:hidden!important}.toolbar{display:flex!important;flex-wrap:wrap!important;gap:6px!important}table{display:block!important;overflow-x:auto!important}.modal-box{width:calc(100vw - 24px)!important;max-width:100%!important;margin:12px!important}}
+@media(max-width:480px){body{font-size:13px}[style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3)"]{grid-template-columns:1fr!important}}
+@media(max-width:320px){body{font-size:12px;padding:0!important}h1{font-size:18px!important}input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}}
+</style>
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB 知识体系审计</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看审计</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>问题标记</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>修真记录</span></div></div>
+<div class="flow-hint">管理员审计知识库条目，覆盖率+来源+置信度核查。</div>
+</div>
+<div class="wrap">
+  <h1>图 KB 知识体系审计</h1>
+  <p class="sub">R57 · 2026-07-26 · 32 文件 · 10.97 MB · 4 物理层级 · 372 Top-level 键</p>
+
+  <!-- Summary Cards -->
+  <div class="summary" id="summary"></div>
+
+  <!-- Quality Score -->
+  <div class="section">
+    <h2>升 数据质量评分</h2>
+    <div class="q-score">
+      <div class="q-ring"><div class="q-val">D</div><div class="q-lbl">综合评级</div></div>
+      <div class="q-details">
+        <div class="q-item"><div class="num">0</div><div class="lbl">trust_score 条目</div></div>
+        <div class="q-item"><div class="num">20</div><div class="lbl">near-duplicate 对</div></div>
+        <div class="q-item"><div class="num">2</div><div class="lbl">巨无霸文件</div></div>
+        <div class="q-item"><div class="num">83.3%</div><div class="lbl">来源集中度</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier Details -->
+  <div class="section">
+    <h2>建 层级分布 <span class="badge">4 层级 · 32 文件</span></h2>
+    <div id="levels"></div>
+  </div>
+
+  <!-- Source Distribution -->
+  <div class="section">
+    <h2>典 来源分布</h2>
+    <div class="source-grid" id="sources"></div>
+  </div>
+
+  <!-- Recommendations -->
+  <div class="section">
+    <h2>示 改进建议 <span class="badge">P0 / P1 / P2</span></h2>
+    <div class="rec-list" id="recs"></div>
+  </div>
+
+  <div class="footer">
+    R57 KB 审计报告 · 命理宝鉴 · 仅扫描 · 零修改 · <span id="scanTime"></span>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  overall: { totalFiles: 32, totalSizeMB: 10.97, totalEntries: 321936, totalTrust: 0, nearDupCount: 20, manifestLevels: 6, diskLevels: 4 },
+  byLevel: {
+    admin: { files: 4, sizeKB: 356, entries: 14017, topKeys: 29, color: '#ef4444' },
+    registered: { files: 15, sizeKB: 1445, entries: 162719, topKeys: 299, color: '#f59e0b' },
+    premium: { files: 7, sizeKB: 4567, entries: 144978, topKeys: 41, color: '#3b82f6' },
+    professional: { files: 6, sizeKB: 4906, entries: 222, topKeys: 13, color: '#8b5cf6' }
+  },
+  files: [
+    // admin
+    {name:'gzh-collect-system.js',level:'admin',sizeKB:25,entries:2609,flag:'ok'},
+    {name:'kb-missing-sections.js',level:'admin',sizeKB:135,entries:0,flag:'warn'},
+    {name:'shop-data.js',level:'admin',sizeKB:116,entries:10318,flag:'ok'},
+    {name:'shop-medicine-data.js',level:'admin',sizeKB:80,entries:1090,flag:'ok'},
+    // registered
+    {name:'classics-highlights.js',level:'registered',sizeKB:118,entries:1189,flag:'warn',note:'近重复密度高'},
+    {name:'faith-content.js',level:'registered',sizeKB:87,entries:5549,flag:'warn',note:'近重复密度高'},
+    {name:'faith-deities-detail.js',level:'registered',sizeKB:68,entries:1736,flag:'ok'},
+    {name:'faith-guide.js',level:'registered',sizeKB:65,entries:3701,flag:'ok'},
+    {name:'faith-knowledge-base.js',level:'registered',sizeKB:163,entries:43147,flag:'warn',note:'近重复密度高'},
+    {name:'faith-renderer.js',level:'registered',sizeKB:163,entries:1214,flag:'ok'},
+    {name:'huajie-age-specific.js',level:'registered',sizeKB:35,entries:1409,flag:'ok'},
+    {name:'incantation-database.js',level:'registered',sizeKB:108,entries:438,flag:'warn',note:'近重复密度高'},
+    {name:'koujue-database-full.js',level:'registered',sizeKB:162,entries:48962,flag:'ok'},
+    {name:'koujue-renderer.js',level:'registered',sizeKB:62,entries:2541,flag:'ok'},
+    {name:'masters-knowledge.js',level:'registered',sizeKB:101,entries:357,flag:'warn',note:'近重复密度高'},
+    {name:'scripture-database.js',level:'registered',sizeKB:74,entries:1931,flag:'ok'},
+    {name:'wuxing-correspondence.js',level:'registered',sizeKB:12,entries:0,flag:'warn',note:'0 条目'},
+    {name:'yanzhi-knowledge-base.js',level:'registered',sizeKB:82,entries:31131,flag:'warn',note:'近重复密度高'},
+    {name:'yanzhi-part2.js',level:'registered',sizeKB:146,entries:19414,flag:'warn',note:'近重复密度高'},
+    // premium
+    {name:'authoritative-knowledge-base.js',level:'premium',sizeKB:3358,entries:135455,flag:'warn',note:'巨无霸 3.4MB'},
+    {name:'knowledge-deep-supplement.js',level:'premium',sizeKB:28,entries:0,flag:'warn',note:'0 条目'},
+    {name:'knowledge-details-extra.js',level:'premium',sizeKB:374,entries:0,flag:'warn',note:'0 条目'},
+    {name:'shuhan-basic-kb.js',level:'premium',sizeKB:331,entries:0,flag:'ok'},
+    {name:'shuhan-knowledge-base.js',level:'premium',sizeKB:387,entries:0,flag:'ok'},
+    {name:'shuhan-mixun-tianji.js',level:'premium',sizeKB:147,entries:9308,flag:'ok'},
+    {name:'ziwei-new-sections.js',level:'premium',sizeKB:51,entries:215,flag:'ok'},
+    // professional
+    {name:'nihaisha-batch1.js',level:'professional',sizeKB:726,entries:0,flag:'warn',note:'大文件'},
+    {name:'nihaisha-batch2.js',level:'professional',sizeKB:417,entries:0,flag:'ok'},
+    {name:'nihaisha-batch3.js',level:'professional',sizeKB:319,entries:0,flag:'ok'},
+    {name:'nihaisha-batch4.js',level:'professional',sizeKB:154,entries:0,flag:'ok'},
+    {name:'nihaisha-classics-kb.js',level:'professional',sizeKB:377,entries:0,flag:'ok'},
+    {name:'nihaisha-tcm-kb.js',level:'professional',sizeKB:3032,entries:222,flag:'warn',note:'巨无霸 3.0MB'}
+  ],
+  bySource: [
+    {name:'nihaisha',label:'倪海厦 TCM',files:6,sizeKB:4907,pct:44.7,color:'#ef4444'},
+    {name:'shuhan',label:'数焕基础/权威',files:5,sizeKB:4237,pct:38.6,color:'#f59e0b'},
+    {name:'unknown',label:'未知来源',files:4,sizeKB:550,pct:5.0,color:'#888'},
+    {name:'faith',label:'神仙信仰',files:5,sizeKB:533,pct:4.9,color:'#3b82f6'},
+    {name:'yanzhi',label:'研致知识',files:2,sizeKB:223,pct:2.0,color:'#8b5cf6'},
+    {name:'koujue',label:'口诀库',files:2,sizeKB:219,pct:2.0,color:'#06b6d4'},
+    {name:'master',label:'大师知识',files:2,sizeKB:177,pct:1.6,color:'#10b981'},
+    {name:'classic',label:'经典精华',files:1,sizeKB:118,pct:1.1,color:'#eab308'},
+    {name:'incantation',label:'咒语库',files:1,sizeKB:108,pct:1.0,color:'#ec4899'},
+    {name:'scripture',label:'经文数据库',files:1,sizeKB:74,pct:0.7,color:'#14b8a6'},
+    {name:'ziwei',label:'紫微新增',files:1,sizeKB:51,pct:0.5,color:'#f97316'},
+    {name:'huajie',label:'华杰年龄',files:1,sizeKB:35,pct:0.3,color:'#6366f1'},
+    {name:'wuxing',label:'五行对应',files:1,sizeKB:12,pct:0.1,color:'#84cc16'}
+  ],
+  recommendations: [
+    {pri:'P0',icon:'🚨',title:'补全 member/public 目录',desc:'manifest 声明了 member（17文件）和 public（8文件）两级，但磁盘未落地。免费层和会员层用户无法访问 KB。',effort:'1–2 小时'},
+    {pri:'P0',icon:'⚡',title:'拆分 authoritative-knowledge-base.js（3.4MB）',desc:'单一文件占 premium 层 73% 存储。建议拆分为 bazi/tiangan/shensha/shiergong/shishen 等模块文件，首屏加载减少 60%+。',effort:'半天'},
+    {pri:'P0',icon:'⚡',title:'拆分 nihaisha-tcm-kb.js（3.0MB）',desc:'专业层最大文件，占专业层 60%+ 存储。建议拆分为 shennong/han shang/jinkui 子文件。',effort:'半天'},
+    {pri:'P1',icon:'🔗',title:'添加 src_id 和 trust_score 元数据',desc:'所有 32 个文件中 0 个包含 trust_score 和 src_id 字段，无法追溯来源和计算信任度。需覆盖全部文件。',effort:'2 天'},
+    {pri:'P1',icon:'🔄',title:'合并 registered 层级近重复内容',desc:'20 对 near-duplicate 中 17 对在 registered 层级，优先合并 classics-highlights + incantation（0.91 相似度）。',effort:'1 天'},
+    {pri:'P1',icon:'🔍',title:'追溯 unknown 来源（4 文件 550 KB）',desc:'4 个文件无明确来源标注，需追溯到原始知识出处并添加 src_id。',effort:'2 天'},
+    {pri:'P1',icon:'🌐',title:'补充来源多样性',desc:'nihaisha + shuhan 占 83.3%，建议补充《滴天髓》《穷通宝鉴》等经典来源降低单一来源风险。',effort:'1–2 周'},
+    {pri:'P2',icon:'📋',title:'建立 KB 条目级索引表',desc:'添加 _index.json 记录每个 KB 模块的条目数、来源、trust_score、关键词，支持前端搜索和可视化。',effort:'1 周'},
+    {pri:'P2',icon:'🔄',title:'实现增量更新机制',desc:'当前 KB 全量随代码部署，建议支持按模块热更新，无需全量部署即可更新单模块。',effort:'2–3 天'},
+    {pri:'P2',icon:'🔄',title:'审计定期化',desc:'建议每次 KB 大更新后执行类似 R57 的扫描，保持审计报告在 docs/ 目录。',effort:'持续'}
+  ]
+};
+
+const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'k' : n;
+const fmtKB = n => n >= 1000 ? (n/1000).toFixed(1)+' MB' : n+' KB';
+
+// Summary Cards
+const o = DATA.overall;
+const cards = [
+  {lbl:'文件数', val: o.totalFiles},
+  {lbl:'总大小', val: o.totalSizeMB+' MB'},
+  {lbl:'总条目', val: fmt(o.totalEntries)},
+  {lbl:'manifest 层级', val: o.manifestLevels},
+  {lbl:'磁盘层级', val: o.diskLevels},
+  {lbl:'近重复对', val: o.nearDupCount},
+  {lbl:'trust 元数据', val: o.totalTrust},
+  {lbl:'准确重复', val: 0}
+];
+document.getElementById('summary').innerHTML = cards.map(c =>
+  `<div class="s-card"><div class="val">${c.val}</div><div class="lbl">${c.lbl}</div></div>`
+).join('');
+
+// Level Details
+const levelOrder = ['admin','registered','premium','professional'];
+const levelLabels = {admin:'管理后台',registered:'注册用户',premium:'付费会员',professional:'专业层'};
+const levelIcons = {admin:'🔒',registered:'👤',premium:'💎',professional:'🎓'};
+const totalSize = DATA.byLevel;
+
+let levelsHtml = '';
+levelOrder.forEach(lv => {
+  const lvData = totalSize[lv];
+  const pct = (lvData.sizeKB / o.totalFiles ? (lvData.sizeKB / (o.totalSizeMB*1024)*100).toFixed(1) : 0);
+  const files = DATA.files.filter(f => f.level === lv);
+  const warnCount = files.filter(f => f.flag === 'warn').length;
+
+  // Tier bar segments (relative to max tier)
+  const maxKB = 4906;
+  const barPct = (lvData.sizeKB / maxKB * 100).toFixed(1);
+
+  levelsHtml += `
+    <div class="level-card">
+      <div class="level-head">
+        <span class="level-name">${levelIcons[lv]} ${levelLabels[lv]}</span>
+        <span class="level-meta">${lvData.files} 文件 · ${fmtKB(lvData.sizeKB)} · ${fmt(lvData.entries)} 条目 · ${lvData.topKeys} keys ${warnCount > 0 ? '· ⚠ '+warnCount+' 需关注' : ''}</span>
+      </div>
+      <div class="level-bar">
+        <div class="seg lb" style="width:${barPct}%"></div>
+      </div>
+      <div class="file-list">
+        ${files.map(f => `
+          <div class="file-item">
+            <span class="file-name">${f.name}</span>
+            <span class="file-size">${f.sizeKB >= 1000 ? (f.sizeKB/1000).toFixed(1)+'MB' : f.sizeKB+'KB'}</span>
+            <span class="file-entries">${f.entries ? fmt(f.entries)+' 条' : '—'}</span>
+            ${f.flag === 'warn' ? `<span class="file-flag flag-warn">${f.note || '关注'}</span>` : '<span class="file-flag flag-ok">OK</span>'}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+});
+document.getElementById('levels').innerHTML = levelsHtml;
+
+// Source Distribution
+const totalSrcSize = DATA.bySource.reduce((s,x) => s + x.sizeKB, 0);
+document.getElementById('sources').innerHTML = DATA.bySource.map(s => `
+  <div class="source-card">
+    <div class="source-dot" style="background:${s.color}"></div>
+    <div class="source-info">
+      <div class="source-name">${s.label} <span style="color:#666;font-size:.7rem">(${s.files}文件)</span></div>
+      <div class="source-size">${s.sizeKB >= 1000 ? (s.sizeKB/1000).toFixed(1)+' MB' : s.sizeKB+' KB'}</div>
+    </div>
+    <div class="source-pct">${s.pct}%</div>
+  </div>
+`).join('');
+
+// Recommendations
+const recColors = {P0:'rec-p0', P1:'rec-p1', P2:'rec-p2'};
+const recLabels = {P0:'紧急', P1:'近期', P2:'长期'};
+document.getElementById('recs').innerHTML = DATA.recommendations.map(r => `
+  <div class="rec-item ${recColors[r.pri]}">
+    <div class="rec-icon">${r.icon}</div>
+    <div class="rec-body">
+      <div class="title">[${r.pri}] ${r.title}</div>
+      <div class="desc">${r.desc}</div>
+      <div class="rec-effort">⏱ ${r.effort}</div>
+    </div>
+  </div>
+`).join('');
+
+document.getElementById('scanTime').textContent = '2026-07-26';
+</script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-n 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-n 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.cross-nav,.flow-steps-wrap,.flow-steps,.flow-hint,.toast,.skip-link,.portal-nav{display:none!important}.wrap{max-width:100%!important;padding:8px!important}.s-card{background:#fff!important;border:1px solid #ddd!important;color:#000!important}.s-card .val{color:#000!important}.s-card .lbl{color:#333!important}.level-card{background:#fff!important;border:1px solid #ddd!important;color:#000!important;page-break-inside:avoid}.level-name{color:#000!important}.level-meta{color:#333!important}.file-item{background:#f9f9f9!important;border-bottom:1px solid #ddd!important;color:#000!important}.source-card{background:#fff!important;border:1px solid #ddd!important;color:#000!important}.rec-item{background:#fff!important;border:1px solid #ddd!important;color:#000!important}.q-score{background:#fff!important;border:1px solid #ddd!important}.section h2{color:#000!important}.sub{color:#333!important}.footer{border-top-color:#ddd!important;color:#333!important}.flag-warn,.flag-ok{color:#000!important;border:1px solid #ddd!important}
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

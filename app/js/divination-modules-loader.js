@@ -1,0 +1,67 @@
+// divination-modules-loader.js
+// R629-R639: divination-core.js 拆分后的统一加载入口
+// 用法：<script src="js/divination-modules-loader.js" defer></script>
+(function(global){
+  const DIVINATION_MODULES = {
+    // Phase 1: 独立无耦合
+    'almanac-engine': { path: 'js/almanac-engine.js', size: '27KB', desc: '黄历计算引擎', phase: 1 },
+    'heluo-math':     { path: 'js/heluo-math.js',     size: '12KB', desc: '河洛数理系统', phase: 1 },
+    'lunar-utils':    { path: 'js/lunar-utils.js',    size: '13KB', desc: '农历转换工具', phase: 1 },
+    // Phase 2: 八字核心
+    'bazi-core':      { path: 'js/bazi-core.js',      size: '32KB', desc: '八字核心引擎', phase: 2 },
+    'bazi-liunian':   { path: 'js/bazi-liunian.js',   size: '14KB', desc: '流年逐月运势', phase: 2 },
+    // Phase 3: 术数引擎
+    'qimen-engine':   { path: 'js/qimen-engine.js',   size: '49KB', desc: '奇门遁甲引擎', phase: 3 },
+    'yijing-engine':  { path: 'js/yijing-engine.js',  size: '14KB', desc: '易经解读引擎', phase: 3 },
+    // Phase 4: 渲染增强
+    'bazi-renderer':  { path: 'js/bazi-renderer.js',  size: '21KB', desc: '八字V2渲染器', phase: 4 },
+    // Phase 5: 非核心模块（延迟加载）
+    'lifeplan-module':{ path: 'js/lifeplan-module.js', size: '40KB', desc: '人生规划模块', phase: 5 }
+  };
+  
+  const loaded = new Set();
+  const loading = new Map();
+  
+  async function loadModule(modules) {
+    const list = Array.isArray(modules) ? modules : [modules];
+    const promises = list.map(name => {
+      if (loaded.has(name)) return Promise.resolve();
+      if (loading.has(name)) return loading.get(name);
+      if (!DIVINATION_MODULES[name]) {
+        return Promise.reject(new Error('Unknown module: ' + name));
+      }
+      const p = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = DIVINATION_MODULES[name].path;
+        script.async = true;
+        script.onload = () => { loaded.add(name); loading.delete(name); resolve(); };
+        script.onerror = () => { loading.delete(name); reject(new Error('Failed: ' + name)); };
+        document.head.appendChild(script);
+      });
+      loading.set(name, p);
+      return p;
+    });
+    return Promise.all(promises);
+  }
+  
+  async function preloadAll() {
+    return loadModule(Object.keys(DIVINATION_MODULES));
+  }
+  
+  function listModules() {
+    return Object.keys(DIVINATION_MODULES).map(name => ({ name, ...DIVINATION_MODULES[name] }));
+  }
+  
+  function isLoaded(name) { return loaded.has(name); }
+  
+  // 导出 API
+  global.DivinationModules = {
+    load: loadModule,
+    preloadAll: preloadAll,
+    list: listModules,
+    isLoaded,
+    CONFIG: DIVINATION_MODULES
+  };
+  
+  // ready 信号（无日志输出，符合全站 console 清零规范）
+})(typeof window !== 'undefined' ? window : globalThis);

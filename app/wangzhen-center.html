@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/wangzhen-center.html">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+  <meta charset="UTF-8">
+<meta name="description" content="望诊中心，舌面诊采集分析">
+<meta name="keywords" content="望诊,舌诊,面诊,中医,体质辨识">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+  <title>望诊中心 · 命理宝鉴</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/divination-hub.css">
+  <style>
+    :root{
+      --wz-bg:#0a0e17; --wz-paper:#e8e0d0; --wz-paper2:#c9bfa8; --wz-paper3:#a09888;
+      --wz-gold:#c9a84c; --wz-jade:#10b981; --wz-red:#ef4444; --wz-cyan:#63b3ed;
+      --wz-border:rgba(201,168,76,.18); --wz-card-bg:rgba(255,255,255,.03);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--wz-bg);color:var(--wz-paper);padding:12px;line-height:1.6;min-height:100vh}
+    .wz-header{text-align:center;padding:16px 0 12px;border-bottom:1px solid var(--wz-border);margin-bottom:16px}
+    .wz-header h1{font-size:20px;color:var(--wz-gold);letter-spacing:2px;margin-bottom:4px}
+    .wz-header .subtitle{font-size:12px;color:var(--wz-paper3)}
+    .kb-status{font-size:11px;padding:4px 10px;border-radius:4px;background:rgba(201,168,76,.08);color:var(--wz-paper3);display:inline-block;margin-top:6px}
+    .kb-status.loaded{background:rgba(16,185,129,.12);color:var(--wz-jade)}
+
+    /* Tabs */
+    .wangzhen-tabs{display:flex;gap:2px;margin-bottom:16px;flex-wrap:wrap;border-bottom:1px solid var(--wz-border)}
+    .wangzhen-tab{padding:10px 18px;cursor:pointer;font-size:13px;color:var(--wz-paper3);border-bottom:2px solid transparent;transition:.2s;white-space:nowrap}
+    .wangzhen-tab:hover{color:var(--wz-paper)}
+    .wangzhen-tab.active{color:var(--wz-gold);border-bottom-color:var(--wz-gold)}
+    .wangzhen-tab-panel{display:none}
+    .wangzhen-tab-panel.active{display:block}
+
+    /* Zone Grid */
+    .wangzhen-zone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:16px}
+    .wangzhen-zone-card{padding:12px;border:1px solid var(--wz-border);border-radius:8px;cursor:pointer;transition:.2s;background:var(--wz-card-bg)}
+    .wangzhen-zone-card:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
+    .wangzhen-zone-card.active{border-color:var(--wz-gold);background:rgba(201,168,76,.12);box-shadow:0 0 0 1px var(--wz-gold)33}
+    .wangzhen-zone-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:2px solid;border-radius:50%;font-weight:700;font-size:14px;margin-bottom:6px}
+    .wangzhen-zone-name{font-size:12px;color:var(--wz-paper);margin-bottom:2px}
+    .wangzhen-zone-organ{font-size:10px;color:var(--wz-paper3)}
+
+    /* Feature Panel */
+    .wangzhen-feature-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .wangzhen-zone-badge-lg{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:2px solid;border-radius:50%;font-weight:700;font-size:16px}
+    .wangzhen-zone-title{font-size:14px;color:var(--wz-paper)}
+    .wangzhen-zone-organ-tag{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(201,168,76,.1);color:var(--wz-gold)}
+    .wangzhen-feature-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+    .wangzhen-feature-chip{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border:1px solid var(--wz-border);border-radius:20px;cursor:pointer;font-size:12px;transition:.2s;user-select:none}
+    .wangzhen-feature-chip:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
+    .wangzhen-feature-chip input{display:none}
+    .wangzhen-feature-chip:has(input:checked){border-color:var(--wz-gold);background:rgba(201,168,76,.15);color:var(--wz-gold)}
+    .feature-icon{font-size:14px}
+    .wangzhen-diagnose-btn-wrap{display:flex;gap:8px;margin-top:8px}
+    .btn{padding:8px 18px;border:none;border-radius:8px;cursor:pointer;font-size:13px;transition:.2s}
+    .btn-primary{background:var(--wz-gold);color:#0a0e17;font-weight:600}
+    .btn-primary:hover{background:#d4b85e}
+    .btn-ghost{background:transparent;border:1px solid var(--wz-border);color:var(--wz-paper3)}
+    .btn-ghost:hover{border-color:var(--wz-paper2)}
+
+    /* Results */
+    .wangzhen-result-summary{padding:12px;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;gap:12px;background:var(--wz-card-bg)}
+    .result-severity-badge{padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600}
+    .result-count{font-size:12px;color:var(--wz-paper3)}
+    .wangzhen-result-item{padding:10px 12px;margin-bottom:8px;border-radius:6px;background:var(--wz-card-bg);font-size:12px}
+    .result-item-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .result-zone{font-weight:600;color:var(--wz-gold)}
+    .result-severity{font-size:11px;font-weight:600}
+    .result-organ{color:var(--wz-cyan);margin-bottom:2px}
+    .result-pathology{color:var(--wz-paper);margin-bottom:2px}
+    .result-advice{color:var(--wz-jade)}
+    .wangzhen-disclaimer{margin-top:12px;padding:10px;border-radius:6px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);font-size:11px;color:#f87171;line-height:1.6}
+
+    /* Five Colors */
+    .wangzhen-five-colors{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:20px}
+    .five-color-card{padding:12px;border:1px solid var(--wz-border);border-radius:8px;background:var(--wz-card-bg)}
+    .five-color-badge{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;font-weight:700;font-size:16px;margin-bottom:6px}
+    .five-color-organ{font-size:13px;color:var(--wz-gold);margin-bottom:4px}
+    .five-color-pathology{font-size:11px;color:var(--wz-paper);margin-bottom:4px}
+    .five-color-examples{font-size:10px;color:var(--wz-paper3)}
+    .wangzhen-six-dims{margin-top:12px}
+    .six-dims-title{font-size:14px;color:var(--wz-gold);margin-bottom:8px}
+    .six-dim-row{display:flex;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--wz-border);font-size:12px}
+    .six-dim-label{min-width:50px;font-weight:600;color:var(--wz-gold)}
+    .six-dim-pair{flex:1;color:var(--wz-paper3)}
+
+    /* Organ Grid */
+    .wangzhen-organ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+    .organ-card{padding:12px;border:1px solid var(--wz-border);border-radius:8px;cursor:pointer;transition:.2s;background:var(--wz-card-bg);text-align:center}
+    .organ-card:hover{border-color:var(--wz-gold);background:rgba(201,168,76,.06)}
+    .organ-icon{font-size:28px;margin-bottom:6px}
+    .organ-name{font-size:13px;color:var(--wz-paper);margin-bottom:4px}
+    .organ-desc{font-size:10px;color:var(--wz-paper3);margin-bottom:4px}
+    .organ-kb-count{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,.1);color:var(--wz-jade);display:inline-block}
+
+    /* Modal */
+    .wangzhen-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+    .wangzhen-modal-content{background:#111827;border:1px solid var(--wz-border);border-radius:12px;max-width:600px;max-height:80vh;overflow-y:auto;padding:20px;width:100%}
+    .wangzhen-modal-close{float:right;cursor:pointer;font-size:20px;color:var(--wz-paper3)}
+    .organ-modal-title{font-size:16px;color:var(--wz-gold);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--wz-border)}
+    .organ-modal-item{margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(201,168,76,.08)}
+    .organ-modal-item-title{font-size:13px;color:var(--wz-paper);font-weight:600;margin-bottom:4px}
+    .organ-modal-item-content{font-size:12px;color:var(--wz-paper2);line-height:1.7}
+    .organ-modal-item-kw{font-size:10px;color:var(--wz-paper3);margin-top:2px}
+
+    /* AI Steps */
+    .wangzhen-ai-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+    .ai-step{display:flex;gap:12px;padding:10px;border:1px solid var(--wz-border);border-radius:8px;background:var(--wz-card-bg)}
+    .ai-step-num{display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:var(--wz-gold);color:#0a0e17;border-radius:50%;font-weight:700;font-size:14px;flex-shrink:0}
+    .ai-step-body{flex:1}
+    .ai-step-name{font-size:13px;color:var(--wz-paper);font-weight:600;margin-bottom:2px}
+    .ai-step-desc{font-size:11px;color:var(--wz-paper3)}
+    .wangzhen-ai-disclaimer{margin-top:12px;padding:10px;border-radius:6px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);font-size:11px;color:#fca5a5;line-height:1.7}
+
+    .muted{color:var(--wz-paper3);font-size:13px;padding:12px;text-align:center}
+    .wz-history-list{display:flex;flex-direction:column;gap:4px}
+    .wz-history-item{display:flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid var(--wz-border);border-radius:6px;font-size:11px;background:var(--wz-card-bg)}
+    .wz-history-time{color:var(--wz-paper3);min-width:80px}
+    .wz-history-zone{color:var(--wz-gold);font-weight:600}
+    .wz-history-severity{font-size:10px;padding:1px 6px;border-radius:3px;background:rgba(245,158,11,.15);color:#fbbf24}
+    .wz-history-organs{color:var(--wz-cyan)}
+    .therapy-lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin-bottom:12px}
+    .therapy-lib-card{padding:10px;border:1px solid var(--wz-border);border-radius:6px;cursor:pointer;transition:.2s;background:var(--wz-card-bg)}
+    .therapy-lib-card:hover{border-color:var(--wz-gold)}
+    .therapy-lib-title{font-size:12px;color:var(--wz-paper);font-weight:600;margin-bottom:4px}
+    .therapy-lib-desc{font-size:10px;color:var(--wz-paper3)}
+    .therapy-plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+    .therapy-plan-card{padding:8px 10px;border:1px solid var(--wz-border);border-radius:6px;cursor:pointer;transition:.2s;background:var(--wz-card-bg);text-align:center}
+    .therapy-plan-card:hover{border-color:var(--wz-jade);background:rgba(16,185,129,.06)}
+    .therapy-plan-name{font-size:12px;color:var(--wz-paper);font-weight:600;margin-bottom:2px}
+    .therapy-plan-pts{font-size:10px;color:var(--wz-paper3)}
+    .wz-quick-ref{margin-top:8px}
+    .quick-ref-tabs{display:flex;gap:4px;margin-bottom:10px}
+    .qr-tab{padding:6px 14px;border:1px solid var(--wz-border);border-radius:6px;cursor:pointer;font-size:12px;color:var(--wz-paper3);background:transparent}
+    .qr-tab.active{border-color:var(--wz-gold);color:var(--wz-gold);background:rgba(201,168,76,.08)}
+    .qr-group{margin-bottom:12px}
+    .qr-group-title{font-size:13px;color:var(--wz-gold);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--wz-border)}
+    .qr-item{display:flex;justify-content:space-between;padding:4px 8px;font-size:12px;border-bottom:1px solid rgba(201,168,76,.05)}
+    .qr-item-ok .qr-key{color:var(--wz-jade)} .qr-item-ok .qr-val{color:var(--wz-jade)}
+    .qr-item-warn .qr-key{color:#fbbf24} .qr-item-warn .qr-val{color:#f87171}
+    .qr-key{color:var(--wz-paper)} .qr-val{color:var(--wz-paper3)}
+    .wz-color-result{margin-top:8px}
+    .section-title{font-size:15px;color:var(--wz-gold);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--wz-border)}
+    .panel-section{margin-bottom:24px}
+
+    @media(max-width:768px){
+      .wangzhen-zone-grid{grid-template-columns:repeat(2,1fr)}
+      .wangzhen-five-colors{grid-template-columns:1fr}
+      .wangzhen-organ-grid{grid-template-columns:repeat(2,1fr)}
+      .wangzhen-tabs{overflow-x:auto;flex-wrap:nowrap}
+      .wangzhen-tab{white-space:nowrap}
+    }
+    @media(max-width:480px){
+      body{padding:8px 4px}
+      .wz-header h1{font-size:17px;letter-spacing:1px}
+      .wz-header{padding:12px 0 8px;margin-bottom:10px}
+      .wangzhen-tab{padding:8px 10px;font-size:12px}
+      .wangzhen-zone-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+      .wangzhen-zone-card{padding:8px}
+      .wangzhen-zone-badge{width:24px;height:24px;font-size:12px}
+      .wangzhen-five-colors{grid-template-columns:1fr}
+      .wangzhen-organ-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+      .organ-card{padding:8px}
+      .organ-icon{font-size:22px}
+      .wangzhen-feature-chip{padding:4px 8px;font-size:11px}
+      .btn{font-size:12px;padding:6px 12px}
+      .section-title{font-size:13px}
+      .wangzhen-modal-content{padding:14px;max-width:94vw}
+      .wangzhen-result-item{padding:8px;font-size:11px}
+      .ai-step{padding:8px}
+      .ai-step-num{width:28px;height:28px;font-size:12px}
+      .therapy-lib-grid{grid-template-columns:1fr}
+      .therapy-plan-grid{grid-template-columns:repeat(2,1fr)}
+      .qr-item{font-size:11px}
+    }
+    @media(max-width:360px){
+      body{padding:6px 3px;font-size:12px}
+      .wz-header h1{font-size:15px}
+      .wz-header .subtitle{font-size:10px}
+      .kb-status{font-size:10px;padding:3px 6px}
+      nav{gap:4px!important;padding:4px 8px!important}
+      .wangzhen-tab{padding:6px 8px;font-size:11px}
+      .wangzhen-zone-grid{grid-template-columns:1fr;gap:4px}
+      .wangzhen-zone-card{padding:6px}
+      .wangzhen-zone-badge{width:22px;height:22px;font-size:11px}
+      .wangzhen-zone-name{font-size:11px}
+      .wangzhen-zone-organ{font-size:9px}
+      .wangzhen-five-colors{grid-template-columns:1fr;gap:6px}
+      .five-color-card{padding:8px}
+      .wangzhen-organ-grid{grid-template-columns:1fr;gap:4px}
+      .organ-card{padding:6px}
+      .organ-icon{font-size:20px}
+      .organ-name{font-size:12px}
+      .wangzhen-feature-chip{padding:3px 6px;font-size:10px}
+      .btn{font-size:11px;padding:5px 10px}
+      .section-title{font-size:12px}
+      .wangzhen-modal-content{padding:10px;max-width:96vw;max-height:85vh}
+      .wangzhen-result-item{padding:6px;font-size:10px}
+      .wangzhen-result-summary{padding:8px;gap:6px}
+      .ai-step{padding:6px;gap:8px}
+      .ai-step-num{width:24px;height:24px;font-size:10px}
+      .ai-step-name{font-size:11px}
+      .ai-step-desc{font-size:10px}
+      .therapy-lib-grid{grid-template-columns:1fr}
+      .therapy-plan-grid{grid-template-columns:1fr}
+      .qr-item{font-size:10px;padding:3px 6px}
+      .qr-tab{padding:4px 8px;font-size:10px}
+      .wangzhen-disclaimer{font-size:10px;padding:8px}
+      .wangzhen-ai-disclaimer{font-size:10px;padding:8px}
+      .wz-history-item{font-size:10px;padding:4px 6px}
+      .wz-history-time{min-width:60px}
+    }
+    /* 28舌象图鉴 */
+    .qr-28-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .qr-28-subgroup{flex:1;min-width:240px;display:flex;flex-direction:column;gap:4px}
+    .qr-28-group-title{font-size:13px;font-weight:600;margin:4px 0;padding-left:6px;border-left:3px solid #4fd1c5}
+    .qr-item-danger{background:rgba(239,68,68,.12)!important;border-left:3px solid #ef4444!important}
+    .qr-item-danger .qr-key{color:#dc2626}
+    @media(max-width:768px){
+      .qr-28-subgroup{min-width:100%}
+    }
+    @media(max-width:480px){
+      .qr-28-grid{gap:4px}
+      .qr-28-subgroup{min-width:100%}
+      .qr-item{font-size:11px!important}
+    }
+    @media(max-width:360px){
+      .qr-28-group-title{font-size:11px}
+      .qr-item{font-size:10px!important;min-width:100px!important}
+    }
+
+@media print{
+  .page-header-bar,.phb-back,.btn,button,.no-print,header,footer,.wangzhen-tabs,.wangzhen-modal,.skip-link{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt;line-height:1.5;padding:0!important}
+  .wz-header h1{color:black!important}
+  .wz-header .subtitle,.kb-status{color:#333!important}
+  .wangzhen-tab-panel.active{display:block!important}
+  .wangzhen-zone-card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important;color:black!important}
+  .wangzhen-zone-name{color:black!important}
+  .wangzhen-zone-organ{color:#333!important}
+  .wangzhen-result-summary{background:white!important;border:1px solid #ccc!important}
+  .wangzhen-result-item{background:white!important;border:1px solid #ccc!important}
+  .result-zone{color:black!important}
+  .result-organ{color:#333!important}
+  .result-pathology{color:black!important}
+  .result-advice{color:#333!important}
+  .five-color-card{background:white!important;border:1px solid #ccc!important}
+  .five-color-organ{color:black!important}
+  .five-color-pathology{color:black!important}
+  .organ-card{background:white!important;border:1px solid #ccc!important}
+  .organ-name{color:black!important}
+  .ai-step{background:white!important;border:1px solid #ccc!important}
+  .ai-step-num{background:#666!important;color:white!important}
+  .ai-step-name,.ai-step-desc{color:black!important}
+  .therapy-lib-card{background:white!important;border:1px solid #ccc!important}
+  .therapy-plan-card{background:white!important;border:1px solid #ccc!important}
+  .qr-item{color:black!important}
+  .qr-key,.qr-val{color:black!important}
+  .quick-ref-tabs,.qr-tab,.wangzhen-feature-chip{display:none!important}
+  .panel-section{page-break-inside:avoid}
+  .wangzhen-disclaimer,.wangzhen-ai-disclaimer{color:#333!important;background:#f5f5f5!important;border:1px solid #ccc!important}
+  h1,h2,h3{page-break-after:avoid;color:black!important}
+  a[href]:after{content:" ("attr(href)")";font-size:9pt;color:#666}
+  img{max-width:100%!important}
+  .print-only{display:block!important}
+}
+  </style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">望诊中心</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>拍摄面相</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>自动分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看面相报告</span></div></div>
+<div class="flow-hint">查看望诊中心 · 命理宝鉴，了解功能详情与使用方式。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+
+<nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
+  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">主平台</a>
+  <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">医 中医诊疗</a>
+  <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">望诊工作台</a>
+  <a href="tcm-symptom.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">诊 症状分析</a>
+  <a href="ai-assistant.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">机 智能助手</a>
+</nav>
+<header class="wz-header">
+  <h1>查 望诊中心</h1>
+  <div class="subtitle">基于《灵枢·五色》面部全息分区 · 九大模块 · AI七步诊断流程</div>
+<main>
+
+  <div id="wangzhen-kb-status" class="kb-status">待 WANGZHEN_KB 加载中...</div>
+</header>
+
+<!-- Tabs -->
+<nav class="wangzhen-tabs">
+  <div class="wangzhen-tab active" data-tab="zones" onclick="wangzhenCenter.switchTab('zones')">图 A-K分区诊断</div>
+  <div class="wangzhen-tab" data-tab="colors" onclick="wangzhenCenter.switchTab('colors')">设 五色辨证</div>
+  <div class="wangzhen-tab" data-tab="organs" onclick="wangzhenCenter.switchTab('organs')">眼️ 九大模块</div>
+  <div class="wangzhen-tab" data-tab="ai" onclick="wangzhenCenter.switchTab('ai')">机 AI七步流程</div>
+  <div class="wangzhen-tab" data-tab="therapy" onclick="wangzhenCenter.switchTab('therapy')">药 理疗方案</div>
+  <div class="wangzhen-tab" data-tab="quickref" onclick="wangzhenCenter.switchTab('quickref')">舌面速查</div>
+</nav>
+
+<!-- Tab: A-K 分区诊断 -->
+<div class="wangzhen-tab-panel" data-tab="zones" style="display:block">
+  <div class="panel-section">
+    <div class="section-title">面部全息分区图（点击选择区域）</div>
+    <div id="wangzhen-zone-map"></div>
+  </div>
+  <div class="panel-section">
+    <div class="section-title">特征选择</div>
+    <div id="wangzhen-feature-panel"></div>
+  </div>
+  <div class="panel-section">
+    <div class="section-title">诊断结果</div>
+    <div id="wangzhen-result-panel"></div>
+  </div>
+  <div class="panel-section">
+    <div class="section-title">表 诊断历史</div>
+    <div id="wangzhen-history"></div>
+  </div>
+</div>
+
+<!-- Tab: 五色辨证 -->
+<div class="wangzhen-tab-panel" data-tab="colors">
+  <div class="panel-section">
+    <div class="section-title">五脏五色主病映射</div>
+    <div id="wangzhen-five-colors"></div>
+  </div>
+</div>
+
+<!-- Tab: 九大模块 -->
+<div class="wangzhen-tab-panel" data-tab="organs">
+  <div class="panel-section">
+    <div class="section-title">分部专项诊法（点击查看详情）</div>
+    <div id="wangzhen-organs"></div>
+  </div>
+</div>
+
+<!-- Tab: 理疗方案 -->
+<div class="wangzhen-tab-panel" data-tab="therapy">
+  <div class="panel-section">
+    <div class="section-title">穴位理疗方案库</div>
+    <div id="wangzhen-therapy"></div>
+  </div>
+</div>
+
+<!-- Tab: 舌面速查 -->
+<div class="wangzhen-tab-panel" data-tab="quickref">
+  <div class="panel-section">
+    <div class="section-title">舌诊28象 + 面诊36维速查</div>
+    <div id="wangzhen-quick-ref"></div>
+  </div>
+</div>
+
+<!-- Tab: AI 七步流程 -->
+<div class="wangzhen-tab-panel" data-tab="ai">
+  <div class="panel-section">
+    <div class="section-title">AI 面诊诊断标准流程（七步执行）</div>
+    <div id="wangzhen-ai-steps"></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="wangzhen-organ-modal" class="wangzhen-modal" onclick="if(event.target===this)wangzhenCenter.closeOrganModal()">
+  <div class="wangzhen-modal-content">
+    <span class="wangzhen-modal-close" onclick="wangzhenCenter.closeOrganModal()">关</span>
+    <div id="wangzhen-organ-modal-body"></div>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="js/ocr-client.js"></script>
+<script src="js/wangzhen-kb-loader.js" defer></script>
+<script src="js/wangzhen-center.js" defer></script>
+
+<div id="flowStepsContainer"></div><div id="flowHintContainer"></div><div id="flowQuickLinks"></div>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("flowStepsContainer",["拍摄面部", "拍摄舌象", "自动分析", "查看报告"],0);
+    var h=document.getElementById("flowHintContainer");
+    if(h)h.innerHTML=FlowEngine.hint("请在自然光下拍摄，面部正面无遮挡，舌象伸平自然。");
+    var ql=document.getElementById("flowQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([{"name": "体质辨识", "icon": "🌿", "url": "tizhi.html"}, {"name": "中医诊所", "icon": "🏥", "url": "tcm-clinic.html"}, {"name": "智能助手", "icon": "🤖", "url": "ai-assistant.html"}]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+:root {
+      --ink: var(--ink); --paper: var(--paper); --gold: var(--gold); --gold2: var(--gold2);
+      --jade: var(--jade);;--gold3:#a08030;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper3:#a09080;--steel:#7f8c8d}
+    body {
+      font-family: 'Noto Serif SC', serif;
+      background: var(--ink); color: var(--paper);
+      margin: 0; padding: 20px; min-height: 100vh; text-align: center;
+    }
+    .merit-circle {
+      width: 200px; height: 200px; border-radius: 50%;
+      border: 4px solid var(--gold); margin: 40px auto;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(circle, var(--ink3) 0%, var(--ink) 100%);
+      box-shadow: 0 0 30px rgba(201,168,76,0.2);
+    }
+    .merit-num { font-size: 48px; color: var(--gold); font-weight: bold; }
+    .merit-label { color: var(--steel); margin-top: 5px; }
+    .quick-actions {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 15px; max-width: 400px; margin: 40px auto;
+    }
+    .action-btn {
+      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
+      padding: 20px; cursor: pointer; transition: all 0.3s;
+    }
+    .action-btn:hover {
+      border-color: var(--jade); transform: scale(1.05);
+    }
+    .action-icon { font-size: 32px; margin-bottom: 8px; }
+    .action-text { color: var(--paper); font-size: 14px; }
+    .action-merit { color: var(--jade); font-size: 12px; margin-top: 5px; }
+    .info-box {
+      background: var(--ink2); border: 1px solid var(--ink4); border-radius: 12px;
+      padding: 25px; max-width: 500px; margin: 30px auto; text-align: left;
+    }
+    .info-title { color: var(--gold2); margin-bottom: 15px; }
+    .info-list { color: var(--steel); line-height: 2; }
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--ink); border-top: 1px solid var(--ink4);
+      display: flex; justify-content: center; padding: 12px;
+    }
+    .nav-btn {
+      background: transparent; border: none; color: var(--steel);
+      padding: 10px 20px; cursor: pointer;
+    }
+    .nav-btn:hover { color: var(--gold); }
+/* R-P3-17.4 reflow（自动注入） */
+@media(max-width:768px){
+  h1{font-size:22px!important}h2{font-size:19px!important}
+  [style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{
+    grid-template-columns:repeat(2,1fr)!important
+  }
+  .wrap,.container,.main{max-width:100vw!important;overflow-x:hidden!important;padding:12px!important}
+}
+@media(max-width:480px){
+  body{font-size:13px}
+  [style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3")]{
+    grid-template-columns:1fr!important
+  }
+}
+@media(max-width:320px){
+  body{font-size:12px;padding:0!important}
+  h1{font-size:18px!important}h2{font-size:15px!important}
+  input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}
+}
+
+  

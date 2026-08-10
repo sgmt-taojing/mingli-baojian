@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="健康监控看板 · 易道智鉴平台">
+<meta name="keywords" content="健康监控看板">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/health-monitor.html">
+<meta name="robots" content="index, follow, noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="健康监控看板 · 命理宝鉴">
+<meta property="og:description" content="健康监控看板 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>健康监控看板 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/report-interpret.css">
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;background:var(--bg);color:var(--text);margin:0;padding:0;font-size:14px}
+.topbar{background:linear-gradient(135deg,var(--bg-2),var(--bg));padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar h1{margin:0;font-size:18px;color:var(--gold)}
+.nav-links{display:flex;gap:6px}
+.nav-links a{padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);text-decoration:none;font-size:12px}
+.nav-links a:hover{border-color:var(--gold);color:var(--gold)}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.section{background:var(--bg-2);border-radius:8px;padding:16px;margin-bottom:16px;border:1px solid var(--border)}
+.section-title{font-size:15px;font-weight:600;margin-bottom:12px;color:var(--gold);display:flex;align-items:center;justify-content:space-between}
+.refresh-btn{padding:4px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:12px}
+.refresh-btn:hover{border-color:var(--gold);color:var(--gold)}
+.row-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:768px){.row-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:360px){body{font-size:13px}.topbar{padding:10px 8px}.topbar h1{font-size:15px}.nav-links a{font-size:11px;padding:4px 6px}.container{padding:10px 6px}.section{padding:12px 8px}.section-title{font-size:13px}.row-grid{grid-template-columns:1fr;gap:6px}.stat-card{padding:10px 6px}.stat-num{font-size:22px}.stat-label{font-size:11px}.timeline{padding-left:20px}.timeline-item{padding:8px 10px}.timeline-title{font-size:12px}.timeline-meta{font-size:10px;gap:4px}.gauge{height:20px}.gauge-label{font-size:11px}.alert-card{padding:10px 8px}.alert-title{font-size:12px}.alert-content{font-size:11px}.refresh-btn{font-size:11px;padding:3px 8px}}
+.stat-card{background:var(--bg);border-radius:8px;padding:14px;text-align:center;border:1px solid var(--border)}
+.stat-num{font-size:28px;font-weight:600;color:var(--gold);font-family:monospace}
+.stat-label{font-size:12px;color:var(--text-muted);margin-top:4px}
+.stat-card.high{border-color:var(--red);background:var(--red)11}
+.stat-card.mid{border-color:var(--orange);background:var(--orange)11}
+.stat-card.normal{border-color:var(--green);background:var(--green)11}
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;margin-bottom:10px;padding:10px 14px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.timeline-item::before{content:"";position:absolute;left:-19px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg)}
+.timeline-item.high::before{background:var(--red)}
+.timeline-item.mid::before{background:var(--orange)}
+.timeline-item.normal::before{background:var(--green)}
+.timeline-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.timeline-meta{font-size:11px;color:var(--text-muted);display:flex;gap:8px;flex-wrap:wrap}
+.timeline-meta span{padding:2px 6px;background:var(--bg-2);border-radius:4px}
+.empty{text-align:center;color:var(--text-muted);padding:30px;font-size:13px}
+.gauge{position:relative;width:100%;height:24px;background:var(--bg);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.gauge-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold),var(--red));transition:width 0.6s ease}
+.gauge-label{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--bg);text-shadow:0 0 4px rgba(0,0,0,.5)}
+.alert-card{padding:12px;background:var(--bg);border-left:4px solid var(--red);border-radius:6px;margin-bottom:8px}
+.alert-card.warn{border-left-color:var(--orange)}
+.alert-card.ok{border-left-color:var(--green)}
+.alert-title{font-size:13px;font-weight:600;margin-bottom:6px}
+.alert-content{font-size:12px;color:var(--text-muted);line-height:1.6}
+@media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.cross-nav,.flow-steps-wrap,.flow-steps,.flow-hint,.toast,.skip-link,.portal-nav{display:none!important}.topbar{position:static!important;background:#fff!important;border-bottom:1px solid #ddd!important}.topbar h1{color:#000!important}.nav-links{display:none!important}.section{background:#fff!important;border:1px solid #ddd!important;color:#000!important;page-break-inside:avoid}.section-title{color:#000!important}.stat-card{background:#fff!important;border:1px solid #ddd!important;color:#000!important}.stat-num{color:#000!important}.timeline::before{background:#ddd!important}.timeline-item{background:#fff!important;border:1px solid #ddd!important;color:#000!important}.gauge{background:#f5f5f5!important;border:1px solid #ddd!important}.alert-card{background:#fff!important;border-left:4px solid #ddd!important;color:#000!important}.refresh-btn{display:none!important}.empty{color:#333!important}
+}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">健康监控看板</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选维度</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>看数据</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>趋势分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>预警处理</span></div></div>
+<div class="flow-hint">个人/家属查看健康监测数据，趋势分析+预警处理。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+<div class="topbar">
+  <h1>盾 健康监控看板</h1>
+  <div class="nav-links">
+    <a href="report-interpret.html">报告解读</a>
+    <a href="wellness-weekly.html">历 周分析</a>
+    <a href="person-center.html">卦 身份中心</a>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- 概览统计 -->
+<div class="section">
+  <div class="section-title">
+    📊 实时健康概览
+    <button class="refresh-btn" onclick="location.reload()">更 刷新</button>
+  </div>
+  <div class="row-grid">
+    <div class="stat-card"><div class="stat-num" id="stat-profile">-</div><div class="stat-label">康养人档案</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-risk">-</div><div class="stat-label">风险等级</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-ocr">-</div><div class="stat-label">OCR异常案例</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-weekly">-</div><div class="stat-label">周分析记录</div></div>
+  </div>
+</div>
+
+<!-- 风险等级可视化 -->
+<div class="section">
+  <div class="section-title">标 综合风险指数</div>
+  <div id="gauge-area" style="margin-top:10px">
+    <div class="gauge"><div class="gauge-fill" id="gauge-fill" style="width:0%"></div><div class="gauge-label" id="gauge-label">计算中...</div></div>
+    <div style="margin-top:10px;font-size:12px;color:var(--text-muted)" id="gauge-detail">综合日主五行、家族遗传、症状、季节、报告OCR异常 多维度</div>
+  </div>
+</div>
+
+<!-- 实时告警 -->
+<div class="section">
+  <div class="section-title">警 实时告警</div>
+  <div id="alerts-list"><div class="empty">正在为您查阅典籍...</div></div>
+</div>
+
+<!-- 报告解读历史 -->
+<div class="section">
+  <div class="section-title">报告解读历史（KB 召回）</div>
+  <div id="report-history"><div class="empty">正在为您查阅典籍...</div></div>
+</div>
+
+<!-- 周分析历史 -->
+<div class="section">
+  <div class="section-title">历 周分析历史</div>
+  <div id="weekly-history"><div class="empty">正在为您查阅典籍...</div></div>
+</div>
+
+<!-- 健康度时间轴 -->
+<div class="section">
+  <div class="section-title">升 健康度时间轴</div>
+  <div id="timeline" class="timeline"><div class="empty">正在为您查阅典籍...</div></div>
+</div>
+
+</div>
+
+<script src="js/report-interpret-engine.js"></script>
+<script>
+var API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+var USER_ID = 4;
+
+window.addEventListener('DOMContentLoaded', function(){
+  loadAll();
+});
+
+async function loadAll(){
+  await Promise.all([loadProfile(), loadOcrAnomalies(), loadWeeklySummary(), loadKbHealth()]);
+  computeRiskGauge();
+}
+
+async function loadProfile(){
+  try{
+    var r = await fetch(API+'/api/wellness/profile/'+USER_ID, {signal: AbortSignal.timeout(15000)});
+    var j = await r.json();
+    var p = j.data || {};
+    document.getElementById('stat-profile').textContent = p.name || '已建档';
+    var rl = p.risk_level || 'normal';
+    var rlMap = {high:'🔴 高',mid:'🟡 中',normal:'🟢 低'};
+    document.getElementById('stat-risk').textContent = rlMap[rl] || '🟢 低';
+    document.getElementById('stat-risk').style.color = rl === 'high' ? 'var(--red)' : rl === 'mid' ? 'var(--orange)' : 'var(--green)';
+    window._profile = p;
+  }catch(e){
+    document.getElementById('stat-profile').textContent = '查阅失败';
+  }
+}
+
+async function loadOcrAnomalies(){
+  try{
+    var r = await fetch(API+'/api/wellness/ocr-anomalies?limit=20', {signal: AbortSignal.timeout(15000)});
+    var j = await r.json();
+    var list = j.data.anomalies || [];
+    document.getElementById('stat-ocr').textContent = list.length;
+    var html = '';
+    if(list.length === 0){
+      html = '<div class="empty">暂无 OCR 异常案例</div>';
+    } else {
+      list.forEach(function(a){
+        var cls = a.title.indexOf('high') > -1 ? 'high' : a.title.indexOf('mid') > -1 ? 'mid' : 'normal';
+        html += '<div class="timeline-item ' + cls + '">';
+        html += '<div class="timeline-title">' + a.title + '</div>';
+        html += '<div style="font-size:12px;color:var(--text-muted);margin:4px 0;line-height:1.6">' + (a.summary || '') + '</div>';
+        html += '<div class="timeline-meta">';
+        html += '<span>trust: ' + a.trust_score + '</span>';
+        html += '<span>' + (a.entry_id || '').slice(0,30) + '</span>';
+        html += '</div></div>';
+      });
+    }
+    document.getElementById('report-history').innerHTML = html;
+    window._ocrAnomalies = list;
+  }catch(e){
+    document.getElementById('report-history').innerHTML = '<div class="empty">查阅失败：'+esc(esc(e.message))+'</div>';
+  }
+}
+
+async function loadWeeklySummary(){
+  try{
+    var r = await fetch(API+'/api/wellness/weekly-summary?user_id='+USER_ID+'&weeks=4', {signal: AbortSignal.timeout(15000)});
+    var j = await r.json();
+    var weeks = j.data.analyses || [];
+    var stats = j.data.stats || {};
+    document.getElementById('stat-weekly').textContent = stats.total || weeks.length;
+    var html = '';
+    if(weeks.length === 0){
+      html = '<div class="empty">暂无周分析记录 · <a href="wellness-weekly.html" style="color:var(--gold)">开始第一次</a></div>';
+    } else {
+      weeks.forEach(function(w){
+        var cls = w.outcome === 'better' ? 'normal' : w.outcome === 'worse' ? 'high' : 'mid';
+        html += '<div class="timeline-item ' + cls + '">';
+        html += '<div class="timeline-title">' + (w.week || '未知周') + ' · ' + (w.outcome || 'unknown') + '</div>';
+        html += '<div style="font-size:12px;color:var(--text-muted);margin:4px 0;line-height:1.6">' + (w.summary || '') + '</div>';
+        html += '</div>';
+      });
+    }
+    document.getElementById('weekly-history').innerHTML = html;
+    window._weeklySummary = weeks;
+  }catch(e){
+    document.getElementById('weekly-history').innerHTML = '<div class="empty">查阅失败：'+esc(esc(e.message))+'</div>';
+  }
+}
+
+async function loadKbHealth(){
+  // 统计 KB 健康度
+  try{
+    var r = await fetch(API+'/api/kb/stats', {signal: AbortSignal.timeout(15000)});
+    var j = await r.json();
+    window._kbStats = j.data || {};
+  }catch(e){window._kbStats = {}}
+}
+
+function computeRiskGauge(){
+  var profile = window._profile || {};
+  var ocr = window._ocrAnomalies || [];
+  var weekly = window._weeklySummary || [];
+
+  // 风险分数 = 基础分 + 加成
+  var score = 0;
+  var reasons = [];
+
+  // 1. 基础风险（基于 profile 的 risk_level）
+  if(profile.risk_level === 'high'){ score += 40; reasons.push('档案风险等级：高'); }
+  else if(profile.risk_level === 'mid'){ score += 25; reasons.push('档案风险等级：中'); }
+  else { score += 10; reasons.push('档案风险等级：正常'); }
+
+  // 2. 家族遗传加成
+  var fg = profile.family_genetic || '';
+  if(fg && fg !== '无'){
+    var fgCount = fg.split(/[、,，;；]/).filter(function(x){return x.trim()}).length;
+    score += fgCount * 5;
+    reasons.push('家族遗传：'+fgCount+'项');
+  }
+
+  // 3. OCR 异常案例加成
+  var highCount = ocr.filter(function(a){return a.title.indexOf('high') > -1}).length;
+  if(highCount > 0){
+    score += highCount * 8;
+    reasons.push('OCR 高风险案例：'+highCount+'条');
+  }
+
+  // 4. 周分析 worse 趋势
+  var worseCount = weekly.filter(function(w){return w.outcome === 'worse'}).length;
+  if(worseCount > 0){
+    score += worseCount * 3;
+    reasons.push('周分析转差：'+worseCount+'次');
+  }
+
+  // 5. 福利
+  if(profile.day_master){
+    score += 5;
+    reasons.push('已配置日主：'+profile.day_master);
+  }
+
+  // 限制 0-100
+  score = Math.max(0, Math.min(100, score));
+
+  // 渲染
+  var color = score >= 60 ? 'var(--red)' : score >= 30 ? 'var(--orange)' : 'var(--green)';
+  document.getElementById('gauge-fill').style.width = score + '%';
+  document.getElementById('gauge-fill').style.background = color;
+  document.getElementById('gauge-label').textContent = score + ' 分 · ' + (score >= 60 ? '高风险' : score >= 30 ? '中风险' : '低风险');
+  document.getElementById('gauge-label').style.color = '#fff';
+  document.getElementById('gauge-detail').textContent = '因素：' + reasons.join(' | ');
+
+  // 渲染告警
+  renderAlerts(score, reasons, ocr, weekly);
+}
+
+function renderAlerts(score, reasons, ocr, weekly){
+  var html = '';
+  // 高风险 alert
+  if(score >= 60){
+    html += '<div class="alert-card"><div class="alert-title">危 综合风险高（'+score+'分）</div>';
+    html += '<div class="alert-content">建议：立即就医复查 + 命理体质调养 + 家族遗传咨询。因素：'+reasons.join('；')+'</div></div>';
+  } else if(score >= 30){
+    html += '<div class="alert-card warn"><div class="alert-title">警 综合风险中（'+score+'分）</div>';
+    html += '<div class="alert-content">建议：定期复查 + 关注家族遗传 + 周分析跟踪。因素：'+reasons.join('；')+'</div></div>';
+  } else {
+    html += '<div class="alert-card ok"><div class="alert-title">安 综合风险低（'+score+'分）</div>';
+    html += '<div class="alert-content">当前健康度良好，继续保持。因素：'+reasons.join('；')+'</div></div>';
+  }
+
+  // 最近一次高风险 OCR 告警
+  var latestHigh = ocr.find(function(a){return a.title.indexOf('high') > -1});
+  if(latestHigh){
+    html += '<div class="alert-card"><div class="alert-title">警 最新高风险 OCR 案例</div>';
+    html += '<div class="alert-content">'+latestHigh.title+' · trust='+latestHigh.trust_score+'</div></div>';
+  }
+
+  // 周分析 worse 趋势
+  var recentWorse = weekly.filter(function(w){return w.outcome === 'worse'}).slice(0,1);
+  if(recentWorse.length > 0){
+    html += '<div class="alert-card warn"><div class="alert-title">降 周分析转差趋势</div>';
+    html += '<div class="alert-content">'+recentWorse[0].week+'：'+(recentWorse[0].summary || '本周健康转差')+'</div></div>';
+  }
+
+  document.getElementById('alerts-list').innerHTML = html;
+
+  // 时间轴
+  var tlHtml = '';
+  var events = [];
+  ocr.forEach(function(a){
+    events.push({date: '2026-07-29', kind: 'ocr', title: a.title, cls: a.title.indexOf('high') > -1 ? 'high' : a.title.indexOf('mid') > -1 ? 'mid' : 'normal', meta: 'trust '+a.trust_score});
+  });
+  weekly.forEach(function(w){
+    events.push({date: w.week || '', kind: 'weekly', title: '周分析：'+(w.outcome||'unknown'), cls: w.outcome === 'better' ? 'normal' : w.outcome === 'worse' ? 'high' : 'mid', meta: w.summary || ''});
+  });
+  if(events.length === 0){
+    document.getElementById('timeline').innerHTML = '<div class="empty">暂无健康事件</div>';
+  } else {
+    events.sort(function(a,b){return (b.date||'').localeCompare(a.date||'')});
+    events.slice(0,15).forEach(function(e){
+      tlHtml += '<div class="timeline-item ' + e.cls + '">';
+      tlHtml += '<div class="timeline-title">' + (e.kind === 'ocr' ? '🔍' : '📅') + ' ' + e.title + '</div>';
+      tlHtml += '<div class="timeline-meta"><span>' + (e.date || '') + '</span><span>' + (e.meta || '').slice(0,50) + '</span></div>';
+      tlHtml += '</div>';
+    });
+    document.getElementById('timeline').innerHTML = tlHtml;
+  }
+}
+</script>
+<script src="js/mobile-nav.js" defer></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

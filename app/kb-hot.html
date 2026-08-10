@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="🔥 KB 热度仪表盘 - 命理宝鉴 · 易道智鉴平台">
+<meta name="keywords" content="🔥 KB 热度仪表盘 - 命理宝鉴">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-hot.html">
+<meta name="theme-color" content="#050608">
+<title>KB热度仪表盘 · 易道智鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e0e0e0;padding:20px}
+.container{max-width:1200px;margin:0 auto}
+h1{font-size:1.6rem;margin-bottom:4px}
+.subtitle{color:#888;font-size:.85rem;margin-bottom:20px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.metric{background:#1a1d27;border:1px solid #2a2d37;border-radius:12px;padding:16px}
+.metric-val{font-size:1.8rem;font-weight:700;color:#7c9eff}
+.metric-label{font-size:.8rem;color:#888;margin-top:4px}
+.panel{background:#1a1d27;border:1px solid #2a2d37;border-radius:12px;padding:16px;margin-bottom:20px}
+.section-title{font-size:1rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center}
+.rich-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:8px}
+.rich-dot-blue{background:#7c9eff}
+.rich-dot-green{background:#4ade80}
+.rich-dot-gold{background:#c9a84c}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{width:120px;font-size:.85rem;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:24px;background:#0f1117;border-radius:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:8px;font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;transition:width .6s ease}
+.bar-val{width:60px;font-size:.8rem;color:#aaa;flex-shrink:0}
+.timeline-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #2a2d37}
+.timeline-item:last-child{border-bottom:none}
+.timeline-time{font-size:.75rem;color:#666;flex-shrink:0;width:70px}
+.timeline-body{flex:1}
+.timeline-module{font-size:.7rem;padding:2px 6px;border-radius:4px;background:#2a2d37;color:#7c9eff;margin-right:6px}
+.timeline-title{font-size:.85rem;margin-top:4px;color:#ccc}
+.badge{font-size:.7rem;padding:2px 6px;border-radius:4px;font-weight:600}
+.badge-high{background:#4ade80;color:#000}
+.badge-mid{background:#fbbf24;color:#000}
+.badge-low{background:#f87171;color:#fff}
+.toggle-bar{display:flex;gap:8px;margin-bottom:16px}
+.toggle-btn{padding:6px 16px;border:1px solid #2a2d37;border-radius:8px;background:transparent;color:#888;cursor:pointer;font-size:.85rem}
+.toggle-btn.active{background:#7c9eff;color:#fff;border-color:#7c9eff}
+.time-btn{padding:6px 16px;border:1px solid #2a2d37;border-radius:8px;background:transparent;color:#888;cursor:pointer;font-size:.85rem;margin-left:4px}
+.time-btn.active{background:#22c55e;color:#fff;border-color:#22c55e}
+.period-card{background:#0a0a0a;border:1px solid #2a2d37;border-radius:8px;padding:14px;margin:12px 0}
+@media(max-width:768px){.bar-label{width:80px}.metric-val{font-size:1.4rem}}
+@media(max-width:480px){.bar-label{width:70px;font-size:.75rem}.bar-val{width:40px;font-size:.7rem}}
+@media(max-width:360px){body{padding:8px 4px;line-height:1.5}.container{padding:0}h1{font-size:1.25rem;letter-spacing:.5px;margin-bottom:3px}.subtitle{font-size:.72rem;margin-bottom:12px}.metrics{grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px}.metric{padding:10px 8px;border-radius:8px}.metric-val{font-size:1.15rem}.metric-label{font-size:.68rem;margin-top:2px}.panel{padding:10px 8px;border-radius:8px;margin-bottom:12px}.section-title{font-size:.88rem;margin-bottom:8px;flex-wrap:wrap;gap:4px}.bar-row{gap:5px;margin-bottom:5px}.bar-label{width:54px;font-size:.68rem;letter-spacing:0}.bar-track{height:18px;border-radius:4px}.bar-fill{padding-left:5px;font-size:.62rem;border-radius:4px}.bar-val{width:42px;font-size:.62rem}.toggle-bar{gap:5px;margin-bottom:10px;flex-wrap:wrap}.toggle-btn,.time-btn{padding:4px 10px;font-size:.72rem;border-radius:6px}.timeline-item{padding:5px 0;gap:6px}.timeline-time{width:56px;font-size:.62rem}.timeline-title{font-size:.72rem;margin-top:2px}.timeline-module{font-size:.62rem;padding:1px 4px}.period-card{padding:10px 8px;border-radius:6px;margin:8px 0}.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}}
+/* R452: Print styles */
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar, .flow-steps-wrap, .phb-back,
+  a[style*="position:fixed"], [style*="position:fixed"],
+  .toggle-bar, .time-btn, .toggle-btn, header, nav{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  h1,h2,h3,h4,h5,h6,p,span,div,a{color:#000!important}
+  .period-card{border:1px solid #ccc!important;background:#fff!important;break-inside:avoid;page-break-inside:avoid}
+  *{box-shadow:none!important;text-shadow:none!important;border-radius:0!important}
+  a[href^="http"]::after{content:" ("attr(href)")";font-size:8pt;color:#666!important}
+}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB热度仪表盘</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看热词</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>模块分布</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>趋势分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出数据</span></div></div>
+<div class="flow-hint">大师/学习者查看热门知识条目，高频检索词排行。</div>
+</div>
+<main id="main" class="container">
+<h1>热 KB 热度仪表盘</h1>
+<p class="subtitle">模块命中排行 · 最近命中流 · 全局热度趋势</p>
+
+<div class="metrics" id="metrics"></div>
+
+<div class="toggle-bar">
+  <button class="toggle-btn active" data-range="7" onclick="switchRange(7)">7 天</button>
+  <button class="toggle-btn" data-range="14" onclick="switchRange(14)">14 天</button>
+  <button class="toggle-btn" data-range="30" onclick="switchRange(30)">30 天</button>
+  <span style="margin:0 8px;color:#444">|</span>
+  <button class="time-btn active" data-period="day" onclick="switchPeriod('day')">历 今日</button>
+  <button class="time-btn" data-period="week" onclick="switchPeriod('week')">历 本周</button>
+  <button class="time-btn" data-period="month" onclick="switchPeriod('month')">历 本月</button>
+</div>
+
+<div class="panel">
+  <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 模块命中排行（滚动窗口）</div>
+  <div id="hotBars">正在为您查阅典籍...</div>
+</div>
+
+<div class="panel">
+  <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 全局累计 TOP 10</div>
+  <div id="allTimeBars">正在为您查阅典籍...</div>
+</div>
+
+<div class="panel">
+  <div class="section-title"><span class="rich-dot rich-dot-blue"></span> 最近命中流 <span style="margin-left:auto;font-size:.75rem;color:#666">每 30s 自动刷新</span></div>
+  <div id="traces">正在为您查阅典籍...</div>
+</div>
+
+<!-- R75: 设备采集流（纯前端 localStorage，零 API） -->
+<div class="panel">
+  <div class="section-title"><span class="rich-dot rich-dot-gold"></span> 📱 设备采集流 <span id="deviceStreamMeta" style="margin-left:auto;font-size:.75rem;color:#666">最近 5 分钟</span></div>
+  <div id="deviceStream">
+    <div style="color:#666;padding:12px;font-size:.85rem">
+      💡 打开 <a href="device-management.html" style="color:#7c9eff">设备管理</a> 或
+      <a href="camera-capture.html" style="color:#7c9eff">相机采集</a> 后，拍照/录音将自动联动知识库模块
+    </div>
+  </div>
+</div>
+
+<!-- R79: 时间维度统计（今日/本周/本月） -->
+<div id="periodStats" data-default-empty="true">
+  <div style="color:#666;padding:12px;font-size:.85rem">统计加载中...</div>
+</div>
+
+</main>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script>
+let currentRange = 7;
+const API_BASE = (location.port === '8914' || location.port === '8920') ? 'http://localhost:8920' : '';
+
+async function fetchJSON(url) {
+  try {
+    const r = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    return await r.json();
+  } catch(e) {
+    console.warn('[fetchJSON]', esc(e.message));
+    return { ok: false, error: 'NETWORK_ERROR' };
+  }
+}
+
+function scoreBadge(score) {
+  if (score >= 0.8) return '<span class="badge badge-high">' + score.toFixed(2) + '</span>';
+  if (score >= 0.5) return '<span class="badge badge-mid">' + score.toFixed(2) + '</span>';
+  return '<span class="badge badge-low">' + score.toFixed(2) + '</span>';
+}
+
+const DEVICE_MODULE_LABEL = {
+  zhongyi: '中医面诊', shexiang: '舌象诊断', mianxue: '眼诊/面相',
+  classics: '经典文献', mantra: '咒语/诵经', tcm: '中医脉象',
+  mobile: '作息养生', fengshui: '环境风水'
+};
+const DEVICE_MODULE_ICON = {
+  zhongyi: '👁', shexiang: '👅', mianxue: '👀',
+  classics: '📜', mantra: '🎙️', tcm: '❤️',
+  mobile: '😴', fengshui: '👓'
+};
+
+/**
+ * R75: 从 localStorage._device_kb_events 渲染设备采集流
+ * 只展示最近 5 分钟内的事件，按模块分组
+ */
+function renderDeviceStream() {
+  const container = document.getElementById('deviceStream');
+  const meta = document.getElementById('deviceStreamMeta');
+  if (!container) return;
+  try {
+    const raw = localStorage.getItem('_device_kb_events') || '[]';
+    const events = JSON.parse(raw);
+    const now = Date.now();
+    const windowMs = 5 * 60 * 1000;
+    const recent = events.filter(e => now - (e.ts || 0) < windowMs);
+    const total = events.length;
+
+    if (total === 0) {
+      container.innerHTML = '<div style="color:#666;padding:12px;font-size:.85rem">暂无设备采集记录 · 拍照/录音后将自动显示</div>';
+      if (meta) meta.textContent = '0 条记录';
+      return;
+    }
+
+    // 按模块分组计数
+    const modCount = {};
+    const modLatest = {};
+    recent.forEach(e => {
+      if (!e.module) return;
+      modCount[e.module] = (modCount[e.module] || 0) + 1;
+      if (!modLatest[e.module] || (e.ts || 0) > modLatest[e.module].ts) modLatest[e.module] = e;
+    });
+    const sorted = Object.entries(modCount).sort((a, b) => b[1] - a[1]);
+    const maxCount = sorted.length > 0 ? sorted[0][1] : 1;
+
+    // 渲染分组条形
+    const barsHtml = sorted.map(([mod, count]) => {
+      const icon = DEVICE_MODULE_ICON[mod] || '📦';
+      const label = DEVICE_MODULE_LABEL[mod] || mod;
+      const pct = (count / maxCount * 100).toFixed(1);
+      const latest = modLatest[mod];
+      const timeStr = latest ? new Date(latest.ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '';
+      return '<div class="bar-row">' +
+        '<span class="bar-label" title="' + label + '">' + icon + ' ' + label + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:' + Math.max(pct, 3) + '%;background:linear-gradient(90deg,#c9a84c,#22d3ee)">' + count + ' 次</div></div>' +
+        '<span class="bar-val">' + timeStr + '</span>' +
+      '</div>';
+    }).join('');
+
+    // 最近 5 条原始事件
+    const last5 = events.slice(-5).reverse();
+    const tracesHtml = last5.map(e => {
+      const icon = DEVICE_MODULE_ICON[e.module] || '📦';
+      const label = DEVICE_MODULE_LABEL[e.module] || e.module || '?';
+      const time = new Date(e.ts).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      return '<div class="timeline-item">' +
+        '<span class="timeline-time">' + time + '</span>' +
+        '<div class="timeline-body">' +
+          '<span class="timeline-module">' + icon + ' ' + label + '</span>' +
+          (e.capability ? '<span style="font-size:.7rem;color:#666"> · ' + e.capability + '</span>' : '') +
+          '<div class="timeline-title">' + (e.label || '设备采集') + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+
+    container.innerHTML = '<div style="margin-bottom:14px">' + barsHtml + '</div>' +
+      '<div style="border-top:1px solid rgba(201,168,76,.15);padding-top:10px;margin-top:6px">' +
+        '<div style="font-size:.75rem;color:#888;margin-bottom:8px">最近事件</div>' +
+        tracesHtml +
+      '</div>';
+
+    if (meta) meta.textContent = total + ' 条记录 · 最近 5 分钟 ' + recent.length + ' 次';
+  } catch (e) {
+    container.innerHTML = '<div style="color:#f87171;padding:12px">读取失败: ' +esc(e.message)+'</div>';
+  }
+}
+
+function renderBars(container, items, valKey, labelKey, maxVal) {
+  if (!items || items.length === 0) {
+    document.getElementById(container).innerHTML = '<div style="color:#666;padding:12px">暂无数据</div>';
+    return;
+  }
+  const palette = ['#667eea','#764ba2','#f093fb','#4facfe','#43e97b','#fa709a','#fee140','#30cfd0','#a78bfa','#34d399','#fb7185','#fbbf24','#60a5fa','#c084fc','#2dd4bf','#f472b6'];
+  const html = items.map((item, i) => {
+    const pct = maxVal > 0 ? (item[valKey] / maxVal * 100).toFixed(1) : 0;
+    const val = item[valKey];
+    return '<div class="bar-row">' +
+      '<span class="bar-label" title="' + item[labelKey] + '">' + item[labelKey] + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + Math.max(pct, 2) + '%;background:' + palette[i % palette.length] + '">' + val + (item.pct ? ' · ' + item.pct + '%' : '') + '</div></div>' +
+      '<span class="bar-val">' + val + '</span>' +
+    '</div>';
+  }).join('');
+  document.getElementById(container).innerHTML = html;
+}
+
+async function loadHot() {
+  try {
+    const data = await fetchJSON(API_BASE + '/api/kb/hot-modules?days=' + currentRange + '&limit=15');
+    if (!data.ok) throw new Error(data.error);
+    const maxHits = data.modules.length > 0 ? data.modules[0].hits : 1;
+    renderBars('hotBars', data.modules, 'hits', 'module', maxHits);
+    const maxAll = data.all_time_top.length > 0 ? data.all_time_top[0].hits : 1;
+    renderBars('allTimeBars', data.all_time_top.map(m => ({...m, pct: 0})), 'hits', 'module', maxAll);
+    document.getElementById('metrics').innerHTML = `
+      <div class="metric"><div class="metric-val">${data.total_hits}</div><div class="metric-label">${currentRange}天总命中</div></div>
+      <div class="metric"><div class="metric-val">${data.modules.length}</div><div class="metric-label">活跃模块数</div></div>
+      <div class="metric"><div class="metric-val">${data.modules.length > 0 ? (data.modules[0].hits / data.total_hits * 100).toFixed(0) + '%' : '—'}</div><div class="metric-label">TOP1 占比${data.modules.length > 0 ? ' (' + data.modules[0].module + ')' : ''}</div></div>
+      <div class="metric"><div class="metric-val">${data.all_time_top.length}</div><div class="metric-label">全局有命中模块</div></div>
+    `;
+  } catch (e) {
+    document.getElementById('hotBars').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' +esc(e.message)+'</div>';
+  }
+}
+
+async function loadTraces() {
+  try {
+    const data = await fetchJSON(API_BASE + '/api/kb/recent-traces?limit=30');
+    if (!data.ok) throw new Error(data.error);
+    if (data.traces.length === 0) {
+      document.getElementById('traces').innerHTML = '<div style="color:#666;padding:12px">暂无命中记录</div>';
+      return;
+    }
+    const html = data.traces.map(t => `
+      <div class="timeline-item">
+        <span class="timeline-time">${t.hit_at || '—'}</span>
+        <div class="timeline-body">
+          <span class="timeline-module">${t.module || '?'}</span>
+          ${scoreBadge(t.hit_score || 0)}
+          ${t.app_endpoint ? '<span style="font-size:.7rem;color:#666"> · ' + t.app_endpoint + '</span>' : ''}
+          <div class="timeline-title">${t.title || '(无标题)'}</div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('traces').innerHTML = html;
+  } catch (e) {
+    document.getElementById('traces').innerHTML = '<div style="color:#f87171;padding:12px">查阅失败: ' +esc(e.message)+'</div>';
+  }
+}
+
+function switchRange(r) {
+  currentRange = r;
+  document.querySelectorAll('.toggle-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.range) === r);
+  });
+  loadHot();
+}
+
+/**
+ * R79: 时间维度切换（今日/本周/本月）
+ * 从本地 _kb_hit_events/{ymd} 或 _kb_hit_count 聚合
+ */
+let currentPeriod = 'day';
+function switchPeriod(p) {
+  currentPeriod = p;
+  document.querySelectorAll('.time-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.period === p);
+  });
+  renderPeriodStats();
+}
+
+function getPeriodRange(p) {
+  const now = new Date();
+  if (p === 'day') {
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    return { start, end: now.getTime(), label: '今日' };
+  }
+  if (p === 'week') {
+    const dayOfWeek = now.getDay() || 7; // 周一为 1，周日为 0 视为 7
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1).getTime();
+    return { start, end: now.getTime(), label: '本周' };
+  }
+  // month
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  return { start, end: now.getTime(), label: '本月' };
+}
+
+function renderPeriodStats() {
+  const container = document.getElementById('periodStats');
+  if (!container) return;
+  const { start, end, label } = getPeriodRange(currentPeriod);
+
+  // 聚合：遍历 _kb_hit_events/{ymd} 中每条事件
+  const modCount = {};
+  let total = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key || !key.startsWith('_kb_hit_events/')) continue;
+    try {
+      const events = JSON.parse(localStorage.getItem(key) || '[]');
+      events.forEach(e => {
+        const t = e.ts || 0;
+        if (t >= start && t <= end) {
+          total++;
+          const m = e.mod || e.module || 'unknown';
+          modCount[m] = (modCount[m] || 0) + 1;
+        }
+      });
+    } catch (err) { /* 忽略 */ }
+  }
+
+  const sorted = Object.entries(modCount).sort((a, b) => b[1] - a[1]);
+  if (sorted.length === 0) {
+    container.innerHTML = '<div class="period-card"><div style="color:#666;padding:12px">' + label + ' 暂无 KB 命中记录。智能助手使用时自动打点。</div></div>';
+    return;
+  }
+
+  const max = sorted[0][1];
+  const palette = ['#c9a84c', '#22d3ee', '#22c55e', '#7c9eff', '#a78bfa', '#f472b6', '#fbbf24', '#34d399'];
+  const barsHtml = sorted.map(([mod, count], i) => {
+    const pct = (count / max * 100).toFixed(1);
+    const color = palette[i % palette.length];
+    return '<div class="bar-row">' +
+      '<span class="bar-label" title="' + mod + '">' + mod + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + Math.max(pct, 3) + '%;background:' + color + '">' + count + ' 次</div></div>' +
+      '<span class="bar-val">' + ((count / total) * 100).toFixed(0) + '%</span>' +
+    '</div>';
+  }).join('');
+
+  container.innerHTML = '<div class="period-card">' +
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+      '<span style="color:#c9a84c;font-weight:600">图 ' + label + ' KB 命中统计</span>' +
+      '<span style="color:#888;font-size:.85rem">总计 <strong style="color:#22c55e">' + total + '</strong> 次</span>' +
+    '</div>' +
+    barsHtml +
+  '</div>';
+}
+
+loadHot();
+loadTraces();
+renderPeriodStats();
+setInterval(() => { loadHot(); loadTraces(); renderDeviceStream(); renderPeriodStats(); }, 30000);
+setTimeout(renderDeviceStream, 500);
+setTimeout(renderPeriodStats, 800);
+</script>
+<script src="js/mobile-nav.js" defer></script>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

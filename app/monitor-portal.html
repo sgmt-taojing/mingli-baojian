@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="index, follow, noindex, nofollow" data-r308-public>
+
+<meta charset="UTF-8">
+<meta name="description" content="监控 · 易道智鉴平台">
+<meta name="keywords" content="监控">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/monitor-portal.html">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="监控·运维·平台健康门户 · 易道智鉴">
+<meta property="og:description" content="监控 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>监控·运维·平台健康门户 · 易道智鉴</title>
+<style>
+  :root{
+    --gold:#c9a84c;--gold2:#e3c97a;--paper:#f4e8c8;--paper2:rgba(244,232,200,.78);
+    --success:#2ecc71;--warn:#f39c12;--error:#e74c3c;--info:#3498db;
+    --cyan:#3aa6b4;--violet:#8e44ad;--jade:#27ae60;--orange:#e67e22;
+    --dark:#1a120a;--dark2:#241609;--dark3:#0e0905;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'STKaiti','KaiTi','楷体',serif;
+    background:radial-gradient(ellipse at top,var(--dark2) 0%,var(--dark3) 100%);
+    color:var(--paper);min-height:100vh;padding:24px 16px 80px;
+  }
+  .hero{text-align:center;max-width:920px;margin:0 auto 24px;padding:24px 0 16px;border-bottom:1px solid rgba(201,168,76,.15)}
+  .hero h1{font-size:36px;color:var(--gold);letter-spacing:8px;margin-bottom:8px;font-family:'Ma Shan Zheng',serif}
+  .hero p{font-size:14px;color:var(--paper2);letter-spacing:3px;opacity:.85}
+  .summary{
+    max-width:1100px;margin:0 auto 24px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px
+  }
+  .sum-card{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.18);border-radius:12px;padding:14px;text-align:center}
+  .sum-card .num{font-size:32px;color:var(--gold);font-weight:600;letter-spacing:2px}
+  .sum-card .label{font-size:11px;color:var(--paper2);letter-spacing:2px;opacity:.8;margin-top:4px}
+  .sum-card.success .num{color:var(--success)}
+  .sum-card.warn .num{color:var(--warn)}
+  .sum-card.error .num{color:var(--error)}
+  .group{max-width:1100px;margin:0 auto 28px}
+  .group-title{
+    display:flex;align-items:center;gap:12px;margin:0 0 12px;
+    font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold);
+    letter-spacing:4px;opacity:.85
+  }
+  .group-title .icon{font-size:22px}
+  .group-title .line{flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.2),transparent)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .card{
+    display:block;padding:18px;border:1px solid rgba(201,168,76,.18);
+    border-radius:14px;background:rgba(201,168,76,.03);
+    cursor:pointer;transition:all .3s ease;color:var(--paper);text-decoration:none;
+    position:relative;overflow:hidden;
+  }
+  .card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 60%,rgba(201,168,76,.06));opacity:0;transition:opacity .3s}
+  .card:hover::before{opacity:1}
+  .card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.45);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .card:hover .name{color:var(--gold2)}
+  .card .symbol{font-size:28px;display:block;margin-bottom:8px}
+  .card .name{font-size:16px;color:var(--gold);font-weight:600;margin-bottom:4px;letter-spacing:2px;transition:color .3s}
+  .card .en{font-size:11px;color:var(--gold2);opacity:.6;letter-spacing:1px;margin-bottom:8px;font-family:Georgia,serif}
+  .card .desc{font-size:12px;color:var(--paper2);line-height:1.7;opacity:.78}
+  .card .go{margin-top:10px;font-size:11px;color:var(--info);opacity:.7;letter-spacing:1.5px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px rgba(46,204,113,.5);animation:pulse 2s infinite}
+  .dot.warn{background:var(--warn);box-shadow:0 0 8px rgba(243,156,18,.5)}
+  .dot.error{background:var(--error);box-shadow:0 0 8px rgba(231,76,60,.5);animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @media(max-width:768px){
+    body{padding:16px 12px 60px}
+    .hero h1{font-size:26px;letter-spacing:4px}
+    .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+    .card{padding:14px 12px}
+  }
+  .footer{padding-bottom:50px;text-align:center;margin-top:36px;font-size:11px;color:var(--paper2);opacity:.45;letter-spacing:2px}
+  .footer a{color:var(--gold);text-decoration:none;margin:0 8px}
+@media(max-width:360px){body{padding:8px 6px 56px;font-size:13px}h1{font-size:18px}h2{font-size:15px}.container,.wrap,.content{padding:8px 6px}.card,.panel,.box{padding:10px 8px;margin-bottom:8px}.grid,.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;gap:8px}.stat-grid,.stat-row{grid-template-columns:1fr 1fr;gap:6px}.stat-card,.stat-item{padding:8px 6px}.btn,.button{font-size:12px;padding:6px 12px}.nav-bar,.tab-bar,.tabs{font-size:11px;gap:4px}.nav-bar a,.tab-btn{padding:4px 6px}.table{font-size:11px}.table th,.table td{padding:4px 6px}input,select,textarea{font-size:13px;padding:6px 8px}label{font-size:12px}.summary,.desc,.text{font-size:12px}.hero{padding:12px 8px}.hero h1{font-size:20px}}
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
+</style>
+<link rel="stylesheet" href="css/a11y-fix.css" data-r309-portal>
+<link rel="stylesheet" href="css/mobile-nav.css" data-r309-portal>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">监控</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看状态</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>趋势分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出报告</span></div></div>
+<div class="flow-hint">查看监控·运维·平台健康门户 · 易道智鉴，了解功能详情与使用方式。</div>
+</div>
+<div class="hero">
+  <h1>运 监控 · 运维 · 平台健康</h1>
+  <p>知识库 · 服务 · 推送 · 设备 · 数据 · 合规 · 全链路可视化</p>
+</div>
+
+<!-- 实时健康摘要 -->
+<div class="summary">
+  <div class="sum-card success" id="sum-kb"><div class="num" id="num-kb">--</div><div class="label"><span class="dot"></span> KB 条目</div></div>
+  <div class="sum-card success" id="sum-modules"><div class="num" id="num-modules">--</div><div class="label"><span class="dot"></span> 知识模块</div></div>
+  <div class="sum-card" id="sum-trust"><div class="num" id="num-trust">--</div><div class="label"><span class="dot"></span> 平均信任度</div></div>
+  <div class="sum-card success" id="sum-services"><div class="num" id="num-services">5/5</div><div class="label"><span class="dot"></span> 服务在线</div></div>
+  <div class="sum-card warn" id="sum-cron"><div class="num" id="num-cron">10</div><div class="label"><span class="dot warn"></span> Cron 任务</div></div>
+</div>
+
+<!-- ① 实时监控仪表板 -->
+<div class="group">
+  <div class="group-title"><span class="icon">图</span><span>实时监控 · 仪表板</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="monitor-dashboard.html">
+      <span class="symbol">运</span>
+      <div class="name">平台总览监控</div>
+      <div class="en">Platform Health Dashboard</div>
+      <div class="desc">5 服务实时状态 · 内存 CPU · 网络延迟 · KB 健康指数</div>
+      <div class="go">→ 打开总览</div>
+    </a>
+    <a class="card" href="eval-dashboard.html">
+      <span class="symbol">评</span>
+      <div class="name">评估看板</div>
+      <div class="en">Eval Dashboard</div>
+      <div class="desc">SFT 训练资产 · 黄金 case · 通用 case · 反馈流评估</div>
+      <div class="go">→ 打开评估看板</div>
+    </a>
+    <a class="card" href="kb-hit-dashboard.html">
+      <span class="symbol">命</span>
+      <div class="name">KB 命中仪表板</div>
+      <div class="en">KB Hit Dashboard</div>
+      <div class="desc">知识库命中率 · 冷启动覆盖 · 引擎分布饼图</div>
+      <div class="go">→ 打开命中看板</div>
+    </a>
+    <a class="card" href="kb-module-health.html">
+      <span class="symbol">降</span>
+      <div class="name">KB 趋势图</div>
+      <div class="en">KB Trends</div>
+      <div class="desc">7/30/90 天命中趋势 · 模块热度 · 死库存预警</div>
+      <div class="go">→ 打开趋势</div>
+    </a>
+  </div>
+</div>
+
+<!-- ② 知识库健康 -->
+<div class="group">
+  <div class="group-title"><span class="icon">知</span><span>知识库 · 健康治理</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="kb-module-health.html">
+      <span class="symbol">心</span>
+      <div class="name">KB 模块健康仪表板</div>
+      <div class="en">KB Module Health</div>
+      <div class="desc">54 模块健康评分 · 死库存比例 · 模块补全优先级</div>
+      <div class="go">→ 查看健康度</div>
+    </a>
+    <a class="card" href="kb-quality.html">
+      <span class="symbol">勋</span>
+      <div class="name">KB 质量审计</div>
+      <div class="en">KB Quality Audit</div>
+      <div class="desc">trust / hits / freshness / depth 多维评分 · CSV 导出</div>
+      <div class="go">→ 质量审计</div>
+    </a>
+    <a class="card" href="kb-audit.html">
+      <span class="symbol">报</span>
+      <div class="name">KB 晚间审计</div>
+      <div class="en">Nightly KB Audit</div>
+      <div class="desc">每周自动审计 · 模块覆盖 · 缺口报告</div>
+      <div class="go">→ 打开审计</div>
+    </a>
+    <a class="card" href="kb-coverage.html">
+      <span class="symbol">量</span>
+      <div class="name">KB 覆盖率</div>
+      <div class="en">KB Coverage Report</div>
+      <div class="desc">22 模块 × 8 子领域交叉覆盖率 · 补救优先级矩阵</div>
+      <div class="go">→ 查看覆盖率</div>
+    </a>
+    <a class="card" href="kb-browser.html">
+      <span class="symbol">查</span>
+      <div class="name">KB 浏览器</div>
+      <div class="en">KB Browser</div>
+      <div class="desc">浏览/搜索/编辑 KB 条目 · 来源标签 · 引用追溯</div>
+      <div class="go">→ 进入浏览器</div>
+    </a>
+    <a class="card" href="kb-graph.html">
+      <span class="symbol">🕸️</span>
+      <div class="name">KB 知识图谱</div>
+      <div class="en">KB Knowledge Graph</div>
+      <div class="desc">模块关系可视化 · 引用网络 · 影响力排序</div>
+      <div class="go">→ 查看图谱</div>
+    </a>
+  </div>
+</div>
+
+<!-- ③ 服务与设备 -->
+<div class="group">
+  <div class="group-title"><span class="icon">配</span><span>服务 · 设备 · 性能</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="device-management.html">
+      <span class="symbol">表</span>
+      <div class="name">智能硬件管理</div>
+      <div class="en">Device Management</div>
+      <div class="desc">Rokid 眼镜 · 摄像头 · Glasses_2312 桥接 · 跨设备状态</div>
+      <div class="go">→ 进入设备管理</div>
+    </a>
+    <a class="card" href="device-diagnostic.html">
+      <span class="symbol">修</span>
+      <div class="name">设备诊断</div>
+      <div class="en">Device Diagnostic</div>
+      <div class="desc">硬件自检 · 摄像头分辨率 · TTS 引擎 · 网络连通</div>
+      <div class="go">→ 设备诊断</div>
+    </a>
+    <a class="card" href="device-audit-rounds.html">
+      <span class="symbol">盾</span>
+      <div class="name">设备审计轮次</div>
+      <div class="en">Device Audit Rounds</div>
+      <div class="desc">R172-R175 历次设备审计跟踪 · 决策矩阵</div>
+      <div class="go">→ 审计跟踪</div>
+    </a>
+    <a class="card" href="monitor-dashboard.html"symbol">眼️</span>
+      <div class="name">视觉引擎健康</div>
+      <div class="en">Vision Engine Health</div>
+      <div class="desc">5 级视觉引擎优先级 · g2claw → GLM-4V → GPT-4o → 豆包 → 离线</div>
+      <div class="go">→ 视觉引擎</div>
+    </a>
+    <a class="card" href="health-monitor.html">
+      <span class="symbol">医</span>
+      <div class="name">健康监控（业务）</div>
+      <div class="en">Health Monitor</div>
+      <div class="desc">KB 模块健康 · 服务心跳 · P95 响应延迟 · 错误告警</div>
+      <div class="go">→ 健康监控</div>
+    </a>
+    <a class="card" href="api-docs.html">
+      <span class="symbol">信</span>
+      <div class="name">API 文档</div>
+      <div class="en">Swagger OpenAPI</div>
+      <div class="desc">149 个端点完整文档 · 在线试调 · CSRF 自动注入</div>
+      <div class="go">→ API 文档</div>
+    </a>
+  </div>
+</div>
+
+<!-- ④ 数据导出与安全 -->
+<div class="group">
+  <div class="group-title"><span class="icon">锁</span><span>数据 · 合规 · 导出</span><span class="line"></span></div>
+  <div class="grid">
+    <a class="card" href="kb-hot.html">
+      <span class="symbol">热</span>
+      <div class="name">KB 热门 Top</div>
+      <div class="en">KB Hot</div>
+      <div class="desc">今日·本周·本月 · 7 维度综合评分 · 即时热门</div>
+      <div class="go">→ 热门浏览</div>
+    </a>
+    <a class="card" href="kb-compare.html">
+      <span class="symbol">平</span>
+      <div class="name">KB 对比分析</div>
+      <div class="en">KB Compare</div>
+      <div class="desc">模块间条目对比 · 覆盖差异 · 补全路径</div>
+      <div class="go">→ 对比分析</div>
+    </a>
+    <a class="card" href="kb-skeleton.html">
+      <span class="symbol">箱</span>
+      <div class="name">KB 骨架测试</div>
+      <div class="en">KB Skeleton</div>
+      <div class="desc">弱骨架模块识别 · 关键词覆盖率 · 自动补全</div>
+      <div class="go">→ 骨架测试</div>
+    </a>
+    <a class="card" href="privacy-center.html"symbol">🛂</span>
+      <div class="name">数据导出守卫</div>
+      <div class="en">Export Guard</div>
+      <div class="desc">合规校验 · 字段脱敏 · 审计日志 · 三档权限</div>
+      <div class="go">→ 导出守卫</div>
+    </a>
+    <a class="card" href="privacy-center.html">
+      <span class="symbol">密</span>
+      <div class="name">隐私合规中心</div>
+      <div class="en">Privacy Compliance</div>
+      <div class="desc">GDPR · 个保法 · 数据主体权利 · 同意管理 · 软删除</div>
+      <div class="go">→ 隐私中心</div>
+    </a>
+    <a class="card" href="disclaimer.html">
+      <span class="symbol">卷</span>
+      <div class="name">免责与合规声明</div>
+      <div class="en">Disclaimer & Compliance</div>
+      <div class="desc">命理非医疗 · 文化娱乐声明 · 未成年人保护 · 申诉通道</div>
+      <div class="go">→ 免责声明</div>
+    </a>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="divination-hub.html">← 返回首页</a> ·
+  <a href="naming-portal.html">命名起号 →</a>
+  <p>© 易道智鉴 · 监控运维门户 · R256 板块规划</p>
+</div>
+
+<script>
+// 自动探测健康指数
+async function probe() {
+  try {
+    const r = await fetch('http://localhost:8920/api/public/kb/module-health', {signal: AbortSignal.timeout(3000)});
+    if (r.ok) {
+      const j = await r.json();
+      const data = j.data || j;
+      const total = data.total || j.total || 0;
+      const modules = (data.modules || []).length || (j.modules || []).length || 0;
+      const trust = data.avg_trust || data.trust || j.avg_trust || 0;
+      document.getElementById('num-kb').textContent = total || '--';
+      document.getElementById('num-modules').textContent = modules || '--';
+      document.getElementById('num-trust').textContent = trust ? (trust*100).toFixed(1)+'%' : '--';
+    }
+  } catch(e) { /* 网络错误时保持静态 */ }
+}
+probe();
+</script>
+<!-- 跨门户导航 -->
+<nav class="portal-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:9000;display:flex;justify-content:center;gap:0;background:rgba(10,8,5,.96);backdrop-filter:blur(12px);border-top:1px solid rgba(201,168,76,.15);padding:6px 0;max-width:100%;overflow-x:auto">
+  <a href="divination-hub.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">首页</a>
+  <a href="naming-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">命名</a>
+  <a href="patient-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">患者</a>
+  <a href="tcm-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">中医</a>
+  <a href="practice-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">修行</a>
+  <a href="folklore-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">民俗</a>
+  <a href="monitor-portal.html" style="flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7">运 监控</a>
+</nav>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-quality.html">
+<meta name="theme-color" content="#050608">
+<title>KB质量审计 · 易道智鉴</title>
+<meta name="description" content="54 模块质量分级卡片 + trust_score 分布 + 模块搜索">
+<meta name="keywords" content="KB质量审计">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/utility-classes.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<style>
+:root{--gold:#c9a84c;--gold-dim:#a88c3a;--ink:#0d1117;--paper:#1a1f2e;--card:#222838;--border:#333a4d}
+body{background:var(--ink);color:#e0d8c8;font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
+.sub{text-align:center;color:#888;font-size:.9rem;margin-bottom:20px}
+
+/* Summary Bar */
+.summary{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+.s-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;text-align:center;min-width:100px}
+.s-card .val{font-size:1.8rem;font-weight:700;color:var(--gold)}
+.s-card .lbl{font-size:.75rem;color:#888;margin-top:2px}
+.s-card.grade .val{font-size:2.2rem}
+
+/* Grade Colors */
+.g-S-plus{color:#ffd700!important}.g-S{color:#e8c44a!important}.g-A-plus{color:#a8d8a8!important}
+.g-A{color:#7ec47e!important}.g-B-plus{color:#7ab8d4!important}.g-B{color:#6a9fd8!important}
+.g-C{color:#d49a6a!important}.g-D{color:#d46a6a!important}
+
+/* Search */
+.search-bar{display:flex;gap:8px;margin-bottom:16px}
+.search-bar input{flex:1;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#e0d8c8;font-size:.95rem;outline:none}
+.search-bar input:focus{border-color:var(--gold-dim)}
+.search-bar select{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:#e0d8c8;font-size:.85rem}
+
+/* Module Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.mod{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .2s;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%;display:block}
+.mod:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,168,76,.15)}
+.mod:hover{border-color:var(--gold-dim)}
+.mod-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.mod-name{font-weight:600;color:#e0d8c8;font-size:.95rem}
+.mod-grade{font-size:1.3rem;font-weight:700}
+.mod-bar{height:6px;border-radius:3px;background:#333;overflow:hidden;display:flex;margin-bottom:6px}
+.mod-bar .seg{height:100%}
+.seg-gold{background:#ffd700}.seg-silver{background:#c0c0c0}.seg-bronze{background:#cd7f32}.seg-fix{background:#d46a6a}
+.mod-meta{display:flex;justify-content:space-between;font-size:.78rem;color:#888}
+.mod-meta span b{color:#ccc;font-weight:600}
+
+/* Distribution */
+.distro{display:flex;height:24px;border-radius:6px;overflow:hidden;margin:12px 0}
+.distro .seg{display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#000;font-weight:600}
+
+/* Refresh + Export */
+.refresh{position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:var(--gold);border:none;color:var(--ink);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:10}
+.refresh:hover{opacity:.85}
+.export-btn{position:fixed;bottom:20px;right:78px;padding:10px 16px;background:var(--card);border:1px solid var(--gold-dim);border-radius:8px;color:var(--gold);font-size:.85rem;cursor:pointer;z-index:10}
+.export-btn:hover{background:var(--gold);color:var(--ink)}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--paper);border:1px solid var(--gold-dim);border-radius:14px;padding:24px;max-width:680px;width:92vw;max-height:80vh;overflow-y:auto}
+.modal h3{color:var(--gold);margin:0 0 12px;font-size:1.1rem}
+.modal .close{float:right;cursor:pointer;color:#888;font-size:1.3rem;background:none;border:none}
+.modal .close:hover{color:#fff}
+.modal .sample{background:var(--card);border-radius:8px;padding:12px;margin:8px 0;font-size:.85rem;line-height:1.5}
+.modal .sample .t{color:var(--gold);font-weight:600;margin-bottom:4px}
+.modal .sample .c{color:#aaa}
+.modal .stats-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-size:.85rem;color:#888}
+.modal .stats-row b{color:var(--gold)}
+.tab-btn{padding:8px 14px;background:none;border:none;border-bottom:2px solid transparent;color:#888;font-size:.85rem;cursor:pointer}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-btn:hover{color:var(--gold)}
+.distro-row{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:.8rem}
+.distro-row .lbl{width:120px;text-align:right;color:#888}
+.distro-row .bar{flex:1;height:18px;background:rgba(255,255,255,.05);border-radius:4px;overflow:hidden}
+.distro-row .bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.distro-row .cnt{width:40px;color:var(--gold);font-weight:600}
+.trust-list{margin:12px 0}
+.trust-list .row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-radius:6px;font-size:.8rem;margin:4px 0}
+.trust-list .row.high{background:rgba(34,197,94,.06)}
+.trust-list .row.low{background:rgba(239,68,68,.06)}
+.trust-list .row .title{color:#ccc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px}
+.trust-list .row .score{font-weight:600;min-width:40px;text-align:right}
+.trust-list .row.high .score{color:#4ade80}
+.trust-list .row.low .score{color:#f87171}
+
+@media(max-width:768px){.grid{grid-template-columns:1fr}.s-card{min-width:80px;padding:10px 14px}.s-card .val{font-size:1.4rem}h1{font-size:1.3rem}}
+@media(max-width:360px){body{padding:6px 4px;line-height:1.55}.wrap{padding-top:8px}.container{padding:6px 4px}h1{font-size:17px;letter-spacing:1px;margin:6px 0 4px}.sub{font-size:10.5px;margin-bottom:6px}.grid{grid-template-columns:1fr;gap:8px;margin-bottom:8px}.s-card{padding:8px 10px;min-width:0;border-radius:8px}.s-card .lbl{font-size:9.5px;letter-spacing:.5px;margin-bottom:2px}.s-card .val{font-size:1.1rem}.s-card .sub{font-size:9px;margin-top:2px}.toolbar{gap:5px;margin-bottom:8px;flex-wrap:wrap}.toolbar input,.toolbar select,.toolbar button{font-size:11px;padding:5px 8px;min-width:0;flex:1}.toolbar .btn-export{width:100%;margin-top:4px}.mod-table,.trust-list{font-size:10.5px}.mod-table th,.mod-table td{padding:5px 4px;word-break:break-all}.mod-table .col-count,.mod-table .col-grade{font-size:9.5px}.trust-list .row{padding:5px 4px;gap:5px;flex-wrap:wrap}.trust-list .row .name{font-size:10.5px}.trust-list .row .score{font-size:10px}.modal{padding:14px 10px;width:96%;max-width:96%;border-radius:8px}.modal h2{font-size:14px;margin-bottom:6px}.modal .m-body{font-size:11px;line-height:1.55}.modal .m-link{font-size:10.5px;padding:4px 6px}.modal .m-row{padding:5px 0;font-size:10.5px;gap:4px;flex-wrap:wrap}.modal .m-row .lbl{font-size:9.5px;letter-spacing:.5px}.empty{padding:24px 8px;font-size:11px}}
+
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB质量审计</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看质量</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>模块分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>趋势对比</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>导出报告</span></div></div>
+<div class="flow-hint">管理员审计知识库质量，模块/条数/置信度/等级分布。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+<div class="wrap">
+<h1>图 KB 知识库质量审计</h1>
+<p class="sub" id="sub">加载中…</p>
+
+<div class="summary" id="summary"></div>
+<main>
+
+
+<div class="search-bar">
+<input  type="text" id="q" placeholder="搜索模块名…（如 tcm / bazi / fengshui）" oninput="render()" aria-label="搜索模块名…（如 tcm / bazi / fengshui）">
+<select id="gradeFilter" onchange="render()" aria-label="筛选等级">
+<option value="">全部等级</option>
+<option value="S+">S+ 顶级</option>
+<option value="S">S 优秀</option>
+<option value="A+">A+ 良好</option>
+<option value="A">A</option>
+<option value="B+">B+</option>
+<option value="B">B</option>
+<option value="C">C</option>
+</select>
+</div>
+
+<div class="distro" id="distro"></div>
+
+<div class="grid" id="grid"></div>
+</div>
+
+<button class="export-btn" onclick="exportCSV()">入 导出 CSV</button>
+<button class="refresh" onclick="load()" title="刷新">更</button>
+<dialog id="modal" class="modal-bg" aria-label="模块详情">
+  <div class="modal">
+    <button class="close" onclick="closeModal()" aria-label="关闭">×</button>
+    <h3 id="modalTitle"></h3>
+    <div id="modalStats" class="stats-row"></div>
+    <div style="display:flex;gap:8px;margin:16px 0 8px;border-bottom:1px solid var(--gold-dim)">
+      <button class="tab-btn active" data-tab="samples" onclick="switchTab('samples')">表 样本</button>
+      <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">图 Trust 分布</button>
+    </div>
+    <div id="tab-samples">
+      <div id="modalSamples"></div>
+    </div>
+    <div id="tab-detail" style="display:none">
+      <div id="modalDetail"><p style="color:#888">加载中…</p></div>
+    </div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--gold-dim);text-align:right;font-size:.85rem">
+      <a id="modalKbGraphLink" href="#"  target="_blank" rel="noopener noreferrer">🕸️ 在图谱中查看</a>
+    </div>
+  </div>
+</dialog>
+
+<script>
+let DATA=null;
+const API=location.hostname.includes('github.io')?'https://mingli-baojian-api.onrender.com':'http://127.0.0.1:8920';
+const fmt=n=>n>=1000?(n/1000).toFixed(1)+'k':n;
+const gradeClass=g=>'g-'+g.replace('+','-plus');
+
+async function load(){
+  document.getElementById('sub').textContent='加载中…';
+  try{
+    const r=await fetch(API+'/api/kb/quality-report', {signal: AbortSignal.timeout(15000)});
+    const j=await r.json();
+    DATA=j.data||j;
+    renderSummary();
+    render();
+    document.getElementById('sub').textContent=`${DATA.summary.module_cnt} 模块 · ${fmt(DATA.summary.total)} 条目 · 更新于 ${new Date(DATA.generatedAt).toLocaleString('zh-CN')}`;
+  }catch(e){
+    document.getElementById('sub').textContent='查阅失败：'+esc(e.message);
+  }
+}
+
+function renderSummary(){
+  const s=DATA.summary;
+  const cards=[
+    {lbl:'总条目',val:fmt(s.total)},
+    {lbl:'模块数',val:s.module_cnt},
+    {lbl:'平均 trust',val:s.avg_trust},
+    {lbl:'综合等级',val:s.grade,cls:'grade'},
+    {lbl:'🥇 Gold',val:fmt(s.gold)},
+    {lbl:'🥈 Silver',val:fmt(s.silver)},
+    {lbl:'🥉 Bronze',val:fmt(s.bronze)},
+    {lbl:'需修复',val:s.needs_fix},
+  ];
+  document.getElementById('summary').innerHTML=cards.map(c=>
+    `<div class="s-card ${c.cls||''}"><div class="val ${c.cls?' '+gradeClass(s.grade):''}">${c.val}</div><div class="lbl">${c.lbl}</div></div>`
+  ).join('');
+
+  // R55: 治理建议面板（根据 summary 动态生成）
+  renderGovernance(s);
+
+  // Distribution bar
+  const t=s.total;
+  const segs=[
+    {lbl:'Gold',val:s.gold,pct:s.gold/t*100,cls:'seg-gold'},
+    {lbl:'Silver',val:s.silver,pct:s.silver/t*100,cls:'seg-silver'},
+    {lbl:'Bronze',val:s.bronze,pct:s.bronze/t*100,cls:'seg-bronze'},
+  ];
+  if(s.needs_fix>0) segs.push({lbl:'Fix',val:s.needs_fix,pct:s.needs_fix/t*100,cls:'seg-fix'});
+  document.getElementById('distro').innerHTML=segs.map(s2=>
+    `<div class="seg ${s2.cls}" style="width:${s2.pct}%" title="${s2.lbl}: ${s2.val} (${s2.pct.toFixed(1)}%)">${s2.pct>5?s2.lbl:''}</div>`
+  ).join('');
+}
+
+// R55: 治理建议面板
+function renderGovernance(s){
+  const t=s.total;
+  const goldPct=t>0?(s.gold/t*100):0;
+  const fixPct=t>0?(s.needs_fix/t*100):0;
+  const advices=[];
+  // 1. Gold 占比
+  if(goldPct<25) advices.push({icon:'🥇', sev:'warn', text:'Gold 占比仅 '+goldPct.toFixed(1)+'%（<25%），建议优先补充高质量经典原文引用到 trust ≥ 0.85'});
+  else if(goldPct>=40) advices.push({icon:'🥇', sev:'good', text:'Gold 占比 '+goldPct.toFixed(0)+'%，质量优秀，继续保持'});
+  // 2. Need Fix
+  if(s.needs_fix>0) advices.push({icon:'⚠️', sev:fixPct>5?'danger':'warn', text:s.needs_fix+' 条 trust < 0.4（'+fixPct.toFixed(1)+'%），建议补内容或升级 trust_score'});
+  else advices.push({icon:'✅', sev:'good', text:'无 trust < 0.4 条目，全部达标'});
+  // 3. Avg trust
+  if(s.avg_trust<0.7) advices.push({icon:'📉', sev:'warn', text:'平均 trust '+s.avg_trust+' < 0.70，低于及格线，需要整体补强'});
+  else if(s.avg_trust>=0.8) advices.push({icon:'📈', sev:'good', text:'平均 trust '+s.avg_trust+' ≥ 0.80，质量优良'});
+  // 4. Module count
+  if(s.module_cnt<40) advices.push({icon:'📦', sev:'warn', text:'仅 '+s.module_cnt+' 个模块，建议扩展到 60+ 模块覆盖更多术数领域'});
+  // 5. Bronze 占比
+  const bronzePct=t>0?(s.bronze/t*100):0;
+  if(bronzePct>15) advices.push({icon:'🥉', sev:'warn', text:'Bronze 占比 '+bronzePct.toFixed(0)+'%（>15%），'+s.bronze+' 条内容偏短或引用不足，建议补充原文和出处'});
+  // 渲染
+  const html = advices.map(a=>{
+    const color=a.sev==='danger'?'#f44336':a.sev==='warn'?'#c9a84c':'#10b981';
+    const bg=a.sev==='danger'?'rgba(244,67,54,.06)':a.sev==='warn'?'rgba(201,168,76,.06)':'rgba(16,185,129,.06)';
+    return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 14px;background:'+bg+';border:1px solid '+color+'33;border-radius:8px;margin-bottom:8px;font-size:13px;line-height:1.6">'+
+      '<span style="font-size:18px;flex-shrink:0">'+a.icon+'</span>'+
+      '<span style="color:#ddd">'+a.text+'</span>'+
+    '</div>';
+  }).join('');
+  // 查找或创建 gov panel
+  let govEl=document.getElementById('govPanel');
+  if(!govEl){
+    govEl=document.createElement('div');
+    govEl.id='govPanel';
+    govEl.style.cssText='margin:20px 0;padding:16px;background:rgba(13,17,23,.5);border:1px solid rgba(201,168,76,.1);border-radius:12px';
+    govEl.innerHTML='<h2 style="font-size:14px;font-weight:600;color:#c9a84c;margin:0 0 12px;border-bottom:1px solid rgba(201,168,76,.1);padding-bottom:8px">盾 治理建议</h2><div id="govList">'+html+'</div>';
+    // 插入到 distro 后
+    const distro=document.getElementById('distro');
+    if(distro && distro.nextSibling) distro.parentNode.insertBefore(govEl, distro.nextSibling);
+    else document.querySelector('.wrap').insertBefore(govEl, document.getElementById('grid'));
+  } else {
+    document.getElementById('govList').innerHTML=html;
+  }
+}
+
+function render(){
+  if(!DATA) return;
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  const gf=document.getElementById('gradeFilter').value;
+  let mods=DATA.modules.filter(m=>{
+    if(q&&!m.module.toLowerCase().includes(q)) return false;
+    if(gf&&m.grade!==gf) return false;
+    return true;
+  });
+  document.getElementById('grid').innerHTML=mods.map(m=>{
+    const t=m.cnt;
+    const gp=(m.gold/t*100).toFixed(0);
+    const sp=(m.silver/t*100).toFixed(0);
+    const bp=(m.bronze/t*100).toFixed(0);
+    const fp=m.needs_fix?(m.needs_fix/t*100).toFixed(0):0;
+    return `<button class="mod" onclick="showDetail('${m.module}')" aria-label="${m.module} 模块详情">
+      <div class="mod-head">
+        <span class="mod-name">${m.module}</span>
+        <span class="mod-grade ${gradeClass(m.grade)}">${m.grade}</span>
+      </div>
+      <div class="mod-bar">
+        <div class="seg seg-gold" style="width:${gp}%"></div>
+        <div class="seg seg-silver" style="width:${sp}%"></div>
+        <div class="seg seg-bronze" style="width:${bp}%"></div>
+        ${fp?`<div class="seg seg-fix" style="width:${fp}%"></div>`:''}
+      </div>
+      <div class="mod-meta">
+        <span><b>${fmt(m.cnt)}</b> 条目</span>
+        <span>trust <b>${m.avg_trust}</b></span>
+        <span>金${m.gold} 🥈${m.silver} 🥉${m.bronze}${m.needs_fix?' ⚠'+m.needs_fix:''}</span>
+      </div>
+    </button>`;
+  }).join('')||'<p style="color:#888;text-align:center;grid-column:1/-1">无匹配模块</p>';
+}
+
+load();
+
+// === 模块详情 Modal ===
+function showDetail(mod){
+  const m=DATA.modules.find(x=>x.module===mod);
+  if(!m) return;
+  // R95-b: 复用 R94 hash 机制，跳 KB 知识图谱并自动聚焦+高亮+弹 modal
+  document.getElementById('modalKbGraphLink').href=`kb-graph.html#module=${encodeURIComponent(mod)}`;
+  document.getElementById('modalTitle').textContent=`${m.module} · ${m.grade}`;
+  document.getElementById('modalStats').innerHTML=`
+    <span>图 <b>${fmt(m.cnt)}</b> 条目</span>
+    <span>标 trust <b>${m.avg_trust}</b></span>
+    <span>金 <b>${m.gold}</b> 🥈 <b>${m.silver}</b> 🥉 <b>${m.bronze}</b>${m.needs_fix?' ⚠<b>'+m.needs_fix+'</b>':''}</span>
+    <span>↕ min <b>${m.min_trust?.toFixed(2)||'-'}</b> / max <b>${m.max_trust?.toFixed(2)||'-'}</b></span>
+  `;
+  document.getElementById('modalSamples').innerHTML='<p style="color:#888">加载中…</p>';
+  document.getElementById('modalDetail').innerHTML='<p style="color:#888">加载中…</p>';
+  document.getElementById('modal').classList.add('show');
+  const dlg=document.getElementById('modal');
+  if(typeof dlg.showModal==='function'){try{dlg.showModal();}catch(e){}}
+  switchTab('samples');
+  // 拉样本
+  fetch(`/api/public/kb-query?q=*&module=${encodeURIComponent(mod)}&limit=8`,{signal:AbortSignal.timeout(15000)})
+    .then(r=>r.json())
+    .then(j=>{
+      const list=(j.data&&j.data.results)||j.results||[];
+      if(!list.length){document.getElementById('modalSamples').innerHTML='<p style="color:#888">无样本</p>';return;}
+      document.getElementById('modalSamples').innerHTML=list.slice(0,8).map(e=>`
+        <div class="sample">
+          <div class="t">${esc(e.title||e.entry_id)} <span style="color:#888;font-weight:400;font-size:.75rem">trust ${e.trust_score||'-'}</span></div>
+          <div class="c">${esc((e.snippet||e.content||'').slice(0,150))}${(e.snippet||e.content)&&((e.snippet||e.content).length>150)?'…':''}</div>
+        </div>`).join('');
+    })
+    .catch(err=>{
+      document.getElementById('modalSamples').innerHTML=`<p style="color:#c66">查阅失败：${err.message}</p>`;
+    });
+  // === R58: 拉详情 (trust 分布 + top/bottom 5) ===
+  fetch(`/api/kb/quality-report?module=${encodeURIComponent(mod)}&detail=true`,{signal:AbortSignal.timeout(15000)})
+    .then(r=>r.json())
+    .then(j=>{
+      const d=j.detail;
+      if(!d){document.getElementById('modalDetail').innerHTML='<p style="color:#888">无详情</p>';return;}
+      const total=d.trustDistro.reduce((s,x)=>s+x.cnt,0);
+      const colors={'🥇 gold (≥0.9)':'#fbbf24','🥈 high (0.8-0.9)':'#60a5fa','🥉 silver (0.7-0.8)':'#a78bfa','⚪ bronze (0.5-0.7)':'#94a3b8','⚠️ low (0.4-0.5)':'#fb923c','🚨 fix (<0.4)':'#ef4444'};
+      const distroHtml=d.trustDistro.map(x=>`
+        <div class="distro-row">
+          <div class="lbl">${x.bucket}</div>
+          <div class="bar"><div class="bar-fill" style="width:${(x.cnt/total*100).toFixed(1)}%;background:${colors[x.bucket]||'#888'}"></div></div>
+          <div class="cnt">${x.cnt}</div>
+        </div>`).join('');
+      const topHtml=d.topTrust.map(e=>`<div class="row high"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
+      const lowHtml=d.lowTrust.map(e=>`<div class="row low"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
+      document.getElementById('modalDetail').innerHTML=`
+        <h4 style="color:#aaa;font-size:.85rem;margin:12px 0 8px">图 Trust 分布（共 ${fmt(total)} 条）</h4>
+        ${distroHtml}
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">冠 Trust Top 5</h4>
+        <div class="trust-list">${topHtml}</div>
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">警 Trust Bottom 5</h4>
+        <div class="trust-list">${lowHtml}</div>`;
+    })
+    .catch(err=>{
+      document.getElementById('modalDetail').innerHTML=`<p style="color:#c66">查阅失败：${err.message}</p>`;
+    });
+}
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  document.getElementById('tab-samples').style.display=name==='samples'?'':'none';
+  document.getElementById('tab-detail').style.display=name==='detail'?'':'none';
+}
+function closeModal(){
+  const dlg=document.getElementById('modal');
+  if(typeof dlg.close==='function'){try{dlg.close();}catch(e){}}
+  dlg.classList.remove('show');
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+function exportCSV(){
+  if(!DATA) return;
+  const rows=[['module','count','avg_trust','min_trust','max_trust','gold','silver','bronze','needs_fix','grade']];
+  DATA.modules.forEach(m=>rows.push([m.module,m.cnt,m.avg_trust,m.min_trust,m.max_trust,m.gold,m.silver,m.bronze,m.needs_fix,m.grade]));
+  const csv='\ufeff'+rows.map(r=>r.map(c=>`"${(c+'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`kb-quality-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+</script>
+<script src="js/mobile-nav.js" defer></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

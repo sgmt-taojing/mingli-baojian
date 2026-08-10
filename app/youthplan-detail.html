@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5, user-scalable=yes">
+<meta name="theme-color" var(--ink)>
+<meta property="og:title" content="青少年专属规划 · 易道智鉴">
+<meta property="og:description" content="青少年定制化成长规划引擎：分阶段重点 / 学科兴趣性格健康评分 / 时间轴 / 行动清单。可分享、可打印。">
+<meta property="og:type" content="website">
+<title>青少年专属规划 · 易道智鉴</title>
+<meta name="description" content="青少年定制化成长规划引擎：分阶段重点 / 学科兴趣性格健康评分 / 时间轴 / 行动清单。可分享、可打印。">
+<meta name="keywords" content="青少年专属规划">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/youthplan-detail.html">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/youthplan-detail-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<style>
+@media print{
+  .page-header-bar,.phb-back,.btn,button,.no-print,header,footer,.flow-steps-wrap,.skip-link,a[style*="fixed"]{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt;line-height:1.5;padding:0!important}
+  .wrap{max-width:100%!important;padding:0!important}
+  h1{color:black!important;font-size:18pt}
+  .card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important;color:black!important;page-break-inside:avoid}
+  .card h2{color:black!important}
+  .report{padding:0!important}
+  label{color:#333!important}
+  input,select,textarea{color:black!important;background:white!important;border:1px solid #ccc!important}
+  h1,h2,h3{page-break-after:avoid;color:black!important}
+  a[href]:after{content:" ("attr(href)")";font-size:9pt;color:#666}
+  img{max-width:100%!important}
+  .print-only{display:block!important}
+}
+</style>
+</head>
+<body class="theme-zhouyi">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">青少年专属规划</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看阶段</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>领域建议</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>教育规划</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>行动清单</span></div></div>
+<div class="flow-hint">家长为青少年生成专属规划，按学段评估+行动清单。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div class="wrap">
+  <header>
+    <h1>青少年专属规划</h1>
+    <p>分阶段成长引擎 · 易道智鉴</p>
+  </header>
+
+  <!-- 输入区 -->
+  <div class="card" id="input">
+    <h2>表 孩子信息</h2>
+    <label for="yName">姓名/昵称</label>
+    <input aria-label="yName" id="yName" placeholder="例：小明" value="">
+    <div class="row">
+      <div>
+        <label for="yGrade">当前学段</label>
+        <select aria-label="yGrade" id="yGrade">
+          <option value="kindergarten">学龄前（3-6岁）</option>
+          <option value="primary" selected>小学（7-12岁）</option>
+          <option value="junior">初中（13-15岁）</option>
+          <option value="senior">高中（16-18岁）</option>
+          <option value="college">大学（19-22岁）</option>
+        </select>
+      </div>
+      <div>
+        <label for="yScore">学业表现</label>
+        <select aria-label="yScore" id="yScore">
+          <option value="excellent">优秀（前 10%）</option>
+          <option value="good">良好（前 30%）</option>
+          <option value="average" selected>一般（中等）</option>
+          <option value="needImprove">待提高</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="yBirthplace">出生地（可选）</label>
+        <input aria-label="yBirthplace" id="yBirthplace" placeholder="例：北京">
+      </div>
+      <div>
+        <label for="yResidence">现居地（可选）</label>
+        <input aria-label="yResidence" id="yResidence" placeholder="例：上海">
+      </div>
+    </div>
+    <label for="yExpect">家长期望（可选）</label>
+    <textarea id="yExpect" placeholder="例：希望培养数学思维 + 体魄健壮" aria-label="例：希望培养数学思维 + 体魄健壮"></textarea>
+    <button class="btn" id="genBtn" onclick="generate()">光 生成专属规划</button>
+  </div>
+
+  <!-- 报告区 -->
+  <div class="report" id="report"></div>
+
+  <!-- footer -->
+  <p style="text-align:center;font-size:11px;opacity:.85;margin:24px 0;letter-spacing:1px">易道智鉴 · 仅供参考 · 命数只占 30%，努力占 70%</p>
+</div>
+
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/youthplan-detail-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

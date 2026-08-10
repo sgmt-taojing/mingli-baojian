@@ -1,0 +1,617 @@
+/**
+ * a11y-fix.css · 节点 9.2 P0 公共修补
+ *
+ * 作用：
+ * 0. :root CSS 变量 token 兜底（确保所有页面都有色彩定义）
+ * 1. 通用 focus-visible 替代 outline:none
+ * 2. skip-link 默认隐藏、聚焦时显示
+ * 3. prefers-reduced-motion 尊重
+ * 4. prefers-color-scheme 自动暗黑
+ * 5. WCAG 强制对比度补充
+ *
+ * 用法：HTML <head> 引入
+ *   <link rel="stylesheet" href="css/a11y-fix.css">
+ */
+
+/* ─── 0. :root token 兜底 — 防止 var() 解析失败 ─── */
+:root {
+  --ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;
+  --paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#c8b89c;
+  --gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;
+  --cinn:#c0392b;--cinn2:#e74c3c;
+  --cyan:#2980b9;--cyan2:#5dade2;
+  --jade:#27ae60;--jade2:#2ecc71;
+  --violet:#8e44ad;--violet2:#a569bd;
+  --orange:#e67e22;--emerald:#16a085;
+  --steel:#607d8b;--wood:#8B4513;--wood2:#A0522D;
+  --earth:#8B7355;--earth2:#A0826D;
+  --metal:#B8860B;--metal2:#DAA520;
+  --fire:#e74c3c;--fire2:#c0392b;
+  --danger:#c0392b;--success:#27ae60;--warn:#e67e22;
+  --font-serif:'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif;
+  --font-mono:'Cutive Mono','Courier New',monospace;
+  --title:var(--gold);--muted:var(--paper3);--accent:var(--gold);
+  --bg:var(--ink);--bg-card:rgba(255,255,255,0.04);
+  --card:rgba(255,255,255,0.04);--card2:rgba(255,255,255,0.06);
+  --border:rgba(201,168,76,.15);--shadow:0 4px 24px rgba(0,0,0,.5);
+  --text:var(--paper);--text-dim:var(--paper3);
+  /* ── R321 补充变量 — 消除 22 个页面的 var() 解析失败 ── */
+  --bg2:rgba(255,255,255,0.06);--bg3:rgba(255,255,255,0.08);
+  --ok:#27ae60;--err:#c0392b;--info:#2980b9;--warn:#e67e22;
+  --purple:#8e44ad;--pink:#e91e63;--brown:#8B4513;
+  --dim:rgba(255,255,255,0.3);--panel:rgba(255,255,255,0.04);
+  --bd:rgba(201,168,76,.15);--bd2:rgba(201,168,76,.25);
+  --muted2:rgba(240,232,216,0.5);--tx:var(--paper);
+}
+
+/* ─── 1. focus-visible：键盘聚焦时显示焦点环，鼠标点击不显 ─── */
+/* 用 !important 保证胜出页面级 inline CSS 的 .input-field{ outline:none } 等 */
+*:focus-visible {
+  outline: 3px solid var(--ml-accent, #d4af37) !important;
+  outline-offset: 3px !important;
+  border-radius: 3px;
+  box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.18) !important;
+}
+/* 默认情况下（鼠标点击）隐藏 — 但 !important 仅对键盘焦点生效 */
+*:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+/* ─── 1.1 兜底：常见页面 input/textarea/select 的 focus-visible ─── */
+.input-field:focus-visible,
+.ask-input:focus-visible,
+.pf-input:focus-visible,
+.ai-qa input:focus-visible,
+.mode-selector select:focus-visible,
+.rename-textarea:focus-visible,
+.search-input:focus-visible,
+input[type="text"]:focus-visible,
+input[type="search"]:focus-visible,
+input[type="email"]:focus-visible,
+input[type="password"]:focus-visible,
+input[type="number"]:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--ml-accent, #d4af37) !important;
+  outline-offset: 2px !important;
+  border-color: var(--ml-accent, #d4af37) !important;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.18) !important;
+}
+
+/* ─── 2. skip-link：跳过导航直达主内容 ─── */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  z-index: 2147483647;
+  background: var(--ml-accent, #d4af37);
+  color: #000;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: top .2s;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 8px;
+}
+
+/* ─── 3. prefers-reduced-motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ─── 4. 颜色对比度强制 (AA 标准 4.5:1) ─── */
+.btn-link, a {
+  text-decoration-skip-ink: auto;
+}
+button:focus-visible,
+a:focus-visible {
+  outline-color: var(--ml-accent, #d4af37);
+}
+
+/* ─── 5. ml-toast aria-live 容器化（节点 9.2 P0-6） ─── */
+ml-toast { display: block; }
+
+/* ─── 6. ml-modal 焦点环加强 ─── */
+ml-modal:not([open]) > [part="backdrop"] { display: none; }
+
+/* ─── 7. 表单必填 * 标记 ─── */
+[aria-required="true"] + label::after,
+label[for] > .required-mark {
+  content: " *";
+  color: var(--err, #ef4444);
+}
+
+/* ─── 8. sr-only：屏幕阅读器可读但视觉隐藏（节点 9 节点 1） ─── */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ─── 9. 假按钮改造后 button 重置（节点 16.1 div→button 化） ─── */
+.a11y-btn-reset {
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  font: inherit !important;
+  font-family: inherit !important;
+  color: inherit !important;
+  cursor: pointer !important;
+  text-align: inherit !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+.a11y-btn-reset:focus-visible {
+  outline: 2px solid var(--accent, #c9a84c) !important;
+  outline-offset: 2px !important;
+}
+
+/* ─── 7. WCAG 2.1 AA color-contrast 修补（节点 9.2 P1）──── */
+/* 目标：所有 < 4.5:1 的文本对比度提升到 ≥ 4.5:1 */
+/* 策略：
+ *   - var(--gold)  → 用 var(--gold2) 提亮
+ *   - var(--paper3) 在小字号 → 用 var(--paper2) 提亮
+ *   - opacity 0.3~0.6 文本 → 提升到 0.85
+ *   - active tab 白字金底 → 黑字金底
+ *   - 金字纸底 (#d4c9b0) → 用 var(--gold3) 深金
+ */
+
+/* 7.1 .hero-eyebrow：旧 gold+opacity:0.85 → gold2+opacity:.85 */
+.hero-eyebrow {
+  color: var(--gold2) !important;
+  opacity: 0.85 !important;
+}
+
+/* 7.2 任何小字号 (≤ 12px) + 金色/暗色文本 → 提亮 */
+/* 使用硬编码 fallback (因为 a11y-fix.css 不依赖 hub 的 :root token) */
+.tab-name, .file-nav-btn, .kbe-engine {
+  color: #f0e8d8 !important;
+}
+.tab-name {
+  color: #d4c9b0 !important;
+  font-weight: 500;
+}
+.file-nav-btn {
+  color: #d4c9b0 !important;
+  background-color: #080808 !important;
+  border-color: rgba(201, 168, 76, 0.3) !important;
+}
+.file-nav-btn:hover {
+  background-color: rgba(201, 168, 76, 0.12) !important;
+  color: #e8cc7a !important;
+}
+.file-nav-btn.active {
+  background-color: #c9a84c !important;
+  color: #080808 !important;
+  border-color: #c9a84c !important;
+}
+
+/* 7.3 active tab/class 状态白字金底 → 改深色 */
+button.active[role="tab"],
+button[role="tab"].active,
+.tab.active,
+[class*="tab"].active,
+.tab-btn.active,
+[class*="tab-btn"].active,
+.const-tab.active,
+[class*="const-tab"].active {
+  color: #080808 !important;
+  background-color: #e8cc7a !important;
+  border-color: #e8cc7a !important;
+}
+
+/* 7.3b ml-tab Web Component 内部按钮 */
+ml-tab button.active,
+ml-tab [role="tab"].active,
+ml-tab .tab.active {
+  color: #080808 !important;
+  background-color: #e8cc7a !important;
+}
+
+/* 7.3c ml-tap 主平台 ml-tap 内部 active 状态 */
+ml-tap .active,
+ml-tap [class*="active"] {
+  color: #080808 !important;
+  background-color: #e8cc7a !important;
+}
+
+/* 7.5 默认 <a> 蓝色对深背景对比度不够 → 仅覆盖无 class 的 */
+a:not([class]):not([style*="color"]) {
+  color: #5dade2;
+}
+a:not([class]):not([style*="color"]):visited {
+  color: #a8c8e8;
+}
+
+/* 7.4 低 opacity 文本提升（≤ 0.65 提到 0.85） */
+[style*="opacity:0.85"],
+[style*="opacity:0.85"],
+[style*="opacity:0.85"],
+[style*="opacity:0.85"],
+[style*="opacity:0.85"],
+[style*="opacity:0.85"],
+[style*="opacity:0.85"],
+[style*="opacity:0.85"] {
+  /* 不强制 opacity 改 — 用户明确指定 — 但确保下方文字可读 */
+  text-shadow: 0 0 1px #080808, 0 0 2px #080808;
+  color: #e8cc7a !important;
+}
+[style*="opacity:.8"],
+[style*="opacity:0.8"] {
+  color: #d4c9b0 !important;
+}
+
+/* 7.5 .warning 红字暗底 → 提亮红色 */
+.warning {
+  color: #e8a09a !important;
+  background-color: rgba(186, 62, 50, 0.12) !important;
+  padding: 12px 16px;
+  border-left: 3px solid #e8a09a;
+}
+
+/* 7.6 .nav-section-title 暗色 → 提亮 */
+.nav-section-title {
+  color: var(--paper2) !important;
+  opacity: 0.85 !important;
+}
+
+/* 7.7 .cn-name / 金色文字 on 浅色背景 → 深金 */
+.cn-name, [class*="cn-name"] {
+  color: #a08030 !important;
+  font-weight: 600;
+}
+
+/* 7.8 summary/details 摘要按钮 — 12px 提升到 14px */
+summary {
+  font-size: 14px !important;
+  color: #f0e8d8 !important;
+}
+
+/* 7.9 .shichen-time / 暗色时段文字 → 提亮 */
+.shichen-time {
+  color: #d4c9b0 !important;
+  opacity: 0.85 !important;
+}
+
+/* 7.10 .kbe-engine (KB 搜索引擎标题) */
+.kbe-engine {
+  color: #e8cc7a !important;
+}
+
+/* 7.11 .hero-eyebrow inline style (overrides CSS) */
+[style*="hero-eyebrow"] {
+  color: #e8cc7a !important;
+  opacity: 0.85 !important;
+}
+
+/* 7.12 invisible span 显示问题修复 */
+[hidden], .hidden {
+  display: none !important;
+}
+
+/* 7.13 暗背景上金/暗文字 inline style 提亮 */
+[style*="color:var(--gold)"] {
+  color: #e8cc7a !important;
+}
+[style*="color:var(--paper3)"] {
+  color: #d4c9b0 !important;
+}
+[style*="color:var(--violet)"] {
+  color: #d0a0e8 !important;
+}
+[style*="color:var(--cyan)"] {
+  color: #7dc5ef !important;
+}
+[style*="color:var(--cyan2)"] {
+  color: #7dc5ef !important;
+}
+
+/* 7.14 .btn / .button 主操作按钮 */
+.btn, .button, .pill-btn {
+  color: #080808 !important;
+  background-color: #e8cc7a !important;
+  border-color: #e8cc7a !important;
+  font-weight: 600;
+}
+
+/* 7.15 fengshui .ab-name 低 opacity → 提亮 */
+.ab-name {
+  opacity: 1 !important;
+  color: #f0e8d8 !important;
+}
+.ab-cell {
+  background: rgba(255,255,255,.06) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+ * R-P3-17.4 通用响应式 reflow（覆盖 65 引用 a11y-fix.css 的页面）
+ * 策略：
+ *   - 768px：水平 grid → 2 列；字号 -1；padding 收缩
+ *   - 320px：进一步单列；导航纵向；字号 -2
+ *   - 不依赖 :root 变量（与 hub 解耦）
+ * ════════════════════════════════════════════════════════════ */
+
+/* ─── 通用元素基础 ─── */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  h1 { font-size: 22px !important; line-height: 1.3 !important; }
+  h2 { font-size: 19px !important; line-height: 1.3 !important; }
+  h3 { font-size: 16px !important; line-height: 1.4 !important; }
+  h4 { font-size: 15px !important; line-height: 1.4 !important; }
+  
+  /* grid 通用 */
+  [style*="grid-template-columns:repeat(3"],
+  [style*="grid-template-columns:repeat(4"],
+  [style*="grid-template-columns:repeat(5"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* flex wrap */
+  [style*="display:flex"][style*="gap"] {
+    flex-wrap: wrap !important;
+  }
+  
+  /* 容器 padding 收缩 */
+  .wrap, .container, .main-container, .page-container, .content {
+    padding: 12px !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* toolbar 多按钮换行 */
+  .toolbar, .toolbar-row, .actions, .action-row, .button-group {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .toolbar button, .toolbar select, .toolbar input {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+  }
+  
+  /* 表格 → 卡片式滚动 */
+  table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* 模态适配 */
+  .modal-box, .modal-content, .modal-dialog {
+    width: calc(100vw - 24px) !important;
+    max-width: 100% !important;
+    margin: 12px !important;
+  }
+  
+  /* 隐藏次要 toolbar 项 */
+  .toolbar .sep { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 13px; }
+  h1 { font-size: 20px !important; }
+  h2 { font-size: 17px !important; }
+  
+  /* grid → 1 列 */
+  [style*="grid-template-columns:repeat(2"],
+  [style*="grid-template-columns:repeat(3"],
+  [style*="grid-template-columns:repeat(4"],
+  [style*="grid-template-columns:repeat(5"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 320px) {
+  body { font-size: 12px; padding: 0 !important; }
+  h1 { font-size: 18px !important; }
+  h2 { font-size: 15px !important; }
+  h3 { font-size: 14px !important; }
+  
+  .wrap, .container, .main-container, .page-container, .content {
+    padding: 8px !important;
+  }
+  
+  .toolbar button, .toolbar select {
+    font-size: 11px !important;
+    padding: 3px 6px !important;
+  }
+  
+  /* 输入框全宽 */
+  input[type="text"], input[type="search"], textarea, select {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+ * 命理宝鉴 · 全平台设计规范组件 (R292)
+ * 统一卡片/按钮/导航/表格/面板/标签/状态
+ * ═══════════════════════════════════════════════════ */
+
+/* ─── 统一卡片 ─── */
+.mlb-card{
+  display:block;padding:18px;border:1px solid rgba(201,168,76,.18);
+  border-radius:14px;background:rgba(201,168,76,.03);
+  cursor:pointer;transition:all .3s ease;color:var(--paper);
+  text-decoration:none;position:relative;overflow:hidden;
+}
+.mlb-card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.45);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.mlb-card .mlb-symbol{font-size:28px;display:block;margin-bottom:8px}
+.mlb-card .mlb-name{font-size:16px;color:var(--gold);font-weight:600;margin-bottom:4px;letter-spacing:2px;transition:color .3s}
+.mlb-card:hover .mlb-name{color:var(--gold2)}
+.mlb-card .mlb-desc{font-size:12px;color:var(--paper2);line-height:1.7;opacity:.78}
+.mlb-card .mlb-go{margin-top:10px;font-size:11px;color:var(--cyan2);opacity:.7;letter-spacing:1.5px}
+
+/* ─── 统一按钮 ─── */
+.mlb-btn{
+  padding:10px 16px;border:1px solid var(--border,rgba(201,168,76,.18));
+  border-radius:8px;background:rgba(26,29,39,.8);color:var(--paper);
+  font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.mlb-btn:hover{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.mlb-btn-primary{border-color:var(--jade);background:rgba(46,204,113,.12);color:var(--jade)}
+.mlb-btn-warn{border-color:var(--orange);background:rgba(230,126,34,.12);color:var(--orange)}
+.mlb-btn-danger{border-color:var(--cinn);background:rgba(192,57,43,.12);color:var(--cinn)}
+.mlb-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ─── 统一面板 ─── */
+.mlb-panel{
+  background:rgba(20,24,33,.8);border:1px solid rgba(37,42,54,.6);
+  border-radius:12px;padding:16px;margin-bottom:12px;
+}
+.mlb-panel-title{font-size:14px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.mlb-panel-title .mlb-badge{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(46,204,113,.15);color:var(--jade)}
+
+/* ─── 统一标签 ─── */
+.mlb-tag{
+  display:inline-block;font-size:11px;padding:2px 8px;
+  border-radius:4px;border:1px solid rgba(201,168,76,.2);
+  color:var(--gold);background:rgba(201,168,76,.06);
+}
+.mlb-tag-jade{border-color:rgba(46,204,113,.2);color:var(--jade);background:rgba(46,204,113,.06)}
+.mlb-tag-cinn{border-color:rgba(192,57,43,.2);color:var(--cinn);background:rgba(192,57,43,.06)}
+.mlb-tag-blue{border-color:rgba(74,158,255,.2);color:var(--cyan2);background:rgba(74,158,255,.06)}
+
+/* ─── 统一状态点 ─── */
+.mlb-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.mlb-dot-ok{background:var(--jade)}.mlb-dot-warn{background:var(--orange)}.mlb-dot-danger{background:var(--cinn)}
+
+/* ─── 统一表格 ─── */
+.mlb-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.mlb-table th{text-align:left;color:var(--muted,#8b8fa3);font-weight:600;padding:6px 8px;border-bottom:1px solid rgba(37,42,54,.6)}
+.mlb-table td{padding:6px 8px;border-bottom:1px solid rgba(37,42,54,.4)}
+.mlb-table tr:hover td{background:rgba(74,158,255,.03)}
+
+/* ─── 统一指标卡 ─── */
+.mlb-metric{
+  background:rgba(14,17,23,.8);border:1px solid rgba(37,42,54,.6);
+  border-radius:10px;padding:14px;text-align:center;
+}
+.mlb-metric .mlb-metric-label{font-size:.7rem;color:#8b8fa3;text-transform:uppercase;letter-spacing:1px}
+.mlb-metric .mlb-metric-value{font-size:1.6rem;font-weight:700;margin:4px 0}
+.mlb-metric.mlb-ok{border-color:rgba(46,204,113,.3)}
+.mlb-metric.mlb-warn{border-color:rgba(230,126,34,.3)}
+.mlb-metric.mlb-danger{border-color:rgba(192,57,43,.3)}
+
+/* ─── 统一输入框 ─── */
+.mlb-input{
+  flex:1;padding:10px 14px;border:1px solid rgba(37,42,54,.6);
+  border-radius:8px;background:rgba(14,17,23,.8);color:var(--paper);
+  font-size:13px;transition:border-color .2s;
+}
+.mlb-input:focus{outline:none;border-color:var(--jade)}
+
+/* ─── 统一网格 ─── */
+.mlb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.mlb-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:768px){.mlb-grid{grid-template-columns:repeat(2,1fr);gap:10px}.mlb-grid-2{grid-template-columns:1fr}}
+
+/* ─── 四层体系标识色 ─── */
+.mlb-layer-1{border-left:3px solid var(--gold)} /* 周易服务大众 */
+.mlb-layer-2{border-left:3px solid var(--jade)} /* 周易+中医服务患者 */
+.mlb-layer-3{border-left:3px solid var(--cyan2)} /* 人机交互服务家庭 */
+.mlb-layer-core{border-left:3px solid var(--violet)} /* 核心知识库 */
+
+/* ─── 全平台导航条 ─── */
+.mlb-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:9000;
+  display:flex;justify-content:center;gap:0;
+  background:rgba(10,8,5,.96);backdrop-filter:blur(12px);
+  border-top:1px solid rgba(201,168,76,.15);padding:6px 0;
+  max-width:100%;overflow-x:auto;
+}
+.mlb-nav a{
+  flex:0 0 auto;padding:6px 12px;font-size:11px;color:var(--gold);
+  text-decoration:none;white-space:nowrap;opacity:.7;transition:opacity .2s;
+}
+.mlb-nav a:hover{opacity:1}
+
+/* R308-P0 三态UI模板（loading/empty/error） */
+.state-loading,
+.state-empty,
+.state-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 32px 16px;
+  border-radius: 12px;
+  text-align: center;
+}
+.state-loading {
+  color: var(--primary, #7c3aed);
+  background: rgba(124, 58, 237, 0.04);
+}
+.state-loading::before {
+  content: '';
+  width: 40px; height: 40px;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.state-empty {
+  color: var(--text-secondary, #666);
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+.state-empty::before {
+  content: '📭';
+  font-size: 40px;
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+.state-error {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.04);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+.state-error::before {
+  content: '⚠️';
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+.state-error .retry-btn {
+  margin-top: 12px;
+  padding: 6px 16px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* R308 暗色模式 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+  }
+  body { background: var(--bg-primary, #111827); color: var(--text-primary, #e5e7eb); }
+}

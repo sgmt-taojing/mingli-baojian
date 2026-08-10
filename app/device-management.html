@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+  <meta charset="UTF-8">
+<meta name="description" content="设备运维中心 · 易道智鉴平台">
+<meta name="keywords" content="设备运维中心">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/device-management.html">
+<meta name="theme-color" content="#050608">
+  <title>设备运维中心 · 命理宝鉴</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/divination-hub.css">
+  <style>
+    :root{--om-bg:#0a0e17;--om-paper:#e8e0d0;--om-paper2:#c9bfa8;--om-paper3:#a09888;--om-gold:#c9a84c;--om-jade:#10b981;--om-red:#ef4444;--om-cyan:#63b3ed;--om-orange:#f59e0b;--om-border:rgba(201,168,76,.18);--om-card:rgba(255,255,255,.03)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC',sans-serif;background:var(--om-bg);color:var(--om-paper);padding:10px;line-height:1.6;min-height:100vh}
+    nav{padding:6px 12px;border-bottom:1px solid var(--om-border);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200}
+    nav a{color:var(--om-gold);font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px}
+    h1{font-size:18px;color:var(--om-gold);letter-spacing:2px;padding:12px 0 4px}
+    .subtitle{font-size:11px;color:var(--om-paper3);margin-bottom:16px}
+
+    /* 概览卡片 */
+    .om-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px}
+    .om-stat{background:var(--om-card);border:1px solid var(--om-border);border-radius:8px;padding:12px;text-align:center}
+    .om-stat-num{font-size:22px;font-weight:700}
+    .om-stat-label{font-size:10px;color:var(--om-paper3);margin-top:2px}
+    .om-stat.ok .om-stat-num{color:var(--om-jade)}
+    .om-stat.warn .om-stat-num{color:var(--om-orange)}
+    .om-stat.err .om-stat-num{color:var(--om-red)}
+
+    /* 面板 */
+    .om-panel{background:var(--om-card);border:1px solid var(--om-border);border-radius:10px;padding:14px;margin-bottom:12px}
+    .om-panel-title{font-size:13px;color:var(--om-gold);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--om-border);display:flex;align-items:center;justify-content:space-between}
+    .om-panel-title .badge{font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(16,185,129,.15);color:var(--om-jade)}
+
+    /* 设备卡片 */
+    .om-device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
+    .om-device{background:rgba(0,0,0,.15);border:1px solid var(--om-border);border-radius:8px;padding:10px}
+    .om-device.online{border-left:3px solid var(--om-jade)}
+    .om-device.offline{border-left:3px solid var(--om-paper3)}
+    .om-device.error{border-left:3px solid var(--om-red)}
+    .om-device-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .om-device-name{font-size:13px;font-weight:600}
+    .om-device-status{font-size:10px;padding:2px 6px;border-radius:3px}
+    .om-device-status.online{background:rgba(16,185,129,.15);color:var(--om-jade)}
+    .om-device-status.offline{background:rgba(160,152,136,.15);color:var(--om-paper3)}
+    .om-device-status.error{background:rgba(239,68,68,.15);color:var(--om-red)}
+    .om-device-info{font-size:11px;color:var(--om-paper3);line-height:1.7}
+    .om-device-info b{color:var(--om-paper2)}
+    .om-device-actions{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+    .om-btn{padding:4px 10px;border:none;border-radius:4px;cursor:pointer;font-size:11px}
+    .om-btn-primary{background:var(--om-gold);color:#0a0e17;font-weight:600}
+    .om-btn-secondary{background:rgba(99,179,237,.15);color:var(--om-cyan);border:1px solid rgba(99,179,237,.3)}
+    .om-btn-ghost{background:transparent;border:1px solid var(--om-border);color:var(--om-paper3)}
+
+    /* 服务健康 */
+    .om-service-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(201,168,76,.06);font-size:12px}
+    .om-service-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .om-service-dot.ok{background:var(--om-jade);box-shadow:0 0 4px var(--om-jade)}
+    .om-service-dot.err{background:var(--om-red);box-shadow:0 0 4px var(--om-red)}
+    .om-service-name{flex:1;color:var(--om-paper)}
+    .om-service-url{font-size:10px;color:var(--om-paper3);min-width:140px}
+    .om-service-latency{font-size:11px;color:var(--om-cyan);min-width:60px;text-align:right}
+    .om-service-actions{display:flex;gap:4px}
+
+    /* 摄像头测试 */
+    .om-cam-test{display:flex;gap:12px;flex-wrap:wrap}
+    .om-cam-preview{min-width:240px}
+    .om-cam-preview video{width:240px;height:180px;background:#000;border-radius:8px;object-fit:cover}
+    .om-cam-controls{flex:1;min-width:200px}
+    .om-select{width:100%;padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--om-border);border-radius:6px;color:var(--om-paper);font-size:12px;margin-bottom:6px}
+    .om-select option{background:#1a1a2e}
+
+    /* 健康指标条 */
+    .om-health-bar{display:flex;align-items:center;gap:4px;font-size:10px;margin:2px 0}
+    .om-health-label{min-width:50px;color:var(--om-paper3)}
+    .om-health-track{flex:1;height:6px;background:rgba(255,255,255,.03);border-radius:3px;overflow:hidden}
+    .om-health-fill{height:100%;border-radius:3px;transition:.3s}
+    .om-health-val{min-width:30px;text-align:right;color:var(--om-paper2)}
+
+    /* 网络状态 */
+    .om-net-info{font-size:12px;line-height:1.8}
+    .om-net-info b{color:var(--om-paper2)}
+
+    .om-empty{color:var(--om-paper3);text-align:center;padding:20px;font-size:13px}
+    .om-hint{font-size:11px;color:var(--om-paper3);margin-top:6px;padding:6px;background:rgba(201,168,76,.04);border-radius:4px;border:1px solid rgba(201,168,76,.08)}
+
+    @media(max-width:768px){.om-device-grid{grid-template-columns:1fr}.om-overview{grid-template-columns:repeat(2,1fr)}.om-cam-test{flex-direction:column}}
+    @media(max-width:480px){
+      body{padding:6px 4px}
+      h1{font-size:16px;letter-spacing:1px;padding:8px 0 4px}
+      .subtitle{font-size:10px}
+      nav{padding:4px 8px;gap:4px}
+      nav a{font-size:10px;padding:3px 6px}
+      .om-overview{grid-template-columns:1fr 1fr;gap:6px}
+      .om-stat{padding:8px 6px}
+      .om-stat-num{font-size:18px}
+      .om-stat-label{font-size:9px}
+      .om-panel{padding:10px 8px}
+      .om-panel-title{font-size:12px}
+      .om-device-grid{grid-template-columns:1fr}
+      .om-cam-test{flex-direction:column}
+      .btn{font-size:10px;padding:5px 8px}
+    }
+    @media(max-width:360px){
+      body{padding:4px 2px;font-size:12px}
+      h1{font-size:14px;letter-spacing:0}
+      nav{flex-direction:row;overflow-x:auto;flex-wrap:nowrap;white-space:nowrap}
+      .om-overview{grid-template-columns:1fr}
+      .om-stat-num{font-size:16px}
+      .om-panel{padding:8px 6px}
+      .om-panel-title{font-size:11px}
+      .btn{width:100%;font-size:10px}
+      .om-cam-test button{width:100%}
+      .om-device-info{font-size:9px}
+      table{font-size:10px}
+      th,td{padding:4px 3px}
+    }
+  </style>
+
+  <!-- R261 inline: device-management-inline.css (7353 bytes) -->
+<style data-r261-inline="device-management-inline.css">
+/* === Extracted from device-management.html
+:root{
+  --ink:#080808; --ink2:#141414; --ink3:#1c1c1c;
+  --gold:#c9a84c; --gold2:#e3c778;
+  --paper:#f5ecd6; --paper2:#d9cfb8; --paper3:#8a7f6a;
+  --danger:#c8503e; --ok:#3e9e6b; --warn:#d4a047;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ink);color:var(--paper);font-family:'Noto Serif SC','Songti SC',serif;letter-spacing:.5px}
+body{min-height:100vh;padding:18px 14px 80px}
+.wrap{max-width:1100px;margin:0 auto}
+header{text-align:center;padding:24px 0 32px;border-bottom:1px solid rgba(201,168,76,.18);margin-bottom:28px}
+header h1{font-size:24px;color:var(--gold);letter-spacing:8px;margin:0;font-weight:500}
+header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
+
+/* === 摘要卡 === */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:28px}
+.summary-card{background:linear-gradient(135deg,var(--ink3),var(--ink2));border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden}
+.summary-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0.85}
+.summary-card .label{font-size:11px;color:var(--paper3);letter-spacing:2px;margin-bottom:8px}
+.summary-card .value{font-size:32px;color:var(--gold2);font-weight:600;line-height:1}
+.summary-card .sub{font-size:10px;color:var(--paper3);margin-top:6px;letter-spacing:1px}
+.summary-card.ok .value{color:var(--ok)}
+.summary-card.warn .value{color:var(--warn)}
+.summary-card.err .value{color:var(--danger)}
+
+/* === 设备卡片网格 === */
+.section-title{font-size:14px;color:var(--gold);letter-spacing:4px;margin:28px 0 14px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(201,168,76,.3),transparent)}
+.section-title .badge{background:rgba(201,168,76,.15);color:var(--gold);font-size:10px;padding:3px 8px;border-radius:10px;letter-spacing:1px;font-weight:400}
+
+.device-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.device-card{background:var(--ink3);border:1px solid rgba(201,168,76,.18);border-radius:var(--radius);padding:18px;position:relative;transition:all .3s}
+.device-card.online{border-color:rgba(62,158,107,.5)}
+.device-card.online::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:var(--ok);border-radius:50%;box-shadow:0 0 8px var(--ok)}
+.device-card.offline{border-color:rgba(201,168,76,.12);opacity:0.85}
+.device-card.offline::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:#555;border-radius:50%}
+.device-card.error{border-color:rgba(200,80,62,.5);background:linear-gradient(135deg,var(--ink3),rgba(200,80,62,.05))}
+.device-card.error::after{content:'';position:absolute;top:14px;right:14px;width:8px;height:8px;background:var(--danger);border-radius:50%;box-shadow:0 0 8px var(--danger);animation:devPulse 1s infinite}
+
+.device-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.device-icon{width:40px;height:40px;background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.device-name{font-size:14px;color:var(--gold2);font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.device-status{font-size:10px;padding:2px 7px;border-radius:8px;letter-spacing:1px}
+.device-status.online{background:rgba(62,158,107,.2);color:var(--ok)}
+.device-status.offline{background:rgba(85,85,85,.3);color:var(--paper3)}
+.device-status.error{background:rgba(200,80,62,.2);color:var(--danger)}
+
+.device-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;font-size:11px}
+.device-meta div{display:flex;flex-direction:column;gap:2px}
+.device-meta .meta-label{color:var(--paper3);letter-spacing:1px;font-size:9px}
+.device-meta .meta-value{color:var(--paper);font-family:monospace;font-size:11px}
+
+.device-actions{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+.dev-btn{background:rgba(201,168,76,.12);color:var(--gold);border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px;letter-spacing:1px;font-family:inherit;transition:all .15s}
+.dev-btn:hover{background:rgba(201,168,76,.25);transform:translateY(-1px)}
+.dev-btn.danger{background:rgba(200,80,62,.15);color:var(--danger)}
+.dev-btn.danger:hover{background:rgba(200,80,62,.3)}
+.dev-btn:disabled{opacity:0.85;cursor:not-allowed}
+
+/* === 健康监控区 === */
+.health-list{display:grid;gap:10px}
+.health-row{background:var(--ink3);border:1px solid rgba(201,168,76,.12);border-radius:6px;padding:14px 18px;display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center}
+.health-row .service-name{font-size:12px;color:var(--gold2);letter-spacing:1px}
+.health-row .service-url{font-size:10px;color:var(--paper3);font-family:monospace}
+.health-row .latency{font-size:12px;color:var(--paper);min-width:60px;text-align:right}
+.health-row .latency.fast{color:var(--ok)}
+.health-row .latency.slow{color:var(--warn)}
+.health-row .latency.crit{color:var(--danger)}
+.health-row .actions{display:flex;gap:6px}
+
+/* === 操作日志 === */
+.log-list{max-height:280px;overflow-y:auto;background:var(--ink2);border:1px solid rgba(201,168,76,.1);border-radius:6px;padding:10px}
+.log-entry{display:flex;gap:10px;padding:6px 0;font-size:11px;border-bottom:1px solid rgba(201,168,76,.06)}
+.log-entry:last-child{border-bottom:none}
+.log-entry .time{color:var(--paper3);font-family:monospace;flex-shrink:0}
+.log-entry .msg{flex:1;color:var(--paper)}
+.log-entry.ok .msg{color:var(--ok)}
+.log-entry.warn .msg{color:var(--warn)}
+.log-entry.err .msg{color:var(--danger)}
+
+/* === 添加设备入口 === */
+.add-device-cta{display:block;text-align:center;padding:20px;background:linear-gradient(135deg,rgba(62,158,107,.08),rgba(201,168,76,.05));border:2px dashed rgba(62,158,107,.4);border-radius:var(--radius);color:var(--ok);text-decoration:none;font-size:13px;letter-spacing:3px;transition:all .2s;margin-bottom:14px}
+.add-device-cta:hover{background:linear-gradient(135deg,rgba(62,158,107,.18),rgba(201,168,76,.08));transform:translateY(-2px)}
+
+/* === R62: 设备 KB 联动 badge === */
+.dev-kb-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:8px;font-size:10px;letter-spacing:1px;margin-right:4px;margin-top:6px}
+.dev-kb-badge.idle{background:rgba(133,133,133,.15);color:var(--paper3);border:1px solid rgba(133,133,133,.2)}
+.dev-kb-badge.active{background:rgba(62,158,107,.15);color:var(--ok);border:1px solid rgba(62,158,107,.3);animation:kbPulse 2s ease-in-out infinite}
+@keyframes kbPulse{0%,100%{box-shadow:0 0 0 rgba(62,158,107,0)}50%{box-shadow:0 0 6px rgba(62,158,107,.3)}}
+
+@media(max-width:768px){
+  header h1{font-size:18px;letter-spacing:5px}
+  .summary-grid{grid-template-columns:repeat(2,1fr)}
+  .device-grid{grid-template-columns:1fr}
+  .health-row{grid-template-columns:1fr 1fr;gap:8px}
+  .health-row .actions{grid-column:1/-1;justify-content:flex-end}
+}
+@media(max-width:320px){
+  body{padding:10px 8px 60px}
+  .summary-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .summary-card{padding:14px}
+  .summary-card .value{font-size:24px}
+}
+  */
+@media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">设备运维中心</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看设备</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>状态监控</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>配置管理</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>远程控制</span></div></div>
+<div class="flow-hint">管理员管理设备清单，配对/状态/权限。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+
+<nav>
+  <a href="divination-hub.html">主平台</a>
+  <a href="wangzhen-clinical.html">望诊工作台</a>
+  <a href="patient-archive.html">表 患者档案</a>
+</nav>
+
+<h1>拍 设备运维中心</h1>
+<div class="subtitle">设备接入 · 网络监测 · 健康度 · 服务状态 · 运维管理</div>
+
+<!-- 概览 -->
+<div class="om-overview" id="om-overview"></div>
+
+<!-- 后端服务健康 -->
+<div class="om-panel">
+  <div class="om-panel-title">屏 后端服务健康 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.checkServices()">更 刷新</button></div>
+  <div id="om-services"></div>
+</div>
+
+<!-- 摄像头设备 -->
+<div class="om-panel">
+  <div class="om-panel-title">拍 摄像头设备 <span class="badge" id="om-cam-count">检测中</span></div>
+  <div class="om-cam-test">
+    <div class="om-cam-preview">
+      <video id="om-preview" autoplay playsinline muted></video>
+    </div>
+    <div class="om-cam-controls">
+      <select id="om-cam-select" class="om-select" aria-label="选择摄像头">
+        <option value="">点击下方按钮检测</option>
+      </select>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="om-btn om-btn-primary" onclick="OpsCenter.detectCameras()">查 检测</button>
+        <button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">拍 测试</button>
+        <button class="om-btn om-btn-ghost" onclick="OpsCenter.stopCamera()">⏹ 停止</button>
+        <button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">星 设为默认</button>
+      </div>
+      <div id="om-cam-info" class="om-hint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 设备列表 -->
+<div class="om-panel">
+  <div class="om-panel-title">机 已接入设备 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.scanAll()">更 扫描</button></div>
+  <div class="om-device-grid" id="om-devices"></div>
+</div>
+
+<!-- 网络状态 -->
+<div class="om-panel">
+  <div class="om-panel-title">网 网络状态</div>
+  <div id="om-network" class="om-net-info"></div>
+</div>
+
+<!-- Rokid 眼镜 -->
+<div class="om-panel">
+  <div class="om-panel-title">智能眼镜</div>
+  <div id="om-glass"></div>
+</div>
+
+<script>
+var OpsCenter = {
+  stream: null,
+  cameras: [],
+  services: [
+    {name:'排盘API', url:'http://127.0.0.1:8911/paipan?name=test&gender=male&year=1990&month=10&day=28&hour=7&calendar=solar', key:'paipan', port:8911},
+    {name:'TTS语音', url:'http://127.0.0.1:8912/api/tts?text=test', key:'tts', port:8912},
+    {name:'面诊OCR', url:'http://127.0.0.1:8913/api/camera/health', key:'face-ocr', port:8913},
+    {name:'静态服务', url:'http://127.0.0.1:8914/wangzhen-clinical.html', key:'static', port:8914},
+    {name:'API网关', url:'http://127.0.0.1:8920/api/health', key:'api', port:8920}
+  ],
+
+  init: function(){
+    this.renderOverview();
+    this.checkServices();
+    this.detectCameras();
+    this.checkNetwork();
+    this.checkGlass();
+    // 定时刷新
+    var self = this;
+    setInterval(function(){ self.checkServices(); }, 30000); // 30秒刷新服务
+    setInterval(function(){ self.checkNetwork(); }, 10000); // 10秒刷新网络
+  },
+
+  // ===== 概览 =====
+  renderOverview: function(){
+    var html = '';
+    html += '<div class="om-stat"><div class="om-stat-num" id="ov-cam">—</div><div class="om-stat-label">摄像头</div></div>';
+    html += '<div class="om-stat"><div class="om-stat-num" id="ov-svc">—</div><div class="om-stat-label">服务在线</div></div>';
+    html += '<div class="om-stat"><div class="om-stat-num" id="ov-net">—</div><div class="om-stat-label">网络延迟</div></div>';
+    html += '<div class="om-stat"><div class="om-stat-num" id="ov-glass">—</div><div class="om-stat-label">智能眼镜</div></div>';
+    html += '<div class="om-stat"><div class="om-stat-num" id="ov-default">—</div><div class="om-stat-label">默认设备</div></div>';
+    document.getElementById('om-overview').innerHTML = html;
+  },
+
+  // ===== 服务健康 =====
+  checkServices: function(){
+    var container = document.getElementById('om-services');
+    if(!container) return;
+    container.innerHTML = '<div class="om-empty">更 正在检测服务...</div>';
+    var self = this;
+    var results = [];
+    var completed = 0;
+
+    this.services.forEach(function(svc){
+      var start = Date.now();
+      fetch(svc.url, {signal: AbortSignal.timeout(15000), mode:'cors', cache:'no-cache'}).then(function(r){
+        var latency = Date.now() - start;
+        results.push({name:svc.name, url:svc.url, port:svc.port, status:r.ok?'ok':'err', latency:latency, code:r.status});
+      }).catch(function(e){
+        results.push({name:svc.name, url:svc.url, port:svc.port, status:'err', latency:-1, error:esc(e.message)});
+      }).then(function(){
+        completed++;
+        if(completed >= self.services.length){
+          self.renderServices(results);
+          self.updateOverview('svc', results.filter(function(r){return r.status==='ok';}).length + '/' + results.length);
+        }
+      });
+    });
+  },
+
+  renderServices: function(results){
+    var html = '';
+    results.forEach(function(r){
+      var dotCls = r.status === 'ok' ? 'ok' : 'err';
+      var latencyStr = r.latency > 0 ? r.latency + 'ms' : 'N/A';
+      var latencyColor = r.latency > 0 && r.latency < 100 ? 'var(--om-jade)' : r.latency > 500 ? 'var(--om-red)' : 'var(--om-orange)';
+      html += '<div class="om-service-row">';
+      html += '<div class="om-service-dot ' + dotCls + '"></div>';
+      html += '<div class="om-service-name">' + r.name + ' <span style="font-size:10px;color:var(--om-paper3)">:' + r.port + '</span></div>';
+      html += '<div class="om-service-url">' + (r.error || (r.code + ' ' + r.url.substring(0,40))) + '</div>';
+      html += '<div class="om-service-latency" style="color:' + latencyColor + '">' + latencyStr + '</div>';
+      html += '<div class="om-service-actions"><button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.restartService(\'' + r.key + '\')">更</button></div>';
+      html += '</div>';
+    });
+    document.getElementById('om-services').innerHTML = html;
+  },
+
+  restartService: function(key){
+    // 提示重启方式
+    var hints = {
+      'paipan': 'launchctl unload/load com.mingli-baojian.paipan.plist',
+      'tts': 'launchctl unload/load com.mingli-baojian.tts.plist',
+      'face-ocr': 'launchctl unload/load com.mingli-baojian.face-ocr.plist',
+      'static': 'node scripts/lh-static-server.js',
+      'api': 'node server/api-server-v2.js'
+    };
+    showToast('重启 ' + key + '：\n\n' + (hints[key] || '手动重启'));
+  },
+
+  // ===== 摄像头检测 =====
+  detectCameras: function(){
+    var self = this;
+    var sel = document.getElementById('om-cam-select');
+    var info = document.getElementById('om-cam-info');
+    var count = document.getElementById('om-cam-count');
+    
+    if(!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices){
+      if(sel) sel.innerHTML = '<option value="">浏览器不支持</option>';
+      if(info) info.innerHTML = '⚠️ 请用 Chrome 打开 <b>http://localhost:8914</b><br>不能用 IP 地址或 file:// 打开';
+      if(count) count.textContent = '不支持';
+      this.updateOverview('cam', '0');
+      return;
+    }
+    
+    if(info) info.innerHTML = '🔍 正在请求摄像头权限...';
+    if(count) count.textContent = '检测中';
+    
+    // 关键：先 getUserMedia 获取权限，再 enumerateDevices 才能拿到 label
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(function(stream){
+      // 立即停止预览流（只是用来获取权限）
+      stream.getTracks().forEach(function(t){ t.stop(); });
+      
+      if(info) info.innerHTML = '🔍 权限已获取，正在枚举设备...';
+      
+      // 权限拿到后再枚举
+      return navigator.mediaDevices.enumerateDevices();
+    }).then(function(devices){
+      self.cameras = devices.filter(function(d){ return d.kind === 'videoinput'; });
+      
+      if(sel){
+        sel.innerHTML = '<option value="">自动选择（' + self.cameras.length + ' 个）</option>';
+        self.cameras.forEach(function(cam, i){
+          var label = cam.label || ('摄像头 ' + (i+1));
+          var o = document.createElement('option');
+          o.value = cam.deviceId;
+          o.textContent = label;
+          sel.appendChild(o);
+        });
+      }
+      
+      var saved = localStorage.getItem('default_camera_device');
+      if(saved && sel){
+        for(var i=0; i<sel.options.length; i++){
+          if(sel.options[i].value === saved){ sel.selectedIndex = i; break; }
+        }
+      }
+      
+      var savedLabel = localStorage.getItem('default_camera_label') || '';
+      if(info){
+        if(self.cameras.length === 0){
+          info.innerHTML = '⚠️ 未检测到摄像头设备<br>请检查 Type-C 摄像头是否已连接并已被系统识别';
+        } else {
+          var html = '✅ 检测到 <b>' + self.cameras.length + '</b> 个摄像头：';
+          self.cameras.forEach(function(d, i){
+            var label = d.label || ('摄像头' + (i+1));
+            var isDefault = d.deviceId === saved ? ' ⭐默认' : '';
+            html += '<br>&nbsp;&nbsp;' + (i+1) + '. ' + label + isDefault;
+          });
+          if(savedLabel) html += '<br>钉 默认设备：' + savedLabel;
+          info.innerHTML = html;
+        }
+      }
+      
+      if(count) count.textContent = self.cameras.length + ' 个';
+      self.updateOverview('cam', self.cameras.length);
+      self.renderDevices();
+    }).catch(function(err){
+      var hint = '';
+      if(err.name === 'NotAllowedError') hint = '请在 Chrome 地址栏点击摄像头图标 → 允许';
+      else if(err.name === 'NotFoundError') hint = '未检测到摄像头，请检查 Type-C 连接<br>可尝试：拔插 USB → 系统设置查看设备';
+      else if(err.name === 'NotReadableError') hint = '摄像头被其他程序占用，请关闭后重试';
+      else hint = err.message;
+      if(info) info.innerHTML = '❌ ' + (err.name || '错误') + ': ' + hint;
+      if(count) count.textContent = '失败';
+      self.updateOverview('cam', '0');
+    });
+  },
+
+  testCamera: function(){
+    var self = this;
+    var sel = document.getElementById('om-cam-select');
+    var video = document.getElementById('om-preview');
+    var info = document.getElementById('om-cam-info');
+    if(!video) return;
+    
+    if(self.stream){ self.stopCamera(); }
+    
+    var deviceId = sel ? sel.value : '';
+    var constraints = { video: true, audio: false };
+    if(deviceId){ constraints = { video: { deviceId: { exact: deviceId } }, audio: false }; }
+    
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      if(info) info.innerHTML = '❌ 浏览器不支持摄像头<br>警 请用 Chrome/Edge 通过 localhost 或 HTTPS 访问';
+      return;
+    }
+    
+    if(info) info.innerHTML = '📷 正在启动...';
+    
+    navigator.mediaDevices.getUserMedia(constraints).then(function(stream){
+      self.stream = stream;
+      video.srcObject = stream;
+      video.play().catch(function(){});
+      
+      var track = stream.getVideoTracks()[0];
+      var settings = track.getSettings();
+      var label = track.label || '未知设备';
+      var res = (settings.width||'?') + 'x' + (settings.height||'?');
+      var fps = settings.frameRate ? Math.round(settings.frameRate) + 'fps' : '?';
+      
+      if(info) info.innerHTML = '✅ 测试成功<br>设备: ' + label + '<br>分辨率: ' + res + ' | 帧率: ' + fps;
+      self.updateOverview('default', label.substring(0, 10));
+    }).catch(function(err){
+      var hint = '';
+      if(err.name === 'NotAllowedError') hint = '请在浏览器地址栏允许摄像头权限';
+      else if(err.name === 'NotFoundError') hint = '未检测到摄像头，请检查 Type-C 连接';
+      else if(err.name === 'NotReadableError') hint = '摄像头被其他程序占用';
+      else hint = err.message;
+      if(info) info.innerHTML = '❌ 启动失败: ' + hint;
+    });
+  },
+
+  stopCamera: function(){
+    if(this.stream){
+      this.stream.getTracks().forEach(function(t){ t.stop(); });
+      this.stream = null;
+    }
+    var video = document.getElementById('om-preview');
+    if(video) video.srcObject = null;
+  },
+
+  setDefault: function(){
+    var sel = document.getElementById('om-cam-select');
+    if(!sel || !sel.value){ showToast('请先检测设备并选择一个摄像头'); return; }
+    localStorage.setItem('default_camera_device', sel.value);
+    localStorage.setItem('default_camera_label', sel.options[sel.selectedIndex].textContent);
+    var info = document.getElementById('om-cam-info');
+    if(info) info.innerHTML = '⭐ 已设为默认采集设备：' + sel.options[sel.selectedIndex].textContent + '<br>望诊工作台将自动使用此设备';
+    this.updateOverview('default', sel.options[sel.selectedIndex].textContent.substring(0, 10));
+  },
+
+  // ===== 设备列表 =====
+  renderDevices: function(){
+    var grid = document.getElementById('om-devices');
+    if(!grid) return;
+    var html = '';
+    
+    // 摄像头设备
+    this.cameras.forEach(function(cam, i){
+      var label = cam.label || ('摄像头 ' + (i+1));
+      var isDefault = cam.deviceId === localStorage.getItem('default_camera_device');
+      html += '<div class="om-device online">';
+      html += '<div class="om-device-head"><div class="om-device-name">拍 ' + label + (isDefault?' ⭐':'') + '</div><div class="om-device-status online">在线</div></div>';
+      html += '<div class="om-device-info"><b>类型:</b> 视频输入<br><b>连接:</b> ' + (cam.label ? 'USB/内置' : '未知') + '<br><b>设备ID:</b> ' + cam.deviceId.substring(0,12) + '...</div>';
+      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">拍 测试</button>';
+      if(!isDefault) html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">星 设为默认</button>';
+      html += '</div></div>';
+    });
+    
+    if(this.cameras.length === 0){
+      html += '<div class="om-empty">未检测到摄像头设备<br>请连接 Type-C 摄像头后点「🔄 扫描」</div>';
+    }
+    
+    grid.innerHTML = html;
+  },
+
+  scanAll: function(){
+    var btn = event && event.target;
+    if(btn){ var orig = btn.textContent; btn.textContent = '🔄 扫描中...'; btn.disabled = true; }
+    var self = this;
+    this.detectCameras();
+    this.checkGlass();
+    setTimeout(function(){
+      if(btn){ btn.textContent = orig; btn.disabled = false; }
+    }, 3000);
+  },
+
+  // ===== 网络状态 =====
+  checkNetwork: function(){
+    var el = document.getElementById('om-network');
+    if(!el) return;
+    var self = this;
+    
+    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    var html = '';
+    
+    // 在线状态
+    html += '<b>在线状态:</b> ' + (navigator.onLine ? '✅ 在线' : '❌ 离线') + '<br>';
+    
+    // 网络类型
+    if(conn){
+      html += '<b>网络类型:</b> ' + (conn.effectiveType || '未知') + '<br>';
+      html += '<b>下行速度:</b> ' + (conn.downlink ? conn.downlink + ' Mbps' : '未知') + '<br>';
+      html += '<b>往返延迟:</b> ' + (conn.rtt ? conn.rtt + 'ms' : '未知') + '<br>';
+      html += '<b>节省模式:</b> ' + (conn.saveData ? '是' : '否') + '<br>';
+    } else {
+      html += '<b>网络类型:</b> 浏览器不支持 Network Information API<br>';
+    }
+    
+    // Ping 测试（测 8911 延迟）
+    var start = Date.now();
+    fetch('http://127.0.0.1:8911/health', {signal: AbortSignal.timeout(15000), cache:'no-cache'}).then(function(){
+      var latency = Date.now() - start;
+      html += '<b>本地服务延迟:</b> ' + latency + 'ms ' + (latency < 50 ? '✅' : latency < 200 ? '⚠️' : '❌') + '<br>';
+      el.innerHTML = html;
+      self.updateOverview('net', latency + 'ms');
+    }).catch(function(){
+      html += '<b>本地服务延迟:</b> N/A<br>';
+      el.innerHTML = html;
+      self.updateOverview('net', 'N/A');
+    });
+    
+    el.innerHTML = html;
+  },
+
+  // ===== Rokid 眼镜 =====
+  checkGlass: function(){
+    var el = document.getElementById('om-glass');
+    if(!el) return;
+    
+    var bridge = null;
+    var bridgeType = '未检测到';
+    if(window.RokidJSBridge){ bridge = window.RokidJSBridge; bridgeType = 'RokidJSBridge'; }
+    else if(window.Rokid && window.Rokid.bridge){ bridge = window.Rokid.bridge; bridgeType = 'Rokid.bridge'; }
+    else if(window.KJJSBridge){ bridge = window.KJJSBridge; bridgeType = 'KJJSBridge'; }
+    
+    var html = '';
+    if(bridge){
+      html += '<div class="om-device online" style="margin-bottom:8px">';
+      html += '<div class="om-device-head"><div class="om-device-name">Rokid 智能眼镜（眼镜端浏览器）</div><div class="om-device-status online">Bridge 就绪</div></div>';
+      html += '<div class="om-device-info"><b>Bridge:</b> ' + bridgeType + '<br><b>连接方式:</b> 眼镜内置浏览器<br>';
+      html += '<b>能力:</b> 拍照/语音/音频/手势/存储</div>';
+      html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.glassTakePhoto()">拍 拍照测试</button>';
+      html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.glassInfo()">ℹ️ 设备信息</button></div>';
+      html += '</div>';
+      this.updateOverview('glass', 'Bridge');
+    } else {
+      html += '<div class="om-device offline" style="margin-bottom:8px">';
+      html += '<div class="om-device-head"><div class="om-device-name">Rokid 智能眼镜</div><div class="om-device-status offline">未直连</div></div>';
+      html += '<div class="om-device-info">';
+      html += '<b>当前状态:</b> 桌面浏览器未检测到 RokidJSBridge<br>';
+      html += '<b>原因:</b> 蓝牙连接的是音频通道(HFP/A2DP)，不暴露 JS Bridge<br><br>';
+      html += '<b>表 接入方案（选一个）:</b><br><br>';
+      html += '<b>方案 A — 眼镜内置浏览器（推荐）</b><br>';
+      html += '&nbsp;1. 眼镜连 WiFi（和电脑同一网络）<br>';
+      html += '&nbsp;2. 眼镜打开「全屏浏览器」App<br>';
+      html += '&nbsp;3. 输入地址：https://sgmt-taojing.github.io/mingli-baojian/app/wangzhen-clinical.html<br>';
+      html += '&nbsp;4. 页面自动检测 Bridge → 激活眼镜拍照<br><br>';
+      html += '<b>方案 B — 眼镜拍照 + 桌面上传</b><br>';
+      html += '&nbsp;1. 用眼镜相机 App 拍面部/舌照<br>';
+      html += '&nbsp;2. 蓝牙传到电脑或 Rokid App 同步<br>';
+      html += '&nbsp;3. 打开 <a href="wangzhen-clinical.html" style="color:var(--om-cyan)">望诊工作台</a> → 点 上传图片<br>';
+      html += '&nbsp;4. 选择图片 → 自动 AI 分析<br><br>';
+      html += '<b>方案 C — 桌面 Type-C 摄像头（最简单）</b><br>';
+      html += '&nbsp;1. 在上方摄像头设备区点 检测<br>';
+      html += '&nbsp;2. 选择摄像头 → 测试 → 设为默认<br>';
+      html += '&nbsp;3. 直接在望诊工作台拍照分析<br><br>';
+      html += '<b>方案 D — Web Bluetooth API（实验性）</b><br>';
+      html += '&nbsp;<button class="om-btn om-btn-secondary" style="margin-top:4px" onclick="OpsCenter.scanBluetooth()">查 扫描蓝牙设备</button>';
+      html += '&nbsp;<span style="font-size:10px;color:var(--om-paper3)">需 Chrome 开启实验性功能</span><br>';
+      html += '&nbsp;<div id="om-bt-result" style="margin-top:4px"></div>';
+      html += '</div>';
+      html += '</div>';
+      this.updateOverview('glass', '未直连');
+    }
+    
+    html += '<div class="om-hint">经 Rokid 开发者文档: <a href="https://developerdoc.rokid.com/" style="color:var(--om-cyan)"  target="_blank" rel="noopener noreferrer">developerdoc.rokid.com</a></div>';
+    
+    el.innerHTML = html;
+  },
+
+  scanBluetooth: function(){
+    var result = document.getElementById('om-bt-result');
+    if(!navigator.bluetooth){
+      if(result) result.innerHTML = '⚠️ 浏览器不支持 Web Bluetooth API<br>请用 Chrome 打开 chrome://flags/#enable-experimental-web-platform-features → Enabled → 重启';
+      return;
+    }
+    if(result) result.innerHTML = '🔍 正在扫描蓝牙设备...';
+    navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['generic_access', 'device_information']
+    }).then(function(device){
+      if(result) result.innerHTML = '✅ 发现设备: <b>' + (device.name || '未知') + '</b><br>ID: ' + device.id;
+    }).catch(function(err){
+      if(result) result.innerHTML = '⚠️ ' + (err.name === 'NotFoundError' ? '未选择设备或未发现设备' : err.message);
+    });
+  },
+
+  glassTakePhoto: function(){
+    var bridge = window.RokidJSBridge || window.KJJSBridge;
+    if(!bridge){ showToast('Bridge 不可用'); return; }
+    try {
+      if(bridge.callNative){
+        bridge.callNative('camera.capture', JSON.stringify({sensor:'front'}), function(res){ showToast('拍照结果: ' + res); });
+      } else if(bridge.postMessage){
+        bridge.postMessage('camera.capture', {sensor:'front'}, function(res){ showToast('拍照结果: ' + res); });
+      }
+    } catch(e){ showToast('调用失败: ' + esc(e.message)); }
+  },
+
+  glassInfo: function(){
+    var bridge = window.RokidJSBridge || window.KJJSBridge;
+    if(!bridge){ showToast('Bridge 不可用'); return; }
+    try {
+      if(bridge.callNative){
+        bridge.callNative('device.info', '{}', function(res){ showToast('设备信息: ' + res); });
+      } else if(bridge.postMessage){
+        bridge.postMessage('device.info', {}, function(res){ showToast('设备信息: ' + res); });
+      }
+    } catch(e){ showToast('调用失败: ' + esc(e.message)); }
+  },
+
+  // ===== 更新概览 =====
+  updateOverview: function(key, val){
+    var map = {cam:'ov-cam', svc:'ov-svc', net:'ov-net', glass:'ov-glass', default:'ov-default'};
+    var el = document.getElementById(map[key]);
+    if(el) el.textContent = val;
+  }
+};
+
+OpsCenter.init();
+</script>
+
+  <script src="js/mobile-nav.js" defer></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

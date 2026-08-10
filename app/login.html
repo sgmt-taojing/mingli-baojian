@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/login.html">
+<meta charset="UTF-8">
+<meta name="description" content="登录 · 易道智鉴平台">
+<meta name="keywords" content="登录">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<title>登录 · 命理宝鉴</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{--bg:#fffbf2;--gold:#c9a227;--brown:#6b4226;--red:#c1452b;--paper:#faf5e8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--brown);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#fff;border-radius:18px;padding:40px 32px;box-shadow:0 8px 32px rgba(107,66,38,.12);width:100%;max-width:420px}
+h1{color:var(--gold);font-size:26px;text-align:center;margin-bottom:8px}
+.sub{color:#888;text-align:center;font-size:14px;margin-bottom:32px}
+.field{margin-bottom:18px}
+label{display:block;font-size:14px;color:var(--brown);margin-bottom:6px}
+input{width:100%;padding:12px 14px;border:1px solid #e5d9b8;border-radius:10px;font-size:15px;background:var(--paper);outline:none;transition:.2s}
+input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,162,39,.15)}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--gold),#a88519);color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px;transition:.2s}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(201,162,39,.4)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.tips{text-align:center;margin-top:24px;font-size:13px;color:#999}
+.tips a{color:var(--gold);text-decoration:none;margin:0 6px}
+.tips a:hover{text-decoration:underline}
+.note{margin-top:18px;padding:12px 14px;background:#fff8e1;border-left:3px solid var(--gold);border-radius:6px;font-size:13px;color:#7a6620}
+@media print{body{background:#fff!important;color:#000!important;display:block!important;padding:0!important}header.page-header-bar,.phb-back,nav,.no-print,footer{display:none!important}.card{box-shadow:none!important;border:1px solid #ddd!important;border-radius:0!important;padding:16px!important;max-width:100%!important;margin:0!important}.btn,button{display:none!important}h1{font-size:16px!important;color:#000!important}h2{font-size:14px!important}.sub{font-size:12px!important}input{border:1px solid #999!important;background:#fff!important}.tips,.note{page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}}
+@media(max-width:360px){body{padding:10px 6px}.card{padding:24px 16px;border-radius:14px}h1{font-size:22px}.sub{font-size:12px;margin-bottom:20px}.field{margin-bottom:14px}label{font-size:13px}input{padding:10px 12px;font-size:14px}.btn{padding:12px;font-size:15px}.tips{font-size:12px;margin-top:18px}.tips a{margin:0 4px}.note{font-size:12px;padding:10px 12px}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-user">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">登录</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>输入账号</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>输入密码</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>验证登录</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>进入系统</span></div></div>
+<div class="flow-hint">用户登录系统获取个性化服务，排盘记录+推送+档案。</div>
+</div>
+<div class="card">
+<h1>钳 命理宝鉴</h1>
+<p class="sub">信众专属入口 · 私人顾问</p>
+<form id="login-form" onsubmit="return handleLogin(event)">
+<div class="field">
+<label for="phone">手机号</label>
+<input aria-label="手机号" id="phone" name="phone" type="tel" placeholder="请输入11位手机号" pattern="^1[3-9]\d{9}$" required autocomplete="tel">
+</div>
+<div class="field">
+<label for="code">验证码</label>
+<input aria-label="code" id="code" name="code" type="text" placeholder="6位短信验证码" pattern="^\d{6}$" maxlength="6" required>
+</div>
+<button id="login-btn" type="submit" class="btn">登 录</button>
+</form>
+
+<script>
+// 解析 ?redirect= 参数
+const _redirectTo = new URLSearchParams(location.search).get('redirect') || '';
+if (_redirectTo) {
+  document.querySelector('.note').innerHTML = '💡 登录后将跳回 <code>' + _redirectTo + '</code>';
+}
+
+// handleLogin 由 inline script 处理
+</script>
+
+<p class="tips">
+<a href="divination-hub.html">返回首页</a> ·
+<a href="disclaimer.html">使用条款</a> ·
+<a href="privacy-center.html">隐私政策</a>
+</p>
+<div class="note">
+💡 当前为占位登录页，正式版将支持微信一键登录 + 手机号验证。开发期间可点击"返回首页"浏览。
+</div>
+</div>
+<script>
+function handleLogin(e){
+  e.preventDefault();
+  var btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = '登录中...';
+  setTimeout(function(){
+    // R304 P0: 占位 — 正式版对接微信API
+    showToast('登录功能即将上线，请先返回首页浏览（占位页）', 'info');
+    btn.disabled = false;
+    btn.textContent = '登 录';
+    window.location.href = 'divination-hub.html';
+  }, 1000);
+  return false;
+}
+
+function showToast(msg, type){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:'+(type==='error'?'#c1452b':type==='success'?'#27a745':'#c9a227')+';color:#fff;padding:12px 20px;border-radius:8px;z-index:99999;font-size:14px';document.body.appendChild(t);setTimeout(function(){t.remove()},2000);}
+
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

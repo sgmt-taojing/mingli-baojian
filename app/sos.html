@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="紧急求助 SOS · 一键呼叫医生与家属 · 易道智鉴">
+<meta name="keywords" content="紧急求助,SOS,呼叫医生,呼叫家属">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/sos.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#7f1d1d">
+<title>紧急求助 · 一键呼叫 · 易道智鉴</title>
+<style>
+:root{--red:#dc2626;--dark:#1a1212;--card:#2a1b1b;--border:#4a2a2a;--text:#f3e8e8;--gold:#c9a84c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.sos-ring{width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(220,38,38,.4),rgba(220,38,38,.1));display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;margin:30px 0;user-select:none}
+.sos-ring::before{content:'';position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(220,38,38,.5);animation:pulse 2s infinite}
+.sos-ring::after{content:'';position:absolute;inset:-24px;border-radius:50%;border:2px solid rgba(220,38,38,.3);animation:pulse 2s infinite .5s}
+@keyframes pulse{0%{transform:scale(.95);opacity:1}100%{transform:scale(1.1);opacity:0}}
+.sos-btn{width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,#ef4444,#b91c1c);border:none;color:#fff;font-size:44px;font-weight:800;cursor:pointer;box-shadow:0 8px 32px rgba(220,38,38,.5)}
+.sos-btn:active{transform:scale(.95)}
+.sos-btn.armed{animation:shake .3s infinite}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+h1{font-size:24px;color:#f87171}
+.countdown{font-size:64px;font-weight:800;color:var(--red);margin:20px 0;display:none}
+.cards{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px;width:100%;max-width:420px}
+.card{flex:1;min-width:130px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.card .icon{font-size:28px}
+.card .name{font-size:13px;font-weight:600;margin:6px 0}
+.card .status{font-size:11px;color:#f87171}
+.card .phone{font-size:12px;color:var(--gold);margin-top:4px;word-break:break-all}
+.tips{font-size:12px;color:rgba(243,232,232,.6);margin-top:20px;text-align:center;line-height:1.8;max-width:400px}
+.back{position:absolute;top:16px;left:16px;color:rgba(243,232,232,.7);text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">紧急求助</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
+<a class="back" href="index.html">← 返回</a>
+
+<div class="sos-ring" id="sos-ring">
+  <button class="sos-btn" id="sos-btn" onclick="triggerSOS()">SOS</button>
+</div>
+
+<div class="countdown" id="countdown"></div>
+
+<div class="cards" id="status-cards" style="display:none">
+  <div class="card"><div class="icon">👨‍⚕️</div><div class="name">联系医生</div><div class="status" id="st-doctor">呼叫中...</div><div class="phone" id="ph-doctor"></div></div>
+  <div class="card"><div class="icon">👨‍👩‍👧</div><div class="name">联系家属</div><div class="status" id="st-family">呼叫中...</div><div class="phone" id="ph-family"></div></div>
+  <div class="card"><div class="icon">🚑</div><div class="name">120 急救</div><div class="status" id="st-120">待确认</div><div class="phone">120</div></div>
+</div>
+
+<div class="tips">
+<b style="color:#f87171">⚠️ 紧急求助须知</b><br>
+长按 SOS 按钮 3 秒触发紧急呼叫<br>
+系统将：通知主治医生 + 通知紧急联系人 + 提供 120 指引<br>
+非紧急情况请勿误触 · 误触后 5 秒内可取消
+</div>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
+var timer=null;
+var armed=false;
+var pressStart=0;
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+
+// 长按触发
+var btn=document.getElementById('sos-btn');
+var ring=document.getElementById('sos-ring');
+btn.addEventListener('mousedown',function(){pressStart=Date.now();arm()});
+btn.addEventListener('touchstart',function(e){e.preventDefault();pressStart=Date.now();arm()});
+btn.addEventListener('mouseup',cancel);
+btn.addEventListener('touchend',cancel);
+btn.addEventListener('mouseleave',cancel);
+
+function arm(){
+  if(armed)return;
+  armed=true;
+  btn.classList.add('armed');
+  var remaining=3;
+  var cd=document.getElementById('countdown');
+  cd.style.display='block';
+  cd.textContent=remaining;
+  timer=setInterval(function(){
+    remaining--;
+    cd.textContent=remaining;
+    if(remaining<=0){
+      clearInterval(timer);
+      armed=false;
+      btn.classList.remove('armed');
+      cd.style.display='none';
+      triggerSOS();
+    }
+  },1000);
+}
+
+function cancel(){
+  if(!armed)return;
+  armed=false;
+  btn.classList.remove('armed');
+  clearInterval(timer);
+  document.getElementById('countdown').style.display='none';
+}
+
+function triggerSOS(){
+  document.getElementById('status-cards').style.display='flex';
+  // 通知医生（写入紧急队列，OpenClaw 心跳发送微信）
+  var body={type:'sos_emergency',detail:'居家紧急求助，需要立即联系'};
+  fetch(API+'/api/clinic/sos', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(d){
+    if(d.ok){
+      document.getElementById('st-doctor').textContent='✅ 已通知';
+      document.getElementById('st-family').textContent=d.familyNotified?'✅ 已通知':'⚠️ 待通知';
+      document.getElementById('ph-doctor').textContent=d.doctorPhone||'微信通知';
+      document.getElementById('ph-family').textContent=d.familyPhone||'—';
+      document.getElementById('st-120').textContent='⏰ 建议立即拨打';
+      showToast('🚨 紧急求助已发送');
+    }else{
+      document.getElementById('st-doctor').textContent='❌ 通知失败';
+      document.getElementById('st-120').textContent='🚨 请立即拨打 120';
+      showToast('请立即拨打 120！');
+    }
+  }).catch(function(){
+    document.getElementById('st-doctor').textContent='⚠️ 网络异常';
+    document.getElementById('st-120').textContent='🚨 请立即拨打 120';
+  });
+}
+
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#2a1b1b;border:1px solid var(--red);color:#f87171;padding:12px 20px;border-radius:24px;font-size:14px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.5)';document.body.appendChild(t);setTimeout(function(){t.remove()},3000)}
+</script>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

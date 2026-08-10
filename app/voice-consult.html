@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="语音问诊 · 周易中医联合分析 · 易道智鉴平台">
+<meta name="keywords" content="语音问诊,AI识别,中医辨证">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/voice-consult.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="语音问诊 · 周易中医联合分析 · 易道智鉴">
+<meta property="og:description" content="录音 + AI识别 + KB 匹配 + 双诊断">
+<meta property="og:type" content="website">
+<title>语音问诊 · 周易中医联合分析 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:480px;margin:0 auto;min-height:100vh}
+h1{color:var(--gold);font-size:17px;margin-bottom:4px;text-align:center}
+.sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+textarea,select,input{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+textarea{resize:vertical;min-height:80px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+/* 录音动画 */
+.rec-btn{width:88px;height:88px;border-radius:50%;margin:16px auto;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all .3s;border:none;position:relative}
+.rec-btn.idle{background:var(--gold);color:#0e1726}
+.rec-btn.recording{background:var(--red);color:#fff;animation:pulse 1.2s infinite}
+.rec-btn.playing{background:var(--green);color:#fff}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(245,101,101,.5)}70%{box-shadow:0 0 0 22px rgba(245,101,101,0)}100%{box-shadow:0 0 0 0 rgba(245,101,101,0)}}
+.timer{text-align:center;font-size:22px;font-weight:700;color:var(--gold);margin:6px 0;font-variant-numeric:tabular-nums}
+.hint{text-align:center;font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.7}
+.transcript{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;line-height:1.8;min-height:60px;margin:8px 0;color:var(--text)}
+.transcript .live{color:var(--blue)}
+.tag-preview{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-size:11px;padding:3px 10px;border-radius:14px}
+.tag.symptom{background:rgba(72,187,120,.12);border-color:rgba(72,187,120,.3);color:var(--green)}
+.tag.birth{background:rgba(66,153,225,.12);border-color:rgba(66,153,225,.3);color:var(--blue)}
+.tag.query{background:rgba(159,122,234,.12);border-color:rgba(159,122,234,.3);color:var(--purple)}
+.step-num{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;background:var(--gold);color:#0e1726;border-radius:50%;font-size:11px;font-weight:700;margin-right:6px}
+.flow-steps-wrap{margin-bottom:8px}
+@media(max-width:360px){body{padding:8px 6px}h1{font-size:15px}.card{padding:10px 8px}.card-title{font-size:12px}textarea{font-size:12px;padding:6px}.btn{padding:10px;font-size:13px}.rec-btn{width:72px;height:72px;font-size:12px}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">语音问诊</span>
+  </div>
+  <a class="phb-back" href="tcm-portal.html">← 返回</a>
+</header>
+<main>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>录音</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">2</span><span>AI转写</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">3</span><span>自动提取</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">4</span><span>双诊断</span></div></div>
+<div class="flow-hint">录音 30-60 秒描述症状与问事，AI 自动转写提取关键信息</div>
+</div>
+
+<!-- 第一步：录音 -->
+<div class="card">
+<div class="card-title"><span class="step-num">1</span>语音描述</div>
+<div class="hint">请自然描述：<br>① 哪里不舒服、多久了 ② 出生年月日时 ③ 想问什么事（事业/感情/健康）</div>
+<button class="rec-btn idle" id="rec-btn" onclick="toggleRecord()" aria-label="开始录音">
+  <span id="rec-icon" aria-hidden="true">🎤</span>
+</button>
+<div class="timer" id="timer">00:00</div>
+<div class="hint" id="rec-hint">点击开始录音</div>
+</div>
+
+<!-- 第二步：转写结果 -->
+<div class="card" id="transcript-card" style="display:none">
+<div class="card-title"><span class="step-num">2</span>AI 转写</div>
+<div class="transcript" id="transcript">正在转写...</div>
+<div style="display:flex;gap:8px;margin-top:8px">
+  <button class="btn btn-ghost" style="flex:1;margin-top:0" onclick="clearAll()">↺ 重新录音</button>
+  <button class="btn btn-green" style="flex:1;margin-top:0" onclick="analyzeText()">下一步：自动提取 →</button>
+</div>
+</div>
+
+<!-- 第三步：自动提取 -->
+<div class="card" id="extract-card" style="display:none">
+<div class="card-title"><span class="step-num">3</span>自动提取</div>
+<div class="tag-preview" id="tag-preview"></div>
+<div class="form-group">
+  <label>症状（已自动识别，可修改）</label>
+  <textarea id="symptoms" aria-label="症状"></textarea>
+</div>
+<div class="form-group">
+  <label>体质/其他（可修改）</label>
+  <input id="constitution" aria-label="体质" placeholder="如：阳虚质/阴虚质/痰湿质">
+</div>
+<div class="form-group">
+  <label>出生年月日时（可选，用于排盘）</label>
+  <div class="row" style="display:flex;gap:8px">
+    <input id="birth-year" type="number" placeholder="年" aria-label="出生年" style="flex:1">
+    <input id="birth-month" type="number" placeholder="月" aria-label="出生月" style="flex:1">
+    <input id="birth-day" type="number" placeholder="日" aria-label="出生日" style="flex:1">
+    <input id="birth-hour" type="number" placeholder="时" aria-label="出生时" style="flex:1">
+  </div>
+</div>
+<button class="btn btn-green" onclick="submitConsult()">提交 → 进入周易中医双诊断</button>
+</div>
+
+<!-- 第四步：结果 -->
+<div class="card" id="result-card" style="display:none">
+<div class="card-title"><span class="step-num">4</span>提交成功</div>
+<div id="result-info" style="font-size:13px;line-height:1.8;color:var(--green)"></div>
+<div class="hint" style="margin-top:8px">大师分析与医生诊断完成后，您可在「我的报告」中查看完整报告。</div>
+<div style="display:flex;gap:8px;margin-top:10px">
+  <button class="btn btn-ghost" style="flex:1;margin-top:0" onclick="location.href='tcm-portal.html'">返回中医馆</button>
+  <button class="btn" style="flex:1;margin-top:0" onclick="location.href='person-center.html'">查看我的报告</button>
+</div>
+</div>
+
+</main>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
+var mediaRecorder=null;
+var mediaStream=null;
+var chunks=[];
+var recordedBlob=null;
+var recSeconds=0;
+var recTimer=null;
+var isRecording=false;
+var recognition=null;
+var finalText='';
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
+
+// ========== 录音 ==========
+function toggleRecord(){
+  if(isRecording){stopRecord();return}
+  startRecord();
+}
+
+function startRecord(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showToast('浏览器不支持录音，请用 Chrome/Edge');return}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    mediaStream=stream;
+    chunks=[];
+    recordedBlob=null;
+    finalText='';
+    mediaRecorder=new MediaRecorder(stream);
+    mediaRecorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data)};
+    mediaRecorder.onstop=function(){
+      recordedBlob=new Blob(chunks,{type:'audio/webm'});
+      document.getElementById('rec-btn').className='rec-btn idle';
+      document.getElementById('rec-icon').textContent='🎤';
+      document.getElementById('rec-hint').textContent='录音完成（'+recSeconds+'秒）';
+      document.getElementById('transcript-card').style.display='block';
+      stopRecognition();
+    };
+    mediaRecorder.start();
+    isRecording=true;
+    recSeconds=0;
+    document.getElementById('timer').textContent='00:00';
+    document.getElementById('rec-btn').className='rec-btn recording';
+    document.getElementById('rec-icon').textContent='⏹';
+    document.getElementById('rec-hint').textContent='正在录音，再次点击停止';
+    recTimer=setInterval(function(){
+      recSeconds++;
+      var m=String(Math.floor(recSeconds/60)).padStart(2,'0');
+      var s=String(recSeconds%60).padStart(2,'0');
+      document.getElementById('timer').textContent=m+':'+s;
+      if(recSeconds>=90){stopRecord()}
+    },1000);
+    // 同时启动 ASR 实时转写
+    startRecognition();
+  }).catch(function(e){showToast('无法访问麦克风：'+esc(e.message))});
+}
+
+function stopRecord(){
+  if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop();
+  if(mediaStream){mediaStream.getTracks().forEach(function(t){t.stop()})}
+  isRecording=false;
+  if(recTimer)clearInterval(recTimer);
+}
+
+// ========== ASR 实时转写 ==========
+function startRecognition(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  recognition=new SR();
+  recognition.lang='zh-CN';
+  recognition.continuous=true;
+  recognition.interimResults=true;
+  recognition.onresult=function(e){
+    var text='';
+    for(var i=0;i<e.results.length;i++){text+=e.results[i][0].transcript}
+    finalText=text;
+    document.getElementById('transcript').innerHTML='<span class="live">'+escapeHtml(text)+'</span>';
+  };
+  recognition.onerror=function(){};
+  try{recognition.start()}catch(e){}
+}
+
+function stopRecognition(){
+  if(recognition){try{recognition.stop()}catch(e){}recognition=null}
+  if(finalText){
+    document.getElementById('transcript').textContent=finalText;
+  }else{
+    document.getElementById('transcript').textContent='未识别到语音内容，请手动输入或重新录音';
+    document.getElementById('transcript').innerHTML='<textarea id="manual-text" aria-label="手动输入" style="min-height:80px" placeholder="请手动输入症状描述..."></textarea>';
+  }
+}
+
+function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function clearAll(){
+  if(mediaStream){mediaStream.getTracks().forEach(function(t){t.stop()})}
+  isRecording=false;
+  if(recTimer)clearInterval(recTimer);
+  recordedBlob=null;
+  finalText='';
+  document.getElementById('rec-btn').className='rec-btn idle';
+  document.getElementById('rec-icon').textContent='🎤';
+  document.getElementById('timer').textContent='00:00';
+  document.getElementById('rec-hint').textContent='点击开始录音';
+  document.getElementById('transcript-card').style.display='none';
+  document.getElementById('extract-card').style.display='none';
+  document.getElementById('transcript').textContent='正在转写...';
+}
+
+// ========== 自动提取 ==========
+var SYMPTOM_WORDS=['痛','疼','酸','麻','胀','晕','失眠','多梦','咳嗽','痰','胸闷','心悸','胃','反酸','食欲','便秘','腹泻','乏力','疲劳','出汗','怕冷','怕热','口干','口苦','头痛','发热','痒','肿','炎症','结节','月经','白带','尿','大便','气短','喘'];
+var BIRTH_PATTERN=/(\d{4})年(\d{1,2})月(\d{1,2})日(?:[上下]?午)?(\d{1,2})?[点时]/;
+var QUERY_WORDS=['事业','工作','财运','感情','婚姻','健康','学业','考试','求职','搬家','出行','诉讼','官司','投资','开店'];
+
+function analyzeText(){
+  var text=finalText;
+  var manual=document.getElementById('manual-text');
+  if(manual&&manual.value)text=manual.value;
+  if(!text||text.length<3){showToast('请先输入或录制语音内容');return}
+  
+  // 提取症状
+  var symptoms=new Set();
+  SYMPTOM_WORDS.forEach(function(w){
+    if(text.indexOf(w)>=0)symptoms.add(w);
+  });
+  var symptomStr=Array.from(symptoms).join('、');
+  if(!symptomStr)symptomStr=text.slice(0,50);
+  
+  // 提取出生时间
+  var birthMatch=text.match(BIRTH_PATTERN);
+  var birth=null;
+  if(birthMatch){
+    birth={year:birthMatch[1],month:birthMatch[2],day:birthMatch[3],hour:birthMatch[4]||''};
+  }
+  
+  // 提取问事
+  var queryWords=QUERY_WORDS.filter(function(w){return text.indexOf(w)>=0});
+  var queryStr=queryWords.length?queryWords.slice(0,3).join('、'):'综合';
+  
+  // 渲染标签
+  var tags='';
+  Array.from(symptoms).slice(0,8).forEach(function(s){tags+='<span class="tag symptom">'+s+'</span>'});
+  if(birth)tags+='<span class="tag birth">出生：'+birth.year+'年'+birth.month+'月'+birth.day+'日'+(birth.hour?' '+birth.hour+'时':'')+'</span>';
+  queryWords.forEach(function(q){tags+='<span class="tag query">'+q+'</span>'});
+  document.getElementById('tag-preview').innerHTML=tags;
+  
+  document.getElementById('symptoms').value=symptomStr;
+  if(birth){
+    document.getElementById('birth-year').value=birth.year;
+    document.getElementById('birth-month').value=birth.month;
+    document.getElementById('birth-day').value=birth.day;
+    document.getElementById('birth-hour').value=birth.hour;
+  }
+  document.getElementById('extract-card').style.display='block';
+  document.getElementById('extract-card').scrollIntoView({behavior:'smooth'});
+}
+
+// ========== 提交 ==========
+function submitConsult(){
+  var symptoms=document.getElementById('symptoms').value;
+  var constitution=document.getElementById('constitution').value;
+  if(!symptoms){showToast('请填写症状');return}
+  
+  var body={symptoms:symptoms,constitution:constitution};
+  var y=document.getElementById('birth-year').value;
+  if(y)body.birthYear=Number(y);
+  
+  fetch(API+'/api/clinic/submit-symptom', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(d){
+    if(d.ok||d.caseId){
+      document.getElementById('result-info').innerHTML='✅ 问诊提交成功！<br>案例号：'+(d.caseId||'')+'<br>已进入周易大师分析队列，随后由中医医生辨证处方。';
+      document.getElementById('extract-card').style.display='none';
+      document.getElementById('result-card').style.display='block';
+      document.getElementById('result-card').scrollIntoView({behavior:'smooth'});
+    }else{
+      showToast('提交失败：'+(d.error||d.message||'请先登录'));
+    }
+  }).catch(function(e){showToast('网络错误：'+esc(e.message))});
+}
+
+// 初始化：有 token 才显示完整流程
+document.addEventListener('DOMContentLoaded',function(){
+  if(!token){
+    document.getElementById('rec-hint').textContent='提示：未登录，录音仍可用但提交需登录';
+  }
+});
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 音频本地处理不上传</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

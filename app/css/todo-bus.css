@@ -1,0 +1,94 @@
+/* todo-bus.css — AI 助手 TODO 任务总线样式
+ * 紧凑型卡片样式，自适应主题
+ */
+.todo-bus{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(201,168,76,.18);
+  border-radius:10px;
+  padding:12px 14px;
+  margin:8px 0;
+  font-size:13px;
+}
+.tb-header{
+  display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  border-bottom:1px dashed rgba(201,168,76,.18);padding-bottom:8px;
+}
+.tb-title{font-size:13px;color:var(--gold,#c9a84c);font-weight:600;flex:1}
+.tb-stats{font-size:11px;color:var(--paper3,#a09888)}
+.tb-clear{
+  background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--paper3,#a09888);
+  padding:2px 8px;border-radius:4px;font-size:11px;cursor:pointer;
+}
+.tb-clear:hover{background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.3)}
+.tb-empty{
+  text-align:center;color:var(--paper3,#a09888);padding:16px 8px;font-size:12px;line-height:1.6;
+}
+.tb-empty small{font-size:11px;opacity:.6}
+.tb-list{display:flex;flex-direction:column;gap:4px}
+.tb-item{
+  display:flex;align-items:center;gap:8px;padding:6px 8px;
+  background:rgba(201,168,76,.04);border-radius:6px;
+  transition:.2s;
+}
+.tb-item:hover{background:rgba(201,168,76,.1)}
+.tb-item.done{opacity:.55;text-decoration:line-through}
+.tb-item .tb-chk{
+  flex-shrink:0;width:14px;height:14px;cursor:pointer;accent-color:var(--gold,#c9a84c);
+}
+.tb-item .tb-text{
+  flex:1;font-size:13px;color:var(--paper,#e8e0d0);line-height:1.5;min-width:0;
+  word-break:break-word;
+}
+.tb-item .tb-meta{
+  display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--paper3,#a09888);flex-shrink:0;
+}
+.tb-item .tb-mod{
+  padding:1px 6px;background:rgba(201,168,76,.12);color:var(--gold,#c9a84c);
+  border-radius:4px;font-size:10px;
+}
+.tb-item .tb-del{
+  background:transparent;border:none;color:var(--paper3,#a09888);cursor:pointer;
+  font-size:14px;padding:0 4px;line-height:1;
+}
+.tb-item .tb-del:hover{color:#ef4444}
+
+/* 浮动 TODO 入口按钮 */
+.todo-fab{
+  position:fixed;right:14px;bottom:80px;z-index:99;
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,#c9a84c,#a07c2a);color:#0a0a0a;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;border:none;
+  box-shadow:0 4px 14px rgba(201,168,76,.4);
+  transition:.25s;
+}
+.todo-fab:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,168,76,.55)}
+.todo-fab .badge{
+  position:absolute;top:-4px;right:-4px;
+  background:#ef4444;color:#fff;border-radius:10px;
+  padding:2px 6px;font-size:10px;font-weight:700;line-height:1.1;
+  min-width:18px;text-align:center;
+}
+.todo-fab[hidden]{display:none}
+
+/* 抽屉式弹出 */
+.todo-drawer{
+  position:fixed;right:0;top:0;bottom:0;width:380px;max-width:90vw;
+  background:var(--ink,#1a1a1a);border-left:1px solid rgba(201,168,76,.3);
+  z-index:9999;padding:16px;box-shadow:-4px 0 24px rgba(0,0,0,.4);
+  overflow-y:auto;transform:translateX(100%);transition:transform .3s;
+}
+.todo-drawer.open{transform:translateX(0)}
+.todo-drawer .td-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+  border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:10px;
+}
+.todo-drawer .td-title{font-size:15px;color:var(--gold,#c9a84c);font-weight:600;margin:0}
+.todo-drawer .td-close{
+  background:none;border:none;color:#fff;font-size:20px;cursor:pointer;
+}
+
+@media(max-width:480px){
+  .todo-fab{bottom:74px;right:12px;width:42px;height:42px;font-size:16px}
+  .todo-drawer{width:100vw}
+}

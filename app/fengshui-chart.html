@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<meta charset="UTF-8">
+<meta name="description" content="风水排盘 · 易道智鉴平台">
+<meta name="keywords" content="风水排盘">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/fengshui-chart.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="风水排盘 · 命理宝鉴">
+<meta property="og:description" content="风水排盘 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>风水排盘 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#0a0e17;--card:#141928;--border:#2a3450;--gold:#c9a84c;--jade:#4ec9b0;--paper:#e8dcc8;--paper2:#b8a88a;--paper3:#8b7e6a;--red:#ef4444;--green:#10b981;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:12px;min-height:100vh}
+.fs-header{text-align:center;margin-bottom:12px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.fs-title{font-size:18px;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.fs-meta{font-size:12px;color:var(--paper3);line-height:1.8}
+.fs-form{max-width:500px;margin:0 auto 16px;display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.fs-form input{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
+.fs-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
+.fs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:600px;margin:0 auto 12px}
+.fs-gong{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;min-height:110px;position:relative}
+.fs-gong.center{background:rgba(201,168,76,.05);border-color:var(--gold);border-style:dashed}
+.fs-gong.kong{opacity:.5}
+.fs-gong-name{font-size:11px;color:var(--gold);font-weight:600;margin-bottom:2px}
+.fs-gong-dir{font-size:9px;color:var(--paper3);margin-bottom:6px}
+.fs-row{display:flex;gap:4px;margin-bottom:3px;align-items:center}
+.fs-label{font-size:9px;color:var(--paper3);width:20px;flex-shrink:0}
+.fs-val{font-size:11px}
+.fs-val.yun{color:var(--gold)}
+.fs-val.shan{color:var(--jade)}
+.fs-val.xiang{color:var(--blue,#63b3ed)}
+.fs-ji{color:var(--red);font-size:9px}
+.fs-jixiong{font-size:8px;padding:1px 3px;border-radius:2px;margin-left:4px}
+.fs-jixiong.ji{background:rgba(16,185,129,.12);color:var(--green)}
+.fs-jixiong.xiong{background:rgba(239,68,68,.12);color:var(--red)}
+.fs-info{max-width:600px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fs-info-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;font-size:11px;line-height:1.8}
+.fs-info-card h4{color:var(--gold);font-size:12px;margin-bottom:6px}
+@media(max-width:768px){.fs-gong{min-height:90px;padding:6px}.fs-val{font-size:10px}.fs-info{grid-template-columns:1fr}}
+@media(max-width:360px){.fs-gong{min-height:75px;padding:4px}.fs-gong-name{font-size:9px}.fs-val{font-size:9px}.fs-label{font-size:7px;width:14px}}
+@media print{body{background:#fff!important;color:#000!important}.page-header-bar,.no-print{display:none!important}.container,.wrap,.fs-grid{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}.fs-info-card,.fs-gong,.card,.section{break-inside:avoid;box-shadow:none!important;border:1px solid #ccc!important}h1,h2,h3{break-after:avoid}table{width:100%!important;font-size:11px}img{max-width:100%!important}}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body class="theme-zhouyi">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">风水排盘</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>输入宅向</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>选择元运</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>排盘分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看建议</span></div></div>
+<div class="flow-hint">查看风水排盘 · 命理宝鉴，了解功能详情与使用方式。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+<div class="fs-header">
+  <div class="fs-title">向 风水排盘</div>
+  <div id="fs-meta" class="fs-meta">请输入信息排盘</div>
+</div>
+<div class="fs-form">
+  <input aria-label="姓名" type="text" id="fs-name" placeholder="姓名(可选)" maxlength="20" style="grid-column:1/-1">
+  <input aria-label="年份" type="number" id="fs-year" placeholder="年份" value="2026" min="1900" max="2100">
+  <select id="fs-sitting" aria-label="坐山"><option value="">-- 坐山 --</option><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="辰">辰(东南偏东)</option><option value="巳">巳(东南偏南)</option><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option></select>
+  <select id="fs-facing" aria-label="朝向"><option value="">-- 朝向 --</option><option value="午">午(南)</option><option value="未">未(西南偏南)</option><option value="申">申(西南偏西)</option><option value="酉">酉(西)</option><option value="戌">戌(西北偏西)</option><option value="亥">亥(西北偏北)</option><option value="子">子(北)</option><option value="丑">丑(东北偏北)</option><option value="寅">寅(东北偏东)</option><option value="卯">卯(东)</option><option value="辰">辰(东南偏东)</option><option value="巳">巳(东南偏南)</option></select>
+  <select id="fs-building-type" aria-label="建筑类型"><option value="">-- 类型(可选) --</option><option value="apartment">公寓</option><option value="house">独立屋/别墅</option><option value="shop">商铺</option><option value="office">办公室</option><option value="factory">厂房</option></select>
+  <select id="fs-floor" aria-label="楼层"><option value="">-- 楼层(可选) --</option><option value="1">1F</option><option value="2">2F</option><option value="3">3F</option><option value="4">4F</option><option value="5">5F</option><option value="6">6F</option><option value="7">7F</option><option value="8">8F+</option></select>
+  <input aria-label="出生年份" type="number" id="fs-birth-year" placeholder="命主出生年(可选,如1985)" min="1900" max="2100" style="grid-column:1/-1">
+  <input aria-label="经度" type="number" id="fs-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="宅址经度（用于真太阳时校正）">
+  <input aria-label="流年" type="number" id="fs-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年飞星的目标年份">
+  <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px;grid-column:1/-1"><input  type="checkbox" id="fs-annual" style="width:auto" checked aria-label="fs annual"> 排流年飞星</label>
+  <button onclick="doPaipan()">排盘</button>
+
+<button onclick="generateFullReport('fengshui')" style="margin-top:12px;padding:10px 24px;background:linear-gradient(135deg,#ffb44d,#ff7e5f);color:#0f1820;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:2px">📜 出具风水堪舆报告</button>
+<script>
+async function generateFullReport(mod){
+  try{
+    const inputs = {};
+    document.querySelectorAll('input,select').forEach(el=>{
+      const m = el.id && el.id.match(/^[a-z]+-(.+)$/);
+      if(m) if(el.type==='number' && el.value) inputs[m[1]] = +el.value;
+        else inputs[m[1]] = el.value;
+    });
+    if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
+    if(inputs.leapMonth===undefined) inputs.leapMonth = false;
+    
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrf = csrfRes.csrfToken || csrfRes.token || '';
+    
+    const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      body: JSON.stringify({
+        ...inputs,
+        questions: [inputs.question||''].filter(Boolean),
+        options: { name: inputs.name||'缘主' }
+      }), signal: AbortSignal.timeout(15000) }).then(r=>r.json());
+    
+    if(!r.ok){
+      const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+      fn('报告生成失败：'+(r.error||''));
+      return;
+    }
+    
+    // 保存报告到 sessionStorage，跳到报告展示页
+    sessionStorage.setItem('lastReport', JSON.stringify(r));
+    window.location.href = 'report-interpret.html?module='+mod+'&name='+encodeURIComponent(inputs.name||'缘主');
+  }catch(e){
+    const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
+    fn('生成失败：'+esc(e.message));
+    console.error(e);
+  }
+}
+</script>
+</div>
+<div id="fs-grid" class="fs-grid" style="display:none"></div>
+<div id="fs-info" class="fs-info" style="display:none"></div>
+<script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+if(typeof showToast!=='function'){window.showToast=function(msg){var t=document.createElement('div');t.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:8px 20px;border-radius:6px;z-index:99999;font-size:13px';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove()},2500);};}
+async function doPaipan(){
+  const y=document.getElementById('fs-year').value;
+  const s=document.getElementById('fs-sitting').value;
+  const f=document.getElementById('fs-facing').value;
+  if(!y){showToast('请填写年份');return;}
+  if(!s){showToast('请选择坐山');return;}
+  if(!f){showToast('请选择朝向');return;}
+  const name = document.getElementById('fs-name').value || '';
+  const buildingType = document.getElementById('fs-building-type').value;
+  const floor = document.getElementById('fs-floor').value;
+  const birthYear = document.getElementById('fs-birth-year').value;
+  const annual = document.getElementById('fs-annual').checked;
+  // R474-G: 经度（真太阳时）+ 流年
+  const lngEl = document.getElementById('fs-lng');
+  const lng = lngEl ? (+lngEl.value || 121.47) : 121.47;
+  const tyEl = document.getElementById('fs-target-year');
+  const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
+  const body={year:+y,sittingMountain:s,facingMountain:f,name,buildingType,floor:floor?+floor:null,birthYear:birthYear?+birthYear:null,annual,lng,targetYear};
+  if(birthYear) body.currentAge = +targetYear - +birthYear;
+  let r, rSvg;
+  try {
+    [r, rSvg] = await Promise.all([
+      fetch(API_BASE+'/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/fengshui/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+    ]);
+  } catch(e) {
+    showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
+    return;
+  }
+  const data=await r.json();
+  if(!data.ok){showToast('排盘失败: '+data.error);return;}
+  const svg = await rSvg.text();
+  renderChart(data.chart);
+  renderSvg(svg);
+  renderFlow(data.flow, targetYear);
+  if(data.interpretation) renderInterpretation(data.interpretation);
+}
+function renderChart(c){
+  document.getElementById('fs-meta').innerHTML=`${c.year}年 · ${c.yunName} · 坐${c.sittingMountain}向${c.facingMountain}<br>山星:${c.mountainStar} | 向星:${c.facingStar}`;
+  const grid=document.getElementById('fs-grid');
+  grid.style.display='grid';
+  const layout=[4,9,2,3,5,7,8,1,6];
+  grid.innerHTML='';
+  for(const p of layout){
+    const pal=c.palaces.find(x=>x.palace===p);
+    if(!pal) continue;
+    const div=document.createElement('div');
+    const cls=['fs-gong'];
+    if(p===5) cls.push('center');
+    div.className=cls.join(' ');
+    let html=`<div class="fs-gong-name">${pal.name}宫</div><div class="fs-gong-dir">${pal.direction}</div>`;
+    if(p!==5){
+      const jb=pal.auspicious==='吉'?'ji':'xiong';
+      html+=`<div class="fs-row"><span class="fs-label">运</span><span class="fs-val yun">${pal.yunStar}<span class="fs-jixiong ${jb}">${pal.auspicious}</span></span></div>`;
+      html+=`<div class="fs-row"><span class="fs-label">山</span><span class="fs-val shan">${pal.mountainStar}</span></div>`;
+      html+=`<div class="fs-row"><span class="fs-label">向</span><span class="fs-val xiang">${pal.facingStar}</span></div>`;
+    } else {
+      html+=`<div class="fs-row"><span class="fs-label">运</span><span class="fs-val yun">${pal.yunStar}</span></div>`;
+      html+=`<div class="fs-row"><span class="fs-label">山</span><span class="fs-val shan">${pal.mountainStar}</span></div>`;
+      html+=`<div class="fs-row"><span class="fs-label">向</span><span class="fs-val xiang">${pal.facingStar}</span></div>`;
+    }
+    div.innerHTML=html;
+    grid.appendChild(div);
+  }
+  const info=document.getElementById('fs-info');
+  info.style.display='grid';
+  let ih='';
+  ih+=`<div class="fs-info-card"><h4>太岁三煞</h4>`;
+  if(c.taisui) ih+=`太岁：${c.taisui.zhi}（${c.taisui.direction}）<br>`;
+  if(c.sansha) ih+=`三煞：${c.sansha.join('、')}<br>`;
+  ih+='</div>';
+  ih+=`<div class="fs-info-card"><h4>九星吉凶</h4>`;
+  ih+='1白·吉 2黑·凶 3碧·凶<br>4绿·吉 5黄·大凶 6白·吉<br>7赤·凶 8白·吉 9紫·吉';
+  ih+='</div>';
+  info.innerHTML=ih;
+}
+
+// R474-G: 渲染高清 SVG 盘图
+function renderSvg(svg){
+  const old = document.getElementById('fs-svg-host');
+  if(old) old.remove();
+  const host = document.createElement('div');
+  host.id = 'fs-svg-host';
+  host.style.cssText = 'max-width:800px;margin:16px auto;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;padding:8px;text-align:center';
+  host.innerHTML = '<div style="font-size:12px;color:var(--gold,#c9a84c);margin-bottom:6px">📜 高清盘图（R474 SVG · 可右键保存 / 微信长按分享）</div>' + svg;
+  const grid = document.getElementById('fs-grid');
+  if(grid) grid.parentNode.insertBefore(host, grid);
+}
+
+// R474-G: 渲染流年 / 小限 / 大运信息卡
+function renderFlow(flow, targetYear){
+  const old = document.getElementById('fs-flow-host');
+  if(old) old.remove();
+  if(!flow) return;
+  const ln = flow.liuNian || {};
+  const xx = flow.xiaoXian || {};
+  const dx = flow.currentDaXian || {};
+  const host = document.createElement('div');
+  host.id = 'fs-flow-host';
+  host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+  host.innerHTML = `
+    <div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:8px">🌊 ${targetYear} 流年 · ${flow.currentAge ? '现年 ' + flow.currentAge + ' 岁' : ''}</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+      <div style="background:rgba(201,168,76,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--gold,#c9a84c)">流年飞星</div>
+        <div>${ln.annualStarName||''}（${ln.annualStar||''}）</div>
+        <div style="color:var(--paper3);margin-top:2px">${ln.yearZhi||''}年 · 太岁${(ln.taisui&&ln.taisui.direction)||''}</div>
+      </div>
+      <div style="background:rgba(78,201,176,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--jade,#4ec9b0)">风水小限</div>
+        <div>${xx.currentPalaceName||''}宫</div>
+        <div style="color:var(--paper3);margin-top:2px">${xx.currentPalaceDir||''}</div>
+      </div>
+      <div style="background:rgba(99,179,237,.08);padding:8px;border-radius:6px">
+        <div style="color:var(--blue,#63b3ed)">玄空大运</div>
+        <div>${dx.currentYunName||''}</div>
+        <div style="color:var(--paper3);margin-top:2px">${dx.yunInfo ? dx.yunInfo.start + '-' + dx.yunInfo.end : ''} · 余${dx.remainingYears||0}年</div>
+      </div>
+    </div>`;
+  const info = document.getElementById('fs-info');
+  if(info) info.parentNode.insertBefore(host, info);
+  else document.body.appendChild(host);
+}
+
+function renderInterpretation(i){
+  if(!i) return;
+  const el=document.getElementById('paipan-interpretation')||(()=>{
+    const d=document.createElement('div');
+    d.id='paipan-interpretation';
+    d.style.cssText='margin:16px 0;padding:16px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:12px';
+    document.querySelector('.zw-grid,.qm-grid,.ly-grid,.lr-grid,.mh-grid,.fs-grid,main,body').appendChild(d);
+    return d;
+  })();
+  let h='<div style="font-size:15px;font-weight:600;color:var(--gold,#c9a84c);margin-bottom:8px">卷 断盘解读</div>';
+  if(i.summary) h+='<div style="font-size:13px;line-height:1.7;opacity:.9;margin-bottom:8px">'+i.summary+'</div>';
+  if(i.advice) h+='<div style="font-size:13px;line-height:1.7;opacity:.75">'+i.advice+'</div>';
+  if(i.guaJi) h+='<div style="font-size:12px;opacity:.6;margin-top:6px">卦象：'+i.guaJi+'</div>';
+  el.innerHTML=h;
+  el.style.display='block';
+}
+</script>
+  <script src="js/mobile-nav.js"></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+</body>
+</html>

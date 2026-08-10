@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/kb-browser.html">
+<meta name="theme-color" content="#080808">
+<title>KB 知识库浏览中心 · 命理宝鉴</title>
+<meta name="description" content="26 个知识库文件 + 65 个模块 + 10993 条结构化条目，全方位探索命理/中医/玄学知识">
+<meta name="keywords" content="KB 知识库浏览中心">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/utility-classes.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/kb-favorites.css">
+<link rel="stylesheet" href="css/kb-recent.css">
+<style>
+:root{
+  --gold:#c9a84c;--gold-dim:#a88c3a;
+  --ink:#0d1117;--paper:#1a1f2e;--card:#222838;
+  --border:#333a4d;--paper2:#e0d8c8;--paper3:#a0a0a0;
+}
+body{background:var(--ink);color:var(--paper2);font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+header.top{display:flex;align-items:center;gap:10px;padding:8px 0 16px}
+header.top h1{font-size:1.4rem;color:var(--gold);margin:0;flex:1}
+header.top .back{color:var(--gold);text-decoration:none;font-size:.9rem;padding:6px 12px;border:1px solid var(--gold);border-radius:6px}
+
+/* Hero summary */
+.hero{background:linear-gradient(135deg,#1a1f2e,#222838);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(201,168,76,.15),transparent 70%);pointer-events:none}
+.hero h2{margin:0 0 8px;font-size:1.15rem;color:var(--gold)}
+.hero .lead{color:var(--paper3);font-size:.9rem;margin:0 0 14px;line-height:1.5}
+.hero-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:12px}
+.hero-stat{background:rgba(0,0,0,.25);padding:12px;border-radius:8px;text-align:center}
+.hero-stat .v{font-size:1.6rem;font-weight:700;color:var(--gold)}
+.hero-stat .l{font-size:.7rem;color:var(--paper3);margin-top:2px}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0;border-bottom:1px solid var(--border);margin-bottom:16px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{height:0}
+.tab{padding:8px 16px;cursor:pointer;color:var(--paper3);border-radius:8px 8px 0 0;font-size:.9rem;white-space:nowrap;transition:all .15s;border:1px solid transparent;border-bottom:none}
+.tab:hover{color:var(--paper2)}
+.tab.on{color:var(--gold);background:var(--card);border-color:var(--border)}
+.tab .badge{background:var(--gold-dim);color:#000;font-size:.65rem;padding:1px 5px;border-radius:4px;margin-left:4px;font-weight:600}
+
+/* Search */
+.search-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.search-bar input{flex:1;min-width:200px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--paper2);font-size:.95rem;outline:none}
+.search-bar input:focus{border-color:var(--gold-dim)}
+.search-bar select{padding:10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--paper2);font-size:.85rem;cursor:pointer}
+
+/* Card grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;transition:all .2s;position:relative}
+.card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(201,168,76,.15)}
+.card h3{margin:0 0 8px;font-size:.95rem;color:var(--paper2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.card .desc{font-size:.8rem;color:var(--paper3);line-height:1.45;margin:6px 0 10px;min-height:36px}
+.card .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{font-size:.7rem;padding:3px 8px;border-radius:10px;background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3)}
+.chip.green{background:rgba(120,200,120,.15);color:#7ec47e;border-color:rgba(120,200,120,.3)}
+.chip.blue{background:rgba(120,180,212,.15);color:#7ab8d4;border-color:rgba(120,180,212,.3)}
+.chip.red{background:rgba(212,106,106,.15);color:#d46a6a;border-color:rgba(212,106,106,.3)}
+.chip.gray{background:rgba(160,160,160,.15);color:var(--paper3);border-color:rgba(160,160,160,.3)}
+.card .actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.card .btn{font-size:.75rem;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--paper);color:var(--paper2);cursor:pointer;text-decoration:none;display:inline-block}
+.card .btn:hover{border-color:var(--gold);color:var(--gold)}
+.card .btn.primary{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* KB file card (file list) */
+.file{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.file-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.file-name{font-family:monospace;font-size:.85rem;color:var(--gold);word-break:break-all}
+.file-size{font-size:.7rem;color:var(--paper3);background:rgba(160,160,160,.15);padding:2px 6px;border-radius:4px;flex-shrink:0}
+
+/* Module row (table-like) */
+table.mod-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;font-size:.85rem}
+table.mod-table th{background:var(--paper);padding:10px;text-align:left;font-weight:600;color:var(--gold);font-size:.8rem;border-bottom:1px solid var(--border)}
+table.mod-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--paper2)}
+table.mod-table tr:hover td{background:rgba(201,168,76,.05)}
+table.mod-table .grade{font-weight:700;text-align:center}
+.g-S-plus{color:#ffd700}.g-S{color:#e8c44a}.g-A-plus{color:#a8d8a8}.g-A{color:#7ec47e}
+.g-B-plus{color:#7ab8d4}.g-B{color:#6a9fd8}.g-C{color:#d49a6a}.g-D{color:#d46a6a}
+.bar-mini{display:inline-block;width:80px;height:8px;border-radius:4px;background:#333;overflow:hidden;vertical-align:middle;margin-left:6px}
+.bar-mini .fill{height:100%;background:var(--gold)}
+
+/* Search result row */
+.sr-item{padding:12px;border-bottom:1px solid var(--border);cursor:pointer}
+.sr-item:hover{background:rgba(201,168,76,.05)}
+.sr-meta{font-size:.7rem;color:var(--paper3);margin-bottom:4px;display:flex;gap:8px;align-items:center}
+.sr-title{color:var(--gold);font-size:.95rem;margin-bottom:4px;font-weight:600}
+.sr-snippet{color:var(--paper2);font-size:.85rem;line-height:1.5}
+
+/* Empty state */
+.empty{padding:40px 20px;text-align:center;color:var(--paper3);background:var(--card);border-radius:10px;border:1px dashed var(--border)}
+.empty h3{color:var(--gold);margin:0 0 8px}
+
+/* Loading */
+.loading{padding:30px;text-align:center;color:var(--paper3)}
+
+/* Footer links */
+footer.links{padding:20px 0;text-align:center;color:var(--paper3);font-size:.85rem;border-top:1px solid var(--border);margin-top:24px}
+footer.links a{color:var(--gold);text-decoration:none;margin:0 8px}
+
+/* Mobile: 480px */
+@media(max-width:480px){
+  .wrap{padding:12px}
+  header.top h1{font-size:1.15rem}
+  .hero{padding:14px}
+  .hero-stat .v{font-size:1.3rem}
+  .grid{grid-template-columns:1fr}
+  table.mod-table{display:block;overflow-x:auto;white-space:nowrap}
+  .tab{padding:6px 10px;font-size:.8rem}
+}
+
+/* Mobile: 360px (R98 紧凑断点) */
+@media(max-width:360px){
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .file-head{flex-direction:column;align-items:flex-start}
+  .file-size{font-size:.65rem}
+  .search-bar{flex-direction:column}
+  .search-bar input{width:100%}
+}
+
+/* Print */
+@media print{
+  body{background:#fff;color:#000}
+  .tabs,.search-bar,footer.links{display:none}
+  .hero,.card,.file{background:#fff;border:1px solid #999;color:#000}
+}
+</style>
+
+<style>
+/* R105 节点弹窗 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:10000;padding:20px;overflow-y:auto}
+.modal-overlay.show{display:flex}
+.modal-card{background:var(--paper);border:1px solid var(--gold);border-radius:14px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;color:var(--paper2);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.modal-card h2{color:var(--gold);margin:0 0 8px;font-size:1.4rem}
+.modal-card .modal-meta{color:var(--paper3);font-size:.85rem;margin-bottom:14px}
+.modal-card .modal-section{margin:14px 0;padding:12px;background:var(--card);border-radius:8px}
+.modal-card .modal-section h3{margin:0 0 8px;color:var(--gold);font-size:.95rem}
+.modal-card .adj-svg{width:100%;height:300px;background:var(--ink);border-radius:6px;border:1px solid var(--border);margin-top:8px}
+.modal-card .neighbor-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem}
+.modal-card .neighbor-row:last-child{border-bottom:0}
+.modal-card .modal-breadcrumb a{color:var(--gold);text-decoration:none;cursor:pointer;padding:2px 6px;border-radius:4px}
+.modal-card .modal-breadcrumb a:hover{background:var(--card)}
+.modal-card .modal-breadcrumb .bc-sep{color:var(--paper3)}
+.modal-card .modal-breadcrumb .bc-current{color:var(--paper2);font-weight:bold}
+.modal-card .modal-breadcrumb button{cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:2px 8px;border-radius:4px;font-size:.7rem}
+.modal-card .modal-breadcrumb button:hover{background:var(--gold);color:#000;border-color:var(--gold)}
+.modal-card .close-btn{position:absolute;top:14px;right:14px;background:var(--card);border:1px solid var(--border);color:var(--paper2);border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:1.1rem;line-height:1}
+.modal-card .close-btn:hover{background:var(--gold);color:#000}
+.modal-wrap{position:relative}
+tr.clickable{cursor:pointer;transition:background .15s}
+tr.clickable:hover{background:rgba(255,180,77,.08)}
+tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-knowledge">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB 知识库浏览中心</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>浏览条目</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>看详情</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>收藏引用</span></div></div>
+<div class="flow-hint">大师/学习者浏览KB条目，收藏引用经典知识。</div>
+</div>
+<a href="#main" class="skip-link">跳到主内容</a>
+<main id="main">
+<div class="wrap">
+
+<header class="top">
+  <h1>典 KB 知识库浏览中心</h1>
+  <a href="divination-hub.html" class="back">← 返回主页</a>
+</header>
+
+<section class="hero">
+  <h2>经 命理 · 中医 · 玄学 · 数字人文知识库</h2>
+  <p class="lead">本平台基于结构化 KB（Knowledge Base）驱动 智能助手，覆盖八字、紫微、奇门、风水、面相、姓名学、中医经典、倪海厦人纪、舒晗天纪、十二生肖等领域。所有报告、知识图谱、知识库直答均由此 KB 实时生成。</p>
+  <div class="hero-stats" id="heroStats">
+    <div class="hero-stat"><div class="v" id="heroTotal">…</div><div class="l">总条目</div></div>
+    <div class="hero-stat"><div class="v" id="heroModules">…</div><div class="l">模块</div></div>
+    <div class="hero-stat"><div class="v" id="heroFiles">…</div><div class="l">KB 文件</div></div>
+    <div class="hero-stat"><div class="v" id="heroTrust">…</div><div class="l">平均 trust</div></div>
+    <div class="hero-stat"><div class="v" id="heroHits">…</div><div class="l">总命中</div></div>
+    <div class="hero-stat"><div class="v" id="heroGrade">…</div><div class="l">质量等级</div></div>
+  </div>
+</section>
+
+<div class="tabs" id="tabs">
+  <div class="tab on" data-tab="modules" title="快捷键 1">档 模块 <span class="badge" id="modBadge">0</span></div>
+  <div class="tab" data-tab="files" title="快捷键 2">夹 KB 文件 <span class="badge" id="fileBadge">0</span></div>
+  <div class="tab" data-tab="hot" title="快捷键 3">热 热门模块 <span class="badge" id="hotBadge">8</span></div>
+  <div class="tab" data-tab="graph" title="快捷键 4">🕸️ 关系图 <span class="badge" id="graphBadge">61</span></div>
+  <div class="tab" data-tab="favs" title="快捷键 5">星 我的收藏 <span class="badge" id="favBadge">0</span></div>
+  <div class="tab" data-tab="search" title="快捷键 6">查 关键词搜索</div>
+</div>
+
+<!-- Search bar -->
+<div class="search-bar" id="searchBar" hidden>
+  <div style="position:relative;flex:1;min-width:200px">
+    <input aria-label="搜索" type="text" id="searchInput" placeholder="输入关键词，如 '八字' '紫微' '小青龙汤' '倪海厦'..." autocomplete="off" style="width:100%;box-sizing:border-box">
+    <div id="searchHistory" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;margin-top:2px;max-height:240px;overflow-y:auto;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.5)"></div>
+  </div>
+  <select id="searchModule" aria-label="搜索模块">
+    <option value="">全部模块</option>
+  </select>
+  <button class="btn primary" id="searchBtn" style="padding:10px 18px;background:var(--gold);color:#000;border:none;border-radius:8px;cursor:pointer;font-size:.9rem">搜索</button>
+</div>
+
+<!-- Panel: Modules -->
+<section class="panel" id="panel-modules">
+  <div id="modContainer" class="loading">加载模块列表...</div>
+</section>
+
+<!-- Panel: Files -->
+<section class="panel" id="panel-files" hidden>
+  <div id="fileContainer" class="loading">加载 KB 文件列表...</div>
+</section>
+
+<!-- Panel: Hot modules -->
+<section class="panel" id="panel-hot" hidden>
+  <div id="hotContainer" class="loading">加载热门模块...</div>
+</section>
+
+<!-- Panel: Search -->
+<section class="panel" id="panel-search" hidden>
+  <div id="searchContainer">
+    <div class="empty"><h3>查 关键词检索</h3>在上方输入关键词检索 10993 条 KB 条目，支持中文模糊匹配。</div>
+  </div>
+</section>
+
+
+<!-- R105 节点弹窗 -->
+<div class="modal-overlay" id="kbNodeModal" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-wrap">
+      <button class="close-btn" id="modalClose" aria-label="关闭">×</button>
+      <button id="modalExportBtn" title="导出此节点+邻接子图为 JSON" style="position:absolute;top:14px;right:54px;background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:.82rem;cursor:pointer">箱 导出</button>
+      <div id="modalBreadcrumb" class="modal-breadcrumb" style="font-size:.78rem;color:var(--paper3);margin-bottom:8px;display:flex;gap:4px;flex-wrap:wrap;align-items:center;min-height:18px"></div>
+      <h2 id="modalTitle">节点详情</h2>
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-section">
+        <h3>表 基础信息</h3>
+        <div id="modalBasic"></div>
+      </div>
+      <div class="modal-section" id="modalStatsSection">
+        <h3>图 邻居质量分布</h3>
+        <div id="modalStats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:8px"></div>
+      </div>
+      <div class="modal-section">
+        <h3>🕸️ 邻接子图</h3>
+        <svg class="adj-svg" id="adjSvg"></svg>
+      </div>
+      <div class="modal-section">
+        <h3>邻接节点 (<span id="neighborCount">0</span>)</h3>
+        <div id="neighborList"></div>
+      </div>
+      <div class="modal-section" id="modalEntriesSection" hidden>
+        <h3>文 关联模块条目预览 <span id="modalEntriesCount" class="chip green" style="font-size:.78rem"></span></h3>
+        <div id="modalEntries" style="display:grid;gap:6px;margin-top:8px"></div>
+        <div id="modalEntriesMore" style="text-align:center;margin-top:8px;font-size:.82rem;color:var(--paper3)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Panel: Graph -->
+<section class="panel" id="panel-graph" hidden>
+  <div id="graphToolbar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+    <input id="graphSearchInput" type="search" placeholder="搜索节点 (ID/名称/拼音..." aria-label="搜索图谱节点" style="flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--paper2);padding:8px 12px;border-radius:8px;font:inherit;font-size:.85rem">
+    <select id="graphLevelFilter" aria-label="图谱层级筛选" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
+      <option value="">全部等级</option>
+      <option value="premium">premium</option>
+      <option value="professional">professional</option>
+      <option value="public">public</option>
+      <option value="admin">admin</option>
+    </select>
+    <select id="graphSortBy" aria-label="图谱排序" style="background:var(--card);border:1px solid var(--border);color:var(--paper2);padding:8px;border-radius:8px;font-size:.82rem">
+      <option value="xref">按引用数</option>
+      <option value="hit">按命中数</option>
+      <option value="size">按大小</option>
+      <option value="id">按 ID</option>
+    </select>
+    <button id="graphResetBtn" class="btn" style="font-size:.82rem">重置</button>
+    <button id="graphBulkBtn" class="btn" style="font-size:.82rem;background:var(--gold-dim);color:#000;border-color:var(--gold)">钉 批量收藏选中</button>
+    <button id="graphExportCheckedBtn" class="btn" style="font-size:.82rem">出 导出选中 JSON</button>
+    <button id="graphExportAllBtn" class="btn" style="font-size:.82rem">导出全部 JSON</button>
+    <button id="graphExportCsvBtn" class="btn" style="font-size:.82rem">出 导出节点 CSV</button>
+    <span id="graphFilterCount" class="chip green" style="font-size:.78rem"></span>
+  </div>
+  <div id="graphContainer" class="loading">加载关系图...</div>
+</section>
+
+<!-- Panel: Favs -->
+<section class="panel" id="panel-favs" hidden>
+  <div id="favsContainer" class="loading">加载收藏...</div>
+</section>
+
+<footer class="links">
+  <a href="kb-quality.html">图 KB 质量审计</a> ·
+  <a href="kb-graph.html">🕸️ KB 知识图谱</a> ·
+  <a href="ai-assistant.html">机 智能助手</a> ·
+  <a href="divination-knowledge.html">典 玄学知识</a> ·
+  <a href="divination-hub.html">宅 主页</a>
+</footer>
+
+</div>
+</main>
+
+<script>
+function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"]");if(el)el.click();}
+(async function(){
+  const CSRF_KEY = '_csrf_token_cache';
+  async function csrf(){
+    let t = sessionStorage.getItem(CSRF_KEY);
+    if(t) return t;
+    try {
+      const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000)});
+      const d = await r.json();
+      t = d.data?.token || d.token;
+      if(t) sessionStorage.setItem(CSRF_KEY, t);
+      return t;
+    } catch(e){ return ''; }
+  }
+  async function api(path){
+    try {
+      const r = await fetch(path, {signal: AbortSignal.timeout(15000)});
+      const d = await r.json();
+      return d.data || d;
+    } catch(e){ return null; }
+  }
+
+  // 加载数据
+  const [stats, files, quality, graph] = await Promise.all([
+    api('/api/public/kb/stats'),
+    api('/api/kb/list'),
+    api('/api/kb/quality-report'),
+    api('/api/kb/graph')
+  ]);
+
+  // Hero
+  const s = stats || {};
+  document.getElementById('heroTotal').textContent = (s.total||0).toLocaleString();
+  document.getElementById('heroModules').textContent = quality?.modules?.length || (s.top_modules?.length||0);
+  document.getElementById('heroFiles').textContent = files?.files?.length || 0;
+  document.getElementById('heroTrust').textContent = quality?.summary?.avg_trust?.toFixed(3) || '—';
+  document.getElementById('heroHits').textContent = (s.total_hits||0).toLocaleString();
+  document.getElementById('heroGrade').textContent = quality?.summary?.grade || '—';
+  document.getElementById('modBadge').textContent = quality?.modules?.length || 0;
+  document.getElementById('fileBadge').textContent = files?.files?.length || 0;
+  document.getElementById('graphBadge').textContent = (graph?.nodes?.length || 0) + '节点';
+  document.getElementById('favBadge').textContent = (JSON.parse(localStorage.getItem('***')||'[]')).length + '项';
+
+  // 填充 search 模块下拉
+  const sel = document.getElementById('searchModule');
+  if(quality?.modules){
+    quality.modules.slice().sort((a,b)=>(b.cnt||0)-(a.cnt||0)).forEach(m => {
+      const o = document.createElement('option');
+      o.value = m.module;
+      o.textContent = `${m.module} (${m.cnt})`;
+      sel.appendChild(o);
+    });
+  }
+
+  // ===== Panel: Modules =====
+  const modules = (quality?.modules || []).slice().sort((a,b)=>(b.cnt||0)-(a.cnt||0));
+  const modC = document.getElementById('modContainer');
+  if(modules.length === 0){
+    modC.innerHTML = '<div class="empty">暂无模块数据</div>';
+  } else {
+    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input aria-label="modulesFilter" type="search" id="modulesFilter" placeholder="🔍 过滤模块名称/等级..." style="flex:1;min-width:160px;padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="modulesSortBy" aria-label="模块排序" style="padding:8px 12px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="cnt">按条目数</option><option value="avg_trust">按信任度</option><option value="grade">按质量等级</option><option value="needs_fix">按需修数</option></select><button id="modulesExport" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">出 导出过滤</button><span id="modulesCount" style="font-size:.8rem;color:var(--paper3)"></span></div><table class="mod-table"><thead><tr><th data-sort="name" style="cursor:pointer" title="点击排序">模块</th><th data-sort="cnt" style="cursor:pointer" title="点击排序">条目</th><th data-sort="grade" style="cursor:pointer" title="点击排序">等级</th><th data-sort="avg_trust" style="cursor:pointer" title="点击排序">平均 trust</th><th data-sort="needs_fix" style="cursor:pointer" title="点击排序">金/银/铜/需修</th><th>分布</th><th>操作</th></tr></thead><tbody>';
+    for(const m of modules){
+      const trust = m.avg_trust || 0;
+      const trustPct = Math.round(trust * 100);
+      const gradeCls = 'g-' + (m.grade || 'B').replace('+','-plus');
+      html += `<tr data-i="${modules.indexOf(m)}" data-mod="${m.module}">
+        <td><strong>${m.module}</strong></td>
+        <td>${m.cnt}</td>
+        <td class="grade"><span class="${gradeCls}">${m.grade||'—'}</span></td>
+        <td>${trust.toFixed(3)} <span class="bar-mini"><span class="fill" style="width:${trustPct}%;background:linear-gradient(90deg,#c9a84c,#7ec47e)"></span></span></td>
+        <td style="font-size:.75rem">${m.gold}/${m.silver}/${m.bronze||0}/${m.needs_fix||0}</td>
+        <td style="font-size:.7rem">min ${m.min_trust?.toFixed(2) || '—'} / max ${m.max_trust?.toFixed(2) || '—'}</td>
+        <td><a class="btn" href="kb-quality.html?module=${m.module}">详情</a> <a class="btn" href="kb-graph.html?module=${m.module}">图谱</a> <a class="btn" href="?tab=search&module=${encodeURIComponent(m.module)}&q=${encodeURIComponent(m.module)}" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${m.module.replace(/'/g,'')}';doSearch();document.getElementById('searchModule').value='${m.module}';}},50)">查 搜</a></td>
+      </tr>`;
+    }
+    html += '</tbody></table>';
+    modC.innerHTML = html;
+
+    // R138 模块过滤
+    const mIn = document.getElementById('modulesFilter');
+    const mCount = document.getElementById('modulesCount');
+    if(mIn) mIn.addEventListener('input', () => {
+      const q = mIn.value.trim().toLowerCase();
+      const rows = modC.querySelectorAll('tbody tr');
+      let shown = 0;
+      rows.forEach(r => {
+        const ok = !q || (r.textContent||'').toLowerCase().includes(q);
+        r.style.display = ok ? '' : 'none';
+        if(ok) shown++;
+      });
+      if(mCount) mCount.textContent = q ? `${shown}/${modules.length}` : `${modules.length} 个模块`;
+    });
+    if(mCount) mCount.textContent = `${modules.length} 个模块`;
+    // R145 排序 + 导出
+    const mSort = document.getElementById('modulesSortBy');
+    const mExp = document.getElementById('modulesExport');
+    function resortMods(){
+      const key = mSort.value;
+      const ord = { cnt: b => (b.cnt||0)-(a.cnt||0), avg_trust: (a,b) => (b.avg_trust||0)-(a.avg_trust||0), grade: (a,b) => { const o = ['S+','S','A+','A','B+','B','C','D','—']; return o.indexOf(b.grade||'—') - o.indexOf(a.grade||'—'); }, needs_fix: (a,b) => (a.needs_fix||0)-(b.needs_fix||0) }[key];
+      const sorted = modules.slice().sort(ord);
+      const tbody = modC.querySelector('tbody');
+      if(!tbody) return;
+      const newRows = sorted.map((m,i) => {
+        const r = tbody.querySelector(`tr[data-mod="${m.module}"]`);
+        return r ? r.outerHTML : '';
+      }).join('');
+      tbody.innerHTML = newRows;
+    }
+    if(mSort) mSort.addEventListener('change', resortMods);
+    // R156 表头点击联动下拉排序
+    modC.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+        if(key === 'name'){
+          // name 排序在下拉里没有，直接排
+          const tbody = modC.querySelector('tbody');
+          if(!tbody) return;
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+          rows.sort((a,b) => (a.dataset.mod||'').localeCompare(b.dataset.mod||''));
+          rows.forEach(r => tbody.appendChild(r));
+          if(window._toast) window._toast('📋 已按模块名排序', 1000);
+        } else {
+          // 联动下拉
+          if(mSort && mSort.value !== key){
+            mSort.value = key;
+            resortMods();
+            if(window._toast) window._toast('📋 已按' + th.textContent + '排序', 1000);
+          } else {
+            resortMods();
+          }
+        }
+      });
+    });
+    if(mExp) mExp.onclick = () => {
+      const visibleRows = modC.querySelectorAll('tbody tr');
+      const rows = [];
+      for(const r of visibleRows){
+        if(r.style.display === 'none') continue;
+        const idx = parseInt(r.dataset.i||'0');
+        const m = modules[idx];
+        if(m) rows.push(m);
+      }
+      if(rows.length === 0){ if(window._toast) window._toast('♻️ 无过滤结果可导出', 1200); return; }
+      const headers = ['module','cnt','grade','avg_trust','min_trust','max_trust','gold','silver','bronze','needs_fix'];
+      const esc = v => { if(v===null||v===undefined) return ''; const s = String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
+      const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => headers.map(h => esc(r[h])).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `kb-modules-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      if(window._toast) window._toast(`📤 已导出 ${rows.length} 个模块`, 1200);
+    };
+  }
+
+  // ===== Panel: Files =====
+  const fileList = (files?.files || []).slice().sort((a,b)=>a.filename.localeCompare(b.filename));
+  const fileC = document.getElementById('fileContainer');
+  if(fileList.length === 0){
+    fileC.innerHTML = '<div class="empty">暂无 KB 文件</div>';
+  } else {
+    let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px;flex-wrap:wrap">';
+    html += `<div><h2 style="margin:0;color:var(--gold);font-size:1.1rem">夹 KB 文件库（${fileList.length} 个）</h2></div>`;
+    html += `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input aria-label="输入" type="search" id="filesFilterInput" placeholder="🔍 按文件名/描述过滤" style="flex:1;min-width:140px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font:inherit;font-size:.85rem"><select id="filesLevelFilter" aria-label="文件层级筛选" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="">全等级</option><option value="public">public</option><option value="professional">professional</option><option value="admin">admin</option></select><select id="filesSortBy" aria-label="filesSortBy" title="按条数排序" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.85rem"><option value="name">按文件名</option><option value="entries-desc">条目数 ↓</option><option value="entries-asc">条目数 ↑</option></select><span id="filesCount" style="font-size:.8rem;color:var(--paper3)"></span><button class="btn" id="randomFilesBtn" style="background:var(--gold);color:#000;border:0;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">随机 5 个</button><button class="btn" id="randomOneBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">骰 随机 1 个精读</button><button class="btn" id="copyFilesListBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">表 复制清单</button><button class="btn" id="filesStatBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">统计</button><button class="btn" id="filesGroupBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.85rem">夹 按等级分组</button></div>`;
+    html += '</div><div class="grid">';
+    function getSortedFiles(){
+      const by = document.getElementById('filesSortBy')?.value || 'name';
+      const arr = fileList.slice();
+      if(by === 'entries-desc') arr.sort((a,b) => (b.entries||0) - (a.entries||0));
+      else if(by === 'entries-asc') arr.sort((a,b) => (a.entries||0) - (b.entries||0));
+      else arr.sort((a,b) => a.filename.localeCompare(b.filename));
+      return arr;
+    }
+    const sortedFiles = getSortedFiles();
+    for(const f of sortedFiles){
+      const lvl = f.level || 'public';
+      const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
+      const desc = f.desc || '（暂无描述）';
+      const searchKey = encodeURIComponent(f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' '));
+      html += `<div class="file" data-kb-id="${f.filename}" data-kb-name="${f.filename}" data-i="${fileList.indexOf(f)}">
+        <div class="file-head">
+          <span class="file-name">${f.filename}</span>
+          ${lvlChip}
+          <button class="kb-copy-name" data-name="${f.filename}" title="复制文件名" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer;margin-left:auto">表</button>
+        </div>
+        <div class="desc">${desc}</div>
+        <div class="meta">
+          <span class="chip">夹 静态 KB</span>
+          <span class="chip gray">点 knowledge/${f.filename}</span>
+          <button class="kb-copy-path" data-path="knowledge/${f.filename}" title="复制路径" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:.7rem;cursor:pointer">表 路径</button>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="ai-assistant.html?preset=${f.filename}">机 用 AI 探索</a>
+          <a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${searchKey.replace(/'/g,'\\\'')}';doSearch();}},50)">查 搜条目</a>
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+    html += `<div id="randomPreview" style="margin-top:18px"></div>`;
+    fileC.innerHTML = html;
+
+    // R131 复制文件名/路径
+    fileC.querySelectorAll('.kb-copy-name').forEach(btn => {
+      btn.onclick = () => {
+        const name = btn.dataset.name;
+        if(navigator.clipboard) navigator.clipboard.writeText(name);
+        const old = btn.textContent; btn.textContent = '✅'; setTimeout(() => btn.textContent = old, 1200);
+      };
+    });
+    fileC.querySelectorAll('.kb-copy-path').forEach(btn => {
+      btn.onclick = () => {
+        const p = btn.dataset.path;
+        if(navigator.clipboard) navigator.clipboard.writeText(p);
+        const old = btn.textContent; btn.textContent = '✅ 已复制'; setTimeout(() => btn.textContent = old, 1200);
+      };
+    });
+
+    // R126/R127 随机浏览
+    const randBtn = document.getElementById('randomFilesBtn');
+    const oneBtn = document.getElementById('randomOneBtn');
+    const preview = document.getElementById('randomPreview');
+    const kbState = kbState || {}; kbState.pickCount = 0;
+
+function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeCompare(b.name||'')).slice(0, n); }
+    function renderPreview(files){
+      let h = '<div class="card"><h3>🔀 随机推荐阅读（' + files.length + ' 个）</h3><div class="grid" style="margin-top:10px">';
+      for(const f of files){
+        const lvl = f.level || 'public';
+        const lvlChip = lvl === 'professional' ? '<span class="chip blue">professional</span>' : lvl === 'admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
+        h += `<div class="file"><div class="file-head"><span class="file-name">${f.filename}</span>${lvlChip}</div><div class="desc">${f.desc || '（暂无描述）'}</div><div class="actions"><a class="btn primary" href="ai-assistant.html?preset=${f.filename}">机 AI 问</a><a class="btn" href="#" onclick="event.preventDefault();switchTab('search');setTimeout(()=>{const i=document.getElementById('searchInput');if(i){i.value='${f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ').replace(/'/g,'\\\'')}';doSearch();}},50)">查 搜</a></div></div>`;
+      }
+      h += '</div></div>';
+      preview.innerHTML = h;
+    }
+    function renderOnePreview(f){
+      preview.innerHTML = '<div class="card"><h3>骰 随机精读 · ' + f.filename + '</h3>' +
+        '<div class="desc" style="margin-top:8px">' + (f.desc || '（暂无描述）') + '</div>' +
+        '<div class="meta" style="margin-top:8px">' + (f.level ? '<span class="chip">' + f.level + '</span>' : '') +
+        '<span class="chip gray">点 knowledge/' + (f.filename || '') + '</span></div>' +
+        '<div class="actions" style="margin-top:12px"><a class="btn primary" href="ai-assistant.html?preset=' + f.filename + '">机 用 AI 探索全文</a>' +
+        '<a class="btn" href="#" onclick="event.preventDefault();switchTab(\'search\');setTimeout(()=>{const i=document.getElementById(\'searchInput\');if(i){i.value=\'' + f.filename.replace('.js','').replace(/-kb$/,'').replace(/-/g,' ') + '\';doSearch();}},50)">查 搜本文件条目</a>' +
+        '<button class="btn" id="randomOneAgainBtn" style="background:var(--gold);color:#000;border:0">骰 再来一个</button></div></div>';
+      const again = document.getElementById('randomOneAgainBtn');
+      if(again) again.onclick = () => renderOnePreview(pickN(1)[0]);
+    }
+    if(randBtn) randBtn.onclick = () => renderPreview(pickN(5));
+
+    // R137 文件搜索/等级过滤
+    const fIn = document.getElementById('filesFilterInput');
+    const fSel = document.getElementById('filesLevelFilter');
+    const fSort = document.getElementById('filesSortBy');
+    if(fSort) fSort.addEventListener('change', () => {
+      const grid = fileC.querySelector('.grid');
+      if(!grid) return;
+      const sorted = getSortedFiles();
+      const cards = Array.from(grid.querySelectorAll('.file'));
+      const ordered = sorted.map(f => cards.find(c => c.dataset.kbName === f.filename)).filter(Boolean);
+      grid.innerHTML = ordered.map(c => c.outerHTML).join('');
+    });
+
+    const fCount = document.getElementById('filesCount');
+    function applyFilesFilter(){
+      const q = (fIn.value||'').trim().toLowerCase();
+      const lv = fSel.value;
+      const cards = fileC.querySelectorAll('.file');
+      let shown = 0, total = cards.length;
+      cards.forEach(card => {
+        const text = (card.textContent||'').toLowerCase();
+        const meta = fileList[parseInt(card.getAttribute('data-i')||'0')] || {};
+        const lvMatch = !lv || (meta.level||'public') === lv;
+        const qMatch = !q || text.includes(q);
+        const show = lvMatch && qMatch;
+        card.style.display = show ? '' : 'none';
+        if(show) shown++;
+      });
+      if(fCount) fCount.textContent = q || lv ? `${shown}/${total}` : '';
+    }
+    if(fIn) fIn.addEventListener('input', applyFilesFilter);
+    if(fSel) fSel.addEventListener('change', applyFilesFilter);
+
+    if(oneBtn) oneBtn.onclick = () => renderOnePreview(pickN(1)[0]);
+    // R134 复制文件清单
+    const copyListBtn = document.getElementById('copyFilesListBtn');
+    if(copyListBtn) copyListBtn.onclick = () => {
+      const txt = fileList.map(f => `${f.filename} | ${f.level || 'public'} | ${f.entries || '?'} 条 | ${f.desc || ''}`).join('\n');
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(txt).then(() => {
+          if(window._toast) window._toast(`📋 已复制 ${fileList.length} 个文件清单`, 1600);
+        });
+      } else {
+        const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+        if(window._toast) window._toast(`📋 已复制 ${fileList.length} 个文件清单`, 1600);
+      }
+    };
+    // R135 文件统计
+    const statBtn = document.getElementById('filesStatBtn');
+    if(statBtn) statBtn.onclick = () => {
+      const byLevel = {};
+      let totalEntries = 0, withDesc = 0;
+      for(const f of fileList){
+        const lv = f.level || 'public';
+        byLevel[lv] = (byLevel[lv] || 0) + 1;
+        totalEntries += (f.entries || 0);
+        if(f.desc && f.desc.trim()) withDesc++;
+      }
+      const levelHtml = Object.entries(byLevel).map(([k,v]) => `<span class="chip ${k==='professional'?'blue':k==='admin'?'red':'green'}">${k} · ${v}</span>`).join(' ');
+      const statHtml = `<div class="card" style="border:1px solid var(--gold)"><h3>图 KB 文件统计</h3>
+        <div class="desc" style="margin-top:8px;line-height:1.8">
+          📁 文件总数：<b style="color:var(--gold)">${fileList.length}</b><br>
+          📚 条目总数：<b style="color:var(--gold)">${totalEntries.toLocaleString()}</b><br>
+          📝 有描述：<b style="color:var(--gold)">${withDesc} / ${fileList.length}</b> (${(withDesc/fileList.length*100).toFixed(0)}%)<br>
+          🎚 等级分布：${levelHtml}
+        </div></div>`;
+      preview.innerHTML = statHtml + preview.innerHTML;
+      if(window._toast) window._toast('统计已生成', 1200);
+    };
+
+    // R140 按等级分组折叠
+    const groupBtn = document.getElementById('filesGroupBtn');
+    let groupedView = false;
+    if(groupBtn) groupBtn.onclick = () => {
+      groupedView = !groupedView;
+      groupBtn.textContent = groupedView ? '🗂️ 平铺视图' : '📂 按等级分组';
+      groupBtn.style.background = groupedView ? 'var(--gold)' : 'var(--card)';
+      groupBtn.style.color = groupedView ? '#000' : 'var(--paper2)';
+      // 重渲染卡片
+      const grid = fileC.querySelector('.grid');
+      if(!grid) return;
+      const cards = Array.from(grid.querySelectorAll('.file'));
+      if(groupedView){
+        // 分组
+        const byLevel = {};
+        for(const f of fileList){
+          const lv = f.level || 'public';
+          if(!byLevel[lv]) byLevel[lv] = [];
+          byLevel[lv].push(f);
+        }
+        const lvlOrder = ['admin','professional','public'];
+        const lvlLbl = {admin:'🔴 Admin',professional:'🔵 Professional',public:'🟢 Public'};
+        let h = '';
+        for(const lv of lvlOrder){
+          if(!byLevel[lv] || byLevel[lv].length === 0) continue;
+          h += `<details open style="margin-bottom:14px;border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--card)"><summary style="cursor:pointer;color:var(--gold);font-weight:600;font-size:.95rem;margin-bottom:8px">${lvlLbl[lv]} · ${byLevel[lv].length} 个</summary><div class="grid" style="margin-top:8px">`;
+          for(const f of byLevel[lv]){
+            const node = cards.find(c => c.dataset.kbName === f.filename);
+            if(node) h += node.outerHTML;
+          }
+          h += '</div></details>';
+        }
+        grid.innerHTML = h;
+        if(window._toast) window._toast('📂 按等级分组', 1000);
+      } else {
+        // 还原
+        grid.innerHTML = cards.map(c => c.outerHTML).join('');
+        if(window._toast) window._toast('🗂️ 平铺视图', 1000);
+      }
+    };
+  }
+
+  // ===== Panel: Hot =====
+  const hotModules = (s.top_modules || []);
+  const hotC = document.getElementById('hotContainer');
+  if(hotModules.length === 0){
+    hotC.innerHTML = '<div class="empty">暂无热门数据</div>';
+  } else {
+    let html = '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap"><h2 style="margin:0;color:var(--gold);font-size:1.05rem">热 热门模块 · ${hotModules.length} 个</h2><input aria-label="搜索" type="search" id="hotSearchInput" placeholder="🔍 过滤模块名..." style="flex:1;min-width:120px;max-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem"><button id="hotCopyList" style="margin-left:auto;background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">表 复制清单</button><button id="hotExportCsv" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:.8rem">出 导出 CSV</button></div><div class="grid">';
+    for(const m of hotModules){
+      // R154 卡片自带 data-mod 已有，搜索过滤用
+      const trust = modules.find(x=>x.module===m.module)?.avg_trust || 0;
+      html += `<div class="card" data-mod="${m.module}" data-hits="${m.hits}" data-cnt="${m.cnt}" data-trust="${trust}">
+        <h3>热 ${m.module}</h3>
+        <div class="desc">命中数 <strong style="color:var(--gold);font-size:1.1rem">${m.hits.toLocaleString()}</strong> · ${m.cnt} 条目 · trust ${trust.toFixed(2)}</div>
+        <div class="actions">
+          <a class="btn primary" href="ai-assistant.html?mod=${m.module}">机 AI 问 ${m.module}</a>
+          <a class="btn" href="kb-quality.html?module=${m.module}">图 质量</a>
+          <a class="btn" href="kb-graph.html?module=${m.module}">🕸️ 图谱</a>
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+    hotC.innerHTML = html;
+    // R146 热门事件
+    const hCp = document.getElementById('hotCopyList');
+    const hEx = document.getElementById('hotExportCsv');
+    if(hCp) hCp.onclick = () => {
+      const lines = hotModules.map(m => `${m.module} | hits=${m.hits} | cnt=${m.cnt} | trust=${(modules.find(x=>x.module===m.module)?.avg_trust||0).toFixed(3)}`);
+      const text = lines.join('\n');
+      if(navigator.clipboard) navigator.clipboard.writeText(text);
+      else { const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove(); }
+      if(window._toast) window._toast(`📋 已复制 ${hotModules.length} 个热门清单`, 1200);
+    };
+    if(hEx) hEx.onclick = () => {
+      const headers = ['module','hits','cnt','avg_trust','grade'];
+      const esc = v => { if(v===null||v===undefined) return ''; const s = String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; };
+      const rows = hotModules.map(m => {
+        const qual = modules.find(x=>x.module===m.module);
+        return [m.module, m.hits, m.cnt, qual?.avg_trust?.toFixed(3)||'', qual?.grade||''];
+      });
+      const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => r.map(esc).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `kb-hot-modules-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+      if(window._toast) window._toast(`📤 已导出 ${rows.length} 个热门`, 1200);
+    };
+    // R154 热门搜索过滤
+    const hotSearch = document.getElementById('hotSearchInput');
+    if(hotSearch) hotSearch.addEventListener('input', () => {
+      const q = hotSearch.value.trim().toLowerCase();
+      let visible = 0;
+      hotC.querySelectorAll('.card').forEach(card => {
+        const mod = (card.dataset.mod || '').toLowerCase();
+        const show = !q || mod.includes(q);
+        card.style.display = show ? '' : 'none';
+        if(show) visible++;
+      });
+      // 更新标题计数
+      const h2 = hotC.querySelector('h2');
+      if(h2) h2.textContent = `🔥 热门模块 · ${q ? visible + '/' + hotModules.length : hotModules.length} 个`;
+    });
+  }
+
+  // ===== Panel: Graph (R104 搜索+过滤+排序) =====
+  const graphC = document.getElementById('graphContainer');
+  const graphSearch = document.getElementById('graphSearchInput');
+  const graphLevel = document.getElementById('graphLevelFilter');
+  const graphSort = document.getElementById('graphSortBy');
+  const graphReset = document.getElementById('graphResetBtn');
+  const graphCount = document.getElementById('graphFilterCount');
+  const gNodes = graph?.nodes || [];
+  const gEdges = graph?.edges || [];
+
+  if(gNodes.length === 0){
+    graphC.innerHTML = '<div class="empty">暂无图谱数据</div>';
+  } else {
+    const levels = {};
+    gNodes.forEach(n => levels[n.level] = (levels[n.level]||0)+1);
+    const edgesByType = {};
+    gEdges.forEach(e => edgesByType[e.reason] = (edgesByType[e.reason]||0)+1);
+    const topHubs = [...gNodes].sort((a,b)=>(b.hit_count||0)-(a.hit_count||0)).slice(0,5);
+    const topXref = [...gNodes].sort((a,b)=>(b.xref_count||0)-(a.xref_count||0)).slice(0,5);
+
+    function renderGraphPanel(){
+      const q = (graphSearch?.value || '').trim().toLowerCase();
+      const lvl = graphLevel?.value || '';
+      const sortBy = graphSort?.value || 'xref';
+
+      let filtered = gNodes.filter(n => {
+        const matchQ = !q || (n.id||'').toLowerCase().includes(q) || (n.name||'').toLowerCase().includes(q);
+        const matchL = !lvl || (n.level||'public') === lvl;
+        return matchQ && matchL;
+      });
+
+      const sortMap = { xref: 'xref_count', hit: 'hit_count', size: 'size_kb', id: 'id' };
+      const key = sortMap[sortBy] || 'xref_count';
+      filtered.sort((a,b)=>{
+        const av = a[key] || 0; const bv = b[key] || 0;
+        if(typeof av === 'string') return av.localeCompare(bv);
+        return bv - av;
+      });
+
+      if(graphCount) graphCount.textContent = filtered.length + ' / ' + gNodes.length;
+
+      if(filtered.length === 0){
+        graphC.innerHTML = `<div class="empty"><h3>无匹配节点</h3><p>尝试调整搜索词或等级过滤条件。</p></div>`;
+        return;
+      }
+
+      const filteredIds = new Set(filtered.map(n=>n.id));
+      const relatedEdges = gEdges.filter(e => filteredIds.has(e.source) && filteredIds.has(e.target));
+
+      let html = `
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+          <div class="card">
+            <h3>图 总览</h3>
+            <div class="desc">
+              <div>安 节点：<b style="color:var(--gold)">${filtered.length}</b> / ${gNodes.length}</div>
+              <div>边：<b style="color:var(--gold)">${relatedEdges.length}</b> / ${gEdges.length}</div>
+              <div>典 等级：${Object.entries(levels).map(([k,v])=>`<span class="chip gray">${k}·${v}</span>`).join('')}</div>
+              <div>🔗 边类型：${Object.entries(edgesByType).map(([k,v])=>`<span class="chip">${k}·${v}</span>`).join('')}</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>热 热门枢纽 (top 5)</h3>
+            <div class="desc">${topHubs.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip">${n.hit_count||0} 命中</span></div>`).join('')}</div>
+          </div>
+          <div class="card">
+            <h3>🕸️ 关联达人 (top 5)</h3>
+            <div class="desc">${topXref.map(n=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span><b>${n.name||n.id}</b></span><span class="chip blue">${n.xref_count||0} 引用</span></div>`).join('')}</div>
+          </div>
+        </div>
+        <h3 style="margin:16px 0 10px;color:var(--gold);font-size:1rem">箱 ${filtered.length} 个匹配节点（按 ${sortBy} 排序）</h3>
+        <table class="mod-table">
+          <thead><tr><th><input type="checkbox" id="graphSelectAll" aria-label="graphSelectAll" title="全选"></th><th>ID</th><th>名称</th><th>等级</th><th>大小 KB</th><th>命中</th><th>引用</th><th>操作</th></tr></thead>
+          <tbody>`;
+      for(const n of filtered){
+        const lvl = n.level || 'public';
+        const lvlChip = lvl==='premium' ? '<span class="chip">premium</span>' : lvl==='professional' ? '<span class="chip blue">professional</span>' : lvl==='admin' ? '<span class="chip red">admin</span>' : '<span class="chip green">public</span>';
+        html += `<tr>
+          <td><input type="checkbox" class="graph-row-check" data-id="${n.id}" aria-label="${n.id}" data-name="${(n.name||n.id).replace(/"/g,'&quot;')}" data-level="${lvl}"></td>
+          <td><code style="font-size:.78rem">${n.id}</code></td>
+          <td><b>${n.name||n.id}</b></td>
+          <td>${lvlChip}</td>
+          <td>${(n.size_kb||0).toFixed(1)}</td>
+          <td>${n.hit_count||0}</td>
+          <td>${n.xref_count||0}</td>
+          <td>
+            <a class="btn" href="kb-graph.html?module=${encodeURIComponent(n.id)}">🕸️ 图谱</a>
+            <a class="btn" href="kb-quality.html?module=${encodeURIComponent(n.id)}">图 质量</a>
+          </td>
+        </tr>`;
+      }
+      html += `</tbody></table>
+        <div style="margin-top:16px;padding:14px;background:var(--card);border-radius:10px;border:1px solid var(--border)">
+          <h3 style="color:var(--gold);margin:0 0 8px">🔗 边 (引用关系 · 前 ${Math.min(20,relatedEdges.length)} 条)</h3>`;
+      relatedEdges.slice(0,20).forEach(e => {
+        const src = gNodes.find(n=>n.id===e.source);
+        const tgt = gNodes.find(n=>n.id===e.target);
+        html += `<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem">
+          <span style="flex:1"><b>${src?.name||e.source}</b></span>
+          <span style="color:var(--gold)">→ ${e.reason||'ref'} (w=${e.weight||1})</span>
+          <span style="flex:1;text-align:right"><b>${tgt?.name||e.target}</b></span>
+        </div>`;
+      });
+      html += `</div>
+        <div style="margin-top:14px;text-align:center"><a class="btn primary" href="kb-graph.html" style="padding:8px 18px;background:var(--gold);color:#000;border-radius:8px;text-decoration:none">打开完整可视化图谱 →</a></div>`;
+      graphC.innerHTML = html;
+    }
+
+    renderGraphPanel();
+
+    // R112 URL 自动弹窗
+    setTimeout(() => {
+      try {
+        const url = new URL(window.location.href);
+        const modParam = url.searchParams.get('module');
+        if(modParam && gNodes.find(n => n.id === modParam)){
+          window._modalHistory = [modParam];
+          openNodeModal(modParam);
+        }
+      } catch(e){}
+    }, 200);
+
+    graphSearch?.addEventListener('input', renderGraphPanel);
+    graphLevel?.addEventListener('change', renderGraphPanel);
+    graphSort?.addEventListener('change', renderGraphPanel);
+    graphReset?.addEventListener('click', () => {
+      if(graphSearch) graphSearch.value = '';
+      if(graphLevel) graphLevel.value = '';
+      if(graphSort) graphSort.value = 'xref';
+      renderGraphPanel();
+    });
+
+    // R109 批量收藏 + 全选
+    document.getElementById('graphBulkBtn')?.addEventListener('click', () => {
+      const checked = document.querySelectorAll('.graph-row-check:checked');
+      if(checked.length === 0){
+        if(window.toast) window.toast('⚠️ 请先勾选节点', 1500);
+        return;
+      }
+      if(!window.KbFavorites){
+        if(window.toast) window.toast('⚠️ KbFavorites 未加载', 1500);
+        return;
+      }
+      let added = 0;
+      checked.forEach(cb => {
+        const id = cb.dataset.id;
+        const name = cb.dataset.name;
+        const level = cb.dataset.level;
+        if(!window.KbFavorites.getAll().find(f => f.id === id)){
+          window.KbFavorites.add({id, name, level, kind: 'module'});
+          added++;
+        }
+      });
+      if(window.toast) window.toast(`✅ 已添加 ${added}/${checked.length} 个到收藏`, 1800);
+      // 触发收藏页刷新
+      try{
+        if(window.KbFavorites && typeof window.KbFavorites._broadcast === 'function') window.KbFavorites._broadcast();
+      }catch(e){}
+    });
+
+    document.getElementById('graphSelectAll')?.addEventListener('change', (e) => {
+      const checked = e.target.checked;
+      document.querySelectorAll('.graph-row-check').forEach(cb => cb.checked = checked);
+    });
+
+    // R148 图谱节点导出 JSON
+    function exportNodesAsJSON(nodes, filename){
+      const payload = {
+        exported_at: new Date().toISOString(),
+        source: 'mingli-baojian/kb-browser.html#graph',
+        node_count: nodes.length,
+        nodes: nodes.map(n => ({
+          id: n.id, name: n.name, level: n.level || 'public',
+          size_kb: n.size_kb || 0, hit_count: n.hit_count || 0, xref_count: n.xref_count || 0
+        }))
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      if(window._toast) window._toast(`✅ 已导出 ${nodes.length} 个节点 JSON`, 1500);
+    }
+
+    document.getElementById('graphExportCheckedBtn')?.addEventListener('click', () => {
+      const checked = document.querySelectorAll('.graph-row-check:checked');
+      if(checked.length === 0){
+        if(window._toast) window._toast('⚠️ 请先勾选节点', 1500);
+        return;
+      }
+      const ids = new Set(Array.from(checked).map(cb => cb.dataset.id));
+      const nodes = gNodes.filter(n => ids.has(n.id));
+      const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+      exportNodesAsJSON(nodes, `kb-graph-selected-${nodes.length}-${ts}.json`);
+    });
+
+    document.getElementById('graphExportAllBtn')?.addEventListener('click', () => {
+      // 按当前过滤结果导出，不是全量
+      const q = (graphSearch?.value || '').trim().toLowerCase();
+      const lvl = graphLevel?.value || '';
+      const filtered = gNodes.filter(n => {
+        const matchQ = !q || (n.id||'').toLowerCase().includes(q) || (n.name||'').toLowerCase().includes(q);
+        const matchL = !lvl || (n.level||'public') === lvl;
+        return matchQ && matchL;
+      });
+      const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+      exportNodesAsJSON(filtered, `kb-graph-all-${filtered.length}-${ts}.json`);
+    });
+
+    // R152 导出节点清单 CSV（按当前过滤）
+    document.getElementById('graphExportCsvBtn')?.addEventListener('click', () => {
+      const q = (graphSearch?.value || '').trim().toLowerCase();
+      const lvl = graphLevel?.value || '';
+      const filtered = gNodes.filter(n => {
+        const matchQ = !q || (n.id||'').toLowerCase().includes(q) || (n.name||'').toLowerCase().includes(q);
+        const matchL = !lvl || (n.level||'public') === lvl;
+        return matchQ && matchL;
+      });
+      if(filtered.length === 0){
+        if(window._toast) window._toast('⚠️ 当前过滤无节点', 1500);
+        return;
+      }
+      const esc = v => {
+        if(v===null||v===undefined) return '';
+        const s2 = String(v);
+        return /[",\n]/.test(s2) ? '"' + s2.replace(/"/g,'""') + '"' : s2;
+      };
+      const headers = ['id','name','level','size_kb','hit_count','xref_count'];
+      const rows = filtered.map(n => [n.id, n.name, n.level||'public', (n.size_kb||0).toFixed(1), n.hit_count||0, n.xref_count||0]);
+      const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => r.map(esc).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `kb-graph-nodes-${filtered.length}-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      if(window._toast) window._toast(`📤 已导出 ${filtered.length} 个节点 CSV`, 1500);
+    });
+  }
+
+
+  // ===== Panel: Graph 节点弹窗 (R105) =====
+  function renderAdjGraph(svgEl, centerId, neighbors){
+    const NS = 'http://www.w3.org/2000/svg';
+    const W = svgEl.clientWidth || 580;
+    const H = 300;
+    svgEl.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svgEl.innerHTML = '';
+    const cx = W/2, cy = H/2;
+    // 中心节点
+    const center = document.createElementNS(NS,'circle');
+    center.setAttribute('cx', cx); center.setAttribute('cy', cy);
+    center.setAttribute('r', 22);
+    center.setAttribute('fill', '#ffb44d'); center.setAttribute('stroke', '#c9a84c'); center.setAttribute('stroke-width', 2);
+    svgEl.appendChild(center);
+    const centerText = document.createElementNS(NS,'text');
+    centerText.setAttribute('x', cx); centerText.setAttribute('y', cy+4);
+    centerText.setAttribute('text-anchor','middle'); centerText.setAttribute('fill','#000');
+    centerText.setAttribute('font-size','11'); centerText.setAttribute('font-weight','bold');
+    centerText.textContent = (gNodes.find(n=>n.id===centerId)?.name || centerId).slice(0, 6);
+    svgEl.appendChild(centerText);
+    // 邻居环形布局
+    const n = neighbors.length;
+    if(n === 0){
+      const empty = document.createElementNS(NS,'text');
+      empty.setAttribute('x', W/2); empty.setAttribute('y', H/2 + 30);
+      empty.setAttribute('text-anchor','middle'); empty.setAttribute('fill','#888');
+      empty.setAttribute('font-size','12');
+      empty.textContent = '（无关联节点）';
+      svgEl.appendChild(empty);
+      return;
+    }
+    const radius = Math.min(W, H)/2 - 40;
+    neighbors.forEach((nb, i) => {
+      const angle = (2 * Math.PI * i) / n - Math.PI/2;
+      const nx = cx + radius * Math.cos(angle);
+      const ny = cy + radius * Math.sin(angle);
+      // 边
+      const line = document.createElementNS(NS,'line');
+      line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+      line.setAttribute('x2', nx); line.setAttribute('y2', ny);
+      line.setAttribute('stroke', '#666'); line.setAttribute('stroke-width', 1);
+      line.setAttribute('opacity', 0.5);
+      svgEl.appendChild(line);
+      // 节点
+      const c = document.createElementNS(NS,'circle');
+      c.setAttribute('cx', nx); c.setAttribute('cy', ny);
+      c.setAttribute('r', 14);
+      const lvl = nb.level || 'public';
+      c.setAttribute('fill', lvl==='premium' ? '#c9a84c' : lvl==='professional' ? '#4a9eff' : '#888');
+      svgEl.appendChild(c);
+      // 标签
+      const t = document.createElementNS(NS,'text');
+      t.setAttribute('x', nx); t.setAttribute('y', ny + 24);
+      t.setAttribute('text-anchor','middle'); t.setAttribute('fill','#e0d8c8');
+      t.setAttribute('font-size','10');
+      t.textContent = (nb.name || nb.id).slice(0, 5);
+      svgEl.appendChild(t);
+    });
+  }
+
+  function openNodeModal(nodeId){
+    const node = gNodes.find(n => n.id === nodeId);
+    if(!node) return;
+    const modal = document.getElementById('kbNodeModal');
+
+    // R111 历史栈管理
+    if(!window._modalHistory) window._modalHistory = [];
+    // 若与栈顶相同则不压栈
+    if(window._modalHistory[window._modalHistory.length - 1] !== nodeId){
+      window._modalHistory.push(nodeId);
+      // 限制深度 20
+      if(window._modalHistory.length > 20) window._modalHistory = window._modalHistory.slice(-20);
+    }
+
+    // 渲染面包屑
+    const bc = document.getElementById('modalBreadcrumb');
+    if(bc){
+      const stack = window._modalHistory;
+      let html = '';
+      stack.forEach((id, i) => {
+        const n = gNodes.find(x => x.id === id);
+        const label = n?.name || id;
+        if(i === stack.length - 1){
+          html += `<span class="bc-current">${label}</span>`;
+        } else {
+          html += `<a data-bc-idx="${i}">${label}</a><span class="bc-sep">›</span>`;
+        }
+      });
+      html += stack.length > 1 ? ' <button id="modalBackBtn" title="返回上一节点">← 返回</button>' : '';
+      bc.innerHTML = html;
+      bc.querySelectorAll('a[data-bc-idx]').forEach(a => {
+        a.onclick = (e) => {
+          e.preventDefault();
+          const idx = parseInt(a.dataset.bcIdx, 10);
+          // 切到这里，并截断后续栈
+          window._modalHistory = window._modalHistory.slice(0, idx + 1);
+          openNodeModal(window._modalHistory[window._modalHistory.length - 1]);
+        };
+      });
+      const backBtn = document.getElementById('modalBackBtn');
+      if(backBtn) backBtn.onclick = () => {
+        if(window._modalHistory.length <= 1) return;
+        window._modalHistory.pop();
+        openNodeModal(window._modalHistory[window._modalHistory.length - 1]);
+      };
+    }
+
+    // R112 URL 同步
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('module', nodeId);
+      window.history.replaceState(null, '', url.toString());
+    } catch(e){}
+    const neighbors = [];
+    const seen = new Set();
+    gEdges.forEach(e => {
+      if(e.source === nodeId && !seen.has(e.target)){
+        const nb = gNodes.find(n => n.id === e.target);
+        if(nb){ neighbors.push({...nb, weight: e.weight||1, reason: e.reason||'ref'}); seen.add(e.target); }
+      }
+      if(e.target === nodeId && !seen.has(e.source)){
+        const nb = gNodes.find(n => n.id === e.source);
+        if(nb){ neighbors.push({...nb, weight: e.weight||1, reason: e.reason||'ref'}); seen.add(e.source); }
+      }
+    });
+    neighbors.sort((a,b) => (b.weight||0) - (a.weight||0));
+
+    document.getElementById('modalTitle').textContent = node.name || node.id;
+    document.getElementById('modalTitle').dataset.nodeId = node.id;
+    document.getElementById('modalMeta').innerHTML = `<code style="background:var(--card);padding:2px 6px;border-radius:4px">${node.id}</code> · 等级 <b>${node.level||'public'}</b> · ${node.hit_count||0} 命中 · ${node.xref_count||0} 引用`;
+    document.getElementById('modalBasic').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.88rem">
+        <div>典 大小：<b>${(node.size_kb||0).toFixed(1)} KB</b></div>
+        <div>图 命中：<b>${node.hit_count||0}</b></div>
+        <div>引用：<b>${node.xref_count||0}</b></div>
+        <div>签 等级：<b>${node.level||'public'}</b></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <a class="btn" href="kb-graph.html?module=${encodeURIComponent(node.id)}" style="padding:6px 10px;background:var(--gold);color:#000;border-radius:6px;text-decoration:none;font-size:.82rem">🕸️ 打开完整图谱</a>
+        <a class="btn" href="kb-quality.html?module=${encodeURIComponent(node.id)}" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;text-decoration:none;font-size:.82rem">图 质量审计</a>
+        <button class="btn" id="modalFavBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">星 收藏</button>
+        <button class="btn" id="modalNoteBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">记 笔记</button>
+        <button class="btn" id="modalExportBtn" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">存 导出 JSON</button>
+        <button class="btn" id="modalRandomBtn" title="随机跳转到一个相邻模块" style="padding:6px 10px;background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:.82rem">骰 随机相邻</button>
+      </div>`;
+    document.getElementById('neighborCount').textContent = neighbors.length;
+    const list = document.getElementById('neighborList');
+    if(neighbors.length === 0){
+      list.innerHTML = '<div style="color:var(--paper3);padding:8px">该节点无关联节点（孤岛节点）</div>';
+    } else {
+      list.innerHTML = neighbors.map(nb => `
+        <div class="neighbor-row" data-id="${nb.id}" style="cursor:pointer" title="点击查看 ${nb.name||nb.id} 的邻接子图">
+          <div><b>${nb.name||nb.id}</b><br><code style="font-size:.7rem;color:var(--paper3)">${nb.id}</code></div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <span class="chip">w=${nb.weight}</span>
+            <span class="chip blue">${nb.reason}</span>
+            <a href="kb-graph.html?module=${encodeURIComponent(nb.id)}" style="color:var(--gold);text-decoration:none;font-size:.78rem" title="跳转到图谱页">→</a>
+            <span style="color:var(--paper3);font-size:.78rem;cursor:pointer" class="nb-jump" data-id="${nb.id}" title="页内切换">⊙</span>
+          </div>
+        </div>`).join('');
+      // R110 页内跳转
+      list.querySelectorAll('.nb-jump').forEach(el => {
+        el.onclick = (e) => {
+          e.stopPropagation();
+          openNodeModal(el.dataset.id);
+        };
+      });
+      list.querySelectorAll('.neighbor-row').forEach(el => {
+        el.onclick = (e) => {
+          if(e.target.tagName === 'A' || e.target.classList.contains('nb-jump')) return;
+          openNodeModal(el.dataset.id);
+        };
+      });
+    }
+    const svg = document.getElementById('adjSvg');
+    renderAdjGraph(svg, nodeId, neighbors);
+
+    // R117 邻居质量分布统计
+    const statsEl = document.getElementById('modalStats');
+    if(statsEl){
+      const levels = {};
+      let totalSize = 0, totalHit = 0, totalXref = 0;
+      neighbors.forEach(n => {
+        const lvl = n.level || 'public';
+        levels[lvl] = (levels[lvl] || 0) + 1;
+        totalSize += n.size_kb || 0;
+        totalHit += n.hit_count || 0;
+        totalXref += n.xref_count || 0;
+      });
+      const lvlColors = { premium: 'gold', professional: 'blue', admin: 'red', public: 'green' };
+      const lvlLabels = { premium: '黄金', professional: '专业', admin: '管理', public: '公开' };
+      const lvlChips = Object.entries(levels).map(([lvl, count]) =>
+        `<div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3);text-transform:uppercase">${lvlLabels[lvl]||lvl}</div><div style="font-size:1.4rem;font-weight:700;color:var(--${lvlColors[lvl]||'paper2'})">${count}</div></div>`
+      ).join('');
+      statsEl.innerHTML = `
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">邻居数</div><div style="font-size:1.4rem;font-weight:700;color:var(--paper2)">${neighbors.length}</div></div>
+        ${lvlChips}
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">平均大小</div><div style="font-size:1.4rem;font-weight:700;color:var(--paper2)">${neighbors.length ? (totalSize/neighbors.length).toFixed(1) : 0}<span style="font-size:.7rem">KB</span></div></div>
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">总命中</div><div style="font-size:1.4rem;font-weight:700;color:var(--gold)">${totalHit}</div></div>
+        <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;text-align:center"><div style="font-size:.7rem;color:var(--paper3)">总引用</div><div style="font-size:1.4rem;font-weight:700;color:var(--paper2)">${totalXref}</div></div>
+      `;
+    }
+    // 0 邻居时折叠统计区
+    document.getElementById('modalStatsSection').style.display = neighbors.length ? 'block' : 'none';
+
+    // R118 关联模块条目预览
+    const entriesSection = document.getElementById('modalEntriesSection');
+    const entriesEl = document.getElementById('modalEntries');
+    const entriesCount = document.getElementById('modalEntriesCount');
+    const entriesMore = document.getElementById('modalEntriesMore');
+    if(entriesSection && entriesEl && window.fetch){
+      // 拉取该节点的 KB 条目（最多 8 条预览）
+      fetch('/api/public/kb-query?module=' + encodeURIComponent(nodeId) + '&size=8',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(data=>{
+        const raw = data && data.data || data || {};
+        const entries = raw.results || raw.entries || raw.items || [];
+        window._lastEntryList = entries;
+        if(entries.length === 0){
+          entriesSection.hidden = false;
+          entriesEl.innerHTML = '<div style="color:var(--paper3);padding:8px;font-size:.85rem">该模块暂无条目（未收录 / 已归档）</div>';
+          entriesCount.textContent = '0';
+          entriesMore.textContent = '';
+          return;
+        }
+        entriesSection.hidden = false;
+        entriesCount.textContent = entries.length;
+        entriesEl.innerHTML = entries.map((e, idx) => `
+          <div style="padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:.85rem">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:6px">
+              <b style="color:var(--gold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${e.title || e.name || e.entry_id || e.id}</b>
+              <div style="display:flex;gap:4px;flex-shrink:0">
+                <button class="kb-entry-toggle" data-idx="${idx}" style="background:var(--paper3);color:var(--bg);border:0;border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">展开</button>
+                <button class="kb-entry-copy" data-id="${e.entry_id||e.id}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">表 ID</button>
+                <button class="kb-entry-fav" data-eid="${e.entry_id||e.id}" data-title="${(e.title||e.name||e.entry_id||e.id).replace(/'/g,'\\\'')}" data-trust="${e.trust||''}"  data-source="${e.source||''}" style="background:var(--card);color:var(--gold);border:1px solid var(--border);border-radius:4px;padding:2px 8px;font-size:.7rem;cursor:pointer">星</button>
+              </div>
+            </div>
+            <div class="kb-entry-snippet" data-idx="${idx}" style="color:var(--paper3);font-size:.78rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">${(e.snippet||e.content||e.summary||'').slice(0,300)}</div>
+            <div style="font-size:.7rem;color:var(--paper3);margin-top:4px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap">
+              <code style="font-size:.7rem">${e.entry_id||e.id}</code>
+              <span>${e.trust ? '⭐ trust ' + e.trust.toFixed(2) : ''}${e.source ? ' · 📚 ' + e.source : ''}${e.fingerprint ? ' · 🔖 ' + e.fingerprint : ''}</span>
+            </div>
+          </div>
+        `).join('');
+        // 展开 / 折叠
+        entriesEl.querySelectorAll('.kb-entry-toggle').forEach(btn => {
+          btn.onclick = () => {
+            const idx = btn.dataset.idx;
+            const snippet = entriesEl.querySelector('.kb-entry-snippet[data-idx="' + idx + '"]');
+            if(!snippet) return;
+            if(snippet.style.webkitLineClamp === 'unset'){
+              snippet.style.webkitLineClamp = 3;
+              snippet.style.display = '-webkit-box';
+              btn.textContent = '展开';
+            } else {
+              snippet.style.webkitLineClamp = 'unset';
+              snippet.style.display = 'block';
+              btn.textContent = '收起';
+            }
+          };
+        });
+        // 复制 ID
+        if(navigator.clipboard){
+          entriesEl.querySelectorAll('.kb-entry-copy').forEach(btn => {
+            btn.onclick = () => {
+              const id = btn.dataset.id;
+              navigator.clipboard.writeText(id).then(()=>{
+                btn.textContent = '✅ 已复制';
+                setTimeout(()=>{ btn.textContent = '📋 ID'; }, 1200);
+              });
+            };
+          });
+        }
+        // R120 收藏 entry
+        entriesEl.querySelectorAll('.kb-entry-fav').forEach(btn => {
+          const update = (added) => {
+            btn.textContent = added ? '⭐ 已收藏' : '⭐';
+            btn.style.background = added ? 'var(--gold)' : 'var(--card)';
+            btn.style.color = added ? '#000' : 'var(--gold)';
+          };
+          const id = btn.dataset.eid;
+          // R122 用专用 entry 收藏判定（不与模块冲突）
+          const checkFav = () => window.KbFavorites && (window.KbFavorites.isEntryFav ? window.KbFavorites.isEntryFav(id) : window.KbFavorites.isFav(id));
+          if(checkFav()) update(true);
+          btn.onclick = () => {
+            if(!window.KbFavorites){
+              if(window._toast) window._toast('⚠️ 收藏模块未加载', 1500);
+              return;
+            }
+            // R122 优先用 toggleEntry，未加载时回退到 add/remove
+            let ok;
+            if(typeof window.KbFavorites.toggleEntry === 'function'){
+              ok = window.KbFavorites.toggleEntry({
+                id,
+                title: btn.dataset.title,
+                trust: parseFloat(btn.dataset.trust) || null,
+                source: btn.dataset.source || ''
+              });
+            } else {
+              if(checkFav()){ window.KbFavorites.remove(id); ok = false; }
+              else {
+                window.KbFavorites.add({
+                  id, name: btn.dataset.title, kind: 'entry', level: 'public',
+                  tags: ['entry'], note: '来源模块: ' + nodeId
+                });
+                ok = true;
+              }
+            }
+            update(ok);
+            // 同步抽屉 UI
+            if(window.KbFavorites.render) window.KbFavorites.render();
+            if(window._toast) window._toast(ok ? '✅ 已收藏条目' : '♻️ 已取消');
+          };
+        });
+        entriesMore.textContent = entries.length >= 8 ? '显示前 8 条，完整列表见下方 📊 质量审计页' : `共 ${entries.length} 条`;
+      }).catch(()=>{
+        entriesSection.hidden = false;
+        entriesEl.innerHTML = '<div style="color:var(--paper3);padding:8px;font-size:.85rem">警 条目查阅失败（KB API 暂不可用）</div>';
+        entriesMore.textContent = '';
+      });
+    }
+
+    modal.classList.add('show');
+    // 收藏按钮
+    const favBtn = document.getElementById('modalFavBtn');
+    if(favBtn){
+      favBtn.onclick = () => {
+        if(window.KbFavorites){
+          const existing = window.KbFavorites.getAll().find(f => f.id === node.id);
+          if(existing){
+            window.KbFavorites.remove(node.id);
+            favBtn.textContent = '⭐ 收藏';
+          } else {
+            window.KbFavorites.add({id: node.id, name: node.name || node.id, level: node.level || 'public', kind: 'module'});
+            favBtn.textContent = '✅ 已收藏';
+          }
+        }
+      };
+      if(window.KbFavorites && window.KbFavorites.getAll().find(f => f.id === node.id)){
+        favBtn.textContent = '✅ 已收藏';
+      }
+    }
+
+    // R108 笔记按钮 → 添加入收藏后可直接编辑笔记/标签
+    const noteBtn = document.getElementById('modalNoteBtn');
+    if(noteBtn){
+      noteBtn.onclick = () => {
+        if(!window.KbFavorites){
+          if(window.toast) window.toast('⚠️ KbFavorites 未加载', 1500);
+          return;
+        }
+        // 如未收藏则先收藏
+        if(!window.KbFavorites.getAll().find(f => f.id === node.id)){
+          window.KbFavorites.add({id: node.id, name: node.name || node.id, level: node.level || 'public', kind: 'module'});
+          favBtn.textContent = '✅ 已收藏';
+        }
+        const cur = window.KbFavorites.getAll().find(f => f.id === node.id);
+        const note = prompt('📝 笔记（可选）：', cur?.note || '');
+        if(note !== null){
+          window.KbFavorites.updateNote(node.id, note);
+          const tagsRaw = prompt('🏷️ 标签（逗号分隔，可留空）：', (cur?.tags || []).join(', '));
+          if(tagsRaw !== null){
+            const tags = tagsRaw.split(/[,，]/).map(t => t.trim()).filter(t => t);
+            window.KbFavorites.updateTags(node.id, tags);
+          }
+          if(window.toast) window.toast('✅ 笔记已保存', 1500);
+        }
+      };
+    }
+
+    // R116 导出 JSON：节点+邻接+关联边
+    const exportBtn = document.getElementById('modalExportBtn');
+    if(exportBtn){
+      exportBtn.onclick = () => {
+        const data = {
+          exported_at: new Date().toISOString(),
+          center: node,
+          neighbors: neighbors,
+          edges: gEdges.filter(e =>
+            (e.source === nodeId && neighbors.some(n => n.id === e.target)) ||
+            (e.target === nodeId && neighbors.some(n => n.id === e.source))
+          ),
+          history: window._modalHistory || []
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kb-node-${nodeId}-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        if(window.toast) window.toast(`✅ 已导出 ${nodeId} (${neighbors.length} 邻居)`, 1800);
+      };
+    }
+    // R125 随机跳转到相邻模块
+    const randomBtn = document.getElementById('modalRandomBtn');
+    if(randomBtn){
+      randomBtn.onclick = () => {
+        if(!neighbors || neighbors.length === 0){
+          if(window.toast) window.toast('⚠️ 该节点无相邻模块', 1500);
+          return;
+        }
+        const pick = neighbors[(++kbState.pickCount) % neighbors.length];
+        if(window.toast) window.toast(`🎲 随机跳到 ${pick.id} (${neighbors.length} 邻居可选)`, 1800);
+        closeNodeModal();
+        setTimeout(() => openNodeModal(pick.id), 250);
+      };
+    }
+  }
+
+  function closeNodeModal(){
+    document.getElementById('kbNodeModal')?.classList.remove('show');
+    // R112 关闭时清 URL 参数 + 清历史栈
+    window._modalHistory = [];
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('module');
+      window.history.replaceState(null, '', url.toString());
+    } catch(e){}
+  }
+
+  // 暴露
+  window.openNodeModal = openNodeModal;
+  // R121 导出节点+邻接+条目为 JSON
+  document.getElementById('modalExportBtn')?.addEventListener('click', () => {
+    const nodeId = document.getElementById('modalTitle').dataset.nodeId || window._modalHistory?.[window._modalHistory.length-1];
+    if(!nodeId){ showToast('当前节点未识别'); return; }
+    const node = (window.gNodes||[]).find(n => n.id === nodeId);
+    const edges = (window.gEdges||[]).filter(e => e.source === nodeId || e.target === nodeId);
+    const neighborIds = new Set();
+    edges.forEach(e => { neighborIds.add(e.source); neighborIds.add(e.target); });
+    neighborIds.delete(nodeId);
+    const neighbors = (window.gNodes||[]).filter(n => neighborIds.has(n.id));
+    const entry = (window._lastEntryList || []).slice();
+    const payload = {
+      exported_at: new Date().toISOString(),
+      node, neighbors, edges, entries: entry
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kb-node-' + nodeId + '-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+    if(window._toast) window._toast('✅ 已导出 JSON');
+  });
+  // record 弹窗打开过的 entry list
+  const _oFetchEntries = window.fetchEntriesForModal;
+  window.fetchEntriesForModal = function(list){
+    window._lastEntryList = list || [];
+    return list;
+  };
+  window.closeNodeModal = closeNodeModal;
+
+  // 关闭按钮
+  document.getElementById('modalClose')?.addEventListener('click', closeNodeModal);
+  document.getElementById('kbNodeModal')?.addEventListener('click', (e) => {
+    if(e.target.id === 'kbNodeModal') closeNodeModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeNodeModal();
+  });
+
+  // 节点表行点击
+  setTimeout(() => {
+    document.querySelectorAll('#graphContainer tbody tr').forEach(tr => {
+      const id = tr.querySelector('code')?.textContent?.trim();
+      if(id){
+        tr.classList.add('clickable', 'graph-row');
+        tr.onclick = (e) => {
+          if(e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+          openNodeModal(id);
+        };
+      }
+    });
+  }, 100);
+
+
+  // ===== Panel: Favs (R103) =====
+  function renderFavs(){
+    const c = document.getElementById('favsContainer');
+    if(!c) return;
+    const arr = window.KbFavorites ? window.KbFavorites.getAll() : JSON.parse(localStorage.getItem('***')||'[]');
+    const tagFilter = window._favTagFilter || '';
+    const searchQ = (window._favSearchQ || '').toLowerCase();
+    const allTags = window.KbFavorites ? window.KbFavorites.getTags() : [];
+
+    let filtered = arr;
+    if(tagFilter) filtered = filtered.filter(f => (f.tags||[]).includes(tagFilter));
+    // R155 排序
+    const favSort = (window._favSortBy || 'time-desc');
+    if(favSort === 'name') filtered = filtered.slice().sort((a,b) => (a.name||a.id||'').localeCompare(b.name||b.id||''));
+    else if(favSort === 'time-asc') filtered = filtered.slice().sort((a,b) => (a.ts||0) - (b.ts||0));
+    else filtered = filtered.slice().sort((a,b) => (b.ts||0) - (a.ts||0));
+    if(searchQ) filtered = filtered.filter(f =>
+      (f.name||'').toLowerCase().includes(searchQ) || (f.id||'').toLowerCase().includes(searchQ) || (f.note||'').toLowerCase().includes(searchQ)
+    );
+
+    if(arr.length === 0){
+      c.innerHTML = `<div class="empty"><h3>星 暂无收藏</h3><p>在任意 KB 模块卡右上角点 ☆ 即可收藏。到这里查看与批量管理。</p></div>`;
+      return;
+    }
+    let html = `
+      <div class="fav-toolbar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);align-items:center">
+        <input type="checkbox" id="favSelectAll" aria-label="favSelectAll" title="全选/取消全选（当前过滤结果）">
+        <input aria-label="搜索" type="text" id="favSearch" placeholder="搜索名称 / ID / 笔记..." value="${searchQ}" style="flex:1;min-width:200px;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)"/>
+        <select id="favTagFilter" aria-label="收藏标签筛选" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2)">
+          <option value="">签 全部标签</option>
+          ${allTags.map(t => `<option value="${t}" ${tagFilter===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+        <select id="favSortBy" aria-label="favSortBy" title="排序方式" style="padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem"><option value="time-desc">最近收藏</option><option value="time-asc">最早收藏</option><option value="name">按名称</option></select>
+        <span id="favCountSpan" style="color:var(--paper3);font-size:.85rem">${filtered.length}/${arr.length}</span><span id="favHitCount" style="font-size:.78rem;color:var(--gold);margin-left:6px"></span>
+        <button class="btn danger" id="favBulkRemoveBtn" style="font-size:.82rem">批量取消选中</button>
+      </div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+        ${filtered.map(f => `
+          <div class="card" data-fav-id="${f.id}">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <input type="checkbox" class="fav-row-check" data-fav-id="${f.id}" aria-label="${f.id}" data-fav-name="${(f.name||'').replace(/"/g,'&quot;')}">
+              <span class="file-name">${f.name||f.id}</span>
+              <span class="file-name">${f.name||f.id}</span>
+              <span class="chip ${f.level==='professional'?'blue':f.level==='admin'?'red':'green'}">${f.level||'public'}</span>
+            </div>
+            <div class="desc"><code style="font-size:.78rem">${f.id}</code></div>
+            <div class="meta"><span class="chip gray">收藏于 ${new Date(f.ts).toLocaleString('zh-CN')}</span></div>
+            ${(f.tags && f.tags.length) ? `<div class="fav-tags" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${f.tags.map(t => `<span class="fav-tag" style="font-size:.7rem;background:var(--gold-dim);color:#000;padding:2px 6px;border-radius:10px">签 ${t}</span>`).join('')}</div>` : ''}
+            ${f.note ? `<div class="fav-note" style="font-size:.82rem;color:var(--paper3);margin-top:6px;font-style:italic;line-height:1.4">记 ${f.note.length > 50 ? f.note.slice(0,50)+'…' : f.note}</div>` : ''}
+            <details style="margin-top:8px">
+              <summary style="cursor:pointer;color:var(--gold);font-size:.82rem;padding:4px 0">写 编辑笔记/标签</summary>
+              <div style="margin-top:6px">
+                <input type="text" aria-label="私域笔记" data-fav-note="${f.id}" placeholder="📝 私域笔记..." value="${(f.note||'').replace(/"/g,'&quot;')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
+                <input type="text" aria-label="标签" data-fav-tags="${f.id}" placeholder="🏷️ 标签 (逗号分隔)" value="${(f.tags||[]).join(', ')}" style="width:100%;padding:6px 10px;background:var(--ink);border:1px solid var(--border);border-radius:6px;color:var(--paper2);font-size:.82rem;margin-bottom:6px"/>
+                <button class="btn primary" style="padding:5px 12px;border-radius:6px;background:var(--gold);color:#000;border:0;cursor:pointer;font-size:.82rem" onclick="saveFavMeta('${f.id}')">存 保存</button>
+              </div>
+            </details>
+            <div class="actions" style="margin-top:8px">
+              <a class="btn" href="kb-quality.html?module=${encodeURIComponent(f.id)}">图 质量</a>
+              <a class="btn" href="kb-graph.html?module=${encodeURIComponent(f.id)}">🕸️ 图谱</a>
+              <button class="btn danger" onclick="KbFavorites.toggle({id:'${f.id}',name:'${(f.name||'').replace(/'/g,"\\'")}'});renderFavs();">× 取消</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="margin-top:14px;padding:12px;background:var(--card);border-radius:10px;border:1px solid var(--border);text-align:center">
+        <p>当前 <b style="color:#ffd700">${arr.length}</b> 条收藏 · 跨页面同步生效 · 可导出 JSON / 一键清空 · <span id="favSelectedInfo" style="color:var(--paper3)"></span></p>
+        <button class="btn primary" onclick="KbFavorites.export?.();">出 导出 JSON</button>
+        <button class="btn" id="favExportCsvBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.82rem">出 导出 CSV</button>
+        <button class="btn danger" onclick="if(confirm('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">清空</button>
+      </div>
+    `;
+    c.innerHTML = html;
+    // 绑定搜索/筛选
+    const sq = document.getElementById('favSearch');
+    // R149 全选 + 批量取消
+    const sa = document.getElementById('favSelectAll');
+    if(sa) sa.onchange = (e) => {
+      const checked = e.target.checked;
+      document.querySelectorAll('.fav-row-check').forEach(cb => cb.checked = checked);
+      updateFavSelectedInfo();
+    };
+    const bulkBtn = document.getElementById('favBulkRemoveBtn');
+    if(bulkBtn) bulkBtn.onclick = () => {
+      const checked = document.querySelectorAll('.fav-row-check:checked');
+      if(checked.length === 0){
+        if(window.toast) window.toast('⚠️ 请先勾选要取消的收藏', 1500);
+        return;
+      }
+      const count = checked.length;
+      if(!confirm(`确定取消 ${count} 个收藏？`)) return;
+      checked.forEach(cb => {
+        const id = cb.dataset.favId;
+        const name = cb.dataset.favName;
+        if(window.KbFavorites) window.KbFavorites.toggle({id, name});
+      });
+      if(window.toast) window.toast(`🗑 已取消 ${count} 个收藏`, 1800);
+      renderFavs();
+    };
+    // 实时更新选中计数
+    document.querySelectorAll('.fav-row-check').forEach(cb => {
+      cb.addEventListener('change', updateFavSelectedInfo);
+    });
+    updateFavSelectedInfo();
+
+    // R150 搜索关键词高亮（split 避开正则转义陷阱）
+    if(searchQ){
+      const lower = searchQ.toLowerCase();
+      document.querySelectorAll('#favsContainer .file-name, #favsContainer .desc code, #favsContainer .fav-note').forEach(el => {
+        const orig = el.textContent;
+        const origLower = orig.toLowerCase();
+        if(origLower.includes(lower)){
+          const parts = origLower.split(lower);
+          let out = '';
+          let idx = 0;
+          for(let i=0;i<parts.length;i++){
+            const slice = orig.slice(idx, idx + parts[i].length);
+            out += slice.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]);
+            if(i < parts.length - 1){
+              const hit = orig.slice(idx + parts[i].length, idx + parts[i].length + lower.length);
+              out += '<mark style="background:var(--gold);color:#000;padding:0 2px;border-radius:2px">' + hit + '</mark>';
+              idx += parts[i].length + lower.length;
+            } else {
+              idx += parts[i].length;
+            }
+          }
+          el.innerHTML = out;
+        }
+      });
+    }
+
+    // R151 收藏搜索命中计数
+    if(searchQ && typeof window.updateFavHitCount === 'function') window.updateFavHitCount();
+    if(sq) sq.oninput = (e) => { window._favSearchQ = e.target.value; renderFavs(); };
+    const tf = document.getElementById('favTagFilter');
+    if(tf) tf.onchange = (e) => { window._favTagFilter = e.target.value; renderFavs(); };
+    // R157 收藏 CSV 导出
+    const favCsv = document.getElementById('favExportCsvBtn');
+    if(favCsv) favCsv.onclick = () => {
+      const esc = v => { if(v===null||v===undefined) return ''; const s2 = String(v); return /[",\n]/.test(s2) ? '"' + s2.replace(/"/g,'""') + '"' : s2; };
+      const headers = ['id','name','level','ts','note','tags'];
+      const rows = filtered.map(f => [f.id, f.name, f.level||'public', new Date(f.ts||0).toISOString(), f.note||'', (f.tags||[]).join('|')]);
+      if(rows.length === 0){ if(window._toast) window._toast('⚠️ 无收藏可导出', 1200); return; }
+      const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => r.map(esc).join(',')).join('\n');
+      const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'kb-favorites-' + new Date().toISOString().slice(0,10) + '.csv';
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+      if(window._toast) window._toast('📤 已导出 ' + rows.length + ' 条收藏 CSV', 1500);
+    };
+    const fsb = document.getElementById('favSortBy');
+    if(fsb) fsb.onchange = (e) => { window._favSortBy = e.target.value; renderFavs(); };
+    if(fsb && window._favSortBy) fsb.value = window._favSortBy;
+  }
+
+  // R151 收藏搜索命中计数（统计所有 mark 元素 + 命中卡片数）
+  window.updateFavHitCount = function(){
+    const marks = document.querySelectorAll('#favsContainer mark');
+    const cards = document.querySelectorAll('#favsContainer .card');
+    let hitCards = 0;
+    cards.forEach(c => { if(c.querySelector('mark')) hitCards++; });
+    const el = document.getElementById('favHitCount');
+    if(el) el.textContent = marks.length > 0 ? `共 ${marks.length} 处命中 / ${hitCards} 卡片` : '';
+  };
+
+  window.updateFavSelectedInfo = function(){
+    const checks = document.querySelectorAll('.fav-row-check:checked');
+    const info = document.getElementById('favSelectedInfo');
+    if(info) info.textContent = checks.length > 0 ? `· 已选 ${checks.length} 项` : '';
+  };
+
+  // R106 保存笔记/标签
+  window.saveFavMeta = function(id){
+    const noteEl = document.querySelector(`input[data-fav-note="${id}"]`);
+    const tagsEl = document.querySelector(`input[data-fav-tags="${id}"]`);
+    if(noteEl && window.KbFavorites) window.KbFavorites.updateNote(id, noteEl.value);
+    if(tagsEl && window.KbFavorites){
+      const tags = tagsEl.value.split(/[,，]/).map(t => t.trim()).filter(t => t);
+      window.KbFavorites.updateTags(id, tags);
+    }
+    renderFavs();
+    if(window.toast) window.toast('✅ 已保存笔记/标签', 1500);
+  };
+  // 暴露给 onclick
+  window.renderFavs = renderFavs;
+
+  // 跨 tab 同步 badge
+  window.addEventListener('storage', (e) => {
+    if(e.key === '***_broadcast'){
+      try {
+        const data = JSON.parse(e.newValue);
+        document.getElementById('favBadge').textContent = (data.arr?.length || 0) + '项';
+        renderFavs();
+        // 同步抽屉 + 星标
+        if(window.KbFavorites){
+          window.KbFavorites.render();
+          document.querySelectorAll('.kb-fav-btn').forEach(b => {
+            const id = b.dataset.id;
+            b.classList.toggle('active', !!data.arr?.some(x => x.id === id));
+            b.innerHTML = data.arr?.some(x => x.id === id) ? '⭐' : '☆';
+          });
+        }
+      } catch(e){}
+    }
+  });
+
+  // ===== Tab 切换 =====
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('on'));
+      t.classList.add('on');
+      document.querySelectorAll('.panel').forEach(p => p.hidden = true);
+      const name = t.dataset.tab;
+      document.getElementById('panel-' + name).hidden = false;
+      document.getElementById('searchBar').hidden = (name !== 'search');
+      if(name === 'search') document.getElementById('searchInput').focus();
+    });
+  });
+
+  // ===== 搜索 =====
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchHistoryEl = document.getElementById('searchHistory');
+  // R130 搜索历史（localStorage）
+  const HIST_KEY = '_kb_search_history_v1';
+  const HIST_MAX = 10;
+  function loadHistory(){
+    try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; }
+  }
+  function saveHistoryItem(q){
+    q = q.trim(); if(!q) return;
+    let arr = loadHistory().filter(x => x !== q);
+    arr.unshift(q);
+    if(arr.length > HIST_MAX) arr = arr.slice(0, HIST_MAX);
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(arr)); } catch {}
+  }
+  function removeHistoryItem(q){
+    const arr = loadHistory().filter(x => x !== q);
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(arr)); } catch {}
+  }
+  function renderHistory(filter){
+    const arr = loadHistory();
+    const q = (filter || '').toLowerCase().trim();
+    const filtered = q ? arr.filter(x => x.toLowerCase().includes(q)) : arr;
+    if(filtered.length === 0){ searchHistoryEl.style.display = 'none'; searchHistoryEl.innerHTML = ''; return; }
+    searchHistoryEl.style.display = 'block';
+    searchHistoryEl.innerHTML = filtered.map(x => `
+      <div data-q="${x.replace(/"/g,'&quot;')}" style="padding:8px 12px;cursor:pointer;font-size:.85rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);color:var(--paper2)">
+        <span>查 ${x}</span>
+        <span data-remove="${x.replace(/"/g,'&quot;')}" style="color:var(--paper3);padding:2px 8px;cursor:pointer;font-size:.9rem" title="删除">关</span>
+      </div>
+    `).join('') + `
+      <div data-clear="1" style="padding:6px 12px;cursor:pointer;font-size:.75rem;text-align:center;color:var(--paper3);background:var(--ink);border-top:1px solid var(--border)">删 清空全部历史</div>
+    `;
+    searchHistoryEl.querySelectorAll('[data-q]').forEach(el => {
+      el.onclick = (e) => {
+        if(e.target.dataset.remove !== undefined) return;
+        searchInput.value = el.dataset.q;
+        searchHistoryEl.style.display = 'none';
+        doSearch();
+      };
+      const rm = el.querySelector('[data-remove]');
+      if(rm) rm.onclick = (e) => { e.stopPropagation(); removeHistoryItem(rm.dataset.remove); renderHistory(searchInput.value); };
+    });
+    const ca = searchHistoryEl.querySelector('[data-clear]');
+    if(ca) ca.onclick = () => { try { localStorage.removeItem(HIST_KEY); } catch {} searchHistoryEl.style.display = 'none'; };
+  }
+  searchInput.addEventListener('focus', () => renderHistory(searchInput.value));
+  searchInput.addEventListener('input', () => renderHistory(searchInput.value));
+  searchInput.addEventListener('blur', () => setTimeout(() => { searchHistoryEl.style.display = 'none'; }, 200));
+  window.doSearch = function(){ doSearch(); };
+  async function doSearch(){
+    const q = searchInput.value.trim();
+    if(!q) return;
+    saveHistoryItem(q);
+    const mod = sel.value;
+    const url = '/api/public/kb/search?q=' + encodeURIComponent(q) + (mod?('&module='+encodeURIComponent(mod)):'') + '&limit=20';
+    const cont = document.getElementById('searchContainer');
+    cont.innerHTML = '<div class="loading">搜索中...</div>';
+    const data = await api(url);
+    const results = data?.results || [];
+    if(results.length === 0){
+      cont.innerHTML = `<div class="empty"><h3>暂无匹配</h3>关键词 "<b>${q}</b>" 在 ${mod||'全模块'} 中无结果</div>`;
+      return;
+    }
+    let html = `<div style="margin-bottom:12px;color:var(--paper3);font-size:.85rem;display:flex;align-items:center;flex-wrap:wrap;gap:8px"><span>找到 <b style="color:var(--gold)">${results.length}</b> 条结果</span><button class="btn sr-export-all" style="margin-left:auto;background:var(--gold);color:#000;border:0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">箱 导出全部 JSON</button><button class="btn sr-export-csv" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.78rem">出 导出 CSV</button></div>`;
+    const escHtml = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const hl = (text, q) => { const e = escHtml(text); if(!q) return e; const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')','gi'); return e.replace(re,'<mark style="background:rgba(201,168,76,.3);color:var(--gold);border-radius:2px">$1</mark>'); };
+    for(const r of results){
+      const trust = r.trust_score || 0;
+      const trustPct = Math.round(trust * 100);
+      html += `<div class="sr-item">
+        <div class="sr-meta">
+          <span class="chip">${r.module||'—'}</span>
+          <span class="chip ${trust>=0.7?'green':'gray'}">trust ${trust.toFixed(2)}</span>
+          ${r.hit_count?`<span>命中 ${r.hit_count}</span>`:''}
+          <button class="btn sr-copy" data-copy="${escHtml((r.title||'')+' | '+(r.module||'')+'\n'+(r.snippet||''))}" style="margin-left:auto;background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">表 复制</button>
+          <button class="btn sr-fav" data-mod="${escHtml(r.module||'')}" data-title="${escHtml(r.title||'')}" data-snippet="${escHtml(r.snippet||'')}" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem">星 收藏</button>
+          <a class="btn" href="ai-assistant.html?preset=${encodeURIComponent(r.module||'kb-search')}" style="background:var(--gold);color:#000;padding:2px 8px;border-radius:6px;cursor:pointer;font-size:.75rem;text-decoration:none">机 AI</a>
+        </div>
+        <div class="sr-title">${hl(r.title, q)}</div>
+        <div class="sr-snippet">${hl(r.snippet, q)}</div>
+      </div>`;
+    }
+    cont.innerHTML = html;
+    // R142 复制 / 收藏按钮
+    cont.querySelectorAll('.sr-copy').forEach(btn => {
+      btn.onclick = () => {
+        const text = btn.dataset.copy || '';
+        if(navigator.clipboard) navigator.clipboard.writeText(text).then(() => window._toast?.('📋 已复制', 1000));
+        else {
+          const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); window._toast?.('📋 已复制', 1000);
+        }
+      };
+    });
+    cont.querySelectorAll('.sr-fav').forEach(btn => {
+      btn.onclick = () => {
+        const data = { id: 'sr-' + (btn.dataset.mod||'') + '-' + Date.now(), name: btn.dataset.title || '(无标题)', level: 'public', kind: 'search-result', source: 'kb-search', note: btn.dataset.snippet || '', tag: '搜索' };
+        const ok = (window.KbFavorites?.add) ? window.KbFavorites.add(data) : false;
+        if(ok || window.KbFavorites) {
+          btn.textContent = '✅ 已收藏'; btn.style.background = 'rgba(80,180,80,.3)';
+          if(window._toast) window._toast('⭐ 已加入收藏', 1000);
+        }
+      };
+    });
+    // R144 导出全部 JSON
+    const expAll = cont.querySelector('.sr-export-all');
+    if(expAll){
+      expAll.onclick = () => {
+        const blob = new Blob([JSON.stringify({q, module:mod, count:results.length, results}, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `kb-search-${q}-${new Date().toISOString().slice(0,10)}.json`; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        if(window._toast) window._toast(`📦 已导出 ${results.length} 条`, 1000);
+      };
+    }
+    // R161 搜索结果 CSV 导出
+    const expCsv = cont.querySelector('.sr-export-csv');
+    if(expCsv){
+      expCsv.onclick = () => {
+        const esc = v => { if(v===null||v===undefined) return ''; const s2 = String(v); return /[",\n]/.test(s2) ? '"' + s2.replace(/"/g,'""') + '"' : s2; };
+        const headers = ['module','title','snippet','trust','hit_count'];
+        const rows = results.map(r => [r.module||'', r.title||'', r.snippet||'', (r.trust_score||0).toFixed(3), r.hit_count||0]);
+        const csv = '\ufeff' + headers.join(',') + '\n' + rows.map(r => r.map(esc).join(',')).join('\n');
+        const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'kb-search-' + q + '-' + new Date().toISOString().slice(0,10) + '.csv';
+        document.body.appendChild(a); a.click();
+        setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+        if(window._toast) window._toast('📤 已导出 ' + rows.length + ' 条 CSV', 1500);
+      };
+    }
+  }
+  // R160 URL 深链初始化（?tab=xxx&q=yyy&module=zzz）
+  try {
+    const u = new URL(window.location.href);
+    const tab = u.searchParams.get('tab');
+    const q = u.searchParams.get('q');
+    const mod = u.searchParams.get('module');
+    if(tab){
+      const tabEl = document.querySelector('.tab[data-tab="' + tab + '"]');
+      if(tabEl) tabEl.click();
+    }
+    if(q){
+      searchInput.value = q;
+      if(mod){
+        const sel2 = document.getElementById('searchModule');
+        if(sel2) sel2.value = mod;
+      }
+      setTimeout(() => doSearch(), 100);
+    }
+  } catch(e){}
+
+  searchBtn.addEventListener('click', doSearch);
+  searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') doSearch(); });
+
+  // ===== R114 键盘快捷键 =====
+  document.addEventListener('keydown', e => {
+    // 输入框不拦截
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      if(e.key === 'Escape') e.target.blur();
+      return;
+    }
+    const tabs = ['files','modules','hot','graph','favs','search'];
+    const activeTab = document.querySelector('.tab.on')?.dataset.tab;
+    let idx = tabs.indexOf(activeTab);
+
+    // ESC 关闭弹窗 / 返回上一节点
+    if(e.key === 'Escape'){
+      if(document.getElementById('kbNodeModal')?.classList.contains('show')){
+        e.preventDefault();
+        if(window._modalHistory && window._modalHistory.length > 1){
+          window._modalHistory.pop(); // 移除当前
+          const prev = window._modalHistory[window._modalHistory.length - 1];
+          if(prev) openNodeModal(prev);
+        } else {
+          closeNodeModal();
+        }
+        return;
+      }
+      if(window.KbFavorites && document.getElementById('kbFavDrawer')?.classList.contains('show')){
+        return; // drawer 自己处理
+      }
+    }
+
+    // Tab 切换: ←/→ 或 1-6
+    if(e.key === 'ArrowLeft' && idx > 0){
+      e.preventDefault();
+      document.querySelector(`.tab[data-tab="${tabs[idx-1]}"]`)?.click();
+    } else if(e.key === 'ArrowRight' && idx < tabs.length - 1){
+      e.preventDefault();
+      document.querySelector(`.tab[data-tab="${tabs[idx+1]}"]`)?.click();
+    } else if(/^[1-6]$/.test(e.key)){
+      e.preventDefault();
+      const i = parseInt(e.key) - 1;
+      document.querySelector(`.tab[data-tab="${tabs[i]}"]`)?.click();
+    }
+
+    // g → 图谱 / f → 收藏 / s → 搜索 / m → 模块
+    if(e.key === 'g') document.querySelector('.tab[data-tab="graph"]')?.click();
+    if(e.key === 'f'){
+      e.preventDefault();
+      window.KbFavorites?.render?.();
+      document.getElementById('kbFavDrawer')?.classList.add('show');
+    }
+    if(e.key === 's'){
+      document.querySelector('.tab[data-tab="search"]')?.click();
+      setTimeout(() => document.getElementById('searchInput')?.focus(), 50);
+    }
+    if(e.key === 'm') document.querySelector('.tab[data-tab="modules"]')?.click();
+  });
+})();
+</script>
+
+<script src="components/toast.js"></script>
+<script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+<script src="js/kb-favorites.js" defer></script>
+<script src="js/kb-recent.js" defer></script>
+
+  <!-- R505b AI 语音助手 -->
+  <div id="ai-assistant-mount"></div>
+  <script src="js/ai-voice-assistant.js" defer></script>
+  <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+  <script src="js/smart-search-bootstrap.js" defer></script>
+</body>
+</html>

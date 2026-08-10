@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+  <meta charset="UTF-8">
+<meta name="description" content="患者档案中心 · 易道智鉴平台">
+<meta name="keywords" content="患者档案中心">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/patient-archive.html">
+<meta name="theme-color" content="#050608">
+  <title>患者档案中心 · 命理宝鉴</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/divination-hub.css">
+  <style>
+    :root{--pa-bg:#0a0e17;--pa-paper:#e8e0d0;--pa-gold:#c9a84c;--pa-jade:#10b981;--pa-cyan:#63b3ed;--pa-red:#ef4444;--pa-border:rgba(201,168,76,.18);--pa-card:rgba(255,255,255,.03)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Noto Serif SC',sans-serif;background:var(--pa-bg);color:var(--pa-paper);padding:10px;line-height:1.6;min-height:100vh}
+    nav{padding:6px 12px;border-bottom:1px solid var(--pa-border);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200}
+    nav a{color:var(--pa-gold);font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px}
+    h1{font-size:18px;color:var(--pa-gold);letter-spacing:2px;padding:12px 0 6px}
+    .pa-subtitle{font-size:11px;color:var(--pa-paper3);margin-bottom:12px}
+
+    /* 统计卡片 */
+    .pa-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px}
+    .pa-stat-card{background:var(--pa-card);border:1px solid var(--pa-border);border-radius:8px;padding:12px;text-align:center}
+    .pa-stat-num{font-size:24px;color:var(--pa-gold);font-weight:700}
+    .pa-stat-label{font-size:11px;color:var(--pa-paper3);margin-top:2px}
+
+    /* 搜索栏 */
+    .pa-toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .pa-search{flex:1;min-width:200px;padding:8px 12px;background:rgba(255,255,255,.05);border:1px solid var(--pa-border);border-radius:6px;color:var(--pa-paper);font-size:13px}
+    .pa-search:focus{outline:none;border-color:var(--pa-gold)}
+    .pa-filter{padding:6px 10px;background:rgba(255,255,255,.05);border:1px solid var(--pa-border);border-radius:6px;color:var(--pa-paper);font-size:12px;cursor:pointer}
+    .pa-filter.active{border-color:var(--pa-gold);color:var(--pa-gold);background:rgba(201,168,76,.08)}
+    .btn{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px}
+    .btn-primary{background:var(--pa-gold);color:#0a0e17;font-weight:600}
+    .btn-ghost{background:transparent;border:1px solid var(--pa-border);color:var(--pa-paper3)}
+
+    /* 表格 */
+    .pa-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+    .pa-table th{background:rgba(201,168,76,.06);color:var(--pa-gold);padding:8px 10px;text-align:left;font-size:11px;border-bottom:1px solid var(--pa-border)}
+    .pa-table td{padding:8px 10px;font-size:12px;border-bottom:1px solid rgba(201,168,76,.06)}
+    .pa-table tr:hover td{background:rgba(201,168,76,.03)}
+    .pa-table tr{cursor:pointer}
+    .pa-tag{font-size:9px;padding:1px 5px;border-radius:3px;margin-right:3px;display:inline-block}
+    .pa-tag-male{background:rgba(99,179,237,.15);color:var(--pa-cyan)}
+    .pa-tag-female{background:rgba(236,72,153,.15);color:#ec4899}
+    .pa-tag-visit{background:rgba(16,185,129,.15);color:var(--pa-jade)}
+
+    /* 分析图表 */
+    .pa-analysis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+    @media(max-width:768px){.pa-analysis{grid-template-columns:1fr}}
+    @media(max-width:480px){
+      body{padding:6px 4px}
+      h1{font-size:16px;letter-spacing:1px;padding:8px 0 4px}
+      .pa-subtitle{font-size:10px}
+      nav{padding:4px 8px;gap:4px}
+      nav a{font-size:10px;padding:3px 6px}
+      .pa-stats{grid-template-columns:1fr 1fr;gap:6px}
+      .pa-stat-card{padding:8px 6px}
+      .pa-stat-num{font-size:18px}
+      .pa-stat-label{font-size:9px}
+      .pa-toolbar{flex-direction:column}
+      .pa-search{min-width:0;width:100%}
+      .pa-filter{font-size:10px;padding:4px 8px}
+      .btn{font-size:10px;padding:5px 8px}
+      .pa-table-wrap{overflow-x:auto}
+      table{font-size:11px}
+      th,td{padding:5px 4px}
+    }
+    @media(max-width:360px){
+      body{padding:4px 2px;font-size:12px}
+      h1{font-size:14px;letter-spacing:0}
+      nav{flex-direction:row;overflow-x:auto;flex-wrap:nowrap;white-space:nowrap}
+      .pa-stats{grid-template-columns:1fr}
+      .pa-stat-num{font-size:16px}
+      .pa-filter{font-size:9px;padding:3px 6px}
+      .btn{width:100%;font-size:10px}
+      table{font-size:10px}
+      th,td{padding:3px 2px;white-space:nowrap}
+      .pa-analysis{grid-template-columns:1fr}
+      .pa-search{font-size:11px}
+    }
+    .pa-chart{background:var(--pa-card);border:1px solid var(--pa-border);border-radius:8px;padding:12px}
+    .pa-chart-title{font-size:13px;color:var(--pa-gold);margin-bottom:8px}
+    .pa-bar-chart{display:flex;flex-direction:column;gap:4px}
+    .pa-bar-row{display:flex;align-items:center;gap:6px;font-size:11px}
+    .pa-bar-label{min-width:60px;color:var(--pa-paper3)}
+    .pa-bar-track{flex:1;height:18px;background:rgba(255,255,255,.03);border-radius:3px;overflow:hidden}
+    .pa-bar-fill{height:100%;border-radius:3px;transition:.3s}
+    .pa-bar-val{min-width:30px;text-align:right;color:var(--pa-paper)}
+
+    /* 弹窗 */
+    .pa-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px}
+    .pa-modal-content{background:#111827;border:1px solid var(--pa-border);border-radius:12px;max-width:700px;max-height:85vh;overflow-y:auto;padding:20px;width:100%}
+    .pa-modal-close{float:right;cursor:pointer;font-size:20px;color:var(--pa-paper3)}
+    .pa-section{margin-bottom:12px;padding:10px;border:1px solid var(--pa-border);border-radius:6px;background:rgba(0,0,0,.1)}
+    .pa-section-title{font-size:12px;color:var(--pa-gold);margin-bottom:6px;font-weight:600}
+    .pa-empty{color:var(--pa-paper3);text-align:center;padding:20px;font-size:13px}
+
+@media print{
+  nav,.page-header-bar,.phb-back,.btn,button,.no-print,header,footer,.pa-toolbar,.pa-modal,.skip-link{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt;line-height:1.5;padding:0!important}
+  h1{color:black!important}
+  .pa-stats{page-break-inside:avoid}
+  .pa-stat-card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important;color:black!important}
+  .pa-stat-num{color:black!important}
+  .pa-stat-label{color:#333!important}
+  .pa-table-wrap{overflow:visible!important}
+  .pa-table{font-size:10pt}
+  .pa-table th{color:black!important;background:#f5f5f5!important}
+  .pa-table td{color:black!important}
+  .pa-chart{background:white!important;border:1px solid #ccc!important;box-shadow:none!important}
+  .pa-chart-title{color:black!important}
+  .pa-bar-fill{background:#666!important}
+  h1,h2,h3{page-break-after:avoid;color:black!important}
+  a[href]:after{content:" ("attr(href)")";font-size:9pt;color:#666}
+  img{max-width:100%!important}
+  .print-only{display:block!important}
+}
+  </style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">患者档案中心</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>搜索患者</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看档案</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>历史记录</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>更新信息</span></div></div>
+<div class="flow-hint">中医师管理患者档案，查看历史记录并更新信息。</div>
+</div>
+
+<nav>
+  <a href="divination-hub.html">主平台</a>
+  <a href="wangzhen-clinical.html">望诊工作台</a>
+  <a href="tcm-clinic.html">医 中医诊疗</a>
+  <a href="doctor-elder.html">医 接诊台</a>
+</nav>
+
+<h1>表 患者档案中心</h1>
+<div class="pa-subtitle">患者档案管理 · 诊断历史分析 · 供医生和周易大师参考</div>
+
+<!-- 统计概览 -->
+<div class="pa-stats" id="pa-stats" role="region" aria-label="统计概览"></div>
+
+<!-- 分析图表 -->
+<div class="pa-analysis" id="pa-analysis"></div>
+
+<!-- 工具栏 -->
+<div class="pa-toolbar">
+  <input type="text" class="pa-search" id="pa-search" placeholder="搜索患者姓名/主诉/电话..." oninput="PatientArchive.search(this.value)" aria-label="搜索患者">
+  <button class="pa-filter active" onclick="PatientArchive.setFilter('all',this)">全部</button>
+  <button class="pa-filter" onclick="PatientArchive.setFilter('male',this)">男</button>
+  <button class="pa-filter" onclick="PatientArchive.setFilter('female',this)">女</button>
+  <button class="pa-filter" onclick="PatientArchive.setFilter('followup',this)">需复诊</button>
+  <button class="btn btn-ghost" onclick="PatientArchive.exportAll()">入 导出全部</button>
+  <button class="btn btn-primary" onclick="PatientArchive.runDistill()">研 蒸馏经验</button>
+</div>
+
+<!-- 患者表格 -->
+<table class="pa-table" role="table" aria-label="患者列表">
+  <thead>
+    <tr>
+      <th>编号</th><th>姓名</th><th>性别</th><th>年龄</th><th>主诉</th><th>就诊次数</th><th>上次就诊</th><th>体质</th><th>操作</th>
+    </tr>
+  </thead>
+  <tbody id="pa-tbody"></tbody>
+</table>
+
+<!-- 患者详情弹窗 -->
+<div class="pa-modal" id="pa-modal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="pa-modal-content">
+    <span class="pa-modal-close" onclick="document.getElementById('pa-modal').style.display='none'">关</span>
+    <div id="pa-modal-body"></div>
+  </div>
+</div>
+
+<script>
+var PatientArchive = {
+  filter: 'all',
+  allPatients: [],
+  allHistory: [],
+
+  init: function(){
+    this.load();
+    this.renderStats();
+    this.renderAnalysis();
+    this.renderTable(this.allPatients);
+  },
+
+  load: function(){
+    try { this.allPatients = JSON.parse(localStorage.getItem('mlbj_doctor_patients') || '[]'); } catch(e) { this.allPatients = []; }
+    try { this.allHistory = JSON.parse(localStorage.getItem('wz_diagnosis_history') || '[]'); } catch(e) { this.allHistory = []; }
+  },
+
+  getPatientVisits: function(patientId, patientName){
+    return this.allHistory.filter(function(h){
+      return h.patient_id === patientId || h.patient_name === patientName;
+    });
+  },
+
+  renderStats: function(){
+    var total = this.allPatients.length;
+    var males = this.allPatients.filter(function(p){ return p.gender === 'male'; }).length;
+    var females = this.allPatients.filter(function(p){ return p.gender === 'female'; }).length;
+    var totalVisits = this.allHistory.length;
+    var followups = this.allPatients.filter(function(p){
+      var visits = this.getPatientVisits(p.id, p.name);
+      if(visits.length === 0) return false;
+      var lastVisit = visits[0];
+      var days = (Date.now() - new Date(lastVisit.timestamp).getTime()) / 86400000;
+      return days > 7;
+    }.bind(this)).length;
+
+    var html = '';
+    html += '<div class="pa-stat-card"><div class="pa-stat-num">' + total + '</div><div class="pa-stat-label">总患者数</div></div>';
+    html += '<div class="pa-stat-card"><div class="pa-stat-num">' + males + '</div><div class="pa-stat-label">男性</div></div>';
+    html += '<div class="pa-stat-card"><div class="pa-stat-num">' + females + '</div><div class="pa-stat-label">女性</div></div>';
+    html += '<div class="pa-stat-card"><div class="pa-stat-num">' + totalVisits + '</div><div class="pa-stat-label">总就诊次数</div></div>';
+    html += '<div class="pa-stat-card"><div class="pa-stat-num">' + followups + '</div><div class="pa-stat-label">需复诊</div></div>';
+    document.getElementById('pa-stats').innerHTML = html;
+  },
+
+  renderAnalysis: function(){
+    var html = '';
+
+    // 1. 年龄分布
+    var ageGroups = {'0-20':0, '21-40':0, '41-60':0, '60+':0};
+    this.allPatients.forEach(function(p){
+      var age = parseInt(p.age) || 0;
+      if(age <= 20) ageGroups['0-20']++;
+      else if(age <= 40) ageGroups['21-40']++;
+      else if(age <= 60) ageGroups['41-60']++;
+      else ageGroups['60+']++;
+    });
+    var maxAge = Math.max.apply(null, Object.values(ageGroups)) || 1;
+    html += '<div class="pa-chart"><div class="pa-chart-title">图 年龄分布</div><div class="pa-bar-chart">';
+    Object.keys(ageGroups).forEach(function(k){
+      var v = ageGroups[k]; var pct = Math.round(v / maxAge * 100);
+      html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '岁</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:var(--pa-cyan)"></div></div><span class="pa-bar-val">' + v + '</span></div>';
+    });
+    html += '</div></div>';
+
+    // 2. 主诉分布（Top 5 关键词）
+    var chiefMap = {};
+    this.allPatients.forEach(function(p){
+      var chief = p.chief || '';
+      ['头痛','失眠','胸闷','胃胀','腹痛','便秘','腹泻','乏力','怕冷','耳鸣','头晕','心悸','腰痛','咳嗽'].forEach(function(kw){
+        if(chief.indexOf(kw) >= 0){ chiefMap[kw] = (chiefMap[kw]||0) + 1; }
+      });
+    });
+    var sorted = Object.keys(chiefMap).sort(function(a,b){ return chiefMap[b] - chiefMap[a]; }).slice(0, 5);
+    var maxChief = sorted.length > 0 ? chiefMap[sorted[0]] : 1;
+    html += '<div class="pa-chart"><div class="pa-chart-title">表 主诉分布 Top5</div><div class="pa-bar-chart">';
+    if(sorted.length === 0){
+      html += '<div class="pa-empty">暂无主诉数据</div>';
+    } else {
+      sorted.forEach(function(k){
+        var v = chiefMap[k]; var pct = Math.round(v / maxChief * 100);
+        html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:var(--pa-jade)"></div></div><span class="pa-bar-val">' + v + '</span></div>';
+      });
+    }
+    html += '</div></div>';
+
+    // 3. 就诊趋势（近7天）
+    var trend = {};
+    for(var i = 6; i >= 0; i--){
+      var d = new Date(Date.now() - i * 86400000);
+      var key = (d.getMonth()+1) + '/' + d.getDate();
+      trend[key] = 0;
+    }
+    this.allHistory.forEach(function(h){
+      if(h.timestamp){
+        var d = new Date(h.timestamp);
+        var key = (d.getMonth()+1) + '/' + d.getDate();
+        if(trend[key] !== undefined) trend[key]++;
+      }
+    });
+    var maxTrend = Math.max.apply(null, Object.values(trend)) || 1;
+    html += '<div class="pa-chart"><div class="pa-chart-title">升 近7天就诊趋势</div><div class="pa-bar-chart">';
+    Object.keys(trend).forEach(function(k){
+      var v = trend[k]; var pct = Math.round(v / maxTrend * 100);
+      html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:var(--pa-gold)"></div></div><span class="pa-bar-val">' + v + '</span></div>';
+    });
+    html += '</div></div>';
+
+    // 4. 体质分布（如果有排盘数据）
+    var constitutionMap = {};
+    this.allPatients.forEach(function(p){
+      if(p.dayMaster){
+        var ele = p.dayMaster.replace(/[^木火土金水]/g, '');
+        if(ele){ constitutionMap[ele] = (constitutionMap[ele]||0) + 1; }
+      }
+    });
+    var eleColors = {'木':'#10b981','火':'#ef4444','土':'#fbbf24','金':'#a78bfa','水':'#6366f1'};
+    var maxConst = Math.max.apply(null, Object.values(constitutionMap)) || 1;
+    html += '<div class="pa-chart"><div class="pa-chart-title">草 体质分布（日主五行）</div><div class="pa-bar-chart">';
+    if(Object.keys(constitutionMap).length === 0){
+      html += '<div class="pa-empty">暂无体质数据（需排盘后生成）</div>';
+    } else {
+      Object.keys(constitutionMap).forEach(function(k){
+        var v = constitutionMap[k]; var pct = Math.round(v / maxConst * 100);
+        html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:' + (eleColors[k]||'#999') + '"></div></div><span class="pa-bar-val">' + v + '</span></div>';
+      });
+    }
+    html += '</div></div>';
+
+    document.getElementById('pa-analysis').innerHTML = html;
+  },
+
+  renderTable: function(list){
+    var tbody = document.getElementById('pa-tbody');
+    if(!tbody) return;
+    if(list.length === 0){
+      tbody.innerHTML = '<tr><td colspan="9" class="pa-empty">暂无患者数据。请在望诊工作台或接诊台创建患者。</td></tr>';
+      return;
+    }
+    var html = '';
+    list.forEach(function(p){
+      var visits = this.getPatientVisits(p.id, p.name);
+      var lastVisit = visits.length > 0 ? visits[0] : null;
+      var lastTime = lastVisit && lastVisit.timestamp ? new Date(lastVisit.timestamp).toLocaleDateString('zh-CN') : '-';
+      var genderTag = p.gender === 'male' ? '<span class="pa-tag pa-tag-male">男</span>' : p.gender === 'female' ? '<span class="pa-tag pa-tag-female">女</span>' : '-';
+      var visitTag = visits.length > 0 ? '<span class="pa-tag pa-tag-visit">' + visits.length + '次</span>' : '初诊';
+      var dm = p.dayMaster || '-';
+      var pid = String(p.id || '').slice(-6);
+
+      html += '<tr onclick="PatientArchive.showDetail(' + p.id + ')">';
+      html += '<td>#' + pid + '</td>';
+      html += '<td>' + (p.name || '') + '</td>';
+      html += '<td>' + genderTag + '</td>';
+      html += '<td>' + (p.age || '?') + '</td>';
+      html += '<td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (p.chief || '-') + '</td>';
+      html += '<td>' + visitTag + '</td>';
+      html += '<td>' + lastTime + '</td>';
+      html += '<td>' + dm + '</td>';
+      html += '<td><button class="btn btn-ghost" style="font-size:10px;padding:3px 8px" onclick="event.stopPropagation();PatientArchive.gotoFollowup(' + p.id + ')">复诊</button></td>';
+      html += '</tr>';
+    }.bind(this));
+    tbody.innerHTML = html;
+  },
+
+  search: function(keyword){
+    if(!keyword){ this.renderTable(this.allPatients); return; }
+    var kw = keyword.toLowerCase();
+    var filtered = this.allPatients.filter(function(p){
+      return (p.name||'').toLowerCase().indexOf(kw) >= 0 ||
+             (p.chief||'').toLowerCase().indexOf(kw) >= 0 ||
+             (p.phone||'').toLowerCase().indexOf(kw) >= 0;
+    });
+    this.renderTable(filtered);
+  },
+
+  setFilter: function(filter, btn){
+    this.filter = filter;
+    document.querySelectorAll('.pa-filter').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var filtered = this.allPatients;
+    if(filter === 'male') filtered = this.allPatients.filter(function(p){ return p.gender === 'male'; });
+    else if(filter === 'female') filtered = this.allPatients.filter(function(p){ return p.gender === 'female'; });
+    else if(filter === 'followup') filtered = this.allPatients.filter(function(p){
+      var visits = this.getPatientVisits(p.id, p.name);
+      if(visits.length === 0) return false;
+      var days = (Date.now() - new Date(visits[0].timestamp).getTime()) / 86400000;
+      return days > 7;
+    }.bind(this));
+    this.renderTable(filtered);
+  },
+
+  showDetail: function(id){
+    var p = this.allPatients.find(function(x){ return x.id === id; });
+    if(!p) return;
+    var visits = this.getPatientVisits(p.id, p.name);
+    var body = document.getElementById('pa-modal-body');
+
+    var html = '<div style="font-size:16px;color:var(--pa-gold);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.2)">';
+    html += '📋 ' + p.name + ' 的完整档案</div>';
+
+    // 基本信息
+    html += '<div class="pa-section"><div class="pa-section-title">基本信息</div>';
+    html += '<div style="font-size:12px;line-height:1.8">';
+    html += '编号：#' + String(p.id).slice(-6) + '<br>';
+    html += '性别：' + (p.gender === 'male' ? '男' : p.gender === 'female' ? '女' : '-') + '<br>';
+    html += '年龄：' + (p.age || '?') + '岁<br>';
+    if(p.phone) html += '电话：' + p.phone + '<br>';
+    if(p.chief) html += '主诉：' + p.chief + '<br>';
+    if(p.createdAt) html += '建档日期：' + new Date(p.createdAt).toLocaleDateString('zh-CN') + '<br>';
+    html += '</div></div>';
+
+    // 体质信息（供医生参考）
+    if(p.dayMaster || p.wuxing){
+      html += '<div class="pa-section"><div class="pa-section-title">体质评估（医生参考）</div>';
+      html += '<div style="font-size:12px;line-height:1.8">';
+      if(p.dayMaster) html += '日主：' + p.dayMaster + '<br>';
+      if(p.wuxing) html += '五行：' + JSON.stringify(p.wuxing).replace(/[{}"]/g,' ') + '<br>';
+      if(p.wuxingLack && p.wuxingLack.length > 0) html += '五行缺失：' + p.wuxingLack.join('、') + '<br>';
+      if(p.zodiac) html += '生肖：' + p.zodiac + '<br>';
+      html += '</div></div>';
+    }
+
+    // 诊断历史
+    html += '<div class="pa-section"><div class="pa-section-title">诊断历史（' + visits.length + '次）</div>';
+    if(visits.length === 0){
+      html += '<div class="pa-empty">暂无诊断记录</div>';
+    } else {
+      visits.forEach(function(v, i){
+        var time = v.timestamp ? new Date(v.timestamp).toLocaleString('zh-CN').substring(0,16) : '';
+        var isLatest = i === 0;
+        html += '<div style="margin-bottom:8px;padding:6px;border-left:3px solid ' + (isLatest ? 'var(--pa-gold)' : 'var(--pa-border)') + '">';
+        if(isLatest) html += '<span style="font-size:10px;color:var(--pa-gold)">钉 最近</span> ';
+        html += '<span style="font-size:11px;color:var(--pa-paper3)">' + time + '</span><br>';
+        if(v.diagnosis_text) html += '<span style="font-size:12px"><b>望诊：</b>' + v.diagnosis_text.substring(0,120) + '</span><br>';
+        if(v.ai_analysis) html += '<span style="font-size:11px;color:var(--pa-paper2)"><b>AI：</b>' + v.ai_analysis.substring(0,80) + '</span><br>';
+        if(v.voice_notes) html += '<span style="font-size:11px;color:var(--pa-jade)"><b>医嘱：</b>' + v.voice_notes.substring(0,80) + '</span><br>';
+        if(v.westernDiag) html += '<span style="font-size:11px;color:var(--pa-cyan)"><b>西医：</b>' + v.westernDiag + '</span>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
+    // 体质趋势（>=2次就诊）
+    if(visits.length >= 2){
+      html += '<div class="pa-section"><div class="pa-section-title">图 趋势分析</div>';
+      var first = visits[visits.length - 1];
+      var last = visits[0];
+      var firstTime = first.timestamp ? new Date(first.timestamp).toLocaleDateString('zh-CN') : '';
+      var lastTime = last.timestamp ? new Date(last.timestamp).toLocaleDateString('zh-CN') : '';
+      html += '<div style="font-size:12px;line-height:1.8">';
+      html += '首次就诊：' + firstTime + '<br>';
+      html += '最近就诊：' + lastTime + '<br>';
+      html += '就诊间隔：' + Math.round((new Date(last.timestamp) - new Date(first.timestamp)) / 86400000) + '天<br>';
+      html += '就诊次数：' + visits.length + '次<br>';
+      html += '💡 建议对比两次面色变化，观察疗效趋势<br>';
+      html += '</div></div>';
+    }
+
+    body.innerHTML = html;
+    document.getElementById('pa-modal').style.display = 'flex';
+  },
+
+  gotoFollowup: function(id){
+    localStorage.setItem('wz_followup_patient_id', id);
+    window.location.href = 'wangzhen-clinical.html';
+  },
+
+  runDistill: function(){
+    if(this.allPatients.length === 0){ showToast('暂无患者数据可蒸馏'); return; }
+    if(!confirm('将从 ' + this.allPatients.length + ' 位患者的 ' + this.allHistory.length + ' 条诊疗记录中蒸馏经验知识，写入知识库待审核队列。\n\n确认开始？')) return;
+    // 导出数据到临时文件
+    var data = { patients: this.allPatients, history: this.allHistory, exportDate: new Date().toISOString() };
+    // 前端蒸馏（简化版）
+    var candidates = this.distillFrontend(data);
+    // 保存到 localStorage
+    var key = 'kb_distill_candidates';
+    var existing = [];
+    try { existing = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) {}
+    existing = candidates.concat(existing).slice(0, 100);
+    localStorage.setItem(key, JSON.stringify(existing));
+    showToast('✅ 蒸馏完成！\n\n生成 ' + candidates.length + ' 条候选知识\n已保存到本地待审核队列\n\n可在 KB 管理面板查看审核');
+  },
+
+  distillFrontend: function(data){
+    var candidates = [];
+    var organMap = {'肝':['肝','目','筋','怒','胆'],'心':['心','舌','脉','喜','小肠'],'脾':['脾','口','肉','思','胃'],'肺':['肺','鼻','皮','悲','大肠'],'肾':['肾','耳','骨','恐','膀胱']};
+    var formulas = ['逍遥散','桂枝汤','小柴胡汤','六味地黄丸','归脾汤','四君子汤','补中益气汤','龙胆泻肝汤','保和丸','半夏泻心汤','酸枣仁汤','玉屏风散','肾气丸','真武汤'];
+    var symptoms = ['头痛','失眠','胸闷','胃胀','乏力','怕冷','耳鸣','头晕','心悸','腰痛'];
+    var organCount = {};
+    var formulaCount = {};
+    
+    data.history.forEach(function(h){
+      var text = (h.diagnosis_text||'') + ' ' + (h.voice_notes||'') + ' ' + (h.ai_analysis||'');
+      Object.keys(organMap).forEach(function(organ){
+        if(organMap[organ].some(function(kw){ return text.indexOf(kw) >= 0; })){
+          organCount[organ] = (organCount[organ]||0) + 1;
+          symptoms.forEach(function(s){
+            if(text.indexOf(s) >= 0){
+              var usedFormulas = formulas.filter(function(f){ return text.indexOf(f) >= 0; });
+              if(usedFormulas.length > 0){
+                candidates.push({
+                  entry_id: 'KB-DISTILL-' + organ + '-' + s + '-' + Date.now(),
+                  module: 'wangzhen',
+                  title: organ + '系症状「' + s + '」临床经验',
+                  content: '脏腑：' + organ + '\n症状：' + s + '\n推荐方剂：' + usedFormulas.join('、'),
+                  category: '临床经验',
+                  keyword: organ + ',' + s + ',' + (usedFormulas[0]||''),
+                  trust: 0.8,
+                  status: 'pending',
+                  source: 'frontend_distill'
+                });
+              }
+            }
+          });
+        }
+      });
+      formulas.forEach(function(f){ if(text.indexOf(f) >= 0){ formulaCount[f] = (formulaCount[f]||0) + 1; } });
+    });
+    
+    // 体质统计
+    var constMap = {};
+    data.patients.forEach(function(p){
+      var dm = (p.dayMaster||'').replace(/[^木火土金水]/g,'');
+      if(dm) constMap[dm] = (constMap[dm]||0) + 1;
+    });
+    if(Object.keys(constMap).length > 0){
+      candidates.push({
+        entry_id: 'KB-DISTILL-CONSTITUTION-' + Date.now(),
+        module: 'wangzhen',
+        title: '患者体质分布统计',
+        content: '体质分布：' + Object.keys(constMap).map(function(k){ return k + ':' + constMap[k] + '人'; }).join(', '),
+        category: '体质统计',
+        keyword: '体质,五行',
+        trust: 0.8,
+        status: 'pending',
+        source: 'frontend_distill'
+      });
+    }
+    
+    // 去重（相同脏腑+症状只保留一条）
+    var seen = {};
+    return candidates.filter(function(c){
+      var key = c.title;
+      if(seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  },
+
+  exportAll: function(){
+    var data = {
+      patients: this.allPatients,
+      history: this.allHistory,
+      exportDate: new Date().toISOString()
+    };
+    var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '患者档案导出_' + new Date().toISOString().substring(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+};
+
+PatientArchive.init();
+</script>
+
+  <script src="js/mobile-nav.js" defer></script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

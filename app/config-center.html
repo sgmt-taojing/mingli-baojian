@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="description" content="">
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/config-center.html">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+<meta name="robots" content="noindex,nofollow">
+<title>配置中心 · 易道智鉴</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+:root{
+  --bg:#0c1118;--bg-2:#131a26;--panel:#1a2333;--panel-2:#1f2a3c;
+  --bd:#2a3650;--tx:#e4e9f2;--tx-2:#9aa6bc;--tx-3:#6a7591;
+  --gold:#c9a84c;--gold-dim:#8c7434;--accent:#5db8d6;--red:#e57373;--green:#5ed18f;
+  --r:8px;--r2:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--tx);font:14px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(12,17,24,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);padding:12px 20px;display:flex;align-items:center;gap:12px}
+.topbar .dot{width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.topbar h1{margin:0;font-size:17px;font-weight:600;color:var(--gold)}
+.topbar .back{color:var(--tx-2);text-decoration:none;font-size:13px;margin-left:auto;padding:6px 12px;border:1px solid var(--bd);border-radius:var(--r)}
+.topbar .back:hover{color:var(--gold);border-color:var(--gold-dim)}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.toolbar input,.toolbar select{background:var(--panel);border:1px solid var(--bd);color:var(--tx);padding:8px 12px;border-radius:var(--r);font-size:13px;min-width:180px}
+.toolbar input:focus,.toolbar select:focus{outline:none;border-color:var(--gold)}
+.toolbar button{background:var(--gold);color:#0c1118;border:none;padding:8px 16px;border-radius:var(--r);font-weight:600;cursor:pointer;font-size:13px}
+.toolbar button:hover{background:#d9b85c}
+.toolbar button.ghost{background:transparent;border:1px solid var(--bd);color:var(--tx-2)}
+.toolbar button.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.toolbar button.danger{background:var(--red)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.stat-card{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r2);padding:14px}
+.stat-card .label{font-size:11px;color:var(--tx-3);text-transform:uppercase;letter-spacing:1px}
+.stat-card .value{font-size:22px;font-weight:700;color:var(--gold);margin-top:4px}
+.stat-card .sub{font-size:11px;color:var(--tx-3);margin-top:2px}
+.group-card{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:14px;overflow:hidden}
+.group-head{padding:12px 16px;background:var(--panel-2);border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;cursor:pointer}
+.group-head .icon{font-size:18px}
+.group-head .name{font-weight:600;font-size:14px;color:var(--gold)}
+.group-head .count{color:var(--tx-3);font-size:12px;margin-left:auto}
+.group-head .arrow{color:var(--tx-3);transition:transform .2s}
+.group-head.collapsed .arrow{transform:rotate(-90deg)}
+.group-body{padding:8px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1.6fr 1fr 90px;gap:10px;align-items:center;padding:10px 8px;border-radius:var(--r);transition:background .15s}
+.row:hover{background:var(--panel-2)}
+.row .key{font-family:"SF Mono",Menlo,monospace;font-size:12px;color:var(--accent);word-break:break-all}
+.row .val-input{background:var(--bg-2);border:1px solid var(--bd);color:var(--tx);padding:6px 10px;border-radius:var(--r);font-size:13px;width:100%}
+.row .val-input:focus{outline:none;border-color:var(--gold)}
+.row .label-txt{font-size:12px;color:var(--tx-2)}
+.row .group-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--bg-2);color:var(--tx-3);display:inline-block}
+.row .actions{display:flex;gap:6px}
+.row .actions button{padding:5px 10px;border:none;border-radius:var(--r);font-size:11px;cursor:pointer;background:var(--bd);color:var(--tx)}
+.row .actions button.save{background:var(--green);color:#0c1118}
+.row .actions button.del{background:var(--red);color:#fff}
+.row .actions button:hover{opacity:.85}
+.empty{padding:30px;text-align:center;color:var(--tx-3)}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;padding:10px 20px;border-radius:var(--r);background:var(--green);color:#0c1118;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .3s}
+.toast.err{background:var(--red);color:#fff}
+.toast.show{opacity:1}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-mask.show{display:flex}
+.modal{background:var(--panel);border:1px solid var(--bd);border-radius:var(--r2);padding:20px;max-width:420px;width:90%}
+.modal h3{margin:0 0 16px;color:var(--gold)}
+.modal label{display:block;font-size:12px;color:var(--tx-2);margin:8px 0 4px}
+.modal input,.modal textarea{width:100%;background:var(--bg-2);border:1px solid var(--bd);color:var(--tx);padding:8px 12px;border-radius:var(--r);font-size:13px;font-family:inherit}
+.modal textarea{min-height:60px;resize:vertical}
+.modal .btn-row{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+.modal .btn-row button{background:var(--gold);color:#0c1118;border:none;padding:8px 18px;border-radius:var(--r);font-weight:600;cursor:pointer}
+.modal .btn-row button.ghost{background:transparent;border:1px solid var(--bd);color:var(--tx-2)}
+@media(max-width:720px){
+  .row{grid-template-columns:1fr;gap:4px}
+  .row .actions{justify-content:flex-end}
+}
+</style>
+</head>
+<body>
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">配置中心</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
+<div class="topbar">
+  <span class="dot"></span>
+  <h1>配置中心</h1>
+  <a class="back" href="index.html">← 返回首页</a>
+</div>
+
+<div class="container">
+  <div class="toolbar">
+    <input  id="q" placeholder="🔍 搜索 key / label / value…" aria-label="🔍 搜索 key / label / value…">
+    <select id="groupFilter">
+      <option value="">全部分组</option>
+    </select>
+    <button class="ghost" onclick="reloadAll()">↻ 刷新</button>
+    <button onclick="openAdd()">+ 新增配置</button>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="label">配置总数</div>
+      <div class="value" id="statTotal">—</div>
+      <div class="sub">所有分组</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">分组数</div>
+      <div class="value" id="statGroups">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">最近更新</div>
+      <div class="value" id="statRecent" style="font-size:14px">—</div>
+    </div>
+  </div>
+
+  <div id="groups"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-mask" id="addModal">
+  <div class="modal">
+    <h3>新增配置</h3>
+    <label>key（唯一标识，小写+点号）</label>
+    <input  id="addKey" placeholder="例如：ui.theme_color" aria-label="例如：ui.theme_color">
+    <label>value</label>
+    <input  id="addValue" placeholder='例如：#c9a84c 或 "light"' aria-label="例如：#c9a84c 或">
+    <label>label（说明）</label>
+    <input  id="addLabel" placeholder="例如：UI 主题色" aria-label="例如：UI 主题色">
+    <label>group（分组）</label>
+    <input  id="addGroup" placeholder="例如：ui" aria-label="例如：ui">
+    <label>备注</label>
+    <textarea id="addNote" placeholder="可选"></textarea>
+    <div class="btn-row">
+      <button class="ghost" onclick="closeAdd()">取消</button>
+      <button onclick="submitAdd()">确认添加</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = (location.protocol === 'https:' ? 'https://' : 'http://') + location.host;
+let _configs = [];
+let _groups = new Set();
+const _collapsed = new Set();
+
+async function loadAll() {
+  let r;
+  try {
+    r = await fetch(API + '/api/public/config', {signal: AbortSignal.timeout(10000)});
+  } catch(e) {
+    console.warn('[R514] fetch error:', esc(e.message));
+    toast('加载失败：' + (e && esc(e.message) || '网络异常') + '，请稍后重试', true);
+    return;
+  }
+  const d = await r.json();
+  if (!d.ok) { toast('加载失败', true); return; }
+  _configs = d.configs || [];
+  renderStats();
+  renderGroups();
+  renderFilter();
+}
+
+function renderStats() {
+  document.getElementById('statTotal').textContent = _configs.length;
+  document.getElementById('statGroups').textContent = _groups.size;
+  const latest = _configs.filter(c => c.updated_at).sort((a,b) => (b.updated_at||0).localeCompare(a.updated_at||0))[0];
+  document.getElementById('statRecent').textContent = latest ? (latest.key + ' ' + (latest.updated_at || '').slice(0,10)) : '—';
+}
+
+function renderFilter() {
+  const sel = document.getElementById('groupFilter');
+  sel.innerHTML = '<option value="">全部分组</option>' +
+    Array.from(_groups).sort().map(g => `<option value="${g}">${g}</option>`).join('');
+}
+
+function renderGroups() {
+  const q = document.getElementById('q').value.toLowerCase().trim();
+  const gFilter = document.getElementById('groupFilter').value;
+  const groups = {};
+  _configs.forEach(c => {
+    if (q && !((c.key + ' ' + (c.label||'') + ' ' + c.value + ' ' + (c.note||'')).toLowerCase().includes(q))) return;
+    if (gFilter && c.group !== gFilter) return;
+    if (!groups[c.group || 'uncategorized']) groups[c.group || 'uncategorized'] = [];
+    groups[c.group || 'uncategorized'].push(c);
+  });
+  const wrap = document.getElementById('groups');
+  if (Object.keys(groups).length === 0) { wrap.innerHTML = '<div class="empty">无匹配配置</div>'; return; }
+  wrap.innerHTML = Object.entries(groups).map(([g, items]) => {
+    const collapsed = _collapsed.has(g) ? 'collapsed' : '';
+    return `<div class="group-card">
+      <div class="group-head ${collapsed}" onclick="toggleGroup('${g}')">
+        <span class="icon">⚙️</span>
+        <span class="name">${g}</span>
+        <span class="count">${items.length} 项</span>
+        <span class="arrow">▾</span>
+      </div>
+      <div class="group-body" style="${_collapsed.has(g) ? 'display:none' : ''}">
+        ${items.map(c => rowHtml(c)).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function rowHtml(c) {
+  return `<div class="row" data-key="${c.key}">
+    <div class="key" title="${c.key}">${c.key}</div>
+    <div class="label-txt">${c.label || '—'}</div>
+    <input  class="val-input" id="v_${cssId(c.key)}" value="${escapeAttr(c.value)}" aria-label="v_${cssId(c.key)}">
+    <div class="group-tag">${c.group || '—'}</div>
+    <div class="actions">
+      <button class="save" onclick="saveOne('${c.key}')">保存</button>
+      <button class="del" onclick="delOne('${c.key}')">删</button>
+    </div>
+  </div>`;
+}
+
+function cssId(k) { return k.replace(/\./g, '_'); }
+function escapeAttr(s) { return String(s || '').replace(/"/g, '&quot;'); }
+
+function toggleGroup(g) {
+  if (_collapsed.has(g)) _collapsed.delete(g); else _collapsed.add(g);
+  renderGroups();
+}
+
+async function saveOne(key) {
+  const v = document.getElementById('v_' + cssId(key)).value;
+  const c = _configs.find(x => x.key === key);
+  try {
+    const r = await fetch(API + '/api/public/config/' + encodeURIComponent(key), { signal: AbortSignal.timeout(15000),
+      method: 'PUT',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ value: v, label: c.label, group: c.group }),
+      signal: AbortSignal.timeout(15000)});
+    const d = await r.json();
+    if (d.ok) { toast('✅ 已保存 ' + key); c.value = v; c.updated_at = new Date().toISOString(); renderStats(); }
+    else { toast('保存失败：' + d.message, true); }
+  } catch (e) { toast('保存失败：' + esc(e.message), true); }
+}
+
+async function delOne(key) {
+  if (!confirm('确认删除配置 ' + key + '？')) return;
+  try {
+    const r = await fetch(API + '/api/public/config/' + encodeURIComponent(key), {method: 'DELETE',signal: AbortSignal.timeout(15000)});    const d = await r.json();
+    if (d.ok) { toast('🗑️ 已删除 ' + key); _configs = _configs.filter(c => c.key !== key); _groups = new Set(_configs.map(c => c.group || 'uncategorized')); renderAll(); }
+    else toast('删除失败：' + d.message, true);
+  } catch (e) { toast('删除失败：' + esc(e.message), true); }
+}
+
+function renderAll() {
+  renderStats();
+  renderGroups();
+  renderFilter();
+}
+
+async function reloadAll() { await loadAll(); toast('已刷新'); }
+
+function openAdd() { document.getElementById('addModal').classList.add('show'); }
+function closeAdd() { document.getElementById('addModal').classList.remove('show'); }
+
+async function submitAdd() {
+  const body = {
+    key: document.getElementById('addKey').value.trim(),
+    value: document.getElementById('addValue').value.trim(),
+    label: document.getElementById('addLabel').value.trim(),
+    group: document.getElementById('addGroup').value.trim() || 'misc',
+    note: document.getElementById('addNote').value.trim()
+  };
+  if (!body.key || !body.value) { toast('key 和 value 必填', true); return; }
+  try {
+    const r = await fetch(API + '/api/public/config', { signal: AbortSignal.timeout(15000),
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15000)
+    });
+    if (d.ok) {
+      toast('✅ 已添加 ' + body.key);
+      closeAdd();
+      _configs.push({...body, updated_at: new Date().toISOString()});
+      _groups.add(body.group);
+      renderAll();
+      ['addKey','addValue','addLabel','addGroup','addNote'].forEach(id => document.getElementById(id).value = '');
+    } else toast('添加失败：' + d.message, true);
+  } catch (e) { toast('添加失败：' + esc(e.message), true); }
+}
+
+let _toastTimer;
+function toast(msg, isErr) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isErr ? ' err' : '');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.className = 'toast', 2200);
+}
+
+document.getElementById('q').addEventListener('input', debounce(renderGroups, 200));
+document.getElementById('groupFilter').addEventListener('change', renderGroups);
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+
+loadAll();
+</script>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

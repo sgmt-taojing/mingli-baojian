@@ -1,0 +1,176 @@
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+logs/
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+
+# Database files (NEVER commit)
+*.db
+*.sqlite
+*.sqlite3
+server/database/
+server/yidao.db
+server/kb.db
+server/kb-store/
+
+# User data (privacy!)
+user-data/
+yuanzhu-data/
+.env
+.env.local
+.env.*.local
+
+# Backups
+*.backup
+*.bak
+*.bak-*
+admin.html.backup
+divination-hub.html.backup
+archive/server-api-v2.bak-*
+
+# Build / cache
+.cache/
+.lighthouseci/
+.tmp/
+tmp/
+
+# Cluster / internal docs
+.cluster/
+
+# App archive (已归档)
+app/*.bak*
+app/*.backup*
+app/_archive/
+app/js/_archived/
+
+# 已废弃的 JS（避免误加载）
+app/js/lp-upgrade.js
+app/js/merchant.js
+app/js/module-misc.js
+app/js/qimen-v3.js
+app/js/shop-admin.js
+
+# Nishan temp
+_nishan_tmp/
+# R308 反爬虫+安全加固
+# 临时文件 / 编辑器
+*.swp
+*.swo
+*~
+*.tmp
+*.orig
+*.rej
+
+# 凭证 / Token
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+gcp-credentials*.json
+aws-credentials*
+api-keys.json
+
+# AI/LLM keys
+.openai-key
+.claude-key
+.gemini-key
+.zhipu-key
+.qwen-key
+
+# 用户隐私数据
+user-uploads/
+upload/
+uploads/
+downloads/
+exports/
+
+# 系统日志/审计
+*.audit.log
+security-audit.json
+audit-trail/
+
+# 二进制/媒体
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.mp3
+*.wav
+*.flac
+*.pdf
+!docs/**/*.pdf
+
+# 临时压缩包
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# 静态服务符号链接（运行期创建，不入 git）
+app/knowledge
+kb.db
+coverage/
+node_modules/
+
+# MLX 训练产物（体积巨大，不入 git）
+training/mlx-checkpoints/
+training/models/
+training/checkpoints/
+
+# R491: 训练数据备份（防误带入库）
+data/*_backup*.json
+data/private-*.json
+data/private-*.jsonl
+data/augment-*.jsonl
+data/mingli_sft_train_augment.json
+data/mingli_sft_tcm.json
+
+# R491: ONNX 视觉模型（大文件，运行时按需下载）
+models/*.onnx
+
+# R491: 蒸馏结果快照（运行时动态生成）
+server/kb/
+distillery/benchmark-*.md
+
+# R474 私有蒸馏（硬约束：不上 GIT）
+server/private-distill.js
+scripts/*.isolated
+
+# 运行时告警数据
+/data/alerts/
+server/private-eval.js
+server/private-prompt-builder.js
+server/sft-augment.js
+server/*.bak*
+training/eval-results/
+server/logs/*.jsonl
+
+# SQLite WAL/SHM 临时文件
+knowledge/*.db-shm
+knowledge/*.db-wal
+knowledge/*.db-journal
+
+# 运行时日志
+server/logs/*.jsonl
+server/logs/*.log
+.openclaw/tmp/*.log
+.openclaw/tmp/*.jsonl
+server/venv/
+*.pyc
+__pycache__/
+
+# Large DB files (GitHub 100MB limit; tracked via backups/yidao.db.tar.gz)
+server/database/yidao.db
+server/database/yidao.db-journal
+server/database/yidao.db-wal
+server/database/yidao.db-shm
+server/database/yidao.db-*

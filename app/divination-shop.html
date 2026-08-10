@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <meta charset="UTF-8">
+<meta name="description" content="易道智鉴 · 易道智鉴平台">
+<meta name="keywords" content="易道智鉴">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/divination-shop.html">
+<meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="易道智鉴 · 先进系统推演">
+<meta property="og:description" content="易道智鉴 · 易道智鉴平台">
+<meta property="og:type" content="website">
+    <title>易道智鉴 · 先进系统推演</title>
+    
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/divination-shop-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+</head>
+
+<body class="theme-zhouyi">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">易道智鉴</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>浏览商品</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>选择服务</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>下单支付</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>享受服务</span></div></div>
+<div class="flow-hint">信众浏览商城商品，吉祥物+书籍+课程。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">主平台</a>
+  <a href="divination-almanac.html" class="file-nav-btn">历 黄历</a>
+  <a href="divination-integrated.html" class="file-nav-btn">因 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn">医 中医诊疗</a>
+  <a href="tcm-symptom.html" class="file-nav-btn">诊 症状分析</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">莲 倪师知识库</a>
+  <a href="nihaisha-tool.html" class="file-nav-btn">研 倪师工具</a>
+  <a href="nihaisha-learning.html" class="file-nav-btn">经 倪师学堂</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">标 舒晗知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn active">购 商城</a>
+  <a href="divination-membership.html" class="file-nav-btn">宝 会员</a>
+  <a href="wechat-hub.html" class="file-nav-btn">机 缘主工具</a>
+  <a href="ai-assistant.html" class="file-nav-btn">机 智能助手</a>
+  <a href="login.html" class="file-nav-btn">密 登录</a>
+</div>
+<!-- 头部导航 -->
+    <header class="header">
+        <div class="header-content">
+            <ml-tap role="button" tabindex="0" class="logo" onclick="window.location.href='divination-hub.html'" style="display:block;"🔮 <span>开运</span>商城</ml-tap>
+            <div class="search-bar">
+                <input aria-label="searchInput" type="text" placeholder="搜索开运好物..." id="searchInput">
+            </div>
+            <div class="header-actions">
+                <button class="cart-btn" onclick="toggleCart()">
+                    🛒 购物车
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 分类导航 -->
+    <nav class="category-nav">
+        <div class="category-list">
+            <a class="category-item active" data-category="all">全部</a>
+            <a class="category-item" href="#" role="button" data-category="bracelet">手串/饰品</a>
+            <a class="category-item" href="#" role="button" data-category="ornament">摆件/风水</a>
+            <a class="category-item" href="#" role="button" data-category="talisman">符咒/锦囊</a>
+            <a class="category-item" href="#" role="button" data-category="incense">熏香/供品</a>
+            <a class="category-item" href="#" role="button" data-category="book">书籍/课程</a>
+            <a class="category-item" href="#" role="button" data-category="medicine">中医药方</a>
+            <a class="category-item" href="#" role="button" data-category="health">养生膏方</a>
+        </div>
+    </nav>
+
+    <!-- 派别筛选栏 -->
+    <nav class="category-nav" style="border-bottom:1px solid rgba(212,168,67,0.15)">
+        <div class="category-list" id="schoolNavList">
+            <a class="category-item active" data-school="all">全部派别</a>
+            <a class="category-item" href="#" role="button" data-school="buddhist" style="color:var(--warn)">佛教</a>
+            <a class="category-item" href="#" role="button" data-school="daoist" style="color:var(--jade)">道 道教</a>
+            <a class="category-item" href="#" role="button" data-school="confucian" style="color:var(--cyan2)">卷 儒家</a>
+            <a class="category-item" href="#" role="button" data-school="instrument" style="color:var(--violet)">醒 法器</a>
+            <a class="category-item" href="#" role="button" data-school="health" style="color:var(--orange)">药 养生</a>
+            <a class="category-item" href="#" role="button" data-school="tea" style="color:var(--emerald)">茶 茶饮</a>
+        </div>
+    </nav>
+
+    <!-- 首页内容 -->
+    <div id="homePage">
+        <!-- 轮播Banner -->
+        <div class="banner">
+            <div class="banner-slide active">
+                <h2>星 限时特惠</h2>
+                <p>精选开运饰品低至8折，为自己和家人添一份好运</p>
+            </div>
+            <div class="banner-slide">
+                <h2>新 新品上架</h2>
+                <p>2026丙午马年太岁符现已开售，提前化解犯太岁</p>
+            </div>
+            <div class="banner-slide">
+                <h2>花 节气推荐</h2>
+                <p>芒种时节，阳气最盛，佩戴火属性饰品旺运势</p>
+            </div>
+            <div class="banner-slide">
+                <h2>草 道医养生</h2>
+                <p>儒道释千年药方，古法膏方四季调养，补气养血宁心安神</p>
+            </div>
+            <div class="banner-controls">
+                <button type="button" class="banner-dot a11y-btn-reset active" onclick="changeSlide(0)" aria-label="切换到第 1 张 banner" aria-current="true"></button>
+                <button type="button" class="banner-dot a11y-btn-reset" onclick="changeSlide(1)" aria-label="切换到第 2 张 banner" aria-current="false"></button>
+                <button type="button" class="banner-dot a11y-btn-reset" onclick="changeSlide(2)" aria-label="切换到第 3 张 banner" aria-current="false"></button>
+                <button type="button" class="banner-dot a11y-btn-reset" onclick="changeSlide(3)" aria-label="切换到第 4 张 banner" aria-current="false"></button>
+            </div>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <span class="filter-label">结缘价区间</span>
+                <div class="filter-options">
+                    <button class="filter-btn" data-filter="price" data-value="all">全部</button>
+                    <button class="filter-btn" data-filter="price" data-value="0-100">100元以下</button>
+                    <button class="filter-btn" data-filter="price" data-value="100-300">100-300元</button>
+                    <button class="filter-btn" data-filter="price" data-value="300-500">300-500元</button>
+                    <button class="filter-btn" data-filter="price" data-value="500+">500元以上</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">功效</span>
+                <div class="filter-options">
+                    <button class="filter-btn" data-filter="effect" data-value="all">全部</button>
+                    <button class="filter-btn" data-filter="effect" data-value="wealth">招财</button>
+                    <button class="filter-btn" data-filter="effect" data-value="protection">辟邪</button>
+                    <button class="filter-btn" data-filter="effect" data-value="love">催桃花</button>
+                    <button class="filter-btn" data-filter="effect" data-value="peace">保平安</button>
+                    <button class="filter-btn" data-filter="effect" data-value="study">学业</button>
+                    <button class="filter-btn" data-filter="effect" data-value="health">养生</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">材质</span>
+                <div class="filter-options">
+                    <button class="filter-btn" data-filter="material" data-value="all">全部</button>
+                    <button class="filter-btn" data-filter="material" data-value="crystal">水晶</button>
+                    <button class="filter-btn" data-filter="material" data-value="wood">木质</button>
+                    <button class="filter-btn" data-filter="material" data-value="metal">金属</button>
+                    <button class="filter-btn" data-filter="material" data-value="jade">玉石</button>
+                    <button class="filter-btn" data-filter="material" data-value="copter">符纸</button>
+                    <button class="filter-btn" data-filter="material" data-value="herbal">草本</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品网格 -->
+        <div class="products-section">
+            <h2 class="section-title">开运好物</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- 商品将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 养生知识推荐 -->
+        <div class="health-knowledge-section">
+            <h2 class="section-title">中医养生智慧</h2>
+            <div class="knowledge-grid">
+                <ml-tap role="button" tabindex="0" class="knowledge-card" onclick="showKnowledge('daoist')" style="display:block"
+                    <div class="knowledge-icon">道</ml-tap>
+                    <h3>道家养生</h3>
+                    <p>道法自然，顺应四时。道家主张「虚其心，实其腹」，以导引吐纳、辟谷服气、药膳调养为法，追求天人合一、长生久视之境。</p>
+                    <div class="knowledge-tags">
+                        <span class="ktag">导引术</span><span class="ktag">吐纳法</span><span class="ktag">辟谷</span><span class="ktag">药膳</span>
+                    </div>
+                </div>
+                <ml-tap role="button" tabindex="0" class="knowledge-card" onclick="showKnowledge('confucian')" style="display:block"
+                    <div class="knowledge-icon">卷</ml-tap>
+                    <h3>儒家养生</h3>
+                    <p>修身齐家，中庸养生。儒家以「仁者寿」为纲，注重饮食有节、起居有常、不妄作劳，强调心性修养与道德养生。</p>
+                    <div class="knowledge-tags">
+                        <span class="ktag">饮食有节</span><span class="ktag">起居有常</span><span class="ktag">修身养性</span><span class="ktag">中庸之道</span>
+                    </div>
+                </div>
+                <ml-tap role="button" tabindex="0" class="knowledge-card" onclick="showKnowledge('tcm')" style="display:block"
+                    <div class="knowledge-icon">药</ml-tap>
+                    <h3>中医经方</h3>
+                    <p>辨证论治，一人一方。中医以阴阳五行为纲，望闻问切为法，经方时方并用，讲究君臣佐使、升降浮沉。</p>
+                    <div class="knowledge-tags">
+                        <span class="ktag">经方</span><span class="ktag">辨证</span><span class="ktag">君臣佐使</span><span class="ktag">四诊</span>
+                    </div>
+                </div>
+                <ml-tap role="button" tabindex="0" class="knowledge-card" onclick="showKnowledge('season')" style="display:block"
+                    <div class="knowledge-icon">花</ml-tap>
+                    <h3>四季养生</h3>
+                    <p>春生夏长，秋收冬藏。顺应天时，依季节调养五脏——春养肝、夏养心、长夏养脾、秋养肺、冬养肾，方合养生之道。</p>
+                    <div class="knowledge-tags">
+                        <span class="ktag">春季养肝</span><span class="ktag">夏季养心</span><span class="ktag">秋季养肺</span><span class="ktag">冬季养肾</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 智能引擎 -->
+        <div class="recommendation-engine">
+            <h2 class="section-title">标 精准推荐</h2>
+            <div class="recommendation-form">
+                <div class="form-group">
+                    <label for="userElement">您的八字喜用神（可选）</label>
+                    <select aria-label="userElement" id="userElement">
+                        <option value="">不清楚</option>
+                        <option value="metal">金</option>
+                        <option value="wood">木</option>
+                        <option value="water">水</option>
+                        <option value="fire">火</option>
+                        <option value="earth">土</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="userNeed">当前需求</label>
+                    <select aria-label="userNeed" id="userNeed">
+                        <option value="wealth">招财旺运</option>
+                        <option value="protection">辟邪保平安</option>
+                        <option value="love">催旺桃花</option>
+                        <option value="study">学业事业</option>
+                        <option value="health">健康长寿</option>
+                    </select>
+                </div>
+                <button class="recommend-btn" onclick="smartRecommend()">标 为我挑选</button>
+            </div>
+            <div class="recommendation-results" id="recommendationResults">
+                <!-- 推荐结果将在这里显示 -->
+            </div>
+        </div>
+
+        <!-- 开运知识关联 -->
+        <div class="knowledge-section">
+            <h2 class="section-title">典 开运知识</h2>
+            <div class="knowledge-card">
+                <h3>卦 如何选择适合自己的开运饰品？</h3>
+                <p>根据八字喜用神选择对应五行属性的饰品。例如，喜用神为金的人适合佩戴金属饰品、白水晶等；喜用神为木的人适合佩戴木质手串、绿色水晶等。了解自己的八字喜用神，才能找到真正适合自己的开运好物。</p>
+            </div>
+            <div class="knowledge-card">
+                <h3>宝 水晶的五行属性</h3>
+                <p>不同颜色的水晶对应不同的五行属性：白水晶、银发晶属金；绿幽灵、绿发晶属木；海蓝宝、蓝晶石属水；红玛瑙、石榴石属火；黄水晶、茶晶属土。选择与自己五行相生或互补的水晶，效果更佳。</p>
+            </div>
+            <div class="knowledge-card">
+                <h3>节 风水摆件的摆放宜忌</h3>
+                <p>貔貅应面向门外或窗外，以吸纳财气；麒麟适合摆放在客厅或书房，头朝向门口；龙龟可化解太岁方，2026年太岁方在南方；八卦镜应悬挂在门外，不可对着他人家门。正确摆放才能发挥最大功效。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 商品详情页 -->
+    <div class="product-detail" id="productDetail">
+        <button class="back-btn" onclick="showHome()">← 返回列表</button>
+        <div class="detail-header">
+            <div class="detail-images">
+                <div class="detail-main-image" id="detailMainImage">卦</div>
+                <div class="detail-thumbnails" id="detailThumbnails">
+                    <!-- 缩略图将通过JavaScript生成 -->
+                </div>
+            </div>
+            <div class="detail-info">
+                <h1 id="detailName">商品名称</h1>
+                <div class="detail-price" id="detailPrice">¥0</div>
+                <div class="element-tags" id="detailElements">
+                    <!-- 五行标签将通过JavaScript生成 -->
+                </div>
+                <div class="suitable-for">
+                    <strong>适合人群：</strong><span id="detailSuitable">暂无数据</span>
+                </div>
+                <div class="effect-explanation">
+                    <strong>化解功效：</strong>
+                    <p id="detailEffect">暂无说明</p>
+                </div>
+                <div class="detail-actions">
+                    <button class="btn-primary" onclick="addToCartFromDetail()">加入购物车</button>
+                    <button class="btn-secondary" onclick="buyNow()">立即购买</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户评价区 -->
+        <div class="reviews-section">
+            <h2 class="section-title">用户评价</h2>
+            <div id="productReviews">
+                <!-- 评价将通过JavaScript生成 -->
+            </div>
+        </div>
+
+        <!-- 相关推荐 -->
+        <div class="related-products">
+            <h2 class="section-title">相关推荐</h2>
+            <div class="products-grid" id="relatedProducts">
+                <!-- 相关商品将通过JavaScript生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 养生知识弹窗 -->
+    <div id="productModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:3000;align-items:center;justify-content:center;">
+        <div id="modalContent" style="background:var(--darker);border:2px solid var(--gold);border-radius:12px;max-width:600px;width:90%;max-height:85vh;overflow:hidden;"></div>
+    </div>
+
+    <!-- 购物车浮层 -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>购 购物车</h2>
+            <button class="close-cart" onclick="toggleCart()">关</button>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- 购物车商品将通过JavaScript生成 -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>合计：</span>
+                <span id="cartTotal">¥0</span>
+            </div>
+            <button class="checkout-btn" onclick="showCheckout()">去结算</button>
+        </div>
+    </div>
+
+    <!-- 结算弹窗 -->
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="checkout-content">
+            <h2 style="color: var(--gold-light); margin-bottom: 2rem;">订单确认</h2>
+            
+            <div class="checkout-section">
+                <h3>收货地址</h3>
+                <div class="form-group">
+                    <input aria-label="recipientName" type="text" placeholder="收货人姓名" id="recipientName">
+                </div>
+                <div class="form-group">
+                    <input aria-label="recipientPhone" type="tel" placeholder="手机号码" id="recipientPhone">
+                </div>
+                <div class="form-group">
+                    <textarea placeholder="详细地址" id="recipientAddress" rows="3" style="width: 100%; padding: 0.6rem; background: var(--black); border: 1px solid var(--gold); border-radius: 5px; color: var(--gold);" aria-label="收货地址"></textarea>
+                </div>
+            </div>
+
+            <div class="checkout-section">
+                <h3>支付方式</h3>
+                <div class="payment-methods">
+                    <button class="payment-btn" onclick="processPayment('wechat')">
+                        💬 微信支付
+                    </button>
+                    <button class="payment-btn" onclick="processPayment('alipay')">
+                        💰 支付宝
+                    </button>
+                </div>
+            </div>
+
+            <div class="checkout-section">
+                <button class="btn-primary" onclick="submitOrder()" style="width: 100%;">确认下单</button>
+                <button class="btn-secondary" onclick="closeCheckout()" style="width: 100%; margin-top: 1rem;">返回修改</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/ui-toast.js" defer></script>
+<script src="js/toast-helper.js"></script>
+
+    <!-- 底部导航 -->
+    <nav style="position:fixed;bottom:0;left:0;right:0;z-index:500;background:rgba(8,8,8,.97);border-top:1px solid rgba(201,168,76,.1);display:flex;padding-bottom:env(safe-area-inset-bottom)">
+      <a href="divination-hub.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">宅</span>排盘</a>
+      <a href="divination-integrated.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">因</span>体质</a>
+      <a href="divination-knowledge.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">经</span>知识</a>
+      <a href="divination-shop.html" style="flex:1;text-align:center;padding:10px 0;color:var(--gold);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">🛍️</span>商城</a>
+      <a href="divination-membership.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">尊</span>会员</a>
+      <a href="divination-almanac.html" style="flex:1;text-align:center;padding:10px 0;color:var(--paper3);text-decoration:none;font-family:'Noto Serif SC',serif;font-size:10px;letter-spacing:1px"><span style="font-size:18px;display:block">历</span>黄历</a>
+    </nav>
+<div style="text-align:center;padding:20px;margin-top:20px;border-top:1px solid rgba(201,168,76,0.1)"><a href="merchant-apply.html" style="color:var(--gold);font-size:13px">店 道观寺庙/大师入驻 →</a> &nbsp;|&nbsp; <a href="merchant-dashboard.html" style="color:var(--paper3);font-size:13px">商家登录</a></div>
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/divination-shop-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-p 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-p 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

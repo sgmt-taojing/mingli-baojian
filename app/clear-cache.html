@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="description" content="清理缓存页面 · 命理宝鉴"><link rel="icon" type="image/svg+xml" href="favicon.svg"><title>清理缓存 | 命理宝鉴</title><link rel="stylesheet" href="css/theme-systems.css"><link rel="stylesheet" href="css/page-header.css">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/clear-cache.html">
+</head>
+<body style="background:#0e0e12;color:#c9a84c;font-family:serif;padding:40px;text-align:center" class="theme-ai">
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">清理缓存</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
+<style>@media(max-width:360px){body{padding:20px 10px}h2{font-size:16px}#status{font-size:13px}}@media print {
+  body { background: #fff !important; }
+  .no-print, header, nav, footer, .navbar, .sidebar, .back-btn, .phb-back, button { display: none !important; }
+  main, .main-content, .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 8px !important; }
+  a { text-decoration: none !important; color: #000 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+  .card, .panel { border: 1px solid #ddd !important; page-break-inside: avoid; }
+}</style>
+<h2>🔄 正在清理缓存...</h2>
+<p id="status">请稍候</p>
+<script>
+// 清理所有缓存
+if('caches' in window) {
+  caches.keys().then(function(names){ names.forEach(function(n){ caches.delete(n); }); });
+}
+// 清理 localStorage 中可能的缓存标记
+var keys = Object.keys(localStorage);
+keys.forEach(function(k){ if(k.includes('cache')||k.includes('version')) localStorage.removeItem(k); });
+// 清理 sessionStorage
+sessionStorage.clear();
+
+document.getElementById('status').innerHTML = '✅ 缓存已清理！3秒后跳转首页...';
+setTimeout(function(){ location.href = 'divination-hub.html'; }, 3000);
+</script>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body></html>

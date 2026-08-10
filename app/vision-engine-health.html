@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="视觉引擎健康 · 易道智鉴平台">
+<meta name="keywords" content="视觉引擎健康">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/vision-engine-health.html">
+<meta name="theme-color" content="#050608">
+<title>视觉引擎健康 · 命理宝鉴</title>
+
+<link rel="stylesheet" href="css/vision-engine-health-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">视觉引擎健康</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看引擎</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>健康检查</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>性能指标</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>日志分析</span></div></div>
+<div class="flow-hint">查看视觉引擎健康 · 命理宝鉴，了解功能详情与使用方式。</div>
+</div>
+<div class="container">
+  <h1>查 视觉引擎健康（fallback 链观测）</h1>
+  <div class="card" style="border-left:3px solid var(--warn);">
+    <strong class="bad">警 当前发现</strong>：4 个 AI 视觉引擎在 launchd plist 中均未配置 API key，
+    <strong>所有视觉请求（图片/中医病历/人脸）只能走 PIL 离线启发式兜底</strong>。
+    KB intent / TTS / STT 等其他路径不受影响。
+  </div>
+
+  <h2>图 引擎配置状态</h2>
+  <div id="engines" class="grid">加载中…</div>
+
+  <h2>工 修复方法（复制粘贴即可）</h2>
+
+  <div class="card">
+    <div class="pill-label">Step 1 · 把以下内容保存到 <code>~/.zshrc</code>（任选其一）</div>
+    <pre># ───── 方案 A · g2claw 代理（项目内置，推荐） ─────
+export G2CLAW_API_KEY="sk-你的密钥"
+export AI_API_BASE="https://api.g2claw.com"
+
+# ───── 方案 B · 智谱 GLM-4V（直接） ─────
+export ZHIPU_API_KEY="你的智谱密钥"
+
+# ───── 方案 C · OpenAI GPT-4o ─────
+export OPENAI_API_KEY="sk-你的密钥"
+
+# ───── 方案 D · 豆包 ─────
+export DOUBAO_API_KEY="你的豆包密钥"</pre>
+  </div>
+
+  <div class="card">
+    <div class="pill-label">Step 2 · 复制 launchd plist 配置（macOS）</div>
+    <pre># 备份原文件
+cp ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist \
+   ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist.bak.$(date +%s)
+
+# 用样例替换（一次性写入）</pre>
+  </div>
+
+  <h2>成 验收清单</h2>
+  <table>
+    <thead><tr><th>检查</th><th>命令</th><th>期望</th></tr></thead>
+    <tbody>
+      <tr><td>服务存活</td><td><code>curl 8913/health</code></td><td>200 ok</td></tr>
+      <tr><td>引擎激活</td><td><code>curl 8913/health | jq '.engines'</code></td><td>至少一个 <code>true</code></td></tr>
+      <tr><td>中医 OCR 真接</td><td><code>curl -F image=@x.jpg 8913/api/ocr/tcm</code></td><td>200 + 非 PIL 兜底文案</td></tr>
+      <tr><td>面相真接</td><td><code>curl -F image=@x.jpg 8913/api/face/analyze</code></td><td>200 + engine 字段非 None</td></tr>
+    </tbody>
+  </table>
+
+  <div id="raw" class="card">
+    <div class="pill-label">原始响应（每 10 秒刷新）</div>
+    <pre id="rawOut">…</pre>
+  </div>
+
+  <div class="footer">face-ocr-server · 8913 · 命理宝鉴 · R20-B 健康诊断</div>
+</div>
+
+
+<script src="js/vision-engine-health-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

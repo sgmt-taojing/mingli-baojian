@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="移动采集 · 易道智鉴平台">
+<meta name="keywords" content="移动采集">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/mobile-capture.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080808">
+<meta property="og:title" content="移动采集 · 命理宝鉴">
+<meta property="og:description" content="移动采集 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>移动采集 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+
+<link rel="stylesheet" href="css/mobile-capture-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">移动采集</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>打开摄像头</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>对准目标</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>拍摄采集</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>上传分析</span></div></div>
+<div class="flow-hint">用户通过手机拍照采集舌面照片，上传AI辅助辨证。</div>
+</div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>移动采集</h1>
+      <div class="subtitle">手机/手持 · 面相 · 草药 · 旅途中</div>
+      <div style="margin-top:6px"><a href="divination-hub.html" style="font-size:11px;color:var(--gold);text-decoration:none;letter-spacing:1px">← 返回主平台</a></div>
+    </div>
+    <div class="header-meta">
+      <div><b id="netState">—</b> · <span id="deviceState">—</span></div>
+      <div id="geoState">—</div>
+    </div>
+  </header>
+<main>
+
+
+  <div class="stage" id="stage">
+    <div class="placeholder" id="placeholder">
+      <div class="icon">拍</div>
+      <div class="hint">点击下方「启动摄像头」开始<br>推荐授权 <b>后置摄像头</b></div>
+    </div>
+    <video id="video" playsinline muted autoplay style="display:none"></video>
+    <canvas id="canvas" style="display:none"></canvas>
+    <div class="live-tag" id="liveTag">LIVE</div>
+    <div class="device-tag" id="deviceTag">—</div>
+    <div class="grid-overlay" id="gridOverlay" style="display:none"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn btn-ghost" id="btnStart">启动</button>
+    <button class="btn btn-ghost" id="btnFlip" disabled>翻转</button>
+    <button class="btn btn-ghost" id="btnTorch" disabled>闪光</button>
+    <button class="btn btn-ghost" id="btnGrid">网格</button>
+    <button class="btn btn-ghost" id="btnWebrtc" disabled>推流</button>
+  </div>
+
+  <div class="shutter">
+    <button id="btnSnap" disabled>拍 摄</button>
+  </div>
+
+  <div class="options">
+    <h3>采集参数</h3>
+    <div class="opt-row">
+      <label>场景</label>
+      <select id="selModule" aria-label="选择场景">
+        <option value="face">面相/远程问诊</option>
+        <option value="tcm">草药辨识</option>
+        <option value="bazi">实物记录</option>
+        <option value="live">直播跟拍</option>
+      </select>
+    </div>
+    <div class="opt-row">
+      <label>画质</label>
+      <select id="selQuality" aria-label="选择画质">
+        <option value="hd">720p · 省流</option>
+        <option value="fhd" selected>1080p · 均衡</option>
+        <option value="uhd">4K · 高清（设备允许时）</option>
+      </select>
+    </div>
+    <div class="opt-row">
+      <label>用户</label>
+      <input  type="text" id="userId" placeholder="可选 · 用户ID / 命主编号" aria-label="可选 · 用户ID / 命主编号">
+    </div>
+    <div class="opt-row">
+      <label>备注</label>
+      <input  type="text" id="note" placeholder="可选 · 采集备注（地点 / 心情 / 症状）" aria-label="可选 · 采集备注（地点 / 心情 / 症状）">
+    </div>
+  </div>
+
+  <div class="status-line" id="status">未启动</div>
+  <div class="queue-info" id="queueInfo"></div>
+
+  <div class="analysis-panel" id="analysisPanel">
+    <h2>AI 分析</h2>
+    <div class="analysis-empty" id="analysisEmpty">拍摄后此处显示 AI 判读结果</div>
+    <div class="analysis-content" id="analysisContent" style="display:none"></div>
+  </div>
+
+  <div class="webrtc-panel" id="webrtcPanel">
+    <h3>WebRTC 推流</h3>
+    <p>已与后端建立 <code>RTCPeerConnection</code>（仅视频 · sendonly）。<br>
+       推流端点：<code id="webrtcEndpoint">/api/webrtc/offer</code>（待后端实现）</p>
+  </div>
+
+  <div class="gallery">
+    <h2>本次采集（<span id="galleryCount">0</span>）</h2>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+
+<script src="js/mobile-capture-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

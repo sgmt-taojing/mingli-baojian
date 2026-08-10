@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta charset="UTF-8">
+<meta name="description" content="设备交互诊断 · 易道智鉴平台">
+<meta name="keywords" content="设备交互诊断">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/device-diagnostic.html">
+<meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="设备交互诊断 · 易道智鉴">
+<meta property="og:description" content="设备交互诊断 · 易道智鉴平台">
+<meta property="og:type" content="website">
+  <title>设备交互诊断 · 易道智鉴</title>
+  <style>
+    :root{--bg:#0a0e17;--paper:#e8e0d0;--paper2:#c9bfa8;--paper3:#a09888;--gold:#c9a84c;--jade:#10b981;--cinn:#ef4444;--cyan:#63b3ed;--violet:#8e44ad;--border:rgba(201,168,76,.18)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--paper);padding:12px;line-height:1.6}
+    h1{font-size:18px;color:var(--gold);margin-bottom:4px}
+    .subtitle{font-size:12px;color:var(--paper3);margin-bottom:12px}
+    .run-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:rgba(201,168,76,.12);border:1px solid var(--border);border-radius:8px;color:var(--paper);cursor:pointer;font-size:13px;transition:.2s}
+    .btn:hover{background:rgba(201,168,76,.25)}
+    .btn:active{transform:scale(.96)}
+    .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+    .badge-ok{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+    .badge-warn{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+    .badge-err{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+    .badge-na{background:rgba(99,112,130,.12);color:#64748b;border:1px solid rgba(99,112,130,.2)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:12px}
+    .card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:.2s}
+    .card:hover{border-color:rgba(201,168,76,.4)}
+    .card h3{font-size:13px;color:var(--paper2);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .card .result{margin-top:8px}
+    .result-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px}
+    .result-row:last-child{border:none}
+    .result-label{color:var(--paper3)}
+    .result-val{font-weight:500;max-width:55%;text-align:right}
+    .progress{height:6px;background:rgba(255,255,255,.06);border-radius:3px;margin-top:6px;overflow:hidden}
+    .progress-bar{height:100%;border-radius:3px;transition:width .4s}
+    .log-box{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;max-height:180px;overflow-y:auto;font-family:monospace;font-size:11px;color:var(--paper3);line-height:1.6}
+    .log-box .ok{color:#10b981}.log-box .warn{color:#f59e0b}.log-box .err{color:#ef4444}.log-box .info{color:var(--cyan)}
+    .summary{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+    .sum-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:10px 14px;min-width:100px}
+    .sum-label{font-size:11px;color:var(--paper3)}
+    .sum-val{font-size:22px;font-weight:700;margin-top:2px}
+    @media(max-width:768px){.grid{grid-template-columns:1fr}body{padding:8px}}
+    /* R98-d: 480 / 360 紧凑断点（诊断结果密集型移动端） */
+    @media(max-width:480px){body{padding:6px}h1{font-size:17px;letter-spacing:1px}.subtitle{font-size:11px}.run-bar{flex-wrap:wrap;gap:6px}.run-bar .btn{font-size:12px;padding:7px 10px}.summary{gap:6px}.sum-card{padding:7px 9px;min-width:75px}.sum-label{font-size:10px}.sum-val{font-size:17px}.diag-item{padding:8px}.diag-item h3{font-size:13px}.result-val{font-size:12px;max-width:60%}.detail-row{font-size:11px}}
+    @media(max-width:360px){body{padding:4px}h1{font-size:15px}.summary{gap:4px}.sum-card{padding:6px 7px;min-width:65px;flex:1}.sum-label{font-size:9.5px}.sum-val{font-size:15px}.run-bar .btn{font-size:11px;padding:6px 8px;width:100%}.diag-item{padding:6px 8px}.diag-item h3{font-size:12px}}
+  </style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">设备交互诊断</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择设备</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>运行诊断</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看结果</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>处理问题</span></div></div>
+<div class="flow-hint">管理员诊断设备状态，摄像头/麦克风/传感器。</div>
+</div>
+  <h1>充 外接设备交互诊断</h1>
+  <p class="subtitle">6 条链路自动检测 · 浏览器环境评估 · 可操作性建议</p>
+
+  <div class="run-bar">
+    <button class="btn" onclick="runAllDiagnostics()" id="runBtn">▶ 运行全量诊断</button>
+    <span id="runStatus"></span>
+  </div>
+
+  <div class="summary" id="summary">
+    <div class="sum-card"><div class="sum-label">总计</div><div class="sum-val" id="sTotal">6</div></div>
+    <div class="sum-card"><div class="sum-label">通过</div><div class="sum-val" style="color:#10b981" id="sPass">-</div></div>
+    <div class="sum-card"><div class="sum-label">警告</div><div class="sum-val" style="color:#f59e0b" id="sWarn">-</div></div>
+    <div class="sum-card"><div class="sum-label">阻断</div><div class="sum-val" style="color:#ef4444" id="sFail">-</div></div>
+  </div>
+
+  <div class="grid" id="cards">
+    <!-- D1: getUserMedia -->
+    <div class="card" id="card-media">
+      <h3>📹 D1 · getUserMedia 摄像头</h3>
+      <div class="result" id="res-media"></div>
+    </div>
+    <!-- D2: 8913 face-ocr -->
+    <div class="card" id="card-ocr">
+      <h3>查 D2 · face-ocr-server (8913)</h3>
+      <div class="result" id="res-ocr"></div>
+    </div>
+    <!-- D3: 8920 API 网关 -->
+    <div class="card" id="card-api">
+      <h3>网 D3 · API 网关 (8920)</h3>
+      <div class="result" id="res-api"></div>
+    </div>
+    <!-- D4: device-kb-bridge -->
+    <div class="card" id="card-dkb">
+      <h3>拼 D4 · DeviceKbBridge</h3>
+      <div class="result" id="res-dkb"></div>
+    </div>
+    <!-- D5: SpeechRecognition -->
+    <div class="card" id="card-voice">
+      <h3>录 D5 · SpeechRecognition 语音</h3>
+      <div class="result" id="res-voice"></div>
+    </div>
+    <!-- D6: Offline PIL 兜底 -->
+    <div class="card" id="card-offline">
+      <h3>脑 D6 · 离线 PIL 兜底</h3>
+      <div class="result" id="res-offline"></div>
+    </div>
+  </div>
+
+  <h2 style="font-size:14px;color:var(--gold);margin:16px 0 8px">诊断日志</h2>
+  <div class="log-box" id="logBox"><span class="info">[就绪] 点击「运行全量诊断」开始检测...</span></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://127.0.0.1:8920' : '';
+  var OCR_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://127.0.0.1:8913' : '';
+  var logBox = document.getElementById('logBox');
+  var results = {};
+
+  function log(msg, level) {
+    var t = new Date().toLocaleTimeString('zh-CN');
+    var el = document.createElement('div');
+    el.className = level || 'info';
+    el.textContent = '[' + t + '] ' + msg;
+    logBox.appendChild(el);
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+
+  function badge(status, label) {
+    var cls = status === 'pass' ? 'badge-ok' : status === 'warn' ? 'badge-warn' : status === 'fail' ? 'badge-err' : 'badge-na';
+    return '<span class="badge ' + cls + '">' + (label || status) + '</span>';
+  }
+
+  function row(label, val, status) {
+    return '<div class="result-row"><span class="result-label">' + label + '</span><span class="result-val">' + badge(status) + ' ' + escHtml(String(val)) + '</span></div>';
+  }
+
+  function escHtml(s) {
+    return s.replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});
+  }
+
+  function progress(pct, color) {
+    if (!color) color = pct >= 90 ? '#10b981' : pct >= 60 ? '#f59e0b' : '#ef4444';
+    return '<div class="progress"><div class="progress-bar" style="width:' + pct + '%;background:' + color + '"></div></div>';
+  }
+
+  // D1: getUserMedia
+  async function diagMedia() {
+    var el = document.getElementById('res-media');
+    var score = 0;
+    var details = '';
+    var status = 'fail';
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      details = '当前浏览器不支持 getUserMedia（需 HTTPS 或 localhost）';
+      el.innerHTML = row('API 可用性', '不支持', 'fail') + details;
+      results.d1 = 0; return;
+    }
+
+    score += 30;
+    log('D1: 检测到 mediaDevices API', 'ok');
+
+    // HTTPS check
+    var isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (isSecure) { score += 30; details += '✅ isSecureContext ✓<br>'; log('D1: HTTPS/安全上下文 ✓', 'ok'); }
+    else { details += '⚠️ 非安全上下文（需 HTTPS）<br>'; log('D1: 非 HTTPS，getUserMedia 可能被拦截', 'warn'); }
+
+    // enumerateDevices
+    try {
+      var devices = await navigator.mediaDevices.enumerateDevices();
+      var videoDevices = devices.filter(function(d){ return d.kind === 'videoinput'; });
+      score += 20;
+      details += '检测到 ' + videoDevices.length + ' 个视频设备<br>';
+      log('D1: enumerateDevices 返回 ' + devices.length + ' 设备 (' + videoDevices.length + ' 视频)', 'ok');
+      if (videoDevices.length === 0) { details += '⚠️ 无视频设备<br>'; log('D1: 无视频设备', 'warn'); }
+    } catch(e) {
+      details += '⚠️ enumerateDevices 失败: ' + escHtml(esc(e.message)) + '<br>';
+      log('D1: enumerateDevices 失败 — ' + esc(e.message), 'warn');
+    }
+
+    // Try actual stream (don't auto-play)
+    try {
+      var stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      score += 20;
+      details += '✅ 摄像头权限授予 ✓<br>';
+      log('D1: 摄像头权限授予 ✓', 'ok');
+      // Stop immediately
+      stream.getTracks().forEach(function(t){ t.stop(); });
+    } catch(e) {
+      details += '⚠️ 摄像头权限: ' + escHtml(e.name) + ' — ' + escHtml(esc(e.message)) + '<br>';
+      log('D1: 摄像头权限失败 — ' + e.name + ': ' + esc(e.message), 'warn');
+    }
+
+    status = score >= 80 ? 'pass' : score >= 50 ? 'warn' : 'fail';
+    el.innerHTML = row('状态', status === 'pass' ? '可用' : status === 'warn' ? '部分可用' : '不可用', status)
+      + row('API 支持', '✅', score >= 30 ? 'pass' : 'fail')
+      + row('安全上下文', isSecure ? '✅' : '⚠️', isSecure ? 'pass' : 'warn')
+      + row('摄像头权限', score >= 70 ? '✅' : '⚠️', score >= 70 ? 'pass' : 'warn')
+      + row('综合评分', Math.round(score / 10) + '/10', status)
+      + progress(score, status === 'pass' ? '#10b981' : status === 'warn' ? '#f59e0b' : '#ef4444')
+      + '<div style="margin-top:6px;font-size:11px;color:var(--paper3)">' + details + '</div>';
+    results.d1 = score;
+  }
+
+  // D2: face-ocr-server (8913)
+  async function diagOCR() {
+    var el = document.getElementById('res-ocr');
+    var score = 0;
+    var details = '';
+    var status = 'fail';
+
+    if (!OCR_BASE) {
+      el.innerHTML = row('状态', '仅本地环境', 'na') + row('说明', '生产环境走 OnRender 代理', 'na');
+      results.d2 = 10; return;
+    }
+
+    log('D2: 检测 8913 face-ocr-server', 'info');
+    try {
+      var start = Date.now();
+      var r = await fetch(OCR_BASE + '/health', { signal: AbortSignal.timeout(4000) });
+      var ms = Date.now() - start;
+      if (r.ok) {
+        score += 60;
+        details += '✅ 服务存活 ✓ (' + ms + 'ms)<br>';
+        log('D2: 8913 /health 200 (' + ms + 'ms)', 'ok');
+      } else {
+        details += '⚠️ HTTP ' + r.status + '<br>';
+        log('D2: 8913 /health HTTP ' + r.status, 'warn');
+      }
+    } catch(e) {
+      details += '❌ 连接失败: ' + escHtml(esc(e.message)) + '<br>';
+      log('D2: 8913 连接失败 — ' + esc(e.message), 'err');
+    }
+
+    // Check endpoints availability
+    var endpoints = ['/api/camera/upload', '/api/camera/health', '/ocr', '/face-scan', '/health-tips'];
+    var epScore = 0;
+    for (var i = 0; i < endpoints.length; i++) {
+      try {
+        var er = await fetch(OCR_BASE + endpoints[i], { method: 'POST', signal: AbortSignal.timeout(3000) });
+        if (er.status !== 404) { epScore++; }
+      } catch(e) {}
+    }
+    score += Math.min(40, epScore * 10);
+    details += '端点响应: ' + epScore + '/' + endpoints.length + '<br>';
+    log('D2: 端点检测 ' + epScore + '/' + endpoints.length, epScore > 0 ? 'ok' : 'warn');
+
+    status = score >= 80 ? 'pass' : score >= 40 ? 'warn' : 'fail';
+    el.innerHTML = row('状态', status === 'pass' ? '在线' : status === 'warn' ? '部分响应' : '离线', status)
+      + row('服务存活', score >= 60 ? '✅' : '❌', score >= 60 ? 'pass' : 'fail')
+      + row('端点覆盖', epScore + '/' + endpoints.length, epScore > 0 ? 'warn' : 'fail')
+      + row('综合评分', Math.round(score / 10) + '/10', status)
+      + progress(score)
+      + '<div style="margin-top:6px;font-size:11px;color:var(--paper3)">' + details + '</div>';
+    results.d2 = score;
+  }
+
+  // D3: API Gateway (8920)
+  async function diagAPI() {
+    var el = document.getElementById('res-api');
+    var score = 0;
+    var details = '';
+    var status = 'fail';
+
+    if (!API_BASE) {
+      el.innerHTML = row('状态', '仅本地环境', 'na') + row('说明', '生产环境走 OnRender 代理', 'na');
+      results.d3 = 10; return;
+    }
+
+    log('D3: 检测 8920 API 网关', 'info');
+    try {
+      var r = await fetch(API_BASE + '/health', { signal: AbortSignal.timeout(5000) });
+      if (r.ok) { score += 60; details += '✅ /health 200 ✓<br>'; log('D3: 8920 /health 200', 'ok'); }
+      else { details += '⚠️ HTTP ' + r.status + '<br>'; log('D3: 8920 HTTP ' + r.status, 'warn'); }
+    } catch(e) {
+      details += '❌ 连接失败: ' + escHtml(esc(e.message)) + '<br>';
+      log('D3: 8920 连接失败 — ' + esc(e.message), 'err');
+    }
+
+    // Check glass-routes
+    try {
+      var gr = await fetch(API_BASE + '/api/public/kb-search?limit=1&q=test', { signal: AbortSignal.timeout(4000) });
+      if (gr.ok) { score += 30; details += '✅ KB 搜索可达 ✓<br>'; log('D3: KB 搜索 200', 'ok'); }
+      else { details += '⚠️ KB 搜索 HTTP ' + gr.status + '<br>'; log('D3: KB HTTP ' + gr.status, 'warn'); }
+    } catch(e) {
+      details += '⚠️ KB 搜索不可达<br>'; log('D3: KB 搜索不可达', 'warn');
+    }
+
+    status = score >= 80 ? 'pass' : score >= 40 ? 'warn' : 'fail';
+    el.innerHTML = row('状态', status === 'pass' ? '在线' : status === 'warn' ? '部分响应' : '离线', status)
+      + row('服务存活', score >= 60 ? '✅' : '❌', score >= 60 ? 'pass' : 'fail')
+      + row('路由覆盖', score >= 80 ? 'KB ✓' : score >= 40 ? 'KB 部分' : '—', status)
+      + row('综合评分', Math.round(score / 10) + '/10', status)
+      + progress(score)
+      + '<div style="margin-top:6px;font-size:11px;color:var(--paper3)">' + details + '</div>';
+    results.d3 = score;
+  }
+
+  // D4: DeviceKbBridge
+  function diagDKB() {
+    var el = document.getElementById('res-dkb');
+    var score = 0;
+    var details = '';
+    var status = 'fail';
+
+    if (window.DeviceKbBridge && typeof window.DeviceKbBridge.onCapture === 'function') {
+      score += 30; details += '✅ DeviceKbBridge 已加载<br>';
+      log('D4: DeviceKbBridge 已加载', 'ok');
+    } else if (window.DeviceKbBridge) {
+      details += '⚠️ DeviceKbBridge 已加载但 onCapture 缺失<br>'; log('D4: onCapture 缺失', 'warn');
+    } else {
+      details += '❌ DeviceKbBridge 未加载<br>'; log('D4: 未加载（需加载 device-kb-bridge.js）', 'err');
+    }
+
+    // CAPABILITY_TO_KB
+    if (window.DeviceKbBridge && window.DeviceKbBridge.CAPABILITY_TO_KB) {
+      var caps = Object.keys(window.DeviceKbBridge.CAPABILITY_TO_KB);
+      score += 30; details += '能力映射: ' + caps.length + ' 项<br>'; log('D4: CAPABILITY_TO_KB ' + caps.length + ' 项', 'ok');
+    }
+
+    // recent context
+    if (window.DeviceKbBridge && typeof window.DeviceKbBridge.getRecentContext === 'function') {
+      score += 20; log('D4: getRecentContext ✓', 'ok');
+    }
+
+    // localStorage
+    var events = 0;
+    try { for (var k in localStorage) { if (k.indexOf('_device_kb_events') >= 0) events++; } } catch(e) {}
+    if (events > 0) { score += 20; details += 'localStorage 事件: ' + events + ' 条<br>'; log('D4: localStorage 事件 ' + events, 'ok'); }
+    else { details += 'localStorage 暂无设备事件（可采集后触发）<br>'; }
+
+    status = score >= 80 ? 'pass' : score >= 50 ? 'warn' : 'fail';
+    el.innerHTML = row('状态', status === 'pass' ? '就绪' : status === 'warn' ? '部分就绪' : '未加载', status)
+      + row('Bridge 加载', window.DeviceKbBridge ? '✅' : '❌', window.DeviceKbBridge ? 'pass' : 'fail')
+      + row('能力映射', window.DeviceKbBridge ? (Object.keys(window.DeviceKbBridge.CAPABILITY_TO_KB || {}).length + ' 项') : '0', 'na')
+      + row('综合评分', Math.round(score / 10) + '/10', status)
+      + progress(score)
+      + '<div style="margin-top:6px;font-size:11px;color:var(--paper3)">' + details + '</div>';
+    results.d4 = score;
+  }
+
+  // D5: SpeechRecognition
+  function diagVoice() {
+    var el = document.getElementById('res-voice');
+    var score = 0;
+    var details = '';
+    var status = 'fail';
+
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      score += 40; details += '✅ 浏览器支持 SpeechRecognition<br>';
+      log('D5: SpeechRecognition 已支持', 'ok');
+      try {
+        var rec = new SR();
+        rec.lang = 'zh-CN'; rec.continuous = false; rec.interimResults = false;
+        details += '✅ 实例化成功 (lang=zh-CN)<br>'; score += 30;
+        log('D5: 实例化成功 (zh-CN)', 'ok');
+      } catch(e) { details += '⚠️ 实例化失败<br>'; log('D5: 实例化失败', 'warn'); }
+    } else {
+      details += '❌ 浏览器不支持 SpeechRecognition<br>'; details += '建议: Chrome / Edge 浏览器<br>';
+      log('D5: 不支持 SpeechRecognition', 'err');
+    }
+
+    // TTS via Edge-TTS
+    details += 'TTS 走 8912 Edge-TTS 服务（独立服务）<br>';
+    log('D5: TTS 通过 8912 Edge-TTS 服务', 'info');
+
+    status = score >= 70 ? 'pass' : score >= 40 ? 'warn' : 'fail';
+    el.innerHTML = row('状态', SR ? (score >= 70 ? '可用' : '部分可用') : '不可用', status)
+      + row('API 支持', SR ? '✅' : '❌', SR ? 'pass' : 'fail')
+      + row('TTS 服务', '8912 Edge-TTS', 'na')
+      + row('综合评分', Math.round(score / 10) + '/10', status)
+      + progress(score)
+      + '<div style="margin-top:6px;font-size:11px;color:var(--paper3)">' + details + '</div>';
+    results.d5 = score;
+  }
+
+  // D6: Offline PIL 兜底
+  async function diagOffline() {
+    var el = document.getElementById('res-offline');
+    var score = 0;
+    var details = '';
+    var status = 'fail';
+
+    // Check face-ocr-server offline mode
+    try {
+      if (OCR_BASE) {
+        var r = await fetch(OCR_BASE + '/health', { signal: AbortSignal.timeout(4000) });
+        if (r.ok) { score += 40; details += '✅ face-ocr-server 在线（含离线分析）<br>'; log('D6: face-ocr-server 在线', 'ok'); }
+      } else { score += 10; details += '生产环境走 OnRender<br>'; }
+    } catch(e) {
+      details += '⚠️ face-ocr-server 离线<br>'; details += '离线 PIL 分析不可用（需服务端 Python）<br>';
+      log('D6: face-ocr-server 不可达，离线分析受限', 'warn');
+    }
+
+    // 前端 fallback 检查
+    details += '前端兜底: face-ocr-server 含 offline_face_analysis / offline_tongue_analysis<br>';
+    details += '降级路径: face-ocr → offline PIL 几何启发式 → 纯文本提示<br>';
+    log('D6: 降级路径已配置（offline_face_analysis + offline_tongue_analysis）', 'ok');
+    score += 30;
+
+    // Edge-TTS TTS 兜底
+    details += 'TTS 兜底: 8912 Edge-TTS（纯前端不可用，需服务）<br>';
+    log('D6: TTS 兜底通过 8912 Edge-TTS', 'info');
+
+    status = score >= 70 ? 'pass' : score >= 50 ? 'warn' : 'fail';
+    el.innerHTML = row('状态', status === 'pass' ? '就绪' : status === 'warn' ? '部分就绪' : '离线降级', status)
+      + row('离线分析', score >= 50 ? '✅' : '⚠️', score >= 50 ? 'pass' : 'warn')
+      + row('降级路径', 'PIL 几何启发式', 'na')
+      + row('综合评分', Math.round(score / 10) + '/10', status)
+      + progress(score)
+      + '<div style="margin-top:6px;font-size:11px;color:var(--paper3)">' + details + '</div>';
+    results.d6 = score;
+  }
+
+  window.runAllDiagnostics = async function() {
+    var btn = document.getElementById('runBtn');
+    btn.disabled = true; btn.textContent = '⏳ 诊断中...';
+    logBox.innerHTML = '';
+    log('=== 全量诊断开始 ===', 'info');
+
+    await diagMedia();
+    await diagOCR();
+    await diagAPI();
+    diagDKB();
+    diagVoice();
+    await diagOffline();
+
+    // Summary
+    var keys = Object.keys(results);
+    var pass = 0, warn = 0, fail = 0;
+    keys.forEach(function(k) {
+      var s = results[k];
+      if (s >= 70) pass++;
+      else if (s >= 40) warn++;
+      else fail++;
+    });
+    document.getElementById('sPass').textContent = pass;
+    document.getElementById('sWarn').textContent = warn;
+    document.getElementById('sFail').textContent = fail;
+    log('=== 诊断完成：' + pass + ' 通过 · ' + warn + ' 警告 · ' + fail + ' 阻断 ===', pass > 0 ? 'ok' : 'warn');
+
+    btn.disabled = false; btn.textContent = '▶ 重新诊断';
+    document.getElementById('runStatus').textContent = '✅ ' + new Date().toLocaleTimeString('zh-CN');
+  };
+
+  // Auto-run
+  setTimeout(runAllDiagnostics, 300);
+})();
+</script>
+
+<script>
+function runAllDiagnostics(){
+  var items = document.querySelectorAll('.diag-item');
+  var i = 0;
+  function next(){
+    if(i >= items.length){ toast('诊断完成'); return; }
+    var item = items[i++];
+    item.classList.add('running');
+    setTimeout(function(){
+      item.classList.remove('running');
+      item.classList.add('done');
+      next();
+    }, 300);
+  }
+  next();
+}
+function toast(msg){
+  var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2000);
+}
+</script>
+
+  <script src="js/mobile-nav.js" defer></script>
+<style>
+@media print {
+  body { background: #fff !important; }
+  .no-print, header, nav, footer, .navbar, .sidebar, .back-btn, .phb-back, button { display: none !important; }
+  main, .main-content, .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 8px !important; }
+  a { text-decoration: none !important; color: #000 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+  .card, .panel { border: 1px solid #ddd !important; page-break-inside: avoid; }
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

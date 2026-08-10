@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="rename · 易道智鉴平台">
+<meta name="keywords" content="rename">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/rename.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="rename · 易道智鉴">
+<meta property="og:description" content="rename · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>rename · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/divination-hub-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-zhouyi">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">rename</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>输入原名</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>选择方向</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>分析计算</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看建议</span></div></div>
+<div class="flow-hint">个人/商户使用姓名学分析，康熙笔画+五行+三才五格。</div>
+</div>
+<section class="section" id="section-rename" role="tabpanel" aria-labelledby="tab-rename">
+    <div class="section-header">
+    <span class="sh-symbol" style="color:var(--gold)">🔤</span>
+    <h2 class="sh-title">起名 / 改名</h2>
+    <p class="sh-en">Name Generation & Change Suggestion</p>
+    <p class="sh-desc">结合生辰八字、三才五格、五行生克、出生地与居住地，为新生儿起名或提供改名建议。</p>
+  </div>
+  <!-- 起名/改名输入 -->
+  <div class="input-card">
+    <h3>基本信息</h3>
+    <!-- 用途选择 -->
+    <div class="input-row" style="margin-bottom:8px">
+      <select id="renamePurpose" class="input-field" onchange="onRenamePurposeChange()" style="max-width:160px" aria-label="renamePurpose">
+        <option value="naming">新生儿起名</option>
+        <option value="rename">改名</option>
+        <option value="penname">取笔名</option>
+      </select>
+      <select id="renameSex" class="input-field" style="max-width:100px" aria-label="renameSex">
+        <option value="">性别</option>
+        <option value="male">男</option>
+        <option value="female">女</option>
+      </select>
+      <select id="renameNameLen" class="input-field" style="max-width:120px" aria-label="renameNameLen">
+        <option value="">字数不限</option>
+        <option value="2">2字名</option>
+        <option value="3">3字名</option>
+      </select>
+    </div>
+    <!-- 姓名/姓氏 -->
+    <div class="input-row">
+      <input  type="text" id="renameCurrentName" class="input-field" placeholder="当前姓名（改名时填写）" style="max-width:200px" aria-label="当前姓名（改名时填写）">
+      <input  type="text" id="renameSurname" class="input-field" placeholder="姓氏（起名时必填）" style="max-width:120px" aria-label="姓氏（起名时必填）">
+      <input  type="text" id="renameZibei" class="input-field" placeholder="字辈（选填）" style="max-width:120px" aria-label="字辈（选填）">
+    </div>
+    <!-- 生辰八字 -->
+    <div style="background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.12);border-radius:10px;padding:14px;margin-top:12px">
+      <h4 style="font-size:12px;color:var(--gold);margin-bottom:10px;letter-spacing:2px">星 生辰八字（按八字用神取名/改名）</h4>
+      <div class="input-row" style="flex-wrap:wrap;gap:8px">
+        <select id="renameCalendarType" class="input-field" style="max-width:100px" onchange="toggleRenameCalendar()" aria-label="renameCalendarType">
+          <option value="solar">阳历</option>
+          <option value="lunar">农历</option>
+        </select>
+        <input  type="date" id="renameBirthDate" class="input-field" style="max-width:160px" title="出生日期" aria-label="Rename Birth Date">
+        <select id="renameBirthHour" class="input-field" style="max-width:120px" aria-label="renameBirthHour">
+          <option value="">时辰</option>
+          <option value="0">子时 23-01</option>
+          <option value="1">丑时 01-03</option>
+          <option value="2">寅时 03-05</option>
+          <option value="3">卯时 05-07</option>
+          <option value="4">辰时 07-09</option>
+          <option value="5">巳时 09-11</option>
+          <option value="6">午时 11-13</option>
+          <option value="7">未时 13-15</option>
+          <option value="8">申时 15-17</option>
+          <option value="9">酉时 17-19</option>
+          <option value="10">戌时 19-21</option>
+          <option value="11">亥时 21-23</option>
+        </select>
+      </div>
+      <div class="input-row" style="margin-top:8px;flex-wrap:wrap;gap:8px">
+        <select id="renameBirthCity" class="input-field" style="max-width:160px" aria-label="renameBirthCity">
+          <option value="">出生城市</option>
+          <option value="北京">北京</option>
+          <option value="上海">上海</option>
+          <option value="广州">广州</option>
+          <option value="深圳">深圳</option>
+          <option value="成都">成都</option>
+          <option value="重庆">重庆</option>
+          <option value="西安">西安</option>
+          <option value="武汉">武汉</option>
+          <option value="杭州">杭州</option>
+          <option value="南京">南京</option>
+          <option value="苏州">苏州</option>
+          <option value="天津">天津</option>
+          <option value="青岛">青岛</option>
+          <option value="大连">大连</option>
+          <option value="厦门">厦门</option>
+          <option value="昆明">昆明</option>
+          <option value="长沙">长沙</option>
+          <option value="郑州">郑州</option>
+          <option value="济南">济南</option>
+          <option value="合肥">合肥</option>
+          <option value="福州">福州</option>
+          <option value="南昌">南昌</option>
+          <option value="太原">太原</option>
+          <option value="沈阳">沈阳</option>
+          <option value="长春">长春</option>
+          <option value="哈尔滨">哈尔滨</option>
+          <option value="石家庄">石家庄</option>
+          <option value="呼和浩特">呼和浩特</option>
+          <option value="乌鲁木齐">乌鲁木齐</option>
+          <option value="兰州">兰州</option>
+          <option value="银川">银川</option>
+          <option value="西宁">西宁</option>
+          <option value="拉萨">拉萨</option>
+          <option value="海口">海口</option>
+          <option value="南宁">南宁</option>
+          <option value="贵阳">贵阳</option>
+          <option value="其他">其他</option>
+        </select>
+        <select id="renameLiveCity" class="input-field" style="max-width:160px" aria-label="renameLiveCity">
+          <option value="">居住/工作城市</option>
+          <option value="北京">北京</option>
+          <option value="上海">上海</option>
+          <option value="广州">广州</option>
+          <option value="深圳">深圳</option>
+          <option value="成都">成都</option>
+          <option value="重庆">重庆</option>
+          <option value="西安">西安</option>
+          <option value="武汉">武汉</option>
+          <option value="杭州">杭州</option>
+          <option value="南京">南京</option>
+          <option value="苏州">苏州</option>
+          <option value="天津">天津</option>
+          <option value="青岛">青岛</option>
+          <option value="大连">大连</option>
+          <option value="厦门">厦门</option>
+          <option value="昆明">昆明</option>
+          <option value="长沙">长沙</option>
+          <option value="郑州">郑州</option>
+          <option value="济南">济南</option>
+          <option value="合肥">合肥</option>
+          <option value="福州">福州</option>
+          <option value="南昌">南昌</option>
+          <option value="太原">太原</option>
+          <option value="沈阳">沈阳</option>
+          <option value="长春">长春</option>
+          <option value="哈尔滨">哈尔滨</option>
+          <option value="石家庄">石家庄</option>
+          <option value="呼和浩特">呼和浩特</option>
+          <option value="乌鲁木齐">乌鲁木齐</option>
+          <option value="兰州">兰州</option>
+          <option value="银川">银川</option>
+          <option value="西宁">西宁</option>
+          <option value="拉萨">拉萨</option>
+          <option value="海口">海口</option>
+          <option value="南宁">南宁</option>
+          <option value="贵阳">贵阳</option>
+          <option value="其他">其他</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <!-- 候选名字 -->
+  <div class="input-card">
+    <h3 id="renameCandidateTitle">候选名字</h3>
+    <p style="font-size:12px;text-align:center;margin-bottom:12px" id="renameCandidateHint">每行一个名字，系统将逐一分析。也可留空让系统自动推荐。</p>
+    <textarea id="renameNewNames" class="input-field rename-textarea" rows="4" style="width:100%;min-height:100px;resize:vertical;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;letter-spacing:2px;outline:none;padding:12px;border-radius:6px;appearance:none;-webkit-appearance:none" placeholder="例如：
+李明
+李晨
+李睿
+
+也可留空，系统将根据八字自动推荐" aria-label="例如：
+李明
+李晨
+李睿
+
+也可留空，系统将根据八字自动推荐"></textarea>
+  </div>
+  <button id="renameBtn" onclick="computeRenameEnhanced()" class="compute-btn">开始分析</button>
+  <!-- 起名/改名结果 -->
+  <div id="renameResult" class="result-card rename-result" style="display:none;padding:20px;border-radius:12px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);margin-top:24px">
+    <div style="text-align:center;margin-bottom:24px">
+      <h3 id="renameNameOut" style="font-family:'Ma Shan Zheng',serif;font-size:28px;letter-spacing:4px;color:var(--gold);margin-bottom:8px"></h3>
+      <p id="renameMetaOut" style="font-size:12px;opacity:.95;letter-spacing:2px"></p>
+    </div>
+    <!-- 八字用神分析 -->
+    <div id="renameBaziAnalysis" style="display:none;margin-bottom:20px"></div>
+    <!-- 三才五格 -->
+    <div id="wugeGrid" class="rename-analysis-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px"></div>
+    <div id="sancaiBox" style="margin-bottom:20px"></div>
+    <!-- 音律分析 -->
+    <div style="margin-bottom:20px">
+      <h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">音律分析</h5>
+      <div id="yinlvAnalysis" style="padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px"></div>
+    </div>
+    <!-- 谐音警示 -->
+    <div id="xieyinAlert" style="display:none;margin-bottom:20px"></div>
+    <!-- 寓意分析 -->
+    <div style="margin-bottom:20px">
+      <h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">寓意分析</h5>
+      <div id="renameYuyiAnalysis" class="rename-analysis-grid"></div>
+    </div>
+    <!-- 五行分析 -->
+    <div id="renameWuxingAnalysis" style="margin-bottom:20px"></div>
+    <!-- 综合评分 -->
+    <div style="text-align:center;margin:24px 0">
+      <div id="renameScoreRing" style="display:inline-block"></div>
+      <div id="renameScoreText" style="margin-top:12px"></div>
+    </div>
+    <!-- 取名禁忌 -->
+    <div id="renameTabooBox" style="display:none;margin-bottom:20px"></div>
+    <!-- 知识科普折叠 -->
+    <div style="text-align:center;margin-top:16px">
+      <button onclick="toggleKnowledge()" style="background:none;border:1px solid rgba(201,168,76,.2);color:var(--gold);font-size:12px;padding:8px 20px;border-radius:20px;cursor:pointer;letter-spacing:2px">卷 姓名学知识科普</button>
+    </div>
+    <div id="knowledgeBlock" style="display:none;margin-top:16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.08);border-radius:8px;font-size:13px;line-height:2;opacity:.85">
+      <p><strong style="color:var(--gold)">三才五格：</strong>天格、地格、人格、外格、总格，通过姓氏与名字笔画数推算，揭示人生各阶段运势。</p>
+      <p style="margin-top:8px"><strong style="color:var(--gold)">五行相生：</strong>木→火→土→金→水→木；相克：木克土、土克水、水克火、火克金、金克木。姓名五行需与八字互补。</p>
+      <p style="margin-top:8px"><strong style="color:var(--gold)">音律美：</strong>平仄协调、声母错落、韵母和谐，读来朗朗上口方为佳名。</p>
+      <p style="margin-top:8px"><strong style="color:var(--gold)">经典出处：</strong>《诗经》《楚辞》《说文解字》是中国取名的三大经典来源。</p>
+    </div>
+  </div>
+  <!-- 姓名学引擎快捷入口 -->
+  <div class="input-card" style="margin-top:20px">
+    <h3>快速姓名学引擎</h3>
+    <div class="input-row" style="justify-content:center;flex-wrap:wrap;gap:8px">
+      <input  type="text" class="input-field" id="xmName" placeholder="请输入姓名" maxlength="20" style="max-width:200px" aria-label="请输入姓名">
+      <select class="input-field" id="xmSex" style="max-width:120px" aria-label="选项xmSex">
+        <option value="male">男</option>
+        <option value="female">女</option>
+      </select>
+      <input  type="date" class="input-field" id="xmBirthDate" style="max-width:160px" title="出生日期" aria-label="Xm Birth Date">
+      <select class="input-field" id="xmBirthHour" style="max-width:120px" aria-label="选项xmBirthHour">
+        <option value="">时辰</option>
+        <option value="0">子时 23-01</option>
+        <option value="1">丑时 01-03</option>
+        <option value="2">寅时 03-05</option>
+        <option value="3">卯时 05-07</option>
+        <option value="4">辰时 07-09</option>
+        <option value="5">巳时 09-11</option>
+        <option value="6">午时 11-13</option>
+        <option value="7">未时 13-15</option>
+        <option value="8">申时 15-17</option>
+        <option value="9">酉时 17-19</option>
+        <option value="10">戌时 19-21</option>
+        <option value="11">亥时 21-23</option>
+      </select>
+    </div>
+    <div style="text-align:center;margin-top:16px">
+      <button class="compute-btn" onclick="runXingmingEngine()">姓名学引擎分析</button>
+    </div>
+    <div id="xmEngineResult" class="engine-result-card" style="display:none;margin-top:16px"></div>
+  </div>
+  </section>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+
+<script>
+// R180: Safe fallbacks for rename.html standalone functions
+if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='divination-hub.html#'+(n||'');}catch(e){history.back();}};}
+if(typeof computeRenameEnhanced!=='function'){window.computeRenameEnhanced=function(){try{var ln=document.getElementById('lastName')||document.getElementById('xmCurrentName');var fn=document.getElementById('firstName')||document.getElementById('xmNewName');var r=document.getElementById('renameResult')||document.getElementById('xmResult');if(r){r.innerHTML='<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">表 姓名分析报告</h5><p style="font-size:13px;color:var(--paper2)">姓名: '+(ln&&ln.value?ln.value:'')+(fn&&fn.value?fn.value:'')+'</p><p style="font-size:13px;color:var(--paper2);margin-top:8px">完整姓名学分析（三才五格、五行匹配、笔画数理）请在主页姓名模块中使用。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('姓名分析已生成（简化版）');}catch(e){console.warn('[computeRenameEnhanced]',e);}};}
+if(typeof toggleKnowledge!=='function'){window.toggleKnowledge=function(){try{var el=document.getElementById('knowledgeSection')||document.getElementById('renameKnowledge');if(el){el.classList.toggle('d-none');}}catch(e){console.warn('[toggleKnowledge]',e);}};}
+if(typeof runXingmingEngine!=='function'){window.runXingmingEngine=function(){try{var n=document.getElementById('xmCurrentName')||document.getElementById('lastName');var nn=document.getElementById('xmNewName')||document.getElementById('firstName');var r=document.getElementById('xmEngineResult')||document.getElementById('renameResult');if(r){r.innerHTML='<div style="padding:14px;background:rgba(201,168,76,0.06);border-radius:10px"><h5 style="color:var(--gold)">修 姓名学引擎</h5><p style="font-size:13px;color:var(--paper2)">姓名学引擎深度分析（含康熙笔画、三才五格、生肖喜忌）请在主页使用完整引擎。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('引擎分析已生成（简化版）');}catch(e){console.warn('[runXingmingEngine]',e);}};}
+</script>
+
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

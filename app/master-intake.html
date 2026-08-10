@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="大师快速批注 · 八字排盘一键命理批注 · 易道智鉴平台">
+<meta name="keywords" content="大师快速批注,八字排盘,命理批注">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/master-intake.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<title>大师快速批注 · 八字排盘 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--purple:#9f7aea;--blue:#4299e1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:520px;margin:0 auto;min-height:100vh}
+h1{color:var(--gold);font-size:17px;margin-bottom:4px;text-align:center}
+.sub{text-align:center;font-size:11px;color:var(--muted);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+input,select,textarea{width:100%;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:inherit}
+textarea{resize:vertical;min-height:80px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.chart-box{background:var(--bg);border:1px solid var(--gold);border-radius:10px;padding:14px;margin:10px 0;font-size:13px;line-height:1.9}
+.chart-box .pillar{display:inline-block;min-width:58px;text-align:center;border-right:1px solid var(--border);padding:0 8px}
+.chart-box .pillar:last-child{border-right:none}
+.chart-box .stem{font-size:20px;font-weight:700;color:var(--gold)}
+.chart-box .branch{font-size:18px;color:var(--blue)}
+.wuxing-bar{display:flex;gap:4px;margin:8px 0}
+.wuxing-item{flex:1;text-align:center;padding:6px 2px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:11px}
+.wuxing-item .n{font-size:16px;font-weight:700;display:block}
+.wu-mu{color:#48bb78}.wu-huo{color:#f56565}.wu-tu{color:#c9a84c}.wu-jin{color:#e2e8f0}.wu-shui{color:#4299e1}
+.note-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;line-height:1.8;margin:8px 0;white-space:pre-wrap}
+.loading{text-align:center;padding:20px;color:var(--gold);font-size:13px;display:none}
+@media(max-width:360px){body{padding:8px 6px}h1{font-size:15px}.card{padding:10px 8px}.chart-box .stem{font-size:16px}.chart-box .branch{font-size:15px}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-zhouyi">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">大师快速批注</span>
+  </div>
+  <a class="phb-back" href="doctor-panel.html">← 返回工作台</a>
+</header>
+<main>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>生辰信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">2</span><span>自动排盘</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">3</span><span>命理批注</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">4</span><span>提交关联</span></div></div>
+</div>
+
+<!-- 第一步：生辰信息 -->
+<div class="card">
+<div class="card-title">患者生辰（排盘三规范：出生地 + 时刻 + 性别）</div>
+<div class="row">
+  <input id="m-name" placeholder="患者姓名" aria-label="患者姓名">
+  <select id="m-sex" aria-label="性别"><option value="">性别</option><option>男</option><option>女</option></select>
+</div>
+<div class="row" style="margin-top:8px">
+  <input id="m-year" type="number" placeholder="出生年" aria-label="出生年">
+  <input id="m-month" type="number" placeholder="月" aria-label="出生月">
+  <input id="m-day" type="number" placeholder="日" aria-label="出生日">
+  <input id="m-hour" type="number" placeholder="时" aria-label="出生时">
+</div>
+<label style="margin-top:8px">出生地（影响真太阳时校正）</label>
+<input id="m-birthplace" placeholder="例如：上海 / 北京 / 广州" aria-label="出生地">
+<label style="margin-top:8px">问事方向（可选，用于聚焦批注）</label>
+<input id="m-questions" placeholder="例如：健康 / 事业 / 婚姻" aria-label="问事方向">
+<button class="btn" onclick="paipanAndDraft()">🀄 一键排盘 + 生成命理批注初稿</button>
+<div class="loading" id="loading">⏳ 正在排盘并生成批注...</div>
+</div>
+
+<!-- 第二步：排盘结果 -->
+<div class="card" id="chart-card" style="display:none">
+<div class="card-title">八字排盘（自动）</div>
+<div class="chart-box" id="chart-box"></div>
+<div class="card-title" style="margin-top:10px">五行能量分布</div>
+<div class="wuxing-bar" id="wuxing-bar"></div>
+<div class="card-title" style="margin-top:10px">AI 命理批注初稿（大师审核后提交）</div>
+<div class="note-box" id="note-box"></div>
+<div class="row" style="margin-top:10px">
+  <button class="btn btn-ghost" style="flex:1;margin-top:0" onclick="editNote()">✎ 编辑批注</button>
+  <button class="btn btn-purple" style="flex:1;margin-top:0" onclick="submitNote()">📤 提交批注</button>
+</div>
+</div>
+
+</main>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
+var chartData=null;
+var noteText='';
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
+
+// 天干地支五行映射
+var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var STEMS_WX=['木','木','火','火','土','土','金','金','水','水'];
+var BRANCHES=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var BRANCHES_WX=['水','土','木','木','土','火','火','土','金','金','土','水'];
+var BRANCHES_ZODIAC=['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+
+// 十神（日干 vs 他干）
+function shishen(dayStem, otherStem){
+  var wx=['木','木','火','火','土','土','金','金','水','水'];
+  var sheng={'木':'水','火':'木','土':'火','金':'土','水':'金'};
+  var ke={'木':'土','火':'金','土':'水','金':'木','水':'火'};
+  var d=wx[dayStem], o=wx[otherStem];
+  if(d===o)return '比肩';
+  if(sheng[o]===d)return '印星(生我)';
+  if(sheng[d]===o)return '食伤(我生)';
+  if(ke[o]===d)return '官杀(克我)';
+  if(ke[d]===o)return '财星(我克)';
+  return '';
+}
+
+// 简易八字排盘（本地，不依赖服务）
+function quickPaipan(year,month,day,hour){
+  // 年柱：立春前属上年（简化：以月>=2为界）
+  var yStem=(year-4)%10, yBranch=(year-4)%12;
+  // 月柱：节气简化（月=2寅月起始）
+  var mIdx=(month+1)%12;
+  var mStem=(yStem%5*2+mIdx)%10, mBranch=mIdx;
+  // 日柱：按累计天数推算（基准 2000-01-01 为甲子日）
+  var base=new Date(2000,0,1);
+  var target=new Date(year,month-1,day);
+  var days=Math.round((target-base)/86400000);
+  var dStem=((days%60)+60)%60%10, dBranch=((days%60)+60)%60%12;
+  // 时柱：日干×时辰
+  var hIdx=Math.floor((hour+1)/2)%12;
+  var hStem=(dStem%5*2+hIdx)%10, hBranch=hIdx;
+  return {
+    year:STEMS[yStem]+BRANCHES[yBranch],
+    month:STEMS[mStem]+BRANCHES[mBranch],
+    day:STEMS[dStem]+BRANCHES[dBranch],
+    hour:STEMS[hStem]+BRANCHES[hBranch],
+    dayStem:STEMS[dStem], dayStemWx:STEMS_WX[dStem],
+    dayBranch:BRANCHES[dBranch], dayBranchWx:BRANCHES_WX[dBranch],
+    yearStem:STEMS[yStem], yearStemWx:STEMS_WX[yStem],
+    zodiac:BRANCHES_ZODIAC[yBranch]
+  };
+}
+
+function paipanAndDraft(){
+  var y=parseInt(document.getElementById('m-year').value);
+  var m=parseInt(document.getElementById('m-month').value);
+  var d=parseInt(document.getElementById('m-day').value);
+  var h=parseInt(document.getElementById('m-hour').value);
+  if(!y||!m||!d||isNaN(h)){showToast('请填写完整出生年月日时');return}
+  
+  document.getElementById('loading').style.display='block';
+  
+  // 先本地快速排盘（秒级），再尝试后端精排
+  var p=quickPaipan(y,m,d,h);
+  chartData=p;
+  renderChart(p);
+  generateNote(p);
+  document.getElementById('loading').style.display='none';
+  
+  // 后端精排（8911 代理，成功则覆盖）
+  var body={year:y,month:m,day:d,hour:h};
+  fetch(API+'/api/paipan/calculate', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(res){
+    if(res&&res.ok){
+      var c=res.chart||res.data||{};
+      if(c&&c.pillars){
+        chartData.pillars=c.pillars;
+        // 用后端四柱覆盖本地
+        var pl=c.pillars;
+        chartData.year=pl.year||pl[0]||chartData.year;
+        chartData.month=pl.month||pl[1]||chartData.month;
+        chartData.day=pl.day||pl[2]||chartData.day;
+        chartData.hour=pl.hour||pl[3]||chartData.hour;
+        renderChart(chartData);
+        showToast('已用后端精排结果');
+      }
+    }
+  }).catch(function(){});
+}
+
+function renderChart(p){
+  document.getElementById('chart-card').style.display='block';
+  var html='<div class="pillar"><div class="stem">'+p.year[0]+'</div><div class="branch">'+p.year[1]+'</div><div style="font-size:10px;opacity:.6">年柱</div></div>'+
+           '<div class="pillar"><div class="stem">'+p.month[0]+'</div><div class="branch">'+p.month[1]+'</div><div style="font-size:10px;opacity:.6">月柱</div></div>'+
+           '<div class="pillar"><div class="stem">'+p.day[0]+'</div><div class="branch">'+p.day[1]+'</div><div style="font-size:10px;opacity:.6">日柱</div></div>'+
+           '<div class="pillar"><div class="stem">'+p.hour[0]+'</div><div class="branch">'+p.hour[1]+'</div><div style="font-size:10px;opacity:.6">时柱</div></div>'+
+           '<div style="font-size:11px;opacity:.7;margin-top:8px">日主：<b style="color:var(--gold)">'+p.dayStem+'('+p.dayStemWx+')</b> · 生肖：'+p.zodiac+'</div>';
+  document.getElementById('chart-box').innerHTML=html;
+  
+  // 五行计数（四柱8字）
+  var wx=[p.year[0],p.year[1],p.month[0],p.month[1],p.day[0],p.day[1],p.hour[0],p.hour[1]];
+  var counts={'木':0,'火':0,'土':0,'金':0,'水':0};
+  wx.forEach(function(ch){
+    var i=STEMS.indexOf(ch);
+    if(i>=0)counts[STEMS_WX[i]]++;
+    var j=BRANCHES.indexOf(ch);
+    if(j>=0)counts[BRANCHES_WX[j]]++;
+  });
+  var order=['木','火','土','金','水'];
+  var cls={'木':'wu-mu','火':'wu-huo','土':'wu-tu','金':'wu-jin','水':'wu-shui'};
+  var html2=order.map(function(w){
+    return '<div class="wuxing-item"><span class="n '+cls[w]+'">'+counts[w]+'</span>'+w+'</div>';
+  }).join('');
+  document.getElementById('wuxing-bar').innerHTML=html2;
+}
+
+// 命理批注生成（五行偏颇 → 健康指导 + 运势）
+function generateNote(p){
+  // 五行计数
+  var wx=[p.year[0],p.year[1],p.month[0],p.month[1],p.day[0],p.day[1],p.hour[0],p.hour[1]];
+  var counts={'木':0,'火':0,'土':0,'金':0,'水':0};
+  wx.forEach(function(ch){
+    var i=STEMS.indexOf(ch);
+    if(i>=0)counts[STEMS_WX[i]]++;
+    var j=BRANCHES.indexOf(ch);
+    if(j>=0)counts[BRANCHES_WX[j]]++;
+  });
+  
+  // 五行→脏腑经络映射（中医+命理结合）
+  var wxHealth={
+    '木':{organ:'肝胆',meridian:'足厥阴肝经',advice:'情志舒畅，避免郁怒，春季养肝，可适当食用绿色蔬果。'},
+    '火':{organ:'心小肠',meridian:'手少阴心经',advice:'养心安神，午时静养，避免过度兴奋，红色食物适量。'},
+    '土':{organ:'脾胃',meridian:'足太阴脾经',advice:'健脾和胃，规律饮食，忌生冷，黄色食物适量。'},
+    '金':{organ:'肺大肠',meridian:'手太阴肺经',advice:'润肺防燥，晨起呼吸练习，白色食物适量。'},
+    '水':{organ:'肾膀胱',meridian:'足少阴肾经',advice:'固肾藏精，早睡养阴，黑色食物适量。'}
+  };
+  
+  // 找出偏弱/偏强
+  var avg=Object.values(counts).reduce(function(a,b){return a+b},0)/5;
+  var weak=[],strong=[];
+  Object.keys(counts).forEach(function(w){
+    if(counts[w]<=avg-0.8)weak.push(w);
+    if(counts[w]>=avg+1.2)strong.push(w);
+  });
+  
+  var lines=[];
+  lines.push('【AI 命理批注初稿】（大师审核后可修改）');
+  lines.push('');
+  lines.push('乾造/坤造：'+p.year+'年 '+p.month+'月 '+p.day+'日 '+p.hour+'时 · 日主'+p.dayStem+'('+p.dayStemWx+')'+' · 生肖'+p.zodiac);
+  lines.push('');
+  lines.push('【五行格局】');
+  lines.push('木'+counts['木']+' · 火'+counts['火']+' · 土'+counts['土']+' · 金'+counts['金']+' · 水'+counts['水']);
+  if(weak.length)lines.push('五行偏弱：'+weak.join('、')+' —— 对应脏腑养护：'+(weak.map(function(w){return wxHealth[w].organ+'（'+wxHealth[w].advice+'）'}).join('；')));
+  if(strong.length)lines.push('五行偏旺：'+strong.join('、')+' —— 需疏泄平衡：'+(strong.map(function(w){return wxHealth[w].organ}).join('、')));
+  if(!weak.length&&!strong.length)lines.push('五行相对平衡，体质调和。');
+  lines.push('');
+  lines.push('【健康维度建议（周易+中医结合）】');
+  weak.forEach(function(w){lines.push('· 补'+w+'：'+wxHealth[w].advice)});
+  strong.forEach(function(w){lines.push('· 泄'+w+'：注意'+wxHealth[w].organ+'养护，不宜过补。');});
+  lines.push('· 起居：顺应四季，春生夏长秋收冬藏，日出而作。');
+  lines.push('');
+  lines.push('【运势维度】');
+  lines.push('日主'+p.dayStem+'坐'+p.dayBranch+'，'+(p.dayStemWx==='木'?'木性仁，主生发，宜立长志、广结善缘。':p.dayStemWx==='火'?'火性礼，主明达，宜守心定志，戒急戒躁。':p.dayStemWx==='土'?'土性信，主承载，宜厚德载物，稳步前行。':p.dayStemWx==='金'?'金主义，主决断，宜刚柔相济，宽严有度。':'水性智，主润下，宜谦和守静，以柔克刚。'));
+  lines.push('');
+  lines.push('⚠️ 本批注由 AI 基于五行生克生成，仅供健康参考，不构成医疗建议，具体诊疗请遵医嘱。');
+  
+  noteText=lines.join('\n');
+  document.getElementById('note-box').textContent=noteText;
+}
+
+function editNote(){
+  var box=document.getElementById('note-box');
+  var ta=document.createElement('textarea');
+  ta.style.minHeight='200px';
+  ta.value=noteText;
+  box.innerHTML='';
+  box.appendChild(ta);
+  var save=document.createElement('button');
+  save.className='btn btn-ghost';
+  save.style.marginTop='6px';
+  save.textContent='保存修改';
+  save.onclick=function(){
+    noteText=ta.value;
+    box.innerHTML='';
+    box.textContent=noteText;
+    showToast('已保存');
+  };
+  box.appendChild(save);
+}
+
+function submitNote(){
+  if(!noteText){showToast('请先生成批注');return}
+  var name=document.getElementById('m-name').value||'患者';
+  var sex=document.getElementById('m-sex').value||'男';
+  var y=document.getElementById('m-year').value;
+  var m=document.getElementById('m-month').value;
+  var d=document.getElementById('m-day').value;
+  var h=document.getElementById('m-hour').value;
+  var questions=document.getElementById('m-questions').value||'健康';
+  
+  // 如果来自医生快速采集的关联案例 → 直接挂载批注到已有案例
+  if(urlCaseId){
+    var body2={caseId:Number(urlCaseId),masterAnalysis:noteText,analysisSummary:noteText.slice(0,300)};
+    fetch(API+'/api/clinic/submit-diagnosis', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body2)})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.ok||d.message){
+        showToast('✅ 批注已关联到案例 #'+urlCaseId);
+        try{localStorage.setItem('mlb_note_'+urlCaseId,noteText)}catch(e){}
+      }else{
+        showToast('关联失败：'+(d.error||'请先登录')+'，将新建案例');
+        submitNewCase();
+      }
+    }).catch(function(){submitNewCase()});
+    return;
+  }
+  submitNewCase();
+  
+  function submitNewCase(){
+    var body={
+      symptoms:'命理批注：'+questions,
+      constitution:'',
+      birthYear:Number(y),birthMonth:Number(m),birthDay:Number(d),birthHour:Number(h)
+    };
+    fetch(API+'/api/clinic/submit-symptom', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.ok||d.caseId){
+        showToast('✅ 已提交批注案例 #'+(d.caseId||'')+'，AI 正在生成完整排盘报告');
+        try{localStorage.setItem('mlb_note_'+d.caseId,noteText)}catch(e){}
+      }else{
+        showToast('提交失败：'+(d.error||'请先登录'));
+      }
+    }).catch(function(){showToast('网络错误')});
+  }
+}
+
+// === URL 参数一键带入（医生快速采集 → 大师批注）===
+var urlCaseId='';
+(function(){
+  var qs=new URLSearchParams(location.search);
+  urlCaseId=qs.get('caseId')||'';
+  var name=qs.get('name')||'';
+  var sex=qs.get('sex')||'';
+  var year=qs.get('year')||'';
+  var month=qs.get('month')||'';
+  var day=qs.get('day')||'';
+  var hour=qs.get('hour')||'';
+  var symptoms=qs.get('symptoms')||'';
+  if(name)document.getElementById('m-name').value=name;
+  if(sex)document.getElementById('m-sex').value=sex;
+  if(year)document.getElementById('m-year').value=year;
+  if(month)document.getElementById('m-month').value=month;
+  if(day)document.getElementById('m-day').value=day;
+  if(hour)document.getElementById('m-hour').value=hour;
+  if(symptoms)document.getElementById('m-questions').value='健康（'+symptoms.slice(0,20)+'）';
+  // 出生信息完整 → 自动排盘生成批注（大师 0 输入）
+  if(year&&month&&day&&hour!==''){
+    setTimeout(function(){paipanAndDraft()},300);
+  }
+})();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 命理批注须大师审核确认</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

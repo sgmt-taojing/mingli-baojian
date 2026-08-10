@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="数据安全导出 · 易道智鉴平台">
+<meta name="keywords" content="数据安全导出">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/export-guard.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1, maximum-scale=5, user-scalable=yes">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="数据安全导出 · 命理宝鉴">
+<meta property="og:description" content="数据安全导出 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>数据安全导出 · 命理宝鉴</title>
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/export-guard-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">数据安全导出</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择数据</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>配置导出</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>校验权限</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>执行导出</span></div></div>
+<div class="flow-hint">管理员管理数据导出权限，白名单+审计日志。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div class="wrap">
+  <h1>锁 数据安全导出 · 管理面板</h1>
+  <p style="color:#6b4226">所有导出操作均经 4 道防线：字段脱敏 / 角色鉴权 / 审计水印 / 加密归档。详细规范见 <a href="docs/DATA_SECURITY_STANDARD.md"  target="_blank" rel="noopener noreferrer">DATA_SECURITY_STANDARD.md</a></p>
+
+  <div class="grid">
+    <div class="card"><b>我的角色</b><span class="v" id="roleBadge">未登录</span></div>
+    <div class="card"><b>可导出表数</b><span class="v" id="tblCnt">--</span></div>
+    <div class="card"><b>本月导出次数</b><span class="v" id="expCnt">--</span></div>
+    <div class="card warn"><b>本月解锁申请</b><span class="v" id="unlockCnt">--</span></div>
+  </div>
+
+  <h2>① 字段脱敏预览（输入示例数据看脱敏效果）</h2>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label for="iptPhone">原手机号：</label><input aria-label="iptPhone" id="iptPhone" value="13800138000">
+        <label for="iptName">原姓名：</label><input aria-label="iptName" id="iptName" value="张三丰">
+        <label for="iptID">身份证号：</label><input aria-label="iptID" id="iptID" value="110101199003078888">
+        <label for="iptAddr">地址：</label><input aria-label="iptAddr" id="iptAddr" value="广东省深圳市南山区科苑路100号">
+        <label for="iptText">病例正文：</label><textarea id="iptText" aria-label="iptText">患者13800138000主诉失眠，邮箱 zhang@example.com，详见 110101199003078888。需健脾祛湿。</textarea>
+      </div>
+      <div>
+        <label for="outPhone">脱敏后手机号：</label><input aria-label="outPhone" id="outPhone" readonly>
+        <label for="outName">脱敏后姓名：</label><input aria-label="outName" id="outName" readonly>
+        <label for="outID">脱敏后身份证：</label><input aria-label="outID" id="outID" readonly>
+        <label for="outAddr">脱敏后地址：</label><input aria-label="outAddr" id="outAddr" readonly>
+        <label for="outText">脱敏后病例：</label><textarea id="outText" aria-label="outText" readonly></textarea>
+        <button onclick="previewMask()">查 立即脱敏预览</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>② 导出 CSV / JSON</h2>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px">
+      <div>
+        <label for="selTable">选择表：</label>
+        <select aria-label="selTable" id="selTable">
+          <option value="users">users（缘主档案）</option>
+          <option value="merchants">merchants（商户）— 需 admin</option>
+          <option value="master_cases">master_cases（大师病例）— 需 master</option>
+          <option value="tcm_reports">tcm_reports（中医报告）— 需 master</option>
+          <option value="feedback">feedback（用户反馈）</option>
+          <option value="medical_cases">medical_cases（诊疗病例）— 需 master</option>
+        </select>
+      </div>
+      <div>
+        <label for="selFmt">格式：</label>
+        <select aria-label="selFmt" id="selFmt"><option value="csv">CSV</option><option value="json">JSON（含水印）</option></select>
+      </div>
+      <div>
+        <label for="iptPurpose">用途：</label>
+        <input aria-label="iptPurpose" id="iptPurpose" placeholder="月度统计 / 审计回溯 ...">
+      </div>
+    </div>
+    <button onclick="doExport('csv')">入 导出 CSV</button>
+    <button onclick="doExport('json')" class="secondary">入 导出 JSON</button>
+    <span id="expHint" style="margin-left:8px;font-size:12px;color:#888"></span>
+  </div>
+
+  <h2>③ 加密归档（仅 super_admin）</h2>
+  <div class="card" id="archivePanel">
+    <p style="color:#a33">⚠ 仅 super_admin 可见。明文数据将 AES-256-GCM 加密，存入安全介质。</p>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px">
+      <div>
+        <label for="archTable">表 + ID：</label>
+        <select aria-label="archTable" id="archTable"><option value="master_cases">master_cases</option><option value="tcm_reports">tcm_reports</option></select>
+        <label for="archIds">ID 列表（逗号分隔）：</label><input aria-label="archIds" id="archIds" value="1,2,3">
+        <label for="archReason">归档原因（必填）：</label><input aria-label="archReason" id="archReason" placeholder="法律合规归档">
+      </div>
+      <div>
+        <label for="archResult">加密结果：</label>
+        <textarea id="archResult" aria-label="archResult" readonly style="min-height:140px"></textarea>
+        <button onclick="doArchive()" class="danger">密 加密归档</button>
+        <button onclick="doDecrypt()" class="secondary">解 解密回看</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>④ 审计日志（最近 50 条）</h2>
+  <div class="card">
+    <button onclick="loadAudit()">更 刷新日志</button>
+    <table id="auditTbl">
+      <thead><tr><th>时间</th><th>用户ID</th><th>动作</th><th>表/目标</th><th>行数</th><th>IP</th><th>用途</th></tr></thead>
+      <tbody id="auditBody"><tr><td colspan="7" style="text-align:center;color:#888">点击刷新加载</td></tr></tbody>
+    </table>
+  </div>
+
+  <h2>⑤ 解锁令牌申请</h2>
+  <div class="card">
+    <p>高级字段临时解锁需说明原因，审计留痕</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+      <input aria-label="unlockTbl" id="unlockTbl" placeholder="表名">
+      <input aria-label="unlockIds" id="unlockIds" placeholder="目标 ID">
+      <input aria-label="unlockTTL" id="unlockTTL" placeholder="TTL (小时)" value="1">
+      <input aria-label="unlockReason" id="unlockReason" placeholder="原因">
+    </div>
+    <button onclick="applyUnlock()">票 申请解锁令牌</button>
+    <pre id="unlockResult" style="margin-top:8px"></pre>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/export-guard-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.cross-nav,.skip-link,.flow-steps-wrap,.flow-steps,.flow-hint,.toast{display:none!important}.container,.wrap,.main{max-width:100%!important;padding:8px!important;margin:0!important;background:#fff!important;color:#000!important}h1,h2,h3{color:#000!important}.card,.grid{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid;background:#fff!important;color:#000!important}table{border-collapse:collapse!important}th,td{border:1px solid #ddd!important;padding:4px 8px!important;color:#000!important}a{color:#000!important;text-decoration:none!important}pre{background:#f5f5f5!important;color:#000!important;border:1px solid #ddd!important}input,select,textarea{background:#fff!important;color:#000!important;border:1px solid #ccc!important}}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta charset="UTF-8">
+<meta name="description" content="健康事业双核仪表盘 | 命理宝鉴 · 易道智鉴平台">
+<meta name="keywords" content="健康事业双核仪表盘 | 命理宝鉴">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/health-career-dashboard.html">
+<meta name="robots" content="index, follow,noindex">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="健康事业双核仪表盘 | 命理宝鉴">
+<meta property="og:description" content="健康事业双核仪表盘 | 命理宝鉴 · 易道智鉴平台">
+<meta property="og:type" content="website">
+  <title>健康事业双核仪表盘 | 命理宝鉴</title>
+  <link rel="stylesheet" href="css/pro-panel.css">
+  
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/health-career-dashboard-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">健康事业双核仪表盘</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>输入生辰</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">2</span><span>排盘分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">3</span><span>双核评分</span></div><span class="flow-step-arrow">→</span><div class="flow-step"><span class="flow-step-num">4</span><span>行动清单</span></div></div>
+<div class="flow-hint">输入生辰后自动排盘，生成健康+事业双维度评分与个性化建议。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+  <div class="hcd-wrap">
+    <div class="hcd-header">
+      <h1>诊💼 健康事业双核仪表盘</h1>
+      <p>基于八字排盘，从日主五行、脏腑对应、大运走势出发，量化评估健康与事业两个核心维度，输出 12 领域行动清单</p>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:11px;opacity:.6">
+        <span>人 适用：个人自查 / 周易大师后台评估</span>
+        <span>经 依据：滴天髓·子平真诠·黄帝内经</span>
+      </div>
+    </div>
+
+    <div class="hcd-input">
+      <label>出生年<input type="number" id="hcdYear" value="1990" min="1900" max="2100" aria-label="出生年"></label>
+      <label>出生月<input type="number" id="hcdMonth" value="6" min="1" max="12" aria-label="出生月"></label>
+      <label>出生日<input type="number" id="hcdDay" value="15" min="1" max="31" aria-label="出生日"></label>
+      <label>出生时<input type="number" id="hcdHour" value="14" min="0" max="23" aria-label="出生时"></label>
+      <label>性别<select id="hcdGender" aria-label="性别"><option value="male">男</option><option value="female">女</option></select></label>
+      <button onclick="hcdCalculate()">卦 排盘分析</button>
+      <button onclick="hcdPrint()">打印报告</button>
+    </div>
+    <p style="font-size:11px;opacity:.5;text-align:center;margin:4px 0 12px">输入生辰后自动调用排盘引擎，生成日主五行→脏腑健康+事业方向的量化分析</p>
+
+    <div id="hcdResult"></div>
+
+    <div style="text-align:center;margin-top:40px;padding:24px;opacity:.85;font-size:11px;letter-spacing:2px">
+      🏛 命理宝鉴 · 健康事业双核引擎 v1.0 · 综合 25 部古籍<br>
+      《滴天髓》《子平真诠》《穷通宝鉴》《三命通会》《紫微斗数全集》《太乙金华宗旨》《黄帝内经》《千金要方》《了凡四训》《阴骘文》《玉历宝钞》《协纪辨方书》《天星择日》《黄帝宅经》《八宅明镜》《玄空飞星》《阳宅三要》《葬书》《撼龙经》《梅花易数》《奇门遁甲》《太上感应篇》《三世因果经》《地藏经》《药师经》
+    </div>
+  </div>
+
+  
+  <script src="js/admin-rbac-shared.js"></script>
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/health-career-dashboard-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-l 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-l 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.cross-nav,.flow-steps-wrap,.flow-steps,.flow-hint,.toast,.skip-link,.portal-nav{display:none!important}.hcd-wrap{max-width:100%!important;padding:8px!important}.hcd-header{background:#fff!important;color:#000!important}.hcd-input{display:none!important}.hcd-header p{color:#333!important}
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

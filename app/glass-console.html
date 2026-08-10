@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="先知智镜 · 易道智鉴平台">
+<meta name="keywords" content="先知智镜">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5,user-scalable=yes">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/glass-console.html">
+<title>先知智镜 · 智能眼镜控制台 · 命理宝鉴</title>
+<meta name="theme-color" content="#0e1116">
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>
+:root{
+  --bg:#0e1116; --bg2:#161b22; --bg3:#1e2530; --bd:#30363d; --bd2:#444c56;
+  --tx:#e6edf3; --muted:#8b949e; --muted2:#6e7681;
+  --gold:#c9a84c; --gold2:#e6c873;
+  --ok:#3fb950; --warn:#d29922; --err:#f85149; --info:#58a6ff; --purple:#bc8cff;
+  --shadow:0 4px 16px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;min-height:100vh}
+a{color:var(--info);text-decoration:none}
+header{background:linear-gradient(135deg,#1c2128,#161b22);border-bottom:1px solid var(--bd);padding:18px 24px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+header h1{font-size:22px;color:var(--gold2);margin-bottom:2px;font-weight:600}
+header p{font-size:13px;color:var(--muted)}
+.back{position:absolute;right:24px;top:24px;color:var(--muted);font-size:13px;padding:6px 14px;border:1px solid var(--bd);border-radius:6px}
+.back:hover{background:var(--bg3);color:var(--tx)}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 24px 100px}
+
+/* === 状态卡片（戴上眼镜第一眼看到的） === */
+.status-hero{display:grid;grid-template-columns:1.4fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:768px){.status-hero{grid-template-columns:1fr}.wrap{padding:14px}}
+.hero-main{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid var(--bd);border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.hero-main::before{content:"";position:absolute;top:-50%;right:-30%;width:300px;height:300px;background:radial-gradient(circle,rgba(201,168,76,.12),transparent 70%);pointer-events:none}
+.hero-icon{font-size:48px;margin-bottom:8px;display:block}
+.hero-title{font-size:24px;font-weight:600;margin-bottom:4px;color:var(--tx)}
+.hero-sub{font-size:14px;color:var(--muted);margin-bottom:14px}
+.hero-state{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:99px;font-size:14px;font-weight:500;border:1px solid var(--bd);background:var(--bg)}
+.hero-state .dot{width:10px;height:10px;border-radius:50%}
+.hero-state.online{background:rgba(63,185,80,.12);border-color:rgba(63,185,80,.4);color:var(--ok)}
+.hero-state.online .dot{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.hero-state.offline{background:rgba(248,81,73,.1);border-color:rgba(248,81,73,.3);color:var(--err)}
+.hero-state.offline .dot{background:var(--err)}
+.hero-state.mock{background:rgba(188,140,255,.12);border-color:rgba(188,140,255,.4);color:var(--purple)}
+.hero-state.mock .dot{background:var(--purple);box-shadow:0 0 8px var(--purple)}
+.hero-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+
+.hero-side{display:flex;flex-direction:column;gap:12px}
+.stat-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px 18px}
+.stat-card .label{font-size:12px;color:var(--muted);margin-bottom:4px;letter-spacing:.5px;text-transform:uppercase}
+.stat-card .value{font-size:28px;font-weight:600;color:var(--tx);font-variant-numeric:tabular-nums}
+.stat-card .value small{font-size:14px;color:var(--muted);margin-left:4px;font-weight:400}
+.stat-card.ok .value{color:var(--ok)}
+.stat-card.warn .value{color:var(--warn)}
+.stat-card.err .value{color:var(--err)}
+
+/* === Tab === */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 20px;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;font-weight:500}
+.tab:hover{color:var(--tx)}
+.tab.active{color:var(--gold2);border-bottom-color:var(--gold2)}
+.tab .badge{margin-left:6px;font-size:11px;background:var(--bg3);padding:1px 8px;border-radius:99px;color:var(--muted)}
+.tab.active .badge{background:rgba(201,168,76,.15);color:var(--gold2)}
+
+.pane{display:none}
+.pane.active{display:block}
+
+/* === 通用卡片 === */
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px}
+.card h3{font-size:15px;margin-bottom:10px;color:var(--tx);font-weight:600;display:flex;align-items:center;gap:8px}
+.card h3 .hint{margin-left:auto;font-size:11px;color:var(--muted2);font-weight:400}
+
+/* === 按钮 === */
+.btn{padding:10px 18px;border-radius:8px;font-size:14px;font-weight:500;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--gold);background:#262d36}
+.btn.primary{background:var(--gold);color:#1c1408;border-color:var(--gold);font-weight:600}
+.btn.primary:hover{background:var(--gold2)}
+.btn.ok{background:var(--ok);color:#0e1116;border-color:var(--ok)}
+.btn.warn{background:var(--warn);color:#1c1408;border-color:var(--warn)}
+.btn.danger{background:transparent;border-color:rgba(248,81,73,.4);color:var(--err)}
+.btn.lg{padding:14px 24px;font-size:16px}
+.btn.sm{padding:6px 12px;font-size:12px}
+
+/* === 模式选择器 === */
+.mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:768px){.mode-grid{grid-template-columns:repeat(2,1fr)}}
+.mode-card{background:var(--bg3);border:2px solid var(--bd);border-radius:12px;padding:18px 12px;text-align:center;cursor:pointer;transition:all .15s}
+.mode-card:hover{border-color:var(--gold2)}
+.mode-card.active{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.mode-card .icon{font-size:32px;margin-bottom:6px;display:block}
+.mode-card .name{font-size:14px;font-weight:500}
+.mode-card .desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* === 表单 === */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.input,.select,.textarea{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx);border-radius:8px;font-size:14px;font-family:inherit}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--gold)}
+.input-row{display:flex;gap:8px}
+.input-row .input{flex:1}
+
+/* === 大输出区 === */
+.output{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:16px;font-size:15px;line-height:1.8;min-height:80px;white-space:pre-wrap;word-break:break-word}
+.output.streaming::after{content:"▍";animation:blink 1s infinite;color:var(--gold2)}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.output-meta{margin-top:8px;font-size:11px;color:var(--muted2);font-family:monospace;display:flex;flex-wrap:wrap;gap:10px}
+.output-meta .chip{background:var(--bg3);padding:2px 8px;border-radius:99px;border:1px solid var(--bd)}
+.output-meta .chip.kb{color:var(--ok);border-color:rgba(63,185,80,.3)}
+.output-meta .chip.ai{color:var(--info);border-color:rgba(88,166,255,.3)}
+.output-meta .chip.ttfb{color:var(--gold2);border-color:rgba(201,168,76,.3)}
+
+/* === 历史列表 === */
+.hist-item{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:8px;display:flex;gap:14px;align-items:flex-start}
+.hist-icon{font-size:24px;flex-shrink:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:8px}
+.hist-body{flex:1;min-width:0}
+.hist-title{font-size:14px;font-weight:500;margin-bottom:4px;color:var(--tx)}
+.hist-text{font-size:13px;color:var(--muted);white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hist-meta{font-size:11px;color:var(--muted2);margin-top:4px;display:flex;gap:10px}
+
+/* === 服务健康 === */
+.svc-row{display:grid;grid-template-columns:1.5fr .8fr 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--bd);font-size:13px}
+.svc-row:last-child{border-bottom:none}
+.svc-name{font-weight:500}
+.svc-row .latency{font-variant-numeric:tabular-nums;color:var(--muted);font-family:monospace}
+.svc-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.svc-dot.ok{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.svc-dot.err{background:var(--err)}
+.svc-dot.warn{background:var(--warn)}
+
+/* === 空态 === */
+.empty{text-align:center;padding:48px 24px;color:var(--muted2)}
+.empty .icon{font-size:48px;margin-bottom:10px;opacity:.6}
+.empty .text{font-size:14px}
+.empty .hint{font-size:12px;margin-top:6px;color:var(--muted2)}
+
+/* === Toast === */
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-100px);background:var(--bg3);border:1px solid var(--bd);color:var(--tx);padding:12px 24px;border-radius:10px;font-size:14px;z-index:1000;transition:transform .3s;box-shadow:var(--shadow);max-width:80vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{border-color:var(--err);background:rgba(248,81,73,.1)}
+.toast.ok{border-color:var(--ok);background:rgba(63,185,80,.1)}
+
+@media(max-width:320px){.wrap{padding:10px}.hero-main{padding:18px}.hero-title{font-size:20px}.btn{padding:8px 14px;font-size:13px}}
+</style>
+  <link rel="stylesheet" href="css/mobile-nav.css">
+
+  <!-- R261 inline: glass-console-inline.css (9232 bytes) -->
+<style data-r261-inline="glass-console-inline.css">
+/* === Extracted from glass-console.html
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --hud-bg: rgba(8, 12, 18, 0.72);
+    --hud-card: rgba(16, 22, 32, 0.85);
+    --hud-border: rgba(120, 200, 240, 0.35);
+    --hud-primary: #78c8f0;
+    --hud-accent: #f0c878;
+    --hud-success: #6ad47a;
+    --hud-warn: #f0a050;
+    --hud-danger: #f06060;
+    --hud-text: #e8eef4;
+    --hud-muted: rgba(232, 238, 244, 0.55);
+    --hud-pad: 10px 14px;
+  }
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    color: var(--hud-text);
+    font-family: "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+  /* HUD 模拟显示器（类似眼镜投影效果） */
+  .hud-stage {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center,
+        rgba(8, 22, 38, 0.85) 0%,
+        rgba(0, 0, 0, 0.95) 70%);
+    overflow: hidden;
+  }
+  /* 顶部状态栏 */
+  .hud-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: var(--hud-pad);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--hud-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hud-border);
+    font-size: 13px;
+    z-index: 10;
+  }
+  .hud-top .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--hud-primary);
+    font-weight: 600;
+  }
+  .hud-top .brand::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--hud-success);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--hud-success);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity:0.85; }
+  }
+  .hud-top .stats {
+    display: flex;
+    gap: 14px;
+    color: var(--hud-muted);
+    font-size: 12px;
+  }
+  .hud-top .stats span strong {
+    color: var(--hud-accent);
+    margin-left: 4px;
+    font-weight: 600;
+  }
+
+  /* 中央主视图 */
+  .hud-main {
+    position: absolute;
+    top: 48px;
+    left: 0; right: 0; bottom: 0;
+    overflow-y: auto;
+    padding: 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 模式选择卡片 */
+  .mode-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .mode-card {
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .mode-card.active {
+    border-color: var(--hud-primary);
+    box-shadow: 0 0 16px rgba(120, 200, 240, 0.4);
+  }
+  .mode-card .icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  .mode-card .name {
+    font-size: 13px;
+    color: var(--hud-text);
+    font-weight: 600;
+  }
+
+  /* 摄像头预览 */
+  .camera-preview {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px dashed var(--hud-border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .camera-preview video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .camera-preview .placeholder {
+    text-align: center;
+    color: var(--hud-muted);
+    font-size: 13px;
+  }
+  .camera-preview .placeholder .icon-big {
+    font-size: 48px;
+    margin-bottom: 8px;
+    opacity:0.85;
+  }
+  .camera-preview .reticle {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid var(--hud-accent);
+    border-radius: 50%;
+    pointer-events: none;
+    display: none;
+  }
+  .camera-preview.capturing .reticle {
+    display: block;
+    animation: reticle-pulse 1.2s infinite;
+  }
+  @keyframes reticle-pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity:0.85; }
+  }
+
+  /* OCR 结果面板 */
+  .ocr-result {
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .ocr-result.show { display: block; }
+  .ocr-result .ocr-title {
+    color: var(--hud-accent);
+    font-size: 12px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .ocr-result .ocr-title::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--hud-accent);
+    border-radius: 50%;
+  }
+  .ocr-result .ocr-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--hud-text);
+  }
+  .ocr-result .ocr-confidence {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--hud-muted);
+  }
+
+  /* 命盘/中医双面板 */
+  .duo-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .duo-card {
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+  .duo-card .duo-title {
+    font-size: 12px;
+    color: var(--hud-primary);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .duo-card .duo-value {
+    font-size: 14px;
+    color: var(--hud-text);
+    font-weight: 600;
+  }
+  .duo-card .duo-meta {
+    margin-top: 4px;
+    color: var(--hud-muted);
+    font-size: 11px;
+  }
+
+  /* 操作按钮 */
+  .action-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    padding: 12px 14px;
+    background: var(--hud-bg);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--hud-border);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+  }
+  .hud-btn {
+    flex: 1;
+    padding: 12px 0;
+    border: 1px solid var(--hud-border);
+    background: var(--hud-card);
+    color: var(--hud-text);
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .hud-btn:active { transform: scale(0.96); }
+  .hud-btn.primary {
+    background: var(--hud-primary);
+    color: #000;
+    border-color: var(--hud-primary);
+    font-weight: 600;
+  }
+  .hud-btn.danger {
+    border-color: var(--hud-danger);
+    color: var(--hud-danger);
+  }
+
+  /* TTS 播放状态 */
+  .tts-indicator {
+    position: absolute;
+    top: 56px;
+    right: 14px;
+    background: var(--hud-card);
+    border: 1px solid var(--hud-border);
+    border-radius: 20px;
+    padding: 4px 10px 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--hud-primary);
+    display: none;
+  }
+  .tts-indicator.show { display: flex; }
+  .tts-indicator::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--hud-primary);
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+  }
+
+  /* 历史记录 */
+  .history-list {
+    margin-bottom: 14px;
+  }
+  .history-item {
+    background: var(--hud-card);
+    border-left: 3px solid var(--hud-primary);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .history-item .h-time {
+    color: var(--hud-muted);
+    font-size: 10px;
+  }
+  .history-item .h-content {
+    color: var(--hud-text);
+    margin-top: 2px;
+  }
+
+  /* 错误提示 */
+  .toast {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--hud-danger);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    z-index: 100;
+    display: none;
+  }
+  .toast.show { display: block; animation: fadein 0.2s; }
+  @keyframes fadein {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+ === */
+
+
+/* R16-E 28 舌象饼图 */
+.tongue-chart-block {
+  margin: 12px 0;
+  padding: 12px 14px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 10px;
+  border: 1px solid var(--hud-border, #2a3953);
+}
+.tongue-chart-title {
+  font-size: 13px;
+  color: var(--hud-accent, #4fd1c5);
+  margin-bottom: 6px;
+}
+.tongue-chart-stage {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.tongue-chart-stage canvas {
+  flex-shrink: 0;
+}
+.tongue-legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px 8px;
+  font-size: 11px;
+}
+.tongue-legend .lg-item {
+  display: flex; align-items: center; gap: 4px;
+}
+.tongue-legend .lg-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.tongue-hint {
+  font-size: 10px;
+  color: var(--hud-muted, #8a99b5);
+  margin-top: 4px;
+}
+/* R-P3-17.4 reflow（自动注入） */
+@media(max-width:768px){
+  h1{font-size:22px!important}h2{font-size:19px!important}
+  [style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4"],[style*="grid-template-columns:repeat(5)"]{
+    grid-template-columns:repeat(2,1fr)!important
+  }
+  .wrap,.container,.main{max-width:100vw!important;overflow-x:hidden!important;padding:12px!important}
+}
+@media(max-width:480px){
+  body{font-size:13px}
+  [style*="grid-template-columns:repeat(2"],[style*="grid-template-columns:repeat(3")]{
+    grid-template-columns:1fr!important
+  }
+}
+@media(max-width:320px){
+  body{font-size:12px;padding:0!important}
+  h1{font-size:18px!important}h2{font-size:15px!important}
+  input[type=text],input[type=search],textarea,select{width:100%!important;max-width:100%!important}
+}
+  </style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body data-need-admin="true" data-admin-redirect="/app/admin-login.html" data-kb-module="wearable" class="theme-user">
+<!-- R504: 新诊疗中心入口 -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a></div>
+
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">先知智镜</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择设备</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看状态</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>发送指令</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看反馈</span></div></div>
+<div class="flow-hint">智能眼镜用户实时交互，排盘+语音+拍照。</div>
+</div>
+<header>
+  <h1>先知智镜 · 智能眼镜控制台</h1>
+  <p>Wearable HUD · 智镜 · 问诊 · 历史 三屏一体 · 戴眼镜也能看清</p>
+  <a href="divination-hub.html" class="back">← 返回主页</a>
+</header>
+<main>
+
+
+<div class="wrap">
+
+  <!-- === 状态总览（戴上眼镜第一眼看到的） === -->
+  <div class="status-hero">
+    <div class="hero-main">
+      <span class="hero-icon" id="heroIcon">🥽</span>
+      <div class="hero-title" id="heroTitle">设备未连接</div>
+      <div class="hero-sub" id="heroSub">点击下方按钮连接 Rokid 智镜 · 或使用 Mock 模式体验</div>
+      <span class="hero-state offline" id="heroState">
+        <span class="dot"></span><span id="heroStateText">未连接</span>
+      </span>
+      <div class="hero-actions">
+        <button class="btn primary lg" id="btnConnect">连接眼镜</button>
+        <button class="btn" id="btnMock">工 体验 Mock 模式</button>
+        <button class="btn" id="btnRefresh">更 刷新状态</button>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="stat-card ok">
+        <div class="label">电量</div>
+        <div class="value" id="statBattery">—<small>%</small></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">网络</div>
+        <div class="value" id="statNetwork">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">设备 ID</div>
+        <div class="value" id="statDeviceId" style="font-size:14px;font-family:monospace">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Tab === -->
+  <div class="tabs">
+    <div class="tab active" data-tab="hud">智镜 HUD</div>
+    <div class="tab" data-tab="ask">语 问诊 <span class="badge" id="askCount">0</span></div>
+    <div class="tab" data-tab="voice">麦 语音</div>
+    <div class="tab" data-tab="vision">拍 视觉</div>
+    <div class="tab" data-tab="mirror">镜 镜象 <span class="badge" id="mirrorBadge">0</span></div>
+    <div class="tab" data-tab="history">卷 历史 <span class="badge" id="histCount">0</span></div>
+    <div class="tab" data-tab="health">服务</div>
+  </div>
+
+  <!-- === Tab · 智镜 HUD === -->
+  <div class="pane active" data-pane="hud">
+
+    <div class="card">
+      <h3>标 模式选择 <span class="hint">影响后续问诊与视觉识别</span></h3>
+      <div class="mode-grid">
+        <div class="mode-card active" data-mode="paipan"><span class="icon">道</span><div class="name">排盘</div><div class="desc">八字 · 紫微</div></div>
+        <div class="mode-card" data-mode="tcm"><span class="icon">草</span><div class="name">中医</div><div class="desc">舌诊 · 病历</div></div>
+        <div class="mode-card" data-mode="face"><span class="icon">眼</span><div class="name">面相</div><div class="desc">颜面 · 五官</div></div>
+        <div class="mode-card" data-mode="bazi"><span class="icon">经</span><div class="name">八字</div><div class="desc">四柱详批</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>图 实时监测</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="stat-card">
+          <div class="label">今日运势</div>
+          <div class="value" id="liveFortune" style="font-size:18px">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">健康提示</div>
+          <div class="value" id="liveHealth" style="font-size:18px">—</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;text-align:right">
+        <button class="btn sm" id="btnRefreshLive">更 刷新</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>诊 28 舌象分布 <span class="hint">来自 KB r16-28tongues-001~028</span></h3>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+        <canvas id="tongue-pie" width="320" height="200" style="background:var(--bg);border-radius:8px;flex-shrink:0"></canvas>
+        <div id="tongue-legend" style="flex:1;min-width:200px"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- === Tab · 问诊 === -->
+  <div class="pane" data-pane="ask">
+    <div class="card">
+      <h3>运️ R18 流式问诊 <span class="hint">TTFB ≤ 800ms · KB 零延迟</span></h3>
+      <div class="input-row">
+        <input class="input" id="askQ" type="text" placeholder="想问什么，如 心气虚怎么调理" aria-label="问诊输入">
+        <button class="btn primary" id="askSend">问 KB</button>
+        <button class="btn danger" id="askStop" disabled>⏹ 停</button>
+      </div>
+      <div style="margin-top:14px">
+        <div class="output streaming-target" id="askOut" data-state="idle">问诊结果会出现在此</div>
+        <div class="output-meta" id="askMeta"></div>
+        <div id="askKbRef" style="margin-top:6px;font-size:12px;color:var(--ok)"></div>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn sm" data-quick="心气虚怎么调理">草 心气虚</button>
+        <button class="btn sm" data-quick="肝火旺怎么降">热 肝火旺</button>
+        <button class="btn sm" data-quick="八字看事业">道 事业</button>
+        <button class="btn sm" data-quick="今日运势">历 今日</button>
+        <button class="btn sm" data-quick="五行音乐推荐">音 五行音乐</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Tab · 语音 === -->
+  <div class="pane" data-pane="voice">
+    <div class="card">
+      <h3>麦 R20 语音 STT <span class="hint">浏览器 Speech → KB intent</span></h3>
+      <div class="input-row">
+        <button class="btn primary" id="sttStart">开始</button>
+        <button class="btn danger" id="sttStop" disabled>⏹ 停止</button>
+      </div>
+      <div style="margin-top:10px" class="input-row">
+        <input class="input" id="sttHint" type="text" placeholder="（可选）提示词：如想问事业" aria-label="stt提示">
+        <button class="btn ok" id="sttUpload">出 上传音频</button>
+      </div>
+      <div class="output-meta" id="sttStatus" style="margin-top:12px"><span class="chip">离线 / 等待点击</span></div>
+      <div class="output" id="sttOut" style="margin-top:10px">录音结果会出现在此</div>
+      <div id="sttIntent" style="margin-top:6px;font-size:12px;color:var(--warn)"></div>
+      <div id="sttKbRef" style="margin-top:6px;font-size:12px;color:var(--ok)"></div>
+    </div>
+  </div>
+
+  <!-- === Tab · 视觉 === -->
+  <div class="pane" data-pane="vision">
+    <div class="card">
+      <h3>拍 R19 病历 OCR <span class="hint">8913 face-ocr-server · 5 引擎优先级</span></h3>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="file" accept="image/*" id="ocrFile" aria-label="上传图片" style="flex:1;padding:8px;background:var(--bg3);border:1px solid var(--bd);border-radius:8px;color:var(--tx);font-size:13px;min-width:0">
+        <select class="select" id="ocrMode" aria-label="OCR 模式" style="width:auto">
+          <option value="tcm">中医病历</option>
+          <option value="recognize">通用 OCR</option>
+        </select>
+        <button class="btn primary" id="ocrUpload">出 上传识别</button>
+      </div>
+      <div class="output-meta" id="ocrMeta" style="margin-top:12px"><span class="chip">—</span></div>
+      <div class="output" id="ocrOut" style="margin-top:10px;min-height:60px">识别结果会出现在此</div>
+      <div id="ocrKbRef" style="margin-top:6px;font-size:12px;color:var(--ok)"></div>
+    </div>
+
+    <div class="card">
+      <h3>拍 摄像头拍照</h3>
+      <div id="camPreview" style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;min-height:180px;display:flex;align-items:center;justify-content:center;color:var(--muted2);font-size:13px">未启动摄像头</div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary" id="camStart">拍 启动</button>
+        <button class="btn" id="camSnap">拍 抓拍</button>
+        <button class="btn danger" id="camStop">⏹ 停止</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === Tab · 镜象镜像（R76-C） === -->
+  <div class="pane" data-pane="mirror">
+    <div class="card">
+      <h3>镜 镜象镜像 <span class="hint">左镜·KB热度 · 右镜·OCR历史 · HUD·状态同步</span></h3>
+      <div class="mirror-grid" id="mirrorGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="mirror-card">
+          <div class="mirror-title">图 KB 热度（7 天）</div>
+          <div class="mirror-content" id="mirrorKb">待 加载中…</div>
+        </div>
+        <div class="mirror-card">
+          <div class="mirror-title">表 OCR 历史（最近 5）</div>
+          <div class="mirror-content" id="mirrorOcr">待 加载中…</div>
+        </div>
+        <div class="mirror-card">
+          <div class="mirror-title">充 引擎状态（4 端口）</div>
+          <div class="mirror-content" id="mirrorEngine">待 加载中…</div>
+        </div>
+        <div class="mirror-card">
+          <div class="mirror-title">升 本镜·实时流</div>
+          <div class="mirror-content" id="mirrorLive">待 加载中…</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+  .mirror-grid{grid-template-columns:1fr 1fr}
+  @media(max-width:768px){.mirror-grid{grid-template-columns:1fr}}
+  .mirror-card{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px 12px}
+  .mirror-title{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .mirror-content{font-size:12px;color:var(--tx);line-height:1.6;max-height:180px;overflow-y:auto}
+  .mirror-content .m-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(37,43,56,.5)}
+  .mirror-content .m-row:last-child{border-bottom:none}
+  .mirror-content .m-key{color:var(--muted)}
+  .mirror-content .m-val{color:var(--tx);font-variant-numeric:tabular-nums}
+  .mirror-content .m-val.ok{color:var(--ok)}
+  .mirror-content .m-val.err{color:var(--err)}
+  .mirror-content .m-val.warn{color:var(--warn)}
+  .mirror-bar{display:inline-block;height:4px;border-radius:2px;min-width:10px}
+  .mirror-bar.ok{background:var(--ok)}.mirror-bar.mid{background:var(--warn)}.mirror-bar.slow{background:var(--err)}
+  </style>
+
+  <!-- === Tab · 历史 === -->
+  <div class="pane" data-pane="history">
+    <div class="card">
+      <h3>卷 问诊 / 拍照 / 录音历史 <span class="hint">本地持久化 · 可导出</span></h3>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn sm" id="histFilterAll" data-filter="all">全部</button>
+        <button class="btn sm" id="histFilterAsk" data-filter="ask">语 问诊</button>
+        <button class="btn sm" id="histFilterOcr" data-filter="ocr">拍 OCR</button>
+        <button class="btn sm" id="histFilterStt" data-filter="stt">麦 语音</button>
+        <button class="btn sm danger" id="histClear">清空</button>
+        <button class="btn sm ok" id="histExport">出 导出 JSON</button>
+      </div>
+      <div id="histList"></div>
+    </div>
+  </div>
+
+  <!-- === Tab · 服务 === -->
+  <div class="pane" data-pane="health">
+    <div class="card">
+      <h3>后端服务健康<span class="hint">6 端口实时监测</span></h3>
+      <div class="svc-row" style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">
+        <div>服务</div><div>端口</div><div>延迟</div><div></div>
+      </div>
+      <div id="svcList"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- === SDK & 服务 === -->
+<script src="js/a11y-divination-hub.js" defer></script>
+<script src="js/sdk-readiness-check.js" defer></script>
+
+<script>
+// === 状态管理 ===
+const State = {
+  mode: 'paipan',
+  connected: false,
+  mock: false,
+  deviceId: '—',
+  battery: null,
+  network: '—',
+  history: JSON.parse(localStorage.getItem('glass_history') || '[]'),
+  historyFilter: 'all',
+  askAbort: null,
+  sttRec: null,
+  sttStream: null,
+};
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+function toast(msg, type='') {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// === Tab 切换 ===
+$$('.tab').forEach(t => t.onclick = () => {
+  $$('.tab').forEach(x => x.classList.remove('active'));
+  $$('.pane').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  $('.pane[data-pane="' + t.dataset.tab + '"]').classList.add('active');
+});
+
+// === 模式切换 ===
+$$('.mode-card').forEach(c => c.onclick = () => {
+  $$('.mode-card').forEach(x => x.classList.remove('active'));
+  c.classList.add('active');
+  State.mode = c.dataset.mode;
+  toast('已切换到「' + c.querySelector('.name').textContent + '」模式');
+});
+
+// === 连接管理 ===
+async function checkBridge() {
+  if (window.RokidBridge && typeof window.RokidBridge.isAvailable === 'function') {
+    try { return await window.RokidBridge.isAvailable(); } catch(e){}
+  }
+  return false;
+}
+
+$('#btnConnect').onclick = async () => {
+  $('#btnConnect').textContent = '🔄 连接中…';
+  $('#btnConnect').disabled = true;
+  try {
+    const available = await checkBridge();
+    if (available) {
+      State.connected = true;
+      State.mock = false;
+      State.deviceId = 'RK-' + (State.rkSeed++).toString(36).toUpperCase().padStart(6,'0').slice(0,6);
+      State.deviceToken = State.deviceId;
+      localStorage.setItem('_glass_device_token', State.deviceToken);
+      State.battery = 87 + (State.rkSeed % 10);
+      State.network = navigator.onLine ? '5G' : 'WiFi';
+      toast('✓ 已连接 Rokid 智镜', 'ok');
+      await refreshStatus();
+    } else {
+      toast('Rokid SDK 未检测到，请使用 Mock 模式', 'err');
+    }
+  } catch (e) {
+    toast('连接失败：' + esc(e.message), 'err');
+  } finally {
+    $('#btnConnect').textContent = '🔗 连接眼镜';
+    $('#btnConnect').disabled = false;
+  }
+};
+
+$('#btnMock').onclick = () => {
+  State.connected = true;
+  State.mock = true;
+  State.deviceId = 'MOCK-' + (++State.mockCount).toString(36).toUpperCase().padStart(6,'0').slice(0,6);
+  State.deviceToken = State.deviceId;
+  localStorage.setItem('_glass_device_token', State.deviceToken);
+  State.battery = 75 + (State.mockCount % 25);
+  State.network = 'Mock-5G';
+  toast('✓ Mock 模式已启动', 'ok');
+  refreshStatus();
+};
+
+$('#btnRefresh').onclick = refreshStatus;
+
+async function refreshStatus() {
+  $('#statBattery').innerHTML = (State.battery ?? '—') + '<small>%</small>';
+  $('#statNetwork').textContent = State.network;
+  $('#statDeviceId').textContent = State.deviceId;
+  const el = $('#heroState');
+  $('#heroIcon').textContent = State.connected ? (State.mock ? '🛠️' : '🥽') : '🥽';
+  $('#heroTitle').textContent = State.connected ? (State.mock ? 'Mock 智镜' : 'Rokid 智镜') : '设备未连接';
+  $('#heroSub').textContent = State.connected
+    ? (State.mock ? '所有功能走本地模拟，无需真实设备' : 'Rokid 智镜已连接，可以问诊/拍照/录音')
+    : '点击「连接眼镜」或「体验 Mock 模式」开始';
+  el.className = 'hero-state ' + (State.connected ? (State.mock ? 'mock' : 'online') : 'offline');
+  $('#heroStateText').textContent = State.connected ? (State.mock ? 'Mock 运行中' : '在线') : '未连接';
+  State.battery = State.connected && State.battery < 100 ? State.battery : State.battery;
+}
+
+// === R18 流式问诊 ===
+async function askSend() {
+  const q = $('#askQ').value.trim();
+  if (!q) { toast('请输入问题', 'err'); return; }
+  const out = $('#askOut');
+  const meta = $('#askMeta');
+  const kbRef = $('#askKbRef');
+  out.textContent = ''; out.dataset.state = 'streaming'; out.classList.add('streaming');
+  meta.innerHTML = '';
+  kbRef.textContent = '';
+  $('#askSend').disabled = true; $('#askStop').disabled = false;
+  const t0 = performance.now();
+  State.askAbort = new AbortController();
+  try {
+    const r = await fetch('/api/glass/stream-ask', { signal: AbortSignal.timeout(15000),
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ q, mode: State.mode }),
+      signal: State.askAbort.signal
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '', ttfb = null, chunk = 0;
+    // [SAFE_LOOP] SSE 流读取，有 done 检查安全退出，非死循环
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!ttfb) { ttfb = performance.now() - t0; meta.innerHTML += '<span class="chip ttfb">⏱ TTFB ' + ttfb.toFixed(0) + 'ms</span>'; }
+      buf += dec.decode(value, { stream:true });
+      const lines = buf.split('\n'); buf = lines.pop();
+      for (const ln of lines) {
+        if (ln.startsWith('data:')) {
+          try {
+            const obj = JSON.parse(ln.slice(5).trim());
+            if (obj.text) { out.textContent += obj.text; chunk++; }
+            if (obj.kb_refs) kbRef.innerHTML = '📚 KB: ' + obj.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ');
+          } catch(e){}
+        }
+      }
+    }
+    const total = (performance.now() - t0).toFixed(0);
+    meta.innerHTML += '<span class="chip">图 ' + chunk + ' chunks</span><span class="chip">⏱ ' + total + 'ms</span><span class="chip ai">AI</span>';
+    out.dataset.state = 'done';
+    addHistory({ type:'ask', icon:'💬', title:q, text:out.textContent.slice(0,500), meta:{ ttfb, total, mode:State.mode }, ts:Date.now() });
+    speak(out.textContent.slice(0,200));
+  } catch (e) {
+    if (e.name !== 'AbortError') {
+      out.textContent = '❌ ' + esc(e.message);
+      meta.innerHTML = '<span class="chip err">fallback → KB</span>';
+      kbFallback(q, out, kbRef, meta);
+    }
+  } finally {
+    out.classList.remove('streaming');
+    $('#askSend').disabled = false; $('#askStop').disabled = true;
+  }
+}
+
+async function kbFallback(q, out, kbRef, meta) {
+  try {
+    const r = await fetch('/api/public/kb-search?q=' + encodeURIComponent(q) + '&limit=3', { signal: AbortSignal.timeout(15000) });
+    const d = await r.json();
+    if (d.ok && d.results && d.results.length) {
+      out.textContent = d.results.map(x => x.title + '\n' + (x.content||x.summary||'').slice(0,300)).join('\n\n---\n\n');
+      kbRef.innerHTML = '📚 KB 直答: ' + d.results.length + ' 条 (来源 ' + (d.engine||'fts5') + ')';
+      meta.innerHTML += '<span class="chip kb">KB</span>';
+    } else {
+      out.textContent = '本地 KB 暂无匹配，可点击下方按钮转 AI 兜底';
+    }
+  } catch(e){}
+}
+
+$('#askSend').onclick = askSend;
+$('#askStop').onclick = () => State.askAbort && State.askAbort.abort();
+$('#askQ').addEventListener('keydown', e => { if (e.key === 'Enter') askSend(); });
+$$('[data-quick]').forEach(b => b.onclick = () => { $('#askQ').value = b.dataset.quick; askSend(); });
+
+// === R20 语音 ===
+function setupSTT() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { $('#sttStart').disabled = true; $('#sttStatus').innerHTML = '<span class="chip err">浏览器不支持 SpeechRecognition</span>'; return; }
+  State.sttRec = new SR();
+  State.sttRec.lang = 'zh-CN';
+  State.sttRec.interimResults = true;
+  State.sttRec.onresult = (e) => {
+    let txt = ''; for (let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+    $('#sttOut').textContent = txt;
+    if (e.results[e.results.length-1].isFinal) {
+      $('#sttStatus').innerHTML = '<span class="chip ok">识别完成</span>';
+      $('#askQ').value = txt; askSend();
+    } else {
+      $('#sttStatus').innerHTML = '<span class="chip warn">识别中…</span>';
+    }
+  };
+  State.sttRec.onerror = (e) => { $('#sttStatus').innerHTML = '<span class="chip err">败 ' + e.error + '</span>'; $('#sttStop').click(); };
+  State.sttRec.onend = () => { $('#sttStart').disabled = false; $('#sttStop').disabled = true; };
+}
+$('#sttStart').onclick = () => { if (!State.sttRec) return; State.sttRec.start(); $('#sttStart').disabled = true; $('#sttStop').disabled = false; $('#sttStatus').innerHTML = '<span class="chip warn">录音中…</span>'; };
+$('#sttStop').onclick = () => { if (State.sttRec) State.sttRec.stop(); };
+$('#sttUpload').onclick = async () => {
+  const hint = $('#sttHint').value.trim();
+  try {
+    const r = await fetch('/api/glass/upload-audio',{method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ text: $('#sttOut').textContent, hint, mode: State.mode }), signal:AbortSignal.timeout(15000) });
+    const d = await r.json();
+    if (d.ok) {
+      $('#sttIntent').textContent = '🎯 Intent: ' + (d.intent||'?') + (d.nextStep ? ' · ' + d.nextStep : '');
+      $('#sttKbRef').innerHTML = d.kb_refs ? '📚 KB: ' + d.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ') : '';
+      addHistory({ type:'stt', icon:'🎤', title: hint || '录音', text: d.intent + ' / ' + (d.nextStep||''), ts:Date.now() });
+    } else {
+      toast('音频上传失败', 'err');
+    }
+  } catch(e) {
+    toast('音频上传失败：' + (e && esc(e.message) || '网络异常') + '，请重试', 'err');
+  }
+};
+setupSTT();
+
+// === R19 OCR ===
+$('#ocrUpload').onclick = async () => {
+  const f = $('#ocrFile').files[0];
+  if (!f) { toast('请先选择图片', 'err'); return; }
+  const fd = new FormData(); fd.append('file', f); fd.append('mode', $('#ocrMode').value);
+  $('#ocrOut').textContent = '⏳ 识别中…';
+  $('#ocrMeta').innerHTML = '<span class="chip warn">5 引擎优先级</span>';
+  try {
+    const r = await fetch('/api/face-ocr/recognize',{method:'POST', body: fd,signal:AbortSignal.timeout(15000)});
+    const d = await r.json();
+    $('#ocrOut').textContent = d.text || d.content || JSON.stringify(d).slice(0,400);
+    $('#ocrMeta').innerHTML = '<span class="chip ok">✓ ' + (d.engine||'?') + '</span><span class="chip">' + (d.confidence?.toFixed?.(2)||'?') + '</span>';
+    if (d.kb_refs) $('#ocrKbRef').innerHTML = '📚 KB: ' + d.kb_refs.map(k=>'<span class="chip kb">' + k + '</span>').join(' ');
+    addHistory({ type:'ocr', icon:'📷', title:f.name, text:$('#ocrOut').textContent.slice(0,400), ts:Date.now() });
+  } catch (e) { $('#ocrOut').textContent = '❌ ' + esc(e.message); $('#ocrMeta').innerHTML = '<span class="chip err">失败</span>'; }
+};
+
+// === 摄像头 ===
+$('#camStart').onclick = async () => {
+  try {
+    const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    State.camStream = s;
+    const v = document.createElement('video'); v.srcObject = s; v.autoplay = true; v.muted = true;
+    v.style.cssText = 'width:100%;max-height:280px;border-radius:10px;background:#000';
+    $('#camPreview').innerHTML = ''; $('#camPreview').appendChild(v);
+  } catch (e) { toast('摄像头权限：' + esc(e.message), 'err'); }
+};
+$('#camStop').onclick = () => { if (State.camStream) State.camStream.getTracks().forEach(t=>t.stop()); $('#camPreview').innerHTML = '已停止'; };
+$('#camSnap').onclick = () => {
+  const v = $('#camPreview video');
+  if (!v) { toast('请先启动摄像头', 'err'); return; }
+  const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+  var _ctx=c.getContext('2d'); if(_ctx) _ctx.drawImage(v, 0, 0);
+  c.toBlob(b => {
+    const fd = new FormData(); fd.append('file', b, 'snap.jpg'); fd.append('mode', State.mode);
+    fetch('/api/face-ocr/recognize',{method:'POST', body: fd,signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(d => {
+      $('#ocrOut').textContent = d.text || JSON.stringify(d).slice(0,400);
+      $('#askQ').value = '这是我的' + State.mode + '情况：' + (d.text||'').slice(0,100); askSend();
+    });
+  }, 'image/jpeg', 0.85);
+};
+
+// === 历史 ===
+function addHistory(item) {
+  State.history.unshift(item);
+  if (State.history.length > 50) State.history = State.history.slice(0, 50);
+  localStorage.setItem('glass_history', JSON.stringify(State.history));
+  renderHistory();
+}
+function renderHistory() {
+  const list = $('#histList');
+  const filtered = State.historyFilter === 'all' ? State.history : State.history.filter(x => x.type === State.historyFilter);
+  $('#histCount').textContent = State.history.length;
+  $('#askCount').textContent = State.history.filter(x=>x.type==='ask').length;
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="icon">空</div><div class="text">还没有记录</div><div class="hint">问诊 / OCR / 录音后会自动出现在这里</div></div>';
+    return;
+  }
+  list.innerHTML = filtered.map(h => `
+    <div class="hist-item">
+      <div class="hist-icon">${h.icon}</div>
+      <div class="hist-body">
+        <div class="hist-title">${escapeHtml(h.title||'')}</div>
+        <div class="hist-text">${escapeHtml(h.text||'')}</div>
+        <div class="hist-meta">
+          <span>${new Date(h.ts).toLocaleString('zh-CN')}</span>
+          ${h.meta?.ttfb ? '<span>TTFB ' + h.meta.ttfb.toFixed(0) + 'ms</span>' : ''}
+          ${h.meta?.mode ? '<span>· ' + h.meta.mode + '</span>' : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+$$('[data-filter]').forEach(b => b.onclick = () => {
+  State.historyFilter = b.dataset.filter;
+  renderHistory();
+});
+$('#histClear').onclick = () => { if (confirm('清空所有历史？')) { State.history = []; localStorage.removeItem('glass_history'); renderHistory(); } };
+$('#histExport').onclick = () => {
+  const blob = new Blob([JSON.stringify(State.history, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'glass-history-' + Date.now() + '.json'; a.click();
+  URL.revokeObjectURL(url);
+};
+
+// === 服务健康 ===
+const SVCS = [
+  { name:'静态服务', port:8914, url:'http://localhost:8914/' },
+  { name:'API 网关', port:8920, url:'http://localhost:8920/api/health' },
+  { name:'排盘引擎', port:8911, url:'http://localhost:8911/health' },
+  { name:'TTS', port:8912, url:'http://localhost:8912/health' },
+  { name:'OCR', port:8913, url:'http://localhost:8913/health' },
+  { name:'KB API', port:8901, url:'http://localhost:8901/health' },
+];
+async function probeSvc(s) {
+  const t0 = performance.now();
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 3000);
+    const r = await fetch(s.url, { signal: ctl.signal, mode:'cors' });
+    const dt = (performance.now() - t0).toFixed(0);
+    return { ok: r.ok, latency: dt };
+  } catch (e) { return { ok: false, latency: '超时' }; }
+}
+async function renderServices() {
+  const list = $('#svcList');
+  list.innerHTML = '<div class="svc-row"><div>检测中…</div><div></div><div></div><div></div></div>';
+  const results = await Promise.all(SVCS.map(probeSvc));
+  list.innerHTML = SVCS.map((s, i) => {
+    const r = results[i];
+    return `<div class="svc-row">
+      <div><span class="svc-dot ${r.ok?'ok':'err'}"></span><span class="svc-name">${s.name}</span></div>
+      <div style="font-family:monospace;color:var(--muted)">${s.port}</div>
+      <div class="latency">${r.latency}ms</div>
+      <div><button class="btn sm" onclick="window.open('${s.url}','_blank')">打开</button></div>
+    </div>`;
+  }).join('');
+}
+renderServices();
+
+// === TTS 播报 ===
+function speak(text) {
+  if (!text || !('speechSynthesis' in window)) return;
+  try { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='zh-CN'; u.rate=1.1; window.speechSynthesis.speak(u); } catch(e){}
+}
+
+// === 28 舌象饼图（硬编码示例） ===
+// [TEST_DATA] 硬编码示例数据，上线前替换
+function drawTonguePie() {
+  const c = $('#tongue-pie'); if (!c) return;
+  const ctx = c.getContext('2d'); if(!ctx) return;
+  const data = [
+    { name:'淡白舌', v:18, c:'#f8d7da' },
+    { name:'红舌', v:22, c:'#f5b5bb' },
+    { name:'绛舌', v:8, c:'#c4384d' },
+    { name:'紫舌', v:6, c:'#7a1f3a' },
+    { name:'胖大舌', v:14, c:'#ffe5b4' },
+    { name:'瘦薄舌', v:10, c:'#ffd089' },
+    { name:'齿痕舌', v:12, c:'#e8d4a0' },
+    { name:'裂纹舌', v:10, c:'#c4a878' },
+  ];
+  const cx = 80, cy = 100, R = 70, r = 40;
+  const total = data.reduce((s,x)=>s+x.v,0);
+  let a0 = -Math.PI/2;
+  data.forEach(d => {
+    const a1 = a0 + d.v/total * 2*Math.PI;
+    ctx.beginPath(); ctx.arc(cx,cy,R,a0,a1); ctx.arc(cx,cy,r,a1,a0,true); ctx.closePath();
+    ctx.fillStyle = d.c; ctx.fill(); ctx.strokeStyle='#0e1116'; ctx.lineWidth=1; ctx.stroke();
+    a0 = a1;
+  });
+  $('#tongue-legend').innerHTML = data.map(d => `<div style="display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 0"><span style="width:12px;height:12px;background:${d.c};border-radius:3px"></span><span style="flex:1">${d.name}</span><span style="color:var(--muted);font-variant-numeric:tabular-nums">${d.v}</span></div>`).join('');
+}
+drawTonguePie();
+
+// === R76-C · 镜象镜像渲染 ===
+async function refreshMirror() {
+  try {
+    const r = await fetch('/api/glass/mirror',{credentials:'same-origin',signal:AbortSignal.timeout(15000)});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = (await r.json()).data || (await r.json());
+    // Engine
+    const eng = data.engine || {};
+    $('#mirrorEngine').innerHTML = Object.entries(eng).map(([k,v]) =>
+      '<div class="m-row"><span class="m-key">' + esc(k) + '</span><span class="m-val ok">' + esc(v) + '</span></div>'
+    ).join('') +
+      '<div class="m-row"><span class="m-key">kb_1h 命中</span><span class="m-val">' + (data.kb_1h||0) + '</span></div>' +
+      '<div class="m-row"><span class="m-key">ocr_1h 调用</span><span class="m-val">' + (data.ocr_1h||0) + '</span></div>' +
+      '<div class="m-row"><span class="m-key">ocr_total 累计</span><span class="m-val">' + (data.ocr_total||0) + '</span></div>';
+
+    // Live timestamp
+    $('#mirrorLive').innerHTML = '<div class="m-row"><span class="m-key">服务汇报</span><span class="m-val ok">在线</span></div>' +
+      '<div class="m-row"><span class="m-key">快照时间</span><span class="m-val">' + esc((data.ts||'').split('T')[1]||'') + '</span></div>' +
+      '<div class="m-row"><span class="m-key">镜像点</span><span class="m-val">' + (data.mirrors||[]).length + ' 个</span></div>';
+
+    // badge
+    const badge = $('#mirrorBadge');
+    if (badge) badge.textContent = data.ocr_total || 0;
+  } catch(e) {
+    $('#mirrorEngine').innerHTML = '<div class="m-row"><span class="m-val err">✗ ' + esc(esc(e.message)) + '</span></div>';
+  }
+
+  // Parallel: KB 热度
+  try {
+    const r2 = await fetch('/api/kb/hot-modules?window=7',{credentials:'same-origin',signal:AbortSignal.timeout(15000)});
+    const d2 = await r2.json();
+    const hot = d2.data || d2;
+    const mods = hot.modules || [];
+    $('#mirrorKb').innerHTML = '<div style="font-size:10px;color:var(--muted);margin-bottom:6px">共 ' + (hot.total_hits||0) + ' 命中 · 窗口 ' + (hot.window_days||'7') + ' 天</div>' +
+      mods.slice(0, 8).map(m => {
+        const w = Math.max(8, Math.min(m.pct * 1.5, 60));
+        return '<div class="m-row"><span class="m-key" style="flex:1;overflow:hidden;text-overflow:ellipsis">' + esc(m.module) + '</span><span class="m-val">' + m.hits + '<span style="color:var(--muted);font-size:10px;margin-left:4px">' + m.pct.toFixed(1) + '%</span></span></div>';
+      }).join('') || '<div style="color:var(--muted2);font-size:11px">暂无数据</div>';
+  } catch(e2) {
+    $('#mirrorKb').innerHTML = '<div class="m-val err">✗ ' + esc(e2.message) + '</div>';
+  }
+
+  // Parallel: OCR history recent 5
+  try {
+    const r3 = await fetch('/api/ocr/history?limit=5',{credentials:'same-origin',signal:AbortSignal.timeout(15000)});
+    const d3 = await r3.json();
+    const hist = d3.data || d3;
+    $('#mirrorOcr').innerHTML = '<div style="font-size:10px;color:var(--muted);margin-bottom:6px">共 ' + (hist.total||0) + ' 条</div>' +
+      (hist.history||[]).map(h =>
+        '<div class="m-row"><span class="m-key" style="overflow:hidden;text-overflow:ellipsis">' + esc(h.hit_at) + ' · ' + esc(h.mode) + '</span><span class="m-val">' + (h.latency_ms||0) + 'ms</span></div>'
+      ).join('') || '<div style="color:var(--muted2);font-size:11px">暂无数据</div>';
+  } catch(e3) {
+    $('#mirrorOcr').innerHTML = '<div class="m-val err">✗ ' + esc(e3.message) + '</div>';
+  }
+}
+
+function esc(s) {
+  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 镜像 15s 刷新
+setInterval(refreshMirror, 15000);
+
+// === 启动 ===
+renderHistory();
+refreshMirror();
+refreshStatus();
+
+// R76-fix: 启动时拉取 CSRF token（用于所有 POST）
+fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(d => {
+  if (d.csrfToken) {
+    State.csrfToken = d.csrfToken;
+    console.warn('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');
+  }
+}).catch(e => console.warn('[CSRF] 获取失败：', esc(e.message)));
+$('#btnRefreshLive').onclick = () => {
+  $('#liveFortune').textContent = '运势 ' + (60 + (++State.tickCount % 40));
+  $('#liveHealth').textContent = ['气血充盈','注意作息','多饮温水','疏肝解郁','脾胃调养'][(State.tickCount) % 5];
+  toast('✓ 已刷新', 'ok');
+};
+
+// 周期性刷新服务健康
+setInterval(renderServices, 30000);
+</script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-h 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-h 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.cross-nav,.flow-steps-wrap,.flow-steps,.flow-hint,.toast,.skip-link,.portal-nav{display:none!important}.wrap{max-width:100%!important;padding:8px!important}.status-hero{grid-template-columns:1fr!important}.hero-main{background:#fff!important;border:1px solid #ddd!important}.stat-card{background:#fff!important;border:1px solid #ddd!important}.card{background:#fff!important;border:1px solid #ddd!important;box-shadow:none!important;page-break-inside:avoid}.tabs,.mode-grid{display:flex!important;flex-wrap:wrap!important;border-bottom:1px solid #ddd!important}.tab.active{color:#000!important;border-bottom-color:#000!important}.tab{color:#333!important}.output{background:#fff!important;border:1px solid #ddd!important;color:#000!important}.btn{display:none!important}.svc-row{border-bottom:1px solid #ddd!important}.pane{display:block!important}header{position:static!important}a.back{display:none!important}.hero-state{display:none!important}.output-meta{display:none!important}.mirror-grid{display:block!important}
+}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+
+  <!-- R505b AI 语音助手 -->
+  <div id="ai-assistant-mount"></div>
+  <script src="js/ai-voice-assistant.js" defer></script>
+  <script src="js/error-interceptor.js" defer></script>
+  <script src="js/smart-search-bootstrap.js" defer></script>
+</body>
+</html>

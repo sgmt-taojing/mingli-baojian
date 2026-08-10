@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="AI 视觉演示 · 易道智鉴平台">
+<meta name="keywords" content="AI 视觉演示">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/vision-demo.html">
+<meta name="theme-color" content="#050608">
+<title>AI 视觉演示 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<style>body{background:#0a0c12;color:#e4e6ed;font-family:sans-serif;padding:20px}</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-need-admin="true" class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">AI 视觉演示</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>上传图片</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>选择模式</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>自动分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看结果</span></div></div>
+<div class="flow-hint">开发者测试AI视觉引擎，面部识别+OCR+望诊功能验证。</div>
+</div>
+<script src="js/ocr-client.js"></script>
+<script src="js/ocr-client.js"></script>
+<script>
+
+/* =========================================================
+ * AI 眼睛 · 桌面体验页（R71 友好化 v2）
+ * ========================================================= */
+
+const MODE_LABELS = {
+  face: '面相识别', tongue: '舌诊分析', wangzhen: '中医望诊', ocr: '通用 OCR', 'ocr-tcm': '病历 OCR'
+};
+
+let currentMode = 'face';
+let stream = null;
+let mockEnabled = false;
+let lastResult = '';
+let lastApiUrl = '';
+let sessionCount = 0;
+let csrfToken = '';
+const HISTORY_KEY = '_r71_vision_history_v2';
+const SESSION_KEY = '_r71_vision_session_v2';
+const SCAN_DURATION = 2200; // ms scan animation
+
+/* ---- Init ---- */
+window.addEventListener('DOMContentLoaded', () => {
+  loadSessionCount();
+  renderHistory();
+  enumerateDevices();
+  fetchCsrfToken();
+  setTimeout(checkBridge, 500);
+  // Listen for device changes
+  if (navigator.mediaDevices) {
+    navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
+  }
+});
+
+/* ---- API base（R76-fix：静态托管页补全 localhost:8920） ---- */
+const API_BASE = (() => {
+  const h = location.host;
+  if (!/^(localhost|127\.0\.0\.1):8914$/.test(h)) return 'http://localhost:8920';
+  return '';
+})();
+const api = (path) => (API_BASE || '') + path;
+/* ---- CSRF token ---- */
+async function fetchCsrfToken() {
+  try {
+    const r = await fetch(api('/api/csrf-token'),{credentials: 'same-origin',signal:AbortSignal.timeout(15000)});
+    const data = await r.json().catch(() => ({}));
+    if (data.csrfToken || data.token) {
+      csrfToken = data.csrfToken || data.token;
+    }
+  } catch(e) {
+    console.warn('[vision] csrf token fetch failed:', esc(e.message));
+  }
+}
+
+function loadSessionCount() {
+  try {
+    sessionCount = parseInt(localStorage.getItem(SESSION_KEY) || '0', 10) || 0;
+  } catch(e) {}
+  var _stCount=document.getElementById('stCount'); if(_stCount) _stCount.textContent = sessionCount;
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value' + (sessionCount > 0 ? ' ok' : ' muted');
+}
+
+function saveSessionCount() {
+  try { localStorage.setItem(SESSION_KEY, String(sessionCount)); } catch(e) {}
+  var _stCount=document.getElementById('stCount'); if(_stCount) _stCount.textContent = sessionCount;
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
+}
+
+/* ---- Toast ---- */
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  if(!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+/* ---- Mode ---- */
+function selectMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  const tag = document.getElementById('modeTag');
+  if (tag) tag.textContent = MODE_LABELS[mode] || mode;
+}
+
+/* ---- Device enumeration ---- */
+async function enumerateDevices() {
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const sel = document.getElementById('deviceSel');
+    const videos = devices.filter(d => d.kind === 'videoinput');
+    sel.innerHTML = '<option value="">默认（自动选择）</option>' +
+      videos.map((d, i) => '<option value="' + d.deviceId + '">' + (d.label || '摄像头 ' + (i + 1)) + '</option>').join('');
+    const tag = document.getElementById('deviceTag');
+    if (tag && videos.length > 0) {
+      tag.textContent = videos[0].label || ('已检测 ' + videos.length + ' 个');
+    }
+    const resLabel = document.getElementById('resLabel');
+    if (resLabel && videos.length > 0 && videos[0].label) {
+      resLabel.textContent = videos.length + ' 设备可用';
+    }
+  } catch(e) {
+    console.warn('[vision] enumerateDevices:', esc(e.message));
+  }
+}
+
+/* ---- Camera ---- */
+async function startCamera() {
+  if (stream) {
+    stopCamera();
+    return;
+  }
+
+  const deviceId = document.getElementById('deviceSel').value;
+  const constraints = {
+    video: deviceId
+      ? { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 720 } }
+      : { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+    audio: false
+  };
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+    video.style.display = 'block';
+    document.getElementById('videoPlaceholder').style.display = 'none';
+    document.getElementById('liveTag').style.display = 'block';
+
+    const btn = document.getElementById('btnStart');
+    btn.textContent = '⏹ 关闭摄像头';
+    btn.classList.remove('primary');
+    btn.style.background = 'rgba(248,81,73,.15)';
+    btn.style.borderColor = 'rgba(248,81,73,.4)';
+    btn.style.color = 'var(--err)';
+    btn.onclick = stopCamera;
+
+    document.getElementById('btnCapture').disabled = false;
+    var _e=document.getElementById('stCam');if(_e)_e.textContent='在线';
+    var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
+    var _e=document.getElementById('stMic');if(_e)_e.textContent='就绪';
+    var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
+
+    // Update resolution label
+    video.addEventListener('loadedmetadata', () => {
+      const rl = document.getElementById('resLabel');
+      if (rl) rl.textContent = video.videoWidth + '×' + video.videoHeight;
+    });
+
+    toast('摄像头已启动');
+    await enumerateDevices();
+  } catch(e) {
+    handleCameraError(e);
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+  const video = document.getElementById('video');
+  video.srcObject = null;
+  video.style.display = 'none';
+  document.getElementById('videoPlaceholder').style.display = '';
+  document.getElementById('liveTag').style.display = 'none';
+
+  const btn = document.getElementById('btnStart');
+  btn.textContent = '📷 启动摄像头';
+  btn.classList.add('primary');
+  btn.style.background = '';
+  btn.style.borderColor = '';
+  btn.style.color = '';
+  btn.onclick = startCamera;
+
+  document.getElementById('btnCapture').disabled = true;
+  var _e=document.getElementById('stCam');if(_e)_e.textContent='已关闭';
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value warn';
+  var _e=document.getElementById('stMic');if(_e)_e.textContent='—';
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value muted';
+  const rl = document.getElementById('resLabel');
+  if (rl) rl.textContent = '—';
+  toast('摄像头已关闭');
+}
+
+function handleCameraError(e) {
+  let msg = '⛔ 摄像头启动失败';
+  let hint = '';
+  const resultBox = document.getElementById('resultBox');
+
+  if (e.name === 'NotAllowedError' || e.name === 'SecurityError') {
+    msg = '⛔ 摄像头权限被拒';
+    hint = '操作指引：\n1. 点击地址栏左侧的 🔒 或 ℹ️ 图标\n2. 找到「摄像头」→ 选择「允许」\n3. 刷新页面后重试\n\n注意：如果是 iframe 内嵌页面，需要用 https 或 localhost 协议。';
+  } else if (e.name === 'NotFoundError' || e.name === 'OverconstrainedError') {
+    msg = '🚫 未找到可用摄像头';
+    hint = '请确认：\n1. 摄像头已正确连接（USB / 内置）\n2. 没有被其他应用独占（关闭 Zoom / 微信 / QQ 等）\n3. 系统设置中摄像头已启用';
+  } else if (e.name === 'NotReadableError') {
+    msg = '⚠️ 摄像头被占用';
+    hint = '摄像头正被其他程序使用。请关闭所有可能使用摄像头的应用后重试。';
+  } else if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+    msg = '🔒 需要安全上下文（HTTPS）';
+    hint = '现代浏览器要求摄像头必须在安全上下文中调用。\n请用 https:// 访问，或使用 http://localhost / http://127.0.0.1。';
+  } else {
+    hint = '错误类型：' + e.name + '\n详情：' + (esc(e.message) || '未知错误');
+  }
+
+  var _e=document.getElementById('stCam');if(_e)_e.textContent='失败';
+  var _e=document.getElementById('stCount');if(_e)_e.className='status-value err';
+  if (resultBox) {
+    resultBox.innerHTML = '<div class="error-msg">' + msg + '</div><div class="hint-text" style="white-space:pre-wrap">' + hint + '</div>';
+  }
+  toast(msg);
+  console.error('[vision] startCamera:', e);
+}
+
+/* ---- Capture + Analyze ---- */
+async function captureAndAnalyze() {
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('captureCanvas');
+  if (!stream || !video || video.readyState < 2) {
+    toast('请先启动摄像头');
+    return;
+  }
+
+  // Flash effect
+  const flash = document.getElementById('scanFlash');
+  if (flash) { flash.classList.add('flash'); setTimeout(() => flash.classList.remove('flash'), 200); }
+
+  // Scan line
+  const scanLine = document.getElementById('scanLine');
+  if (scanLine) scanLine.classList.add('active');
+
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const mode = currentMode;
+  const resultBox = document.getElementById('resultBox');
+  if(!resultBox) return;
+  resultBox.innerHTML = '<div class="result-meta"><span class="tag">待 分析中</span><span>正在调用 OCR 引擎…</span></div><div class="result-content">预计 1-5 秒，请稍候</div>';
+
+  const t0 = Date.now();
+  lastApiUrl = '';
+
+  try {
+    const blob = await new Promise((res, rej) => canvas.toBlob(res, 'image/jpeg', 0.85));
+    const b64 = await new Promise((res, rej) => {
+      const reader = new FileReader();
+      reader.onload = () => res(reader.result.split(',')[1] || '');
+      reader.onerror = () => rej(new Error('图片编码失败'));
+      reader.readAsDataURL(blob);
+    });
+
+    let apiUrl = '/api/face/analyze';
+    let body = { image: b64 };
+    if (mode === 'ocr') {
+      apiUrl = '/api/ocr/recognize';
+    } else if (mode === 'ocr-tcm') {
+      apiUrl = '/api/ocr/tcm';
+      body = { image: b64, mode: 'tcm' };
+    } else if (mode === 'tongue') {
+      apiUrl = '/api/face/analyze';
+      body = { image: b64, mode: 'tongue' };
+    } else if (mode === 'wangzhen') {
+      apiUrl = '/api/face/analyze';
+      body = { image: b64, mode: 'wangzhen' };
+    }
+    lastApiUrl = apiUrl;
+
+    const r = await fetch(apiUrl, { signal: AbortSignal.timeout(15000),
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(csrfToken ? { 'x-csrf-token': csrfToken } : {})
+      },
+      body: JSON.stringify(body),
+      mode: 'cors',
+      credentials: 'same-origin', signal: AbortSignal.timeout(15000) });
+
+    const latency = Date.now() - t0;
+    var _e=document.getElementById('latencyLabel');if(_e)_e.textContent=latency + 'ms';
+
+    const data = await r.json().catch(() => ({}));
+    sessionCount++;
+    saveSessionCount();
+
+    const ts = new Date().toLocaleTimeString();
+    const summary = summarizeResult(data, mode);
+    lastResult = summary;
+
+    // Success result
+    const badge = r.ok ? '✅' : '⚠️';
+    const statusText = r.ok ? '成功' : '部分结果';
+    resultBox.innerHTML = '<div class="result-meta"><span class="tag">' + badge + ' ' + statusText + '</span><span class="tag">' + ts + '</span><span class="tag">' + MODE_LABELS[mode] + '</span><span>' + latency + 'ms</span></div><div class="result-content">' + escHtml(summary) + '</div>';
+
+    addHistory(mode, summary);
+    // R80: vision → KB 桥接（舌象→shexiang / 面相→mianxue / 脉象→tcm）
+    triggerVisionKb(mode, summary);
+    document.getElementById('btnTTS').disabled = false;
+    toast('分析完成 (' + latency + 'ms)');
+  } catch(e) {
+    const latency = Date.now() - t0;
+    var _e=document.getElementById('latencyLabel');if(_e)_e.textContent=latency + 'ms';
+    resultBox.innerHTML = '<div class="error-msg">分析失败</div><div class="hint-text" style="white-space:pre-wrap">' + escHtml(esc(e.message)) + '\n\n请确认 face-ocr-server 运行在 8913 端口，且 8920 API 网关在线。</div>';
+    toast('分析失败：' + esc(e.message));
+  } finally {
+    if (scanLine) scanLine.classList.remove('active');
+  }
+}
+
+/* ---- TTS ---- */
+async function speakResult() {
+  if (!lastResult) { toast('暂无结果可朗读'); return; }
+  const text = lastResult.slice(0, 200);
+  const voice = document.getElementById('ttsVoice')?.value || 'female';
+  const btn = document.getElementById('btnTTS');
+
+  try {
+    btn.disabled = true;
+    btn.textContent = '⏳ 合成中...';
+
+    // Try direct 8912 first (GET with query string)
+    const audio = new Audio(api('/api/tts?text=' + encodeURIComponent(text) + '&voice=' + encodeURIComponent(voice)));
+
+    audio.onplaying = () => {
+      btn.textContent = '🔊 朗读中...';
+      toast('播放中...');
+    };
+    audio.onended = () => {
+      btn.disabled = false;
+      btn.textContent = '🔊 朗读结果';
+    };
+    audio.onerror = async () => {
+      // Fallback: try 8920 proxy
+      try {
+        const pr = await fetch(api('/api/tts?text=') + encodeURIComponent(text), { signal: AbortSignal.timeout(15000) });
+        if (pr.ok) {
+          const blob = await pr.blob();
+          const a = new Audio(URL.createObjectURL(blob));
+          a.onended = () => { btn.disabled = false; btn.textContent = '🔊 朗读结果'; };
+          a.play();
+          return;
+        }
+      } catch(e2) {}
+      btn.disabled = false;
+      btn.textContent = '🔊 朗读结果';
+      toast('TTS 不可用（请启动 tts-server.py）');
+    };
+
+    audio.play().catch(() => audio.onerror());
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '🔊 朗读结果';
+    toast('TTS 失败：' + esc(e.message));
+  }
+}
+
+/* ---- Mock toggle ---- */
+function toggleMock() {
+  const sel = document.getElementById('mockSel');
+  if(!sel) return;
+  const val = sel.value;
+  if (val === 'mock') {
+    if (typeof MockRokid !== 'undefined' && MockRokid.enable) {
+      MockRokid.enable({ kind: 'jr-bridge', delayMs: 50 });
+      mockEnabled = true;
+      var _e=document.getElementById('stBridge');if(_e)_e.textContent='Mock';
+      var _e=document.getElementById('stCount');if(_e)_e.className='status-value ok';
+      toast('Mock Rokid 已启用');
+    } else {
+      toast('mock-harness 未加载');
+    }
+  } else {
+    if (typeof MockRokid !== 'undefined' && MockRokid.disable) {
+      MockRokid.disable();
+    }
+    mockEnabled = false;
+    checkBridge();
+    toast('Mock 已关闭');
+  }
+}
+
+/* ---- Bridge check ---- */
+function checkBridge() {
+  let available = false;
+  let kind = 'none';
+  try {
+    if (window.RokidBridge && window.RokidBridge.available) {
+      available = true;
+      kind = window.RokidBridge.bridgeKind || 'native';
+    }
+  } catch(e) {}
+  const el = document.getElementById('stBridge');
+  if(!el) return;
+  if (mockEnabled) {
+    el.textContent = 'Mock';
+    el.className = 'status-value ok';
+  } else if (available) {
+    el.textContent = kind;
+    el.className = 'status-value ok';
+  } else {
+    el.textContent = '未连接';
+    el.className = 'status-value warn';
+  }
+}
+
+/* ---- Summarize ---- */
+function summarizeResult(data, mode) {
+  if (!data || typeof data !== 'object') return String(data || '');
+  if (data.text) return data.text;
+  if (data.result) return typeof data.result === 'string' ? data.result : JSON.stringify(data.result, null, 2);
+  if (data.analysis) return data.analysis;
+  if (data.diagnosis) return data.diagnosis;
+  if (data.findings) return data.findings.map(f => '- ' + f).join('\n');
+  if (data.error) return '错误：' + data.error + (data.message ? '\n' + data.message : '');
+  const keys = Object.keys(data).filter(k => !['ok','code','ts','processing_time'].includes(k)).slice(0, 6);
+  if (keys.length) return keys.map(k => k + ':\n' + JSON.stringify(data[k], null, 2)).join('\n\n');
+  return JSON.stringify(data, null, 2);
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---- R80: Vision → KB 桥接 ---- */
+function triggerVisionKb(mode, summary) {
+  if (!window.DeviceKbBridge || typeof window.DeviceKbBridge.onCapture !== 'function') return;
+  const capMap = {
+    face:   'mianxue',
+    tongue: 'shexiang',
+    eye:    'mianxue',
+    ocr:    'classics',
+    'ocr-tcm': 'tcm'
+  };
+  const cap = capMap[mode] || 'classics';
+  window.DeviceKbBridge.onCapture(cap, {
+    source: 'vision-demo',
+    mode: mode,
+    label: (MODE_LABELS[mode] || mode) + ' 分析',
+    score: summary.length > 40 ? 0.75 : 0.5
+  });
+  console.warn('[R80] vision→kb:', cap, summary.slice(0, 20));
+}
+
+/* ---- History ---- */
+function addHistory(mode, preview) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  hist.unshift({
+    ts: new Date().toLocaleString(),
+    mode,
+    preview: preview.slice(0, 80),
+    full: preview
+  });
+  if (hist.length > 20) hist.length = 20;
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(hist)); } catch(e) {}
+  renderHistory();
+}
+
+function renderHistory() {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  const el = document.getElementById('historyList');
+  if(!el) return;
+  if (!hist.length) {
+    el.innerHTML = '<div style="color:var(--muted2);font-size:12px;padding:8px">暂无记录</div>';
+    return;
+  }
+  el.innerHTML = hist.map((h, i) =>
+    '<div class="history-item" role="button" tabindex="0" onclick="replayHistory(' + i + ')" title="点击重放结果">' +
+      '<span class="hist-ts">' + escHtml(h.ts) + '</span>' +
+      '<span class="hist-tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span>' +
+      '<span class="hist-preview">' + escHtml(h.preview) + '</span>' +
+      '<span class="hist-actions">' +
+        '<button class="hist-btn" onclick="event.stopPropagation();replayHistory(' + i + ')">查看</button>' +
+        '<button class="hist-btn" onclick="event.stopPropagation();speakHistory(' + i + ')" aria-label="语音播放">🔊</button>' +
+      '</span>' +
+    '</div>'
+  ).join('');
+}
+
+// a11y: keyboard support for history items (role=button)
+document.addEventListener('keydown', function(e) {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.classList && e.target.classList.contains('history-item')) {
+    e.preventDefault();
+    var children = e.target.parentNode ? Array.from(e.target.parentNode.children) : [];
+    var idx = children.indexOf(e.target);
+    if (idx >= 0 && typeof replayHistory === 'function') replayHistory(idx);
+  }
+});
+
+function replayHistory(idx) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  if (!hist[idx]) return;
+  const h = hist[idx];
+  lastResult = h.full || h.preview;
+  const resultBox = document.getElementById('resultBox');
+  if(!resultBox) return;
+  resultBox.innerHTML = '<div class="result-meta"><span class="tag">卷 历史记录</span><span class="tag">' + (MODE_LABELS[h.mode] || h.mode) + '</span><span>' + escHtml(h.ts) + '</span></div><div class="result-content">' + escHtml(lastResult) + '</div>';
+  document.getElementById('btnTTS').disabled = false;
+  toast('已加载历史记录');
+}
+
+function speakHistory(idx) {
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch(e) {}
+  if (!hist[idx]) return;
+  lastResult = hist[idx].full || hist[idx].preview;
+  speakResult();
+}
+
+function clearHistory() {
+  try { localStorage.removeItem(HISTORY_KEY); } catch(e) {}
+  renderHistory();
+  toast('历史已清空');
+}
+
+/* ---- Voice input (SpeechRecognition) ---- */
+let voiceRec = null;
+let voiceStream = null;
+
+function toggleVoice() {
+  const btn = document.getElementById('btnVoice');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SR) {
+    toast('当前浏览器不支持语音识别，推荐使用 Chrome 或 Edge');
+    return;
+  }
+
+  // Toggle off
+  if (voiceRec) {
+    voiceRec.stop();
+    voiceRec = null;
+    btn.textContent = '🎤 点击开始录音';
+    btn.classList.remove('warn');
+    if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
+    return;
+  }
+
+  voiceRec = new SR();
+  voiceRec.lang = 'zh-CN';
+  voiceRec.interimResults = false;
+  voiceRec.maxAlternatives = 1;
+  voiceRec.continuous = false;
+
+  btn.textContent = '🔴 录音中...';
+  btn.classList.add('warn');
+
+  // Open mic stream
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(s => { voiceStream = s; }).catch(() => {});
+
+  voiceRec.onresult = (e) => {
+    const text = e.results[0][0].transcript.trim();
+    if (text) {
+      toast('识别：' + text.slice(0, 30));
+      addHistory('voice', text);
+      sessionCount++;
+      saveSessionCount();
+    }
+  };
+
+  voiceRec.onerror = (e) => {
+    btn.textContent = '🎤 点击开始录音';
+    btn.classList.remove('warn');
+    const errMap = {
+      'not-allowed': '麦克风权限被拒，请在浏览器设置中允许',
+      'no-speech': '未检测到语音，请靠近麦克风再试',
+      'network': '语音识别需要网络，请检查连接',
+      'audio-capture': '未检测到麦克风设备',
+      'aborted': '录音被中断'
+    };
+    const errMsg = errMap[e.error] || ('语音识别错误：' + e.error);
+    toast(errMsg);
+    if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
+    voiceRec = null;
+  };
+
+  voiceRec.onend = () => {
+    btn.textContent = '🎤 点击开始录音';
+    btn.classList.remove('warn');
+    if (voiceStream) { voiceStream.getTracks().forEach(t => t.stop()); voiceStream = null; }
+    voiceRec = null;
+  };
+
+  voiceRec.start();
+}
+</script>
+<script src="js/admin-rbac-shared.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print {
+  .no-print, .nav-bar, .sidebar, .back-btn, .action-bar, .fab, .bottom-nav, header, nav, .toolbar, .btn, button { display: none !important; }
+  body { background: #fff !important; color: #000 !important; font-size: 12pt !important; }
+  .print-area, .report-content, .main-content, main, .content, .card { width: 100% !important; margin: 0 !important; padding: 8mm !important; }
+  a { color: #000 !important; text-decoration: underline; }
+  img { max-width: 100% !important; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #ccc !important; padding: 4px !important; }
+  h1, h2, h3 { page-break-after: avoid; }
+  .page-break { page-break-before: always; }
+  .report-card, .info-card, .detail-card { break-inside: avoid; }
+}
+</style>
+
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

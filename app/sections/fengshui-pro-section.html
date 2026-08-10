@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/fengshui-pro-section.html">
+<meta name="robots" content="noindex,nofollow">
+<title>section-fengshui-pro</title>
+</head>
+<body>
+<section class="section" id="section-fengshui-pro" role="tabpanel" aria-labelledby="tab-fengshui-pro">
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--jade)">🏔️</span>
+    <h2 class="sh-title">风 水 进 阶</h2>
+    <p class="sh-en">Feng Shui Pro · Daily Guide · Layout · Business · Sha Qi · Flying Stars · Annual Cure · Ze Ri</p>
+    <p class="sh-desc">每日方位 · 布局诊断 · 商铺风水 · 化煞大全 · 流年飞星 · 家庭化解 · 风水择日</p>
+  </div>
+
+  <!-- 子导航 -->
+  <div class="zhanbu-subnav" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid rgba(201,168,76,0.1);overflow-x:auto;scrollbar-width:none">
+    <button class="zhanbu-subtab fs-pro-subtab active" onclick="showFengshuiProSub('fengshui-daily-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--gold);color:var(--gold)">🧭 每日方位</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-layout-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🏠 布局诊断</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-business-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🏢 商铺风水</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-shaqi-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">⚔️ 化煞大全</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-stars-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">⭐ 流年飞星</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-cure-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">💊 家庭化解</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showFengshuiProSub('fengshui-zeri-content',this)" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">📅 风水择日</button>
+    <button class="zhanbu-subtab fs-pro-subtab" onclick="showSection('huajie')" style="padding:10px 16px;font-size:12px;letter-spacing:2px;color:var(--paper3);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent">🛡️ 开运化解</button>
+  </div>
+
+  <!-- 1. 每日风水方位指南 -->
+  <div id="fengshui-daily-content" class="fengshui-pro-sub">
+    <div class="input-card">
+      <h3>🧭 每日风水方位指南</h3>
+      <p style="text-align:center;font-size:12px;margin-bottom:16px">依据日干支、流月飞星推算当日吉凶方位</p>
+      <p style="text-align:center;font-size:11px;margin-bottom:12px">参考：《钦定协纪辨方书》《玉匣记》《紫白诀》</p>
+      <button class="compute-btn" onclick="fsProCompute('daily')">查 询 今 日 方 位</button>
+    </div>
+    <div id="fs-pro-output-daily" class="d-none"></div>
+  </div>
+
+  <!-- 2. 家居布局诊断 -->
+  <div id="fengshui-layout-content" class="fengshui-pro-sub d-none">
+    <div class="input-card">
+      <h3>🏠 家居布局诊断</h3>
+      <p style="text-align:center;font-size:12px;margin-bottom:16px">输入各房间方位，根据八宅法+玄空飞星综合诊断</p>
+      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《八宅明镜》《阳宅三要》《沈氏玄空学》</p>
+      <div class="input-row"><select class="input-field" id="fs-pro-door-dir" aria-label="选项fs-pro-door-dir"><option value="">大门方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-bedroom-dir" aria-label="选项fs-pro-bedroom-dir"><option value="">主卧方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-kitchen-dir" aria-label="选项fs-pro-kitchen-dir"><option value="">厨房方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-bathroom-dir" aria-label="选项fs-pro-bathroom-dir"><option value="">卫生间方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-study-dir" aria-label="选项fs-pro-study-dir"><option value="">书房方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-living-dir" aria-label="选项fs-pro-living-dir"><option value="">客厅方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><input class="input-field" type="number" id="fs-pro-build-year" placeholder="建造年份" min="1900" max="2100" value="2000" aria-label="建造年份"></div>
+      <button class="compute-btn" onclick="fsProCompute('layout')">开 始 诊 断</button>
+    </div>
+    <div id="fs-pro-output-layout" class="d-none"></div>
+  </div>
+
+  <!-- 3. 商铺/办公室风水 -->
+  <div id="fengshui-business-content" class="fengshui-pro-sub d-none">
+    <div class="input-card">
+      <h3>🏢 商铺/办公室风水分析</h3>
+      <p style="text-align:center;font-size:12px;margin-bottom:16px">输入商铺各区域方位，分析风水吉凶</p>
+      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《八宅明镜》《阳宅三要》</p>
+      <div class="input-row"><select class="input-field" id="fs-pro-shop-type" aria-label="选项fs-pro-shop-type"><option value="retail">零售商铺</option><option value="restaurant">餐饮店铺</option><option value="office">办公场所</option><option value="beauty">美容美发</option><option value="clinic">诊所药房</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-shop-door" aria-label="选项fs-pro-shop-door"><option value="">大门/入口方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-cashier" aria-label="选项fs-pro-cashier"><option value="">收银台方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-boss-office" aria-label="选项fs-pro-boss-office"><option value="">老板办公室方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-staff-area" aria-label="选项fs-pro-staff-area"><option value="">员工工位区方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <div class="input-row"><select class="input-field" id="fs-pro-counter" aria-label="选项fs-pro-counter"><option value="">展示柜台方位</option><option value="北">北</option><option value="南">南</option><option value="东">东</option><option value="西">西</option><option value="东南">东南</option><option value="西南">西南</option><option value="西北">西北</option><option value="东北">东北</option></select></div>
+      <button class="compute-btn" onclick="fsProCompute('business')">开 始 分 析</button>
+    </div>
+    <div id="fs-pro-output-business" class="d-none"></div>
+  </div>
+
+  <!-- 4. 风水化煞大全 -->
+  <div id="fengshui-shaqi-content" class="fengshui-pro-sub d-none">
+    <div class="input-card">
+      <h3>⚔️ 风水化煞大全</h3>
+      <p style="text-align:center;font-size:12px;margin-bottom:16px">收录12种常见煞气及对应化解方案</p>
+      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《阳宅大全》《风水化煞全书记》《沈氏玄空学》</p>
+      <button class="compute-btn" onclick="fsProCompute('shaqi')">查 看 化 煞 大 全</button>
+    </div>
+    <div id="fs-pro-output-shaqi" class="d-none"></div>
+  </div>
+
+  <!-- 5. 流年飞星盘 -->
+  <div id="fengshui-stars-content" class="fengshui-pro-sub d-none">
+    <div class="input-card">
+      <h3>⭐ 流年飞星盘</h3>
+      <p style="text-align:center;font-size:12px;margin-bottom:16px">九宫飞星可视化 · 大凶预警 · 大吉催旺</p>
+      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《沈氏玄空学》《紫白诀》</p>
+      <div class="input-row"><input class="input-field" type="number" id="fs-pro-fx-year" placeholder="年份" min="2000" max="2050" value="2026" aria-label="年份"></div>
+      <button class="compute-btn" onclick="fsProCompute('stars')">排 列 飞 星 盘</button>
+    </div>
+    <div id="fs-pro-output-stars" class="d-none"></div>
+  </div>
+
+  <!-- 6. 家庭年度化解方案 -->
+  <div id="fengshui-cure-content" class="fengshui-pro-sub d-none">
+    <div class="input-card">
+      <h3>💊 家庭年度化解方案</h3>
+      <p style="text-align:center;font-size:12px;margin-bottom:16px">结合流年飞星，为每位成员生成个性化化解方案</p>
+      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《沈氏玄空学》《紫白诀》《八宅明镜》</p>
+      <div id="fs-pro-family-members" style="margin-bottom:12px"></div>
+      <div class="input-row"><button onclick="addFamilyMemberRow()" style="padding:8px 20px;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--success);border-radius:6px;cursor:pointer;font-size:12px;letter-spacing:2px">+ 添加成员</button></div>
+      <button class="compute-btn" onclick="fsProCompute('cure')">生 成 化 解 方 案</button>
+    </div>
+    <div id="fs-pro-output-cure" class="d-none"></div>
+  </div>
+
+  <!-- 7. 风水择日 -->
+  <div id="fengshui-zeri-content" class="fengshui-pro-sub d-none">
+    <div class="input-card">
+      <h3>📅 风水择日</h3>
+      <p style="text-align:center;font-size:12px;margin-bottom:16px">搬家入宅 · 动土装修 · 开业 · 结婚 · 安葬</p>
+      <p style="text-align:center;font-size:11px;margin-bottom:16px">参考：《钦定协纪辨方书》《玉匣记》《象吉通书》</p>
+      <div class="input-row"><select class="input-field" id="fs-pro-zeri-type" aria-label="选项fs-pro-zeri-type"><option value="move">搬家入宅</option><option value="construction">动土装修</option><option value="business">开业</option><option value="wedding">结婚</option><option value="burial">安葬</option></select></div>
+      <div class="input-row"><input class="input-field" type="date" id="fs-pro-zeri-start" placeholder="开始日期" aria-label="开始日期"></div>
+      <div class="input-row"><input class="input-field" type="date" id="fs-pro-zeri-end" placeholder="结束日期" aria-label="结束日期"></div>
+      <button class="compute-btn" onclick="fsProCompute('zeri')">查 询 吉 日</button>
+    </div>
+    <div id="fs-pro-output-zeri" class="d-none"></div>
+  </div>
+
+</section>
+<script src="../js/error-interceptor.js"></script>
+<script src="../js/submit-guard.js"></script>
+<script src="../js/escape-html.js"></script>
+</body>
+</html>

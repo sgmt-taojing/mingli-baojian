@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="望诊知识库 · 易道智鉴平台">
+<meta name="keywords" content="望诊知识库">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/wangzhen-kb.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="望诊知识库 · 命理宝鉴">
+<meta property="og:description" content="望诊知识库 · 易道智鉴平台">
+<meta property="og:type" content="website">
+<title>望诊知识库 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/tokens.css">
+<style>
+:root{
+  --bg:#f8f6f0;--bg2:#fff;--bg3:#f0ede5;--bd:#d4cfc0;--tx:#2a2520;--muted:#7a7568;
+  --gold:#c9a84c;--gold2:#e6c873;--jade:#5a8a5a;--paper:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;padding:16px;max-width:960px;margin:0 auto}
+h1{color:var(--gold);font-size:1.4rem;margin-bottom:8px;text-align:center}
+.subtitle{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:16px}
+.stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:8px 16px;text-align:center;min-width:80px}
+.stat-num{font-size:1.4rem;font-weight:700;color:var(--gold)}
+.stat-label{font-size:.7rem;color:var(--muted)}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;justify-content:center}
+.filter-btn{padding:6px 14px;border:1px solid var(--bd);border-radius:20px;background:var(--bg2);cursor:pointer;font-size:.8rem;transition:all .2s}
+.filter-btn:hover{border-color:var(--gold)}
+.filter-btn.active{background:var(--gold);color:#fff;border-color:var(--gold)}
+.search-box{width:100%;padding:10px 14px;border:1px solid var(--bd);border-radius:8px;font-size:.9rem;margin-bottom:16px;background:var(--bg2)}
+.kb-list{display:flex;flex-direction:column;gap:12px}
+.kb-card{background:var(--bg2);border:1px solid var(--bd);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:14px 16px;cursor:pointer;transition:all .2s}
+.kb-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.kb-card.hidden{display:none}
+.kb-id{font-size:.7rem;color:var(--muted);font-family:monospace}
+.kb-title{font-size:1rem;font-weight:600;color:var(--tx);margin:4px 0}
+.kb-cat{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;margin-right:6px}
+.cat-五官{background:#e8f4fd;color:#1565c0}
+.cat-分区{background:#e8f5e9;color:#2e7d32}
+.cat-形态{background:#fff3e0;color:#e65100}
+.cat-五色{background:#fce4ec;color:#c62828}
+.cat-诊断{background:#f3e5f5;color:#6a1b9a}
+.cat-规则{background:#efebe9;color:#5d4037}
+.cat-理疗{background:#e0f7fa;color:#00838f}
+.kb-summary{font-size:.85rem;color:var(--muted);margin-top:4px}
+.kb-content{display:none;margin-top:12px;padding:12px;background:var(--bg3);border-radius:6px;font-size:.85rem;white-space:pre-wrap;line-height:1.8}
+.kb-card.expanded .kb-content{display:block}
+.kb-meta{display:flex;gap:12px;font-size:.7rem;color:var(--muted);margin-top:8px}
+.kb-meta span{display:flex;align-items:center;gap:2px}
+.back-link{display:block;text-align:center;margin-top:24px;color:var(--gold);text-decoration:none;font-size:.85rem}
+@media(max-width:768px){
+  body{padding:12px}
+  h1{font-size:1.2rem}
+  .stat-card{min-width:60px;padding:6px 10px}
+  .stat-num{font-size:1.1rem}
+}
+@media(max-width:360px){
+  .stats{gap:6px}
+  .filter-btn{padding:4px 10px;font-size:.75rem}
+}
+@media print{
+  .page-header-bar,.phb-back,.btn,button,.no-print,header,footer,.filter-bar,.search-box,.back-link,.skip-link{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt;line-height:1.5;padding:0!important;max-width:100%!important}
+  h1{color:black!important;font-size:18pt}
+  .subtitle{color:#333!important}
+  .stats{display:flex!important;page-break-inside:avoid}
+  .stat-card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important}
+  .stat-num{color:black!important}
+  .stat-label{color:#333!important}
+  .kb-list{page-break-inside:avoid}
+  .kb-card{background:white!important;border:1px solid #ccc!important;box-shadow:none!important;color:black!important;border-left:3px solid #999!important}
+  .kb-title{color:black!important}
+  .kb-summary{color:#333!important}
+  .kb-content{display:block!important;background:#fafafa!important;color:black!important}
+  .kb-meta,.kb-id{color:#666!important}
+  h1,h2,h3{page-break-after:avoid;color:black!important}
+  a[href]:after{content:" ("attr(href)")";font-size:9pt;color:#666}
+  img{max-width:100%!important}
+  .print-only{display:block!important}
+}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">望诊知识库</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+<main>
+
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择分类</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>浏览知识</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>查看条目</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>引用参考</span></div></div>
+<div class="flow-hint">中医师/学生浏览望诊知识库，舌诊+面诊参考。</div>
+</div>
+
+<h1>诊 望诊知识库</h1>
+<p class="subtitle">命理宝鉴 · 中医面诊结构化知识 · 50 条</p>
+
+<div class="stats" id="stats"></div>
+
+<div class="filter-bar" id="filterBar">
+  <button class="filter-btn active" data-cat="全部">全部</button>
+  <button class="filter-btn" data-cat="分区">分区</button>
+  <button class="filter-btn" data-cat="五色">五色</button>
+  <button class="filter-btn" data-cat="形态">形态</button>
+  <button class="filter-btn" data-cat="五官">五官</button>
+  <button class="filter-btn" data-cat="诊断">诊断</button>
+  <button class="filter-btn" data-cat="规则">规则</button>
+  <button class="filter-btn" data-cat="理疗">理疗</button>
+</div>
+
+<input class="search-box" id="searchBox" type="text" placeholder="搜索标题、关键词、内容…" aria-label="搜索望诊知识库">
+
+<div class="kb-list" id="kbList">
+  <p style="text-align:center;color:var(--muted)">加载中…</p>
+</div>
+
+<a class="back-link" href="javascript:history.back()">← 返回</a>
+
+<script>
+let allData=[];
+let currentFilter='全部';
+
+async function init(){
+  try{
+    const resp=await fetch('../knowledge/wangzhen-kb-data.json', {signal: AbortSignal.timeout(15000)});
+    if(!resp.ok) throw new Error('HTTP '+resp.status);
+    allData=await resp.json();
+    renderStats();
+    renderList();
+  }catch(e){
+    // 尝试相对路径
+    try{
+      const resp2=await fetch('knowledge/wangzhen-kb-data.json', {signal: AbortSignal.timeout(15000)});
+      allData=await resp2.json();
+      renderStats();
+      renderList();
+    }catch(e2){
+      document.getElementById('kbList').innerHTML='<p style="text-align:center;color:#c44">警 无法加载知识库数据。请从项目根目录访问。</p>';
+    }
+  }
+}
+
+function renderStats(){
+  const cats={};
+  allData.forEach(d=>{cats[d.category]=(cats[d.category]||0)+1;});
+  const el=document.getElementById('stats');
+  el.innerHTML='<div class="stat-card"><div class="stat-num">'+allData.length+'</div><div class="stat-label">总条目</div></div>'+
+    Object.entries(cats).map(([c,n])=>'<div class="stat-card"><div class="stat-num">'+n+'</div><div class="stat-label">'+c+'</div></div>').join('');
+}
+
+function renderList(){
+  const search=document.getElementById('searchBox').value.toLowerCase().trim();
+  const el=document.getElementById('kbList');
+  const filtered=allData.filter(d=>{
+    if(currentFilter!=='全部' && d.category!==currentFilter) return false;
+    if(search){
+      const text=(d.title+' '+d.summary+' '+(d.keywords||'')+' '+d.content).toLowerCase();
+      if(!text.includes(search)) return false;
+    }
+    return true;
+  });
+  if(filtered.length===0){
+    el.innerHTML='<p style="text-align:center;color:var(--muted)">无匹配结果</p>';
+    return;
+  }
+  el.innerHTML=filtered.map(d=>{
+    return '<div class="kb-card" onclick="toggleCard(this)">'+
+      '<div class="kb-id">'+d.entry_id+'</div>'+
+      '<div class="kb-title">'+escHtml(d.title)+'</div>'+
+      '<span class="kb-cat cat-'+d.category+'">'+d.category+'</span>'+
+      (d.summary?'<div class="kb-summary">'+escHtml(d.summary)+'</div>':'')+
+      '<div class="kb-meta">'+
+        '<span>星 trust: '+d.trust_score+'</span>'+
+        '<span>经 '+(d.content||'').length+' 字</span>'+
+      '</div>'+
+      '<div class="kb-content">'+escHtml(d.content||'')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+function toggleCard(el){
+  el.classList.toggle('expanded');
+}
+
+function escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('filterBar').addEventListener('click',function(e){
+  if(e.target.classList.contains('filter-btn')){
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentFilter=e.target.dataset.cat;
+    renderList();
+  }
+});
+
+document.getElementById('searchBox').addEventListener('input',renderList);
+
+init();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

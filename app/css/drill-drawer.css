@@ -1,0 +1,46 @@
+/* ═══ R322: 下钻抽屉组件 ═══ */
+.drill-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;opacity:0;visibility:hidden;transition:all .3s}
+.drill-overlay.open{opacity:1;visibility:visible}
+.drill-drawer{position:fixed;top:0;right:-480px;width:460px;max-width:90vw;height:100vh;background:linear-gradient(180deg,var(--ink2),var(--ink));border-left:2px solid var(--gold3);box-shadow:-8px 0 32px rgba(0,0,0,.5);z-index:201;transition:right .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;overflow-x:hidden}
+.drill-drawer.open{right:0}
+.drill-header{position:sticky;top:0;background:linear-gradient(135deg,var(--ink2),var(--ink3));border-bottom:1px solid var(--gold3);padding:1rem 1.2rem;display:flex;align-items:center;justify-content:space-between;z-index:10;backdrop-filter:blur(8px)}
+.drill-title{font-family:'ZCOOL XiaoWei',serif;font-size:1.15rem;color:var(--gold2);display:flex;align-items:center;gap:.5rem}
+.drill-close{width:32px;height:32px;border-radius:8px;background:var(--ink);border:1px solid var(--ink4);color:var(--paper3);cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.drill-close:hover{border-color:var(--cinn2);color:var(--cinn2);transform:rotate(90deg)}
+.drill-body{padding:1.2rem}
+.drill-section{margin-bottom:1.2rem}
+.drill-section h4{font-size:.9rem;color:var(--gold2);margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1px solid var(--ink3);display:flex;align-items:center;gap:.4rem}
+.drill-metric{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--ink3)}
+.drill-metric:last-child{border-bottom:none}
+.drill-metric .label{font-size:.82rem;color:var(--paper3)}
+.drill-metric .value{font-family:var(--font-mono);font-weight:600;color:var(--gold2)}
+.drill-trend{display:flex;align-items:flex-end;gap:3px;height:60px;margin:.5rem 0}
+.drill-trend .bar{flex:1;border-radius:2px 2px 0 0;min-height:4px;transition:height .3s}
+.drill-tag{display:inline-block;padding:.2rem .6rem;border-radius:4px;font-size:.72rem;margin:2px}
+.drill-action{display:block;width:100%;padding:.6rem;text-align:center;border-radius:8px;font-size:.85rem;cursor:pointer;transition:all .2s;border:1px solid var(--ink4);background:var(--ink);color:var(--paper2)}
+.drill-action:hover{border-color:var(--gold3);color:var(--gold2)}
+.drill-action.primary{background:linear-gradient(135deg,var(--gold3),var(--gold2));color:var(--ink);border-color:var(--gold2);font-weight:600}
+.drill-empty{text-align:center;padding:2rem;color:var(--paper3);font-size:.85rem}
+
+/* 可点击卡片/行的指针和 hover 效果 */
+.card[data-drill]{cursor:pointer}
+.card[data-drill]:hover{border-color:var(--gold2);box-shadow:0 4px 24px rgba(201,168,76,.15)}
+.card[data-drill]::after{content:'🔍';position:absolute;top:.8rem;right:.8rem;font-size:.7rem;opacity:0;transition:opacity .2s}
+.card[data-drill]:hover::after{opacity:.6}
+.svc-row[data-drill]{cursor:pointer;transition:all .15s}
+.svc-row[data-drill]:hover{background:rgba(201,168,76,.05);padding-left:.5rem;border-radius:4px}
+.alert-item[data-drill]{cursor:pointer;transition:all .15s}
+.alert-item[data-drill]:hover{transform:translateX(4px)}
+tr[data-drill]{cursor:pointer;transition:background .15s}
+tr[data-drill]:hover{background:rgba(201,168,76,.06)!important}
+
+/* 加载动画 */
+.drill-loading{display:flex;align-items:center;justify-content:center;padding:2rem;color:var(--paper3)}
+.drill-loading::before{content:'';width:20px;height:20px;border:2px solid var(--ink4);border-top-color:var(--gold2);border-radius:50%;animation:spin .8s linear infinite;margin-right:.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 响应式 */
+@media(max-width:768px){
+  .drill-drawer{width:100vw;right:-100vw}
+  .drill-drawer.open{right:0}
+}

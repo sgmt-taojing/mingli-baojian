@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/knowledge-section.html">
+<meta name="robots" content="noindex,nofollow">
+<title>section-knowledge</title>
+</head>
+<body>
+<section class="section" id="section-knowledge" role="tabpanel" aria-labelledby="tab-knowledge">
+  <div class="back-row"><button class="back-btn" onclick="showSection('hero')">返回首页</button></div>
+  <div class="section-header">
+    <span class="sh-symbol" style="color:var(--gold)">📚</span>
+    <h2 class="sh-title">易 学 知 识 库</h2>
+    <p class="sh-en">Knowledge Base · I Ching · BaZi · Qimen · FengShui</p>
+    <p class="sh-desc">全量命理知识库，支持分类检索、全文搜索、关键词匹配。涵盖八字、六爻、风水、紫微、奇门、梅花、六壬、姓名学等16大领域。</p>
+  </div>
+  <div class="section-body" style="max-width:1200px;margin:0 auto;">
+    <!-- 知识库检索界面 -->
+    <div id="kbSearchPanel" style="margin-bottom:16px;">
+      <!-- 搜索栏 -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <input type="text" id="kbSearchInput" placeholder="🔍 搜索知识（如：天乙贵人、六冲、飞星...）" 
+          style="flex:1;min-width:200px;padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid var(--gold-dim);border-radius:6px;color:var(--text-light);font-size:14px;"
+          oninput="debounceKbSearch(this.value)" / aria-label="🔍 搜索知识（如：天乙贵人、六冲、飞星...）">
+        <select id="kbSortSelect" style="padding:10px 14px;background:rgba(0,0,0,0.3);border:1px solid var(--gold-dim);border-radius:6px;color:var(--text-light);font-size:14px;" aria-label="kbSortSelect">
+          <option value="relevance">相关度</option>
+          <option value="category">按分类</option>
+          <option value="alpha">按字母</option>
+        </select>
+      </div>
+      <!-- 分类标签栏 -->
+      <div id="kbCategoryBar" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="kb-cat-btn kb-cat-active" onclick="filterKbByCategory('all')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:var(--gold-dim);color:var(--paper);cursor:pointer;font-size:13px;">全部</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('bazi')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">八字命理</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('liuyao')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">六爻</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('fengshui')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">风水</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('ziwei')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">紫微斗数</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('qimen')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">奇门遁甲</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('meihua')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">梅花易数</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('liuren')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">大六壬</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('xingming')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">姓名学</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('tizhi')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">体质调理</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('zhouyi')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">周易</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('bagua')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">八卦</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('wuxing')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">五行</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('shishen')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">十神</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('nayin')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">纳音</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('shensha')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">神煞</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('hechong')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">合冲刑害</button>
+        <button class="kb-cat-btn" onclick="filterKbByCategory('koujue')" style="padding:6px 14px;border:1px solid var(--gold-dim);border-radius:20px;background:transparent;color:var(--text-light);cursor:pointer;font-size:13px;">口诀库</button>
+      </div>
+      <!-- 热门词条快捷入口 -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+        <span style="font-size:12px;color:var(--text-dim);margin-right:4px;">🔥 热门:</span>
+        <button onclick="quickSearchKb('天乙贵人')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">天乙贵人</button>
+        <button onclick="quickSearchKb('六冲')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">六冲</button>
+        <button onclick="quickSearchKb('飞星')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">飞星</button>
+        <button onclick="quickSearchKb('纳甲')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">纳甲</button>
+        <button onclick="quickSearchKb('四化')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">四化</button>
+        <button onclick="quickSearchKb('用神')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">用神</button>
+        <button onclick="quickSearchKb('三奇')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">三奇</button>
+        <button onclick="quickSearchKb('空亡')" style="padding:3px 10px;border:1px solid rgba(201,168,76,.2);border-radius:12px;background:transparent;color:var(--paper2);cursor:pointer;font-size:12px;">空亡</button>
+      </div>
+      <!-- 统计信息 -->
+      <div id="kbStats" style="font-size:12px;color:var(--text-dim);margin-bottom:8px;"></div>
+    </div>
+    
+    <!-- 搜索结果区域 -->
+    <div id="kbResults" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;max-height:calc(100vh - 420px);overflow-y:auto;padding:4px;">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim);">输入关键词或选择分类开始检索</div>
+    </div>
+    
+    <!-- 知识详情弹窗 -->
+    <div id="kbDetailModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:10000;justify-content:center;align-items:center;">
+      <div style="background:var(--bg-dark);border:1px solid var(--gold-dim);border-radius:8px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto;padding:24px;position:relative;">
+        <button onclick="closeKbDetail()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text-light);font-size:24px;cursor:pointer;">✕</button>
+        <div id="kbDetailContent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="../js/error-interceptor.js"></script>
+<script src="../js/submit-guard.js"></script>
+<script src="../js/escape-html.js"></script>
+</body>
+</html>

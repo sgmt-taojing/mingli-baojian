@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta charset="UTF-8">
+<meta name="description" content="易道智鉴 · 易道智鉴平台">
+<meta name="keywords" content="易道智鉴">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/merit-system.html">
+<meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<meta property="og:title" content="易道智鉴 · 功德系统">
+<meta property="og:description" content="易道智鉴 · 易道智鉴平台">
+<meta property="og:type" content="website">
+  <title>易道智鉴 · 功德系统</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/merit-system-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-user">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">易道智鉴</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>查看功德</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>了解规则</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>积攒功德</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>兑换权益</span></div></div>
+<div class="flow-hint">信众查看功德值与积分，日常学习+分享积累功德。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div style="position:fixed;top:12px;right:12px;z-index:99998">
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
+</div>
+  <h1 style="color: var(--gold); margin-top: 40px;">花 功德系统</h1>
+  <p style="color: var(--paper3);">积功累德，福报绵长</p>
+  
+  <div class="merit-circle">
+    <div class="merit-num" id="meritNum">0</div>
+    <div class="merit-label">当前功德</div>
+  </div>
+  
+  <div class="quick-actions">
+    <ml-tap class="action-btn" onclick="addMerit(1)" style="display:block"
+      <div class="action-icon">拜</ml-tap>
+      <div class="action-text">每日签到</div>
+      <div class="action-merit">+1 功德</div>
+    </div>
+    <ml-tap class="action-btn" onclick="addMerit(3)" style="display:block"
+      <div class="action-icon">经</ml-tap>
+      <div class="action-text">诵经打卡</div>
+      <div class="action-merit">+3 功德</div>
+    </div>
+    <ml-tap class="action-btn" onclick="addMerit(5)" style="display:block"
+      <div class="action-icon">🕯️</ml-tap>
+      <div class="action-text">供灯祈福</div>
+      <div class="action-merit">+5 功德</div>
+    </div>
+    <ml-tap class="action-btn" onclick="addMerit(10)" style="display:block"
+      <div class="action-icon">宝</ml-tap>
+      <div class="action-text">放生回向</div>
+      <div class="action-merit">+10 功德</div>
+    </div>
+  </div>
+  
+  <div class="info-box">
+    <div class="info-title">功德获取方式</div>
+    <div class="info-list">
+      • 每日签到可获得1功德<br>
+      • 诵经打卡可获得3功德<br>
+      • 供灯祈福可获得5功德<br>
+      • 放生回向可获得10功德<br>
+      • 推荐好友可获得20功德
+    </div>
+  </div>
+  
+  <button onclick="window.location.href='divination-hub.html'"
+          style="background: linear-gradient(135deg, var(--gold), var(--gold3));
+                 border: none; color: var(--ink); padding: 15px 40px;
+                 border-radius: 8px; cursor: pointer; font-weight: bold;
+                 margin: 20px 0;">
+    前往主平台查看完整功能
+  </button>
+  
+  <div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">主平台</a>
+  <a href="divination-almanac.html" class="file-nav-btn">历 黄历</a>
+  <a href="divination-integrated.html" class="file-nav-btn">因 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn">医 中医诊疗</a>
+  <a href="tcm-symptom.html" class="file-nav-btn">诊 症状分析</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">莲 倪师知识库</a>
+  <a href="nihaisha-tool.html" class="file-nav-btn">研 倪师工具</a>
+  <a href="nihaisha-learning.html" class="file-nav-btn">经 倪师学堂</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">标 舒晗知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn">购 商城</a>
+  <a href="divination-membership.html" class="file-nav-btn">宝 会员</a>
+  <a href="wechat-hub.html" class="file-nav-btn">机 缘主工具</a>
+  <a href="login.html" class="file-nav-btn">密 登录</a>
+</div>
+  
+  <script src="js/ui-toast.js" defer></script>
+<script src="js/toast-helper.js"></script>
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/merit-system-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

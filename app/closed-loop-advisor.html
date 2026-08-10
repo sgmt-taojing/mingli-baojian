@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="description" content="">
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/closed-loop-advisor.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全闭环顾问 · 命理宝鉴</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root {
+    --bg: #0c0e18; --panel: #141827; --panel2: #1a1f35; --gold: #c9a84c; --gold2: #e8dcc8;
+    --text: #e8dcc8; --muted: #8b93a7; --red: #d97b6c; --green: #7fb069; --blue: #6fa8dc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; min-height: 100vh; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 60px; }
+  header { text-align: center; padding: 28px 0 8px; }
+  header h1 { font-size: 26px; color: var(--gold); letter-spacing: 4px; }
+  header p { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .badge { display: inline-block; border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 2px 12px; font-size: 12px; margin-top: 10px; }
+
+  /* ── 输入区 ── */
+  .card { background: var(--panel); border: 1px solid #232945; border-radius: 14px; padding: 20px; margin-top: 18px; }
+  .card h2 { font-size: 15px; color: var(--gold); margin-bottom: 12px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 6px; }
+  textarea, input[type="text"], input[type="number"] {
+    width: 100%; background: var(--panel2); border: 1px solid #2c3350; color: var(--text);
+    border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none; resize: vertical;
+  }
+  textarea:focus, input:focus { border-color: var(--gold); }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 150px; }
+  .lng-btn { width: 100%; background: var(--panel2); border: 1px dashed var(--gold); color: var(--gold);
+    border-radius: 8px; padding: 10px 12px; font-size: 13px; cursor: pointer; text-align: left; }
+  .lng-btn:hover { background: #20273f; }
+  .btn-primary { width: 100%; margin-top: 16px; background: linear-gradient(135deg, #d4af37, #a8842c); color: #0c0e18;
+    border: none; border-radius: 10px; padding: 13px; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 2px; }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.6; }
+
+  /* ── 加载动画：7 引擎并发 ── */
+  #loading { display: none; margin-top: 18px; }
+  .engines-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 12px; }
+  .engine-cell { background: var(--panel2); border: 1px solid #232945; border-radius: 10px; padding: 12px; text-align: center; }
+  .engine-cell .spinner { width: 22px; height: 22px; margin: 0 auto 8px; border: 3px solid #2c3350; border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; }
+  .engine-cell.done .spinner { border-color: var(--green); border-top-color: var(--green); animation: none; }
+  .engine-cell.done::after { content: '✓'; color: var(--green); font-size: 14px; }
+  .engine-cell.fail .spinner { border-color: var(--red); border-top-color: var(--red); animation: none; }
+  .engine-cell .name { font-size: 13px; color: var(--text); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading .phase { text-align: center; color: var(--gold); font-size: 14px; margin-top: 14px; min-height: 20px; }
+
+  /* ── 结果区：4 类卡片 grid ── */
+  #results { display: none; }
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-top: 18px; }
+  .res-card { background: var(--panel); border: 1px solid #232945; border-radius: 14px; padding: 18px; }
+  .res-card .tag { display: inline-block; font-size: 11px; border-radius: 4px; padding: 2px 8px; margin-bottom: 8px; }
+  .tag-overview { background: rgba(201,168,76,.15); color: var(--gold); }
+  .tag-detail { background: rgba(111,168,220,.15); color: var(--blue); }
+  .tag-remedy { background: rgba(127,176,105,.15); color: var(--green); }
+  .tag-advice { background: rgba(217,123,108,.15); color: var(--red); }
+  .res-card h3 { font-size: 15px; color: var(--text); margin-bottom: 10px; }
+  .res-card .body { font-size: 13px; line-height: 1.8; color: var(--gold2); white-space: pre-wrap; word-break: break-word; }
+  .res-card .meta { font-size: 12px; color: var(--muted); margin-top: 10px; border-top: 1px solid #232945; padding-top: 8px; }
+  .engine-list { margin-top: 10px; }
+  .engine-item { font-size: 12px; color: var(--muted); padding: 6px 0; border-bottom: 1px dashed #232945; }
+  .engine-item b { color: var(--gold); }
+  .engine-item .s { display: block; color: var(--gold2); margin-top: 2px; line-height: 1.6; }
+
+  /* ── 流年交互卡 ── */
+  #flowCard { margin-top: 16px; }
+  .flow-controls { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .flow-controls button { background: var(--panel2); border: 1px solid var(--gold); color: var(--gold); border-radius: 8px; padding: 6px 14px; font-size: 14px; cursor: pointer; }
+  .flow-controls button:hover { background: #20273f; }
+  .flow-controls span { font-size: 15px; color: var(--text); min-width: 60px; text-align: center; }
+
+  .validation { margin-top: 14px; font-size: 12px; color: var(--muted); line-height: 1.8; }
+  .validation .pass { color: var(--green); }
+  .validation .fail { color: var(--red); }
+  .disclaimer { margin-top: 24px; padding: 14px; border: 1px dashed #2c3350; border-radius: 10px; font-size: 12px; color: var(--muted); line-height: 1.8; }
+
+  /* ── 经度选择弹层 ── */
+  .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65); z-index: 50; align-items: center; justify-content: center; }
+  .modal-mask.open { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--gold); border-radius: 14px; width: 92%; max-width: 460px; padding: 20px; max-height: 80vh; overflow-y: auto; }
+  .modal h3 { color: var(--gold); font-size: 16px; margin-bottom: 12px; }
+  .city-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .city-grid button { background: var(--panel2); border: 1px solid #2c3350; color: var(--text); border-radius: 8px; padding: 8px 4px; font-size: 13px; cursor: pointer; }
+  .city-grid button:hover { border-color: var(--gold); color: var(--gold); }
+  .modal .custom { display: flex; gap: 8px; }
+  .modal .close-btn { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
+  .modal-pos { position: relative; }
+  .err-box { display: none; margin-top: 12px; background: rgba(217,123,108,.12); border: 1px solid var(--red); color: var(--red); border-radius: 8px; padding: 10px; font-size: 13px; }
+</style>
+</head>
+<body>
+<header class="page-header-bar" data-theme="system">
+  <div class="phb-left">
+    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
+    <span class="phb-title">全闭环顾问</span>
+  </div>
+  <a href="index.html" class="phb-back">← 返回</a>
+</header>
+
+
+<div class="wrap">
+  <header>
+    <h1>全闭环顾问</h1>
+    <p>问事 → 8 维度分类 → 知识库检索 → 七引擎并发排盘 → 综合报告 · 四卡交付</p>
+    <span class="badge">紫微 · 八字 · 奇门 · 六壬 · 六爻 · 梅花 · 风水</span>
+  </header>
+
+  <!-- ── 输入区 ── -->
+  <div class="card">
+    <h2>✍ 所问何事</h2>
+    <textarea id="question" rows="2" placeholder="例如：我今年事业运势怎么样，想跳槽换工作"></textarea>
+    <label>生辰（支持 公历/农历、中文数字、时辰，例：1990年5月20日 14:30 男 / 农历1990年四月廿六 未时 女）</label>
+    <div class="row">
+      <div><input  type="text" id="birthInput" placeholder="生辰原文" aria-label="生辰原文"></div>
+      <div><button class="lng-btn" id="lngBtn" type="button">📍 点击选择出生地经度（真太阳时）</button></div>
+    </div>
+    <button class="btn-primary" id="consultBtn">开始顾问</button>
+    <div class="hint">测算结果由七引擎独立排盘交叉验证，仅作传统文化研究与自我认知参考。</div>
+    <div class="err-box" id="errBox"></div>
+  </div>
+
+  <!-- ── 加载动画 ── -->
+  <div id="loading" class="card">
+    <h2>⏳ 七引擎并发排盘中</h2>
+    <div class="engines-grid" id="enginesGrid"></div>
+    <div class="phase" id="phaseText">正在分类问题维度…</div>
+  </div>
+
+  <!-- ── 结果区 ── -->
+  <div id="results">
+    <div class="cards-grid" id="cardsGrid"></div>
+
+    <!-- 流年交互卡 -->
+    <div class="card" id="flowCard">
+      <h2>📅 流年交互</h2>
+      <div class="body" id="flowBody"></div>
+      <div class="flow-controls">
+        <button id="flowPrev" type="button">◀ 上一年</button>
+        <span id="flowYear">2026</span>
+        <button id="flowNext" type="button">下一年 ▶</button>
+        <button id="flowReconsult" type="button" style="margin-left:auto">重新排流年</button>
+      </div>
+    </div>
+
+    <div class="validation" id="validationBox"></div>
+    <div class="disclaimer" id="disclaimerBox"></div>
+  </div>
+</div>
+
+<!-- 经度选择弹层 -->
+<div class="modal-mask" id="lngModal">
+  <div class="modal modal-pos">
+    <button class="close-btn" id="modalClose" type="button">×</button>
+    <h3>选择出生地经度</h3>
+    <div class="city-grid" id="cityGrid"></div>
+    <div class="custom">
+      <input  type="number" id="lngCustom" placeholder="自定义经度，如 116.41" step="0.01" min="73" max="135" aria-label="自定义经度，如 116.41">
+      <button class="btn-primary" id="lngConfirm" type="button" style="margin-top:0;padding:10px 16px;width:auto;font-size:14px">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const API = 'http://127.0.0.1:8920';
+  const ENGINES = ['紫微斗数', '八字命理', '奇门遁甲', '大六壬', '六爻', '梅花易数', '风水'];
+  const CITIES = [
+    ['北京', 116.41], ['上海', 121.47], ['广州', 113.26], ['深圳', 114.06], ['成都', 104.07],
+    ['杭州', 120.15], ['武汉', 114.31], ['西安', 108.94], ['南京', 118.78], ['重庆', 106.55],
+    ['天津', 117.20], ['苏州', 120.58], ['郑州', 113.63], ['长沙', 112.94], ['沈阳', 123.43],
+    ['青岛', 120.38], ['大连', 121.61], ['厦门', 118.09], ['昆明', 102.83], ['哈尔滨', 126.63],
+    ['乌鲁木齐', 87.62], ['拉萨', 91.11], ['香港', 114.17], ['台北', 121.56]
+  ];
+  let state = { lng: null, targetYear: new Date().getFullYear(), lastPayload: null, consulting: false };
+
+  const $ = id => document.getElementById(id);
+  const engNames = ['ziwei', 'bazi', 'qimen', 'liuren', 'liuyao', 'meihua', 'fengshui'];
+
+  // ── 经度选择弹层 ──
+  const cityGrid = $('cityGrid');
+  CITIES.forEach(([name, lng]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = name;
+    b.onclick = () => { state.lng = lng; $('lngBtn').textContent = '📍 ' + name + '（' + lng + '°E）'; closeModal(); };
+    cityGrid.appendChild(b);
+  });
+  function closeModal() { $('lngModal').classList.remove('open'); }
+  $('lngBtn').onclick = () => $('lngModal').classList.add('open');
+  $('modalClose').onclick = closeModal;
+  $('lngModal').addEventListener('click', e => { if (e.target === $('lngModal')) closeModal(); });
+  $('lngConfirm').onclick = () => {
+    const v = parseFloat($('lngCustom').value);
+    if (isNaN(v) || v < 73 || v > 135) { const el=document.getElementById('lng-err')||document.createElement('div'); el.id='lng-err'; el.textContent='请输入 73~135 之间的经度'; el.style.cssText='color:#ef4444;font-size:12px;margin-top:4px'; this.parentNode.appendChild(el); return; }
+    state.lng = v; $('lngBtn').textContent = '📍 自定义经度（' + v + '°E）'; closeModal();
+  };
+
+  // ── 加载动画 ──
+  function showLoading() {
+    $('loading').style.display = 'block'; $('results').style.display = 'none'; $('errBox').style.display = 'none';
+    const grid = $('enginesGrid'); grid.innerHTML = '';
+    ENGINES.forEach((name, i) => {
+      const cell = document.createElement('div');
+      cell.className = 'engine-cell'; cell.id = 'ec-' + i;
+      cell.innerHTML = '<div class="spinner"></div><div class="name">' + name + '</div>';
+      grid.appendChild(cell);
+    });
+    setTimeout(() => markEngine(0), 60);
+  }
+  function markEngine(i) {
+    if (i >= ENGINES.length) return;
+    const cell = $('ec-' + i); if (!cell) return;
+    cell.classList.add('done');
+    if (i === 6) { $('phaseText').textContent = '七引擎全部完成，正在综合报告…'; }
+    else $('phaseText').textContent = '引擎 ' + (i + 1) + '/7 完成：' + ENGINES[i];
+    setTimeout(() => markEngine(i + 1), 70);
+  }
+  function failLoading() { document.querySelectorAll('.engine-cell').forEach(c => c.classList.add('fail')); }
+
+  // ── 渲染结果 ──
+  function renderResult(r) {
+    $('results').style.display = 'block'; $('loading').style.display = 'none';
+    const grid = $('cardsGrid'); grid.innerHTML = '';
+    const cards = r.cards;
+
+    // 总览
+    const ov = mkCard('overview', '总览 · 综合断语', cards.overview.body);
+    ov.meta.innerHTML = '引擎 ' + cards.overview.engineCount + ' · 风险点 ' + cards.overview.riskCount + ' · ' + r.classification.primary + '维度';
+    grid.appendChild(ov.el);
+
+    // 详析
+    const dt = mkCard('detail', '详析 · 分引擎细断', cards.detail.body);
+    const list = document.createElement('div'); list.className = 'engine-list';
+    cards.detail.engines.forEach(e => {
+      const item = document.createElement('div'); item.className = 'engine-item';
+      item.innerHTML = '<b>' + e.name + '</b>' + (e.ok ? '' : '（引擎暂不可用）') +
+        (e.summary ? '<span class="s">' + esc(e.summary) + '</span>' : '') +
+        (e.advice && e.advice !== e.summary ? '<span class="s">→ ' + esc(e.advice) + '</span>' : '');
+      list.appendChild(item);
+    });
+    dt.el.appendChild(list);
+    grid.appendChild(dt.el);
+
+    // 化解
+    const rm = mkCard('remedy', '化解 · 趋吉避凶', cards.remedy.body);
+    grid.appendChild(rm.el);
+
+    // 建议
+    const ad = mkCard('advice', '建议 · 行动清单', cards.advice.body);
+    grid.appendChild(ad.el);
+
+    // 流年交互卡
+    state.targetYear = 2026;
+    renderFlow(r);
+    // 红线 + 免责
+    const vb = $('validationBox'); vb.innerHTML = '';
+    r.validation.redLines.forEach(rl => {
+      const span = document.createElement('div');
+      span.className = rl.pass ? 'pass' : 'fail';
+      span.textContent = '红线 ' + rl.id + ' ' + rl.name + '：' + (rl.pass ? '✓ 通过' : '✗ ' + rl.detail);
+      vb.appendChild(span);
+    });
+    $('disclaimerBox').textContent = '免责声明：' + (r.disclaimer || '');
+  }
+
+  function renderFlow(r) {
+    const flows = (r.cards.overview.flow || []);
+    $('flowYear').textContent = state.targetYear;
+    $('flowBody').innerHTML = flows.length
+      ? flows.map(f => '【' + esc(f.title) + '】' + esc(f.body)).join('<br><br>')
+      : '（该年流年信息暂缺，可尝试切换年份重新排盘）';
+  }
+
+  function mkCard(tag, title, body) {
+    const el = document.createElement('div'); el.className = 'res-card';
+    el.innerHTML = '<span class="tag tag-' + tag + '">' + {overview:'总览', detail:'详析', remedy:'化解', advice:'建议'}[tag] + '</span><h3>' + esc(title) + '</h3><div class="body">' + esc(body) + '</div><div class="meta"></div>';
+    return { el, meta: el.querySelector('.meta') };
+  }
+  function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+
+  // ── 咨询主流程 ──
+  async function consult(targetYear) {
+    if (state.consulting) return;
+    const question = $('question').value.trim();
+    const birthInput = $('birthInput').value.trim();
+    if (!question) return showErr('请先填写「所问何事」');
+    if (!birthInput) return showErr('请填写生辰原文，例如：1990年5月20日 14:30 男');
+    state.consulting = true;
+    const btn = $('consultBtn'); btn.disabled = true; btn.textContent = '排盘中…';
+    showLoading();
+    const payload = {
+      question, birthInput,
+      lng: state.lng || undefined,
+      targetYear: targetYear || undefined
+    };
+    state.lastPayload = payload;
+    try {
+      // 拉取 CSRF token（白名单端点即便缺 token 也放行，这里双保险）
+      let token = null;
+      try { token = (await (await fetch(API + '/api/csrf-token', {signal: AbortSignal.timeout(15000)})).json()).token || null; } catch (e) { /* 白名单内可免 */ }
+      const resp = await fetch(API + '/api/advisor/consult', { signal: AbortSignal.timeout(15000),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { 'x-csrf-token': token } : {}) },
+        body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) });
+      const data = await resp.json();
+      if (!resp.ok || !data.ok) throw new Error(data.error || ('HTTP ' + resp.status));
+      renderResult(data);
+    } catch (e) {
+      failLoading();
+      showErr('咨询失败：' + esc(e.message));
+    } finally {
+      state.consulting = false;
+      btn.disabled = false; btn.textContent = '开始顾问';
+    }
+  }
+  function showErr(msg) { const el = $('errBox'); el.textContent = msg; el.style.display = 'block'; }
+
+  $('consultBtn').onclick = () => consult(undefined);
+  $('flowPrev').onclick = () => { state.targetYear--; consult(state.targetYear); };
+  $('flowNext').onclick = () => { state.targetYear++; consult(state.targetYear); };
+  $('flowReconsult').onclick = () => consult(state.targetYear);
+})();
+</script>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

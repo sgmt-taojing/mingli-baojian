@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <script src="/app/js/escape-html.js" defer></script>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="我的诊断报告 · 易道智鉴">
+<meta name="keywords" content="诊断报告,处方,易道智鉴">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/patient-report.html">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#050608">
+<title>诊断报告 · 易道智鉴</title>
+<link rel="stylesheet" href="css/divination-hub.css">
+<style>
+:root{--gold:#c9a84c;--bg:#0e1726;--card:#1a2332;--border:#2d3748;--text:#c9d1d9;--muted:#718096;--green:#48bb78;--red:#f56565;--blue:#4299e1;--purple:#9f7aea}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;padding:16px;max-width:520px;margin:0 auto;min-height:100vh}
+.report-head{background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(66,153,225,.1));border:1px solid var(--gold);border-radius:14px;padding:18px;margin-bottom:14px;text-align:center}
+.report-head .title{font-size:18px;font-weight:700;color:var(--gold)}
+.report-head .sub{font-size:11px;color:var(--muted);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
+.section{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0;font-size:13px;line-height:1.9;white-space:pre-wrap}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px}
+.meta-item .k{font-size:11px;color:var(--muted)}
+.meta-item .v{font-size:14px;font-weight:600;margin-top:2px}
+.btn{display:block;width:100%;padding:12px;background:var(--gold);color:#0e1726;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;text-align:center;text-decoration:none}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.disclaimer{font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-top:16px;line-height:1.7}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;margin-top:20px}
+.login-box input{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;margin:8px 0;text-align:center}
+@media(max-width:360px){body{padding:8px 6px}.report-head{padding:14px}.card{padding:10px 8px}.section{font-size:12px}}
+</style>
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/page-header.css">
+  <script src="/app/js/submit-guard.js" defer></script>
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">我的诊断报告</span>
+  </div>
+  <a class="phb-back" href="person-center.html">← 返回</a>
+</header>
+<main>
+
+<div id="login-view" style="display:none">
+  <div class="login-box">
+    <div style="font-size:40px;margin-bottom:8px">📋</div>
+    <div style="font-size:15px;font-weight:600;color:var(--gold)">查看诊断报告</div>
+    <div style="font-size:12px;color:var(--muted);margin:6px 0 10px">请输入您的手机号登录后查看</div>
+    <input id="login-phone" type="tel" placeholder="手机号" aria-label="手机号" inputmode="numeric">
+    <button class="btn" onclick="login()">登录并查看</button>
+  </div>
+</div>
+
+<div id="report-view" style="display:none">
+  <div class="report-head">
+    <div class="title">🏥 综合诊断报告</div>
+    <div class="sub">易道智鉴 · 中医辨证 + 周易命理双维度</div>
+  </div>
+  <div id="report-content"></div>
+  <button class="btn btn-ghost" onclick="window.print()">🖨️ 打印 / 保存 PDF</button>
+</div>
+
+<div id="empty-view" style="display:none;text-align:center;padding:60px 20px">
+  <div style="font-size:48px;margin-bottom:12px">📭</div>
+  <div style="font-size:15px;color:var(--muted)">暂无报告</div>
+  <div style="font-size:12px;color:var(--muted);margin-top:6px">医生审核完成后报告会自动出现在这里</div>
+</div>
+
+<div class="disclaimer">* 本报告仅供健康参考，不构成医疗建议<br>具体诊疗请遵医嘱 · 易道智鉴 · 仅供学习参考</div>
+</main>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var token=localStem('admin_token')||localStorage.getItem('token')||'';
+var caseId=new URLSearchParams(location.search).get('case')||'';
+
+function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
+function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}
+
+function init(){
+  if(token){
+    loadReports();
+  }else{
+    document.getElementById('login-view').style.display='block';
+  }
+}
+
+function login(){
+  var phone=document.getElementById('login-phone').value.trim();
+  if(!/^1\d{10}$/.test(phone)){showToast('请输入正确的手机号');return}
+  fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(function(r){return r.json()}).then(function(csrf){
+    return fetch(API+'/api/user/login',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.csrfToken},signal:AbortSignal.timeout(15000),body:JSON.stringify({phone:phone})});
+  }).then(function(r){return r.json()}).then(function(d){
+    if(d.token){
+      localStorage.setItem('token',d.token);
+      token=d.token;
+      document.getElementById('login-view').style.display='none';
+      loadReports();
+    }else{
+      showToast(d.error||'登录失败');
+    }
+  }).catch(function(){showToast('网络错误')});
+}
+
+function loadReports(){
+  fetch(API+'/api/clinic/my-reports', {signal: AbortSignal.timeout(15000), headers:authHeaders()})
+  .then(function(r){return r.json()}).then(function(list){
+    if(!Array.isArray(list)||!list.length){
+      document.getElementById('empty-view').style.display='block';
+      document.getElementById('report-view').style.display='none';
+      return;
+    }
+    // 优先 caseId 匹配，否则最新
+    var report=null;
+    if(caseId){
+      list.forEach(function(r){if(String(r.case_id)===String(caseId))report=r});
+    }
+    if(!report)report=list[0];
+    renderReport(report);
+  }).catch(function(){showToast('加载失败')});
+}
+
+function renderReport(r){
+  document.getElementById('report-view').style.display='block';
+  var text=r.report_text||'';
+  // 智能分段：辨证/处方/医嘱
+  var sections=[];var cur='';
+  text.split('\n').forEach(function(line){
+    if(/^【.*】/.test(line.trim())){
+      if(cur)sections.push(cur);
+      cur=line.trim()+'\n';
+    }else{
+      cur+=line+'\n';
+    }
+  });
+  if(cur)sections.push(cur);
+  
+  var html='';
+  html+='<div class="meta-grid">'+
+    '<div class="meta-item"><div class="k">报告编号</div><div class="v">#'+(r.case_id||'')+'</div></div>'+
+    '<div class="meta-item"><div class="k">生成时间</div><div class="v" style="font-size:12px">'+(r.pushed_at||r.created_at||'').slice(0,16)+'</div></div>'+
+  '</div>';
+  sections.forEach(function(s){
+    var title=s.split('\n')[0].replace(/【|】/g,'');
+    var body=s.split('\n').slice(1).join('\n').trim();
+    html+='<div class="card"><div class="card-title">'+title+'</div><div class="section">'+escapeHTML(body||s.replace(/【.*?】/,'').trim())+'</div></div>';
+  });
+  document.getElementById('report-content').innerHTML=html;
+}
+
+function escapeHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+init();
+</script>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考 · 处方需医生审核确认</footer>
+<script src="js/error-interceptor.js" defer></script>
+</body>
+</html>

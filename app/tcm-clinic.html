@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/tcm-clinic.html">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="中医诊疗，辨证论治方剂推荐">
+<meta name="keywords" content="中医诊疗,辨证,方剂,体质,中药">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="易道智鉴">
+<title>中医诊疗 · 易道智鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+
+<script src="js/ocr-client.js"></script>
+<script src="js/ui-toast.js" defer></script>
+<script src="js/secure-storage.js"></script>
+<link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/tcm-clinic-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-tcm">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">中医诊疗</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>录入信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>望诊采集</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>四诊合参</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>出具方案</span></div></div>
+<div class="flow-hint">中医师使用诊疗工作台，辨证+方剂+体质+报告。</div>
+</div>
+<a href="#main-content" class="skip-link">跳到主要内容</a>
+<main id="main-content" role="main">
+<div class="nav-bar">
+  <a href="divination-hub.html" class="file-nav-btn">主平台</a>
+  <a href="divination-almanac.html" class="file-nav-btn">历 黄历</a>
+  <a href="divination-integrated.html" class="file-nav-btn">因 体质调理</a>
+  <a href="tcm-clinic.html" class="file-nav-btn active">医 健康咨询</a>
+  <a href="tcm-symptom.html" class="file-nav-btn">诊 症状分析</a>
+  <a href="wangzhen-clinical.html" class="file-nav-btn">望诊工作台</a>
+  <a href="divination-knowledge.html" class="file-nav-btn">知识库</a>
+  <a href="nihaisha-knowledge.html" class="file-nav-btn">莲 倪师知识库</a>
+  <a href="nihaisha-tool.html" class="file-nav-btn">研 倪师工具</a>
+  <a href="nihaisha-learning.html" class="file-nav-btn">经 倪师学堂</a>
+  <a href="shuhan-knowledge.html" class="file-nav-btn">标 舒晗知识库</a>
+  <a href="divination-shop.html" class="file-nav-btn">购 商城</a>
+  <a href="ai-assistant.html" class="file-nav-btn">机 智能助手</a>
+  <a href="login.html" class="file-nav-btn">密 登录</a>
+</div>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-inner">
+    <button class="nav-brand" onclick="switchRole('patient')" style="display:block;background:none;border:none;color:var(--gold);font-family:'Ma Shan Zheng',cursive;font-size:1.5rem;cursor:pointer;letter-spacing:3px">易道智鉴</button>
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="switchRole('health',this)">示 健康咨询</button>
+      <button class="role-tab" onclick="switchRole('master',this)">卷 大师分析</button>
+      <button class="role-tab" onclick="switchRole('consultant',this)">诊 顾问方案</button>
+      <button class="role-tab" onclick="switchRole('collab',this)">协作区</button>
+    </div>
+  </div>
+</nav>
+
+<!-- FILE SUB-NAV -->
+<div class="main">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-title">中医健康咨询</div>
+    <div class="hero-sub">AI 体质辨识 · 症状自查 · 养生调理建议 · 在线咨询</div>
+    <div class="hero-divider"></div>
+  <div style="text-align:center;padding:8px 0 16px;font-size:12px;color:var(--paper3);opacity:.85;letter-spacing:1px">
+    ⚠️ 本平台提供中医养生参考，<b>不替代专业医疗诊断</b>。如有疾病请及时就医。
+  </div>
+
+  </div>
+
+  <!-- ==================== HEALTH WORKBENCH PANEL (NEW DEFAULT) ==================== -->
+<div id="panel-health" class="panel">
+  <!-- Hero -->
+  <div class="health-hero">
+    <div class="health-hero-title">示 中医健康咨询</div>
+    <div class="health-hero-sub">
+      AI 自助咨询 · 即时体质辨识 · 症状自查 · 食疗/起居/情志养生建议
+    </div>
+  </div>
+
+  <!-- 五大快捷入口 -->
+  <div class="health-quicks">
+    <div class="health-quick" onclick="healthQuick('tizhi')" style="cursor:pointer">
+      <div class="qi-icon">草</div>
+      <div class="qi-label">体质辨识</div>
+      <div class="qi-desc">9 种中医体质</div>
+    </div>
+    <div class="health-quick" onclick="healthQuick('symptom')" style="cursor:pointer">
+      <div class="qi-icon">诊</div>
+      <div class="qi-label">症状自查</div>
+      <div class="qi-desc">即时 KB 匹配</div>
+    </div>
+    <div class="health-quick" onclick="healthQuick('season')" style="cursor:pointer">
+      <div class="qi-icon">花</div>
+      <div class="qi-label">节气养生</div>
+      <div class="qi-desc">当下时令宜忌</div>
+    </div>
+    <div class="health-quick" onclick="healthQuick('food')" style="cursor:pointer">
+      <div class="qi-icon">菜</div>
+      <div class="qi-label">食疗药膳</div>
+      <div class="qi-desc">对症食材推荐</div>
+    </div>
+    <div class="health-quick" onclick="healthQuick('doctor')" style="cursor:pointer">
+      <div class="qi-icon">卷</div>
+      <div class="qi-label">名医名方</div>
+      <div class="qi-desc">历代名医验方</div>
+    </div>
+  </div>
+
+  <!-- 主输入区 -->
+  <div class="health-input-card" id="healthMainCard">
+    <div class="card-title"><span class="icon">光</span> <span id="healthCardTitle">症状自查 · 即时咨询</span></div>
+    <div class="health-input-tabs">
+      <ml-tap class="health-input-tab active" data-tab="symptom" onclick="switchHealthTab('symptom')" style="display:block">诊 症状</ml-tap>
+      <ml-tap class="health-input-tab" data-tab="tizhi" onclick="switchHealthTab('tizhi')" style="display:block">草 体质</ml-tap>
+      <ml-tap class="health-input-tab" data-tab="season" onclick="switchHealthTab('season')" style="display:block">花 节气</ml-tap>
+      <ml-tap class="health-input-tab" data-tab="food" onclick="switchHealthTab('food')" style="display:block">菜 食疗</ml-tap>
+      <ml-tap class="health-input-tab" data-tab="doctor" onclick="switchHealthTab('doctor')" style="display:block">卷 名医</ml-tap>
+    </div>
+    <div id="healthTabBody">
+      <!-- JS 动态填充 -->
+    </div>
+  </div>
+
+  <!-- 报告输出 -->
+  <div id="healthReport"></div>
+</div>
+
+<!-- ==================== PATIENT PANEL ==================== -->
+  <div id="panel-patient" class="panel">
+    <!-- Symptom Input -->
+    <div class="card" id="symptomInputCard">
+      <div class="card-title"><span class="icon">记</span> 描述您的症状</div>
+      <div class="input-channels" style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="startPatientVoice()" title="语音输入">麦 语音</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('symptomFile').click()" title="上传图片/文件/PDF">夹 文件</button>
+        <label class="btn btn-secondary btn-sm" for="symptomPhoto" title="直接调用摄像头拍照（iOS点按弹出相机）">拍 拍照</label>
+        <button class="btn btn-secondary btn-sm" onclick="switchSymptomInput('manual')" title="手动输入">键 手动</button>
+      </div>
+      <input type="file" id="symptomFile" aria-label="上传症状图片或录音" accept="image/*,audio/*,.pdf" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleSymptomFile(this)">
+      <input type="file" id="symptomPhoto" aria-label="symptomPhoto" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleSymptomPhoto(this)">
+      <div id="symptomFilePreview" style="display:none;margin-top:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:13px;color:var(--paper2)"></div>
+      <textarea class="form-textarea" id="symptomText" rows="4" placeholder="请详细描述您的症状，例如：最近睡眠不好，白天头晕，食欲下降..." style="min-height:120px" aria-label="请详细描述您的症状，例如：最近睡眠不好，白天头晕，食欲下降..."></textarea>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary btn-sm" onclick="submitSymptom()">推 提交给专家</button>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('symptomText').value='';document.getElementById('symptomFilePreview').style.display='none'">清空</button>
+      </div>
+      <div id="voiceStatus" style="display:none;margin-top:8px;padding:8px;background:rgba(201,168,76,0.06);border-radius:6px;font-size:13px;color:var(--gold)"></div>
+    </div>
+
+    <!-- Report Area -->
+    <div id="patientReportArea">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- History -->
+    <div class="card" id="patientHistoryCard" style="display:none">
+      <div class="card-title"><span class="icon">表</span> 历史报告</div>
+      <div id="patientHistoryList"></div>
+    </div>
+  </div>
+
+  <!-- ==================== MASTER PANEL ==================== -->
+  <div id="panel-master" class="panel">
+    <div id="masterListView">
+      <div class="card">
+        <div class="card-title"><span class="icon">卷</span> 待分析病例</div>
+        <div id="masterPendingList" class="case-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">成</span> 已分析病例</div>
+        <div id="masterDoneList" class="case-list"></div>
+      </div>
+    </div>
+    <div id="masterWorkspaceView" style="display:none">
+      <button class="back-btn" onclick="backToMasterList()">← 返回病例列表</button>
+      <div class="workspace">
+        <div class="workspace-left">
+          <h4>病患信息</h4>
+          <div id="masterCaseInfo"></div>
+        </div>
+        <div class="workspace-right">
+          <h4>分析工作台</h4>
+          <div class="sub-tabs">
+            <button class="sub-tab active" onclick="switchSubTab(this,'master-bazi')">八字分析</button>
+            <button class="sub-tab" onclick="switchSubTab(this,'master-hexagram')">周易起卦</button>
+            <button class="sub-tab" onclick="switchSubTab(this,'master-report')">分析报告</button>
+            <button class="sub-tab" onclick="switchSubTab(this,'master-mingxiang')">命相同参</button>
+          </div>
+          <!-- Sub: Bazi -->
+          <div id="master-bazi" class="sub-panel active">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="bazi-year">年柱</label>
+      <select id="sel211" aria-label="sel211"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="bazi-month">月柱</label>
+      <select id="sel215" aria-label="sel215"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="bazi-day">日柱</label>
+      <select id="sel219" aria-label="sel219"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="bazi-hour">时柱</label>
+      <select id="sel223" aria-label="sel223"></select>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="analyzeBazi()">分析五行</button>
+            <div id="baziResult" style="margin-top:16px"></div>
+          </div>
+          <!-- Sub: Hexagram -->
+          <div id="master-hexagram" class="sub-panel">
+            <div class="sub-tabs">
+              <button class="sub-tab active" onclick="switchHexMethod(this,'time')">时间起卦</button>
+              <button class="sub-tab" onclick="switchHexMethod(this,'number')">数字起卦</button>
+              <button class="sub-tab" onclick="switchHexMethod(this,'symptom')">症状起卦</button>
+            </div>
+            <div id="hex-time" class="sub-panel active">
+              <div class="form-group">
+                <label class="form-label" for="hex-num1">当前时间卦象</label>
+                <button class="btn btn-secondary btn-sm" onclick="castHexTime()">起卦</button>
+              </div>
+            </div>
+            <div id="hex-number" class="sub-panel">
+              <div class="form-group">
+                <label class="form-label" for="hex-num1">输入三个数字</label>
+                <div class="form-row">
+                  <input class="form-input" id="hex-num1" type="number" placeholder="第一数" min="1" max="99" aria-label="第一数">
+                  <input class="form-input" id="hex-num2" type="number" placeholder="第二数" min="1" max="99" aria-label="第二数">
+                  <input class="form-input" id="hex-num3" type="number" placeholder="第三数" min="1" max="99" aria-label="第三数">
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="castHexNumber()" style="margin-top:8px">起卦</button>
+              </div>
+            </div>
+            <div id="hex-symptom" class="sub-panel">
+              <div class="form-group">
+                <label class="form-label">基于症状起卦</label>
+                <button class="btn btn-secondary btn-sm" onclick="castHexSymptom()">起卦</button>
+              </div>
+            </div>
+            <div id="hexagramResult" style="margin-top:16px"></div>
+          </div>
+          <!-- Sub: Report -->
+          <div id="master-report" class="sub-panel">
+            <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="startMasterVoice()">麦 语音输入</button>
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('masterFile').click()">夹 上传文件</button>
+              <label class="btn btn-secondary btn-sm" for="masterPhoto" title="直接调用摄像头拍照">拍 拍照</label>
+            </div>
+            <input type="file" id="masterFile" aria-label="上传大师案例图片" accept="image/*,.pdf" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleMasterFile(this)">
+            <input type="file" id="masterPhoto" aria-label="masterPhoto" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleMasterPhoto(this)">
+            <div id="masterFilePreview" style="display:none;margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2)"></div>
+            <div class="form-group">
+              <label class="form-label" for="masterNote">分析摘要（可含周易术语）</label>
+              <textarea class="form-textarea" id="masterNote" placeholder="日主癸水，生于寅月..." aria-label="日主癸水，生于寅月..."></textarea>
+            <div id="masterVoiceStatus" style="display:none;margin-top:6px;padding:6px;background:rgba(201,168,76,0.06);border-radius:6px;font-size:12px;color:var(--gold)"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="medicalTranslation">医学化翻译建议（通俗语言，病患可见）</label>
+              <textarea class="form-textarea" id="medicalTranslation" placeholder="您的体质偏于..." aria-label="您的体质偏于..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="tizhiTrend">体质趋势判断</label>
+                <input class="form-input" id="tizhiTrend" placeholder="如：气郁质，偏肝旺" aria-label="如：气郁质，偏肝旺">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="organRiskInput">脏腑风险提示（通俗语言）</label>
+                <input class="form-input" id="organRiskInput" placeholder="如：肝胆系统需注意" aria-label="如：肝胆系统需注意">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="seasonalAdvice">季节调理方向</label>
+              <input class="form-input" id="seasonalAdvice" placeholder="如：春季养肝，疏肝理气" aria-label="如：春季养肝，疏肝理气">
+            </div>
+            <button class="btn btn-primary" onclick="submitMasterAnalysis()">提交给医生</button>
+          </div>
+          <!-- Sub: 命相同参 -->
+          <div id="master-mingxiang" class="sub-panel">
+            <div class="card-title" style="font-size:14px;color:var(--gold2);letter-spacing:2px;margin-bottom:12px">诊 命相同参（面相×八字交叉分析）</div>
+            <div style="font-size:12px;color:var(--paper3);margin-bottom:12px;line-height:1.7">路总理念：「命相同参是最准的判断。面相是「活」的反映近期状态，八字是「定」的反映先天格局，两者交叉验证准确率更高。」</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="mx-year">八字输入（请选择四柱）</label>
+                <div class="form-row">
+                  <select class="form-select" id="mx-year" aria-label="mx-year">
+                    <option value="">年柱</option>
+                  </select>
+                  <select class="form-select" id="mx-month" aria-label="mx-month">
+                    <option value="">月柱</option>
+                  </select>
+                </div>
+                <div class="form-row" style="margin-top:6px">
+                  <select class="form-select" id="mx-day" aria-label="mx-day">
+                    <option value="">日柱</option>
+                  </select>
+                  <select class="form-select" id="mx-hour" aria-label="mx-hour">
+                    <option value="">时柱</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="mx-face-symptom">面诊症状（可多选）</label>
+                <select class="form-select" id="mx-face-symptom" multiple size="6" style="min-height:120px" aria-label="mx-face-symptom">
+                  <option value="面青">面青</option>
+                  <option value="面赤">面赤</option>
+                  <option value="面黄">面黄</option>
+                  <option value="面白">面白</option>
+                  <option value="面黑">面黑</option>
+                  <option value="印堂发红">印堂发红</option>
+                  <option value="鼻头红赤">鼻头红赤</option>
+                  <option value="法令纹深">法令纹深</option>
+                  <option value="山根低陷">山根低陷</option>
+                  <option value="面部斑点">面部斑点</option>
+                  <option value="眼袋浮肿">眼袋浮肿</option>
+                  <option value="泪堂凹陷">泪堂凹陷</option>
+                  <option value="毛发稀疏">毛发稀疏</option>
+                  <option value="唇色暗紫">唇色暗紫</option>
+                  <option value="颧骨高露">颧骨高露</option>
+                  <option value="颧骨有肉">颧骨有肉</option>
+                  <option value="眉骨突出">眉骨突出</option>
+                  <option value="耳大有垂">耳大有垂</option>
+                  <option value="人中深长">人中深长</option>
+                </select>
+                <div style="font-size:11px;color:var(--paper3);margin-top:4px">按住 Ctrl/Command 多选</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="mx-focus">关注脏腑（单选）</label>
+              <select class="form-select" id="mx-focus" aria-label="mx-focus">
+                <option value="综合">综合判断</option>
+                <option value="肝胆">肝胆</option>
+                <option value="心小肠">心小肠</option>
+                <option value="脾胃">脾胃</option>
+                <option value="肺大肠">肺大肠</option>
+                <option value="肾膀胱">肾膀胱</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="analyzeMingxiang()">诊 开始交叉分析</button>
+            <div id="mingxiangResult" style="margin-top:16px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DOCTOR PANEL ==================== -->
+  <div id="panel-doctor" class="panel">
+    <div id="doctorListView">
+      <div class="card">
+        <div class="card-title"><span class="icon">诊</span> 待诊病例</div>
+        <div id="doctorPendingList" class="case-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">成</span> 已诊病例</div>
+        <div id="doctorDoneList" class="case-list"></div>
+      </div>
+    </div>
+    <div id="doctorWorkspaceView" style="display:none">
+      <button class="back-btn" onclick="backToDoctorList()">← 返回病例列表</button>
+      <div class="workspace">
+        <div class="workspace-left">
+          <h4>病患信息</h4>
+          <div id="doctorCaseInfo"></div>
+          <h4 style="margin-top:20px">大师分析报告</h4>
+          <div id="doctorMasterReport"></div>
+        </div>
+        <div class="workspace-right">
+          <h4>咨询方案表单</h4>
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="startDoctorVoice()">麦 语音输入</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('doctorFile').click()">夹 上传文件</button>
+            <label class="btn btn-secondary btn-sm" for="doctorPhoto" title="直接调用摄像头拍照">拍 拍照</label>
+          </div>
+          <input type="file" id="doctorFile" aria-label="上传医生资料图片" accept="image/*,.pdf" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleDoctorFile(this)">
+          <input type="file" id="doctorPhoto" aria-label="doctorPhoto" accept="image/*" capture="environment" style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0,0,0,0)" onchange="handleDoctorPhoto(this)">
+          <div id="doctorFilePreview" style="display:none;margin-bottom:8px;padding:8px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:8px;font-size:12px;color:var(--paper2)"></div>
+          <div class="form-group">
+            <label class="form-label" for="doc-syndrome">证候诊断</label>
+            <input class="form-input" id="doc-syndrome" list="syndromeList" placeholder="如：肝郁气滞" aria-label="如：肝郁气滞">
+            <datalist id="syndromeList">
+              <option value="肝郁气滞"><option value="肝火上炎"><option value="心脾两虚">
+              <option value="脾胃虚寒"><option value="肾阳虚"><option value="肾阴虚">
+              <option value="气血两虚"><option value="阴虚火旺"><option value="痰湿内阻">
+              <option value="气滞血瘀"><option value="风寒感冒"><option value="风热犯肺">
+              <option value="湿热下注"><option value="脾肾阳虚"><option value="肝胃不和">
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-treatment">治则治法</label>
+            <input class="form-input" id="doc-treatment" placeholder="如：疏肝理气，健脾和胃" aria-label="如：疏肝理气，健脾和胃">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-formula">推荐方剂</label>
+            <input class="form-input" id="doc-formula" placeholder="如：逍遥散加减" aria-label="如：逍遥散加减">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-acupoints">针灸穴位（逗号分隔）</label>
+            <input class="form-input" id="doc-acupoints" placeholder="如：太冲,阳陵泉,期门" aria-label="如：太冲,阳陵泉,期门">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-diet">食疗方案</label>
+            <textarea class="form-textarea" id="doc-diet" placeholder="推荐食物、禁忌食物、每日食谱建议" aria-label="推荐食物、禁忌食物、每日食谱建议"></textarea>
+          <div id="doctorVoiceStatus" style="display:none;margin-top:6px;padding:6px;background:rgba(201,168,76,0.06);border-radius:6px;font-size:12px;color:var(--gold)"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-exercise">运动方案</label>
+            <input class="form-input" id="doc-exercise" placeholder="如：户外运动、登山、慢跑" aria-label="如：户外运动、登山、慢跑">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-lifestyle">起居调摄</label>
+            <textarea class="form-textarea" id="doc-lifestyle" placeholder="作息建议、情绪管理等" aria-label="作息建议、情绪管理等"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="doc-followup-date">复诊日期</label>
+              <input class="form-input" id="doc-followup-date" type="date" aria-label="doc-followup-date">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="doc-followup-note">复诊注意事项</label>
+              <input class="form-input" id="doc-followup-note" placeholder="如：一周后复诊" aria-label="如：一周后复诊">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="doc-note">养生嘱托（给病患的留言）</label>
+            <textarea class="form-textarea" id="doc-note" placeholder="给病患的温馨提示" aria-label="给病患的温馨提示"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="pushToPatient()">推送给病患</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== COLLABORATION PANEL ==================== -->
+  <div id="panel-collab" class="panel">
+    <div class="card">
+      <div class="card-title"><span class="icon">🤝</span> 协作空间</div>
+      <div class="form-group">
+        <label class="form-label" for="collabCaseSelect">选择病例</label>
+      <select id="sel458" aria-label="sel458"></select>
+      </div>
+    </div>
+    <div id="collabContent" style="display:none">
+      <!-- Status Tracker -->
+      <div class="card">
+        <div class="card-title"><span class="icon">图</span> 病例状态</div>
+        <div id="collabStatusTracker" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
+      </div>
+      <!-- Shared View -->
+      <div class="collab-layout">
+        <div class="collab-col">
+          <h4>大师分析区</h4>
+          <div id="collabMasterArea"></div>
+        </div>
+        <div class="collab-col">
+          <h4>顾问咨询区</h4>
+          <div id="collabDoctorArea"></div>
+        </div>
+      </div>
+      <!-- Discussion -->
+      <div class="collab-middle">
+        <h4>讨论区</h4>
+        <div class="discussion-area" id="discussionArea"></div>
+        <div class="discussion-input">
+          <select id="discussRole" aria-label="discussRole">
+            <option value="master">大师</option>
+            <option value="doctor">医生</option>
+          </select>
+          <input id="discussText" placeholder="输入消息..." onkeydown="if(event.key==='Enter')sendDiscussion()" aria-label="输入消息...">
+          <button class="btn btn-primary btn-sm" onclick="sendDiscussion()">发送</button>
+        </div>
+      </div>
+      <!-- Version History -->
+      <div class="card">
+        <div class="card-title"><span class="icon">历</span> 版本历史</div>
+        <div id="versionHistory" class="version-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="../knowledge/tcm-diagnosis-kb.js"></script>
+<script src="../knowledge/tcm-doctors-kb.js"></script>
+<script src="../knowledge/tcm-formulas-kb.js"></script>
+<script src="../knowledge/tcm-classics-kb.js"></script>
+<script src="../knowledge/tcm-famous-formulas-kb.js"></script>
+<script src="../knowledge/mingxiang-cross-kb.js"></script>
+
+<script src="js/rbac-client.js"></script>
+<a href="index.html" style="position:fixed;bottom:20px;left:20px;z-index:9999;padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:20px;color:var(--paper3);text-decoration:none;font-size:12px;font-family:var(--font-serif);letter-spacing:1px;transition:all .25s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--paper3)'">首页</a>
+<a href="tcm-symptom.html" style="position:fixed;bottom:20px;left:120px;z-index:9999;padding:8px 16px;background:var(--card);border:1px solid var(--border);border-radius:20px;color:var(--paper3);text-decoration:none;font-size:12px;font-family:var(--font-serif);letter-spacing:1px;transition:all .25s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--paper3)'">典 症状自查</a>
+  <!-- 智能助手浮动按钮 -->
+<a href="ai-assistant.html" style="position:fixed;bottom:20px;right:20px;z-index:9999;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;font-size:24px;text-decoration:none;box-shadow:0 4px 16px rgba(201,168,76,0.3)">机</a>
+
+</main>
+<script src="js/tcm-clinic-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-u 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-u 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print,.sidebar,.filter-bar,.tab-btn{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table,.panel,.result-box{page-break-inside:avoid}
+  .container,main,.wrap{width:100%!important;margin:0!important;padding:0!important}
+  h1,h2,h3{page-break-after:avoid}
+  img{max-width:100%!important}
+  .print-full{display:block!important}
+}
+</style>
+<div id="flowStepsContainer"></div><div id="flowHintContainer"></div><div id="flowQuickLinks"></div>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("flowStepsContainer",["填写信息", "症状描述", "AI辨证", "查看建议"],0);
+    var h=document.getElementById("flowHintContainer");
+    if(h)h.innerHTML=FlowEngine.hint("请如实填写健康信息，AI将结合周易五行与中医理论给出参考建议。");
+    var ql=document.getElementById("flowQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([{"name": "体质辨识", "icon": "🌿", "url": "tizhi.html"}, {"name": "望诊中心", "icon": "👁", "url": "wangzhen-center.html"}, {"name": "健康预测", "icon": "📈", "url": "health-forecast.html"}]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

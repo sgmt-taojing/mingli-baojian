@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="KB 批量管理 · 易道智鉴平台">
+<meta name="keywords" content="KB 批量管理">
+<meta name="robots" content="noindex, nofollow">
+<title>KB 批量管理 · R45-A · 易道智鉴</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/admin-kb-batch.html">
+<meta name="theme-color" content="#050608">
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/admin-kb-batch-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/tokens.css">
+</head>
+<body data-need-admin="true" class="theme-ops">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">KB 批量管理</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>批量操作</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>校验数据</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>提交执行</span></div></div>
+<div class="flow-hint">管理员批量操作知识库，导入/导出/修改/删除。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<div class="container">
+<h1>工️ KB 批量管理 · R45-A</h1>
+<div class="sub">知识库批量操作 · 紫微 12 宫 · 八字十神 · 化解古籍 · R316 修真 + RBAC</div>
+
+<!-- R316: token 登录 -->
+<div class="row" style="margin:12px 0;padding:12px;background:var(--bg-2);border-radius:8px">
+  <input id="tokenInput" placeholder="Admin Token (header Authorization)" aria-label="Admin Token" style="flex:1;padding:8px;border:1px solid var(--line);border-radius:4px">
+  <button class="btn" onclick="saveToken()" aria-label="保存管理Token">存 保存</button>
+  <span id="tokenStatus" style="font-size:12px;color:var(--ink-3)"></span>
+</div>
+
+<!-- R316: KB 搜索 -->
+<div class="row" style="margin:12px 0">
+  <input id="searchInput" placeholder="🔍 检索 KB 条目 (≥2 字)" aria-label="检索 KB" style="flex:1">
+  <button class="btn" onclick="doSearch()" aria-label="检索知识库条目">查 检索</button>
+</div>
+<div id="searchResult" class="log"></div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="stats">图 总览</div>
+  <div class="tab" data-tab="batch">电 批量操作</div>
+  <div class="tab" data-tab="ingest">入 批量入库</div>
+  <div class="tab" data-tab="audit">查 审计</div>
+  <div class="tab" data-tab="export">出 导出</div>
+</div>
+
+<!-- 总览 -->
+<div id="panel-stats" class="panel active">
+  <div class="grid" id="statsGrid"></div>
+  <h3 style="color:var(--gold);margin:20px 0 12px">升 模块分布 Top 12</h3>
+  <table id="modulesTable">
+    <thead><tr><th>模块</th><th>条目</th><th>占比</th><th>来源</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- 批量操作 -->
+<div id="panel-batch" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">电 批量操作</h3>
+  <div class="row">
+    <select id="batchModule" aria-label="选择模块">
+      <option value="">-- 选择模块 --</option>
+    </select>
+    <select id="batchAction" aria-label="选择操作">
+      <option value="promote">提升信任分 +0.1</option>
+      <option value="demote">降低信任分 -0.1</option>
+      <option value="tag">加标签</option>
+      <option value="retag">改标签</option>
+    </select>
+    <input  id="batchTag" placeholder="标签 (如 八字/化解)" style="width:160px" aria-label="标签 (如 八字/化解)">
+    <button class="btn warn" onclick="batchExecute()" aria-label="批量执行SQL语句">执行</button>
+  </div>
+  <div id="batchResult" class="log"></div>
+</div>
+
+<!-- 批量入库 -->
+<div id="panel-ingest" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">入 批量入库</h3>
+  <div class="row">
+    <select id="ingestModel" aria-label="选择入库模型">
+      <option value="r45_palace">紫微 12 宫</option>
+      <option value="r45_shishen">八字十神</option>
+      <option value="r45_huajie">化解古籍</option>
+      <option value="r45_lifeplan">人生规划</option>
+      <option value="r45_tcm">中医体质</option>
+    </select>
+    <select id="ingestMode" aria-label="选择入库模式">
+      <option value="auto">自动生成</option>
+      <option value="manual">手工粘贴</option>
+    </select>
+  </div>
+  <div id="ingestArea">
+    <textarea id="ingestText" placeholder="JSON Lines (每行一条: {module, title, content, category, keywords, score})" aria-label="JSON 文本粘贴"></textarea>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" onclick="ingestExecute()" aria-label="批量入库知识条目">入 入库</button>
+    <button class="btn warn" onclick="ingestGenerate()" aria-label="生成示例知识条目">机 生成示例</button>
+  </div>
+  <div id="ingestResult" class="log"></div>
+</div>
+
+<!-- 审计 -->
+<div id="panel-audit" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">查 KB 审计</h3>
+  <div class="row">
+    <button class="btn" onclick="auditQuality()" aria-label="扫描知识库质量">质量扫描</button>
+    <button class="btn warn" onclick="auditDuplicate()" aria-label="检测重复知识条目">重复检测</button>
+    <button class="btn danger" onclick="auditLowScore()" aria-label="筛选低分知识条目">低分条目</button>
+  </div>
+  <div id="auditResult" class="log"></div>
+</div>
+
+<!-- 导出 -->
+<div id="panel-export" class="panel">
+  <h3 style="color:var(--gold);margin-bottom:12px">出 数据导出</h3>
+  <div class="row">
+    <select id="exportModule" aria-label="选择导出模块">
+      <option value="">-- 全部 --</option>
+    </select>
+    <select id="exportFormat" aria-label="选择导出格式">
+      <option value="json">JSON</option>
+      <option value="csv">CSV</option>
+      <option value="sql">SQL</option>
+    </select>
+    <button class="btn" onclick="exportData()" aria-label="导出下载知识库数据">出 下载</button>
+  </div>
+  <div id="exportResult" class="log"></div>
+</div>
+
+</div>
+
+
+  <script src="js/admin-rbac-shared.js"></script>
+<script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/admin-kb-batch-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-q 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-q 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print {
+  body { background: #fff !important; }
+  .no-print, header, nav, footer, .navbar, .sidebar, .back-btn, .phb-back, button { display: none !important; }
+  main, .main-content, .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 8px !important; }
+  a { text-decoration: none !important; color: #000 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: none !important; }
+  .card, .panel { border: 1px solid #ddd !important; page-break-inside: avoid; }
+}
+</style>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

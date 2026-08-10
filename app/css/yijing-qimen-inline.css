@@ -1,0 +1,167 @@
+:root {
+  --ink: var(--ink); --ink-deep: var(--ink2); --ink-mid: var(--ink3);
+  --paper: var(--paper); --paper-dark: var(--paper2);
+  --cinnabar: var(--cinn); --cinnabar-light: var(--cinn2);
+  --gold: var(--gold); --gold-light: var(--gold2);
+  --jade: var(--jade); ;
+  --cyan: var(--cyan); --cyan-light: var(--cyan2);
+  --violet: var(--violet2); ;
+  --cloud: rgba(240,232,216,0.04); --cloud2: rgba(240,232,216,0.02);;--cinn:#c0392b;--cinn2:#e74c3c;--cyan2:#5dade2;--gold2:#e8cc7a;--ink2:#111;--ink3:#1a1a1a;--paper2:#d4c9b0;--violet2:#9b59b6;--emerald:#27ae60;--jade-light:#2ecc71;--metal:#95a5a6;--orange:#e67e22;--steel:#7f8c8d;--success:#2ecc71;--violet-light:#bb8fce;--warn:#e67e22}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'EB Garamond','Noto Serif SC',serif;background:var(--ink);color:var(--paper);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,0.04) 0%,transparent 60%);pointer-events:none;z-index:1}
+
+/* NAV */
+.top-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:center;align-items:center;padding:18px 40px;background:linear-gradient(to bottom,rgba(10,10,10,0.95) 0%,rgba(10,10,10,0) 100%);backdrop-filter:blur(4px)}
+.nav-brand{font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold);letter-spacing:8px;text-shadow:0 0 30px rgba(201,168,76,0.3)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:120px 40px 80px;text-align:center;position:relative}
+.hero-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0.85;pointer-events:none}
+.hero-bg svg{width:600px;height:600px}
+.hero-eyebrow{font-family:'EB Garamond',serif;font-size:12px;letter-spacing:8px;text-transform:uppercase;color:var(--gold);opacity:0.85;margin-bottom:24px;animation:fadeUp 1s ease both}
+.hero-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(56px,10vw,96px);color:var(--paper);letter-spacing:16px;line-height:1.1;margin-bottom:20px;text-shadow:0 0 80px rgba(240,232,216,0.1);animation:fadeUp 1s .15s ease both}
+.hero-subtitle{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:300;color:var(--paper-dark);letter-spacing:4px;margin-bottom:60px;line-height:2;animation:fadeUp 1s .3s ease both}
+.hero-divider{width:1px;height:60px;background:linear-gradient(to bottom,var(--gold),transparent);margin:0 auto 60px;animation:fadeUp 1s .4s ease both}
+
+/* MODE CARDS */
+.mode-selection{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;animation:fadeUp 1s .5s ease both}
+.mode-card{position:relative;padding:36px 48px;border:1px solid rgba(201,168,76,0.15);background:rgba(201,168,76,0.02);cursor:pointer;transition:all .4s ease;overflow:hidden;min-width:200px}
+.mode-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .4s ease;pointer-events:none}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 12px 50px rgba(201,168,76,0.15);border-color:rgba(201,168,76,0.5)}
+.mode-card:hover::before{opacity:1}
+.mode-card .mc-symbol{font-family:'Ma Shan Zheng',serif;font-size:42px;margin-bottom:12px;display:block;transition:transform .4s ease}
+.mode-card:hover .mc-symbol{transform:scale(1.1)}
+.mode-card .mc-name{font-family:'Ma Shan Zheng',serif;font-size:26px;letter-spacing:6px;margin-bottom:8px;display:block}
+.mode-card .mc-desc{font-size:12px;letter-spacing:2px;opacity:.95;display:block;font-weight:300}
+.mode-card.yijing{border-color:rgba(201,168,76,0.15)}
+.mode-card.yijing::before{background:linear-gradient(135deg,rgba(201,168,76,0.08) 0%,transparent 60%)}
+.mode-card.yijing .mc-symbol,.mode-card.yijing .mc-name{color:var(--gold)}
+.mode-card.qimen{border-color:rgba(41,128,185,0.2)}
+.mode-card.qimen::before{background:linear-gradient(135deg,rgba(41,128,185,0.08) 0%,transparent 60%)}
+.mode-card.qimen .mc-symbol,.mode-card.qimen .mc-name{color:var(--cyan-light)}
+.mode-card.qimen:hover{border-color:rgba(41,128,185,0.5);box-shadow:0 12px 50px rgba(41,128,185,0.12)}
+
+/* READING AREA */
+.reading-area{display:none;min-height:100vh;padding:100px 40px 80px;max-width:1100px;margin:0 auto}
+.reading-area.active{display:block}
+
+/* SECTION HEADERS */
+.section-title{font-family:'Ma Shan Zheng',serif;font-size:24px;color:var(--gold);letter-spacing:6px;text-align:center;margin-bottom:40px}
+
+/* INPUT SECTION */
+.input-section{background:rgba(240,232,216,0.03);border:1px solid rgba(201,168,76,0.1);padding:50px 60px;margin-bottom:40px;text-align:center}
+.input-section h3{font-family:'Ma Shan Zheng',serif;font-size:20px;color:var(--paper-dark);letter-spacing:4px;margin-bottom:8px}
+.input-section p{font-size:12px;color:var(--paper-dark);opacity:0.85;letter-spacing:2px;margin-bottom:30px;font-weight:300}
+.input-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.input-field{background:rgba(240,232,216,0.04);border:1px solid rgba(201,168,76,0.15);color:var(--paper);font-family:'Noto Serif SC',serif;font-size:14px;padding:12px 20px;letter-spacing:2px;outline:none;transition:all .3s ease;min-width:160px;text-align:center}
+.input-field:focus{border-color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,.12)}
+.input-field::placeholder{opacity:0.85}
+select.input-field{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;color-scheme:dark}
+select.input-field option{background:var(--ink-deep);color:var(--paper)}
+
+/* COMPUTE BUTTON */
+.compute-btn{padding:16px 60px;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:'Noto Serif SC',serif;font-size:15px;letter-spacing:6px;cursor:pointer;transition:all .4s ease}
+.compute-btn:hover:not(:disabled){background:var(--gold);color:var(--ink);box-shadow:0 0 40px rgba(201,168,76,.3)}
+.compute-btn:disabled{opacity:0.85;cursor:not-allowed}
+.compute-btn.qimen-style{border-color:var(--cyan);color:var(--cyan-light)}
+.compute-btn.qimen-style:hover:not(:disabled){background:var(--cyan);color:var(--paper);box-shadow:0 0 40px rgba(41,128,185,.3)}
+
+/* RESULT */
+.result-section{display:none;animation:fadeUp .8s ease both}
+.result-section.visible{display:block}
+
+/* BANNER */
+.result-banner{text-align:center;margin-bottom:50px;padding:40px;border-bottom:1px solid rgba(201,168,76,.1)}
+.result-banner .qi-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(32px,6vw,52px);letter-spacing:8px;margin-bottom:12px}
+.result-banner .qi-subtitle{font-size:13px;letter-spacing:4px;opacity:.95;font-weight:300}
+
+/* NINE PALACE GRID */
+.nine-palace-wrapper{margin-bottom:50px}
+.nine-palace-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:600px;margin:0 auto 20px;position:relative}
+.nine-palace-grid::before{content:'';position:absolute;inset:0;border:1px solid rgba(201,168,76,.2);pointer-events:none}
+
+.palace-cell{background:rgba(240,232,216,.02);border:1px solid rgba(201,168,76,.08);padding:20px 16px;text-align:center;position:relative;transition:all .3s ease;min-height:140px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.palace-cell:hover{background:rgba(240,232,216,.06);border-color:rgba(201,168,76,.3)}
+.palace-cell.gong-center{background:rgba(192,57,43,.04);border-color:rgba(192,57,43,.2)}
+.palace-cell.gong-center:hover{background:rgba(192,57,43,.08)}
+.palace-cell .palace-num{font-family:'EB Garamond',serif;font-size:11px;letter-spacing:2px;opacity:0.85;margin-bottom:8px}
+.palace-cell .palace-star{font-family:'Ma Shan Zheng',serif;font-size:22px;margin-bottom:4px;line-height:1}
+.palace-cell .palace-door{font-family:'Ma Shan Zheng',serif;font-size:18px;margin-bottom:4px;opacity:.8}
+.palace-cell .palace-god{font-size:13px;opacity:0.85;margin-bottom:4px;letter-spacing:1px}
+.palace-cell .palace-hp{font-size:10px;opacity:0.85;letter-spacing:1px;line-height:1.5;margin-top:4px;font-weight:300}
+.palace-cell .palace-qi{font-size:10px;letter-spacing:1px;margin-top:2px;font-weight:300}
+
+/* Plate display row */
+.plate-row{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:40px}
+.plate-card{flex:1;min-width:280px;max-width:380px;padding:28px;border:1px solid rgba(201,168,76,.1);background:rgba(240,232,216,.02);text-align:center}
+.plate-card .plate-label{font-size:11px;letter-spacing:4px;text-transform:uppercase;opacity:0.85;margin-bottom:16px}
+.plate-card .plate-symbol{font-family:'Ma Shan Zheng',serif;font-size:48px;margin-bottom:8px}
+.plate-card .plate-name{font-family:'Ma Shan Zheng',serif;font-size:20px;letter-spacing:4px;margin-bottom:6px}
+.plate-card .plate-desc{font-size:12px;opacity:.95;letter-spacing:1px;line-height:1.8;font-weight:300}
+.plate-card.qimen-blue{border-color:rgba(41,128,185,.15)}
+.plate-card.qimen-blue .plate-label{color:var(--cyan-light)}
+
+/* QIMEN INTERPRETATION */
+.qimen-interp{margin-bottom:40px}
+.interp-card{background:rgba(240,232,216,.02);border:1px solid rgba(201,168,76,.08);padding:32px 36px;margin-bottom:24px;position:relative;overflow:hidden}
+.interp-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);opacity:0.85}
+.interp-card.blue-accent::before{background:var(--cyan)}
+.interp-card.red-accent::before{background:var(--cinnabar)}
+.interp-card.green-accent::before{background:var(--jade)}
+.interp-card.violet-accent::before{background:var(--violet)}
+.interp-card h5{font-family:'Noto Serif SC',serif;font-size:12px;letter-spacing:4px;color:var(--gold);opacity:0.85;margin-bottom:14px}
+.interp-card.blue-accent h5{color:var(--cyan-light)}
+.interp-card.green-accent h5{color:var(--jade-light)}
+.interp-card.red-accent h5{color:var(--cinnabar-light)}
+.interp-card.violet-accent h5{color:var(--violet-light)}
+.interp-card p{font-family:'Noto Serif SC',serif;font-size:14px;color:var(--paper-dark);line-height:2;letter-spacing:1px;font-weight:300}
+.interp-card .sub-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:20px}
+.interp-item{padding:16px 20px;background:rgba(240,232,216,.02);border:1px solid rgba(201,168,76,.06)}
+.interp-item .item-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);opacity:.95;margin-bottom:8px}
+.interp-item .item-value{font-family:'Ma Shan Zheng',serif;font-size:18px;letter-spacing:3px;color:var(--paper)}
+.interp-item .item-desc{font-size:12px;opacity:0.85;line-height:1.7;margin-top:6px;font-weight:300}
+
+/* DOOR STAR MATRIX */
+.door-star-matrix{margin:40px 0}
+.door-star-matrix h5{font-size:12px;letter-spacing:4px;color:var(--gold);opacity:0.85;margin-bottom:20px;text-align:center}
+.matrix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:600px;margin:0 auto}
+.matrix-cell{background:rgba(240,232,216,.02);border:1px solid rgba(201,168,76,.07);padding:18px 12px;text-align:center;font-size:13px;transition:all .3s ease}
+.matrix-cell:hover{background:rgba(240,232,216,.06)}
+.matrix-cell .mc-pos{font-size:10px;opacity:0.85;letter-spacing:2px;margin-bottom:8px}
+.matrix-cell .mc-star{font-family:'Ma Shan Zheng',serif;font-size:20px;display:block;margin-bottom:4px}
+.matrix-cell .mc-door{font-family:'Ma Shan Zheng',serif;font-size:16px;display:block;opacity:0.85;margin-bottom:4px}
+.matrix-cell .mc-analysis{font-size:11px;opacity:0.85;line-height:1.6;font-weight:300;margin-top:6px}
+
+/* ACTION */
+.result-actions{display:flex;justify-content:center;gap:20px;margin-top:60px;flex-wrap:wrap}
+.action-btn{padding:14px 36px;border:1px solid rgba(201,168,76,.25);background:transparent;color:var(--paper-dark);font-family:'Noto Serif SC',serif;font-size:13px;letter-spacing:4px;cursor:pointer;transition:all .3s ease}
+.action-btn:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 20px rgba(201,168,76,.1)}
+
+/* STARS COLOR */
+.star-pei{color:var(--cinn)}.star-yin{color:var(--orange)}.star-chu{color:var(--warn)}.star-fang{color:var(--success)}.star-jin{color:var(--jade)}.star-zhen{color:var(--emerald)}.star-rong{color:var(--cyan2)}.star-ying{color:var(--violet)}.star-you{color:var(--violet2)}
+.door-sheng{color:var(--jade)}.door-jin{color:var(--success)}.door-shang{color:var(--warn)}.door-jing{color:var(--orange)}.door-si{color:var(--metal)}.door-du{color:var(--steel)}.door-xin{color:var(--cinn)}.door-jing2{color:var(--cyan)}
+.god-zhi{color:var(--cyan2)}.god-nu{color:var(--violet)}.god-hu{color:var(--orange)}.god-tian{color:var(--warn)}.god-di{color:var(--success)}.god-hei{color:var(--steel)}.god-yue{color:var(--paper2)}.god-she{color:var(--cinn)}
+
+/* FOOTER NOTE */
+.footer-note{text-align:center;font-size:11px;opacity:0.85;letter-spacing:2px;padding:40px 0 20px;font-weight:300}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .mode-selection{flex-direction:column;align-items:center}
+  .nine-palace-grid{max-width:100%}
+  .palace-cell{min-height:120px;padding:14px 10px}
+  .plate-row{flex-direction:column;align-items:center}
+  .plate-card{max-width:100%;width:100%}
+  .input-section{padding:30px 20px}
+  .interp-card{padding:24px 20px}
+  .hero{padding:100px 20px 60px}
+  .reading-area{padding:80px 20px 60px}
+  .result-banner{padding:30px 0}
+}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.15);border-radius:3px}

@@ -1,0 +1,66 @@
+html{overflow-x:hidden;max-width:100vw}*{margin:0;padding:0;box-sizing:border-box}svg{max-width:100%;height:auto}
+body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);min-height:100vh;overflow-x:hidden;max-width:100vw}
+body::before{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
+
+.container{max-width:1200px;margin:0 auto;padding:84px 20px;position:relative;z-index:1}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:60px;padding-top:40px}
+.header-brand{font-family:'Ma Shan Zheng',serif;font-size:28px;color:var(--gold);letter-spacing:8px;margin-bottom:20px}
+.header-title{font-family:'Ma Shan Zheng',serif;font-size:clamp(36px,7vw,56px);letter-spacing:8px;margin-bottom:16px}
+.header-sub{font-size:14px;color:var(--paper3);letter-spacing:4px}
+
+/* NAV TABS */
+.kb-nav{position:sticky;top:0;z-index:100;background:var(--ink);border-bottom:1px solid var(--paper3);padding:8px 0;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.kb-tab{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);color:var(--paper);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:13px;transition:all .2s;font-family:'Noto Serif SC',serif}
+.kb-tab:hover{background:rgba(201,168,76,.18)}
+.kb-tab.active{background:var(--gold);color:var(--ink);font-weight:600}
+
+/* KB SECTIONS */
+.kb-section{display:none;padding:20px 0}
+.kb-section.active{display:block}
+.kb-section h2{font-family:'Ma Shan Zheng',serif;font-size:28px;color:var(--gold);margin-bottom:20px;text-align:center;letter-spacing:4px}
+.chapter{margin-bottom:40px}
+.chapter-title{font-family:'Ma Shan Zheng',serif;font-size:22px;color:var(--gold2);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.2)}
+.chapter-content p{line-height:2;color:var(--paper);margin-bottom:12px;font-size:15px}
+.kb-table{width:100%;border-collapse:collapse;margin:12px 0}
+.kb-table th,.kb-table td{padding:8px 12px;border:1px solid rgba(201,168,76,.15);text-align:center;font-size:13px}
+.kb-table th{background:rgba(201,168,76,.1);color:var(--gold2)}
+.quote{background:rgba(201,168,76,.04);border-left:3px solid var(--gold);padding:16px 20px;margin:16px 0;border-radius:0 8px 8px 0}
+.quote-text{font-size:15px;color:var(--paper2);font-style:italic;line-height:1.8}
+.quote-author{font-size:13px;color:var(--paper3);margin-top:8px;text-align:right}
+
+.kd-section{margin-bottom:24px}
+.kd-section h4{font-family:'Ma Shan Zheng',serif;font-size:18px;color:var(--gold2);margin:16px 0 8px}
+.kd-section p{line-height:1.9;color:var(--paper2);font-size:14px;margin-bottom:8px}
+.file-nav-bar{background:rgba(8,8,8,0.97);border-bottom:1px solid rgba(201,168,76,0.15);padding:10px 0;display:flex;justify-content:center;gap:6px;flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.file-nav-btn{color:var(--paper3);text-decoration:none;font-size:12px;padding:5px 14px;border:1px solid rgba(201,168,76,0.12);border-radius:16px;transition:all .25s;font-family:'Noto Serif SC',serif;letter-spacing:1px;white-space:nowrap}
+.file-nav-btn:hover{background:rgba(201,168,76,0.1);color:var(--gold);border-color:rgba(201,168,76,0.3)}
+.file-nav-btn.active{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.35)}
+@media(max-width:768px){
+  .container{padding:70px 12px}
+  .header-title{font-size:32px;letter-spacing:4px}
+  .kb-nav{padding:6px 0;gap:4px}
+  .kb-tab{padding:4px 10px;font-size:12px}
+  .kb-table th,.kb-table td{padding:4px 6px;font-size:11px}
+  .chapter-title{font-size:18px}
+  .kb-card{padding:12px}
+  .file-nav-bar{padding:6px 0;gap:4px}
+  .file-nav-btn{font-size:11px;padding:4px 10px}
+}
+@media(max-width:480px){
+  .container{padding:60px 8px}
+  .header-title{font-size:26px;letter-spacing:2px}
+  .header-brand{font-size:22px;letter-spacing:4px}
+  .kb-tab{padding:3px 8px;font-size:11px}
+}
+
+/* A11Y: 提升 music-tag / warn-box 文本对比度（WCAG 1.4.3） */
+.music-tag{display:inline-block;padding:3px 10px;border-radius:10px;font-size:12px;letter-spacing:1px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.12);color:var(--gold);font-weight:500}
+.warn-box{background:rgba(192,57,43,.18);border-left:3px solid #e74c3c;padding:16px 20px;margin:16px 0;border-radius:0 8px 8px 0;color:#ff8a80;font-size:14px;line-height:1.8}
+.warn-box h5{color:#ff8a80;font-size:15px;margin-bottom:8px;font-weight:600}
+
+
+@media(max-width:768px){svg text{font-size:8px!important} svg{max-width:100%;height:auto;overflow:hidden}}
+/* ===== P3-17.4 320px 响应式溢出修复·SVG ===== */
+@media(max-width:480px){svg{max-width:100%;height:auto;display:block} #tudisSvg{max-width:100%;height:auto;width:100%}}

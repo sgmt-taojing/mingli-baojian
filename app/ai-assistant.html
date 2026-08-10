@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/ai-assistant.html">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="AI命理助手，24模块智能问答">
+<meta name="keywords" content="命理咨询,知识助手,八字,中医,风水,知识问答">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#050608">
+<title>AI命理助手 · 易道智鉴</title>
+
+<link rel="stylesheet" href="css/a11y-fix.css">
+
+<link rel="stylesheet" href="css/ai-assistant-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/todo-bus.css">
+<link rel="stylesheet" href="css/report-scroll.css">
+<link rel="stylesheet" href="css/report-template.css">
+<link rel="stylesheet" href="css/meditation.css">
+<!-- R89-P2 沉浸模式样式 -->
+<link rel="stylesheet" href="css/immersive-mode.css">
+<link rel="stylesheet" href="css/paipan-ritual.css">
+<link rel="stylesheet" href="css/divination-hub.css">
+<link rel="stylesheet" href="css/divination-hub-inline.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+<link rel="stylesheet" href="css/hci-enhance.css">
+</head>
+<body class="theme-ai">
+<!-- R504: 新诊疗中心入口 -->
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a><a href="master-workstation.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🧭 命理大师工作台</a></div>
+
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">AI命理助手</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模块</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>输入问题</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>自动分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看结果</span></div></div>
+<div class="flow-hint">选择模块输入问题进行智能问答。</div>
+</div>
+<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+
+<a href="#main-content" class="skip-link">跳到主要内容</a>
+<span id="netBadge" style="display:none;position:fixed;top:8px;right:8px;padding:4px 10px;background:#ef4444;color:#fff;border-radius:10px;font-size:11px;font-weight:600;z-index:9999;font-family:monospace"></span>
+<main id="main-content" role="main"><h1 class="sr-only">AI 命理助手 · 24 模块智能问答</h1>
+<nav class="nav">
+<a href="divination-hub.html">主平台</a>
+<a href="divination-almanac.html">历 黄历</a>
+<a href="tcm-clinic.html">医 诊疗</a>
+<a href="tcm-symptom.html">诊 症状</a>
+<a href="wangzhen-clinical.html">查 望诊</a>
+<a href="divination-knowledge.html">知识库</a><a href="kb-explorer.html"  target="_blank" rel="noopener noreferrer">查 KB浏览器</a>
+<a href="nihaisha-knowledge.html">莲 倪师</a>
+<a href="shuhan-knowledge.html">标 舒晗</a>
+<a href="divination-shop.html">购 商城</a>
+<a href="ai-assistant.html" class="active">机 智能助手</a>
+<ml-tap role="button" tabindex="0" onclick="openKBPanel()">典 KB</ml-tap>
+<ml-tap role="button" tabindex="0" onclick="openHistoryPanel()">卷 历史</ml-tap>
+<ml-tap role="button" tabindex="0" onclick="openFeedback()">反馈</ml-tap>
+<a href="feedback-center.html" style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:10px;color:#c9a84c;font-size:11px;padding:4px 8px;text-decoration:none">语 意见反馈</a>
+<a href="im.html" style="background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.3);color:#22d3ee">语 站内消息</a>
+<a href="privacy-center.html" style="background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.3);color:#a78bfa">锁 隐私</a>
+<a href="login.html">密 登录</a>
+<ml-tap role="button" tabindex="0" onclick="openProfilePanel()" title="缘主档案（最近查询）" style="margin-left:auto;padding:4px 10px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);border-radius:10px;color:#c9a84c;font-size:11px;cursor:pointer">人 档案</ml-tap>
+<ml-tap id="profileChip" role="status" aria-live="polite" onclick="showProfileHistory()" title="点击查看该缘主的历史报告" style="display:none;padding:3px 9px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:10px;color:#c9a84c;font-size:10px;cursor:pointer;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></ml-tap>
+</nav>
+<!-- R25-P0-1：KB 命中率 stats bar（始终可见顶部） -->
+<div id="kbStatsBar" class="kb-stats-bar" role="status" aria-live="polite" aria-label="今日 KB 命中率统计"></div>
+<div id="rbacBadge" style="display:none;padding:3px 10px;font-size:10px;border-radius:10px;align-self:center;margin-left:6px"></div>
+<div class="app">
+<div id="quickActions" style="display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;background:rgba(255,255,255,0.04);border-top:1px solid rgba(201,168,76,0.15)" role="toolbar" aria-label="快捷提问">
+  <button class="qa-btn" onclick="toggleImmersive()" aria-label="切换沉浸模式" title="开启全屏沉浸模式" style="padding:6px 12px;background:rgba(167,139,250,0.15);border:1px solid rgba(167,139,250,0.4);border-radius:14px;color:#a78bfa;font-size:12px;cursor:pointer">夜 沉浸</button>
+  <span style="font-size:11px;color:#c9a84c;align-self:center;font-weight:600">快捷：</span>
+  <button class="qa-btn" onclick="quickAsk('帮我排一个八字')" aria-label="排盘八字" style="padding:6px 12px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:14px;color:#c9a84c;font-size:12px;cursor:pointer">珠 排八字</button>
+  <button class="qa-btn" onclick="quickAsk('今日运势怎么样')" aria-label="今日运势" style="padding:6px 12px;background:rgba(76,175,80,0.15);border:1px solid rgba(76,175,80,0.4);border-radius:14px;color:#81c784;font-size:12px;cursor:pointer">星 今日运势</button>
+  <button class="qa-btn" onclick="quickAsk('查一下今日黄历')" aria-label="今日黄历" style="padding:6px 12px;background:rgba(33,150,243,0.15);border:1px solid rgba(33,150,243,0.4);border-radius:14px;color:#64b5f6;font-size:12px;cursor:pointer">历 今日黄历</button>
+  <button class="qa-btn" onclick="quickAsk('五行音乐推荐')" aria-label="五行音乐" style="padding:6px 12px;background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.4);border-radius:14px;color:#ba68c8;font-size:12px;cursor:pointer">音 五行音乐</button>
+  <button class="qa-btn" onclick="quickAsk('人生规划建议')" aria-label="人生规划" style="padding:6px 12px;background:rgba(255,152,0,0.15);border:1px solid rgba(255,152,0,0.4);border-radius:14px;color:#ffb74d;font-size:12px;cursor:pointer">向 人生规划</button>
+  <button class="qa-btn" onclick="window.open('monthly-report.html','_blank')" aria-label="逐月运势" style="padding:6px 12px;background:rgba(8,145,178,0.15);border:1px solid rgba(8,145,178,0.4);border-radius:14px;color:#22d3ee;font-size:12px;cursor:pointer">历 逐月运势</button>
+</div>
+<div class="chat" id="chat"></div>
+
+<!-- R477-C 主动澄清卡片容器 -->
+<div id="clarify-card" style="display:none;margin:0 14px 12px;padding:14px;background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(167,139,250,.08));border:1px solid rgba(201,168,76,.3);border-radius:14px;font-family:inherit">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <span style="font-size:18px">💬</span>
+    <span style="color:#c9a84c;font-weight:600;font-size:14px">需要更多信息才能为您服务</span>
+    <button onclick="_dismissClarifyCard()" aria-label="跳过澄清" style="margin-left:auto;background:transparent;border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:2px 8px;color:#c9a84c;cursor:pointer;font-size:11px">跳过</button>
+  </div>
+  <div id="clarify-intro" style="font-size:12px;color:var(--paper2,#ccc);margin-bottom:12px;opacity:.85">自动识别到您的问题还需要补充一些信息才能给出准确回答：</div>
+  <div id="clarify-questions"></div>
+  <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+    <input type="text" id="clarify-free-input" placeholder="或直接输入补充信息..." aria-label="补充信息" style="flex:1;padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);border-radius:8px;color:#fff;font-size:13px;font-family:inherit" onkeypress="if(event.key==='Enter')_submitClarifyFreeInput()">
+    <button onclick="_submitClarifyFreeInput()" aria-label="发送补充信息" style="padding:8px 14px;background:linear-gradient(135deg,#c9a84c,#a78bfa);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-size:13px">发送</button>
+  </div>
+</div>
+
+<!-- KB 抽屉 -->
+<div id="kbPanel" style="display:none;position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:var(--ink,#1a1a1a);border-left:1px solid rgba(201,168,76,0.3);z-index:9999;overflow-y:auto;padding:16px;box-shadow:-4px 0 24px rgba(0,0,0,0.4)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h3 style="color:var(--gold,#c9a84c);margin:0;font-size:16px">知识库</h3>
+    <button onclick="closeKBPanel()" aria-label="关闭知识库面板" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">关</button>
+  </div>
+  <div id="kbList" style="margin-bottom:12px;font-size:13px;color:var(--paper2,#ccc)"></div>
+  <div id="kbContent" style="background:rgba(201,168,76,0.05);border-radius:8px;padding:12px;font-size:13px;line-height:1.6;color:var(--paper,#eee);max-height:60vh;overflow-y:auto"></div>
+</div>
+
+<!-- 历史抽屉 -->
+<div id="historyPanel" style="display:none;position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:var(--ink,#1a1a1a);border-left:1px solid rgba(201,168,76,0.3);z-index:9999;overflow-y:auto;padding:16px;box-shadow:-4px 0 24px rgba(0,0,0,0.4)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h3 style="color:var(--gold,#c9a84c);margin:0;font-size:16px">卷 排盘历史</h3>
+    <button onclick="closeHistoryPanel()" aria-label="关闭历史记录面板" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">关</button>
+  </div>
+  <div id="historyList" style="font-size:13px;color:var(--paper2,#ccc)"></div>
+</div>
+
+<!-- 反馈抽屉 -->
+<div id="feedbackPanel" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:380px;max-width:90vw;background:var(--ink,#1a1a1a);border:1px solid rgba(201,168,76,0.3);border-radius:12px;z-index:9999;padding:20px;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <h3 style="color:var(--gold,#c9a84c);margin:0;font-size:16px">反馈与建议</h3>
+    <button onclick="closeFeedback()" aria-label="关闭反馈面板" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer">关</button>
+  </div>
+  <textarea id="feedbackText" placeholder="说说你对智能助手的建议或遇到的问题..." style="width:100%;min-height:100px;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(201,168,76,0.2);border-radius:6px;color:#fff;font-size:13px;resize:vertical" aria-label="智能助手反馈"></textarea>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button onclick="submitFeedback(\'praise\')" aria-label="点赞反馈" style="flex:1;padding:10px;background:rgba(76,175,80,0.2);border:1px solid rgba(76,175,80,0.4);border-radius:6px;color:#fff;cursor:pointer">赞 点赞</button>
+    <button onclick="submitFeedback(\'suggest\')" aria-label="建议反馈" style="flex:1;padding:10px;background:rgba(201,168,76,0.2);border:1px solid rgba(201,168,76,0.4);border-radius:6px;color:#fff;cursor:pointer">示 建议</button>
+    <button onclick="submitFeedback(\'bug\')" aria-label="问题反馈" style="flex:1;padding:10px;background:rgba(244,67,54,0.2);border:1px solid rgba(244,67,54,0.4);border-radius:6px;color:#fff;cursor:pointer">虫 问题</button>
+  </div>
+</div>
+
+<div class="input">
+<button class="mic" id="mic" onclick="voice()" aria-label="语音输入">麦</button>
+<button class="tts-btn" id="tts-btn" onclick="toggleTTS()" aria-label="朗读或停止朗读" title="朗读/停止">🔊</button>
+<input  type="text" id="box" placeholder="输入问题..." onkeypress="if(event.key==='Enter')send()" aria-label="输入问题...">
+<button class="send" onclick="send()" aria-label="发送消息">➤</button>
+</div>
+</div>
+<!-- KB 优先：倪师 + 舒晗 KB（命中分 ≥ 0.7 直答） -->
+<script src="../knowledge/nihaisha-kb.js" defer></script>
+<script src="../knowledge/nihaisha-structured-kb.js" defer></script>
+<script src="../knowledge/shuhan-kb-combined.js" defer></script>
+<script src="../knowledge/mingxiang-cross-kb.js" defer></script>
+<!-- 公共 toast + esc -->
+<script src="js/ocr-client.js"></script>
+<script src="js/ui-toast.js" defer></script>
+<script src="js/kb-recommend-panel.js" defer></script>
+<script src="components/tap.js" defer></script>
+<!-- R41-DR1：五行×12 维度权重偏差共享（lifeindex/music/lifeplan 三模块同源） -->
+<script src="js/wx-dim-bias.js" defer></script>
+<script src="js/compliance.js" defer></script>
+<script src="js/paipan-input.js" defer></script>
+<!-- R89-P2 排盘仪式感 -->
+<script src="js/paipan-ritual-inline.js" defer></script>
+<!-- 语音交互 -->
+<script src="js/voice-interaction.js" defer></script>
+<!-- W2: ASR 语音输入 + 麦克风按钮 + 实时识别 -->
+<script src="js/ai-voice-input.js" defer></script>
+<!-- R89-K 缘主档案同步 -->
+<script src="js/yuanzhu-profile-sync.js" defer></script>
+<script src="js/meditation-inline.js" defer></script>
+<!-- R89-M 缘主档案召回 -->
+<script src="js/yuanzhu-recall.js" defer></script>
+<!-- R89-L Service Worker 注册 + 离线徽章 -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('service-worker.js').catch(function(e){console.warn('[SW] reg fail', e);});
+  });
+  // 离线/上线状态徽章
+  function _r89LBadge(){
+    var b = document.getElementById('netBadge');
+    if(!b) return;
+    if(!navigator.onLine){
+      b.textContent='⚠️ 离线';
+      b.style.background='#ef4444';
+      b.style.display='inline-block';
+    } else {
+      b.textContent='🟢 在线';
+      b.style.background='#10b981';
+      setTimeout(function(){ if(navigator.onLine) b.style.display='none'; }, 2000);
+    }
+  }
+  window.addEventListener('online', _r89LBadge);
+  window.addEventListener('offline', _r89LBadge);
+  document.addEventListener('DOMContentLoaded', _r89LBadge);
+}
+</script>
+<script src="js/user-profile.js" defer></script>
+<!-- 自然查询路由（识别 "LIU套5815" 等模糊输入） -->
+<script src="js/parse-natural.js" defer></script>
+<!-- R25-P0-1：KB 命中率计数器（localStorage 打点 + stats bar 渲染） -->
+<script src="js/kb-hit-counter.js" defer></script>
+<script src="js/offline-banner.js" defer></script>
+<script src="js/ai-fab.js" defer></script>
+<!-- kb-suggest.js 修真为注释（不存在）-->
+
+<script src="js/module-reports-kb.js" defer></script>
+<script src="js/module-reports-kb-extended.js" defer></script>
+
+<script src="knowledge-models/classics-model.js"></script>
+<script src="knowledge-models/faith-model.js"></script>
+<script src="knowledge-models/fengshui-model.js"></script>
+<script src="knowledge-models/huajie-model.js"></script>
+<script src="knowledge-models/huangli-model.js"></script>
+<script src="knowledge-models/liuren-model.js"></script>
+<script src="knowledge-models/liuyao-model.js"></script>
+<script src="knowledge-models/mantra-model.js"></script>
+<script src="knowledge-models/meihua-model.js"></script>
+<script src="knowledge-models/mobile-model.js"></script>
+<script src="knowledge-models/nihaisha-model.js"></script>
+<script src="knowledge-models/qimen-model.js"></script>
+<script src="knowledge-models/shuhan-model.js"></script>
+<script src="knowledge-models/taisui-model.js"></script>
+<script src="knowledge-models/wuxing-model.js"></script>
+<script src="knowledge-models/xingming-model.js"></script>
+<script src="knowledge-models/yanzhi-model.js"></script>
+<script src="knowledge-models/yijing-model.js"></script>
+<script src="knowledge-models/zeri-model.js"></script>
+<script src="js/smart-search-bootstrap.js" defer></script>
+<script src="knowledge-models/ziwei-model.js"></script>
+<script src="knowledge-models/zodiac-model.js"></script>
+
+<!-- R39-C 双核 KB 集成 -->
+<script src="../knowledge/r39-dual-core-kb.js" defer></script>
+
+<!-- R41-E KB 命中 UI 升级 -->
+
+
+
+</main>
+
+<!-- R89-P2 全屏沉浸模式：背景画卷 + 毛笔字渐显 -->
+<div id="immersiveOverlay" class="immersive-overlay" aria-hidden="true">
+  <div class="immersive-scroll-bg">
+    <div class="scroll-layer scroll-mountains"></div>
+    <div class="scroll-layer scroll-clouds"></div>
+    <div class="scroll-layer scroll-stars"></div>
+  </div>
+  <div class="immersive-content">
+    <div class="brush-title" id="brushTitle">易道智鉴</div>
+    <div class="brush-subtitle" id="brushSubtitle">天人合一 · 万象归道</div>
+    <div class="immersive-hint">点击任意位置退出沉浸模式</div>
+  </div>
+  <button class="immersive-exit" onclick="toggleImmersive()" aria-label="退出沉浸模式">关 退出</button>
+</div>
+
+<script src="js/jieqi-table.js" defer></script>
+<script src="js/jieqi-hours.js" defer></script>
+<script src="js/jieqi-engine.js" defer></script>
+<script src="js/report-engine.js" defer></script>
+<script src="js/immersive-mode-inline.js" defer></script>
+<script src="js/consent-banner.js" defer></script>
+<script src="js/todo-bus.js" defer></script>
+<script src="js/paipan-engine.js" defer></script>
+<script src="js/luzong-quotes.js" defer></script>
+<script src="js/adaptive-renderer.js" defer></script>
+<script src="js/multimodal-bridge.js" defer></script>
+<script src="js/super-agent-ui.js" defer></script>
+<script src="js/ai-stream-client.js" defer></script>
+<script src="js/ai-stream-bridge.js" defer></script>
+<script src="js/voice-engine.js" defer></script>
+<script src="js/voice-engine-bootstrap.js" defer></script>
+<script src="js/smart-search-v2.js" defer></script>
+<script src="js/ai-assistant-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+<!-- R86 TODO 任务总线 -->
+<button class="todo-fab" id="todoFabBtn" onclick="openTodoDrawer()" aria-label="行动清单">表<span class="badge" id="todoBadge" hidden>0</span></button>
+<div class="todo-drawer" id="todoDrawer">
+  <div class="td-head"><p class="td-title">记 我的行动清单</p><button class="td-close" onclick="closeTodoDrawer()" aria-label="关闭行动清单">关</button></div>
+  <div id="todoContainer"><span style="color:var(--paper3);font-size:12px">报告生成后自动提取...</span></div>
+</div>
+<script>
+(function(){
+  if (typeof TodoBus === 'undefined') return;
+  var fab = document.getElementById('todoFabBtn');
+  var drawer = document.getElementById('todoDrawer');
+  var container = document.getElementById('todoContainer');
+
+  function refreshBadge(){
+    var s = TodoBus.stats();
+    var b = document.getElementById('todoBadge');
+    if (s.pending > 0){ b.textContent = s.pending; b.hidden = false; }
+    else { b.hidden = true; }
+  }
+
+  function openTodoDrawer(){
+    if (!drawer) return;
+    drawer.classList.add('open');
+    TodoBus.render(container, { showClear: true });
+    refreshBadge();
+  }
+  function closeTodoDrawer(){
+    if (!drawer) return;
+    drawer.classList.remove('open');
+  }
+  // expose
+  window.openTodoDrawer = openTodoDrawer;
+  window.closeTodoDrawer = closeTodoDrawer;
+
+  // FAB pulse after every AI report (hook showReport end)
+  var _origRender = null;
+  document.addEventListener('todo:added', refreshBadge);
+  document.addEventListener('todo:done', refreshBadge);
+  document.addEventListener('todo:removed', refreshBadge);
+  document.addEventListener('todo:clear', refreshBadge);
+
+  // If drawer open, refresh on events
+  document.addEventListener('todo:added', function(){
+    if (drawer && drawer.classList.contains('open')) TodoBus.render(container, { showClear: true });
+  });
+  document.addEventListener('todo:done', function(){
+    if (drawer && drawer.classList.contains('open')) TodoBus.render(container, { showClear: true });
+  });
+
+  // Initial badge
+  refreshBadge();
+
+  // Close drawer on outside click
+  document.addEventListener('click', function(e){
+    if (!drawer) return;
+    if (drawer.classList.contains('open') && !drawer.contains(e.target) && e.target !== fab){
+      closeTodoDrawer();
+    }
+  });
+})();
+</script>
+
+<style>
+/* R98-v 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-v 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+
+@media print{
+  .mobile-nav,.nav-bar,.btn,button,.no-print,.sidebar,.filter-bar,.tab-btn{display:none!important}
+  body{background:white!important;color:black!important;font-size:12pt}
+  a[href]:after{content:" ("attr(href)")"}
+  .card,.report-section,table,.panel,.result-box{page-break-inside:avoid}
+  .container,main,.wrap{width:100%!important;margin:0!important;padding:0!important}
+  h1,h2,h3{page-break-after:avoid}
+  img{max-width:100%!important}
+  .print-full{display:block!important}
+}
+</style>
+
+<script>
+function toggleImmersive(){
+  document.body.classList.toggle('immersive-mode');
+  var btn = event.target;
+  if(btn) btn.textContent = document.body.classList.contains('immersive-mode') ? '✕ 退出' : '🌙 沉浸';
+}
+</script>
+
+<script src="js/multimodal-fusion.js" defer></script>
+<script src="js/rbac-client.js" defer></script>
+
+<!-- R308 三态UI -->
+<div class="state-loading" id="loading-template" hidden>正在加载…</div>
+<div class="state-empty" id="empty-template" hidden>暂无数据</div>
+<div class="state-error" id="error-template" hidden>查阅失败，请稍后重试<button class="retry-btn" onclick="location.reload()" aria-label="重试加载">重试</button></div>
+
+<div id="flowStepsContainer"></div><div id="flowHintContainer"></div><div id="flowQuickLinks"></div>
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+  if(typeof FlowEngine!=="undefined"){
+    FlowEngine.steps("flowStepsContainer",["选择模块", "输入问题", "自动分析", "查看结果"],0);
+    var h=document.getElementById("flowHintContainer");
+    if(h)h.innerHTML=FlowEngine.hint("选择需要咨询的模块，输入您的出生信息或问题，AI将给出参考建议。");
+    var ql=document.getElementById("flowQuickLinks");
+    if(ql)ql.innerHTML=FlowEngine.quicklinks([{"name": "八字排盘", "icon": "🌟", "url": "bazi.html"}, {"name": "望诊中心", "icon": "👁", "url": "wangzhen-center.html"}, {"name": "知识库", "icon": "📚", "url": "kb-explorer.html"}]);
+  }
+});
+</script>
+<script src="js/flow-engine.js"></script>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+
+  <!-- R505b AI 语音助手 -->
+  <div id="ai-assistant-mount"></div>
+  <script src="js/ai-voice-assistant.js" defer></script>
+  <!-- 超级物种级 HCI 前端引擎 -->
+  <script src="js/super-hci-frontend.js" defer></script>
+  <script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+
+  <!-- R515 · 人机交互增强 -->
+  <div id="hci-thinking-panel" class="hci-thinking-panel" hidden>
+    <div class="hci-thinking-header">
+      <span class="hci-icon">🧠</span>
+      <span class="hci-label">智能体推理过程</span>
+      <button class="hci-close" onclick="hciToggleThinking(false)" aria-label="关闭思维链面板">关</button>
+    </div>
+    <div id="hci-thinking-steps" class="hci-thinking-steps"></div>
+  </div>
+
+  <div id="hci-confidence-badge" class="hci-confidence-badge" hidden>
+    <span class="hci-conf-dot"></span>
+    <span class="hci-conf-text"></span>
+  </div>
+
+  <div id="hci-followup-container" class="hci-followup-container"></div>
+
+  <div id="hci-thinking-indicator" class="hci-thinking-indicator" hidden>
+    <div class="hci-pulse"></div>
+    <div class="hci-pulse"></div>
+    <div class="hci-pulse"></div>
+    <span class="hci-indicator-text">正在思考</span>
+  </div>
+
+  <div id="hci-quick-panel" class="hci-quick-panel" hidden>
+    <div class="hci-quick-header">
+      <span>⚡ 快捷指令 · Ctrl+K</span>
+      <button class="hci-close" onclick="hciToggleQuick(false)" aria-label="关闭快捷面板">关</button>
+    </div>
+    <div class="hci-quick-grid">
+      <button class="hci-quick-btn" onclick="hciQuick('八字排盘')" data-expert="bazi"><span class="hci-quick-icon">乾</span><span class="hci-quick-label">排八字</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('紫微排盘')" data-expert="ziwei"><span class="hci-quick-icon">紫</span><span class="hci-quick-label">紫微斗数</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('奇门起局')" data-expert="qimen"><span class="hci-quick-icon">奇</span><span class="hci-quick-label">奇门遁甲</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('六爻起卦')" data-expert="liuyao"><span class="hci-quick-icon">爻</span><span class="hci-quick-label">六爻起卦</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('中医辨证')" data-expert="tcm"><span class="hci-quick-icon">医</span><span class="hci-quick-label">中医问诊</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('风水分析')" data-expert="fengshui"><span class="hci-quick-icon">宅</span><span class="hci-quick-label">风水堪舆</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('今日运势')" data-expert="bazi"><span class="hci-quick-icon">星</span><span class="hci-quick-label">今日运势</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('今日黄历')" data-expert="bazi"><span class="hci-quick-icon">历</span><span class="hci-quick-label">今日黄历</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('五行音乐')" data-expert="tcm"><span class="hci-quick-icon">音</span><span class="hci-quick-label">五行音乐</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('人生规划')" data-expert="bazi"><span class="hci-quick-icon">向</span><span class="hci-quick-label">人生规划</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('化解指导')" data-expert="huajie"><span class="hci-quick-icon">化</span><span class="hci-quick-label">化解指导</span></button>
+      <button class="hci-quick-btn" onclick="hciQuick('合婚配对')" data-expert="bazi"><span class="hci-quick-icon">缘</span><span class="hci-quick-label">合婚配对</span></button>
+    </div>
+  </div>
+
+  <button id="hci-quick-trigger" class="hci-quick-trigger" onclick="hciToggleQuick(true)" aria-label="打开快捷指令面板" style="display:none">
+    <span>⚡</span>
+  </button>
+
+  <script src="js/hci-enhance.js" defer></script>
+</body>
+</html>

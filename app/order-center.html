@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="robots" content="index, follow">
+<title>订单中心 · 易道智鉴</title>
+  <meta name="description" content="查看和管理您的命理宝鉴订单">
+  <link rel="canonical" href="https://mingli-baojian.app/order-center.html">
+  <style>
+    :root {
+      --bg: #080808;
+      --paper: #f0e8d8;
+      --gold: #c9a84c;
+      --gold2: #e8cc7a;
+      --jade: #27ae60;
+      --cinn: #c0392b;
+      --cyan: #2980b9;
+      --ink2: #111;
+      --ink3: #1a1a1a;
+      --ink4: #222;
+      --border: rgba(201,168,76,.15);
+      --card-bg: #0e1726;
+      --card-border: #1e293b;
+      --text: #c9d1d9;
+      --text2: #8b949e;
+      --text3: #6e7681;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Noto Serif SC', serif;
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    /* ── page-header-bar ── */
+    .page-header-bar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(8,8,8,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .phb-left { display: flex; align-items: center; gap: 10px; }
+    .phb-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(201,168,76,.5); }
+    .phb-title { font-size: 16px; font-weight: 600; color: var(--gold2); letter-spacing: .5px; }
+    .phb-back {
+      background: none; border: 1px solid var(--card-border); color: var(--text2);
+      padding: 4px 12px; border-radius: 8px; cursor: pointer; font-size: 13px;
+      transition: all .2s;
+    }
+    .phb-back:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── 容器 ── */
+    .container { max-width: 800px; margin: 0 auto; padding: 16px; }
+
+    /* ── 统计卡片 ── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 14px 10px; text-align: center;
+      cursor: pointer; transition: all .2s;
+    }
+    .stat-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .stat-card.active { border-color: var(--gold); background: rgba(201,168,76,.08); }
+    .stat-num { font-size: 22px; font-weight: 700; color: var(--gold2); }
+    .stat-label { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+    /* ── 订单列表 ── */
+    .order-list { display: flex; flex-direction: column; gap: 12px; }
+    .order-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 16px; transition: all .2s;
+    }
+    .order-card:hover { border-color: rgba(201,168,76,.3); }
+    .order-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px; flex-wrap: wrap; gap: 6px;
+    }
+    .order-id { font-size: 13px; color: var(--text2); font-family: monospace; }
+    .order-time { font-size: 11px; color: var(--text3); }
+    .order-product { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+    .order-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 8px;
+    }
+    .order-amount { font-size: 18px; font-weight: 700; color: var(--gold2); }
+    .order-actions { display: flex; gap: 8px; }
+
+    /* ── 状态徽章 ── */
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 500; letter-spacing: .3px;
+    }
+    .badge-pending { background: rgba(230,126,34,.15); color: #e67e22; border: 1px solid rgba(230,126,34,.3); }
+    .badge-paid { background: rgba(41,128,185,.15); color: #5dade2; border: 1px solid rgba(41,128,185,.3); }
+    .badge-shipped { background: rgba(201,168,76,.15); color: #c9a84c; border: 1px solid rgba(201,168,76,.3); }
+    .badge-completed { background: rgba(39,174,96,.15); color: #2ecc71; border: 1px solid rgba(39,174,96,.3); }
+    .badge-cancelled { background: rgba(113,128,150,.1); color: #718096; border: 1px solid rgba(113,128,150,.2); }
+    .badge-refunded { background: rgba(192,57,43,.1); color: #e74c3c; border: 1px solid rgba(192,57,43,.2); }
+    .badge-refunding { background: rgba(230,126,34,.15); color: #f39c12; border: 1px solid rgba(230,126,34,.3); }
+
+    /* ── 按钮 ── */
+    .btn {
+      padding: 6px 14px; border-radius: 8px; border: none;
+      font-size: 12px; cursor: pointer; transition: all .2s;
+      font-family: inherit;
+    }
+    .btn-cancel { background: rgba(113,128,150,.15); color: #8b949e; border: 1px solid rgba(113,128,150,.2); }
+    .btn-cancel:hover { background: rgba(192,57,43,.15); color: #e74c3c; border-color: rgba(192,57,43,.3); }
+    .btn-refund { background: rgba(192,57,43,.12); color: #e74c3c; border: 1px solid rgba(192,57,43,.25); }
+    .btn-refund:hover { background: rgba(192,57,43,.25); }
+    .btn-detail { background: rgba(201,168,76,.1); color: var(--gold); border: 1px solid rgba(201,168,76,.2); }
+    .btn-detail:hover { background: rgba(201,168,76,.2); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* ── 分页 ── */
+    .pagination {
+      display: flex; justify-content: center; align-items: center;
+      gap: 8px; margin-top: 20px; padding: 10px 0;
+    }
+    .page-btn {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text2); padding: 6px 14px; border-radius: 8px;
+      cursor: pointer; font-size: 13px; transition: all .2s;
+    }
+    .page-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+    .page-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .page-info { font-size: 12px; color: var(--text3); }
+
+    /* ── 模态框 ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--ink3); border: 1px solid var(--card-border);
+      border-radius: 16px; max-width: 500px; width: 100%;
+      max-height: 80vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1px solid var(--card-border);
+    }
+    .modal-title { font-size: 16px; font-weight: 600; color: var(--gold2); }
+    .modal-close {
+      background: none; border: none; color: var(--text3);
+      font-size: 20px; cursor: pointer; padding: 4px;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 20px; }
+    .detail-row {
+      display: flex; justify-content: space-between; padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px;
+    }
+    .detail-label { color: var(--text3); }
+    .detail-value { color: var(--text); font-weight: 500; text-align: right; max-width: 60%; word-break: break-all; }
+    .detail-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--ink3); border: 1px solid var(--card-border);
+      color: var(--text); padding: 10px 20px; border-radius: 10px;
+      font-size: 13px; z-index: 300; opacity: 0; transition: opacity .3s;
+      box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    }
+    .toast.show { opacity: 1; }
+    .toast.success { border-color: rgba(39,174,96,.4); }
+    .toast.error { border-color: rgba(192,57,43,.4); }
+
+    /* ── 空状态 ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--text3);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .5; }
+    .empty-text { font-size: 14px; }
+
+    /* ── 加载 ── */
+    .loading {
+      text-align: center; padding: 40px; color: var(--text3);
+    }
+    .spinner {
+      width: 32px; height: 32px; border: 2px solid var(--card-border);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin .8s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── 响应式 ── */
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .order-header { flex-direction: column; align-items: flex-start; }
+      .order-footer { flex-direction: column; align-items: flex-start; }
+      .order-actions { width: 100%; justify-content: flex-end; }
+    }
+  </style>
+    <script src="/app/js/escape-html.js" defer></script>
+</head>
+<body>
+
+<!-- page-header-bar -->
+<header class="page-header-bar">
+  <div class="phb-left">
+    <button class="phb-back" onclick="history.back()" aria-label="返回">← 返回</button>
+    <div class="phb-dot"></div>
+    <span class="phb-title">订单中心</span>
+  </div>
+</header>
+
+<div class="container">
+  <!-- 统计卡片 -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card active" data-status="" onclick="switchStatus('')">
+      <div class="stat-num" id="statAll">--</div>
+      <div class="stat-label">全部</div>
+    </div>
+    <div class="stat-card" data-status="pending" onclick="switchStatus('pending')">
+      <div class="stat-num" id="statPending">--</div>
+      <div class="stat-label">待确认</div>
+    </div>
+    <div class="stat-card" data-status="paid" onclick="switchStatus('paid')">
+      <div class="stat-num" id="statPaid">--</div>
+      <div class="stat-label">已支付</div>
+    </div>
+    <div class="stat-card" data-status="completed" onclick="switchStatus('completed')">
+      <div class="stat-num" id="statCompleted">--</div>
+      <div class="stat-label">已完成</div>
+    </div>
+  </div>
+
+  <!-- 订单列表 -->
+  <div id="orderListContainer">
+    <div class="loading" id="loadingState">
+      <div class="spinner"></div>
+      <div>加载中...</div>
+    </div>
+    <div class="order-list" id="orderList" style="display:none;"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-icon">📋</div>
+      <div class="empty-text">暂无订单</div>
+    </div>
+  </div>
+
+  <!-- 分页 -->
+  <div class="pagination" id="pagination" style="display:none;">
+    <button class="page-btn" id="prevBtn" onclick="goPage(-1)">上一页</button>
+    <span class="page-info" id="pageInfo">第 1 页</span>
+    <button class="page-btn" id="nextBtn" onclick="goPage(1)">下一页</button>
+  </div>
+</div>
+
+<!-- 订单详情模态框 -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">订单详情</span>
+      <button class="modal-close" onclick="closeModal()" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── 状态 ──
+  let currentFilter = '';
+  let currentPage = 1;
+  let pageSize = 10;
+  let totalPages = 1;
+  let allOrdersCache = [];
+  const API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
+    ? 'http://127.0.0.1:8920' : '';
+
+  // ── 工具 ──
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function getToken() { return localStorage.getItem('mingli_token') || ''; }
+  function getUser() { try { return JSON.parse(localStorage.getItem('mingli_user') || '{}'); } catch(e) { return {}; } }
+  function fmtTime(ts) {
+    if (!ts) return '--';
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function statusBadge(s) {
+    const map = {
+      pending: '待确认', paid: '已支付', shipped: '已发货',
+      completed: '已完成', cancelled: '已取消', refunded: '已退款', refunding: '退款中'
+    };
+    const cls = 'badge badge-' + (s || 'pending');
+    return `<span class="${cls}">${map[s] || s || '未知'}</span>`;
+  }
+  function showToast(msg, type) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (type === 'error' ? ' error' : type === 'success' ? ' success' : '');
+    setTimeout(() => t.className = 'toast', 2500);
+  }
+
+  // ── 鉴权 ──
+  function authHeaders() {
+    const h = { 'Content-Type': 'application/json' };
+    const t = getToken();
+    if (t) h['Authorization'] = 'Bearer ' + t;
+    return h;
+  }
+  async function apiFetch(url, opts) {
+    const r = await fetch(API_BASE + url, { signal: AbortSignal.timeout(15000),
+      ...(opts || {}),
+      headers: { ...authHeaders(), ...((opts && opts.headers) || {}) },
+      credentials: 'include' });
+    if (r.status === 401) { showToast('请先登录', 'error'); }
+    return r;
+  }
+
+  // ── 统计 ──
+  async function loadStats() {
+    try {
+      // 用全部订单做统计（前端分页）
+      const r = await apiFetch('/api/order/list?pageSize=50&_t=' + Date.now());
+      const data = await r.json();
+      if (!data.ok) return;
+      allOrdersCache = data.items || [];
+      const counts = { all: allOrdersCache.length };
+      allOrdersCache.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
+      $('#statAll').textContent = counts.all || 0;
+      $('#statPending').textContent = counts.pending || 0;
+      $('#statPaid').textContent = (counts.paid || 0) + (counts.shipped || 0);
+      $('#statCompleted').textContent = counts.completed || 0;
+      renderOrders();
+    } catch (e) {
+      showToast('加载失败', 'error');
+    }
+  }
+
+  // ── 订单列表 ──
+  function switchStatus(status) {
+    currentFilter = status;
+    currentPage = 1;
+    document.querySelectorAll('.stat-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.status === status);
+    });
+    renderOrders();
+  }
+  function goPage(dir) {
+    currentPage += dir;
+    if (currentPage < 1) currentPage = 1;
+    renderOrders();
+  }
+  function renderOrders() {
+    const filtered = currentFilter
+      ? allOrdersCache.filter(o => o.status === currentFilter)
+      : allOrdersCache;
+    const total = filtered.length;
+    totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * pageSize;
+    const pageItems = filtered.slice(start, start + pageSize);
+
+    const listEl = $('#orderList');
+    if (total === 0) {
+      listEl.style.display = 'none';
+      $('#emptyState').style.display = 'block';
+      $('#pagination').style.display = 'none';
+      return;
+    }
+    $('#emptyState').style.display = 'none';
+    listEl.style.display = 'flex';
+
+    listEl.innerHTML = pageItems.map(o => {
+      const canCancel = o.status === 'pending';
+      const canRefund = o.status === 'paid' || o.status === 'shipped' || o.status === 'completed';
+      const actions = [];
+      actions.push(`<button class="btn btn-detail" onclick="window._showDetail(${o.id})">详情</button>`);
+      if (canCancel) actions.push(`<button class="btn btn-cancel" onclick="window._cancelOrder(${o.id})">取消</button>`);
+      if (canRefund) actions.push(`<button class="btn btn-refund" onclick="window._refundOrder(${o.id})">退款</button>`);
+
+      return `<div class="order-card">
+        <div class="order-header">
+          <div>
+            <span class="order-id">订单 #${o.id}</span>
+            <span style="margin-left:8px">${statusBadge(o.status)}</span>
+          </div>
+          <span class="order-time">${fmtTime(o.created_at)}</span>
+        </div>
+        <div class="order-product">${escapeHtml(o.product_name || '命理服务')}</div>
+        <div class="order-footer">
+          <div class="order-amount">¥${(o.amount || 0).toFixed(2)}</div>
+          <div class="order-actions">${actions.join('')}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    // 分页
+    $('#pageInfo').textContent = totalPages > 1 ? `第 ${currentPage} / ${totalPages} 页` : '';
+    $('#pagination').style.display = totalPages > 1 ? 'flex' : 'none';
+    $('#prevBtn').disabled = currentPage <= 1;
+    $('#nextBtn').disabled = currentPage >= totalPages;
+  }
+
+  // ── 订单详情 ──
+  window._showDetail = async function(orderId) {
+    try {
+      const r = await apiFetch(`/api/order/${orderId}?_t=${Date.now()}`);
+      const data = await r.json();
+      if (!data.ok) { showToast(data.message || '加载失败', 'error'); return; }
+      const o = data.order;
+      const body = $('#detailBody');
+      const rows = [
+        { label: '订单编号', value: '#' + o.id },
+        { label: '商品名称', value: o.product_name || '--' },
+        { label: '商品ID', value: o.product_id || '--' },
+        { label: '订单金额', value: '¥' + (o.amount || 0).toFixed(2) },
+        { label: '商家金额', value: '¥' + (o.merchant_amount || 0).toFixed(2) },
+        { label: '平台佣金', value: '¥' + (o.platform_amount || 0).toFixed(2) },
+        { label: '订单状态', value: statusBadge(o.status) },
+        { label: '创建时间', value: fmtTime(o.created_at) },
+        { label: '更新时间', value: fmtTime(o.updated_at) },
+        { label: '幂等键', value: o.idempotency_key || '--' },
+      ];
+      body.innerHTML = rows.map(r =>
+        `<div class="detail-row"><span class="detail-label">${r.label}</span><span class="detail-value">${r.value}</span></div>`
+      ).join('') + renderDetailActions(o);
+      $('#detailModal').classList.add('open');
+    } catch (e) {
+      showToast('加载详情失败', 'error');
+    }
+  };
+
+  function renderDetailActions(o) {
+    const canCancel = o.status === 'pending';
+    const canRefund = ['paid', 'shipped', 'completed'].includes(o.status);
+    let btns = '';
+    if (canCancel) btns += `<button class="btn btn-cancel" onclick="window._cancelOrder(${o.id});closeModal();">取消订单</button>`;
+    if (canRefund) btns += `<button class="btn btn-refund" onclick="window._refundOrder(${o.id});closeModal();">申请退款</button>`;
+    return btns ? `<div class="detail-actions">${btns}</div>` : '';
+  }
+
+  window.closeModal = function() { $('#detailModal').classList.remove('open'); };
+  $('#detailModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+  // ── 取消订单 ──
+  window._cancelOrder = async function(orderId) {
+    if (!confirm('确定要取消此订单吗？')) return;
+    try {
+      const r = await apiFetch(`/api/order/cancel`, {
+        method: 'POST',
+        body: JSON.stringify({ orderId, reason: '用户主动取消' }),
+      });
+      const data = await r.json();
+      if (data.ok) { showToast('订单已取消', 'success'); loadStats(); }
+      else { showToast(data.message || '取消失败', 'error'); }
+    } catch (e) { showToast('取消失败', 'error'); }
+  };
+
+  // ── 退款 ──
+  window._refundOrder = async function(orderId) {
+    const reason = prompt('请输入退款原因（可选）：') || '用户申请退款';
+    try {
+      const r = await apiFetch(`/api/order/refund`, {
+        method: 'POST',
+        body: JSON.stringify({ orderId, reason: reason.substring(0, 300) }),
+      });
+      const data = await r.json();
+      if (data.ok) { showToast('退款申请已提交', 'success'); loadStats(); }
+      else { showToast(data.message || '退款失败', 'error'); }
+    } catch (e) { showToast('退款失败', 'error'); }
+  };
+
+  // ── XSS 防护 ──
+  function escapeHtml(str) {
+    if (!str) return '--';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ── 启动 ──
+  document.addEventListener('DOMContentLoaded', loadStats);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+/* R102 KB 最近访问侧栏 */
+#kbRecentToggle {
+  position: fixed;
+  top: 60px;
+  right: 18px;
+  z-index: 9999;
+  background: var(--card, #222838);
+  border: 1px solid var(--border, #333a4d);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: #7ab8d4;
+  font-size: .85rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .2s;
+}
+#kbRecentToggle:hover { border-color: #7ab8d4; box-shadow: 0 4px 20px rgba(122,184,212,.3); }
+#kbRecentToggle .badge,
+#kbRecentCount {
+  background: #7ab8d4;
+  color: #000;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  font-size: .7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.kb-recent-drawer {
+  position: fixed;
+  top: 100px;
+  right: 18px;
+  width: min(380px, 96vw);
+  max-height: 70vh;
+  background: var(--card, #222838);
+  border: 1px solid #7ab8d4;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  z-index: 9998;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+}
+.kb-recent-drawer.open { display: flex; }
+
+.kb-recent-drawer .fav-head { background: #7ab8d4; }
+
+@media(max-width: 480px) {
+  #kbRecentToggle { top: auto; bottom: 110px; right: 14px; }
+  .kb-recent-drawer { top: auto; bottom: 160px; right: 14px; left: 14px; width: auto; max-height: 60vh; }
+}

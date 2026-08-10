@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+
+<meta charset="UTF-8">
+<meta name="description" content="桌面摄像头采集 · 易道智鉴平台">
+<meta name="keywords" content="桌面摄像头采集">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/camera-capture.html">
+<meta name="theme-color" content="#050608">
+<title>桌面摄像头采集 · 命理宝鉴</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
+
+<link rel="stylesheet" href="css/camera-capture-inline.css">
+<link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body data-kb-module="mobile" class="theme-tcm">
+<div class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">桌面摄像头采集</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</div>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>打开摄像头</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>对准目标</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>拍摄采集</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>上传分析</span></div></div>
+<div class="flow-hint">用户拍照采集面/舌部照片，AI辅助望诊分析。</div>
+</div>
+<nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
+  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">主平台</a>
+  <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">望诊工作台</a>
+  <a href="glass-console.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">眼镜控制台</a>
+</nav>
+<div class="wrap">
+  <header>
+    <h1>桌面摄像头采集</h1>
+    <div class="subtitle">面相 · 远程问诊 · 实物辨识 · 自动归档到本地知识库</div>
+  </header>
+<main>
+
+
+  <div class="hero">
+    <div class="stage" id="stage">
+      <div class="live-tag" id="liveTag">LIVE</div>
+      <div class="device-tag" id="deviceTag">未连接</div>
+      <div class="placeholder" id="placeholder">
+        <div class="icon">拍</div>
+        <div class="hint">点击「启动摄像头」开始</div>
+      </div>
+      <video id="video" autoplay playsinline muted style="display:none"></video>
+      <canvas id="canvas" style="display:none"></canvas>
+      <div class="guide-layer" id="guideLayer">
+        <div class="guide-frame"></div>
+        <div class="guide-label" id="guideLabel">请将面部置于圆框内</div>
+      </div>
+
+      <!-- R257 P0 §2.1 采集标准提示卡 -->
+      <div class="capture-standards" id="captureStandards" role="note" aria-label="采集标准提示">
+        <div class="cs-title">卷 采集标准（docx V1.1 §2.1）</div>
+        <ul class="cs-list">
+          <li>日 <strong>自然光</strong>（避免逆光/灯光直射）</li>
+          <li>禁 <strong>无美颜</strong>（不开手机美颜）</li>
+          <li>禁 <strong>无滤镜</strong>（不使用滤镜/特效）</li>
+          <li>禁 <strong>无妆容</strong>（素颜，避免口红/粉底）</li>
+          <li>禁 <strong>无遮挡</strong>（不戴口罩/眼镜/帽子）</li>
+          <li>尺 <strong>稳定拍摄</strong>（避免模糊）</li>
+        </ul>
+      </div>
+      <div class="new-device-badge" id="newDeviceBadge">新 检测到新设备</div>
+    </div>
+
+    <div class="controls">
+      <h3>控制台</h3>
+
+      <div class="field">
+        <label for="modeSel">采集模式</label>
+        <select id="modeSel" aria-label="modeSel">
+          <option value="face">面相分析（人脸识别 + AI 分析）</option>
+          <option value="tongue">舌诊分析（中医舌象 + 五脏辨证）</option>
+          <option value="ocr">通用 OCR（字/文档/卦象）</option>
+          <option value="ocr-tcm">中医病历 OCR（处方/舌苔）</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="deviceSel">摄像头设备</label>
+        <select id="deviceSel" aria-label="deviceSel"><option value="">默认（自动选择）</option></select>
+        <button class="btn-ghost" id="refreshDevBtn" style="margin-top:6px;padding:7px 12px;font-size:11px">↻ 刷新设备列表</button>
+      </div>
+
+      <div class="field" style="border-top:1px dashed rgba(201,168,76,.18);padding-top:10px;margin-top:6px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="audioEnable" aria-label="启用音频采集" style="width:auto;flex-shrink:0">
+          <span>麦 启用麦克风（拾音器·与 KB 联动）</span>
+        </label>
+        <select id="micSel" aria-label="micSel" style="margin-top:6px"><option value="">默认（自动选择）</option></select>
+        <div class="dev-status" id="devStatus">
+          <div class="dev-item"><span class="dev-dot offline" id="camDot"></span><span class="dev-name" id="camName">摄像头：未检测</span></div>
+          <div class="dev-item"><span class="dev-dot offline" id="micDot"></span><span class="dev-name" id="micName">麦克风：未检测</span></div>
+        </div>
+      </div>
+
+      <button class="btn" id="startBtn">▶ 启动摄像头</button>
+      <button class="btn btn-ghost" id="snapBtn" disabled>拍 拍照并分析</button>
+      <button class="btn btn-ghost" id="autoBtn" disabled>循 自动采集（每 3s）</button>
+      <button class="btn btn-danger" id="stopBtn" disabled>⏹ 停止</button>
+      <a href="video-capture.html" style="display:block;width:100%;padding:10px;background:rgba(66,153,225,.15);color:var(--blue);border:1px solid rgba(66,153,225,.3);border-radius:8px;font-size:13px;font-weight:600;text-align:center;text-decoration:none;margin-top:8px">🎬 视频模式：录制 10 秒抽帧分析</a>
+
+      <div class="status-line" id="status">待机 · 等待启动</div>
+    </div>
+  </div>
+
+  <div class="analysis-panel">
+    <h2>表 分析结果</h2>
+    <div class="analysis-content" id="analysis">
+      <div class="analysis-empty">拍照后将显示 AI 分析结果</div>
+    </div>
+    <!-- R100: KB 知识支撑区（识别结果 → 知识库匹配） -->
+    <div class="kb-support" id="kbSupport" style="display:none">
+      <div class="kb-support-header">
+        <span class="kb-support-title">📚 知识库支撑</span>
+        <span class="kb-support-meta" id="kbSupportMeta"></span>
+      </div>
+      <div class="kb-support-list" id="kbSupportList"></div>
+    </div>
+  </div>
+
+  <div class="gallery">
+    <h2>典 本地采集库（<span id="galleryCount">0</span> 张）</h2>
+    <div class="gallery-grid" id="gallery">
+      <div class="thumb" style="cursor:default;border-style:dashed;display:flex;align-items:center;justify-content:center;color:var(--paper3);font-size:11px">暂无</div>
+    </div>
+  </div>
+
+  <div class="gear-card">
+    <h3>标 设备选型推荐（桌面固定摄像头）</h3>
+    <div class="gear-list">
+      <div class="gear">
+        <div class="name">Logitech MX Brio</div>
+        <div class="price">¥1,500 · 4K USB-C</div>
+        <div class="use"><span class="tag">高分辨率</span><span class="tag">AI取景</span>面相/微表情首选。Windows Hello IR，可夜间模式。</div>
+      </div>
+      <div class="gear">
+        <div class="name">OBSBOT Tiny 2</div>
+        <div class="price">¥2,000 · AI 云台</div>
+        <div class="use"><span class="tag">三轴跟随</span><span class="tag">手势控制</span>远程问诊时自动跟拍人脸/手相，适合视频录制。</div>
+      </div>
+      <div class="gear">
+        <div class="name">Insta360 Link</div>
+        <div class="price">¥1,800 · 4K AI</div>
+        <div class="use"><span class="tag">白平衡</span><span class="tag">手势</span>色温准，适合药材/舌苔这种需要真实色彩的场景。</div>
+      </div>
+      <div class="gear">
+        <div class="name">Apple Studio Display 内置</div>
+        <div class="price">¥0（你已有的）</div>
+        <div class="use"><span class="tag">零成本</span><span class="tag">12MP</span>起步用最划算。系统级权限，可做访客自动拍照入库。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hotplug-toast" id="hotplugToast">充 检测到新设备</div>
+  <div class="kb-fallback-badge" id="kbFallbackBadge" title="KB 兜底就绪，点击查看详情">成 KB 兜底就绪</div>
+
+  <div class="voice-panel" id="voicePanel" style="display:none">
+    <h3>语音→知识库（拾音器联动）</h3>
+    <div class="voice-row">
+      <button class="voice-btn" id="voiceBtn">录 按住说话</button>
+      <label class="listen-toggle">
+        <input type="checkbox" id="continuousMode" aria-label="连续拍照模式">
+        <span>连续监听模式</span>
+        <span class="listen-mode-indicator" id="listenIndicator" style="display:none">● LIVE</span>
+      </label>
+      <span class="voice-hint">按住说话 或 开启连续模式 · 自动检索 KB</span>
+    </div>
+    <div class="voice-transcript" id="voiceTranscript"></div>
+    <div class="voice-result kb-result-stream" id="voiceResult"></div>
+  </div>
+</div>
+  <div style="text-align:center;padding:12px"><a href="device-test.html" style="color:var(--gold);font-size:13px;text-decoration:none">充 设备检测与测试 →</a></div>
+
+
+
+
+<script src="js/module-reports-kb.js"></script>
+<script src="js/kb-fallback-indicator.js"></script>
+
+<script src="js/device-hotplug.js" defer></script>
+  <script src="js/camera-capture-inline.js" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+
+<style>
+/* R98-o 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+  video,canvas,img{max-width:100%;height:auto}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<style>
+/* R98-o 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+  video,canvas,img{max-width:100%;height:auto}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print{body{background:#fff!important;color:#000!important}nav,.nav-bar,.mobile-nav,.sidebar,.no-print,.page-header-bar{display:none!important}main,.container,.card,.wrap,.admin-main{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}button,.btn,.action-btn,.tab-btn{display:none!important}table{width:100%!important;font-size:11px!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}a{color:#000!important;text-decoration:none!important}a[href^="http"]:after{content:" (" attr(href) ")";font-size:10px;color:#666}}
+</style>
+</main>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

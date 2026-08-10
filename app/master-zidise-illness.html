@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta charset="UTF-8">
+<meta name="description" content="紫微斗数 · 易道智鉴平台">
+<meta name="keywords" content="紫微斗数">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/master-zidise-illness.html">
+<meta name="theme-color" content="#050608">
+<title>紫微斗数 · 大师级断疾病生死 · 易道智鉴</title>
+
+  <link rel="stylesheet" href="css/a11y-fix.css">
+<link rel="stylesheet" href="css/master-zidise-illness-inline.css">
+  <link rel="stylesheet" href="css/mobile-nav.css">
+<link rel="stylesheet" href="css/theme-systems.css">
+<link rel="stylesheet" href="css/flow-engine.css">
+<link rel="stylesheet" href="css/page-header.css">
+</head>
+<body class="theme-knowledge">
+<header class="page-header-bar">
+  <div class="phb-left">
+    <span class="phb-theme-dot"></span>
+    <span class="phb-title">紫微斗数</span>
+  </div>
+  <a class="phb-back" href="divination-hub.html">← 返回</a>
+</header>
+
+<div class="flow-steps-wrap" style="padding:12px 24px 0">
+<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择疾病</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>查看辨证</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>参考方案</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>深入学习</span></div></div>
+<div class="flow-hint">查看紫微斗数 · 大师级断疾病生死 · 易道智鉴，了解功能详情与使用方式。</div>
+</div>
+  <a class="skip-link" href="#main-content">跳到主内容</a>
+<main id="main-content" role="main">
+<nav class="nav">
+  <a href="index.html">首页</a>
+  <a href="divination-hub.html">卦 排盘</a>
+  <a href="master-elder.html">大师端</a>
+  <a href="doctor-elder.html">诊 医生端</a>
+  <a href="tcm-clinic.html">医 诊疗</a>
+  <a href="ai-assistant.html">机 智能助手</a>
+  <a href="master-zidise-illness.html" class="active">⚕️ 紫微断疾病</a>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1>紫微斗数 · 大师级断疾病生死</h1>
+    <div class="sub">十二宫 · 四化飞星 · 煞星重叠 · 大限流年</div>
+    <div class="quote">
+      「化忌所在，即心结所在。知道心结在哪里，便可对症下药。」 ——《骨髓赋》<br>
+      「疾厄宫看体质和疾病，煞星云集则身体欠佳。廉贞、七杀等煞星入疾厄需注意血光之灾。」
+    </div>
+  </div>
+
+  <!-- 输入面板 -->
+  <div class="panel">
+    <h2>卷 生辰输入</h2>
+    <div class="field" style="margin-bottom:10px">
+      <label for="in-name">命主姓名</label>
+      <input aria-label="in-name" type="text" id="in-name" placeholder="请输入命主姓名" maxlength="20">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label for="in-y">公历生日（年）</label>
+        <input aria-label="in-y" type="number" id="in-y" value="1985" min="1900" max="2050">
+      </div>
+      <div class="field">
+        <label for="in-m">月</label>
+        <input aria-label="in-m" type="number" id="in-m" value="7" min="1" max="12">
+      </div>
+      <div class="field">
+        <label for="in-d">日</label>
+        <input aria-label="in-d" type="number" id="in-d" value="15" min="1" max="31">
+      </div>
+      <div class="field">
+        <label for="in-h">时辰（24h）</label>
+        <input aria-label="in-h" type="number" id="in-h" value="14" min="0" max="23">
+      </div>
+    </div>
+    <div class="row2" style="margin-top:14px">
+      <div class="field">
+        <label for="in-gender">性别</label>
+        <select aria-label="in-gender" id="in-gender">
+          <option value="M">男（阳男顺行）</option>
+          <option value="F">女（阴女顺行）</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="in-focus">关注重点</label>
+        <select aria-label="in-focus" id="in-focus">
+          <option value="all">综合疾病风险</option>
+          <option value="cancer">癌症/重症风险</option>
+          <option value="heart">心脑血管</option>
+          <option value="liver">肝胆系统</option>
+          <option value="blood">血光之灾/手术</option>
+          <option value="mental">精神/心理</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-block" onclick="analyze()">⚕️ 大师级断疾病生死分析</button>
+  </div>
+
+  <!-- 排盘结果 -->
+  <div id="result-section" class="hidden">
+    <!-- 综合摘要 -->
+    <div class="panel scroll-section" id="sec-summary">
+      <h2>图 综合疾病风险评估</h2>
+      <div class="summary-card" id="summary-cards"></div>
+      <div id="risk-overview"></div>
+    </div>
+
+    <!-- 十二宫星曜 -->
+    <div class="panel scroll-section" id="sec-palaces">
+      <h2>🏛️ 十二宫 · 星曜分布</h2>
+      <div id="palace-grid"></div>
+    </div>
+
+    <!-- 风险标记详解 -->
+    <div class="panel scroll-section" id="sec-risks">
+      <h2>警 疾病风险标记（8 大核心规则）</h2>
+      <div id="risk-detail"></div>
+    </div>
+
+    <!-- 大限时间轴 -->
+    <div class="panel scroll-section" id="sec-timeline">
+      <h2>历 大限时间轴 · 流年风险</h2>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- 调理方案 -->
+    <div class="panel scroll-section" id="sec-actions">
+      <h2>草 调理方案 · 化解之道</h2>
+      <ul class="action-list" id="action-list"></ul>
+    </div>
+
+    <!-- KB 引用 -->
+    <div class="panel scroll-section" id="sec-kb">
+      <h2>典 古籍断语 · 实战案例（来自知识库）</h2>
+      <div id="kb-refs"></div>
+    </div>
+
+    <!-- 过去回溯（用户输入病史 → 自动反查流年） -->
+    <div class="panel scroll-section" id="sec-history">
+      <h2>🕰️ 过去健康大事·流年应验反查</h2>
+      <div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px;color:var(--paper3)">
+        💡 如有已知健康大事（手术/大病/慢性病），请按"年份+事件"格式输入，系统会反查该流年紫微格局是否应验。
+      </div>
+      <div class="row">
+        <div class="field" style="grid-column:span 3"><label for="in-history">过往病史记录（可多条）</label>
+          <input aria-label="in-history" type="text" id="in-history" placeholder="如：1985年肝火旺盛，1998年动过胆囊手术，2015年高血压"></div>
+        <div class="field"><label>&nbsp;</label><button class="btn" onclick="renderHistory()">查 反查流年</button></div>
+      </div>
+      <div id="history-output" style="margin-top:14px"></div>
+    </div>
+
+    <!-- 流年精确预测（未来 10 年逐年） -->
+    <div class="panel scroll-section" id="sec-future">
+      <h2>卦 未来10年·逐年疾病预测+调养期</h2>
+      <div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px;color:var(--paper3)">
+        📅 以当前大限为骨架，推算未来10年逐年疾厄能量、可能发作、调理重点、治愈周期预估。
+      </div>
+      <div id="future-grid"></div>
+    </div>
+
+    <!-- 治愈周期判断 -->
+    <div class="panel scroll-section" id="sec-cure">
+      <h2>药 治愈周期·复原路径</h2>
+      <div id="cure-output"></div>
+    </div>
+
+    <!-- 化解方案（七维系统） -->
+    <div class="panel scroll-section" id="sec-resolve">
+      <h2>莲 化解方案·七维系统</h2>
+      <div class="legend">
+        <span class="dot dot-r"></span> 风水
+        <span class="dot dot-r"></span> 五行补救
+        <span class="dot dot-r"></span> 符咒
+        <span class="dot dot-r"></span> 宗教
+        <span class="dot dot-r"></span> 饮食
+        <span class="dot dot-r"></span> 起居
+        <span class="dot dot-r"></span> 运动
+      </div>
+      <div id="resolve-output"></div>
+    </div>
+
+    <!-- 运势联动（财官疾厄线） -->
+    <div class="panel scroll-section" id="sec-fortune">
+      <h2>星 运势×健康 联动判断</h2>
+      <div id="fortune-output"></div>
+    </div>
+
+    <!-- 人生全面分析（过去→现在→未来） -->
+    <div class="panel scroll-section" id="sec-lifecycle">
+      <h2>因 人生全面分析·过去 现在 未来</h2>
+      <div id="lifecycle-output"></div>
+    </div>
+
+    <!-- 访客档案（大师专属） -->
+    <div class="panel scroll-section" id="sec-archive">
+      <h2>夹 访客档案中心</h2>
+      <div style="background:rgba(201,168,76,.05);padding:14px;border-radius:10px;margin-bottom:14px;font-size:14px;color:var(--paper3)">
+        💡 所有咨询过的访客都会自动入库。包含生辰、风险等级、化忌星、命中规则、调理方案、访问历史。
+      </div>
+      <div id="archive-list">
+        <div class="empty"><span class="spinner"></span>正在加载...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fab">
+  <button onclick="window.print()">🖨️ 打印报告</button>
+  <button onclick="location.href='index.html'">宅 回首页</button>
+</div>
+
+
+  <script src="js/a11y-divination-hub.js" defer></script>
+  
+</main>
+<script src="js/master-zidise-illness-inline.js" defer></script>
+  <script src="js/mobile-nav.js" defer></script>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<script src="js/error-interceptor.js" defer></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html
+<!-- ========== R19-2·饮食调养·独立大模块 ========== -->
+<section id="sec-diet" class="sec-diet">
+<h2>茶 饮食调养·五脏六腑·按节令·按化忌星</h2>
+<div class="lead">中医「药食同源」，饮食化忌星之毒、补五行之缺。<b>三餐按时、五味调和、寒热均衡</b>是基本纲领。</div>
+<div id="diet-output"></div>
+<div class="kb-evidence">
+  <div class="src">卷《黄帝内经·素问·脏气法时论》</div>
+  <div class="qb">「肝苦急，急食甘以缓之；心苦缓，急食酸以收之；脾苦湿，急食苦以燥之；肺苦气上逆，急食苦以泄之；肾苦燥，急食辛以润之。」</div>
+  <div class="md">医 现代医学：五味对应五脏功能调节，酸入肝、苦入心、甘入脾、辛入肺、咸入肾。化忌星对应脏腑为重点调养对象。</div>
+</div>
+<div class="clinical">
+  <b>⚕️ 大师实战：</b>临床 30 年所见——化忌星对应脏腑的<b>节气前后 3 天</b>必须严格遵守饮食禁忌（如忌酒/忌辛辣/忌生冷），节气换班是化忌星「应期」高发节点。
+</div>
+</section>
+
+<!-- ========== R19-2·起居调养·独立大模块 ========== -->
+<section id="sec-sleep" class="sec-sleep">
+<h2>夜 起居调养·12 时辰·季节·房事</h2>
+<div class="lead">人体小宇宙，顺应天时则养生，逆之则伤。<b>子时（23-1）胆经旺，必睡；午时（11-13）心经旺，小憩 15-30 分</b>。化忌星对应经络的时辰要避免剧烈活动。</div>
+<div id="sleep-output"></div>
+<div class="kb-evidence" style="margin-top:14px">
+  <div class="src">卷《黄帝内经·素问·四气调神大论》</div>
+  <div class="qb">「春三月，夜卧早起；夏三月，夜卧早起，无厌于日；秋三月，早卧早起，与鸡俱兴；冬三月，早卧晚起，必待日光。」</div>
+  <div class="md">医 现代医学：四季作息规律符合<b>褪黑素分泌周期</b>（晚上 21-23 时开始分泌高峰），顺应四时起居可改善睡眠质量 40%+。</div>
+</div>
+<div class="clinical" style="background:rgba(243,156,18,.08);border-left-color:#f39c12;margin-top:8px">
+  <b style="color:#f39c12">⚕️ 大师实战：</b>化忌<b>太阴（脾土）</b>者，最忌<b>夜宵 + 晚睡</b>，子时不睡则脾土运化失常，临床常见 30-45 岁人群出现脾胃湿热、虚胖、三高。调理首选「夜卧早起 + 戒夜宵 + 揉腹术」。
+</div>
+</section>
+
+<!-- ========== R19-2·运动导引·独立大模块 ========== -->
+<section id="sec-sport" class="sec-sport">
+<h2>修 运动导引·八段锦·五禽戏·穴位按摩·吐纳</h2>
+<div class="lead">动静相宜、刚柔并济。按<b>化忌星对应五行</b>选择导引术：木→五禽戏虎戏 / 火→八段锦摇头摆尾 / 土→五禽戏熊戏 / 金→八段锦左右开弓 / 水→五禽戏鹿戏。</div>
+<div id="sport-output"></div>
+<div class="kb-evidence" style="margin-top:14px">
+  <div class="src">卷《云笈七签·导引按摩篇》</div>
+  <div class="qb">「形不动则精流，精不流则气郁。气郁则百病生。是以导引之法，行气血、利关节、延年寿、防百病。」</div>
+  <div class="md">医 现代医学：规律运动（每周 3-5 次 × 30 分）可使<b>端粒酶活性提升 30%</b>，延缓细胞衰老。导引术属于低强度有氧 + 呼吸训练，最适合中老年体质。</div>
+</div>
+<div class="clinical" style="background:rgba(230,126,34,.08);border-left-color:#e67e22;margin-top:8px">
+  <b style="color:#e67e22">⚕️ 大师实战：</b>化忌<b>廉贞（肾水）</b>者，最忌<b>剧烈跑步 + 长时间站立</b>（伤肾）。推荐「<b>五禽戏·鹿戏</b>」每日 15 分 + 「<b>搓腰眼</b>」早晚各 100 次 + 「<b>吞津功</b>」（舌抵上颚，待口水满口，分 3 次咽下）。临床验证：3 个月可明显改善腰膝酸软、夜尿频多。
+</div>
+</section>
+>
+<style>
+/* R98-z 480+360 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .container,.main,.body,.wrap{max-width:100%;padding:8px}
+  h1{font-size:18px}
+  h2{font-size:15px}
+  h3{font-size:13px}
+  .btn{padding:6px 10px;font-size:12px}
+  table{font-size:11px}
+  .row{flex-wrap:wrap;gap:4px}
+}
+@media(max-width:360px){
+  body{font-size:12px}
+  .container,.main,.body,.wrap{padding:6px}
+  h1{font-size:16px}
+  h2{font-size:14px}
+  h3{font-size:12px}
+  .btn{padding:5px 8px;font-size:11px;width:100%}
+  table{font-size:10px}
+  .nav-bar a{padding:4px 6px;font-size:11px}
+  .row{flex-direction:column;align-items:flex-start}
+}
+@media print {
+  .no-print{display:none!important}
+  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
+  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
+  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
+  table{width:100%!important;border-collapse:collapse!important}
+  th,td{border:1px solid #333!important;padding:4px 8px!important}
+  h1,h2,h3{page-break-after:avoid!important}
+  .card,.section,.module{page-break-inside:avoid!important}
+  a{color:#000!important;text-decoration:none!important}
+  .print-only{display:block!important}
+}
+</style>
+
+</html>
