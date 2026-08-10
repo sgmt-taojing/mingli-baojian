@@ -148,6 +148,9 @@ input:focus,textarea:focus{border-color:var(--accent)}
       </div>
       <textarea id="pVoice" style="margin-top:8px" placeholder="点击🎙说话自动转写，或粘贴穿戴设备语音识别结果（如：最近总是感觉乏力，舌苔很厚）"></textarea>
       <button class="btn primary block" id="submitBtn" onclick="submitSession()">🚀 提交诊断（AI视觉 + AI知识库 并行）</button>
+      <div class="toggle" id="autoSubmitToggle" onclick="toggleAutoSubmit()">
+        <span class="switch" id="asSwitch" style="background:var(--green)"></span> 采集自动提交（语音停顿/视觉停止 → 自动生成会话进医生队列）
+      </div>
       <div class="toggle" id="autoPilotToggle" onclick="toggleAutoPilot()">
         <span class="switch" id="apSwitch"></span> 无人化自主模式（AI 双路高置信自动建议处方，高风险强制医生审核）
       </div>
@@ -280,6 +283,9 @@ let voiceRec = null;
 let voiceActive = false;
 let _kbDebounceTimer = null;
 let _lastLiveText = '';
+let _silenceTimer = null;   // 静音计时器（3s 无新词自动停止收音）
+let _voiceSubmitted = false; // 本次收音已自动提交标记
+let autoSubmitOn = true;    // 自动提交开关（语音/视觉采集产物自动进队列）
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (SR) {
   voiceRec = new SR();
@@ -305,6 +311,15 @@ if (SR) {
       _lastLiveText = liveText;
       clearTimeout(_kbDebounceTimer);
       _kbDebounceTimer = setTimeout(() => liveKbMatch(liveText), 300);
+      // R497d: 静音检测——有新词就重置 3s 计时器
+      clearTimeout(_silenceTimer);
+      _silenceTimer = setTimeout(() => {
+        if (voiceActive && autoSubmitOn) {
+          const vs2 = document.getElementById('voiceStatus');
+          if (vs2) vs2.textContent = '⏹ 静音 3s，自动停止收音…';
+          try { voiceRec.stop(); } catch (_) {}
+        }
+      }, 3000);
     }
   };
   voiceRec.onerror = (e) => {
@@ -320,6 +335,17 @@ if (SR) {
     if (vb) vb.textContent = '🎙 开始收音';
     const vs = document.getElementById('voiceStatus');
     if (vs) vs.textContent = '⏹ 收音结束';
+    clearTimeout(_silenceTimer);
+    // R497d: 收音结束 → 有语音内容且未提交 → 自动生成会话
+    const voiceText = document.getElementById('pVoice').value.trim();
+    if (autoSubmitOn && voiceText && !_voiceSubmitted) {
+      _voiceSubmitted = true;
+      const symptoms = document.getElementById('pSymptoms').value.trim();
+      if (!symptoms) {
+        toast('📤 语音已自动提交诊断…');
+        autoSubmitSession({ fromVoice: true });
+      }
+    }
   };
 }
 
@@ -359,6 +385,7 @@ function escapeHtml(s) {
 let camStream = null;
 let camTimer = null;
 let _bestVision = null;
+let _bestVisionB64 = null;   // 最优帧原始 base64（用于自动提交）
 async function toggleLiveCamera() {
   const btn = document.getElementById('liveCamBtn');
   const state = document.getElementById('liveCamState');
@@ -373,6 +400,11 @@ async function toggleLiveCamera() {
     video.classList.add('hidden');
     btn.textContent = '📹 连续采集模式（边拍边分析）';
     state.textContent = '已停止';
+    // R497d: 停止采集 → 自动生成会话进医生队列（有最优帧时）
+    if (_bestVisionB64 && autoSubmitOn) {
+      toast('📤 最优帧已自动提交诊断…');
+      autoSubmitSession({ fromVision: true });
+    }
     return;
   }
   try {
@@ -398,9 +430,10 @@ async function toggleLiveCamera() {
         const d = await res.json();
         if (d.code !== 0) return;
         const r = d.data;
-        // 增量融合：保留置信度最高的帧结论
+        // 增量融合：保留置信度最高的帧结论 + 原始 b64
         if (!_bestVision || (r.confidence || 0) > (_bestVision.confidence || 0)) {
           _bestVision = r;
+          _bestVisionB64 = b64;
         }
         const box = document.getElementById('liveVisionResult');
         const b = _bestVision;
@@ -421,6 +454,8 @@ function toggleVoice() {
   if (!voiceRec) { toast('当前浏览器不支持语音识别，请粘贴文本'); return; }
   if (voiceActive) { voiceRec.stop(); voiceActive = false; if (vb) vb.textContent = '🎙 开始收音'; }
   else {
+    _voiceSubmitted = false;   // 新一轮收音重置提交标记
+    _lastLiveText = '';
     try {
       voiceRec.start();
       voiceActive = true;
@@ -476,6 +511,8 @@ function switchRole(role) {
 
 function setMode(m) {
   currentMode = m;
+  _bestVision = null;
+  _bestVisionB64 = null;
   document.querySelectorAll('#modeTabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
   document.getElementById('dzText').textContent = {tongue:'👅 舌诊照片',face:'😊 面诊照片',eye:'👁 眼诊照片',hand:'✋ 手诊照片'}[m];
 }
@@ -500,21 +537,35 @@ function toggleAutoPilot() {
   document.getElementById('apSwitch').style.background = autopilotEnabled ? 'var(--green)' : '';
 }
 
+// 采集自动提交开关
+function toggleAutoSubmit() {
+  autoSubmitOn = !autoSubmitOn;
+  document.getElementById('autoSubmitToggle').classList.toggle('on', autoSubmitOn);
+  document.getElementById('asSwitch').style.background = autoSubmitOn ? 'var(--green)' : '';
+  toast(autoSubmitOn ? '📤 采集自动提交已开启' : '⏸ 采集自动提交已关闭');
+}
+
 async function submitSession() {
-  const symptoms = document.getElementById('pSymptoms').value.trim();
-  const voiceText = document.getElementById('pVoice').value.trim();
-  const name = document.getElementById('pName').value.trim();
-  const image_b64 = window._imageB64 || null;
-  if (!image_b64 && !symptoms && !voiceText) return toast('请至少提供照片或症状描述');
-  const body = {
-    name: name || undefined,
+  const body = collectSessionBody();
+  if (!body.image_b64 && !body.symptoms && !body.voiceText) return toast('请至少提供照片或症状描述');
+  await createCollabSession(body);
+}
+
+// 采集患者输入（公共）
+function collectSessionBody() {
+  return {
+    name: document.getElementById('pName').value.trim() || undefined,
     mode: currentMode,
-    image_b64,
-    symptoms,
-    voiceText,
+    image_b64: _bestVisionB64 || window._imageB64 || null,
+    symptoms: document.getElementById('pSymptoms').value.trim(),
+    voiceText: document.getElementById('pVoice').value.trim(),
     selectedConditions: [...selectedConditions],
     autoPilot: autopilotEnabled,
   };
+}
+
+// 创建会话（公共：手动提交 / 语音自动 / 视觉自动 共用）
+async function createCollabSession(body) {
   document.getElementById('submitStatus').style.display = 'flex';
   document.getElementById('submitText').textContent = '诊断进行中（AI视觉 + AI知识库并行）…';
   document.getElementById('submitBtn').disabled = true;
@@ -534,6 +585,17 @@ async function submitSession() {
     document.getElementById('submitStatus').style.display = 'none';
     document.getElementById('submitBtn').disabled = false;
   }
+}
+
+// 自动提交（语音/视觉采集产物 → 会话 → 医生队列）
+async function autoSubmitSession({ fromVoice = false, fromVision = false } = {}) {
+  const body = collectSessionBody();
+  if (!body.image_b64 && !body.symptoms && !body.voiceText) {
+    toast('暂无可提交内容（无语音/症状/画面）');
+    return;
+  }
+  body.source = fromVision ? 'vision_auto' : 'voice_auto';
+  await createCollabSession(body);
 }
 
 function connectSSE(sessionId, global) {
