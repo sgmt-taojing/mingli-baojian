@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>能力出海战略分析 · 2026-08-10</title>
+<style>
+:root{--bg:#0d0d10;--panel:#16161c;--card:#1c1c24;--border:#2a2a35;--gold:#c9a84c;--green:#64c864;--red:#f44336;--amber:#ff9800;--purple:#7c4dff;--cyan:#4dd0e1;--text:#e8e6df;--muted:#9a978d}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;padding:32px 20px}
+.wrap{max-width:1100px;margin:0 auto}
+header{text-align:center;padding:40px 20px 30px;border-bottom:1px solid var(--border);margin-bottom:36px}
+header h1{font-size:28px;color:var(--gold);letter-spacing:2px}
+header .sub{color:var(--muted);margin-top:8px;font-size:14px}
+section{margin-bottom:36px}
+h2{font-size:20px;color:var(--gold);margin-bottom:16px;padding-left:12px;border-left:3px solid var(--gold)}
+h3{font-size:15px;color:var(--text);margin:18px 0 10px}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+th{background:var(--panel);color:var(--gold);text-align:left;padding:10px 12px;border:1px solid var(--border);font-weight:600}
+td{padding:9px 12px;border:1px solid var(--border);color:var(--text)}
+td.ok{color:var(--green)} td.warn{color:var(--amber)} td.bad{color:var(--red)} td.info{color:var(--cyan)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin:10px 0}
+.card .title{font-weight:600;color:var(--gold);margin-bottom:8px;font-size:14px}
+.card .desc{font-size:13px;color:var(--muted);line-height:1.8}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.metric{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.metric .num{font-size:24px;font-weight:700;color:var(--gold)}
+.metric .label{font-size:12px;color:var(--muted);margin-top:4px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.compare-col{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px}
+.compare-col h4{color:var(--gold);font-size:14px;margin-bottom:8px}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;border:1px solid var(--border)}
+.badge.green{color:var(--green);border-color:rgba(100,200,100,.3)}
+.badge.gold{color:var(--gold);border-color:rgba(201,168,76,.3)}
+.badge.red{color:var(--red);border-color:rgba(244,67,54,.3)}
+.badge.amber{color:var(--amber);border-color:rgba(255,152,0,.3)}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:30px 0;border-top:1px solid var(--border);margin-top:40px}
+.tl{position:relative;padding-left:24px;margin:16px 0}
+.tl::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--border)}
+.tl-step{position:relative;margin-bottom:16px}
+.tl-step::before{content:'';position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--bg)}
+.tl-step .ph{font-weight:600;font-size:14px}
+.tl-step .dt{font-size:13px;color:var(--muted);margin-top:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<h1>能力出海战略分析</h1>
+<div class="sub">8 大能力域 × 6 大目标市场 · 合法规适配 · 语言策略 · 优先级排序</div>
+</header>
+
+<div class="metrics">
+<div class="metric"><div class="num">5</div><div class="label">可出海能力域</div></div>
+<div class="metric"><div class="num">3</div><div class="label">最佳首站市场</div></div>
+<div class="metric"><div class="num">56.9亿</div><div class="label">占星 App 市场规模(2026)</div></div>
+<div class="metric"><div class="num">926亿</div><div class="label">中医市场(2026)</div></div>
+<div class="metric"><div class="num">39亿</div><div class="label">低空管理(2026)</div></div>
+</div>
+
+<section>
+<h2>一、能力域出海可行性评估</h2>
+<table>
+<tr><th>能力域</th><th>来源项目</th><th>出海可行性</th><th>核心优势</th><th>主要障碍</th></tr>
+<tr>
+<td>命理/占星（八字/紫微/风水）</td>
+<td>mingli-baojian</td>
+<td class="ok">✅ 高</td>
+<td>42963 条 KB · 8-Agent 编排 · 6 种术数体系 · PWA 离线</td>
+<td>东方术数需本地化（西方市场偏好星座塔罗）</td>
+</tr>
+<tr>
+<td>中医四诊+辨证</td>
+<td>mingli-baojian / tcm-diagnosis</td>
+<td class="warn">⚠️ 中高</td>
+<td>16 ONNX 模型 · 面舌眼手四诊 · 方剂库 · 体质辨识</td>
+<td>欧美医疗器械监管(FDA/MDR) · 东南亚相对宽松</td>
+</tr>
+<tr>
+<td>AI 视觉引擎</td>
+<td>ai-vision-toolkit</td>
+<td class="ok">✅ 高</td>
+<td>16 模型 · 场景化 UI · 离线 ONNX 推理</td>
+<td>通用技术，需按场景适配各国法规</td>
+</tr>
+<tr>
+<td>低空经济/无人机管理</td>
+<td>lowaltitude-platform</td>
+<td class="ok">✅ 高</td>
+<td>空域可视化 · 航线冲突 · UOM 追溯</td>
+<td>各国空域法规差异大（需逐国适配）</td>
+</tr>
+<tr>
+<td>家庭健康/生活管理</td>
+<td>smart-home-family</td>
+<td class="warn">⚠️ 中</td>
+<td>趋势预测 · 生活撮合 · 温和教练 · 医疗闭环</td>
+<td>医疗建议需各国执业资质</td>
+</tr>
+<tr>
+<td>视频安防/监控</td>
+<td>video-ai-surveillance</td>
+<td class="info">ℹ️ 中低</td>
+<td>多算法 · 布控告警 · 无人机载荷</td>
+<td>各国安防资质 · 数据本地化要求</td>
+</tr>
+<tr>
+<td>环保设备管理</td>
+<td>epb-assistant</td>
+<td class="bad">❌ 低</td>
+<td>中国环保法规深度绑定</td>
+<td>法规完全不可迁移</td>
+</tr>
+</table>
+</section>
+
+<section>
+<h2>二、目标市场优先级排序</h2>
+
+<h3>第一梯队：最佳首站（高需求 + 低门槛）</h3>
+<div class="grid">
+<div class="card">
+<div class="title">🇸🇬 新加坡（华人文化圈 · 英中双语）</div>
+<div class="desc">
+<strong>命理</strong>：华人占比 74%，八字/风水刚需 · <strong>中医</strong>：立法认可 TCM，有执业注册体系<br>
+<strong>低空</strong>：CAAS 积极推进 UAM · <strong>语言</strong>：英语 + 简体中文双语<br>
+<strong>法规</strong>：PDPA 个人数据保护法（类似 GDPR 但更宽松）· 无占星禁令<br>
+<strong>优势</strong>：支付发达 · App Store 消费力强 · 中文→英文跳板市场
+</div>
+</div>
+<div class="card">
+<div class="title">🇲🇾 马来西亚（华人 23% · TCM 立法成熟）</div>
+<div class="desc">
+<strong>命理</strong>：华人 700 万，八字/风水/紫微刚需 · <strong>中医</strong>：1967 中医法令，注册中医师制度<br>
+<strong>低空</strong>：CAAM 无人机法规已成型 · <strong>语言</strong>：中文/英文/马来文三语<br>
+<strong>法规</strong>：PDPA 2010 · 伊斯兰文化需尊重（避免「算命」用词，改「命运趋势分析」）<br>
+<strong>优势</strong>：华人消费力强 · 文化亲近度高 · 进入成本低
+</div>
+</div>
+<div class="card">
+<div class="title">🇹🇭 泰国（佛教文化 · 命理市场巨大）</div>
+<div class="desc">
+<strong>命理</strong>：泰国占星/塔罗/命理 App 极受欢迎（Buddhist astrology 天然适配）<br>
+<strong>低空</strong>：CAAT 积极推进无人机应用 · 农业无人机市场大<br>
+<strong>语言</strong>：泰语 + 英语（命理术语需泰语本地化）<br>
+<strong>法规</strong>：PDPA 2019（仿 GDPR）· 无占星禁令 · 医疗 App 需 FDA 注册<br>
+<strong>优势</strong>：命理市场增长快 · 农业无人机需求旺盛 · 文化包容度高
+</div>
+</div>
+</div>
+
+<h3>第二梯队：高潜力需适配</h3>
+<div class="grid">
+<div class="card">
+<div class="title">🇯🇵 日本（命理文化深厚 · 质量要求极高）</div>
+<div class="desc">
+四柱推命（八字日本版）+ 風水有成熟市场。APPI 个人信息保护法。<br>
+<strong>关键</strong>：日语本地化必须完美（日本用户对翻译质量零容忍）· 「占い」市场成熟<br>
+<strong>中医</strong>：汉方医学有法律地位 · 但处方药管理严格
+</div>
+</div>
+<div class="card">
+<div class="title">🇻🇳 越南（风水命理市场巨大）</div>
+<div class="desc">
+越南风水/八字/紫微文化极深。网络安全法 2018 要求数据本地化。<br>
+<strong>关键</strong>：越南语本地化 · 数据需存本地服务器
+</div>
+</div>
+<div class="card">
+<div class="title">🇰🇷 韩国（命理+中医市场）</div>
+<div class="desc">
+사주(四柱) + 풍수(风水) 市场巨大。中医韩医学有立法。<br>
+<strong>关键</strong>：韩语本地化 · PIPA 个人信息法（严格）
+</div>
+</div>
+</div>
+
+<h3>第三梯队：长期布局</h3>
+<div class="grid">
+<div class="card">
+<div class="title">🇺🇸 美国（最大市场但法规复杂）</div>
+<div class="desc">
+占星 App 市场全球第一（Co-Star/Sanctuary）。<strong>但</strong>宾州等仍有占星禁令（1861年法律）。<br>
+中医：针刺有 licensure，草药按 dietary supplement（DSHEA）。<br>
+<strong>关键</strong>：需要做西方占星版本（星座/塔罗/出生图）而非八字 · 州级法规逐州适配
+</div>
+</div>
+<div class="card">
+<div class="title">🇪🇺 欧盟（GDPR 严格但市场大）</div>
+<div class="desc">
+占星 App 市场成熟。TCM 在欧盟监管框架外（CAM 补充医学）。<br>
+<strong>关键</strong>：GDPR 合规成本高 · AI Act 对 AI 系统有分级要求 · 需要 CE 认证（如涉及医疗器械）
+</div>
+</div>
+<div class="card">
+<div class="title">🇦🇪 中东（低空经济新蓝海）</div>
+<div class="desc">
+UAE/Saudi 积极推进低空经济（飞行出租车/物流无人机）。<br>
+<strong>关键</strong>：阿拉伯语 RTL 布局 · 伊斯兰文化需适配（禁止占卜/算命，但「性格分析」「趋势参考」可接受）
+</div>
+</div>
+</div>
+</section>
+
+<section>
+<h2>三、各能力域的出海策略</h2>
+
+<h3>策略 1：命理/占星（最高优先 · 最快变现）</h3>
+<div class="compare">
+<div class="compare-col">
+<h4>东方术数版（新加坡/马来西亚/越南/日本/韩国）</h4>
+<p style="font-size:13px;color:var(--muted)">
+• 八字 → 四柱推命(日) / 사주(韩) / Tứ Trụ(越)<br>
+• 紫微斗数 → 原样输出（华人圈）<br>
+• 风水 → 風水(日) / 풍수(韩) / Phong Thủy(越)<br>
+• 语言：日/韩/越各需专业术数翻译<br>
+• 合规：加「文化娱乐参考」免责声明<br>
+• 定价：$4.99-$14.99/月（参考 Co-Star $9.99）
+</p>
+</div>
+<div class="compare-col">
+<h4>西方占星版（美国/欧洲/全球英语市场）</h4>
+<p style="font-size:13px;color:var(--muted)">
+• 八字 → 改为出生图(Natal Chart) + 行星相位<br>
+• 紫微 → 改为星座分析 + 上升/月亮星座<br>
+• 风水 → 改为 Space Clearing / Interior Energy<br>
+• 核心 KB 需重建（4万条东方→5千条西方占星）<br>
+• 合规：宾州等禁令州做「Entertainment Only」标签<br>
+• 定价：$9.99-$19.99/月（成熟市场付费意愿高）
+</p>
+</div>
+</div>
+
+<h3>策略 2：中医四诊（中高风险 · 需资质）</h3>
+<table>
+<tr><th>市场</th><th>合规要求</th><th>定位</th><th>变现模式</th></tr>
+<tr><td>新加坡</td><td class="ok">TCM 注册医师法（已有立法）</td><td>辅助诊断工具（给 TCM 医师用）</td><td>B2B SaaS $99/月/医师</td></tr>
+<tr><td>马来西亚</td><td class="ok">1967 中医法令</td><td>健康管理+体质辨识（非诊断）</td><td>B2C $6.99/月 + B2B</td></tr>
+<tr><td>泰国</td><<td class="warn">FDA 注册（若涉及诊断）</td><td>健康参考（避免「诊断」用词）</td><td>B2C $4.99/月</td></tr>
+<tr><td>日本</td><td class="warn">汉方医学（需医师资格）</td><td>体质养生参考</td><td>B2C ¥980/月</td></tr>
+<tr><td>美国</td><td class="bad">DSHEA（膳食补充剂范畴）</td><td>Wellness/生活方式（禁止诊断）</td><td>B2C $9.99/月</td></tr>
+<tr><td>欧盟</td><td class="bad">MDR 医疗器械法规</td><td>CAM 参考（不申请医疗器械）</td><td>B2C €7.99/月</td></tr>
+</table>
+<p style="font-size:13px;color:var(--muted);margin-top:8px">
+<strong>关键合规策略</strong>：所有市场统一加「本工具不提供医疗诊断，结果仅供健康养生参考」免责声明。面/舌/眼/手视觉分析在欧美降级为「lifestyle indicator」而非「diagnostic tool」。
+</p>
+
+<h3>策略 3：AI 视觉引擎（技术出海 · 无文化壁垒）</h3>
+<div class="card">
+<div class="title">通用视觉引擎 → 行业场景 SaaS</div>
+<div class="desc">
+• <strong>输出形式</strong>：ONNX 模型 + SDK + 场景化 UI 模板<br>
+• <strong>目标市场</strong>：全球（技术无国界）<br>
+• <strong>合规</strong>：GDPR（面部数据属敏感数据，需明确同意）· 各国 AI 法规<br>
+• <strong>定价</strong>：API 调用计费 $0.01-$0.05/次 · 或 $299/月企业版<br>
+• <strong>优势</strong>：16 个模型已训练完成 · 4 场景 UI 已验证 · 离线推理零延迟
+</div>
+</div>
+
+<h3>策略 4：低空经济管理平台</h3>
+<div class="card">
+<div class="title">无人机/低空管理 SaaS → 东盟/中东</div>
+<div class="desc">
+• <strong>目标市场优先级</strong>：新加坡(CAAS) > 泰国(CAAT) > 马来西亚(CAAM) > UAE(GCAA) > Saudi(GACA)<br>
+• <strong>语言</strong>：英语为主（航空领域全球通用英语）<br>
+• <strong>合规</strong>：逐国适配空域法规 · 数据本地化（部分国家要求）<br>
+• <strong>定价</strong>：$999-$4999/月（B2G/B2E 政企客户）<br>
+• <strong>市场数据</strong>：全球低空管理市场 $39.3 亿(2026) → $74.7 亿(2030)，CAGR 17.4%
+</div>
+</div>
+</section>
+
+<section>
+<h2>四、语言本地化策略</h2>
+<table>
+<tr><th>语言</th><th>目标市场</th><th>本地化难度</th><th>关键术语处理</th></tr>
+<tr><td>英语</td><td>新加坡/马来西亚/全球</td><td class="ok">低</td><td>BaZi → Birth Chart · 风水 → Feng Shui (已国际化)</td></tr>
+<tr><td>日语</td><td>日本</td><td class="warn">中</td><td>八字 → 四柱推命 · 紫微 → 紫微斗数(保留汉字)</td></tr>
+<tr><td>韩语</td><td>韩国</td><td class="warn">中</td><td>八字 → 사주팔자 · 风水 → 풍수</td></tr>
+<tr><td>越南语</td><td>越南</td><td class="warn">中</td><td>八字 → Tứ Trụ · 风水 → Phong Thủy</td></tr>
+<tr><td>泰语</td><td>泰国</td><td class="bad">高</td><td>命理术语缺乏标准泰语对应 · 需创建术语表</td></tr>
+<tr><td>阿拉伯语</td><td>中东</td><td class="bad">高</td><td>RTL 布局 · 禁占卜 → 改「性格分析」</td></tr>
+</table>
+</section>
+
+<section>
+<h2>五、合规适配清单（按市场）</h2>
+<div class="tl">
+<div class="tl-step"><div class="ph">数据保护合规</div><div class="dt">新加坡 PDPA · 马来西亚 PDPA · 泰国 PDPA · 日本 APPI · 韩国 PIPA · 越南 PDPD · 美国 CCPA · 欧盟 GDPR</div></div>
+<div class="tl-step"><div class="ph">免责声明统一化</div><div class="dt">命理：「文化娱乐参考，不构成命运预言」<br>中医：「健康养生参考，不替代专业医疗诊断」<br>视觉：「lifestyle indicator，非医疗诊断工具」</div></div>
+<div class="tl-step"><div class="ph">敏感内容适配</div><div class="dt">伊斯兰市场：禁止「算命/占卜」用词 → 改「趋势分析/性格参考」<br>美国部分州：宾州/新泽西等占星禁令 → 加「Entertainment Only」</div></div>
+<div class="tl-step"><div class="ph">数据本地化</div><div class="dt">越南：网络安全法要求用户数据存境内 · 中国：数据出境安全评估<br>欧盟：GDPR 要求用户有权要求数据删除</div></div>
+<div class="tl-step"><div class="ph">支付与定价</div><div class="dt">Apple/Google 内购（30% 抽成）· 东南亚本地支付（GrabPay/DuitNow/PromptPay）<br>定价策略：PPP 购买力平价（马来西亚/泰国定价为美国的 40-50%）</div></div>
+</div>
+</section>
+
+<section>
+<h2>六、出海路线图（12 个月）</h2>
+<div class="tl">
+<div class="tl-step"><div class="ph">Phase 1（M1-M3）：新加坡首发</div><div class="dt">
+• 英中双语版命理 App（八字/紫微/风水 → 英文术语适配）<br>
+• PDPA 合规 · Apple/Google 上架 · 「Entertainment」分类<br>
+• 定价：S$6.99/月 · 目标：1000 付费用户
+</div></div>
+<div class="tl-step"><div class="ph">Phase 2（M2-M5）：马来西亚 + 泰国</div><div class="dt">
+• 马来西亚：三语版（中/英/马来）· 避免伊斯兰敏感词<br>
+• 泰国：泰语本地化（术语表创建）· 农业无人机试点<br>
+• 中医体质辨识（非诊断定位）
+</div></div>
+<div class="tl-step"><div class="ph">Phase 3（M4-M8）：日本 + 韩国 + 越南</div><div class="dt">
+• 日本：四柱推命日语版 · APPI 合规 · 质量极致化<br>
+• 韩国：사주 한국어 버전 · PIPA 合规<br>
+• 越南：风水越南语版 · 数据本地化部署
+</div></div>
+<div class="tl-step"><div class="ph">Phase 4（M6-M12）：低空 SaaS + AI 视觉 SDK</div><div class="dt">
+• 低空管理 SaaS：新加坡/泰国/UAE 政企客户<br>
+• AI 视觉 SDK：全球开发者市场（API 计费）<br>
+• 英语占星版（美国/欧洲，西方占星 KB 重建）
+</div></div>
+</div>
+</section>
+
+<footer>
+出海战略分析 · 命理宝鉴 · 2026-08-10 · 数据来源：Research and Markets / MarkNTel Advisors / DLA Piper / Access Partnership
+</footer>
+
+</div>
+</body>
+</html>
