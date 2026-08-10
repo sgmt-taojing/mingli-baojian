@@ -814,30 +814,40 @@ async function generateBaziReport(){
   function renderBaziBasic(data, meta){
     // 四柱：Python 返回 pillars = {年:丙午, 月:甲午, 日:辛巳, 时:丁酉}
     var pillars = data.pillars || (data.chart && data.chart.pillars) || {};
-    var names = ['年','月','日','时'];
+    // R705: 兼容中/英 key（API lang=en 返回 Year/Month/Day/Hour）
+    var isEn = data.lang === 'en' || (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh'));
+    var cnNames = ['年','月','日','时'];
+    var enNames = ['Year','Month','Day','Hour'];
+    var names = isEn ? enNames : cnNames;
+    var dayLabel = isEn ? 'Day Master' : '日主';
     for(var i=0;i<4;i++){
-      var gz = pillars[names[i]] || '';
-      var g = gz.charAt(0), z = gz.charAt(1) || '';
+      var gz = pillars[names[i]] || pillars[cnNames[i]] || '';
+      // 英文模式 gz = "Geng Wu"（空格分隔），中文 = "庚午"（2 字符）
+      var g, z;
+      if (isEn && gz.indexOf(' ') > 0) { var pa = gz.split(' '); g = pa[0]; z = pa[1]; }
+      else { g = gz.charAt(0); z = gz.charAt(1) || ''; }
       var ge = document.getElementById('bz'+i+'g');
       var ze = document.getElementById('bz'+i+'z');
       var ee = document.getElementById('bz'+i+'e');
       var ne = document.getElementById('bz'+i+'n');
       if(ge) ge.textContent = g;
       if(ze) ze.textContent = z;
-      if(ee) ee.textContent = (GAN_ELE[g]||'') + ' · ' + (ZHI_ELE[z]||'');
-      if(ne) ne.textContent = i===2 ? '日主' : (data.gan_shen ? (data.gan_shen[names[i]]||'') : '');
+      if(ee) ee.textContent = isEn ? '' : ((GAN_ELE[g]||'') + ' · ' + (ZHI_ELE[z]||''));
+      if(ne) ne.textContent = i===2 ? dayLabel : (data.gan_shen ? (data.gan_shen[names[i]]||data.gan_shen[cnNames[i]]||'') : '');
     }
     var nameOut = document.getElementById('baziNameOut');
-    if(nameOut) nameOut.textContent = meta.name + ' 命盘';
+    if(nameOut) nameOut.textContent = meta.name + (isEn ? ' Chart' : ' 命盘');
     var metaOut = document.getElementById('baziMetaOut');
     if(metaOut){
-      var m = '公历'+meta.year+'年'+meta.month+'月'+meta.day+'日 '+meta.hour+'时 · '+(meta.sex==='female'?'女':'男')+'命';
+      var m = isEn
+        ? 'Solar '+meta.year+'-'+meta.month+'-'+meta.day+' '+meta.hour+':00 · '+(meta.sex==='female'?'Female':'Male')
+        : '公历'+meta.year+'年'+meta.month+'月'+meta.day+'日 '+meta.hour+'时 · '+(meta.sex==='female'?'女':'男')+'命';
       if(data.input && data.input.true_solar) m += ' · 真太阳时: ' + data.input.true_solar;
       if(data.input && data.input.correction) m += ' · ' + data.input.correction;
       metaOut.textContent = m;
     }
     var tags = document.getElementById('baziTagsOut');
-    if(tags && data.day_master) tags.innerHTML = '<span class="rb-tag">'+data.day_master+'</span><span class="rb-tag">'+meta.targetYear+'年流年</span>';
+    if(tags && data.day_master) tags.innerHTML = '<span class="rb-tag">'+data.day_master+'</span><span class="rb-tag">'+(isEn?'Year '+(meta.targetYear||'')+':':meta.targetYear+'年流年')+'</span>';
     var result = document.getElementById('baziResult');
     if(result){ result.classList.add('visible'); result.style.display = 'block'; }
   }
@@ -898,7 +908,8 @@ async function generateBaziReport(){
       var tyEl = document.getElementById('baziTargetYear');
       var targetYear = tyEl && tyEl.value ? parseInt(tyEl.value) : new Date().getFullYear();
       var currentAge = targetYear - year + 1;
-      var body = { year:year, month:month, day:day, hour:hour, minute:minute, sex:sex, lng:lng, targetYear:targetYear, currentAge:currentAge };
+      var _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
+      var body = { year:year, month:month, day:day, hour:hour, minute:minute, sex:sex, lng:lng, targetYear:targetYear, currentAge:currentAge, lang:_lang };
       showToast('排盘中…');
       var [r, rSvg] = await Promise.all([
         fetch(API_BASE+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body)}),
