@@ -39,6 +39,7 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
 .hint{text-align:center;font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.7}
 .transcript{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;line-height:1.8;min-height:60px;margin:8px 0;color:var(--text)}
 .transcript .live{color:var(--blue)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .tag-preview{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .tag{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold);font-size:11px;padding:3px 10px;border-radius:14px}
 .tag.symptom{background:rgba(72,187,120,.12);border-color:rgba(72,187,120,.3);color:var(--green)}
@@ -76,6 +77,19 @@ label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
 </button>
 <div class="timer" id="timer">00:00</div>
 <div class="hint" id="rec-hint">点击开始录音</div>
+<div class="live-voice-row">
+  <label class="live-voice-switch" style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer;user-select:none">
+    <input type="checkbox" id="liveMode" aria-label="实时语音模式" style="accent-color:var(--gold2,#c9a84c)">
+    实时语音模式（边说边查知识库）
+  </label>
+</div>
+</div>
+
+<!-- R697：实时 KB 理解流（说话过程中即时响应） -->
+<div class="card" id="kb-live-card" style="display:none;border-color:rgba(201,168,76,.25)">
+<div class="card-title" style="font-size:13px"><span class="step-num" style="font-size:11px">◉</span>知识库实时理解 <span class="kb-live-dot" id="kbLiveDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold2,#c9a84c);margin-left:6px;animation:pulse 1.2s infinite"></span></div>
+<div class="kb-live-query" id="kbLiveQuery" style="font-size:13px;color:var(--blue,#4dd0e1);margin-bottom:6px;min-height:20px">等待语音输入...</div>
+<div id="kbLiveResults" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto"></div>
 </div>
 
 <!-- 第二步：转写结果 -->
@@ -149,6 +163,9 @@ function toggleRecord(){
 
 function startRecord(){
   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){showToast('浏览器不支持录音，请用 Chrome/Edge');return}
+  // R697: 读取实时语音模式开关
+  var liveEl=document.getElementById('liveMode');
+  liveMode=liveEl?liveEl.checked:false;
   navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
     mediaStream=stream;
     chunks=[];
@@ -170,7 +187,7 @@ function startRecord(){
     document.getElementById('timer').textContent='00:00';
     document.getElementById('rec-btn').className='rec-btn recording';
     document.getElementById('rec-icon').textContent='⏹';
-    document.getElementById('rec-hint').textContent='正在录音，再次点击停止';
+    document.getElementById('rec-hint').textContent=liveMode?'🎙️ 实时模式 · 边说边查 KB · 再次点击停止':'正在录音，再次点击停止';
     recTimer=setInterval(function(){
       recSeconds++;
       var m=String(Math.floor(recSeconds/60)).padStart(2,'0');
@@ -191,6 +208,13 @@ function stopRecord(){
 }
 
 // ========== ASR 实时转写 ==========
+// R697: 升级为「实时语音 → 知识库即时响应」流式交互
+// 说话过程中：interim 文本实时显示 + 防抖 500ms 自动查 KB + 实时症状提取
+let liveMode = false;          // 实时语音模式开关
+let kbLiveTimer = null;        // KB 查询防抖
+let lastKbQuery = '';          // 去重
+let kbCardCount = 0;           // KB 卡片计数
+
 function startRecognition(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR)return;
@@ -200,16 +224,82 @@ function startRecognition(){
   recognition.interimResults=true;
   recognition.onresult=function(e){
     var text='';
-    for(var i=0;i<e.results.length;i++){text+=e.results[i][0].transcript}
+    var interim='';
+    var finals='';
+    for(var i=0;i<e.results.length;i++){
+      if(e.results[i].isFinal){
+        finals+=e.results[i][0].transcript;
+      }else{
+        interim+=e.results[i][0].transcript;
+      }
+    }
+    text=finals+interim;
     finalText=text;
-    document.getElementById('transcript').innerHTML='<span class="live">'+escapeHtml(text)+'</span>';
+    // 实时显示（final 白色 + interim 金色）
+    document.getElementById('transcript').innerHTML='<span class="live">'+escapeHtml(finals)+'</span>'+(interim?'<span style="color:var(--gold2,#c9a84c);opacity:.85">'+escapeHtml(interim)+'</span>':'');
+    // R697: 实时语音 → KB 即时响应（防抖 500ms，边说话边查）
+    if(liveMode && text && text.trim().length>=3){
+      scheduleKbQuery(text.trim());
+    }
+    // R697: 实时症状提取（每 1.5s 节流，边说话边出标签）
+    if(interim && text.length>=8 && (!window.__lastExtractTs || Date.now()-window.__lastExtractTs>1500)){
+      window.__lastExtractTs=Date.now();
+      try{previewExtract(text)}catch(_){}
+    }
   };
   recognition.onerror=function(){};
+  recognition.onend=function(){
+    // 实时模式自动续接（防止识别器自动停止）
+    if(liveMode && isRecording){
+      try{recognition.start()}catch(_){}
+    }
+  };
   try{recognition.start()}catch(e){}
+}
+
+// R697: KB 实时查询调度（防抖 + 去重）
+function scheduleKbQuery(text){
+  if(text===lastKbQuery)return;
+  lastKbQuery=text;
+  if(kbLiveTimer)clearTimeout(kbLiveTimer);
+  kbLiveTimer=setTimeout(function(){streamKbToLive(text)},500);
+}
+
+// R697: KB 流式响应（说话中即时返回匹配词条）
+function streamKbToLive(query){
+  var card=document.getElementById('kb-live-card');
+  var qEl=document.getElementById('kbLiveQuery');
+  var box=document.getElementById('kbLiveResults');
+  if(!card||!box)return;
+  card.style.display='block';
+  qEl.textContent='🔍 '+query.slice(0,60);
+  // 简短查询直接查，长查询取最近 30 字（聚焦最新意图）
+  var q=query.length>30?query.slice(-30):query;
+  fetch(API+'/api/public/kb-search?q='+encodeURIComponent(q)+'&module=tcm&limit=3',{signal:AbortSignal.timeout(8000)})
+  .then(function(r){return r.json()})
+  .then(function(d){
+    var results=(d&&d.data&&d.data.results)||[];
+    if(!results.length){qEl.textContent='🔍 '+query.slice(0,60)+' · 暂无直接匹配';return}
+    // 流式追加卡片（保留最近 6 条）
+    var item=document.createElement('div');
+    item.style.cssText='background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:8px;padding:8px 10px;font-size:12px';
+    item.innerHTML='<div style="color:var(--gold2,#c9a84c);font-weight:600;margin-bottom:4px">'+escapeHtml(results[0].title||'').slice(0,50)+'</div>'+'<div style="color:var(--text);opacity:.85;line-height:1.6">'+escapeHtml((results[0].snippet||results[0].summary||'').slice(0,110))+'</div>';
+    box.insertBefore(item,box.firstChild);
+    kbCardCount++;
+    while(box.children.length>6)box.removeChild(box.lastChild);
+    qEl.textContent='🔍 '+query.slice(0,60)+' · 命中 '+results.length+' 条';
+    // 实时预判：命中≥2 条且含症状词 → 提示可提前分析
+    if(results.length>=2 && /失眠|头痛|胃|咳嗽|痛|虚|湿|热|寒|痒|胀/.test(q)){
+      qEl.textContent=qEl.textContent+' · 可提前分析 ✓';
+      document.getElementById('transcript-card').style.display='block';
+    }
+  })
+  .catch(function(){});
 }
 
 function stopRecognition(){
   if(recognition){try{recognition.stop()}catch(e){}recognition=null}
+  if(kbLiveTimer){clearTimeout(kbLiveTimer);kbLiveTimer=null}
   if(finalText){
     document.getElementById('transcript').textContent=finalText;
   }else{
@@ -240,12 +330,10 @@ var SYMPTOM_WORDS=['痛','疼','酸','麻','胀','晕','失眠','多梦','咳嗽
 var BIRTH_PATTERN=/(\d{4})年(\d{1,2})月(\d{1,2})日(?:[上下]?午)?(\d{1,2})?[点时]/;
 var QUERY_WORDS=['事业','工作','财运','感情','婚姻','健康','学业','考试','求职','搬家','出行','诉讼','官司','投资','开店'];
 
-function analyzeText(){
-  var text=finalText;
-  var manual=document.getElementById('manual-text');
-  if(manual&&manual.value)text=manual.value;
-  if(!text||text.length<3){showToast('请先输入或录制语音内容');return}
-  
+// R697: 提取逻辑抽成独立函数（实时语音模式边说话边调用）
+// silent=true 时不滚动、不弹卡（由 onresult 节流触发）
+function previewExtract(text, silent){
+  if(!text||text.length<3)return;
   // 提取症状
   var symptoms=new Set();
   SYMPTOM_WORDS.forEach(function(w){
@@ -270,17 +358,28 @@ function analyzeText(){
   Array.from(symptoms).slice(0,8).forEach(function(s){tags+='<span class="tag symptom">'+s+'</span>'});
   if(birth)tags+='<span class="tag birth">出生：'+birth.year+'年'+birth.month+'月'+birth.day+'日'+(birth.hour?' '+birth.hour+'时':'')+'</span>';
   queryWords.forEach(function(q){tags+='<span class="tag query">'+q+'</span>'});
-  document.getElementById('tag-preview').innerHTML=tags;
+  var tp=document.getElementById('tag-preview');
+  if(tp)tp.innerHTML=tags;
   
-  document.getElementById('symptoms').value=symptomStr;
+  var symEl=document.getElementById('symptoms');
+  if(symEl)symEl.value=symptomStr;
   if(birth){
-    document.getElementById('birth-year').value=birth.year;
-    document.getElementById('birth-month').value=birth.month;
-    document.getElementById('birth-day').value=birth.day;
-    document.getElementById('birth-hour').value=birth.hour;
+    var by=document.getElementById('birth-year');if(by)by.value=birth.year;
+    var bm=document.getElementById('birth-month');if(bm)bm.value=birth.month;
+    var bd=document.getElementById('birth-day');if(bd)bd.value=birth.day;
+    var bh=document.getElementById('birth-hour');if(bh)bh.value=birth.hour;
   }
-  document.getElementById('extract-card').style.display='block';
-  document.getElementById('extract-card').scrollIntoView({behavior:'smooth'});
+  var ec=document.getElementById('extract-card');
+  if(ec)ec.style.display='block';
+  if(!silent&&ec)ec.scrollIntoView({behavior:'smooth'});
+}
+
+function analyzeText(){
+  var text=finalText;
+  var manual=document.getElementById('manual-text');
+  if(manual&&manual.value)text=manual.value;
+  if(!text||text.length<3){showToast('请先输入或录制语音内容');return}
+  previewExtract(text,false);
 }
 
 // ========== 提交 ==========
