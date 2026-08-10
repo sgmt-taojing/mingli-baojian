@@ -116,6 +116,46 @@ const REGION_CONFIG = {
     terminology: 'who-en',
     dataPrivacy: { law: 'GDPR', consentRequired: true, dataLocalization: true, rightToBeForgotten: true },
   },
+
+  kr: {
+    name: '한국 (Korea)',
+    locale: 'ko-KR',
+    features: {
+      fortuneTelling: true,
+      tcmDiagnosis: 'hanbang',
+      prescription: false,
+      aiVision: true,
+      autopilot: false,
+      voiceInput: true,
+    },
+    disclaimer: {
+      level: 'medium',
+      text: '전통 의학 문화 참고용입니다. 전문의 상담을 권장합니다.',
+      showOnEveryPage: true,
+    },
+    terminology: 'hanbang-ko',
+    dataPrivacy: { law: 'PIPA', consentRequired: true, dataLocalization: false },
+  },
+
+  vn: {
+    name: 'Việt Nam',
+    locale: 'vi-VN',
+    features: {
+      fortuneTelling: true,
+      tcmDiagnosis: true,
+      prescription: true,
+      aiVision: true,
+      autopilot: false,
+      voiceInput: true,
+    },
+    disclaimer: {
+      level: 'medium',
+      text: 'Tham khảo văn hóa y học cổ truyền. Không thay thế tư vấn y tế chuyên nghiệp.',
+      showOnEveryPage: true,
+    },
+    terminology: 'tcm-vi',
+    dataPrivacy: { law: 'PDPD', consentRequired: true, dataLocalization: false },
+  },
 };
 
 /** 获取当前地区配置（从环境变量或 localStorage 读取） */
