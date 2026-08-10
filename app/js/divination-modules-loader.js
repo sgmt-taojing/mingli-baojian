@@ -63,5 +63,5 @@
     CONFIG: DIVINATION_MODULES
   };
   
-  console.info('[divination-modules-loader] ready:', listModules().length, 'modules');
+  // ready 信号（无日志输出，符合全站 console 清零规范）
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -2108,15 +2108,32 @@ a[href="divination-hub.html"]:hover {
 <script src="knowledge-models/yijing-model.js" defer></script>
 <script src="knowledge-models/ziwei-model.js" defer></script>
 <script src="knowledge-models/zodiac-model.js" defer></script>
+<script src="js/divination-modules-loader.js" defer></script>
 <script>
-// R341: divination-core.js 按需加载（434KB 首屏不需要）
+// R629-R639: 拆分模块按需加载（替代 2.3MB 旧 core 首屏加载）
 window._loadDivinationCore = function() {
   if (window.__divCoreLoaded) return;
   window.__divCoreLoaded = true;
-  var s = document.createElement('script');
-  s.src = 'js/divination-core.js';
-  s.defer = true;
-  document.head.appendChild(s);
+  if (window.DivinationModules) {
+    // 加载 Phase 1-4 核心模块（Phase 5 lifeplan 由调用处单独加载）
+    window.DivinationModules.load([
+      'almanac-engine', 'heluo-math', 'lunar-utils',
+      'bazi-core', 'bazi-liunian',
+      'qimen-engine', 'yijing-engine',
+      'bazi-renderer'
+    ]).catch(function() {
+      // loader 失败 → 回退旧 core（兼容兜底）
+      var s = document.createElement('script');
+      s.src = 'js/divination-core.js';
+      s.defer = true;
+      document.head.appendChild(s);
+    });
+  } else {
+    var s = document.createElement('script');
+    s.src = 'js/divination-core.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  }
 };
 // 首次用户交互时加载
 ['click', 'keydown', 'touchstart'].forEach(function(e) {
