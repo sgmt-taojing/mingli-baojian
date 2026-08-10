@@ -5769,6 +5769,10 @@ function _renderOrchestratePanel(plan, results, final) {
     if (final && final.auditFlags && final.auditFlags.length > 0) {
       stepsEl.innerHTML += '<div class="hci-thought-step" style="animation-delay:' + ((results ? results.length : 0) * 0.1 + 0.1) + 's"><div class="step-num" style="color:#ff9800">⚠</div><div class="step-content"><div class="step-phase">Critic · 审查</div><div class="step-detail">过滤: ' + final.auditFlags.join('; ') + '</div></div></div>';
     }
+    // R695: Critic 多视角交叉验证展示
+    if (final && final.crossView && final.crossView.length >= 2) {
+      stepsEl.innerHTML += '<div class="hci-thought-step" style="animation-delay:' + ((results ? results.length : 0) * 0.1 + 0.2) + 's"><div class="step-num" style="color:#7c4dff">🔀</div><div class="step-content"><div class="step-phase">Critic · 交叉验证</div><div class="step-detail">多视角融合: ' + final.crossView.map(function(a){ return a.replace(/_expert|_researcher/g, ''); }).join(' + ') + '</div></div></div>';
+    }
     if (typeof window.hciToggleThinking === 'function') window.hciToggleThinking(true);
     if (typeof window.hciShowThinking === 'function') window.hciShowThinking(false);
     if (typeof window.hciShowConfidence === 'function') window.hciShowConfidence({ level: finalScore >= 0.7 ? '高' : (finalScore >= 0.4 ? '中' : '低'), score: finalScore });
