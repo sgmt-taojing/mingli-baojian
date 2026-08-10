@@ -6,8 +6,11 @@
 //   Phase 4: bazi-renderer.js (31KB)
 //   Phase 5: lifeplan-module.js (60KB)
 // 新页面请使用 divination-modules-loader.js 按需加载，勿直接引用本文件。
-// 旧页面（bazi/tizhi/report-config/wechat-hub/lifeindex-section）仍依赖本文件，
-// 后续将逐页迁移到 loader 方案，迁移完成后本文件将被替换为空壳导入。
+// R696 审计结论（2026-08-10）：本文件 545 个业务函数仍被 divination-hub 的 26 个
+// runXxx 流程函数依赖（runQimen/runZiwei/runMeihua 等），其余页面已全部迁移
+// （zhanbu 自带实现 / ui-toast.js 独立 / bazi 自带 computeBazi / fengshui-inline）。
+// 空壳化路径：Phase 6 将 hub 的 26 个 runXxx 提取为 js/hub-run-engines.js，
+// 完成后本文件即可退役。showToast 等通用函数已由 ui-toast.js 提供，本文件内为冗余。
 // 已拆分的 14 个核心函数在本文中仍有重复定义（兼容旧页面），
 // 新代码应从拆分模块中调用，不要依赖本文件中的同名函数。
 typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if(!s) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); });
