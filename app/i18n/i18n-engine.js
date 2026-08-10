@@ -11,7 +11,13 @@
 'use strict';
 
 const I18N = (function () {
-  const STORAGE_KEY = 'mbj_locale';
+  const LANG_STORE = 'mbj_locale';
+  const REGION_STORE = 'mbj_region';
+  const DEFAULT_LOCALE = 'zh-CN';
+  const REGION_LOCALE = {
+    cn: 'zh-CN', sg: 'en-SG', jp: 'ja-JP', kr: 'ko-KR', vn: 'vi-VN',
+    us: 'en-SG', eu: 'en-SG', tw: 'zh-TW', hk: 'zh-TW', my: 'en-SG', th: 'en-SG', au: 'en-SG',
+  };
   const SUPPORTED = {
     'zh-CN': '简体中文',
     'zh-TW': '繁體中文',
@@ -21,10 +27,10 @@ const I18N = (function () {
     'vi-VN': 'Tiếng Việt',
   };
 
-  let _locale = localStorage.getItem(STORAGE_KEY) || _localeFromRegion() || _detectLocale();
+  let _locale = localStorage.getItem(LANG_STORE) || _localeFromRegion() || _detectLocale();
 
   function _localeFromRegion() {
-    const region = localStorage.getItem(REGION_KEY);
+    const region = localStorage.getItem(REGION_STORE);
     return (region && REGION_LOCALE[region]) || null;
   }
   let _packs = {};
@@ -47,10 +53,9 @@ const I18N = (function () {
   async function _load(locale) {
     if (_loaded[locale]) return _packs[locale];
     try {
-      let res = await fetch(`/app/i18n/${locale}.json`).catch(() => null);
-      if (!res || !res.ok) res = await fetch(`/i18n/${locale}.json`);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      let res = await fetch(`/i18n/${locale}.json`).catch(() => null);
+      if (!res || !res.ok) res = await fetch(`/app/i18n/${locale}.json`).catch(() => null);
+      if (!res || !res.ok) throw new Error('HTTP ' + (res && res.status));
       _packs[locale] = await res.json();
       _loaded[locale] = true;
       return _packs[locale];
@@ -94,7 +99,7 @@ const I18N = (function () {
       return;
     }
     _locale = locale;
-    localStorage.setItem(STORAGE_KEY, locale);
+    localStorage.setItem(LANG_STORE, locale);
     await _load(locale);
     if (!_packs[DEFAULT_LOCALE]) await _load(DEFAULT_LOCALE);
     _applyDOM();

@@ -55,14 +55,14 @@
 <script src="js/divination-hub-life36.js" defer></script>
 
 <script src="js/divination-hub-nav.js" defer></script>
-<script src="../knowledge/authoritative-knowledge-base.js" defer></script>
-    <script src="../knowledge/faith-knowledge-base.js" defer></script>
-    <script src="../knowledge/faith-deities-detail.js" defer></script>
-    <script src="../knowledge/scripture-database.js" defer></script>
+<script src="knowledge/authoritative-knowledge-base.js" defer></script>
+    <script src="knowledge/faith-knowledge-base.js" defer></script>
+    <script src="knowledge/faith-deities-detail.js" defer></script>
+    <script src="knowledge/scripture-database.js" defer></script>
     <script src="voice-reader.js" defer></script>
-    <script src="../knowledge/faith-renderer.js" defer></script>
-    <script src="../knowledge/knowledge-supplement.js" defer></script>
-    <script src="../knowledge/koujue-database-full.js" defer></script>
+    <script src="knowledge/faith-renderer.js" defer></script>
+    <script src="knowledge/knowledge-supplement.js" defer></script>
+    <script src="knowledge/koujue-database-full.js" defer></script>
 <script src="js/secure-storage.js" defer></script>
 <script src="js/user-profile.js" defer></script>
 <style>
@@ -572,7 +572,44 @@ a[href="divination-hub.html"]:hover {
 
 </style>
 <script src="js/i18n.js" defer></script>
+<script src="i18n/region-config.js" defer></script>
 <script src="i18n/i18n-engine.js" defer></script>
+<script>
+// R704: 地区参数消费 + 海外合规横幅（功能层不弹回——海外用户从 index-global 进入功能页可正常使用）
+(function() {
+  try {
+    const p = new URLSearchParams(location.search);
+    const urlRegion = p.get('region');
+    const urlLocale = p.get('locale');
+    if (urlRegion) localStorage.setItem('mbj_region', urlRegion);
+    if (urlLocale) localStorage.setItem('mbj_locale', urlLocale);
+    if (urlRegion || urlLocale) {
+      p.delete('region'); p.delete('locale');
+      const clean = p.toString();
+      history.replaceState(null, '', location.pathname + (clean ? '?' + clean : ''));
+    }
+    const region = localStorage.getItem('mbj_region');
+    // 海外合规横幅（仅非国内地区显示；DOM 就绪后挂载，避免 body 未解析）
+    if (region && region !== 'cn') {
+      const showBanner = function() {
+        try {
+          const cfg = (window.RegionConfig && RegionConfig.REGION_CONFIG && RegionConfig.REGION_CONFIG[region]) || null;
+          const banner = document.createElement('div');
+          banner.id = 'region-compliance-banner';
+          banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#1a1a2e;color:#e8dcc0;font-size:12px;padding:8px 40px;text-align:center;font-family:ui-serif,serif';
+          banner.textContent = (cfg && cfg.disclaimer && cfg.disclaimer.text) ||
+            'Content provided for cultural education and entertainment reference only.';
+          document.body.appendChild(banner);
+          const phb = document.querySelector('.page-header-bar');
+          if (phb) phb.style.marginTop = '34px';
+        } catch (_) {}
+      };
+      if (document.body) showBanner();
+      else document.addEventListener('DOMContentLoaded', showBanner);
+    }
+  } catch (_) {}
+})();
+</script>
 </head>
 <body class="theme-zhouyi">
 <header class="page-header-bar" data-theme="divination">
@@ -612,8 +649,8 @@ a[href="divination-hub.html"]:hover {
   <div class="nav-inner">
     <div class="nav-brand">易道智鉴</div>
     <div class="lang-switch" style="margin-left:auto;display:flex;gap:4px">
-      <button onclick="i18n.setLang('zh')" style="font-size:11px;padding:2px 8px;border:1px solid var(--border);background:transparent;color:var(--gold);border-radius:4px;cursor:pointer">中</button>
-      <button onclick="i18n.setLang('en')" style="font-size:11px;padding:2px 8px;border:1px solid var(--border);background:transparent;color:var(--gold);border-radius:4px;cursor:pointer">EN</button>
+      <button onclick="I18N.setLocale('zh-CN')" style="font-size:11px;padding:2px 8px;border:1px solid var(--border);background:transparent;color:var(--gold);border-radius:4px;cursor:pointer">中</button>
+      <button onclick="I18N.setLocale('en-SG')" style="font-size:11px;padding:2px 8px;border:1px solid var(--border);background:transparent;color:var(--gold);border-radius:4px;cursor:pointer">EN</button>
     </div>
   </div>
 </nav>
@@ -2250,43 +2287,43 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="js/divination-hub-extra-lazy-loader.js" defer></script>
 
 <script src="js/divination-hub-extra-scroll-check.js" defer></script>
-<script src="../knowledge/knowledge-details.js" defer></script>
-<script src="../knowledge/knowledge-details-extra.js" defer></script>
-<script src="../knowledge/liuyao-knowledge-base.js" defer></script>
-<script src="../knowledge/bazi-knowledge-base.js" defer></script>
-<script src="../knowledge/ziwei-knowledge-base.js" defer></script>
-<script src="../knowledge/qimen-knowledge-base.js" defer></script>
-<script src="../knowledge/meihua-knowledge-base.js" defer></script>
-<script src="../knowledge/liuren-knowledge-base.js" defer></script>
-<script src="../knowledge/fengshui-knowledge-base.js" defer></script>
-<script src="../knowledge/zhouyi-knowledge-base.js" defer></script>
+<script src="knowledge/knowledge-details.js" defer></script>
+<script src="knowledge/knowledge-details-extra.js" defer></script>
+<script src="knowledge/liuyao-knowledge-base.js" defer></script>
+<script src="knowledge/bazi-knowledge-base.js" defer></script>
+<script src="knowledge/ziwei-knowledge-base.js" defer></script>
+<script src="knowledge/qimen-knowledge-base.js" defer></script>
+<script src="knowledge/meihua-knowledge-base.js" defer></script>
+<script src="knowledge/liuren-knowledge-base.js" defer></script>
+<script src="knowledge/fengshui-knowledge-base.js" defer></script>
+<script src="knowledge/zhouyi-knowledge-base.js" defer></script>
 
-<script src="../knowledge/yangzhai-knowledge-base.js" defer></script>
-<script src="../knowledge/zodiac-knowledge-base.js" defer></script>
-<script src="../knowledge/masters-knowledge.js" defer></script>
-    <script src="../knowledge/nishan-knowledge.js" defer></script>
-<script src="../knowledge/shop-data.js" defer></script>
-<script src="../knowledge/faith-content.js" defer></script>
+<script src="knowledge/yangzhai-knowledge-base.js" defer></script>
+<script src="knowledge/zodiac-knowledge-base.js" defer></script>
+<script src="knowledge/masters-knowledge.js" defer></script>
+    <script src="knowledge/nishan-knowledge.js" defer></script>
+<script src="knowledge/shop-data.js" defer></script>
+<script src="knowledge/faith-content.js" defer></script>
 <script src="js/divination-hub-extra-shop-init.js" defer></script>
 
 <!-- 口诀库渲染器 -->
-<script src="../knowledge/koujue-renderer.js" defer></script>
+<script src="knowledge/koujue-renderer.js" defer></script>
 
 <!-- 知识库补充文件 -->
-<script src="../knowledge/knowledge-supplement-1.js" defer></script>
-<script src="../knowledge/knowledge-supplement-2.js" defer></script>
-<script src="../knowledge/knowledge-supplement-3.js" defer></script>
-<script src="../knowledge/knowledge-supplement-4.js" defer></script>
-<script src="../knowledge/knowledge-supplement-5.js" defer></script>
-<script src="../knowledge/knowledge-supplement-6.js" defer></script>
-<script src="../knowledge/knowledge-deep-supplement.js" defer></script>
-<script src="../knowledge/knowledge-index.js" defer></script>
+<script src="knowledge/knowledge-supplement-1.js" defer></script>
+<script src="knowledge/knowledge-supplement-2.js" defer></script>
+<script src="knowledge/knowledge-supplement-3.js" defer></script>
+<script src="knowledge/knowledge-supplement-4.js" defer></script>
+<script src="knowledge/knowledge-supplement-5.js" defer></script>
+<script src="knowledge/knowledge-supplement-6.js" defer></script>
+<script src="knowledge/knowledge-deep-supplement.js" defer></script>
+<script src="knowledge/knowledge-index.js" defer></script>
 
 <!-- 外部JS引擎 -->
 <!-- 额外知识库 -->
-<script src="../knowledge/faith-guide.js" defer></script>
-<script src="../knowledge/incantation-database.js" defer></script>
-<script src="../knowledge/psychology-wisdom.js" defer></script>
+<script src="knowledge/faith-guide.js" defer></script>
+<script src="knowledge/incantation-database.js" defer></script>
+<script src="knowledge/psychology-wisdom.js" defer></script>
 <!-- AI 分析浮动按钮 + 引擎已就绪 -->
 <div id="ai-analyze-fab" style="position:fixed;right:14px;bottom:80px;z-index:998;display:flex;flex-direction:column;gap:8px;background:rgba(20,16,30,.92);backdrop-filter:blur(8px);border:1px solid rgba(201,168,76,.3);border-radius:18px;padding:10px 12px;box-shadow:0 4px 18px rgba(0,0,0,.4)">
   <div style="font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:2px">AI 分析</div>
