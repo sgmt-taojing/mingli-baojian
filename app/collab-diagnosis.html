@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>四方实时协作诊断 · 患者×AI视觉×AI知识库×医生</title>
+<style>
+:root{
+  --bg:#0f1420;--card:#1a2233;--card2:#202a40;--line:#2c3854;
+  --text:#e8edf7;--dim:#8b98b5;--accent:#4f8cff;--green:#2ecc71;--amber:#f5b942;--red:#e74c3c;--purple:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{display:flex;align-items:center;gap:14px;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar h1{font-size:17px;font-weight:700;letter-spacing:.5px}
+.topbar .sub{font-size:12px;color:var(--dim)}
+.role-switch{margin-left:auto;display:flex;gap:6px;background:var(--card2);padding:4px;border-radius:10px}
+.role-switch button{border:none;background:transparent;color:var(--dim);padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.role-switch button.active{background:var(--accent);color:#fff}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+.badge.blue{background:rgba(79,140,255,.15);color:var(--accent)}
+.badge.green{background:rgba(46,204,113,.15);color:var(--green)}
+.badge.amber{background:rgba(245,185,66,.15);color:var(--amber)}
+.badge.red{background:rgba(231,76,60,.15);color:var(--red)}
+.badge.purple{background:rgba(167,139,250,.15);color:var(--purple)}
+.container{display:grid;grid-template-columns:340px 1fr;gap:16px;padding:16px;max-width:1500px;margin:0 auto}
+@media(max-width:900px){.container{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.panel h2{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel h2 .count{margin-left:auto;font-size:12px;color:var(--dim);font-weight:400}
+label{display:block;font-size:12px;color:var(--dim);margin:10px 0 4px}
+input[type=text],textarea,select{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit}
+textarea{resize:vertical;min-height:64px}
+input:focus,textarea:focus{border-color:var(--accent)}
+.btn{border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.amber{background:var(--amber);color:#1a1a1a}
+.btn.red{background:var(--red);color:#fff}
+.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:12px}
+.btn.block{width:100%;justify-content:center;margin-top:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{background:var(--card2);border:1px solid var(--line);color:var(--dim);padding:5px 11px;border-radius:20px;font-size:12px;cursor:pointer;transition:.12s;user-select:none}
+.chip.on{background:rgba(79,140,255,.2);border-color:var(--accent);color:var(--accent)}
+.dropzone{border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;color:var(--dim);font-size:13px;cursor:pointer;transition:.15s;margin-top:6px;position:relative;overflow:hidden}
+.dropzone:hover{border-color:var(--accent)}
+.dropzone img{max-width:100%;max-height:160px;border-radius:8px;display:block;margin:0 auto}
+.mode-tabs{display:flex;gap:6px;margin-top:8px}
+.mode-tabs button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--dim);padding:7px;border-radius:8px;font-size:12px;cursor:pointer}
+.mode-tabs button.on{background:rgba(79,140,255,.18);border-color:var(--accent);color:var(--accent)}
+.status-line{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px}
+.spinner{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:1100px){.flow{grid-template-columns:repeat(2,1fr)}}
+.flow .step{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;position:relative}
+.flow .step .icon{font-size:20px}
+.flow .step .name{font-size:12px;font-weight:700;margin:6px 0 2px}
+.flow .step .state{font-size:11px;color:var(--dim)}
+.flow .step.done{border-color:rgba(46,204,113,.5);background:rgba(46,204,113,.07)}
+.flow .step.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,140,255,.15)}
+.flow .step.error{border-color:rgba(231,76,60,.5);background:rgba(231,76,60,.07)}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+@media(max-width:1100px){.result-grid{grid-template-columns:1fr}}
+.result-card{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.result-card .head{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-weight:700;font-size:13px}
+.syndrome{font-size:18px;font-weight:800;color:var(--accent);margin:6px 0}
+.conf{font-size:12px;color:var(--dim)}
+.evidence{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.7}
+.evidence li{margin-left:16px}
+.formulas{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.formula{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);color:var(--purple);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.rx-box{margin-top:12px;background:rgba(46,204,113,.06);border:1px solid rgba(46,204,113,.35);border-radius:12px;padding:14px}
+.rx-box h3{font-size:13px;color:var(--green);margin-bottom:6px}
+.rx-formula{font-size:15px;font-weight:700}
+.queue-item{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:.12s}
+.queue-item:hover{border-color:var(--accent)}
+.queue-item .row1{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.queue-item .row2{font-size:11px;color:var(--dim);margin-top:6px;line-height:1.6}
+.risk-tag{font-size:10px;background:rgba(231,76,60,.15);color:var(--red);padding:2px 8px;border-radius:10px;margin:2px 4px 2px 0;display:inline-block}
+.toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--dim);margin-top:10px;cursor:pointer;user-select:none}
+.switch{width:36px;height:20px;background:var(--line);border-radius:20px;position:relative;transition:.15s;flex-shrink:0}
+.switch::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.15s}
+.toggle.on .switch{background:var(--green)}
+.toggle.on .switch::after{left:18px}
+.hidden{display:none!important}
+.notice{font-size:11px;color:var(--dim);line-height:1.6;margin-top:8px;padding:8px;background:var(--card2);border-radius:8px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;color:#111;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.4);opacity:0;transition:.25s;z-index:99;pointer-events:none}
+#toast.show{opacity:1}
+.evt-log{max-height:180px;overflow-y:auto;font-size:11px;color:var(--dim);background:var(--card2);border-radius:8px;padding:8px;margin-top:10px;font-family:ui-monospace,monospace;line-height:1.8}
+.evt-log b{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1>🩺 四方实时协作诊断</h1>
+  <span class="sub">患者 × AI视觉 × AI知识库 × 医生 · 实时交互 · 处方医生审核</span>
+  <span id="connBadge" class="badge amber">● 未连接</span>
+  <div class="role-switch">
+    <button id="rolePatient" class="active" onclick="switchRole('patient')">🧑 患者端</button>
+    <button id="roleDoctor" onclick="switchRole('doctor')">👨‍⚕️ 医生端</button>
+  </div>
+</div>
+
+<div class="container">
+  <!-- ═══ 左栏：患者提交 / 医生队列 ═══ -->
+  <div>
+    <!-- 患者端 -->
+    <div id="patientPanel" class="panel">
+      <h2>📋 患者信息提交 <span class="count" id="patientHint">拍照 / 症状 / 语音</span></h2>
+      <label>患者称呼（可选）</label>
+      <input type="text" id="pName" placeholder="如：张先生 / 不填则匿名">
+      <div class="mode-tabs" id="modeTabs">
+        <button class="on" data-mode="tongue" onclick="setMode('tongue')">👅 舌诊</button>
+        <button data-mode="face" onclick="setMode('face')">😊 面诊</button>
+        <button data-mode="eye" onclick="setMode('eye')">👁 眼诊</button>
+        <button data-mode="hand" onclick="setMode('hand')">✋ 手诊</button>
+      </div>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+        <span id="dzText">📷 点击拍摄 / 上传照片</span>
+        <img id="preview" class="hidden" alt="预览">
+      </div>
+      <input type="file" id="fileInput" accept="image/*" capture="environment" class="hidden" onchange="handleFile(this)">
+      <label>症状描述（文字）</label>
+      <textarea id="pSymptoms" placeholder="如：舌苔黄腻，口苦口干，大便粘滞，烦躁易怒"></textarea>
+      <label>病情勾选（多选）</label>
+      <div class="chips" id="condChips"></div>
+      <label>穿戴设备语音转写（粘贴语音识别结果）</label>
+      <textarea id="pVoice" placeholder="如：最近总是感觉乏力，舌苔很厚（可来自穿戴设备语音）"></textarea>
+      <button class="btn primary block" id="submitBtn" onclick="submitSession()">🚀 提交诊断（AI视觉 + AI知识库 并行）</button>
+      <div class="toggle" id="autoPilotToggle" onclick="toggleAutoPilot()">
+        <span class="switch" id="apSwitch"></span> 无人化自主模式（AI 双路高置信自动建议处方，高风险强制医生审核）
+      </div>
+      <div class="status-line" id="submitStatus" style="display:none">
+        <span class="spinner"></span><span id="submitText">诊断进行中…</span>
+      </div>
+    </div>
+
+    <!-- 医生端 -->
+    <div id="doctorPanel" class="panel hidden">
+      <h2>👨‍⚕️ 医生待办队列 <span class="count" id="queueCount">0</span></h2>
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button class="btn ghost sm" onclick="loadQueue('pending')">⏳ 待处理</button>
+        <button class="btn ghost sm" onclick="loadQueue('completed')">✅ 已完成</button>
+        <button class="btn ghost sm" onclick="loadQueue('rejected')">🚫 已取消</button>
+      </div>
+      <div id="queueList"><div class="notice">加载中…</div></div>
+      <div class="notice">💡 新会话实时推送，AI 双路诊断完成后自动出现在队列。无人化模式下 AI 建议处方标记 <b style="color:var(--green)">AI自主</b>，医生快速审核即可签发。</div>
+    </div>
+  </div>
+
+  <!-- ═══ 右栏：会话详情 / 实时四路 ═══ -->
+  <div>
+    <div id="emptyState" class="panel" style="text-align:center;padding:60px 20px">
+      <div style="font-size:44px;margin-bottom:14px">🩺</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">四方实时协作诊断工作台</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.8">
+        患者提交照片 + 症状 + 病情勾选 + 语音 →<br>
+        <b style="color:var(--accent)">AI 视觉诊断</b> 与 <b style="color:var(--purple)">AI 知识库诊断</b> 并行实时跑 →<br>
+        医生实时接收 → 审核/修改 → 处方 → 终审签发<br><br>
+        <span style="font-size:12px">进化目标：无人化纯 AI 视觉 + 音频 + 底层知识库自主诊断</span>
+      </div>
+    </div>
+
+    <div id="sessionView" class="hidden">
+      <!-- 四路状态流 -->
+      <div class="flow">
+        <div class="step" id="stepPatient"><div class="icon">🧑</div><div class="name">患者提交</div><div class="state" id="stepPatientState">等待中</div></div>
+        <div class="step" id="stepVision"><div class="icon">👁️</div><div class="name">AI 视觉诊断</div><div class="state" id="stepVisionState">等待中</div></div>
+        <div class="step" id="stepKb"><div class="icon">📚</div><div class="name">AI 知识库诊断</div><div class="state" id="stepKbState">等待中</div></div>
+        <div class="step" id="stepDoctor"><div class="icon">👨‍⚕️</div><div class="name">医生审核 → 处方</div><div class="state" id="stepDoctorState">等待中</div></div>
+      </div>
+
+      <!-- 会话头部 -->
+      <div class="panel">
+        <h2>🧑 会话 <span id="sessionId" style="font-size:12px;color:var(--dim);font-weight:400"></span>
+          <span id="sessionStatus" class="badge blue">init</span>
+          <span id="apBadge" class="badge green hidden">AI自主</span>
+          <span id="riskBadge" class="badge red hidden">⚠ 风险</span>
+        </h2>
+        <div style="font-size:12px;color:var(--dim);line-height:1.8" id="patientInfo"></div>
+
+        <!-- 双路 AI 结论 -->
+        <div class="result-grid" id="aiResults">
+          <div class="result-card">
+            <div class="head">👁️ AI 视觉诊断 <span id="visionState" class="badge amber">等待</span></div>
+            <div id="visionBody"><div class="notice">尚无视觉诊断结论</div></div>
+          </div>
+          <div class="result-card">
+            <div class="head">📚 AI 知识库诊断 <span id="kbState" class="badge amber">等待</span></div>
+            <div id="kbBody"><div class="notice">尚无知识库诊断结论</div></div>
+          </div>
+        </div>
+
+        <!-- 建议处方（AI 出） -->
+        <div id="suggestRxBox" class="rx-box hidden">
+          <h3>🤖 AI 建议处方（需医生审核）</h3>
+          <div class="rx-formula" id="suggestRxFormulas"></div>
+          <div style="font-size:11px;color:var(--dim);margin-top:6px" id="suggestRxRationale"></div>
+        </div>
+
+        <!-- 医生审核区 -->
+        <div id="doctorReviewArea" style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
+          <label>医生最终诊断（可修改 AI 结论）</label>
+          <input type="text" id="docDiagnosis" placeholder="如：湿热内蕴证（湿重于热）">
+          <label>审核意见</label>
+          <textarea id="docNotes" placeholder="同意 / 驳回原因 / 修改说明"></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn green" onclick="doctorReview('approved')">✅ 审核通过</button>
+            <button class="btn amber" onclick="doctorReview('modified')">✏️ 修改后通过</button>
+            <button class="btn red" onclick="doctorReview('rejected')">❌ 驳回</button>
+          </div>
+
+          <!-- 处方区 -->
+          <div id="rxArea" style="margin-top:12px">
+            <label>处方方剂（逗号分隔，默认 AI 建议）</label>
+            <input type="text" id="rxFormulas" placeholder="如：茵陈蒿汤, 三仁汤">
+            <label>处方说明</label>
+            <textarea id="rxNotes" placeholder="如：清热利湿，7剂，水煎服"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn primary" onclick="createRx()">💊 生成处方（AI建议转正式）</button>
+              <button class="btn green hidden" id="approveRxBtn" onclick="reviewRx('approve')">✅ 处方终审签发</button>
+              <button class="btn red hidden" id="rejectRxBtn" onclick="reviewRx('reject')">❌ 处方驳回</button>
+              <button class="btn ghost" onclick="cancelSession()">🚫 取消会话</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 实时事件日志 -->
+      <div class="panel" style="margin-top:14px">
+        <h2>⚡ 实时事件流（SSE）</h2>
+        <div class="evt-log" id="evtLog"><div>连接中…</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const API = 'http://127.0.0.1:8920';
+const CONDITIONS = ['湿热内蕴','肝火旺盛','脾气虚','阴虚火旺','阳虚寒证','血瘀','痰湿','风热犯肺','风寒束表','心脾两虚','肝肾阴虚','气血两虚','肾阳虚','脾胃虚寒','胃热','气滞血瘀'];
+let currentMode = 'tongue';
+let currentSession = null;
+let currentRole = 'patient';
+let selectedConditions = new Set();
+let autopilotEnabled = false;
+let evtSource = null;
+let docId = 'doc_' + Math.random().toString(36).slice(2, 8);
+
+// 病情勾选渲染
+const condBox = document.getElementById('condChips');
+CONDITIONS.forEach(c => {
+  const el = document.createElement('span');
+  el.className = 'chip';
+  el.textContent = c;
+  el.onclick = () => {
+    if (selectedConditions.has(c)) { selectedConditions.delete(c); el.classList.remove('on'); }
+    else { selectedConditions.add(c); el.classList.add('on'); }
+  };
+  condBox.appendChild(el);
+});
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function switchRole(role) {
+  currentRole = role;
+  document.getElementById('rolePatient').classList.toggle('active', role === 'patient');
+  document.getElementById('roleDoctor').classList.toggle('active', role === 'doctor');
+  document.getElementById('patientPanel').classList.toggle('hidden', role !== 'patient');
+  document.getElementById('doctorPanel').classList.toggle('hidden', role !== 'doctor');
+  if (role === 'doctor') {
+    loadQueue('pending');
+    connectSSE(null, true); // 全局订阅
+  } else {
+    connectSSE(currentSession?.id || null, false);
+  }
+}
+
+function setMode(m) {
+  currentMode = m;
+  document.querySelectorAll('#modeTabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  document.getElementById('dzText').textContent = {tongue:'👅 舌诊照片',face:'😊 面诊照片',eye:'👁 眼诊照片',hand:'✋ 手诊照片'}[m];
+}
+
+function handleFile(input) {
+  const f = input.files && input.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('preview');
+    img.src = e.target.result;
+    img.classList.remove('hidden');
+    document.getElementById('dzText').classList.add('hidden');
+    window._imageB64 = e.target.result.split(',')[1];
+  };
+  reader.readAsDataURL(f);
+}
+
+function toggleAutoPilot() {
+  autopilotEnabled = !autopilotEnabled;
+  document.getElementById('autoPilotToggle').classList.toggle('on', autopilotEnabled);
+  document.getElementById('apSwitch').style.background = autopilotEnabled ? 'var(--green)' : '';
+}
+
+async function submitSession() {
+  const symptoms = document.getElementById('pSymptoms').value.trim();
+  const voiceText = document.getElementById('pVoice').value.trim();
+  const name = document.getElementById('pName').value.trim();
+  const image_b64 = window._imageB64 || null;
+  if (!image_b64 && !symptoms && !voiceText) return toast('请至少提供照片或症状描述');
+  const body = {
+    name: name || undefined,
+    mode: currentMode,
+    image_b64,
+    symptoms,
+    voiceText,
+    selectedConditions: [...selectedConditions],
+    autoPilot: autopilotEnabled,
+  };
+  document.getElementById('submitStatus').style.display = 'flex';
+  document.getElementById('submitText').textContent = '诊断进行中（AI视觉 + AI知识库并行）…';
+  document.getElementById('submitBtn').disabled = true;
+  try {
+    const res = await fetch(API + '/api/collab/session', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    if (d.code !== 0) throw new Error(d.message);
+    currentSession = d.data;
+    renderSession(d.data);
+    connectSSE(d.data.id, false);
+    toast('✅ 会话已创建，双路诊断进行中');
+  } catch (e) {
+    toast('❌ ' + e.message);
+  } finally {
+    document.getElementById('submitStatus').style.display = 'none';
+    document.getElementById('submitBtn').disabled = false;
+  }
+}
+
+function connectSSE(sessionId, global) {
+  if (evtSource) { evtSource.close(); evtSource = null; }
+  const url = API + '/api/collab/events' + (sessionId ? '?sessionId=' + sessionId : '');
+  const badge = document.getElementById('connBadge');
+  evtSource = new EventSource(url);
+  evtSource.onopen = () => { badge.className = 'badge green'; badge.textContent = '● 实时连接'; };
+  evtSource.onerror = () => { badge.className = 'badge amber'; badge.textContent = '● 重连中…'; };
+  evtSource.onmessage = ev => {
+    try {
+      const data = JSON.parse(ev.data);
+      handleSSEEvent(data);
+    } catch (_) {}
+  };
+}
+
+function handleSSEEvent(ev) {
+  logEvt(ev);
+  // 全局广播的新会话 → 医生队列刷新
+  if (currentRole === 'doctor' && ev.type === 'session_created') loadQueue('pending');
+  if (currentRole === 'doctor' && ['diagnosis_completed','doctor_reviewed','rx_created'].includes(ev.type)) loadQueue('pending');
+  // 当前会话事件 → 刷新详情
+  if (currentSession && (ev.sessionId === currentSession.id || ev.type === 'snapshot' && ev.session?.id === currentSession.id)) {
+    if (ev.type === 'snapshot' && ev.session) { currentSession = ev.session; renderSession(ev.session); }
+    else refreshSession(currentSession.id);
+  }
+}
+
+function logEvt(ev) {
+  const log = document.getElementById('evtLog');
+  const line = document.createElement('div');
+  const t = (ev.at || new Date().toISOString()).slice(11, 19);
+  line.innerHTML = `<span style="color:var(--dim)">${t}</span> <b>${ev.type}</b> ${ev.status ? '· ' + ev.status : ''} ${ev.verdict ? '· ' + ev.verdict : ''}`;
+  log.prepend(line);
+  while (log.children.length > 60) log.removeChild(log.lastChild);
+}
+
+async function refreshSession(id) {
+  try {
+    const res = await fetch(API + '/api/collab/session/' + id);
+    const d = await res.json();
+    if (d.code === 0) { currentSession = d.data; renderSession(d.data); }
+  } catch (_) {}
+}
+
+// ═══ 会话渲染 ═══
+function renderSession(s) {
+  document.getElementById('emptyState').classList.add('hidden');
+  document.getElementById('sessionView').classList.remove('hidden');
+  document.getElementById('sessionId').textContent = s.id;
+  const st = document.getElementById('sessionStatus');
+  st.textContent = statusLabel(s.status);
+  st.className = 'badge ' + (['completed'].includes(s.status) ? 'green' : ['cancelled','ai_failed'].includes(s.status) ? 'red' : s.status === 'init' ? 'amber' : 'blue');
+
+  const apEligible = s.suggestedRx?.autopilot_eligible;
+  document.getElementById('apBadge').classList.toggle('hidden', !apEligible);
+  const risks = s.risks || [];
+  document.getElementById('riskBadge').classList.toggle('hidden', risks.length === 0);
+  document.getElementById('riskBadge').textContent = '⚠ ' + risks.slice(0, 3).join('、') + (risks.length > 3 ? ' 等' : '');
+
+  document.getElementById('patientInfo').innerHTML =
+    `👤 ${s.patient.name || '匿名患者'} ${s.patient.age ? '· ' + s.patient.age + '岁' : ''} ${s.patient.gender || ''}<br>` +
+    `📷 模态: ${modeLabel(s.patient.mode)} | 📝 症状: ${s.patient.symptoms || '—'}<br>` +
+    `🎯 勾选: ${(s.patient.selectedConditions || []).join('、') || '—'} | 🎙 语音: ${s.patient.voiceText || '—'}`;
+
+  // 四路状态
+  setStep('stepPatient', ['init','diagnosing','reopened'].includes(s.status) ? 'active' : 'done', s.status === 'cancelled' ? '已取消' : '已提交');
+  const v = s.aiVision || {};
+  const k = s.aiKb || {};
+  setStep('stepVision', v.status === 'done' ? 'done' : v.status === 'error' ? 'error' : (v.status === 'running' || s.status === 'diagnosing') ? 'active' : '', v.status === 'done' ? '完成' : v.status === 'skipped' ? '跳过(无图)' : v.status === 'error' ? '失败' : '等待');
+  setStep('stepKb', k.status === 'done' ? 'done' : k.status === 'error' ? 'error' : (k.status === 'running' || s.status === 'diagnosing') ? 'active' : '', k.status === 'done' ? '完成' : k.status === 'error' ? '失败' : '等待');
+  const docSt = s.doctor ? (s.doctor.verdict === 'approved' ? '已通过' : s.doctor.verdict === 'modified' ? '修改通过' : '已驳回') : (s.rx ? '处方' + rxStatusLabel(s.rx.status) : '待审核');
+  const docDone = ['doctor_reviewed','rx_pending','completed'].includes(s.status);
+  setStep('stepDoctor', docDone ? 'done' : ['cancelled'].includes(s.status) ? 'error' : s.status === 'doctor_reviewing' ? 'active' : '', docSt);
+
+  // AI 视觉结论
+  const vs = document.getElementById('visionState');
+  const vb = document.getElementById('visionBody');
+  if (v.status === 'done') {
+    vs.className = 'badge green'; vs.textContent = '完成';
+    vb.innerHTML = `
+      <div class="syndrome">${v.syndrome || '未识别'} <span class="conf">置信度 ${(v.confidence * 100).toFixed(0)}%</span></div>
+      <div style="font-size:12px;color:var(--dim)">八纲: ${v.eight_principles || '—'}</div>
+      <ul class="evidence">${(v.findings || []).slice(0, 4).map(f => `<li>${typeof f === 'string' ? f : (f.label || f.feature || JSON.stringify(f))}</li>`).join('')}</ul>
+      ${(v.formulas || []).length ? `<div class="formulas">${v.formulas.map(f => `<span class="formula">${f}</span>`).join('')}</div>` : ''}
+      <div class="conf">治法: ${(v.treatments || []).join('、') || '—'}</div>`;
+  } else if (v.status === 'error') { vs.className = 'badge red'; vs.textContent = '失败'; vb.innerHTML = `<div class="notice">${v.error || '视觉服务不可用'}</div>`; }
+  else if (v.status === 'skipped') { vs.className = 'badge amber'; vs.textContent = '跳过'; vb.innerHTML = '<div class="notice">未提供照片，视觉诊断跳过（可补充照片后重开）</div>'; }
+  else { vs.className = 'badge amber'; vs.textContent = '等待'; }
+
+  // AI 知识库结论
+  const ks = document.getElementById('kbState');
+  const kb2 = document.getElementById('kbBody');
+  if (k.status === 'done') {
+    ks.className = 'badge green'; ks.textContent = '完成';
+    kb2.innerHTML = `
+      <div class="syndrome">${k.syndrome || '未识别'} <span class="conf">匹配分 ${(k.score * 100).toFixed(0)}</span></div>
+      <ul class="evidence">${(k.evidence || []).slice(0, 3).map(e => `<li>${e.title}${e.score ? ` (${(e.score * 100).toFixed(0)}分)` : ''}</li>`).join('')}</ul>
+      ${(k.formulas || []).length ? `<div class="formulas">${k.formulas.map(f => `<span class="formula">${f}</span>`).join('')}</div>` : ''}`;
+  } else if (k.status === 'error') { ks.className = 'badge red'; ks.textContent = '失败'; kb2.innerHTML = `<div class="notice">${k.error || '知识库服务不可用'}${k.fallback ? '· ' + k.fallback : ''}</div>`; }
+  else { ks.className = 'badge amber'; ks.textContent = '等待'; }
+
+  // 建议处方
+  const sr = s.suggestedRx;
+  const srBox = document.getElementById('suggestRxBox');
+  if (sr && sr.formulas && sr.formulas.length) {
+    srBox.classList.remove('hidden');
+    document.getElementById('suggestRxFormulas').textContent = sr.formulas.join(' + ');
+    document.getElementById('suggestRxRationale').innerHTML =
+      (sr.rationale || []).map(r => '· ' + r).join('<br>') +
+      `<br>· 建议来源: <b>${sr.suggested_by === 'ai_autopilot' ? '🤖 AI 自主（无人化）' : 'AI 辅助（需医生审核）'}</b>`;
+  } else srBox.classList.add('hidden');
+
+  // 医生区（当前角色是医生才显示操作）
+  const canReview = ['ai_diagnosed','ai_partial','doctor_reviewing','doctor_reviewed','reopened'].includes(s.status);
+  document.getElementById('docDiagnosis').value = s.doctor?.finalDiagnosis || s.aiKb?.syndrome || s.aiVision?.syndrome || '';
+  if (s.rx) {
+    document.getElementById('rxFormulas').value = s.rx.formulas.join(', ');
+    document.getElementById('rxNotes').value = s.rx.notes || '';
+    const pending = s.rx.status === 'pending';
+    document.getElementById('approveRxBtn').classList.toggle('hidden', !pending);
+    document.getElementById('rejectRxBtn').classList.toggle('hidden', !pending);
+  }
+  document.getElementById('rxFormulas').placeholder = sr?.formulas?.length ? '默认 AI 建议: ' + sr.formulas.join(', ') : '如：茵陈蒿汤, 三仁汤';
+  // 状态变化提示
+  if (s.status === 'completed') toast('✅ 处方已签发，诊疗闭环完成');
+}
+
+function setStep(id, cls, text) {
+  const el = document.getElementById(id);
+  el.className = 'step' + (cls ? ' ' + cls : '');
+  el.querySelector('.state').textContent = text;
+}
+
+function statusLabel(s) {
+  return {init:'已创建',diagnosing:'诊断中',ai_diagnosed:'AI双路完成',ai_partial:'AI部分完成',ai_failed:'AI失败',doctor_reviewing:'医生审核中',doctor_reviewed:'医生已审核',rx_pending:'待签发',completed:'✅ 已完成',cancelled:'已取消',reopened:'已重开',archived:'已归档'}[s] || s;
+}
+function rxStatusLabel(s) { return {pending:'待签发',approved:'已签发',rejected:'已驳回'}[s] || s; }
+function modeLabel(m) { return {tongue:'舌诊',face:'面诊',eye:'眼诊',hand:'手诊'}[m] || m; }
+
+// ═══ 医生操作 ═══
+async function doctorReview(verdict) {
+  if (!currentSession) return;
+  const body = {
+    doctorId: docId,
+    verdict,
+    notes: document.getElementById('docNotes').value.trim(),
+    syndrome: document.getElementById('docDiagnosis').value.trim(),
+    finalDiagnosis: document.getElementById('docDiagnosis').value.trim() || null,
+  };
+  const res = await fetch(API + `/api/collab/session/${currentSession.id}/doctor-review`, {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+  });
+  const d = await res.json();
+  if (d.code === 0) { toast(verdict === 'approved' ? '✅ 审核通过' : verdict === 'modified' ? '✏️ 已修改通过' : '❌ 已驳回'); renderSession(d.data); loadQueue('pending'); }
+  else toast('❌ ' + d.message);
+}
+
+async function createRx() {
+  if (!currentSession) return;
+  const formulas = document.getElementById('rxFormulas').value.trim()
+    ? document.getElementById('rxFormulas').value.split(/[,，、]/).map(s => s.trim()).filter(Boolean)
+    : undefined;
+  const res = await fetch(API + `/api/collab/session/${currentSession.id}/rx`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ doctorId: docId, formulas, notes: document.getElementById('rxNotes').value.trim() })
+  });
+  const d = await res.json();
+  if (d.code === 0) { toast('💊 处方已生成，待终审签发'); renderSession(d.data); loadQueue('pending'); }
+  else toast('❌ ' + d.message);
+}
+
+async function reviewRx(action) {
+  if (!currentSession) return;
+  const res = await fetch(API + `/api/collab/session/${currentSession.id}/rx/review`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ action, doctorId: docId })
+  });
+  const d = await res.json();
+  if (d.code === 0) { toast(action === 'approve' ? '✅ 处方签发完成' : '❌ 处方已驳回'); renderSession(d.data); loadQueue('pending'); }
+  else toast('❌ ' + d.message);
+}
+
+async function cancelSession() {
+  if (!currentSession || !confirm('确定取消该会话？')) return;
+  const res = await fetch(API + `/api/collab/session/${currentSession.id}/cancel`, {
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ by: docId })
+  });
+  const d = await res.json();
+  if (d.code === 0) { toast('🚫 会话已取消'); renderSession(d.data); loadQueue('pending'); }
+}
+
+// ═══ 医生队列 ═══
+async function loadQueue(filter) {
+  try {
+    const res = await fetch(API + '/api/collab/queue?filter=' + (filter || 'pending'));
+    const d = await res.json();
+    const list = d.data || [];
+    document.getElementById('queueCount').textContent = list.length;
+    const box = document.getElementById('queueList');
+    if (!list.length) { box.innerHTML = '<div class="notice">暂无会话</div>'; return; }
+    box.innerHTML = list.map(q => `
+      <div class="queue-item" onclick="openFromQueue('${q.id}')">
+        <div class="row1">
+          ${q.autopilot ? '<span class="badge green">🤖 AI自主</span>' : ''}
+          ${(q.risks || []).length ? '<span class="badge red">⚠风险</span>' : ''}
+          ${q.patient.name} <span style="color:var(--dim);font-weight:400">${q.patient.age || ''}${q.patient.gender || ''}</span>
+          <span class="badge blue" style="margin-left:auto">${statusLabel(q.status)}</span>
+        </div>
+        <div class="row2">
+          👁 ${q.visionSyndrome || '—'} <span style="color:var(--dim)">${(q.visionConfidence * 100).toFixed(0)}%</span>
+          &nbsp;·&nbsp; 📚 ${q.kbSyndrome || '—'} <span style="color:var(--dim)">${(q.kbScore * 100).toFixed(0)}分</span>
+          ${q.hasRx ? '<br>💊 处方: ' + rxStatusLabel(q.rxStatus) : ''}
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    document.getElementById('queueList').innerHTML = '<div class="notice">加载失败: ' + e.message + '</div>';
+  }
+}
+
+async function openFromQueue(id) {
+  currentSession = null;
+  await refreshSession(id);
+  // 切到会话视图（保持医生面板）
+  connectSSE(id, false);
+}
+
+// 初始
+setMode('tongue');
+loadQueue('pending');
+connectSSE(null, true);
+</script>
+</body>
+</html>
