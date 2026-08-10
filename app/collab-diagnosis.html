@@ -128,8 +128,12 @@ input:focus,textarea:focus{border-color:var(--accent)}
       <textarea id="pSymptoms" placeholder="如：舌苔黄腻，口苦口干，大便粘滞，烦躁易怒"></textarea>
       <label>病情勾选（多选）</label>
       <div class="chips" id="condChips"></div>
-      <label>穿戴设备语音转写（粘贴语音识别结果）</label>
-      <textarea id="pVoice" placeholder="如：最近总是感觉乏力，舌苔很厚（可来自穿戴设备语音）"></textarea>
+      <label>穿戴设备语音转写（实时收音 / 粘贴识别结果）</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn ghost sm" id="voiceBtn" onclick="toggleVoice()">🎙 开始收音</button>
+        <span id="voiceStatus" style="font-size:11px;color:var(--dim)"></span>
+      </div>
+      <textarea id="pVoice" style="margin-top:8px" placeholder="点击🎙说话自动转写，或粘贴穿戴设备语音识别结果（如：最近总是感觉乏力，舌苔很厚）"></textarea>
       <button class="btn primary block" id="submitBtn" onclick="submitSession()">🚀 提交诊断（AI视觉 + AI知识库 并行）</button>
       <div class="toggle" id="autoPilotToggle" onclick="toggleAutoPilot()">
         <span class="switch" id="apSwitch"></span> 无人化自主模式（AI 双路高置信自动建议处方，高风险强制医生审核）
@@ -141,7 +145,16 @@ input:focus,textarea:focus{border-color:var(--accent)}
 
     <!-- 医生端 -->
     <div id="doctorPanel" class="panel hidden">
-      <h2>👨‍⚕️ 医生待办队列 <span class="count" id="queueCount">0</span></h2>
+      <h2>👨‍⚕️ 医生工作台 <span class="count" id="queueCount">0</span></h2>
+      <div id="doctorAuthArea" style="margin-bottom:10px;padding:10px;background:var(--card2);border-radius:10px">
+        <div style="font-size:12px;color:var(--dim);margin-bottom:6px">🔐 医生认证（审核/处方需登录）</div>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="docUser" placeholder="账号" style="flex:1">
+          <input type="password" id="docPass" placeholder="密码" style="flex:1">
+          <button class="btn primary sm" onclick="doctorLogin()">登录</button>
+        </div>
+        <div id="doctorLoginStatus" style="font-size:11px;color:var(--dim);margin-top:6px">未登录（演示账号 doctor / doctor123）</div>
+      </div>
       <div style="display:flex;gap:6px;margin-bottom:10px">
         <button class="btn ghost sm" onclick="loadQueue('pending')">⏳ 待处理</button>
         <button class="btn ghost sm" onclick="loadQueue('completed')">✅ 已完成</button>
@@ -248,6 +261,57 @@ let currentSession = null;
 let currentRole = 'patient';
 let selectedConditions = new Set();
 let autopilotEnabled = false;
+
+// ═══ 语音实时收音（Web Speech API，浏览器原生，零依赖）═══
+let voiceRec = null;
+let voiceActive = false;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SR) {
+  voiceRec = new SR();
+  voiceRec.lang = 'zh-CN';
+  voiceRec.continuous = true;
+  voiceRec.interimResults = true;
+  voiceRec.onresult = (e) => {
+    let finalText = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalText += e.results[i][0].transcript;
+    }
+    if (finalText) {
+      const box = document.getElementById('pVoice');
+      box.value = (box.value ? box.value + '，' : '') + finalText;
+    }
+    const vs = document.getElementById('voiceStatus');
+    if (vs) vs.textContent = '🎙 正在聆听…';
+  };
+  voiceRec.onerror = (e) => {
+    const vs = document.getElementById('voiceStatus');
+    if (vs) vs.textContent = '⚠ ' + (e.error === 'not-allowed' ? '麦克风权限被拒绝' : e.error);
+    voiceActive = false;
+    const vb = document.getElementById('voiceBtn');
+    if (vb) vb.textContent = '🎙 开始收音';
+  };
+  voiceRec.onend = () => {
+    voiceActive = false;
+    const vb = document.getElementById('voiceBtn');
+    if (vb) vb.textContent = '🎙 开始收音';
+    const vs = document.getElementById('voiceStatus');
+    if (vs) vs.textContent = '⏹ 收音结束';
+  };
+}
+function toggleVoice() {
+  const vb = document.getElementById('voiceBtn');
+  if (!voiceRec) { toast('当前浏览器不支持语音识别，请粘贴文本'); return; }
+  if (voiceActive) { voiceRec.stop(); voiceActive = false; if (vb) vb.textContent = '🎙 开始收音'; }
+  else {
+    try {
+      voiceRec.start();
+      voiceActive = true;
+      if (vb) vb.textContent = '⏹ 停止收音';
+      const vs = document.getElementById('voiceStatus');
+      if (vs) vs.textContent = '🎙 正在聆听…';
+    } catch (e) { toast('语音启动失败: ' + e.message); }
+  }
+}
 let evtSource = null;
 // R695: 确定性 docId（替代 Math.random，修真闭环要求）
 let docId = 'doc_' + Date.now().toString(36) + '_' + ((performance.now() * 1000) | 0).toString(36);
@@ -493,22 +557,51 @@ function statusLabel(s) {
 function rxStatusLabel(s) { return {pending:'待签发',approved:'已签发',rejected:'已驳回'}[s] || s; }
 function modeLabel(m) { return {tongue:'舌诊',face:'面诊',eye:'眼诊',hand:'手诊'}[m] || m; }
 
+// ═══ 医生认证 ═══
+let doctorToken = localStorage.getItem('collab_doctor_token') || null;
+let doctorUser = JSON.parse(localStorage.getItem('collab_doctor_user') || 'null');
+function doctorHeaders() {
+  return { 'Content-Type': 'application/json', ...(doctorToken ? { 'x-doctor-token': doctorToken } : {}) };
+}
+async function doctorLogin() {
+  const username = document.getElementById('docUser').value.trim();
+  const password = document.getElementById('docPass').value.trim();
+  if (!username || !password) return toast('请输入账号密码');
+  try {
+    const res = await fetch(API + '/api/collab/doctor-login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const d = await res.json();
+    if (d.code !== 0) return toast('❌ ' + d.message);
+    doctorToken = d.data.token;
+    doctorUser = d.data.user;
+    localStorage.setItem('collab_doctor_token', doctorToken);
+    localStorage.setItem('collab_doctor_user', JSON.stringify(doctorUser));
+    document.getElementById('doctorLoginStatus').textContent = '✅ 已登录：' + doctorUser.username + '（' + doctorUser.role + '）';
+    toast('✅ 医生认证成功');
+  } catch (e) { toast('❌ ' + e.message); }
+}
+// 恢复登录态
+if (doctorToken && doctorUser) {
+  document.getElementById('doctorLoginStatus').textContent = '✅ 已登录：' + doctorUser.username + '（' + doctorUser.role + '）';
+}
+
 // ═══ 医生操作 ═══
 async function doctorReview(verdict) {
   if (!currentSession) return;
   const body = {
-    doctorId: docId,
     verdict,
     notes: document.getElementById('docNotes').value.trim(),
     syndrome: document.getElementById('docDiagnosis').value.trim(),
     finalDiagnosis: document.getElementById('docDiagnosis').value.trim() || null,
   };
   const res = await fetch(API + `/api/collab/session/${currentSession.id}/doctor-review`, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
+    method: 'POST', headers: doctorHeaders(), body: JSON.stringify(body)
   });
   const d = await res.json();
   if (d.code === 0) { toast(verdict === 'approved' ? '✅ 审核通过' : verdict === 'modified' ? '✏️ 已修改通过' : '❌ 已驳回'); renderSession(d.data); loadQueue('pending'); }
-  else toast('❌ ' + d.message);
+  else { toast('❌ ' + (d.message || '操作失败')); if (d.code === 401) doctorLogin(); }
 }
 
 async function createRx() {
@@ -517,23 +610,23 @@ async function createRx() {
     ? document.getElementById('rxFormulas').value.split(/[,，、]/).map(s => s.trim()).filter(Boolean)
     : undefined;
   const res = await fetch(API + `/api/collab/session/${currentSession.id}/rx`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ doctorId: docId, formulas, notes: document.getElementById('rxNotes').value.trim() })
+    method: 'POST', headers: doctorHeaders(),
+    body: JSON.stringify({ formulas, notes: document.getElementById('rxNotes').value.trim() })
   });
   const d = await res.json();
   if (d.code === 0) { toast('💊 处方已生成，待终审签发'); renderSession(d.data); loadQueue('pending'); }
-  else toast('❌ ' + d.message);
+  else { toast('❌ ' + (d.message || '操作失败')); if (d.code === 401) doctorLogin(); }
 }
 
 async function reviewRx(action) {
   if (!currentSession) return;
   const res = await fetch(API + `/api/collab/session/${currentSession.id}/rx/review`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ action, doctorId: docId })
+    method: 'POST', headers: doctorHeaders(),
+    body: JSON.stringify({ action })
   });
   const d = await res.json();
   if (d.code === 0) { toast(action === 'approve' ? '✅ 处方签发完成' : '❌ 处方已驳回'); renderSession(d.data); loadQueue('pending'); }
-  else toast('❌ ' + d.message);
+  else { toast('❌ ' + (d.message || '操作失败')); if (d.code === 401) doctorLogin(); }
 }
 
 async function cancelSession() {
