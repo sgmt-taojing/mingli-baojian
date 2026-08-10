@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet" data-r308-anti-crawler>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<title>多源实时诊断 · 易道智鉴</title>
+<meta name="description" content="四路实时诊断：AI视觉医学 + AI医学知识库 + AI视觉命理 + AI命理知识库 → 医生审核 → 处方">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/multi-source-diagnosis.html">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0a0a0a;--paper:#f5f1e8;--gold:#c9a84c;--gold2:#a07c2a;--bronze:#8c6a30;--line:rgba(201,168,76,.2);--jade:#4ade80;--blue:#63b3ed;--red:#f87171;--r:10px}
+body{font-family:'Noto Serif SC',serif;background:linear-gradient(135deg,#0a0a0a,#1a1208);color:var(--paper);min-height:100vh;padding:20px;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto}
+header{text-align:center;padding:20px 0 14px;border-bottom:1px solid var(--line);margin-bottom:20px}
+h1{font-size:22px;font-weight:500;color:var(--gold);letter-spacing:3px}
+header p{font-size:12px;opacity:.9;letter-spacing:1px;margin-top:4px}
+.card{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.card h2{font-size:14px;color:var(--gold);font-weight:500;border-left:3px solid var(--gold);padding-left:10px;margin-bottom:12px;letter-spacing:1px}
+label{display:block;font-size:12px;opacity:.85;margin-bottom:4px;margin-top:10px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:rgba(255,255,255,.05);color:var(--paper);font:inherit;font-size:14px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+textarea{min-height:56px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:560px){.row,.row3{grid-template-columns:1fr}}
+.btn{display:block;width:100%;padding:13px;background:linear-gradient(135deg,var(--gold),var(--bronze));color:#0a0a0a;font:inherit;font-size:15px;font-weight:600;border:none;border-radius:var(--r);cursor:pointer;letter-spacing:3px;margin-top:10px}
+.btn:hover:not(:disabled){box-shadow:0 6px 18px rgba(201,168,76,.3)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--paper)}
+.btn-blue{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff}
+.btn-jade{background:linear-gradient(135deg,#10b981,#059669);color:#fff}
+/* 四路状态 */
+.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+@media(max-width:560px){.grid4{grid-template-columns:1fr}}
+.src{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:8px;padding:12px;position:relative;min-height:74px}
+.src .nm{font-size:13px;font-weight:600;color:var(--gold)}
+.src .st{font-size:11px;opacity:.75;margin-top:4px;min-height:16px}
+.src .tag{position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--line)}
+.src.done{border-color:rgba(74,222,128,.5)}
+.src.done .tag{color:var(--jade);border-color:rgba(74,222,128,.5)}
+.src.fail{border-color:rgba(248,113,113,.5)}
+.src.fail .tag{color:var(--red);border-color:rgba(248,113,113,.5)}
+.src.run{border-color:rgba(99,179,237,.5)}
+.src.run .tag{color:var(--blue);border-color:rgba(99,179,237,.5)}
+.spin{display:inline-block;width:10px;height:10px;border:2px solid rgba(99,179,237,.3);border-top-color:var(--blue);border-radius:50%;animation:rot .8s linear infinite;vertical-align:-1px;margin-right:4px}
+@keyframes rot{to{transform:rotate(360deg)}}
+/* 结论 */
+.seg{background:rgba(255,255,255,.03);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:6px;padding:10px 12px;margin:8px 0;font-size:13px}
+.seg b{color:var(--gold)}
+.seg .s{font-size:11px;opacity:.7;margin-top:4px}
+.hit{font-size:11px;color:#c5d1de;background:rgba(99,179,237,.06);border-radius:4px;padding:6px 8px;margin:4px 0}
+.pill{display:inline-block;padding:3px 10px;border-radius:12px;border:1px solid rgba(201,168,76,.4);font-size:11px;margin:3px 4px 0 0;cursor:pointer;color:var(--paper)}
+.pill.on{background:rgba(201,168,76,.25);border-color:var(--gold)}
+.disclaimer{font-size:11px;opacity:.6;text-align:center;margin:16px 0;letter-spacing:1px}
+.rx{background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));border:1px solid var(--gold);border-radius:var(--r);padding:16px;margin-top:10px}
+.rx h3{color:var(--gold);font-size:15px;margin-bottom:8px;letter-spacing:2px}
+.rx .row2{display:flex;justify-content:space-between;font-size:12px;opacity:.85;margin-top:6px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(26,35,50,.95);border:1px solid var(--gold);color:var(--paper);padding:10px 20px;border-radius:8px;font-size:13px;z-index:99;display:none}
+video{width:100%;border-radius:8px;background:#000;display:none}
+#camPreview{width:100%;border-radius:8px;display:none}
+#captureBtn,#retakeBtn{margin-top:8px}
+</style>
+</head>
+<body data-kb-module="multi-source">
+<div class="wrap">
+<header>
+  <h1>四路实时诊断 · 易道智鉴</h1>
+  <p>AI 视觉医学 + AI 医学知识库 + AI 视觉命理 + AI 命理知识库 → 医生审核 → 处方</p>
+</header>
+
+<!-- ① 患者信息 -->
+<div class="card">
+  <h2>患者 / 信众信息</h2>
+  <div class="row">
+    <div><label>姓名</label><input id="pName" placeholder="选填" aria-label="姓名"></div>
+    <div class="row" style="gap:8px">
+      <div><label>性别</label><select id="pGender" aria-label="性别"><option value="男">男</option><option value="女">女</option></select></div>
+      <div><label>年龄</label><input id="pAge" type="number" min="0" max="150" placeholder="岁" aria-label="年龄"></div>
+    </div>
+  </div>
+  <div class="row3">
+    <div><label>出生年</label><input id="pYear" type="number" min="1900" max="2026" placeholder="如 1985" aria-label="出生年"></div>
+    <div><label>出生月</label><input id="pMonth" type="number" min="1" max="12" placeholder="如 6" aria-label="出生月"></div>
+    <div><label>出生日</label><input id="pDay" type="number" min="1" max="31" placeholder="如 15" aria-label="出生日"></div>
+  </div>
+  <div class="row">
+    <div><label>出生时辰（地支）</label><select id="pHour" aria-label="出生时辰">
+      <option value="0">子时 23-1</option><option value="2">丑时 1-3</option><option value="4">寅时 3-5</option>
+      <option value="6" selected>卯时 5-7</option><option value="8">辰时 7-9</option><option value="10">巳时 9-11</option>
+      <option value="12">午时 11-13</option><option value="14">未时 13-15</option><option value="16">申时 15-17</option>
+      <option value="18">酉时 17-19</option><option value="20">戌时 19-21</option><option value="22">亥时 21-23</option>
+    </select></div>
+    <div><label>出生地</label><input id="pPlace" placeholder="省/市（选填）" aria-label="出生地"></div>
+  </div>
+</div>
+
+<!-- ② 病情输入（文本 + 语音 + 医生协作） -->
+<div class="card">
+  <h2>病情输入（语音 / 文本 / 医生补充）</h2>
+  <label>主要症状（口述或输入，支持穿戴设备语音转写）</label>
+  <textarea id="sChief" placeholder="如：面色偏黄，乏力两周，睡眠差…" aria-label="主要症状"></textarea>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button class="btn btn-ghost" id="btnVoice" style="flex:1;font-size:13px;letter-spacing:1px">🎙️ 语音输入</button>
+    <button class="btn btn-ghost" id="btnWearable" style="flex:1;font-size:13px;letter-spacing:1px">⌚ 穿戴语音</button>
+  </div>
+  <span style="font-size:11px;opacity:.6" id="voiceStatus"></span>
+  <label>医生补充（选填）</label>
+  <textarea id="sDoctorInput" placeholder="医生根据问诊补充的关键信息…" aria-label="医生补充"></textarea>
+</div>
+
+<!-- ③ 图像采集 -->
+<div class="card">
+  <h2>图像采集（面 / 舌 / 眼 / 手）</h2>
+  <video id="cam" playsinline muted></video>
+  <img id="camPreview" alt="采集预览">
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost" id="btnCam" style="flex:1;font-size:13px">📷 拍照采集</button>
+    <button class="btn btn-ghost" id="btnUpload" style="flex:1;font-size:13px">🖼️ 上传图片</button>
+  </div>
+  <button class="btn btn-ghost" id="retakeBtn" style="display:none">↺ 重新拍摄</button>
+  <input type="file" id="fileInput" accept="image/*" style="display:none" aria-label="上传图片">
+  <div style="font-size:11px;opacity:.6;margin-top:6px" id="imgInfo">未采集</div>
+</div>
+
+<!-- ④ 四路实时诊断 -->
+<button class="btn" id="btnRun" disabled>▶ 开始四路实时诊断</button>
+
+<div class="grid4" id="srcGrid" style="display:none">
+  <div class="src" id="src-ai_vision"><div class="nm">视觉医学</div><div class="st">等待启动…</div><span class="tag">待命</span></div>
+  <div class="src" id="src-ai_kb"><div class="nm">医学知识库</div><div class="st">等待启动…</div><span class="tag">待命</span></div>
+  <div class="src" id="src-vision_mingli"><div class="nm">视觉命理</div><div class="st">等待启动…</div><span class="tag">待命</span></div>
+  <div class="src" id="src-mingli_kb"><div class="nm">命理知识库</div><div class="st">等待启动…</div><span class="tag">待命</span></div>
+</div>
+
+<!-- ⑤ 结论分层 -->
+<div class="card" id="resultCard" style="display:none">
+  <h2>诊断结论（AI 分层 · 医生审核）</h2>
+  <div id="resultBody"></div>
+</div>
+
+<!-- ⑥ 医生审核 + 处方 -->
+<div class="card" id="rxCard" style="display:none">
+  <h2>医生审核 → 处方</h2>
+  <label>选择病情标签（综合判断）</label>
+  <div id="symptomPills"></div>
+  <label>医生姓名（签名）</label>
+  <input id="docName" placeholder="执业医生姓名" aria-label="医生姓名">
+  <label>审核意见</label>
+  <textarea id="docReview" placeholder="医生的辨证意见、用药调整说明…" aria-label="审核意见"></textarea>
+  <button class="btn btn-jade" id="btnRx">✍️ 审核签发处方</button>
+  <button class="btn btn-ghost" id="btnRevoke" style="display:none">↩ 驳回处方</button>
+  <div id="rxBox"></div>
+</div>
+
+<p class="disclaimer">易道智鉴 · AI 结论仅供医患参考 · 处方须经执业医生审核签发 · 命数只占 30%，努力占 70%</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var API = 'http://127.0.0.1:8920';
+  var currentImage = null;
+  var currentToken = null;
+  var layers = null;
+  var rx = null;
+  var streamTimer = null;
+
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(function () { t.style.display = 'none'; }, 2600);
+  }
+
+  // ── 图像采集 ──
+  var camStream = null;
+  $('btnCam').addEventListener('click', function () {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      toast('当前环境不支持摄像头'); return;
+    }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(function (s) {
+        camStream = s;
+        $('cam').srcObject = s;
+        $('cam').style.display = 'block';
+        $('camPreview').style.display = 'none';
+        $('btnCam').textContent = '📸 拍摄';
+        $('btnCam').onclick = captureShot;
+      })
+      .catch(function (e) { toast('摄像头不可用：' + e.message); });
+  });
+
+  function captureShot() {
+    var v = $('cam');
+    var canvas = document.createElement('canvas');
+    canvas.width = v.videoWidth || 640;
+    canvas.height = v.videoHeight || 480;
+    canvas.getContext('2d').drawImage(v, 0, 0);
+    currentImage = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+    $('camPreview').src = canvas.toDataURL('image/jpeg');
+    $('camPreview').style.display = 'block';
+    $('cam').style.display = 'none';
+    if (camStream) { camStream.getTracks().forEach(function (t) { t.stop(); }); camStream = null; }
+    $('btnCam').textContent = '📷 拍照采集';
+    $('btnCam').onclick = null;
+    $('retakeBtn').style.display = 'block';
+    $('imgInfo').textContent = '已采集 ' + Math.round(currentImage.length * 0.75 / 1024) + ' KB';
+    checkReady();
+  }
+
+  $('retakeBtn').addEventListener('click', function () {
+    currentImage = null;
+    $('camPreview').style.display = 'none';
+    $('retakeBtn').style.display = 'none';
+    $('imgInfo').textContent = '未采集';
+    checkReady();
+  });
+
+  $('btnUpload').addEventListener('click', function () { $('fileInput').click(); });
+  $('fileInput').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      currentImage = String(reader.result).split(',')[1];
+      $('camPreview').src = String(reader.result);
+      $('camPreview').style.display = 'block';
+      $('retakeBtn').style.display = 'block';
+      $('imgInfo').textContent = '已上传 ' + Math.round(f.size / 1024) + ' KB';
+      checkReady();
+    };
+    reader.readAsDataURL(f);
+  });
+
+  // ── 语音输入（浏览器 STT）──
+  var recognizing = false;
+  $('btnVoice').addEventListener('click', function () {
+    if (!('webkitSpeechRecognition' in window)) { toast('当前浏览器不支持语音识别'); return; }
+    var rec = new webkitSpeechRecognition();
+    rec.lang = 'zh-CN';
+    rec.continuous = false;
+    rec.interimResults = false;
+    recognizing = true;
+    $('voiceStatus').textContent = '🎙️ 正在聆听…';
+    rec.onresult = function (ev) {
+      var t = ev.results[0][0].transcript;
+      $('sChief').value = $('sChief').value + ($('sChief').value ? '，' : '') + t;
+      $('voiceStatus').textContent = '✅ 已转写：' + t.slice(0, 40);
+      recognizing = false;
+    };
+    rec.onerror = function () { $('voiceStatus').textContent = '语音识别失败，请手动输入'; recognizing = false; };
+    rec.onend = function () { if (recognizing) { $('voiceStatus').textContent = '语音识别结束'; recognizing = false; } };
+    rec.start();
+  });
+
+  // ── 穿戴设备语音（Rokid 桥接占位：接入点）──
+  $('btnWearable').addEventListener('click', function () {
+    toast('穿戴语音通道已就绪：请在穿戴设备端说出症状（接入点 js/wearable/rokid-bridge.js）');
+    $('voiceStatus').textContent = '⌚ 穿戴语音通道待设备响应…';
+  });
+
+  // ── 就绪检查 ──
+  function checkReady() {
+    $('btnRun').disabled = !currentImage;
+    $('imgInfo').textContent = currentImage ? '图像就绪' : '未采集';
+  }
+  checkReady();
+
+  // ── 四路实时诊断 ──
+  $('btnRun').addEventListener('click', function () {
+    var btn = $('btnRun');
+    btn.disabled = true;
+    btn.textContent = '⏳ 四路并行诊断中…';
+    var body = {
+      image: currentImage,
+      patient: {
+        name: $('pName').value.trim(),
+        gender: $('pGender').value,
+        age: $('pAge').value ? Number($('pAge').value) : null,
+        birthYear: $('pYear').value ? Number($('pYear').value) : null,
+        birthMonth: $('pMonth').value ? Number($('pMonth').value) : null,
+        birthDay: $('pDay').value ? Number($('pDay').value) : null,
+        birthHour: Number($('pHour').value),
+        birthPlace: $('pPlace').value.trim()
+      },
+      symptoms: {
+        chief: $('sChief').value.trim(),
+        voiceTranscript: '',
+        doctorSelected: [],
+        doctorInput: $('sDoctorInput').value.trim()
+      },
+      modes: ['face', 'eye', 'tongue', 'hand']
+    };
+    $('srcGrid').style.display = 'grid';
+    ['ai_vision', 'ai_kb', 'vision_mingli', 'mingli_kb'].forEach(function (k) {
+      var el = $('src-' + k);
+      el.className = 'src run';
+      el.querySelector('.tag').textContent = '进行中';
+      el.querySelector('.st').textContent = '正在分析…';
+    });
+
+    fetch(API + '/api/public/multi-source-diagnosis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.ok) { toast(d.message || '诊断失败'); resetBtn(); return; }
+      currentToken = d.token;
+      layers = d.layers;
+      renderSources(d.layers);
+      renderResult(d.layers);
+      // SSE 实时流（重放事件）
+      openStream(d.token);
+      btn.textContent = '🔄 重新诊断';
+      btn.disabled = false;
+    }).catch(function (e) {
+      toast('请求失败：' + e.message);
+      resetBtn();
+    });
+  });
+
+  function resetBtn() {
+    var btn = $('btnRun');
+    btn.textContent = '▶ 开始四路实时诊断';
+    btn.disabled = !currentImage;
+  }
+
+  function openStream(token) {
+    if (streamTimer) clearInterval(streamTimer);
+    // EventSource 单发流；为兼容，用轮询 recent 兜底（SSE 主用）
+    var es = null;
+    try {
+      es = new EventSource(API + '/api/public/multi-source-diagnosis/stream/' + encodeURIComponent(token));
+      es.addEventListener('source_done', function (ev) {
+        var d = JSON.parse(ev.data);
+        var el = $('src-' + d.source);
+        if (el) {
+          el.className = 'src done';
+          el.querySelector('.tag').textContent = '✓ 完成';
+          el.querySelector('.st').textContent = '已完成（' + (d.hits ? d.hits + ' 条 KB 命中' : '') + '）';
+        }
+      });
+      es.addEventListener('completed', function () { if (es) es.close(); });
+      es.onerror = function () { if (es) es.close(); };
+    } catch (e) { /* SSE 不可用时静默，主结果已同步返回 */ }
+  }
+
+  function renderSources(L) {
+    var st = {
+      ai_vision: L.ai_vision && L.ai_vision.sources && L.ai_vision.sources.length
+        ? L.ai_vision.sources.length + ' 路视觉特征' + (L.ai_vision.failed && L.ai_vision.failed.length ? '，' + L.ai_vision.failed.length + ' 路降级' : '')
+        : '视觉特征不足（降级）',
+      ai_kb: (L.ai_kb && L.ai_kb.inferred_syndromes || []).length
+        ? '证型：' + L.ai_kb.inferred_syndromes.join('、') + ' · ' + L.ai_kb.hits.length + ' 条 KB'
+        : '证型不足',
+      vision_mingli: (L.vision_mingli && L.vision_mingli.mapped || []).length
+        ? L.vision_mingli.mapped.map(function (m) { return m.wuxing + '行'; }).join('、')
+        : '五行映射不足',
+      mingli_kb: L.mingli_kb && L.mingli_kb.ok
+        ? '日主 ' + (L.mingli_kb.dayMaster || '—') + ' · 旺 ' + (L.mingli_kb.wuxingStrong || []).join('') + ' · 弱 ' + (L.mingli_kb.wuxingWeak || []).join('')
+        : (L.mingli_kb && L.mingli_kb.error) || '未排盘'
+    };
+    ['ai_vision', 'ai_kb', 'vision_mingli', 'mingli_kb'].forEach(function (k) {
+      var el = $('src-' + k);
+      el.className = 'src done';
+      el.querySelector('.tag').textContent = '✓ 完成';
+      el.querySelector('.st').textContent = st[k] || '';
+    });
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function renderResult(L) {
+    $('resultCard').style.display = 'block';
+    var h = '';
+    // 综合
+    h += '<div class="seg"><b>综合结论</b><div>' + esc(L.summary || '') + '</div></div>';
+
+    // AI 视觉医学
+    h += '<div class="seg"><b>① AI 视觉诊断结论（医学）</b>';
+    if (L.ai_vision && L.ai_vision.sources && L.ai_vision.sources.length) {
+      L.ai_vision.sources.forEach(function (s) {
+        h += '<div class="s">' + esc(s.mode) + '：' + esc(s.label || '特征不足') +
+             (s.confidence ? '（置信 ' + Math.round(s.confidence * 100) + '%）' : '') + '</div>';
+      });
+    } else { h += '<div class="s">视觉引擎未返回有效特征（可重试或补充采集）</div>'; }
+    h += '</div>';
+
+    // AI 知识库医学
+    h += '<div class="seg"><b>② AI 知识库诊断结论（医学）</b>';
+    if (L.ai_kb && L.ai_kb.inferred_syndromes && L.ai_kb.inferred_syndromes.length) {
+      h += '<div class="s">推断证型：' + esc(L.ai_kb.inferred_syndromes.join('、')) + '</div>';
+    }
+    (L.ai_kb && L.ai_kb.hits || []).forEach(function (x) {
+      h += '<div class="hit">📚 ' + esc(x.title) + ' <span style="opacity:.6">· 信任度 ' + Math.round((x.trust || 0.85) * 100) + '%</span><br>' + esc(x.snippet || '').slice(0, 120) + '</div>';
+    });
+    if (!(L.ai_kb && L.ai_kb.hits && L.ai_kb.hits.length)) h += '<div class="s">知识库暂无高相关命中</div>';
+    h += '</div>';
+
+    // AI 视觉命理
+    h += '<div class="seg"><b>③ AI 视觉命理参考</b>';
+    if (L.vision_mingli && L.vision_mingli.mapped && L.vision_mingli.mapped.length) {
+      L.vision_mingli.mapped.forEach(function (m) {
+        h += '<div class="s">' + esc(m.wuxing) + '行（' + esc(m.organ) + '）' + esc(m.meaning || '') + '</div>';
+      });
+    } else { h += '<div class="s">' + esc((L.vision_mingli && L.vision_mingli.note) || '五色特征不足') + '</div>'; }
+    h += '</div>';
+
+    // 命理知识库
+    h += '<div class="seg"><b>④ AI 命理知识库参考</b>';
+    if (L.mingli_kb && L.mingli_kb.ok) {
+      h += '<div class="s">日主 ' + esc(L.mingli_kb.dayMaster || '—') +
+           ' · 五行旺：' + esc((L.mingli_kb.wuxingStrong || []).join('、')) +
+           ' · 弱：' + esc((L.mingli_kb.wuxingWeak || []).join('、')) + '</div>';
+      (L.mingli_kb.hits || []).forEach(function (x) {
+        h += '<div class="hit">📖 ' + esc(x.title) + '<br>' + esc(x.snippet || '').slice(0, 100) + '</div>';
+      });
+    } else {
+      h += '<div class="s">' + esc((L.mingli_kb && L.mingli_kb.error) || '未排盘（补充生辰）') + '</div>';
+    }
+    h += '</div>';
+
+    h += '<div class="s" style="font-size:11px;opacity:.55;margin-top:8px">' + esc(L.disclaimer || '') + '</div>';
+    $('resultBody').innerHTML = h;
+
+    // 医生审核区
+    var pills = ['湿热内蕴', '气血两虚', '热证', '寒证/血瘀', '痰湿', '阴津亏虚', '肝郁气滞', '脾虚'];
+    var ph = '';
+    pills.forEach(function (p) {
+      ph += '<span class="pill" data-p="' + esc(p) + '">' + esc(p) + '</span>';
+    });
+    $('symptomPills').innerHTML = ph;
+    Array.prototype.forEach.call(document.querySelectorAll('.pill'), function (el) {
+      el.addEventListener('click', function () { el.classList.toggle('on'); });
+    });
+    $('rxCard').style.display = 'block';
+  }
+
+  // ── 处方签发 / 驳回 ──
+  $('btnRx').addEventListener('click', function () {
+    var selected = Array.prototype.map.call(document.querySelectorAll('.pill.on'), function (el) { return el.getAttribute('data-p'); });
+    if (!currentToken) { toast('请先完成诊断'); return; }
+    var btn = $('btnRx');
+    btn.disabled = true;
+    btn.textContent = '⏳ 签发中…';
+    fetch(API + '/api/public/multi-source-prescription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: currentToken,
+        doctor: { name: $('docName').value.trim() || '待签名', review: $('docReview').value.trim() },
+        symptoms: {
+          chief: $('sChief').value.trim(),
+          doctorInput: $('sDoctorInput').value.trim(),
+          doctorSelected: selected
+        }
+      })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      btn.disabled = false;
+      btn.textContent = '✍️ 审核签发处方';
+      if (!d.ok) { toast(d.message || '签发失败'); return; }
+      rx = d.rx;
+      renderRx(d.rx);
+    }).catch(function (e) { toast('签发失败：' + e.message); btn.disabled = false; btn.textContent = '✍️ 审核签发处方'; });
+  });
+
+  $('btnRevoke').addEventListener('click', function () {
+    if (!currentToken) return;
+    fetch(API + '/api/public/multi-source-prescription/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: currentToken, reason: '医生复核后驳回' })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.ok && d.rx) { rx = d.rx; renderRx(d.rx); toast('处方已驳回'); }
+    }).catch(function () { toast('驳回失败'); });
+  });
+
+  function renderRx(rxObj) {
+    var h = '<h3>📜 处方 ' + esc(rxObj.rxNo) + '</h3>';
+    h += '<div>状态：' + (rxObj.status === 'issued' ? '<b style="color:var(--jade)">已签发</b>' : '<b style="color:var(--red)">已驳回</b>') + '</div>';
+    h += '<div style="font-size:13px;margin-top:8px">辨证：<b>' + esc((rxObj.syndromes || []).join('、') || '—') + '</b></div>';
+    if (rxObj.formulas && rxObj.formulas.length) {
+      h += '<div style="font-size:13px;margin-top:8px">参考方剂（知识库）：</div>';
+      rxObj.formulas.forEach(function (f) {
+        h += '<div class="hit">💊 ' + esc(f.title) + ' <span style="opacity:.6">· 信任度 ' + Math.round((f.trust || 0.85) * 100) + '%</span></div>';
+      });
+    }
+    h += '<div style="font-size:13px;margin-top:8px">医生：' + esc((rxObj.doctor && rxObj.doctor.name) || '—') + '</div>';
+    if (rxObj.doctorNote) h += '<div style="font-size:12px;opacity:.85;margin-top:6px">审核意见：' + esc(rxObj.doctorNote) + '</div>';
+    if (rxObj.selectedSymptoms && rxObj.selectedSymptoms.length) {
+      h += '<div style="font-size:12px;opacity:.85;margin-top:6px">医生选定病情：' + esc(rxObj.selectedSymptoms.join('、')) + '</div>';
+    }
+    h += '<div class="row2"><span>签发：' + esc(String(rxObj.issuedAt || '').slice(0, 16)) + '</span></div>';
+    h += '<div style="font-size:11px;opacity:.55;margin-top:8px">' + esc(rxObj.disclaimer || '') + '</div>';
+    if (rxObj.status === 'issued') { $('btnRevoke').style.display = 'block'; }
+    $('rxBox').innerHTML = h;
+  }
+})();
+</script>
+</body>
+</html>
