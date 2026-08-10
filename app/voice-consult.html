@@ -211,6 +211,7 @@ function stopRecord(){
 // R697: 升级为「实时语音 → 知识库即时响应」流式交互
 // 说话过程中：interim 文本实时显示 + 防抖 500ms 自动查 KB + 实时症状提取
 let liveMode = false;          // 实时语音模式开关
+let silenceTimer = null;       // R697: 停顿自动停止计时器
 let kbLiveTimer = null;        // KB 查询防抖
 let lastKbQuery = '';          // 去重
 let kbCardCount = 0;           // KB 卡片计数
@@ -235,6 +236,17 @@ function startRecognition(){
     }
     text=finals+interim;
     finalText=text;
+    // R697: 停顿自动停止（实时模式·3 秒无新语音自动收尾）
+    if(liveMode && isRecording){
+      if(silenceTimer){clearTimeout(silenceTimer);silenceTimer=null}
+      silenceTimer=setTimeout(function(){
+        if(isRecording && liveMode){
+          var hint=document.getElementById('rec-hint');
+          if(hint)hint.textContent='检测到停顿，自动结束';
+          stopRecord();
+        }
+      },3000);
+    }
     // 实时显示（final 白色 + interim 金色）
     document.getElementById('transcript').innerHTML='<span class="live">'+escapeHtml(finals)+'</span>'+(interim?'<span style="color:var(--gold2,#c9a84c);opacity:.85">'+escapeHtml(interim)+'</span>':'');
     // R697: 实时语音 → KB 即时响应（防抖 500ms，边说话边查）
@@ -299,6 +311,7 @@ function streamKbToLive(query){
 
 function stopRecognition(){
   if(recognition){try{recognition.stop()}catch(e){}recognition=null}
+  if(silenceTimer){clearTimeout(silenceTimer);silenceTimer=null}
   if(kbLiveTimer){clearTimeout(kbLiveTimer);kbLiveTimer=null}
   if(finalText){
     document.getElementById('transcript').textContent=finalText;
