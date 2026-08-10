@@ -173,7 +173,8 @@ async function doPaipan(){
   const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
   const now = new Date();
   const currentAge = now.getFullYear() - +y;
-  const body={year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge};
+  const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
+  const body={year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge,lang:_lang },lang:_lang ,lang:_lang };
   if(dg) body.dayGanZhi=dg;
   if(question) body.question=question;
   let r, rSvg;

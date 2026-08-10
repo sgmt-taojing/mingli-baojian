@@ -158,7 +158,8 @@ async function doPaipan(){
   const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
   const now = new Date();
   const currentAge = now.getFullYear() - +y;
-  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge};
+  const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
+  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge,lang:_lang },lang:_lang ,lang:_lang };
   if(num1) body.num1 = +num1;
   if(num2) body.num2 = +num2;
   if(num3) body.num3 = +num3;
