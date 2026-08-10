@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>实时交互实验室 · 语音 × 知识库 × 视觉（零延迟）</title>
+<style>
+:root{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --line:#2d333b;
+  --ink:#e6edf3; --ink2:#9aa4b2; --gold:#c9a84c; --gold2:#e3c566;
+  --green:#3fb950; --green-bg:rgba(63,185,80,.12);
+  --amber:#d29922; --amber-bg:rgba(210,153,34,.12);
+  --red:#f85149; --red-bg:rgba(248,81,73,.12);
+  --blue:#58a6ff; --blue-bg:rgba(88,166,255,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6}
+.wrap{max-width:1280px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:14px 18px;background:linear-gradient(135deg,#1a2030,#141a24);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+header h1{font-size:18px;letter-spacing:1px;color:var(--gold2)}
+header .sub{color:var(--ink2);font-size:12px}
+.statusline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chip{padding:4px 12px;border-radius:20px;border:1px solid var(--line);font-size:12px;color:var(--ink2);background:var(--panel)}
+.chip b{color:var(--ink)}
+.chip.gold{border-color:rgba(201,168,76,.5);color:var(--gold2);background:rgba(201,168,76,.08)}
+.chip.green{border-color:rgba(63,185,80,.5);color:var(--green);background:var(--green-bg)}
+.chip.red{border-color:rgba(248,81,73,.5);color:var(--red);background:var(--red-bg)}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:520px}
+.panel h2{font-size:15px;display:flex;align-items:center;gap:8px;color:var(--ink)}
+.panel h2 .tag{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:400}
+.tag.voice{background:var(--amber-bg);color:var(--amber)}
+.tag.kb{background:var(--green-bg);color:var(--green)}
+.tag.vision{background:var(--blue-bg);color:var(--blue)}
+.micbtn{width:76px;height:76px;border-radius:50%;border:2px solid var(--gold);background:rgba(201,168,76,.08);color:var(--gold2);font-size:28px;cursor:pointer;margin:0 auto;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.micbtn:hover{border-color:var(--gold2);transform:scale(1.05)}
+.micbtn.recording{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(248,81,73,.5)}70%{box-shadow:0 0 0 16px rgba(248,81,73,0)}100%{box-shadow:0 0 0 0 rgba(248,81,73,0)}}
+.vbar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden}
+.vbar i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .12s}
+.transcript{min-height:96px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px;color:var(--ink2)}
+.transcript .interim{color:var(--gold)}
+.transcript .final{color:var(--ink)}
+.textinput{display:flex;gap:8px}
+.textinput input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--ink);font-size:13px;outline:none}
+.textinput input:focus{border-color:var(--gold)}
+.textinput button{background:var(--gold);border:none;border-radius:8px;color:#1a1505;font-weight:600;padding:0 16px;cursor:pointer}
+.textinput button:hover{background:var(--gold2)}
+.kblist{display:flex;flex-direction:column;gap:8px;flex:1;overflow-y:auto;max-height:330px}
+.kbcard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel2);animation:fadein .25s}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.kbcard .row1{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.kbcard .tier{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+.tier.direct{background:var(--green-bg);color:var(--green)}
+.tier.summary{background:var(--amber-bg);color:var(--amber)}
+.tier.ai{background:var(--red-bg);color:var(--red)}
+.kbcard .title{font-size:13px;font-weight:600;color:var(--ink)}
+.kbcard .meta{font-size:11px;color:var(--ink2);display:flex;gap:10px;flex-wrap:wrap}
+.kbcard .content{font-size:12px;color:var(--ink2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.empty{color:var(--ink2);font-size:12px;text-align:center;padding:24px 8px;border:1px dashed var(--line);border-radius:8px}
+.video-box{position:relative;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/9}
+.video-box video{width:100%;height:100%;object-fit:cover;display:block}
+.video-box .overlay{position:absolute;left:8px;bottom:8px;right:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.video-box .overlay .st{background:rgba(13,17,23,.8);color:var(--ink);font-size:11px;padding:4px 10px;border-radius:12px;backdrop-filter:blur(4px)}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.controls button{flex:1;min-width:100px;padding:9px 0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);cursor:pointer;font-size:13px}
+.controls button:hover{border-color:var(--gold);color:var(--gold2)}
+.controls button.primary{background:var(--blue);border-color:var(--blue);color:#04121f;font-weight:600}
+.controls button.primary:hover{background:#79b8ff}
+.feats{display:flex;flex-wrap:wrap;gap:6px}
+.feat{font-size:11px;padding:3px 10px;border-radius:12px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(88,166,255,.3)}
+.vis-matches{display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto}
+.vmatch{font-size:12px;padding:6px 10px;border-radius:6px;background:var(--green-bg);color:var(--green);border:1px solid rgba(63,185,80,.3)}
+.err{color:var(--red);font-size:12px;background:var(--red-bg);border:1px solid rgba(248,81,73,.3);border-radius:8px;padding:8px 10px;display:none}
+.err.show{display:block}
+.note{font-size:11px;color:var(--ink2);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.note b{color:var(--gold2)}
+footer{margin-top:14px;color:var(--ink2);font-size:12px;text-align:center;padding:10px}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+th{background:var(--panel2);color:var(--gold2);font-weight:600}
+td code{color:var(--blue);font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>实时交互实验室</h1>
+      <div class="sub">语音实时收音 × 知识库实时互通 × 视觉实时识别 — 全程无等待</div>
+    </div>
+    <div class="statusline">
+      <span class="chip" id="stateChip">状态：<b id="stateLabel">待命</b></span>
+      <span class="chip">KB 延迟 <b id="kbLat">–</b></span>
+      <span class="chip">语音→KB <b id="v2kLat">–</b></span>
+      <span class="chip">视觉延迟 <b id="visLat">–</b></span>
+      <span class="chip gold" id="kbHitChip">KB 直答 0 次</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ══════════ 语音实时收音 ══════════ -->
+    <section class="panel">
+      <h2><span class="tag voice">实时</span> 语音收音 <span style="font-size:11px;color:var(--ink2)">Web Speech API · 边说边出字</span></h2>
+      <button id="micBtn" class="micbtn" aria-label="开始语音输入">🎙</button>
+      <div class="vbar" aria-hidden="true"><i id="volBar"></i></div>
+      <div class="transcript" id="transcript">
+        <div class="empty">点击麦克风开始说话，转写会实时滚动（灰色为未定稿，白色为已定稿）</div>
+      </div>
+      <div class="textinput">
+        <input id="fallbackInput" type="text" placeholder="浏览器不支持语音时，可直接输入/粘贴文字" aria-label="文字输入">
+        <button id="sendText" type="button">发送</button>
+      </div>
+      <div class="err" id="voiceErr"></div>
+      <div class="note">💡 技术原理：<code>SpeechRecognition</code> 连续识别 + <code>interimResults</code>，每 150ms 防抖触发一次 KB 检索 — <b>您还没说完，答案已经先出</b>。</div>
+    </section>
+
+    <!-- ══════════ KB 实时互通 ══════════ -->
+    <section class="panel">
+      <h2><span class="tag kb">零延迟</span> 知识库实时互通 <span style="font-size:11px;color:var(--ink2)">FTS5 · 三级分级</span></h2>
+      <div class="kblist" id="kbList">
+        <div class="empty">实时检索结果将在这里流出：绿色=KB直答 · 黄色=KB摘要 · 红色=AI兜底</div>
+      </div>
+      <div class="note">⚡ 命中分 ≥0.7 → <b>KB 直答</b>（来源标注，直接朗读）；0.4~0.7 → KB 摘要；&lt;0.4 → AI 兜底。</div>
+    </section>
+
+    <!-- ══════════ 视觉实时识别 ══════════ -->
+    <section class="panel">
+      <h2><span class="tag vision">实时</span> 视觉识别 <span style="font-size:11px;color:var(--ink2)">抽帧 → 识别 → KB 匹配</span></h2>
+      <div class="video-box">
+        <video id="cam" autoplay playsinline muted></video>
+        <div class="overlay"><span class="st" id="visState">未启动</span><span class="st" id="visMode">面诊</span></div>
+      </div>
+      <div class="controls">
+        <button id="visStart" class="primary" type="button">▶ 开始识别</button>
+        <button id="visStop" type="button">■ 停止</button>
+        <button id="visOnce" type="button">📷 单帧</button>
+      </div>
+      <div class="feats" id="visFeats"><span class="note" style="width:100%">识别出的特征词会显示在这里（如：面色萎黄 / 舌苔白腻）</span></div>
+      <div class="vis-matches" id="visMatches"></div>
+      <div class="err" id="visErr"></div>
+      <div class="note">📷 规则与语音一致：<b>实时采集 → 实时识别 → 实时 KB 匹配 → 无等待反馈</b>（默认 800ms/帧，服务不可用会明确提示并自动暂停）。</div>
+    </section>
+  </div>
+
+  <!-- 工作原理 -->
+  <table>
+    <tr><th>环节</th><th>技术</th><th>延迟目标</th><th>失败兜底</th></tr>
+    <tr><td>语音收音</td><td><code>Web Speech API</code>（连续 + 中间结果）</td><td>边说边出字（即时）</td><td>自动重启 / 粘贴输入降级</td></tr>
+    <tr><td>语音→KB</td><td><code>interim</code> 事件 → 150ms 防抖检索</td><td>边说边出结果（< 300ms）</td><td>请求合并 + LRU 缓存 + 断网持久化缓存</td></tr>
+    <tr><td>KB 分级</td><td>命中分 ≥0.7 直答 / 0.4~0.7 摘要 / &lt;0.4 AI</td><td>分级即刻判定</td><td>AI 兜底回调（可接现有 AI 接口）</td></tr>
+    <tr><td>视觉识别</td><td><code>getUserMedia</code> 取流 + 抽帧上传</td><td>800ms/帧（可配置）</td><td>3 次连续失败自动暂停 + 明确提示 + 单帧上传降级</td></tr>
+  </table>
+
+  <footer>Realtime Interaction Engine v2.0 · 跨项目共享组件 · 供 mingli-baojian / tcm-agent / smart-home-family 等全部项目复用</footer>
+</div>
+
+<script src="realtime-voice.js"></script>
+<script src="realtime-kb.js"></script>
+<script src="realtime-vision.js"></script>
+<script src="realtime-engine.js"></script>
+<script>
+(function(){
+'use strict';
+// ══════════ 配置（可按部署环境修改） ══════════
+var KB_API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
+  ? 'http://127.0.0.1:8920/api/public/kb/search-fts'   // 本地：mingli-baojian API 网关
+  : '/api/public/kb/search-fts';                        // 线上：同域反代
+var VISION_API = 'http://127.0.0.1:8913/api/camera/upload'; // face-ocr-server
+
+var $ = function(id){ return document.getElementById(id); };
+var els = {
+  micBtn:$('micBtn'), volBar:$('volBar'), transcript:$('transcript'),
+  kbList:$('kbList'), stateLabel:$('stateLabel'), stateChip:$('stateChip'),
+  kbLat:$('kbLat'), v2kLat:$('v2kLat'), visLat:$('visLat'), kbHitChip:$('kbHitChip'),
+  voiceErr:$('voiceErr'), visErr:$('visErr'), fallbackInput:$('fallbackInput'), sendText:$('sendText'),
+  cam:$('cam'), visStart:$('visStart'), visStop:$('visStop'), visOnce:$('visOnce'),
+  visState:$('visState'), visMode:$('visMode'), visFeats:$('visFeats'), visMatches:$('visMatches')
+};
+var directCount = 0;
+
+// ══════════ 语音引擎 ══════════
+var voice = new RealtimeVoice({
+  continuous: true, interimResults: true, volumeMeter: true, autoRestart: true,
+  onState: function(s){
+    els.micBtn.classList.toggle('recording', s === 'listening' || s === 'starting');
+    els.micBtn.textContent = (s === 'listening' || s === 'starting') ? '⏺' : '🎙';
+    els.micBtn.setAttribute('aria-label', s === 'listening' ? '停止语音输入' : '开始语音输入');
+  },
+  onVolume: function(level){ els.volBar.style.width = Math.max(4, level) + '%'; },
+  onError: function(err){
+    if (!err.message) return;
+    els.voiceErr.textContent = err.message;
+    els.voiceErr.classList.add('show');
+    setTimeout(function(){ els.voiceErr.classList.remove('show'); }, 6000);
+  }
+});
+
+function renderTranscript(interim, accum){
+  var finalHtml = (accum || '').replace(/</g,'&lt;');
+  var interimHtml = (interim || '').replace(/</g,'&lt;');
+  els.transcript.innerHTML =
+    (finalHtml ? '<div class="final">' + finalHtml + '</div>' : '') +
+    (interimHtml ? '<div class="interim">' + interimHtml + '</div>' : '') +
+    (!finalHtml && !interimHtml ? '<div class="empty">点击麦克风开始说话…</div>' : '');
+}
+
+// ══════════ KB 引擎 ══════════
+var kb = new RealtimeKB({
+  apiBase: KB_API,
+  maxResults: 5,
+  onResult: renderKb,
+  onStatus: function(st){
+    if (typeof st.latencyMs === 'number') els.kbLat.textContent = st.latencyMs + 'ms';
+  }
+});
+
+function renderKb(r){
+  if (!r || !r.items || !r.items.length) return;
+  var tierClass = { direct:'direct', summary:'summary', ai:'ai' }[r.tier] || 'ai';
+  var tierLabel = { direct:'KB 直答', summary:'KB 摘要', ai:'AI 兜底' }[r.tier] || '';
+  if (r.tier === 'direct') { directCount++; els.kbHitChip.textContent = 'KB 直答 ' + directCount + ' 次'; }
+  var html = r.items.map(function(it, idx){
+    var src = '来源:KB' + (it.module ? '·' + it.module : '');
+    return '<div class="kbcard">' +
+      '<div class="row1"><span class="title">' + esc(it.title || '知识条目') + '</span>' +
+      '<span class="tier ' + tierClass + '">' + (idx === 0 ? tierLabel : '') + '</span></div>' +
+      '<div class="meta"><span>' + src + '</span><span>' + r.latencyMs + 'ms</span>' +
+      (r.cacheHit ? '<span>缓存</span>' : '') + '<span>命中分 ' + Math.round((r.score||0)*100) + '%</span></div>' +
+      '<div class="content">' + esc((it.content || '').substring(0, 160)) + '</div>' +
+      '</div>';
+  }).join('');
+  // 首条置顶展示（最新检索结果）
+  var wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  els.kbList.innerHTML = '';
+  while (wrap.firstChild) els.kbList.appendChild(wrap.firstChild);
+}
+function esc(s){ return String(s == null ? '' : s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ══════════ 编排引擎 ══════════
+var vision = new RealtimeVision({
+  videoEl: els.cam, endpoint: VISION_API, intervalMs: 800, mode: 'face',
+  onResult: function(r){
+    els.visLat.textContent = r.latencyMs + 'ms';
+    els.visState.textContent = '实时识别中 · ' + r.latencyMs + 'ms';
+    if (r.features && r.features.length) {
+      els.visFeats.innerHTML = r.features.slice(0, 8).map(function(f){ return '<span class="feat">' + esc(f) + '</span>'; }).join('');
+    }
+    if (r.matches && r.matches.length) {
+      els.visMatches.innerHTML = r.matches.slice(0, 4).map(function(m){
+        return '<div class="vmatch">📖 ' + esc(m.title || m.entry_id || '知识条目') + ' — ' + esc((m.snippet || m.content || '').substring(0, 50)) + '</div>';
+      }).join('');
+    }
+  },
+  onStatus: function(st){
+    els.visState.textContent = st.detail || st.status;
+    els.visStart.textContent = (st.status === 'scanning') ? '⏸ 识别中' : '▶ 开始识别';
+  },
+  onError: function(e){
+    els.visErr.textContent = e.message;
+    els.visErr.classList.add('show');
+    setTimeout(function(){ els.visErr.classList.remove('show'); }, 6000);
+  }
+});
+
+var engine = new RealtimeEngine({
+  voice: voice, kb: kb, vision: vision,
+  onEvent: function(type, payload){
+    if (type === 'statechange') {
+      els.stateLabel.textContent = payload.label;
+      els.stateChip.className = 'chip' + (payload.state === 'listening' ? ' gold' : (payload.state === 'vision_scanning' ? ' gold' : ''));
+    } else if (type === 'interim') {
+      renderTranscript(payload.text, payload.accum);
+      els.v2kLat.textContent = '~' + engine.getTimings().voiceToKb + 'ms';
+    } else if (type === 'final') {
+      renderTranscript('', payload.accum);
+    } else if (type === 'voice_error' && payload && payload.code === 'unsupported') {
+      els.voiceErr.textContent = payload.message;
+      els.voiceErr.classList.add('show');
+    }
+  }
+});
+
+// ══════════ 交互绑定 ══════════
+els.micBtn.addEventListener('click', function(){ voice.toggle(); });
+els.sendText.addEventListener('click', function(){
+  var t = els.fallbackInput.value.trim();
+  if (!t) return;
+  voice.feedText(t);
+  els.fallbackInput.value = '';
+  kb.search(t, { force: true });
+});
+els.fallbackInput.addEventListener('keydown', function(e){
+  if (e.key === 'Enter') els.sendText.click();
+});
+els.visStart.addEventListener('click', function(){
+  if (vision.getStatus() === 'scanning') { vision.stop(); } else { vision.start(); }
+});
+els.visStop.addEventListener('click', function(){ vision.stop(); });
+els.visOnce.addEventListener('click', function(){ vision.captureOnce(); });
+
+// 初始状态
+renderTranscript('', '');
+console.log('[realtime-demo] 引擎就绪 | voice:', voice.isSupported() ? 'Web Speech API' : '降级粘贴模式', '| kb:', KB_API, '| vision:', VISION_API);
+})();
+</script>
+</body>
+</html>
