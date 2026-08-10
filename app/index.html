@@ -29,18 +29,28 @@
 <link rel="stylesheet" href="css/flow-engine.css">
 <link rel="stylesheet" href="css/page-header.css">
 <script>
-// ═══ R502: 国内版守卫——强制 zh-CN + 全功能（防止海外参数污染）═══
+// ═══ R502+R703: 地区版本守卫——消费激活参数，不强制国内 ═══
+// R703 修真：不再删除 mbj_region/mbj_locale；URL 参数优先写入 localStorage
+// （修复国内外版本混淆：激活选国外 → 跳转后被打回国内版）
 (function() {
   try {
-    // 清除可能残留的海外激活状态
-    localStorage.removeItem('mbj_region');
-    localStorage.removeItem('mbj_locale');
-    // 忽略 URL 中的 region/locale 参数（海外跳转进来也强制国内）
     const p = new URLSearchParams(location.search);
-    if (p.get('region') || p.get('locale')) {
+    // URL 参数优先（激活向导跳转时携带 region/locale）
+    const urlRegion = p.get('region');
+    const urlLocale = p.get('locale');
+    if (urlRegion) localStorage.setItem('mbj_region', urlRegion);
+    if (urlLocale) localStorage.setItem('mbj_locale', urlLocale);
+    // 清理 URL 参数（已持久化，避免刷新时参数残留）
+    if (urlRegion || urlLocale || p.get('activated')) {
       p.delete('region'); p.delete('locale'); p.delete('activated');
       const clean = p.toString();
       history.replaceState(null, '', location.pathname + (clean ? '?' + clean : ''));
+    }
+    // R703 分流：非国内 region → 海外版（index-global.html），国内 → 全功能国内版
+    const region = localStorage.getItem('mbj_region');
+    if (region && region !== 'cn' && !location.pathname.includes('index-global')) {
+      location.replace('index-global.html?region=' + encodeURIComponent(region) +
+                       '&locale=' + encodeURIComponent(localStorage.getItem('mbj_locale') || 'en-SG'));
     }
   } catch (_) {}
 })();

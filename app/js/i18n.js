@@ -111,7 +111,7 @@
   function setLang(lang) {
     if (!_packs[lang]) return;
     _lang = lang;
-    try { localStorage.setItem('_i18n_lang', lang); } catch (_) {}
+    try { localStorage.setItem('mbj_locale', lang === 'en' ? 'en-SG' : (lang === 'zh' ? 'zh-CN' : lang)); } catch (_) {}
     applyTranslations();
     document.documentElement.lang = lang;
     // 通知其他组件
@@ -156,7 +156,7 @@
 
   function init() {
     var saved = null;
-    try { saved = localStorage.getItem('_i18n_lang'); } catch (_) {}
+    try { saved = localStorage.getItem('mbj_locale') || localStorage.getItem('_i18n_lang'); } catch (_) {}
     if (saved && _packs[saved]) _lang = saved;
     // 浏览器语言探测
     if (!saved) {

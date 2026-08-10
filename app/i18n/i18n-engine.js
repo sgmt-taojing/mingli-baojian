@@ -12,7 +12,6 @@
 
 const I18N = (function () {
   const STORAGE_KEY = 'mbj_locale';
-  const DEFAULT_LOCALE = 'zh-CN';
   const SUPPORTED = {
     'zh-CN': '简体中文',
     'zh-TW': '繁體中文',
@@ -22,7 +21,12 @@ const I18N = (function () {
     'vi-VN': 'Tiếng Việt',
   };
 
-  let _locale = localStorage.getItem(STORAGE_KEY) || _detectLocale();
+  let _locale = localStorage.getItem(STORAGE_KEY) || _localeFromRegion() || _detectLocale();
+
+  function _localeFromRegion() {
+    const region = localStorage.getItem(REGION_KEY);
+    return (region && REGION_LOCALE[region]) || null;
+  }
   let _packs = {};
   let _loaded = {};
 
@@ -43,7 +47,9 @@ const I18N = (function () {
   async function _load(locale) {
     if (_loaded[locale]) return _packs[locale];
     try {
-      const res = await fetch(`/i18n/${locale}.json`);
+      let res = await fetch(`/app/i18n/${locale}.json`).catch(() => null);
+      if (!res || !res.ok) res = await fetch(`/i18n/${locale}.json`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       _packs[locale] = await res.json();
       _loaded[locale] = true;
