@@ -578,6 +578,14 @@ async function submitSession() {
 
 // 采集患者输入（公共）
 function collectSessionBody() {
+  // R503: 会话携带地区（海外版 ?region=sg 直达）
+  let region = 'cn';
+  try {
+    region = new URLSearchParams(location.search).get('region')
+      || localStorage.getItem('mbj_region')
+      || (typeof RegionConfig !== 'undefined' ? RegionConfig.getRegion().code : 'cn')
+      || 'cn';
+  } catch (_) {}
   return {
     name: document.getElementById('pName').value.trim() || undefined,
     mode: currentMode,
@@ -586,6 +594,7 @@ function collectSessionBody() {
     voiceText: document.getElementById('pVoice').value.trim(),
     selectedConditions: [...selectedConditions],
     autoPilot: autopilotEnabled,
+    region,
   };
 }
 
@@ -887,6 +896,13 @@ async function openFromQueue(id) {
 }
 
 // ═══ i18n + 合规分层初始化 ═══
+// R503: URL 地区参数优先（海外版 ?region=sg 直达）
+try {
+  const urlRegion = new URLSearchParams(location.search).get('region');
+  if (urlRegion && typeof RegionConfig !== 'undefined' && RegionConfig.REGION_CONFIG[urlRegion]) {
+    localStorage.setItem('mbj_region', urlRegion);
+  }
+} catch (_) {}
 // 语言选择器
 const i18nSel = document.getElementById('i18nSelector');
 if (i18nSel) {
