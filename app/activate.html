@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>易道智鉴</title>
+<style>
+:root{
+  --bg:#000;--card:rgba(28,28,30,.92);--card2:rgba(44,44,46,.72);
+  --gold:#c9a84c;--gold2:#a8893a;--gold3:#d4b06a;
+  --text:#e8e6df;--text2:#aea69a;--muted:#6e6a5f;
+  --blue:#4dd0e1;--green:#64c864;--red:#f44336;
+  --border:rgba(201,168,76,.12);--border2:rgba(255,255,255,.06);
+  --backdrop:blur(20px) saturate(1.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;overflow-x:hidden;position:relative}
+
+/* 星空背景 */
+.starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.starfield::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;
+  background:radial-gradient(ellipse at 50% 0%,rgba(201,168,76,.04) 0%,transparent 60%),
+             radial-gradient(circle at 20% 80%,rgba(77,208,225,.03) 0%,transparent 50%),
+             radial-gradient(circle at 80% 60%,rgba(124,77,255,.03) 0%,transparent 50%);}
+
+/* 太极装饰 */
+.bagua-ring{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:480px;height:480px;border-radius:50%;
+  border:1px solid rgba(201,168,76,.06);z-index:0;pointer-events:none}
+.bagua-ring::before{content:'';position:absolute;top:40px;left:40px;right:40px;bottom:40px;border-radius:50%;
+  border:1px solid rgba(201,168,76,.04)}
+.bagua-ring::after{content:'';position:absolute;top:100px;left:100px;right:100px;bottom:100px;border-radius:50%;
+  border:1px solid rgba(201,168,76,.03)}
+
+/* 主容器 */
+.container{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px}
+
+/* 步骤切换 */
+.step{display:none;width:100%;max-width:380px;animation:fadeIn .6s ease forwards}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Logo 区域 */
+.logo-area{text-align:center;margin-bottom:40px}
+.logo-icon{width:72px;height:72px;margin:0 auto 16px;border-radius:18px;
+  background:linear-gradient(135deg,#1a1a1e,#0d0d10);border:1px solid rgba(201,168,76,.2);
+  display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--gold);
+  box-shadow:0 4px 24px rgba(201,168,76,.08)}
+.logo-title{font-size:28px;font-weight:600;color:var(--gold3);letter-spacing:4px;margin-bottom:6px}
+.logo-sub{font-size:13px;color:var(--muted);letter-spacing:2px}
+
+/* 步骤指示器 */
+.steps-indicator{display:flex;gap:6px;justify-content:center;margin-bottom:32px}
+.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.12);transition:all .3s}
+.step-dot.active{background:var(--gold);width:24px;border-radius:3px}
+.step-dot.done{background:var(--gold2)}
+
+/* 卡片 */
+.card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:24px 20px;margin-bottom:16px;backdrop-filter:var(--backdrop);-webkit-backdrop-filter:var(--backdrop)}
+
+/* 卡片标题 */
+.card h2{font-size:20px;font-weight:600;color:var(--text);margin-bottom:6px;text-align:center}
+.card .card-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:24px;line-height:1.6}
+
+/* 国家选择网格 */
+.country-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.country-item{background:var(--card2);border:1.5px solid transparent;border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer;transition:all .25s;position:relative}
+.country-item:active{transform:scale(.96)}
+.country-item.selected{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.country-item .flag{font-size:32px;margin-bottom:6px;line-height:1}
+.country-item .cname{font-size:12px;color:var(--text)}
+.country-item .cregion{font-size:10px;color:var(--muted);margin-top:2px}
+.country-item .check{position:absolute;top:6px;right:6px;width:18px;height:18px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center;font-size:10px;color:#000}
+.country-item.selected .check{display:flex}
+
+/* 语言选择 */
+.lang-list{display:flex;flex-direction:column;gap:8px}
+.lang-item{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--card2);border:1.5px solid transparent;border-radius:12px;cursor:pointer;transition:all .2s}
+.lang-item:active{transform:scale(.98)}
+.lang-item.selected{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.lang-item .licon{font-size:20px}
+.lang-item .lname{font-size:15px;font-weight:500;color:var(--text);flex:1}
+.lang-item .lcheck{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.15);transition:all .2s}
+.lang-item.selected .lcheck{border-color:var(--gold);background:var(--gold)}
+
+/* 确认信息 */
+.summary{background:var(--card2);border-radius:12px;padding:16px;margin:16px 0}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.summary-row:last-child{border-bottom:none}
+.summary-row .skey{font-size:13px;color:var(--muted)}
+.summary-row .sval{font-size:14px;color:var(--text);font-weight:500}
+
+/* 按钮 */
+.btn{width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;display:block;text-align:center;text-decoration:none}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000}
+.btn-primary:disabled{opacity:.3;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid rgba(255,255,255,.08);margin-top:10px;font-size:14px}
+
+/* 免责声明 */
+.disclaimer{margin-top:24px;padding:14px;background:rgba(255,152,0,.04);border:1px solid rgba(255,152,0,.08);border-radius:10px;font-size:11px;color:var(--muted);line-height:1.7;text-align:center}
+
+/* 完成页 */
+.complete-icon{width:64px;height:64px;margin:0 auto 16px;border-radius:50%;
+  background:linear-gradient(135deg,var(--green),#4caf50);display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff}
+
+/* 适配 */
+@media(max-width:360px){.country-grid{grid-template-columns:repeat(2,1fr)}.logo-title{font-size:24px}}
+@media(min-width:768px){.container{padding:40px}.step{max-width:440px}}
+</style>
+</head>
+<body>
+
+<div class="starfield"></div>
+<div class="bagua-ring"></div>
+
+<div class="container">
+
+  <!-- 步骤指示器 -->
+  <div class="steps-indicator" id="stepsDots">
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+
+  <!-- ═══ Step 0: 欢迎 ═══ -->
+  <div class="step active" id="step-welcome">
+    <div class="logo-area">
+      <div class="logo-icon">☰</div>
+      <div class="logo-title" data-i18n="brand.name">易道智鉴</div>
+      <div class="logo-sub" data-i18n="brand.tagline">传统智慧 · 现代生活</div>
+    </div>
+    <div class="card">
+      <h2 data-i18n="welcome.title">欢迎使用</h2>
+      <p class="card-sub" data-i18n="welcome.desc">选择您的地区和语言，开始探索传统文化与现代智慧的融合体验</p>
+      <button class="btn btn-primary" onclick="goStep('country')" data-i18n="welcome.start">开始</button>
+    </div>
+    <div class="disclaimer" data-i18n="welcome.disclaimer">本应用提供的内容仅供文化研究与娱乐参考</div>
+  </div>
+
+  <!-- ═══ Step 1: 选择国别 ═══ -->
+  <div class="step" id="step-country">
+    <div class="logo-area">
+      <div class="logo-icon" style="font-size:28px;width:56px;height:56px;border-radius:14px">🌍</div>
+    </div>
+    <div class="card">
+      <h2 data-i18n="country.title">选择您的地区</h2>
+      <p class="card-sub" data-i18n="country.desc">不同地区提供本地化的内容与服务</p>
+      <div class="country-grid" id="countryGrid"></div>
+    </div>
+    <button class="btn btn-primary" id="countryNext" onclick="goStep('language')" disabled data-i18n="common.next">下一步</button>
+  </div>
+
+  <!-- ═══ Step 2: 选择语言 ═══ -->
+  <div class="step" id="step-language">
+    <div class="logo-area">
+      <div class="logo-icon" style="font-size:28px;width:56px;height:56px;border-radius:14px">🌐</div>
+    </div>
+    <div class="card">
+      <h2 data-i18n="lang.title">选择您的语言</h2>
+      <p class="card-sub" data-i18n="lang.desc">您可以随时在设置中更改</p>
+      <div class="lang-list" id="langList"></div>
+    </div>
+    <button class="btn btn-primary" id="langNext" onclick="goStep('confirm')" disabled data-i18n="common.next">下一步</button>
+    <button class="btn btn-ghost" onclick="goStep('country')" data-i18n="common.back">返回</button>
+  </div>
+
+  <!-- ═══ Step 3: 确认 ═══ -->
+  <div class="step" id="step-confirm">
+    <div class="logo-area">
+      <div class="logo-icon" style="font-size:28px;width:56px;height:56px;border-radius:14px">✓</div>
+    </div>
+    <div class="card">
+      <h2 data-i18n="confirm.title">确认您的选择</h2>
+      <p class="card-sub" data-i18n="confirm.desc">设置完成后可在「我的」页面随时修改</p>
+      <div class="summary">
+        <div class="summary-row">
+          <span class="skey" data-i18n="confirm.region">地区</span>
+          <span class="sval" id="sumRegion">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="skey" data-i18n="confirm.language">语言</span>
+          <span class="sval" id="sumLang">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="skey" data-i18n="confirm.version">版本</span>
+          <span class="sval" id="sumVersion">—</span>
+        </div>
+      </div>
+      <div class="disclaimer" data-i18n="confirm.disclaimer">命理内容仅供文化娱乐参考，不构成命运预言；健康建议仅供养生参考，不替代专业医疗诊断</div>
+    </div>
+    <button class="btn btn-primary" onclick="completeActivation()" data-i18n="confirm.activate">激活并开始</button>
+    <button class="btn btn-ghost" onclick="goStep('language')" data-i18n="common.back">返回</button>
+  </div>
+
+  <!-- ═══ 完成动画 ═══ -->
+  <div class="step" id="step-complete">
+    <div class="complete-icon">✓</div>
+    <div class="logo-area">
+      <div class="logo-title" style="font-size:22px" data-i18n="complete.title">设置完成</div>
+      <div class="logo-sub" id="completeMsg">正在进入…</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══ 国家/地区数据（含合规适配）═══
+var COUNTRIES = [
+  {code:'SG',flag:'🇸🇬',name:'新加坡',nameEn:'Singapore',region:'东南亚',lang:'en,zh',version:'SG',compliance:'PDPA'},
+  {code:'MY',flag:'🇲🇾',name:'马来西亚',nameEn:'Malaysia',region:'东南亚',lang:'en,zh,ms',version:'MY',compliance:'PDPA'},
+  {code:'TH',flag:'🇹🇭',name:'泰国',nameEn:'Thailand',region:'东南亚',lang:'en,th',version:'TH',compliance:'PDPA'},
+  {code:'VN',flag:'🇻🇳',name:'越南',nameEn:'Vietnam',region:'东南亚',lang:'en,vi',version:'VN',compliance:'PDPD'},
+  {code:'JP',flag:'🇯🇵',name:'日本',nameEn:'Japan',region:'东亚',lang:'en,ja',version:'JP',compliance:'APPI'},
+  {code:'KR',flag:'🇰🇷',name:'韩国',nameEn:'Korea',region:'东亚',lang:'en,ko',version:'KR',compliance:'PIPA'},
+  {code:'CN',flag:'🇨🇳',name:'中国',nameEn:'China',region:'东亚',lang:'zh',version:'CN',compliance:'PIPL'},
+  {code:'TW',flag:'🇹🇼',name:'台湾',nameEn:'Taiwan',region:'东亚',lang:'zh,en',version:'TW',compliance:'PDPA'},
+  {code:'HK',flag:'🇭🇰',name:'香港',nameEn:'Hong Kong',region:'东亚',lang:'zh,en',version:'HK',compliance:'PDPO'},
+  {code:'US',flag:'🇺🇸',name:'美国',nameEn:'United States',region:'北美',lang:'en',version:'US',compliance:'CCPA'},
+  {code:'CA',flag:'🇨🇦',name:'加拿大',nameEn:'Canada',region:'北美',lang:'en',version:'CA',compliance:'PIPEDA'},
+  {code:'AU',flag:'🇦🇺',name:'澳大利亚',nameEn:'Australia',region:'大洋洲',lang:'en',version:'AU',compliance:'Privacy Act'},
+];
+
+// ═══ 语言数据 ═══
+var LANGUAGES = [
+  {code:'zh',icon:'🇨🇳',name:'简体中文',nameEn:'Simplified Chinese'},
+  {code:'en',icon:'🇬🇧',name:'English',nameEn:'English'},
+  {code:'ja',icon:'🇯🇵',name:'日本語',nameEn:'Japanese'},
+  {code:'ko',icon:'🇰🇷',name:'한국어',nameEn:'Korean'},
+  {code:'vi',icon:'🇻🇳',name:'Tiếng Việt',nameEn:'Vietnamese'},
+  {code:'th',icon:'🇹🇭',name:'ภาษาไทย',nameEn:'Thai'},
+  {code:'ms',icon:'🇲🇾',name:'Bahasa Melayu',nameEn:'Malay'},
+];
+
+// ═══ 状态 ═══
+var selectedCountry = null;
+var selectedLang = null;
+
+// ═══ 渲染国家网格 ═══
+function renderCountries() {
+  var grid = document.getElementById('countryGrid');
+  grid.innerHTML = COUNTRIES.map(function(c) {
+    return '<div class="country-item" data-code="'+c.code+'" onclick="selectCountry(\''+c.code+'\')">'+
+      '<div class="check">✓</div>'+
+      '<div class="flag">'+c.flag+'</div>'+
+      '<div class="cname">'+c.name+'</div>'+
+      '<div class="cregion">'+c.region+'</div>'+
+      '</div>';
+  }).join('');
+}
+
+function selectCountry(code) {
+  selectedCountry = COUNTRIES.find(function(c){return c.code===code});
+  // 更新选中态
+  var items = document.querySelectorAll('.country-item');
+  for (var i=0;i<items.length;i++) items[i].classList.remove('selected');
+  document.querySelector('.country-item[data-code="'+code+'"]').classList.add('selected');
+  // 激活下一步
+  document.getElementById('countryNext').disabled = false;
+  // 根据国家过滤可用语言
+  filterLanguages(code);
+}
+
+// ═══ 渲染语言列表 ═══
+function renderLanguages(filterCode) {
+  var list = document.getElementById('langList');
+  var available = filterCode ? LANGUAGES.filter(function(l){return selectedCountry.lang.indexOf(l.code)>=0}) : LANGUAGES;
+  list.innerHTML = available.map(function(l) {
+    return '<div class="lang-item" data-code="'+l.code+'" onclick="selectLang(\''+l.code+'\')">'+
+      '<span class="licon">'+l.icon+'</span>'+
+      '<span class="lname">'+l.name+'</span>'+
+      '<span class="lcheck"></span>'+
+      '</div>';
+  }).join('');
+}
+
+function filterLanguages(code) {
+  renderLanguages(code);
+  selectedLang = null;
+  document.getElementById('langNext').disabled = true;
+}
+
+function selectLang(code) {
+  selectedLang = LANGUAGES.find(function(l){return l.code===code});
+  var items = document.querySelectorAll('.lang-item');
+  for (var i=0;i<items.length;i++) items[i].classList.remove('selected');
+  document.querySelector('.lang-item[data-code="'+code+'"]').classList.add('selected');
+  document.getElementById('langNext').disabled = false;
+  // 即时切换 UI 语言
+  if (window.i18n) i18n.setLang(code);
+}
+
+// ═══ 步骤导航 ═══
+var stepOrder = ['welcome','country','language','confirm'];
+var stepIdx = 0;
+
+function goStep(name) {
+  // 隐藏所有
+  var steps = document.querySelectorAll('.step');
+  for (var i=0;i<steps.length;i++) steps[i].classList.remove('active');
+  // 显示目标
+  document.getElementById('step-'+name).classList.add('active');
+  // 更新指示器
+  stepIdx = stepOrder.indexOf(name);
+  var dots = document.querySelectorAll('.step-dot');
+  for (var j=0;j<dots.length;j++) {
+    dots[j].className = 'step-dot' + (j<stepIdx?' done':'') + (j===stepIdx?' active':'');
+  }
+  // 确认页填充摘要
+  if (name==='confirm') {
+    document.getElementById('sumRegion').textContent = (selectedCountry?selectedCountry.flag+' '+selectedCountry.name:'—');
+    document.getElementById('sumLang').textContent = (selectedLang?selectedLang.icon+' '+selectedLang.name:'—');
+    document.getElementById('sumVersion').textContent = selectedCountry ? ('v-'+selectedCountry.version+' · '+selectedCountry.compliance) : '—';
+  }
+}
+
+// ═══ 完成激活 ═══
+function completeActivation() {
+  // 持久化
+  var profile = {
+    country: selectedCountry.code,
+    countryName: selectedCountry.name,
+    region: selectedCountry.region,
+    version: selectedCountry.version,
+    compliance: selectedCountry.compliance,
+    lang: selectedLang.code,
+    activatedAt: new Date().toISOString(),
+  };
+  try {
+    localStorage.setItem('_activation_profile', JSON.stringify(profile));
+    localStorage.setItem('_i18n_lang', selectedLang.code);
+  } catch(e) {}
+
+  // 切换到完成动画
+  goStep('complete');
+  // 指示器全亮
+  var dots = document.querySelectorAll('.step-dot');
+  for (var i=0;i<dots.length;i++) dots[i].className = 'step-dot done';
+
+  // 2 秒后跳转主页
+  setTimeout(function() {
+    window.location.href = 'divination-hub.html';
+  }, 2000);
+}
+
+// ═══ 初始化 ═══
+renderCountries();
+renderLanguages();
+
+// 检测已激活用户（跳过向导）
+try {
+  var saved = JSON.parse(localStorage.getItem('_activation_profile') || '{}');
+  if (saved.country && saved.lang && !location.search.includes('reset')) {
+    // 已激活过，显示「欢迎回来」1 秒后跳转
+    document.getElementById('completeMsg').textContent = '欢迎回来 · '+saved.countryName;
+    goStep('complete');
+    setTimeout(function() { window.location.href = 'divination-hub.html'; }, 1200);
+  }
+} catch(e) {}
+</script>
+
+</body>
+</html>
