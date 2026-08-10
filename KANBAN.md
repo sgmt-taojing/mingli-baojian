@@ -43,6 +43,17 @@
 | 2026-08-07~08 | P1-任务3: music/lifeindex/lifeplan KB兜底 | _MODULE_REPORTS 901行 |
 | 2026-08-07~08 | P1-任务4: lifeplan蓝图化 | lifeplan-detail.html + 时间轴 |
 | 2026-08-06 | R695: Critic交叉验证 | commit 4f149a4 |
+| 2026-08-11 | R503: collab region参数化 + 排盘页i18n全接入 | commit cd09aab |
+| 2026-08-11 | R502: 国内/海外版本隔离 | commit 2670e55 |
+| 2026-08-11 | R501: 全球方剂接入诊断链 | commit 409ab21 |
+| 2026-08-10 | R500: 类iPhone激活流程 | commit b528625 |
+| 2026-08-10 | R499: 全球传统医学方剂库 | commit 30ea2eb |
+| 2026-08-10 | R498: 出海i18n框架+合规分层 | commit be1b5e0 |
+| 2026-08-10 | R497f: 双源融合置信(无人化) | commit 11119bf |
+| 2026-08-10 | R497e: autopilot放行 | commit 4f34367 |
+| 2026-08-10 | R497d: 采集自动提交闭环 | commit d07d3ee |
+| 2026-08-10 | R497c: 语音流式KB+视觉连续采集 | commit b5088d1 |
+| 2026-08-10 | R497b: 安全闸门+医生认证 | commit d56a382 |
 | 2026-08-05 | R497: 四方实时协作诊断工作台 | commit aa20a96 |
 | 2026-08-04 | R693: console.log清零 + AI味文案清零 | commit 1909bf0 |
 | 2026-08-03 | R689: pre-commit 接入 health-check-all | commit 5e7e6cb |
