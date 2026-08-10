@@ -169,7 +169,12 @@ input:focus,textarea:focus{border-color:var(--accent)}
           <input type="password" id="docPass" placeholder="密码" style="flex:1">
           <button class="btn primary sm" onclick="doctorLogin()">登录</button>
         </div>
-        <div id="doctorLoginStatus" style="font-size:11px;color:var(--dim);margin-top:6px">未登录（演示账号 doctor / doctor123）</div>
+        <div id="doctorLoginStatus" style="font-size:11px;color:var(--dim);margin-top:6px">未登录</div>
+        <div style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.8">
+          演示账号（点击自动填充）：
+          <span class="demo-acct" onclick="fillDemo('doctor','doctor123')" style="cursor:pointer;color:var(--accent);text-decoration:underline">医生 doctor/doctor123</span> ·
+          <span class="demo-acct" onclick="fillDemo('admin','admin123')" style="cursor:pointer;color:var(--accent);text-decoration:underline">管理员 admin/admin123</span>
+        </div>
       </div>
       <div style="display:flex;gap:6px;margin-bottom:10px">
         <button class="btn ghost sm" onclick="loadQueue('pending')">⏳ 待处理</button>
@@ -753,7 +758,7 @@ async function doctorLogin() {
       body: JSON.stringify({ username, password })
     });
     const d = await res.json();
-    if (d.code !== 0) return toast('❌ ' + d.message);
+    if (d.code !== 0) { toast('❌ ' + d.message + '（可点击上方演示账号填充）'); return; }
     doctorToken = d.data.token;
     doctorUser = d.data.user;
     localStorage.setItem('collab_doctor_token', doctorToken);
@@ -761,6 +766,12 @@ async function doctorLogin() {
     document.getElementById('doctorLoginStatus').textContent = '✅ 已登录：' + doctorUser.username + '（' + doctorUser.role + '）';
     toast('✅ 医生认证成功');
   } catch (e) { toast('❌ ' + e.message); }
+}
+// 演示账号一键填充
+function fillDemo(u, p) {
+  document.getElementById('docUser').value = u;
+  document.getElementById('docPass').value = p;
+  toast('已填充 ' + u + '，点击登录');
 }
 // 恢复登录态
 if (doctorToken && doctorUser) {
