@@ -96,34 +96,34 @@ const MODULES = {
   zh: {
     title: '东方智慧', sub: '传统文化知识平台',
     modules: [
-      { ic: '🩺', name: 'AI 视觉诊断', desc: '舌/面/眼/手四诊分析', url: '/tcm-visual-reference.html' },
-      { ic: '🗣', name: 'AI 助手', desc: '知识问答 · 语音交互', url: '/ai-assistant.html' },
-      { ic: '📜', name: '命理排盘', desc: '八字/紫微/奇门/六爻', url: '/divination-hub.html' },
-      { ic: '🏠', name: '风水堪舆', desc: '飞星/八宅/玄空', url: '/fengshui-chart.html' },
-      { ic: '🍵', name: '中医养生', desc: '体质/证型/方剂知识', url: '/tcm-portal.html' },
-      { ic: '👥', name: '协作诊断', desc: '患者×AI×医生', url: '/collab-diagnosis.html' },
+      { ic: '🩺', name: 'AI 视觉诊断', desc: '舌/面/眼/手四诊分析', url: '/tcm-visual-reference.html', cat: 'vision' },
+      { ic: '🗣', name: 'AI 助手', desc: '知识问答 · 语音交互', url: '/ai-assistant.html', cat: 'general' },
+      { ic: '📜', name: '命理排盘', desc: '八字/紫微/奇门/六爻', url: '/divination-hub.html', cat: 'fortune' },
+      { ic: '🏠', name: '风水堪舆', desc: '飞星/八宅/玄空', url: '/fengshui-chart.html', cat: 'fortune' },
+      { ic: '🍵', name: '中医养生', desc: '体质/证型/方剂知识', url: '/tcm-portal.html', cat: 'tcm' },
+      { ic: '👥', name: '协作诊断', desc: '患者×AI×医生', url: '/collab-diagnosis.html', cat: 'general' },
     ]
   },
   en: {
     title: 'Eastern Wisdom', sub: 'Traditional Knowledge Platform',
     modules: [
-      { ic: '🩺', name: 'AI Wellness Scan', desc: 'Face/Tongue/Eye/Hand analysis', url: '/tcm-visual-reference.html' },
-      { ic: '🗣', name: 'AI Assistant', desc: 'Q&A · Voice interaction', url: '/ai-assistant.html' },
-      { ic: '📜', name: 'Eastern Astrology', desc: 'Bazi · Ziwei · Qi Men', url: '/divination-hub.html' },
-      { ic: '🏠', name: 'Feng Shui', desc: 'Flying Star · Eight Mansions', url: '/fengshui-chart.html' },
-      { ic: '🍵', name: 'TCM Wellness', desc: 'Constitution · Formulas', url: '/tcm-portal.html' },
-      { ic: '👥', name: 'Collaborative Diagnosis', desc: 'Patient × AI × Doctor', url: '/collab-diagnosis.html' },
+      { ic: '🩺', name: 'AI Wellness Scan', desc: 'Face/Tongue/Eye/Hand analysis', url: '/tcm-visual-reference.html', cat: 'vision' },
+      { ic: '🗣', name: 'AI Assistant', desc: 'Q&A · Voice interaction', url: '/ai-assistant.html', cat: 'general' },
+      { ic: '📜', name: 'Eastern Astrology', desc: 'Bazi · Ziwei · Qi Men', url: '/divination-hub.html', cat: 'fortune' },
+      { ic: '🏠', name: 'Feng Shui', desc: 'Flying Star · Eight Mansions', url: '/fengshui-chart.html', cat: 'fortune' },
+      { ic: '🍵', name: 'TCM Wellness', desc: 'Constitution · Formulas', url: '/tcm-portal.html', cat: 'tcm' },
+      { ic: '👥', name: 'Collaborative Diagnosis', desc: 'Patient × AI × Doctor', url: '/collab-diagnosis.html', cat: 'general' },
     ]
   },
   ja: {
     title: '東洋智慧', sub: '伝統知識プラットフォーム',
     modules: [
-      { ic: '🩺', name: 'AI ウェルネススキャン', desc: '舌/顔/目/手の分析', url: '/tcm-visual-reference.html' },
-      { ic: '🗣', name: 'AI アシスタント', desc: 'Q&A · 音声対話', url: '/ai-assistant.html' },
-      { ic: '📜', name: '四柱推命', desc: '四柱 · 紫微 · 奇門', url: '/divination-hub.html' },
-      { ic: '🏠', name: '風水', desc: '飛星 · 八宅', url: '/fengshui-chart.html' },
-      { ic: '🍵', name: '漢方ウェルネス', desc: '体質 · 方剤知識', url: '/tcm-portal.html' },
-      { ic: '👥', name: '協調診断', desc: '患者 × AI × 医師', url: '/collab-diagnosis.html' },
+      { ic: '🩺', name: 'AI ウェルネススキャン', desc: '舌/顔/目/手の分析', url: '/tcm-visual-reference.html', cat: 'vision' },
+      { ic: '🗣', name: 'AI アシスタント', desc: 'Q&A · 音声対話', url: '/ai-assistant.html', cat: 'general' },
+      { ic: '📜', name: '四柱推命', desc: '四柱 · 紫微 · 奇門', url: '/divination-hub.html', cat: 'fortune' },
+      { ic: '🏠', name: '風水', desc: '飛星 · 八宅', url: '/fengshui-chart.html', cat: 'fortune' },
+      { ic: '🍵', name: '漢方ウェルネス', desc: '体質 · 方剤知識', url: '/tcm-portal.html', cat: 'tcm' },
+      { ic: '👥', name: '協調診断', desc: '患者 × AI × 医師', url: '/collab-diagnosis.html', cat: 'general' },
     ]
   },
 };
@@ -161,8 +161,20 @@ function renderUI() {
   document.getElementById('heroTitle').textContent = M.title;
   document.getElementById('heroSub').textContent = M.sub;
 
-  // 模块网格
-  document.getElementById('moduleGrid').innerHTML = M.modules.map(m =>
+  // 模块网格（R705: 按 region-config 功能开关过滤）
+  let mods = M.modules;
+  if (typeof RegionConfig !== 'undefined') {
+    const ff = RegionConfig.filterFeatures(region);
+    mods = M.modules.filter(function(m) {
+      // 按模块类型 + 合规过滤
+      if (m.cat === 'fortune' && !ff.showFortune) return false;
+      if (m.cat === 'tcm' && !ff.showTCM) return false;
+      if (m.cat === 'prescription' && !ff.showPrescription) return false;
+      if (m.cat === 'vision' && !ff.showAIVision) return false;
+      return true;
+    });
+  }
+  document.getElementById('moduleGrid').innerHTML = mods.map(m =>
     `<a class="mod" href="${m.url}"><div class="ic">${m.ic}</div><div class="nm">${m.name}</div><div class="ds">${m.desc}</div></a>`
   ).join('');
 
