@@ -37,7 +37,7 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass
 
-    def _send_json(self, status, data):
+    def _respond(self, status, data):
         body = json.dumps(data, ensure_ascii=False).encode()
         self.send_response(status)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -46,7 +46,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _read_json(self):
+    def _parse_body(self):
         length = int(self.headers.get('Content-Length', 0))
         return json.loads(self.rfile.read(length))
 
@@ -58,30 +58,32 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path in ('/', '/health'):
-            self._send_json(200, {'status': 'ok', 'model': MODEL, 'adapter': ADAPTER})
+        if self.path == '/v1/models':
+            self._respond(200, {'object': 'list', 'data': [{'id': 'mingli-v5', 'object': 'model'}]})
+        elif self.path in ('/', '/health'):
+            self._respond(200, {'status': 'ok', 'model': MODEL, 'adapter': ADAPTER})
         else:
-            self._send_json(404, {'error': 'not found'})
+            self._respond(404, {'error': 'not found'})
 
     def do_POST(self):
         try:
-            req = self._read_json()
+            req = self._parse_body()
         except Exception as e:
-            self._send_json(400, {'error': f'invalid json: {e}'})
+            self._respond(400, {'error': f'invalid json: {e}'})
             return
 
         if self.path == '/generate':
             prompt = req.get('prompt', '').strip()
             max_tokens = int(req.get('max_tokens', 256))
             if not prompt:
-                self._send_json(400, {'error': 'prompt required'})
+                self._respond(400, {'error': 'prompt required'})
                 return
             self._generate(prompt, max_tokens)
         elif self.path == '/v1/chat/completions':
             messages = req.get('messages', [])
             max_tokens = int(req.get('max_tokens', 256))
             if not messages:
-                self._send_json(400, {'error': 'messages required'})
+                self._respond(400, {'error': 'messages required'})
                 return
             # 拼 prompt（Qwen chat 格式）
             prompt = ''
@@ -97,7 +99,7 @@ class Handler(BaseHTTPRequestHandler):
             prompt += '助手:'
             self._generate(prompt, max_tokens, openai=True)
         else:
-            self._send_json(404, {'error': 'not found'})
+            self._respond(404, {'error': 'not found'})
 
     def _generate(self, prompt, max_tokens, openai=False):
         t0 = time.time()
@@ -123,7 +125,7 @@ class Handler(BaseHTTPRequestHandler):
                     text = text.split(marker)[0]
                     break
             if openai:
-                self._send_json(200, {
+                self._respond(200, {
                     'id': 'chatcmpl-' + str(int(time.time() * 1000)),
                     'object': 'chat.completion',
                     'created': int(time.time()),
@@ -132,14 +134,14 @@ class Handler(BaseHTTPRequestHandler):
                     'usage': {'prompt_tokens': len(prompt), 'completion_tokens': len(text), 'total_tokens': len(prompt) + len(text)},
                 })
             else:
-                self._send_json(200, {
+                self._respond(200, {
                     'text': text,
                     'latency_s': round(elapsed, 2),
                     'model': 'mingli-sft-v5',
                 })
         except Exception as e:
             traceback.print_exc()
-            self._send_json(500, {'error': str(e)})
+            self._respond(500, {'error': str(e)})
 
 
 if __name__ == '__main__':
