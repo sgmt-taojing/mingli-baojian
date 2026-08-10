@@ -1,609 +1,492 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta charset="UTF-8">
-<meta name="description" content="运营监控大屏，平台健康状态">
-<meta name="keywords" content="运营监控,平台健康,API状态,服务监控">
-<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/monitor-dashboard.html">
-<meta name="robots" content="index, follow,noindex">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="var(--ink)">
-<meta property="og:title" content="运营监控 · 易道智鉴">
-<meta property="og:description" content="运营监控大屏，平台健康状态">
-<meta property="og:type" content="website">
-<title>运营监控 · 易道智鉴</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="css/a11y-fix.css">
-<link rel="stylesheet" href="css/monitor-dashboard-inline.css">
-<link rel="stylesheet" href="css/drill-drawer.css">
-  <link rel="stylesheet" href="css/mobile-nav.css">
-<link rel="stylesheet" href="css/theme-systems.css">
-<link rel="stylesheet" href="css/flow-engine.css">
-<link rel="stylesheet" href="css/page-header.css">
-<link rel="stylesheet" href="css/tokens.css">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🛡️ 智能体训练矩阵 · 监控总览</title>
+<style>
+/* ═══════════ 设计系统 ═══════════ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#05070f;
+  --card:#0b1020;
+  --card-2:#0e1528;
+  --line:rgba(0,212,255,0.10);
+  --line-hot:rgba(0,212,255,0.28);
+  --text:#e6ecff;
+  --dim:#5a6a90;
+  --green:#00ffa3;
+  --yellow:#ffb800;
+  --red:#ff3860;
+  --blue:#00d4ff;
+  --purple:#8b6cff;
+  --radius:12px;
+  --shadow:0 4px 24px rgba(0,0,0,0.45);
+}
+body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(900px 400px at 15% -5%,rgba(0,212,255,0.07),transparent 60%),
+    radial-gradient(900px 400px at 85% -5%,rgba(139,108,255,0.06),transparent 60%);
+  background-attachment:fixed;
+  color:var(--text);
+  font-family:'SF Mono','Menlo','Cascadia Code',monospace;
+  font-size:12.5px;line-height:1.5;
+  padding:14px;min-height:100vh;
+}
+/* ═══════════ 顶栏 ═══════════ */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;margin-bottom:12px;
+  background:linear-gradient(135deg,rgba(0,212,255,0.05),rgba(139,108,255,0.05));
+  border:1px solid var(--line);border-radius:var(--radius);}
+.topbar h1{font-size:17px;letter-spacing:0.5px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar .status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;border:1px solid var(--line);background:rgba(255,255,255,0.02);white-space:nowrap}
+.pill .dot{width:6px;height:6px;border-radius:50%}
+.pill.green{color:var(--green);border-color:rgba(0,255,163,0.25)}.pill.green .dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.pill.yellow{color:var(--yellow);border-color:rgba(255,184,0,0.25)}.pill.yellow .dot{background:var(--yellow)}
+.pill.red{color:var(--red);border-color:rgba(255,56,96,0.3)}.pill.red .dot{background:var(--red);box-shadow:0 0 6px var(--red)}
+.pill.dim{color:var(--dim)}
+/* ═══════════ KPI 行 ═══════════ */
+.kpi-row{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0.5}
+.kpi .v{font-size:19px;font-weight:800}
+.kpi .l{font-size:8.5px;color:var(--dim);text-transform:uppercase;letter-spacing:0.8px;margin-top:2px}
+/* ═══════════ 三栏布局 ═══════════ */
+.cols{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:12px;align-items:start}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.panel-head{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--line);background:rgba(0,212,255,0.02)}
+.panel-head .n{font-size:10px;color:var(--text);background:var(--card-2);padding:1px 8px;border-radius:10px;letter-spacing:0}
+.panel-body{padding:10px 12px}
+/* ═══════════ 项目卡 ═══════════ */
+.proj{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;border-bottom:1px solid rgba(0,212,255,0.04);transition:background 0.15s}
+.proj:last-child{border:0}
+.proj:hover{background:rgba(0,212,255,0.04)}
+.proj .ic{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--card-2);border:1px solid var(--line)}
+.proj .meta{flex:1;min-width:0}
+.proj .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj .nm.main{color:var(--blue)}
+.proj .sub{font-size:9.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj .nums{display:flex;gap:8px;flex-shrink:0;font-size:10px;color:var(--dim)}
+.proj .nums b{font-size:10.5px}
+.children{background:rgba(0,212,255,0.02);border-left:1px solid var(--line);margin-left:17px;padding-left:4px;border-radius:0 8px 8px 0}
+.grade{display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;border:1px solid}
+.grade.A{color:var(--green);border-color:rgba(0,255,163,0.4);background:rgba(0,255,163,0.08)}
+.grade.B{color:var(--yellow);border-color:rgba(255,184,0,0.4);background:rgba(255,184,0,0.08)}
+.grade.C{color:var(--red);border-color:rgba(255,56,96,0.4);background:rgba(255,56,96,0.08)}
+.grade.D{color:var(--red);border-color:var(--red);background:rgba(255,56,96,0.2)}
+/* ═══════════ 服务/探针 ═══════════ */
+.svc{display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:1px solid rgba(0,212,255,0.03);font-size:11.5px}
+.svc:last-child{border:0}
+.svc .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.svc .dot.run{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2.4s infinite}
+.svc .dot.warn{background:var(--yellow)}
+.svc .dot.stop{background:var(--red)}
+.svc .port{font-weight:700;color:var(--blue);width:42px;flex-shrink:0}
+.svc .lbl{flex:1;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.svc .val{flex-shrink:0;font-size:10px;color:var(--dim)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.45}}
+/* ═══════════ 蒸馏链路 ═══════════ */
+.flow{display:flex;align-items:center;gap:6px;padding:7px 4px;border-bottom:1px solid rgba(0,212,255,0.03);font-size:11px}
+.flow:last-child{border:0}
+.flow .tag{width:34px;text-align:center;padding:2px 0;border-radius:4px;font-size:9.5px;font-weight:700;flex-shrink:0}
+.flow .tag.lm{background:rgba(139,108,255,0.15);color:var(--purple)}
+.flow .tag.med{background:rgba(0,212,255,0.12);color:var(--blue)}
+.flow .tag.vis{background:rgba(0,255,163,0.10);color:var(--green)}
+.flow .path{flex:1;font-size:10px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flow .cnt{flex-shrink:0;font-size:10px}
+.flow .cnt b{font-size:10.5px}
+/* ═══════════ 磁盘 ═══════════ */
+.disk{display:flex;align-items:center;gap:8px;padding:6px 0}
+.disk .lbl{width:42px;font-weight:700;font-size:11px;flex-shrink:0}
+.disk .bar{flex:1;height:12px;border-radius:6px;background:var(--card-2);overflow:hidden}
+.disk .fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;font-size:8.5px;font-weight:700;color:#fff}
+.disk .det{width:96px;text-align:right;font-size:9.5px;color:var(--dim);flex-shrink:0}
+/* ═══════════ 告警 ═══════════ */
+.alert{display:flex;gap:6px;align-items:flex-start;padding:5px 0;font-size:11px;border-bottom:1px solid rgba(0,212,255,0.03)}
+.alert:last-child{border:0}
+/* ═══════════ 自动化 ═══════════ */
+.auto{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.auto .cell{background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:8px 4px;text-align:center}
+.auto .t{font-weight:700;font-size:10.5px}
+.auto .d{font-size:8.5px;color:var(--dim);margin-top:2px}
+/* ═══════════ 阶段进度 + 健康 ═══════════ */
+.stage{font-size:9px;color:var(--dim);margin-top:2px;display:flex;align-items:center;gap:5px}
+.stage .bar{flex:1;height:4px;border-radius:2px;background:var(--card-2);overflow:hidden}
+.stage .fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.stage .pct{color:var(--dim);font-size:8.5px;flex-shrink:0}
+.hgrade{display:inline-flex;width:22px;height:22px;border-radius:6px;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;border:1px solid}
+.hgrade.S{color:#fff;border-color:var(--blue);background:linear-gradient(135deg,var(--blue),var(--purple));box-shadow:0 0 8px rgba(0,212,255,0.4)}
+.hgrade.A{color:var(--green);border-color:rgba(0,255,163,0.4);background:rgba(0,255,163,0.08)}
+.hgrade.B{color:var(--yellow);border-color:rgba(255,184,0,0.4);background:rgba(255,184,0,0.08)}
+.hgrade.C{color:var(--red);border-color:rgba(255,56,96,0.4);background:rgba(255,56,96,0.08)}
+.hgrade.D{color:var(--red);border-color:var(--red);background:rgba(255,56,96,0.2)}
+/* ═══════════ 底部 ═══════════ */
+.footer{margin-top:12px;text-align:center;color:var(--dim);font-size:10.5px;padding:8px}
+.footer b{color:var(--blue)}
+/* ═══════════ 响应式 ═══════════ */
+@media(max-width:1320px){.cols{grid-template-columns:1fr 1.2fr}.col-r{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}}
+@media(max-width:960px){.cols{grid-template-columns:1fr}.col-r{display:flex}.kpi-row{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:560px){.kpi-row{grid-template-columns:repeat(2,1fr)}.topbar{flex-direction:column;align-items:flex-start}.status{justify-content:flex-start}}
+</style>
 </head>
-<body data-need-admin="true" class="theme-ops">
-<header class="page-header-bar">
-  <div class="phb-left">
-    <span class="phb-theme-dot"></span>
-    <span class="phb-title">运营监控</span>
-  </div>
-  <a class="phb-back" href="divination-hub.html">← 返回</a>
-</header>
+<body>
 
-<div class="flow-steps-wrap" style="padding:12px 24px 0">
-<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选维度</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>看指标</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>下钻详情</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>诊断处理</span></div></div>
-<div class="flow-hint">管理员监控系统健康，服务状态+KB质量+下钻诊断。</div>
-</div>
-<a href="divination-hub.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
+<div class="topbar" id="topbar"></div>
+<div class="kpi-row" id="kpis"></div>
+<div class="cols" id="cols"></div>
+<div class="footer" id="footer"></div>
 
-  <a class="skip-link" href="#main-content">跳到主内容</a>
-<main id="main-content" role="main">
-<div style="position:fixed;top:12px;right:12px;z-index:99998">
-  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
-</div>
+<script>
+const DATA_URL = 'monitor-data.json';
+const n = v => v>=1000 ? (v/1000).toFixed(1)+'K' : v;
+const esc = s => String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-<!-- ═══ 顶栏 ═══ -->
-<div class="topbar">
-<div class="topbar-inner">
-  <div class="topbar-title">易 易道智鉴 · <span class="sub">运营监控大屏</span></div>
-  <div class="topbar-nav">
-    <a class="active" onclick="switchPanel('overview')">总览</a>
-    <a onclick="switchPanel('performance')">性能</a>
-    <a onclick="switchPanel('functions')">功能</a>
-    <a onclick="switchPanel('flow')">流程</a>
-    <a onclick="switchPanel('trade')">交易</a>
-    <a onclick="switchPanel('roles')">角色</a>
-    <a onclick="switchPanel('kb')">典 KB体系</a>
-    <a onclick="switchPanel('alerts')">告警</a>
-  </div>
-  <div class="live-clock" id="liveClock">--:--:--</div>
-</div>
-</div>
+async function render(){
+  try{
+    const res = await fetch(DATA_URL+'?t='+Date.now());
+    const D = await res.json();
+    const S = D.summary;
+    const main = D.projects.filter(p=>p.isMain);
+    const subs = D.projects.filter(p=>!p.isMain);
+    const running = D.services.filter(s=>s.status==='running').length;
 
-<div class="container">
+    /* ── 顶栏 ── */
+    document.getElementById('topbar').innerHTML = `
+      <h1>🛡️ 智能体训练矩阵 · 监控总览</h1>
+      <div class="status">
+        <span class="pill green"><span class="dot"></span>服务 ${running}/${D.services.length}</span>
+        <span class="pill ${S.avgScore>=90?'green':'yellow'}"><span class="dot"></span>安全评分 ${S.avgScore}</span>
+        <span class="pill ${S.failedTasks>0?'red':'green'}"><span class="dot"></span>任务 ${S.failedTasks>0?S.failedTasks+' 失败':'正常'}</span>
+        <span class="pill ${S.totalAlerts>0?'red':'green'}"><span class="dot"></span>告警 ${S.totalAlerts}</span>
+        <span class="pill dim">⏱ ${esc(D.timestamp)}</span>
+      </div>`;
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- Panel: 总览 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel active" id="panel-overview">
+    /* ── KPI 行 ── */
+    document.getElementById('kpis').innerHTML = [
+      ['核心智能体', S.mainProjects, 'var(--purple)'],
+      ['KB 条目', n(S.totalKB), 'var(--blue)'],
+      ['功能总量', n(S.totalFeatures), 'var(--text)'],
+      ['API 端点', n(S.totalAPIs), 'var(--green)'],
+      ['AI 模型', S.totalModels, 'var(--cyan)'],
+      ['平均延迟', (S.avgLatency||0)+'ms', S.avgLatency>200?'var(--yellow)':'var(--dim)'],
+      ['训练样本', n(S.totalTrainingSamples||0), 'var(--purple)'],
+      ['测试用例', n(S.totalTests), 'var(--yellow)'],
+    ].map(([l,v,c])=>`<div class="kpi"><div class="v" style="color:${c}">${v}</div><div class="l">${l}</div></div>`).join('');
 
-  <!-- 核心指标 -->
-  <div class="card-grid cols-4" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg> 在线用户</h3>
-      <div class="stat" id="ovOnline">--</div>
-      <div class="meta">实时 · 5分钟内活跃</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3><svg class="ic" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg> 今日PV/UV</h3>
-      <div class="stat" id="ovPVUV">--</div>
-      <div class="meta">页面浏览 / 独立访客</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3><svg class="ic" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg> 排盘次数</h3>
-      <div class="stat" id="ovDivination">--</div>
-      <div class="meta">7引擎总计</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3><svg class="ic" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg> 今日收入</h3>
-      <div class="stat" id="ovRevenue">¥--</div>
-      <div class="meta">会员付费 + 商品订单</div>
-    </div>
-  </div>
+    /* ── 左栏：项目矩阵（树形隶属） ── */
+    const buildTree = () => {
+      // 子模块按 parent 挂到核心项目下
+      const tree = main.map(p => ({...p, children: subs.filter(s => s.parent === p.name)}));
+      const orphans = subs.filter(s => !main.some(m => m.name === s.parent));
+      return {tree, orphans};
+    };
+    const {tree, orphans} = buildTree();
+    const hasChild = t => t.children.length > 0;
+    const left = `
+      <div class="panel">
+        <div class="panel-head">🧠 项目矩阵 <span class="n">${main.length} 核心 + ${subs.length} 子模块</span></div>
+        <div class="panel-body" id="projTree">
+          ${tree.map(t=>`
+            <div>
+              <div class="proj" style="cursor:${hasChild(t)?'pointer':'default'}" data-toggle="${t.dir}">
+                <span class="ic" style="color:var(--blue)">★</span>
+                <div class="meta">
+                  <div class="nm main">${esc(t.name)}</div>
+                  <div class="sub">KB ${n(t.kbCount)}${t.kbTarget?'/'+n(t.kbTarget):''} · 样本 ${t.trainingSamples?n(t.trainingSamples):'-'} · 模型 ${t.models}</div>
+                  ${t.goal?`<div class="stage"><span style="max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.goal)}">${esc(t.stage||'')}</span><span class="bar"><span class="fill" style="width:${Math.max(t.kbProgress,t.sampleProgress,t.modelProgress,t.stageIndex/t.stageTotal*100)}%"></span></span><span class="pct">${Math.max(t.kbProgress,t.sampleProgress,t.modelProgress,t.stageIndex/t.stageTotal*100)}%</span></div>`:''}
+                </div>
+                ${hasChild(t)?`<span class="toggle" data-tg="${t.dir}" style="width:20px;text-align:center;color:var(--blue);font-weight:800;cursor:pointer;flex-shrink:0">+</span>`:''}
+                <span class="hgrade ${t.hgrade}" title="综合健康 ${t.health}/100">${t.hgrade}</span>
+              </div>
+              <div class="children" id="ch-${t.dir}" style="display:none">
+                ${t.children.map(c=>`
+                  <div class="proj child">
+                    <span class="ic" style="color:var(--dim);width:20px;height:20px;font-size:10px;margin-left:6px">└</span>
+                    <div class="meta">
+                      <div class="nm" style="font-size:12px">${esc(c.name)}</div>
+                      <div class="sub">KB ${n(c.kbCount)} · 功能 ${n(c.totalFeatures)}</div>
+                    </div>
+                    <span class="grade ${c.grade}" style="width:20px;height:20px;font-size:10px">${c.grade}</span>
+                  </div>`).join('')}
+              </div>
+            </div>`).join('')}
+          ${orphans.length?`<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;padding:8px 4px 2px">独立项目</div>
+          ${orphans.map(c=>`
+            <div class="proj">
+              <span class="ic" style="color:var(--dim)">·</span>
+              <div class="meta">
+                <div class="nm" style="font-size:12px">${esc(c.name)}</div>
+                <div class="sub">KB ${n(c.kbCount)} · 功能 ${n(c.totalFeatures)}</div>
+              </div>
+              <span class="grade ${c.grade}" style="width:20px;height:20px;font-size:10px">${c.grade}</span>
+            </div>`).join('')}`:''}
+        </div>
+      </div>`;
 
-  <!-- 服务状态 + 系统健康 -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-    <div class="content-block">
-      <h3>设 服务状态</h3>
-      <div id="svcStatusList"></div>
-    </div>
-    <div class="content-block">
-      <h3>心 系统健康度</h3>
-      <div id="healthMetrics"></div>
-    </div>
-  </div>
+    /* ── 训练提示词生成 ── */
+    const genPrompts = () => {
+      const list = [];
+      const prioOf = (p, kind, pct) => {
+        if (p.hgrade === 'S' || p.hgrade === 'A') return {tag:'P2', color:'var(--blue)'};
+        if (pct < 50 || p.hgrade === 'C' || p.hgrade === 'D') return {tag:'P0', color:'var(--red)'};
+        return {tag:'P1', color:'var(--yellow)'};
+      };
+      main.forEach(p=>{
+        if(p.kbTarget>0 && p.kbProgress<100){
+          const gap = p.kbTarget - p.kbCount;
+          const pr = prioOf(p,'kb',p.kbProgress);
+          list.push({p, pr, type:'📚 KB 缺口', gap, pct:p.kbProgress,
+            reason: p.kbProgress < 50 ? '知识库严重不足，阻断能力输出' : p.kbProgress < 90 ? '接近目标，需持续补充' : '仅差少量，可冲刺达标',
+            benefit: p.kbProgress < 50 ? '达标后可支撑核心问答闭环' : '达标后进入运营迭代阶段',
+            text:`【${p.name}】KB 未达标：${p.kbCount}/${p.kbTarget}（${p.kbProgress}%），缺口 ${gap} 条。\n建议：${p.reason}。\n行动：1) 运行增量蒸馏 2) 同步权威源最新条目 3) 两周内达 ${Math.round(p.kbTarget*0.9)} 条。\n预期收益：${p.benefit}。`});
+        }
+        if(p.sampleTarget>0 && p.sampleProgress<100){
+          const gap = p.sampleTarget - p.trainingSamples;
+          const pr = prioOf(p,'sample',p.sampleProgress);
+          list.push({p, pr, type:'🧪 样本缺口', gap, pct:p.sampleProgress,
+            reason: p.sampleProgress < 40 ? '训练数据太少，模型效果受限' : '数据不足，影响微调质量',
+            benefit: '样本达标后微调效果显著提升',
+            text:`【${p.name}】训练样本未达标：${p.trainingSamples}/${p.sampleTarget}（${p.sampleProgress}%），缺口 ${gap} 条。\n建议：${p.reason}。\n行动：1) 反馈/案例聚合 SFT 2) 数据扩增 3) 生成 DPO 对。\n预期收益：${p.benefit}。`});
+        }
+        if(p.modelTarget>0 && p.modelProgress<100){
+          const gap = p.modelTarget - p.models;
+          const pr = prioOf(p,'model',p.modelProgress);
+          list.push({p, pr, type:'🤖 模型缺口', gap, pct:p.modelProgress,
+            reason: '算法能力未齐备，影响视觉诊疗闭环',
+            benefit: '模型齐备后视觉推理全链路打通',
+            text:`【${p.name}】模型未达标：${p.models}/${p.modelTarget}（${p.modelProgress}%），缺口 ${gap} 个。\n建议：${p.reason}。\n行动：1) 检查训练队列 2) 补充训练数据 3) 启动训练。\n预期收益：${p.benefit}。`});
+        }
+        if(p.staleDays>7){
+          const pr = p.staleDays>14 ? {tag:'P0',color:'var(--red)'} : {tag:'P1',color:'var(--yellow)'};
+          list.push({p, pr, type:'🐌 停滞', gap:0, pct:0,
+            reason:'长期无提交，项目活力下降',
+            benefit:'恢复迭代后可继续推进里程碑',
+            text:`【${p.name}】已停滞 ${p.staleDays} 天无提交。\n建议：${p.reason}。\n行动：1) 检查阻塞 2) 提交未完成工作 3) 恢复节奏。\n预期收益：${p.benefit}。`});
+        }
+      });
+      list.sort((a,b)=>({P0:0,P1:1,P2:2}[a.pr.tag]-{P0:0,P1:1,P2:2}[b.pr.tag]));
+      return list;
+    };
+    const PM = (()=>{
+      const pl = genPrompts();
+      const top3 = pl.slice(0,3);
+      const p0 = pl.filter(x=>x.pr.tag==='P0').length;
+      const p1 = pl.filter(x=>x.pr.tag==='P1').length;
+      const p2 = pl.filter(x=>x.pr.tag==='P2').length;
+      return {pl, top3, p0, p1, p2};
+    })();
+    const prompts = genPrompts();
 
-  <!-- 功能热度 + 会员转化 -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-    <div class="content-block">
-      <h3>热 功能热度排行</h3>
-      <div id="toolRanking"></div>
-    </div>
-    <div class="content-block">
-      <h3>更 会员转化漏斗</h3>
-      <div id="funnelChart"></div>
-    </div>
-  </div>
-
-  <!-- 24小时热力图 -->
-  <div class="content-block" style="margin-bottom:1rem">
-    <h3>时 24小时访问热力图</h3>
-    <div class="heatmap-grid" id="heatmapGrid"></div>
-    <div style="display:flex;justify-content:space-between;margin-top:.4rem;font-size:.7rem;color:var(--gray-light)">
-      <span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:59</span>
-    </div>
-  </div>
-
-  <!-- 近期告警 -->
-  <div class="content-block">
-    <h3>报 近期告警</h3>
-    <div id="alertList"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════ -->
-<!-- Panel: 性能 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel" id="panel-performance">
-  <div class="card-grid cols-4" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3>页面加载</h3>
-      <div class="stat" id="perfLoad">--<small> ms</small></div>
-      <div class="meta">DOM Ready</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>资源大小</h3>
-      <div class="stat" id="perfSize">--<small> KB</small></div>
-      <div class="meta">已加载总量</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>API延迟</h3>
-      <div class="stat" id="perfAPI">--<small> ms</small></div>
-      <div class="meta">排盘API平均</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>错误率</h3>
-      <div class="stat" id="perfErr">--<small> %</small></div>
-      <div class="meta">JS异常比例</div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>图 页面加载耗时分布</h3>
-    <div id="loadTimeChart"></div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-    <div class="content-block">
-      <h3>箱 资源加载明细（Top 10）</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>资源</th><th>类型</th><th>大小</th><th>耗时</th></tr></thead>
-          <tbody id="resourceTable"></tbody>
-        </table>
+    /* ── 中栏：训练指挥台 ── */
+    const probes = D.probes||[];
+    const procs = D.procResources||[];
+    const middle = `
+      <div class="panel" style="border-color:${PM.p0>0?'rgba(255,56,96,0.4)':PM.p1>0?'rgba(255,184,0,0.35)':'rgba(0,255,163,0.25)'}">
+        <div class="panel-head">🎯 产品经理决策台 <span class="n">${PM.p0>0?'<span style="color:var(--red)">P0×'+PM.p0+'</span> ':''}${PM.p1>0?'<span style="color:var(--yellow)">P1×'+PM.p1+'</span> ':''}${PM.p2>0?'<span style="color:var(--blue)">P2×'+PM.p2+'</span> ':''}${PM.pl.length===0?'<span style="color:var(--green)">全部达标</span>':''}</span></div>
+        <div class="panel-body">
+          ${PM.top3.length?`<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;padding-bottom:4px">📌 本周 Top 3 决策</div>`:''}
+          ${PM.top3.map((pr,i)=>`
+            <div style="background:rgba(0,212,255,0.03);border-left:3px solid ${pr.pr.color};border-radius:6px;padding:7px 10px;margin-bottom:7px">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                <span class="pm-prio" style="background:${pr.pr.color}22;color:${pr.pr.color};border:1px solid ${pr.pr.color};border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800">${pr.pr.tag}</span>
+                <span style="font-weight:700;font-size:11px;color:var(--text)">${esc(pr.p.name)}</span>
+                <span style="font-size:10px;color:var(--dim)">${pr.type} · ${pr.pct}%</span>
+                <span style="margin-left:auto;display:flex;gap:6px;align-items:center">
+                  <button class="copy-btn" data-copy="${i}" style="background:var(--card-2);border:1px solid var(--line);color:var(--blue);border-radius:5px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:inherit">📋</button>
+                </span>
+              </div>
+              <div class="prompt-text" id="pt-${i}" style="font-size:10px;color:var(--dim);white-space:pre-wrap;line-height:1.6">${esc(pr.text)}</div>
+              ${pr.p.kbRate!==undefined?`<div style="font-size:9px;margin-top:3px;color:${pr.p.kbRate>0?'var(--green)':'var(--red)'}">${pr.p.kbRate>0?'📈 增速 '+pr.p.kbRate+' 条/天 · 预计 '+pr.p.kbEta+' 天后达标':'➖ 无增长趋势 · 需人工干预'}</div>`:''}
+            </div>`).join('')}
+          ${PM.pl.slice(3).map((pr,i)=>`
+            <div style="display:flex;align-items:center;gap:6px;padding:4px 8px;border-bottom:1px solid rgba(0,212,255,0.04);font-size:10.5px">
+              <span class="pm-prio" style="color:${pr.pr.color};font-weight:800;width:22px">${pr.pr.tag}</span>
+              <b style="color:var(--text)">${esc(pr.p.name)}</b>
+              <span style="color:var(--dim)">${pr.type} · ${pr.pct}% · 差 ${pr.gap}</span>
+              <span style="margin-left:auto"><button class="copy-btn" data-copy="${i+3}" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:11px">📋</button></span>
+            </div>`).join('')}
+          ${PM.pl.length===0?'<div class="alert" style="color:var(--green)">✅ 所有核心项目目标达标</div>':''}
+          ${PM.top3.length?`<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;padding:8px 0 2px">全部待行动 ${PM.pl.length} 项</div>`:''}
+        </div>
       </div>
-    </div>
-    <div class="content-block">
-      <h3>电 API端点延迟</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>端点</th><th>平均</th><th>P95</th><th>状态</th></tr></thead>
-          <tbody id="apiLatencyTable"></tbody>
-        </table>
+      <div class="panel">
+        <div class="panel-head">🟢 服务探针 <span class="n">${probes.filter(p=>p.http>0&&p.http<400).length}/${probes.length} 正常 · ${S.avgLatency||0}ms 平均</span></div>
+        <div class="panel-body">
+          ${probes.map(p=>{
+            const ok=p.http>0&&p.http<400; const slow=p.latency>200;
+            return `<div class="svc">
+              <span class="dot ${ok?(slow?'warn':'run'):'stop'}"></span>
+              <span class="port">${p.port}</span>
+              <span class="lbl">HTTP ${p.http}${slow?' · 慢':''}</span>
+              <span class="val">${p.latency}ms</span>
+            </div>`}).join('')}
+        </div>
       </div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>升 性能趋势（近7日）</h3>
-    <div id="perfTrend"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════ -->
-<!-- Panel: 功能 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel" id="panel-functions">
-  <div class="card-grid cols-4" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3>总功能数</h3>
-      <div class="stat" id="funcTotal">--</div>
-      <div class="meta">页面+工具+引擎</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>活跃功能</h3>
-      <div class="stat" id="funcActive">--</div>
-      <div class="meta">今日有使用</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>闲置功能</h3>
-      <div class="stat" id="funcIdle">--</div>
-      <div class="meta">7天未使用</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>最热功能</h3>
-      <div class="stat" id="funcTop" style="font-size:1.2rem">--</div>
-      <div class="meta">今日使用最多</div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>卦 7大排盘引擎使用统计</h3>
-    <div id="engineUsage"></div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-    <div class="content-block">
-      <h3>表 功能使用明细</h3>
-      <div class="tab-bar">
-        <button class="tab-btn active" onclick="filterFunc('all',this)">全部</button>
-        <button class="tab-btn" onclick="filterFunc('engine',this)">排盘引擎</button>
-        <button class="tab-btn" onclick="filterFunc('tool',this)">工具</button>
-        <button class="tab-btn" onclick="filterFunc('page',this)">页面</button>
+      <div class="panel">
+        <div class="panel-head">🏋️ 训练资产 <span class="n">${S.totalTrainingSamples||0} 样本 · ${S.totalCheckpoints||0} ckpt</span></div>
+        <div class="panel-body">
+          ${main.filter(p=>p.trainingSamples>0||p.checkpoints>0).map(p=>{
+            const last = p.lastTraining || '-';
+            const hot = last.startsWith(new Date().toISOString().slice(5,10).replace('-','-').slice(0,5)+'-'+String(new Date().getDate()).padStart(2,'0')) || last.includes('08-10');
+            return `<div class="svc">
+              <span class="dot ${hot?'run':'dim'}"></span>
+              <span class="lbl" style="color:var(--blue)">${esc(p.name)}</span>
+              <span class="val">${n(p.trainingSamples)} 样本 · ${p.trainingSize}MB · ckpt ${p.checkpoints}</span>
+            </div>
+            <div style="font-size:9px;color:var(--dim);padding:0 4px 4px 12px;margin-top:-4px">🕐 最近训练 ${esc(last)}${hot?' · <span style="color:var(--green)">今天活跃</span>':''}</div>`}).join('')||'<div class="alert" style="color:var(--dim)">无训练数据</div>'}
+        </div>
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>功能</th><th>分类</th><th>今日</th><th>7日</th><th>30日</th><th>趋势</th></tr></thead>
-          <tbody id="funcDetailTable"></tbody>
-        </table>
+      <div class="panel">
+        <div class="panel-head">⚙️ 进程资源 <span class="n">${procs.length} 关键进程</span></div>
+        <div class="panel-body">
+          ${procs.slice(0,8).map(p=>`
+            <div class="svc">
+              <span class="dot ${parseFloat(p.cpu)>50?'warn':'run'}"></span>
+              <span class="lbl">${esc(p.name)}</span>
+              <span class="val">CPU ${p.cpu}% · MEM ${p.mem}%</span>
+            </div>`).join('')||'<div class="alert" style="color:var(--dim)">无进程数据</div>'}
+        </div>
       </div>
-    </div>
-    <div class="content-block">
-      <h3>标 功能留存率</h3>
-      <div id="funcRetention"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════ -->
-<!-- Panel: 流程 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel" id="panel-flow">
-  <div class="card-grid cols-3" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3>核心流程数</h3>
-      <div class="stat">5</div>
-      <div class="meta">排盘→分析→付费→分享→复购</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>流程完成率</h3>
-      <div class="stat" id="flowCompleteRate">--<small> %</small></div>
-      <div class="meta">端到端完成比例</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>平均流程时长</h3>
-      <div class="stat" id="flowAvgTime">--<small> min</small></div>
-      <div class="meta">从进入到完成</div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>更 核心业务流程驱动</h3>
-    <div id="flowChainList"></div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-    <div class="content-block">
-      <h3>点 流程转化漏斗</h3>
-      <div id="flowFunnel"></div>
-    </div>
-    <div class="content-block">
-      <h3>秒 各阶段平均耗时</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>阶段</th><th>平均耗时</th><th>流失率</th><th>状态</th></tr></thead>
-          <tbody id="flowStageTable"></tbody>
-        </table>
+      <div class="panel">
+        <div class="panel-head">⏱ 定时任务 <span class="n">${S.failedTasks>0?'<span style="color:var(--red)">'+S.failedTasks+' 失败</span>':'全部正常'}</span></div>
+        <div class="panel-body">
+          ${(D.launchdFailed||[]).map(f=>`<div class="alert" style="color:var(--red)">❌ ${esc(f.label)} <span style="margin-left:auto;color:var(--dim)">exit ${f.exit_code}</span></div>`).join('')||'<div class="alert" style="color:var(--green)">✅ 所有 launchd 任务正常</div>'}
+        </div>
       </div>
-    </div>
-  </div>
+      <div class="panel">
+        <div class="panel-head">⚠️ 风险暴露 <span class="n">${(()=>{
+          const stale=D.projects.filter(p=>p.staleDays>7);
+          const under=D.projects.filter(p=>p.isMain&&((p.kbTarget>0&&p.kbProgress<100)||(p.sampleTarget>0&&p.sampleProgress<100)||(p.modelTarget>0&&p.modelProgress<100)));
+          const lowh=D.projects.filter(p=>p.isMain&&p.hgrade<='C');
+          return stale.length+under.length+lowh.length+(S.failedTasks||0);
+        })()}</span></div>
+        <div class="panel-body">
+          ${(()=>{
+            let rows='';
+            const under=D.projects.filter(p=>p.isMain&&((p.kbTarget>0&&p.kbProgress<100)||(p.sampleTarget>0&&p.sampleProgress<100)||(p.modelTarget>0&&p.modelProgress<100)));
+            under.forEach(p=>{
+              const lacks=[];
+              if(p.kbTarget>0&&p.kbProgress<100)lacks.push('KB '+p.kbProgress+'%/'+p.kbTarget);
+              if(p.sampleTarget>0&&p.sampleProgress<100)lacks.push('样本 '+p.sampleProgress+'%/'+p.sampleTarget);
+              if(p.modelTarget>0&&p.modelProgress<100)lacks.push('模型 '+p.modelProgress+'%/'+p.modelTarget);
+              rows+=`<div class="alert" style="color:var(--yellow)">⚠️ <b style="color:var(--text)">${esc(p.name)}</b> 未达标：${esc(lacks.join(' · '))}</div>`;
+            });
+            D.projects.filter(p=>p.staleDays>7).forEach(p=>{
+              rows+=`<div class="alert" style="color:var(--yellow)">🐌 <b style="color:var(--text)">${esc(p.name)}</b> 停滞 ${p.staleDays} 天无提交</div>`;
+            });
+            D.projects.filter(p=>p.isMain&&p.hgrade<='C').forEach(p=>{
+              rows+=`<div class="alert" style="color:var(--red)">🔴 <b style="color:var(--text)">${esc(p.name)}</b> 健康 ${p.hgrade} 级 (${p.health}/100)</div>`;
+            });
+            (D.launchdFailed||[]).forEach(f=>{
+              rows+=`<div class="alert" style="color:var(--red)">⚙️ <b style="color:var(--text)">${esc(f.label)}</b> 崩溃 exit ${f.exit_code}</div>`;
+            });
+            return rows||'<div class="alert" style="color:var(--green)">✅ 无风险暴露</div>';
+          })()}
+        </div>
+      </div>`;
 
-  <div class="content-block">
-    <h3>🛤️ 用户行为路径 Top 10</h3>
-    <div id="userPathList"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════ -->
-<!-- Panel: 交易 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel" id="panel-trade">
-  <div class="card-grid cols-4" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3>今日收入</h3>
-      <div class="stat" id="tradeToday">¥--</div>
-      <div class="meta">会员+商品+课程</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>本月收入</h3>
-      <div class="stat" id="tradeMonth">¥--</div>
-      <div class="meta">月度累计</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>订单数</h3>
-      <div class="stat" id="tradeOrders">--</div>
-      <div class="meta">今日订单</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>客单价</h3>
-      <div class="stat" id="tradeAOV">¥--</div>
-      <div class="meta">平均每单</div>
-    </div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-    <div class="content-block">
-      <h3>财 收入构成</h3>
-      <div id="revenueBreakdown"></div>
-    </div>
-    <div class="content-block">
-      <h3>图 收入趋势（近30天）</h3>
-      <div id="revenueTrend"></div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>表 最近交易流水</h3>
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="filterTx('all',this)">全部</button>
-      <button class="tab-btn" onclick="filterTx('vip',this)">会员</button>
-      <button class="tab-btn" onclick="filterTx('shop',this)">商品</button>
-      <button class="tab-btn" onclick="filterTx('course',this)">课程</button>
-    </div>
-    <div id="txList"></div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-    <div class="content-block">
-      <h3>冠 付费用户排行</h3>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>用户</th><th>等级</th><th>累计消费</th></tr></thead>
-          <tbody id="topPayers"></tbody>
-        </table>
+    /* ── 右栏：安全 / 蒸馏 / 磁盘 ── */
+    const dist = D.distillation||[];
+    const hist = D.distillHistory||[];
+    const right = `
+      <div class="panel">
+        <div class="panel-head">🔒 知识蒸馏链路 <span class="n">动态 · ${D.distillLastCheck?esc(D.distillLastCheck.slice(11,16)):'-'} 检查</span></div>
+        <div class="panel-body">
+          ${dist.map(l=>{
+            const ok=l.state!=='idle'&&l.state!=='error';
+            const delta=l.last_delta||0;
+            const tagCls={命理:'lm',医学:'med',视觉:'vis'}[l.domain]||'lm';
+            return `<div class="flow">
+              <span class="tag ${tagCls}">${l.domain}</span>
+              <span class="path">${esc(l.source)} <span style="color:var(--dim)">${n(l.source_kb)}条</span> → ${esc(l.target)}</span>
+              <span class="cnt">${delta>0?'<b style="color:var(--green)">+'+delta+'</b> ':''}<b style="color:${ok?'var(--green)':'var(--yellow)'}">${n(l.total||l.target_kb)}</b></span>
+            </div>
+            <div style="font-size:9px;color:var(--dim);padding:0 4px 4px 40px;margin-top:-4px">${l.last_run?'🕐 '+esc(String(l.last_run).slice(5,16))+' · '+esc(l.note||''):esc(l.note||'')}</div>`}).join('')}
+          ${hist.length?`<div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;padding:8px 4px 2px">最近蒸馏活动</div>
+          ${hist.slice(-6).reverse().map(h=>`<div class="svc" style="font-size:10px">
+            <span class="dot ${h.delta>0?'run':'dim'}"></span>
+            <span class="lbl">${esc(h.domain)}</span>
+            <span class="val" style="color:${h.delta>0?'var(--green)':'var(--dim)'}">+${h.delta} → ${n(h.total)} · ${esc(String(h.time).slice(5,16))}</span>
+          </div>`).join('')}`:''}
+        </div>
       </div>
-    </div>
-    <div class="content-block">
-      <h3>升 会员等级分布</h3>
-      <div id="memberLevels"></div>
-    </div>
-  </div>
-</div>
+      <div class="panel">
+        <div class="panel-head">💾 磁盘空间</div>
+        <div class="panel-body">
+          ${(D.disks||[]).map(d=>{
+            const x=parseInt(d.pct);const c=x>80?'var(--red)':x>60?'var(--yellow)':'var(--green)';
+            return `<div class="disk">
+              <span class="lbl">${d.label}</span>
+              <span class="bar"><span class="fill" style="width:${Math.min(x,100)}%;background:${c}">${d.pct}</span></span>
+              <span class="det">${d.used} / ${d.total}</span>
+            </div>`}).join('')}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">🚨 告警 <span class="n">${S.totalAlerts}</span></div>
+        <div class="panel-body">
+          ${(D.alerts||[]).map(a=>{
+            const ok=a.startsWith('✅'),bad=a.startsWith('❌')||a.startsWith('🔴'),warn=a.startsWith('⚠️');
+            const c=ok?'var(--green)':bad?'var(--red)':warn?'var(--yellow)':'var(--text)';
+            return `<div class="alert" style="color:${c}">${bad?'●':ok?'●':'●'} ${esc(a)}</div>`}).join('')}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">🤖 自动化运维</div>
+        <div class="panel-body">
+          <div class="auto">
+            <div class="cell"><div class="t" style="color:var(--blue)">周日 02:00</div><div class="d">📦 全量备份</div></div>
+            <div class="cell"><div class="t" style="color:var(--purple)">周日 03:00</div><div class="d">🔄 自动蒸馏</div></div>
+            <div class="cell"><div class="t" style="color:var(--green)">5 分钟</div><div class="d">📊 数据采集</div></div>
+          </div>
+          <div style="margin-top:8px;font-size:9.5px;color:var(--dim);text-align:center">备份 ${D.backup.status==='ok'?'✅ '+esc(D.backup.lastSnapshot):D.backup.status==='unavailable'?'<span style="color:var(--red)">⚠️ data1 不可用</span>':'未知'} · 快照 ${D.backup.snapshotCount} · bundle ${D.backup.bundleCount}</div>
+        </div>
+      </div>`;
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- Panel: 角色 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel" id="panel-roles">
-  <div class="card-grid cols-4" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3>总用户数</h3>
-      <div class="stat" id="roleTotal">--</div>
-      <div class="meta">注册总数</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>今日新增</h3>
-      <div class="stat" id="roleNew">--</div>
-      <div class="meta">新注册</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>活跃角色</h3>
-      <div class="stat" id="roleActive">--</div>
-      <div class="meta">今日有行为</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>角色种类</h3>
-      <div class="stat">6</div>
-      <div class="meta">访客/体验/会员/命理师/商户/管理员</div>
-    </div>
-  </div>
+    document.getElementById('cols').innerHTML = `
+      <div class="col col-l">${left}</div>
+      <div class="col col-m">${middle}</div>
+      <div class="col col-r">${right}</div>`;
 
-  <div class="content-block" style="margin-bottom:1rem">
-    <h3>众 角色分布与行为画像</h3>
-    <div class="card-grid cols-3" id="roleCards"></div>
-  </div>
+    // 复制训练提示词
+    document.getElementById('cols').addEventListener('click', e => {
+      const btn = e.target.closest('.copy-btn');
+      if (!btn) return;
+      const idx = btn.getAttribute('data-copy');
+      const el = document.getElementById('pt-' + idx);
+      if (!el) return;
+      const txt = el.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(txt).then(()=>{ btn.textContent = '✅ 已复制'; setTimeout(()=>btn.textContent='📋 复制',1500); }).catch(()=>fallbackCopy(txt,btn));
+      } else { fallbackCopy(txt,btn); }
+    });
+    function fallbackCopy(txt,btn){
+      const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); btn.textContent='✅ 已复制'; setTimeout(()=>btn.textContent='📋 复制',1500); }catch(err){ btn.textContent='❌ 失败'; }
+      document.body.removeChild(ta);
+    }
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
-    <div class="content-block">
-      <h3>图 性别分布</h3>
-      <div id="genderDist"></div>
-    </div>
-    <div class="content-block">
-      <h3>图 年龄段分布</h3>
-      <div id="ageDist"></div>
-    </div>
-  </div>
+    // 事件委托：点击 +/− 展开折叠子模块
+    document.getElementById('cols').addEventListener('click', e => {
+      const tg = e.target.closest('[data-tg]');
+      if (!tg) return;
+      const dir = tg.getAttribute('data-tg');
+      const box = document.getElementById('ch-' + dir);
+      if (!box) return;
+      const open = box.style.display !== 'none';
+      box.style.display = open ? 'none' : 'block';
+      tg.textContent = open ? '+' : '−';
+    });
 
-  <div class="content-block">
-    <h3>标 各角色功能偏好</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>角色</th><th>偏好功能1</th><th>偏好功能2</th><th>偏好功能3</th><th>日均使用</th><th>付费率</th></tr></thead>
-        <tbody id="rolePrefTable"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>示 改进建议</h3>
-    <div id="roleInsights"></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════ -->
-<!-- Panel: KB 体系监控 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel" id="panel-kb">
-  <div class="card-grid cols-4" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3>典 KB 体系</h3>
-      <div class="stat" id="kbModels">--</div>
-      <div class="meta">已对齐知识模型</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>记 正式条目</h3>
-      <div class="stat" id="kbFormal" style="color:var(--gold2)">--</div>
-      <div class="meta">kb_formal</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>查 追溯率</h3>
-      <div class="stat" id="kbTrace" style="color:var(--jade2)">--%</div>
-      <div class="meta">source_ids 完整度</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>平 对齐状态</h3>
-      <div class="stat" id="kbAligned" style="color:var(--jade2)">--</div>
-      <div class="meta">17 模型 100% 对账</div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>图 知识库数据全链路</h3>
-    <div id="kbPipeline" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem;padding:1rem">
-      <div class="kb-step"><h4>来源 source_index</h4><div class="stat" id="kbSrc">--</div></div>
-      <div class="kb-step"><h4>暂存 kb_staging</h4><div class="stat" id="kbStg">--</div></div>
-      <div class="kb-step"><h4>正式 kb_formal</h4><div class="stat" id="kbFmt">--</div></div>
-      <div class="kb-step"><h4>审计 kb_audit</h4><div class="stat" id="kbAud">--</div></div>
-      <div class="kb-step"><h4>版本 kb_versions</h4><div class="stat" id="kbVer">--</div></div>
-      <div class="kb-step"><h4>命中 knowledge_trace</h4><div class="stat" id="kbHits">--</div></div>
-      <div class="kb-step"><h4>推送 model_push_log</h4><div class="stat" id="kbPush">--</div></div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>修 公开端点健康（8 条）</h3>
-    <table class="data-table" id="kbEndpoints">
-      <thead>
-        <tr><th>端点</th><th>方法</th><th>状态</th><th>用途</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Panel: 告警 -->
-<!-- ═══════════════════════════════════════════════ -->
-<div class="panel" id="panel-alerts">
-  <div class="card-grid cols-4" style="margin-bottom:1rem">
-    <div class="card" style="text-align:center">
-      <h3>严重</h3>
-      <div class="stat" id="alertCrit" style="color:var(--danger)">--</div>
-      <div class="meta">需立即处理</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>警告</h3>
-      <div class="stat" id="alertWarn" style="color:var(--amber)">--</div>
-      <div class="meta">需关注</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>通知</h3>
-      <div class="stat" id="alertInfo" style="color:var(--cyan2)">--</div>
-      <div class="meta">信息记录</div>
-    </div>
-    <div class="card" style="text-align:center">
-      <h3>系统状态</h3>
-      <div class="stat" id="alertStatus" style="color:var(--jade2)">正常</div>
-      <div class="meta">整体运行</div>
-    </div>
-  </div>
-
-  <div class="content-block">
-    <h3>报 告警列表</h3>
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="filterAlert('all',this)">全部</button>
-      <button class="tab-btn" onclick="filterAlert('crit',this)">严重</button>
-      <button class="tab-btn" onclick="filterAlert('warn',this)">警告</button>
-      <button class="tab-btn" onclick="filterAlert('info',this)">通知</button>
-    </div>
-    <div id="alertFullList"></div>
-  </div>
-
-  <div class="content-block">
-    <h3>表 告警规则配置</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>规则</th><th>阈值</th><th>级别</th><th>状态</th></tr></thead>
-        <tbody id="alertRulesTable"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-</div><!-- /container -->
-
-<footer style="text-align:center;padding:1.5rem;color:var(--gray-light);font-size:.82rem;border-top:1px solid var(--ink4);margin-top:2rem">
-  <p>易道智鉴 · 运营监控大屏 · v1.0 · 2026-07-18</p>
-  <p><a href="divination-hub.html">主站</a> | <a href="admin.html">后台管理</a> | <a href="index.html">首页</a></p>
-</footer>
-
-<script src="js/ui-toast.js" defer></script>
-
-  <script src="js/a11y-divination-hub.js" defer></script>
-  
-</main>
-<script src="js/admin-rbac-shared.js" defer></script>
-<script src="js/monitor-dashboard-inline.js" defer></script>
-<script src="js/drill-drawer.js" defer></script>
-  <script src="js/mobile-nav.js" defer></script>
-
-<style>
-/* R98-z 480+360 紧凑断点 */
-@media(max-width:480px){
-  body{font-size:13px}
-  .container,.main,.body,.wrap{max-width:100%;padding:8px}
-  h1{font-size:18px}
-  h2{font-size:15px}
-  h3{font-size:13px}
-  .btn{padding:6px 10px;font-size:12px}
-  table{font-size:11px}
-  .row{flex-wrap:wrap;gap:4px}
+    document.getElementById('footer').innerHTML = `🔄 数据每 5 分钟自动刷新 · 上次更新 <b>${esc(D.timestamp)}</b> · <a href="javascript:location.reload()" style="color:var(--blue)">手动刷新</a>`;
+  }catch(e){
+    document.getElementById('cols').innerHTML = `<div class="panel"><div class="panel-body" style="padding:40px;text-align:center;color:var(--red)">⚠️ 数据加载失败: ${esc(e.message)}</div></div>`;
+  }
 }
-@media(max-width:360px){
-  body{font-size:12px}
-  .container,.main,.body,.wrap{padding:6px}
-  h1{font-size:16px}
-  h2{font-size:14px}
-  h3{font-size:12px}
-  .btn{padding:5px 8px;font-size:11px;width:100%}
-  table{font-size:10px}
-  .nav-bar a{padding:4px 6px;font-size:11px}
-  .row{flex-direction:column;align-items:flex-start}
-}
-</style>
-
-<style>
-/* R98-z 480+360 紧凑断点 */
-@media(max-width:480px){
-  body{font-size:13px}
-  .container,.main,.body,.wrap{max-width:100%;padding:8px}
-  h1{font-size:18px}
-  h2{font-size:15px}
-  h3{font-size:13px}
-  .btn{padding:6px 10px;font-size:12px}
-  table{font-size:11px}
-  .row{flex-wrap:wrap;gap:4px}
-}
-@media(max-width:360px){
-  body{font-size:12px}
-  .container,.main,.body,.wrap{padding:6px}
-  h1{font-size:16px}
-  h2{font-size:14px}
-  h3{font-size:12px}
-  .btn{padding:5px 8px;font-size:11px;width:100%}
-  table{font-size:10px}
-  .nav-bar a{padding:4px 6px;font-size:11px}
-  .row{flex-direction:column;align-items:flex-start}
-}
-@media print {
-  .no-print{display:none!important}
-  .page-header-bar,.flow-steps-wrap,.phb-back,.top,.btn,.mobile-nav,header,nav,.skip-link,a[style*="position:fixed"],[style*="position:fixed"],.refresh,.export-btn,.search-bar,.modal-bg,.tab-btn,.skip-link{display:none!important}
-  body{background:#fff!important;color:#000!important;font-size:12pt!important;padding:0!important;margin:0!important}
-  .container,.main,.content,.card,.report-body,.wrap{width:100%!important;max-width:none!important;margin:0!important;padding:8mm!important}
-  table{width:100%!important;border-collapse:collapse!important}
-  th,td{border:1px solid #333!important;padding:4px 8px!important}
-  h1,h2,h3{page-break-after:avoid!important}
-  .card,.section,.module{page-break-inside:avoid!important}
-  a{color:#000!important;text-decoration:none!important}
-  .print-only{display:block!important}
-}
-</style>
-<script src="js/error-interceptor.js" defer></script>
-<script src="js/submit-guard.js"></script>
-<script src="js/escape-html.js"></script>
+render();
+setInterval(render, 60000);
+</script>
 </body>
 </html>
