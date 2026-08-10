@@ -391,6 +391,7 @@ let camStream = null;
 let camTimer = null;
 let _bestVision = null;
 let _bestVisionB64 = null;   // 最优帧原始 base64（用于自动提交）
+let _frameResults = [];      // 多帧投票统计 { syndrome, confidence }
 async function toggleLiveCamera() {
   const btn = document.getElementById('liveCamBtn');
   const state = document.getElementById('liveCamState');
@@ -420,6 +421,7 @@ async function toggleLiveCamera() {
     btn.textContent = '⏹ 停止连续采集';
     state.textContent = '● 采集中';
     _bestVision = null;
+    _frameResults = [];
     // 每 2.5s 抓帧分析
     camTimer = setInterval(async () => {
       try {
@@ -435,11 +437,19 @@ async function toggleLiveCamera() {
         const d = await res.json();
         if (d.code !== 0) return;
         const r = d.data;
-        // 增量融合：保留置信度最高的帧结论 + 原始 b64
+        // 增量融合：保留置信度最高的帧结论 + 原始 b64 + 多帧投票统计
+        _frameResults.push({ syndrome: r.syndrome, confidence: r.confidence || 0 });
+        if (_frameResults.length > 20) _frameResults.shift();
         if (!_bestVision || (r.confidence || 0) > (_bestVision.confidence || 0)) {
           _bestVision = r;
           _bestVisionB64 = b64;
         }
+        // 投票统计：证型频次
+        const votes = {};
+        _frameResults.forEach(f => { const k = f.syndrome || '未识别'; votes[k] = (votes[k] || 0) + 1; });
+        const total = _frameResults.length;
+        const voteHtml = Object.entries(votes).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) =>
+          `<span style="color:var(--dim)">${escapeHtml(k)} ${n}/${total}</span>`).join(' · ');
         const box = document.getElementById('liveVisionResult');
         const b = _bestVision;
         box.innerHTML =
@@ -447,6 +457,7 @@ async function toggleLiveCamera() {
           (r.formulas && r.formulas.length ? `💊 ${r.formulas.slice(0, 2).map(f => escapeHtml(f)).join(' + ')}<br>` : '') +
           `🏆 最优帧：${escapeHtml(b.syndrome || '—')} <span style="color:var(--dim)">(${(b.confidence * 100).toFixed(0)}%)</span>` +
           (b.kb && b.kb.length ? `<br>📚 ${b.kb.slice(0, 2).map(k => escapeHtml(k.title.slice(0, 16))).join(' · ')}` : '') +
+          (total >= 2 ? `<br>🗳 多帧投票：${voteHtml}` : '') +
           `<span style="color:var(--dim);font-size:10px">（${r.ms}ms/帧）</span>`;
       } catch (_) { /* 单帧失败跳过 */ }
     }, 2500);
@@ -518,6 +529,7 @@ function setMode(m) {
   currentMode = m;
   _bestVision = null;
   _bestVisionB64 = null;
+  _frameResults = [];
   document.querySelectorAll('#modeTabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
   document.getElementById('dzText').textContent = {tongue:'👅 舌诊照片',face:'😊 面诊照片',eye:'👁 眼诊照片',hand:'✋ 手诊照片'}[m];
 }
@@ -712,6 +724,7 @@ function renderSession(s) {
     document.getElementById('suggestRxFormulas').textContent = sr.formulas.join(' + ');
     document.getElementById('suggestRxRationale').innerHTML =
       (sr.rationale || []).map(r => '· ' + _esc(r)).join('<br>') +
+      `<br>· 融合置信: <b>${sr.fused_confidence ? (sr.fused_confidence * 100).toFixed(0) + '%' : '—'}</b>（视觉 ${sr.vision_confidence ? (sr.vision_confidence * 100).toFixed(0) + '%' : '—'} + KB ${sr.kb_score ? (sr.kb_score * 100).toFixed(0) + '分' : '—'}）` +
       `<br>· 建议来源: <b>${sr.suggested_by === 'ai_autopilot' ? '🤖 AI 自主（无人化）' : 'AI 辅助（需医生审核）'}</b>`;
   } else srBox.classList.add('hidden');
 
