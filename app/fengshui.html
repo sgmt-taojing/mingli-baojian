@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <script src="/app/js/escape-html.js" defer></script>
+<script src="/app/i18n/i18n-engine.js" defer></script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="robots" content="index, follow" data-r308-public>
 
@@ -39,7 +40,7 @@
     <span class="phb-theme-dot"></span>
     <span class="phb-title">风水排盘</span>
   </div>
-  <a class="phb-back" href="divination-hub.html">← 返回</a>
+  <a class="phb-back" href="divination-hub.html"><span data-i18n="common.back">← 返回</span></a>
 </header>
 
 <div class="flow-steps-wrap" style="padding:12px 24px 0">
@@ -49,7 +50,7 @@
   <a class="skip-link" href="#main-content">跳到主内容</a>
 <main id="main-content" role="main"><h1 class="sr-only">宅子风水 · 八宅派玄空飞星综合诊断</h1>
 <div style="position:fixed;top:12px;right:12px;z-index:99998">
-  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--paper);font-weight:600;border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
+  <a href="tcm-clinic.html" style="display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--paper);font-weight:600;border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px"><span data-i18n="nav.tcm">医 中医诊疗</span></a>
 </div>
 <div id="loading-overlay" style="position:fixed;inset:0;background:var(--ink3);z-index:9999;display:none;"></div>
 <!-- section-fengshui START -->
@@ -4124,5 +4125,8 @@ async function generateFengshuiReport(){
 
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){ try { I18N.init(); } catch(e){} });
+</script>
 </body>
 </html>

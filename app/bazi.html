@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <script src="/app/js/escape-html.js" defer></script>
+<script src="/app/i18n/i18n-engine.js" defer></script>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="robots" content="index, follow" data-r308-public>
 
@@ -49,9 +50,9 @@
 <div class="flow-hint">填写出生年月日时，点击排盘演算。</div>
 </div>
 <nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
-  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">主平台</a>
+  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px"><span data-i18n="nav.home">主平台</span></a>
   <a href="ziwei.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">星 紫微斗数</a>
-  <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">望诊工作台</a>
+  <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px"><span data-i18n="vision.visualDiagnosis">望诊工作台</span></a>
   <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">医 中医诊疗</a>
 </nav>
 
@@ -746,6 +747,9 @@ document.addEventListener("DOMContentLoaded",function(){
 <\/script>
 \x3cscript src="js/flow-engine.js">\x3c/script>
 \x3cscript src="js/error-interceptor.js" defer>\x3c/script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){ try { I18N.init(); } catch(e){} });
+</script>
 </body></html>`;var blob=new Blob([html],{type:'text/html'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bazi-report.'+(fmt||'html');a.click();if(typeof toast==='function')toast('已导出'+(fmt||'html'));}catch(e){if(typeof toast==='function')toast('导出失败: '+esc(e.message));}};}
 </script>
 

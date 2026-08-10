@@ -17,6 +17,9 @@ const I18N = (function () {
     'zh-CN': '简体中文',
     'zh-TW': '繁體中文',
     'en-SG': 'English (SEA)',
+    'ja-JP': '日本語',
+    'ko-KR': '한국어',
+    'vi-VN': 'Tiếng Việt',
   };
 
   let _locale = localStorage.getItem(STORAGE_KEY) || _detectLocale();
