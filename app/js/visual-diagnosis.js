@@ -94,43 +94,24 @@
   }
 
   function analyzeImage(blob, mode) {
-    setStatus('🔍 正在分析（HSV+LBP+规则引擎）…', '');
+    setStatus('🔍 正在分析（HSV+LBP+ONNX+规则+贝叶斯+KB）…', '');
     blobToB64(blob, function (b64) {
-      var fd = new FormData();
-      fd.append('image', blob, 'capture.jpg');
-      fd.append('mode', mode);
-
-      fetch(FACE_OCR + '/api/camera/upload', {
+      // R493c 修真：单次请求 full-diagnose（替代原两次串行 8913+8920）
+      fetch(API + '/api/vision/full-diagnose', {
         method: 'POST',
-        body: fd,
-        signal: AbortSignal.timeout(20000),
-        headers: { 'X-API-Key': 'mingli-tcm-2024' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_b64: b64, mode: mode }),
+        signal: AbortSignal.timeout(25000)
       })
         .then(function (r) { return r.json(); })
-        .then(function (ocrResult) {
-          if (!ocrResult.ok) throw new Error(ocrResult.error || 'OCR failed');
-          var features = ocrResult.structured_features || {};
-          var analysisText = ocrResult.analysis || '';
+        .then(function (full) {
+          if (!full.ok) throw new Error(full.error || 'full-diagnose failed');
+          var features = full.structured_features || {};
+          var analysisText = (full.pipeline && full.pipeline._ocrData) ? full.pipeline._ocrData.analysis : '';
           if (analysisText && Object.keys(features).length < 2) {
             features = extractFeaturesFromText(analysisText);
           }
-          return fetch(API + '/api/vision/diagnose', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              mode: mode,
-              features: features,
-              image_b64: b64,
-              image_quality: {
-                brightness: ocrResult.inspect ? ocrResult.inspect.brightness : undefined
-              }
-            }),
-            signal: AbortSignal.timeout(15000)
-          })
-            .then(function (r) { return r.json(); })
-            .then(function (diagResult) {
-              renderDiagnosis(ocrResult, diagResult, features);
-            });
+          renderDiagnosis(full.pipeline && full.pipeline._ocrData, full, features);
         })
         .catch(function (err) {
           if (err.name === 'TimeoutError') {
@@ -181,14 +162,32 @@
     var findingsHtml = '';
     if (diag.findings && diag.findings.length) {
       findingsHtml = diag.findings.slice(0, 5).map(function (f, i) {
-        var fpct = Math.round((f.score || f.base_confidence || 0) * 100);
+        var fpct = Math.round((f.fused_score || f.score || f.base_confidence || 0) * 100);
         var fcolor = fpct >= 80 ? '#38a169' : fpct >= 60 ? '#d69e2e' : '#a0aec0';
+        var evHtml = '';
+        if (f.evidence && f.evidence.length) {
+          evHtml = '<div style="font-size:11px;color:var(--muted);margin-top:2px">' +
+            f.evidence.slice(0, 3).map(function (e) {
+              var s = e.feature || e;
+              return String(s).replace(/_/g, ' ').replace(/=/g, '=');
+            }).join(' · ') + '</div>';
+        }
+        if (f.eight_principles) {
+          var ep = f.eight_principles;
+          evHtml += '<div style="font-size:10px;color:#9f7aea;margin-top:1px">八纲: ' +
+            [ep.yin_yang, ep.biao_li, ep.han_re, ep.xu_shi].filter(Boolean).join(' · ') +
+            (f.organs && f.organs.length ? ' · 脏腑: ' + f.organs.join('/') : '') + '</div>';
+        }
+        if (f.treatments && f.treatments.length) {
+          evHtml += '<div style="font-size:10px;color:#48bb78;margin-top:1px">治法: ' +
+            f.treatments.slice(0, 4).join(' / ') + '</div>';
+        }
         return '<div style="margin:4px 0;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:6px">' +
           '<span style="color:#ccc;font-weight:600">' + (i + 1) + '. ' + escapeHtml(f.syndrome) + '</span>' +
           ' <span style="color:' + fcolor + ';font-size:12px;font-weight:600">' + fpct + '%</span>' +
-          (f.evidence && f.evidence.length ? '<div style="font-size:11px;color:var(--muted);margin-top:2px">' +
-            f.evidence.slice(0, 3).map(escapeHtml).join(' · ') + '</div>' : '') +
-          '</div>';
+          (f.bayesian_probability ? '<span style="font-size:10px;color:#9f7aea;margin-left:6px">贝叶斯 ' +
+            Math.round(f.bayesian_probability * 100) + '%</span>' : '') +
+          evHtml + '</div>';
       }).join('');
     }
 
@@ -204,9 +203,30 @@
     var hsvBadge = diag.hsv_lbp_boost
       ? ' <span style="font-size:11px;color:#d69e2e">⚡HSV+LBP增强(' + diag.hsv_lbp_boost.applied_signals.length + '信号)</span>'
       : '';
+    if (diagResult && diagResult.bayesian_used) {
+      hsvBadge += ' <span style="font-size:11px;color:#9f7aea">🧠贝叶斯融合</span>';
+    }
 
-    var ocrEngine = ocrResult.engine || 'unknown';
+    var ocrEngine = (ocrResult && ocrResult.engine) || 'unknown';
     var ocrEngineLabel = ocrEngine === 'offline-pil' ? 'PIL 离线兜底' : ocrEngine;
+
+    var kbHtml = '';
+    var kbMatches = diagResult.kb_matches || [];
+    if (kbMatches.length) {
+      kbHtml = '<div style="margin-top:8px;padding:8px;background:rgba(159,122,234,.06);border-radius:6px">' +
+        '<div style="font-size:12px;font-weight:600;color:#9f7aea;margin-bottom:4px">📚 知识库支撑 (' + kbMatches.length + ')</div>' +
+        kbMatches.slice(0, 3).map(function (m) {
+          return '<div style="font-size:11px;color:#ccc;margin:2px 0">• ' + escapeHtml(m.title || m.content || '').slice(0, 60) + '</div>';
+        }).join('') + '</div>';
+    }
+
+    var featHtml = '';
+    if (features && Object.keys(features).length) {
+      featHtml = '<div style="margin-top:6px;font-size:11px;color:var(--muted)">特征: ' +
+        Object.keys(features).slice(0, 6).map(function (k) {
+          return escapeHtml(k.replace(/_/g, ' ')) + '=' + escapeHtml(String(features[k]));
+        }).join(' · ') + '</div>';
+    }
 
     el.innerHTML =
       '<div style="padding:8px 0">' +
@@ -220,8 +240,9 @@
       '</div>' +
       '<div style="font-size:11px;color:var(--muted);margin-top:2px">置信度' + hsvBadge + ' · 引擎: ' + escapeHtml(ocrEngineLabel) + '</div>' +
       '</div>' +
-      '</div>' +
+      featHtml +
       (findingsHtml ? '<div style="margin-top:4px"><div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px">📊 辨证排序</div>' + findingsHtml + '</div>' : '') +
+      kbHtml +
       recsHtml +
       '<div style="margin-top:8px;font-size:11px;color:var(--muted)">⚠️ 本结果仅为中医筛查参考，不替代专业医师诊断</div>';
 

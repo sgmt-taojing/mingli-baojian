@@ -19,7 +19,7 @@ if [ "$HTML_CHANGED" -gt 0 ] 2>/dev/null; then
   SCAN="$HOME/.openclaw-autoclaw/workspace/.openclaw/tmp/scan-all.js"
   if [ -f "$SCAN" ]; then
     git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E "^app/.*\.html$" | while read f; do
-      node "$SCAN" "$f" 2>/dev/null | grep "^❌" && echo "  ↑ $f"
+      node "$SCAN" "$f" 2>/dev/null | grep "^❌" && echo "  ↑ $f" || true
     done
     echo "✅ acorn 快扫完成"
   fi
