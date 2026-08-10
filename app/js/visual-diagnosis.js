@@ -182,6 +182,18 @@
           evHtml += '<div style="font-size:10px;color:#48bb78;margin-top:1px">治法: ' +
             f.treatments.slice(0, 4).join(' / ') + '</div>';
         }
+        // R494：方剂卡片（组成/功效/禁忌，折叠展示）
+        if (f.formulas && f.formulas.length) {
+          evHtml += '<div style="margin-top:4px">' +
+            f.formulas.slice(0, 3).map(function (rx) {
+              return '<div style="font-size:10px;color:#fbd38d;background:rgba(251,211,141,.07);border-left:2px solid #fbd38d;padding:3px 6px;margin:2px 0;border-radius:0 4px 4px 0">' +
+                '📜 <b>' + escapeHtml(rx.name) + '</b> <span style="color:var(--muted)">' + escapeHtml(rx.source || '') + '</span>' +
+                (rx.actions ? '<div style="color:#48bb78">' + escapeHtml(rx.actions) + '</div>' : '') +
+                (rx.composition ? '<div style="color:#ccc">组成: ' + escapeHtml(rx.composition) + '</div>' : '') +
+                (rx.contraindications ? '<div style="color:#e53e3e">⚠️ ' + escapeHtml(rx.contraindications) + '</div>' : '') +
+                '</div>';
+            }).join('') + '</div>';
+        }
         return '<div style="margin:4px 0;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:6px">' +
           '<span style="color:#ccc;font-weight:600">' + (i + 1) + '. ' + escapeHtml(f.syndrome) + '</span>' +
           ' <span style="color:' + fcolor + ';font-size:12px;font-weight:600">' + fpct + '%</span>' +
