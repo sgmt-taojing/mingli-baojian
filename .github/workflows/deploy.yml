@@ -62,7 +62,7 @@ jobs:
           # 输出大小信息
           echo "Deploy size:"
           du -sh _site/
-          du -sh _site/app _site/js _site/knowledge _site/css 2>/dev/null
+          du -sh _site/app _site/js _site/knowledge _site/css 2>/dev/null || true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
