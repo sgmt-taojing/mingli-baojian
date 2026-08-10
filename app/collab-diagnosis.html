@@ -720,7 +720,8 @@ function renderSession(s) {
     kb2.innerHTML = `
       <div class="syndrome">${_esc(k.syndrome || '未识别')} <span class="conf">匹配分 ${(k.score * 100).toFixed(0)}</span></div>
       <ul class="evidence">${(k.evidence || []).slice(0, 3).map(e => `<li>${_esc(e.title)}${e.score ? ` (${(e.score * 100).toFixed(0)}分)` : ''}</li>`).join('')}</ul>
-      ${(k.formulas || []).length ? `<div class="formulas">${k.formulas.map(f => `<span class="formula">${_esc(f)}</span>`).join('')}</div>` : ''}`;
+      ${(k.formulas || []).length ? `<div class="formulas">${k.formulas.map(f => `<span class="formula">${_esc(f)}</span>`).join('')}</div>` : ''}` +
+      `${(k.global_formulas || []).length ? `<div style="margin-top:6px;font-size:11px;color:var(--purple)">🌍 海外体系方剂：${k.global_formulas.slice(0, 2).map(f => _esc(f).split(' (')[0]).join('、')}</div>` : ''}`;
   } else if (k.status === 'error') { ks.className = 'badge red'; ks.textContent = '失败'; kb2.innerHTML = `<div class="notice">${_esc(k.error || '知识库服务不可用')}${k.fallback ? '· ' + _esc(k.fallback) : ''}</div>`; }
   else { ks.className = 'badge amber'; ks.textContent = '等待'; }
 
