@@ -249,7 +249,14 @@ let currentRole = 'patient';
 let selectedConditions = new Set();
 let autopilotEnabled = false;
 let evtSource = null;
-let docId = 'doc_' + Math.random().toString(36).slice(2, 8);
+// R695: 确定性 docId（替代 Math.random，修真闭环要求）
+let docId = 'doc_' + Date.now().toString(36) + '_' + ((performance.now() * 1000) | 0).toString(36);
+
+// R695: HTML 转义（XSS 防护 · 所有用户输入拼 innerHTML 前必须经过）
+function _esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 // 病情勾选渲染
 const condBox = document.getElementById('condChips');
@@ -378,7 +385,7 @@ function logEvt(ev) {
   const log = document.getElementById('evtLog');
   const line = document.createElement('div');
   const t = (ev.at || new Date().toISOString()).slice(11, 19);
-  line.innerHTML = `<span style="color:var(--dim)">${t}</span> <b>${ev.type}</b> ${ev.status ? '· ' + ev.status : ''} ${ev.verdict ? '· ' + ev.verdict : ''}`;
+  line.innerHTML = `<span style="color:var(--dim)">${_esc(t)}</span> <b>${_esc(ev.type)}</b> ${ev.status ? '· ' + _esc(ev.status) : ''} ${ev.verdict ? '· ' + _esc(ev.verdict) : ''}`;
   log.prepend(line);
   while (log.children.length > 60) log.removeChild(log.lastChild);
 }
@@ -407,9 +414,9 @@ function renderSession(s) {
   document.getElementById('riskBadge').textContent = '⚠ ' + risks.slice(0, 3).join('、') + (risks.length > 3 ? ' 等' : '');
 
   document.getElementById('patientInfo').innerHTML =
-    `👤 ${s.patient.name || '匿名患者'} ${s.patient.age ? '· ' + s.patient.age + '岁' : ''} ${s.patient.gender || ''}<br>` +
-    `📷 模态: ${modeLabel(s.patient.mode)} | 📝 症状: ${s.patient.symptoms || '—'}<br>` +
-    `🎯 勾选: ${(s.patient.selectedConditions || []).join('、') || '—'} | 🎙 语音: ${s.patient.voiceText || '—'}`;
+    `👤 ${_esc(s.patient.name || '匿名患者')} ${s.patient.age ? '· ' + _esc(String(s.patient.age)) + '岁' : ''} ${_esc(s.patient.gender || '')}<br>` +
+    `📷 模态: ${modeLabel(s.patient.mode)} | 📝 症状: ${_esc(s.patient.symptoms || '—')}<br>` +
+    `🎯 勾选: ${_esc((s.patient.selectedConditions || []).join('、') || '—')} | 🎙 语音: ${_esc(s.patient.voiceText || '—')}`;
 
   // 四路状态
   setStep('stepPatient', ['init','diagnosing','reopened'].includes(s.status) ? 'active' : 'done', s.status === 'cancelled' ? '已取消' : '已提交');
@@ -427,12 +434,12 @@ function renderSession(s) {
   if (v.status === 'done') {
     vs.className = 'badge green'; vs.textContent = '完成';
     vb.innerHTML = `
-      <div class="syndrome">${v.syndrome || '未识别'} <span class="conf">置信度 ${(v.confidence * 100).toFixed(0)}%</span></div>
-      <div style="font-size:12px;color:var(--dim)">八纲: ${v.eight_principles || '—'}</div>
-      <ul class="evidence">${(v.findings || []).slice(0, 4).map(f => `<li>${typeof f === 'string' ? f : (f.label || f.feature || JSON.stringify(f))}</li>`).join('')}</ul>
-      ${(v.formulas || []).length ? `<div class="formulas">${v.formulas.map(f => `<span class="formula">${f}</span>`).join('')}</div>` : ''}
-      <div class="conf">治法: ${(v.treatments || []).join('、') || '—'}</div>`;
-  } else if (v.status === 'error') { vs.className = 'badge red'; vs.textContent = '失败'; vb.innerHTML = `<div class="notice">${v.error || '视觉服务不可用'}</div>`; }
+      <div class="syndrome">${_esc(v.syndrome || '未识别')} <span class="conf">置信度 ${(v.confidence * 100).toFixed(0)}%</span></div>
+      <div style="font-size:12px;color:var(--dim)">八纲: ${_esc(v.eight_principles || '—')}</div>
+      <ul class="evidence">${(v.findings || []).slice(0, 4).map(f => `<li>${_esc(typeof f === 'string' ? f : (f.label || f.feature || JSON.stringify(f)))}</li>`).join('')}</ul>
+      ${(v.formulas || []).length ? `<div class="formulas">${v.formulas.map(f => `<span class="formula">${_esc(f)}</span>`).join('')}</div>` : ''}
+      <div class="conf">治法: ${_esc((v.treatments || []).join('、') || '—')}</div>`;
+  } else if (v.status === 'error') { vs.className = 'badge red'; vs.textContent = '失败'; vb.innerHTML = `<div class="notice">${_esc(v.error || '视觉服务不可用')}</div>`; }
   else if (v.status === 'skipped') { vs.className = 'badge amber'; vs.textContent = '跳过'; vb.innerHTML = '<div class="notice">未提供照片，视觉诊断跳过（可补充照片后重开）</div>'; }
   else { vs.className = 'badge amber'; vs.textContent = '等待'; }
 
@@ -442,10 +449,10 @@ function renderSession(s) {
   if (k.status === 'done') {
     ks.className = 'badge green'; ks.textContent = '完成';
     kb2.innerHTML = `
-      <div class="syndrome">${k.syndrome || '未识别'} <span class="conf">匹配分 ${(k.score * 100).toFixed(0)}</span></div>
-      <ul class="evidence">${(k.evidence || []).slice(0, 3).map(e => `<li>${e.title}${e.score ? ` (${(e.score * 100).toFixed(0)}分)` : ''}</li>`).join('')}</ul>
-      ${(k.formulas || []).length ? `<div class="formulas">${k.formulas.map(f => `<span class="formula">${f}</span>`).join('')}</div>` : ''}`;
-  } else if (k.status === 'error') { ks.className = 'badge red'; ks.textContent = '失败'; kb2.innerHTML = `<div class="notice">${k.error || '知识库服务不可用'}${k.fallback ? '· ' + k.fallback : ''}</div>`; }
+      <div class="syndrome">${_esc(k.syndrome || '未识别')} <span class="conf">匹配分 ${(k.score * 100).toFixed(0)}</span></div>
+      <ul class="evidence">${(k.evidence || []).slice(0, 3).map(e => `<li>${_esc(e.title)}${e.score ? ` (${(e.score * 100).toFixed(0)}分)` : ''}</li>`).join('')}</ul>
+      ${(k.formulas || []).length ? `<div class="formulas">${k.formulas.map(f => `<span class="formula">${_esc(f)}</span>`).join('')}</div>` : ''}`;
+  } else if (k.status === 'error') { ks.className = 'badge red'; ks.textContent = '失败'; kb2.innerHTML = `<div class="notice">${_esc(k.error || '知识库服务不可用')}${k.fallback ? '· ' + _esc(k.fallback) : ''}</div>`; }
   else { ks.className = 'badge amber'; ks.textContent = '等待'; }
 
   // 建议处方
@@ -455,7 +462,7 @@ function renderSession(s) {
     srBox.classList.remove('hidden');
     document.getElementById('suggestRxFormulas').textContent = sr.formulas.join(' + ');
     document.getElementById('suggestRxRationale').innerHTML =
-      (sr.rationale || []).map(r => '· ' + r).join('<br>') +
+      (sr.rationale || []).map(r => '· ' + _esc(r)).join('<br>') +
       `<br>· 建议来源: <b>${sr.suggested_by === 'ai_autopilot' ? '🤖 AI 自主（无人化）' : 'AI 辅助（需医生审核）'}</b>`;
   } else srBox.classList.add('hidden');
 
@@ -552,17 +559,17 @@ async function loadQueue(filter) {
         <div class="row1">
           ${q.autopilot ? '<span class="badge green">🤖 AI自主</span>' : ''}
           ${(q.risks || []).length ? '<span class="badge red">⚠风险</span>' : ''}
-          ${q.patient.name} <span style="color:var(--dim);font-weight:400">${q.patient.age || ''}${q.patient.gender || ''}</span>
+          ${_esc(q.patient.name)} <span style="color:var(--dim);font-weight:400">${_esc(q.patient.age || '')}${_esc(q.patient.gender || '')}</span>
           <span class="badge blue" style="margin-left:auto">${statusLabel(q.status)}</span>
         </div>
         <div class="row2">
-          👁 ${q.visionSyndrome || '—'} <span style="color:var(--dim)">${(q.visionConfidence * 100).toFixed(0)}%</span>
-          &nbsp;·&nbsp; 📚 ${q.kbSyndrome || '—'} <span style="color:var(--dim)">${(q.kbScore * 100).toFixed(0)}分</span>
+          👁 ${_esc(q.visionSyndrome || '—')} <span style="color:var(--dim)">${(q.visionConfidence * 100).toFixed(0)}%</span>
+          &nbsp;·&nbsp; 📚 ${_esc(q.kbSyndrome || '—')} <span style="color:var(--dim)">${(q.kbScore * 100).toFixed(0)}分</span>
           ${q.hasRx ? '<br>💊 处方: ' + rxStatusLabel(q.rxStatus) : ''}
         </div>
       </div>`).join('');
   } catch (e) {
-    document.getElementById('queueList').innerHTML = '<div class="notice">加载失败: ' + e.message + '</div>';
+    document.getElementById('queueList').innerHTML = '<div class="notice">加载失败: ' + _esc(e.message) + '</div>';
   }
 }
 
