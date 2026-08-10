@@ -1,14 +1,14 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-10 22:08 CST
+> 最后更新: 2026-08-11 06:20 CST（停滞告警后盘点：实际有 R702-R705 + 蒸馏闭环推进未上板）
 
 ## 进行中
 
 ### #1 蒸馏闭环常态化
-- **节点**: 3/5（采集→KB检查→蒸馏入库→审核上线→反馈闭环）
-- **进度**: 低分反馈提取 + KB覆盖检查 + 蒸馏入库已验证；修真 distill-server.js module 透传 ✅
-- **阻塞**: staging 中 2 条待审核词条
-- **下一步**: 将蒸馏 cron 与 feedback-aggregator 打通，形成自动闭环
+- **节点**: 4/5（采集→KB检查→蒸馏入库→审核上线→反馈闭环）
+- **进度**: 低分反馈提取 + KB覆盖检查 + 蒸馏入库已验证 ✅；**feedback loop 已打通**（commit ac32801，aggregator→staging 带噪声过滤）✅；3 个 launchd cron 已挂载（auto-distill / distill-link / distill-feedback-loop）✅；08-11 03:45 自动蒸馏运行：流年班 PDF×2 + 天相天梁 pptx → 12 词条入库（ziwei 模块，KB 总量 44399）
+- **阻塞**: staging 中 2 条待审核词条（仅剩审核上线节点）
+- **下一步**: 审核 staging 2 词条 → 验证全自动闭环跑满 5/5
 
 ### #2 公共能力包市场（capability-market）
 - **节点**: 4/6（规划→注册表→模板→匹配器→自进化脚本→实际运营）
@@ -60,6 +60,11 @@
 | 2026-08-02 | R688: divination-hub 按需加载 | commit 8d6dbd0 |
 | 2026-08-01 | R494: prescription matcher 方剂闭环 | commit f121082 |
 | 2026-07-31 | R687: PWA PNG 图标 | commit 7568d25 |
+| 2026-08-11 | R705: i18n-engine 接入 5 核心页（cn-global 拆分） | commit d66269e |
+| 2026-08-11 | R704: knowledge路径修真(87处) + /app/双前缀修真(54处) + sft v3 null guard | commit 8b222b7 / 47ca230 / 4c9d454 |
+| 2026-08-11 | R703: cn-global i18n 键统一修真 | commit 1d7d310 |
+| 2026-08-11 | R702: 排盘API英文转换层(lang=en) + server/ 独立 git 仓库化 + distill feedback loop | commit ae59a50 / c199f95 / ac32801 |
+| 2026-08-11 | 蒸馏闭环 cron 自动运行（03:45 增量 3 文件→12 词条） | .distill-progress.json |
 
 ## 冻结/低优先级
 
