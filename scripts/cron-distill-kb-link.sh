@@ -1,0 +1,35 @@
+#!/bin/bash
+# R249 修真：蒸馏→KB 关联 每天 03:30 跑
+# 直接调 node 模块（绕过 HTTP / JWT / CSRF），更可靠
+set -e
+
+LOG_FILE="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/cron-distill-kb-link.log"
+echo "[$(date '+%F %T')] 开始 distill-link 任务" >> "$LOG_FILE"
+
+cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+
+# 1) 全量画像蒸馏（直接调 engine 模块）
+node -e "
+try {
+  const engine = require('./server/profile-distill-engine');
+  const patients = engine.rebuildAllPatientProfiles();
+  const believers = engine.rebuildAllBelieverInsights();
+  console.log('[distill] patients:', JSON.stringify(patients));
+  console.log('[distill] believers:', JSON.stringify(believers));
+} catch (e) {
+  console.log('[distill ERROR]', e.message);
+  process.exit(1);
+}
+" >> "$LOG_FILE" 2>&1 || echo "[$(date '+%F %T')] distill engine error" >> "$LOG_FILE"
+
+# 2) 跑 linker
+node -e "
+const l = require('./server/distill-kb-linker');
+const r = l.linkAllInsights(0.7);
+console.log('[linker]', JSON.stringify({linked:r.linked, pending:r.pending, no_match:r.no_match, total:r.total}));
+console.log('[hot linked KB]');
+l.getHotLinkedKB(5).forEach(h => console.log('  ' + h.kb_entry_id + ' | ' + h.module + ' | refs=' + h.ref_count));
+console.log('[stats]', JSON.stringify(l.getLinkStats()));
+" >> "$LOG_FILE" 2>&1 || echo "[$(date '+%F %T')] linker error" >> "$LOG_FILE"
+
+echo "[$(date '+%F %T')] 任务完成" >> "$LOG_FILE"

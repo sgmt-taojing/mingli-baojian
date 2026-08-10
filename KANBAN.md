@@ -7,8 +7,8 @@
 ### #1 蒸馏闭环常态化
 - **节点**: 4/5（采集→KB检查→蒸馏入库→审核上线→反馈闭环）
 - **进度**: 低分反馈提取 + KB覆盖检查 + 蒸馏入库已验证 ✅；**feedback loop 已打通**（commit ac32801，aggregator→staging 带噪声过滤）✅；3 个 launchd cron 已挂载（auto-distill / distill-link / distill-feedback-loop）✅；08-11 03:45 自动蒸馏运行：流年班 PDF×2 + 天相天梁 pptx → 12 词条入库（ziwei 模块，KB 总量 44399）
-- **阻塞**: staging 中 2 条待审核词条（仅剩审核上线节点）
-- **下一步**: 审核 staging 2 词条 → 验证全自动闭环跑满 5/5
+- **阻塞**: staging 待审核 1155 条（feedback-loop 00:34 自动入库 10 条）；distill-kb-link 路径修真完成（绝对路径修复 + 验证通过：38 insights, 24 linked, avg_conf 0.84）
+- **下一步**: 审核 staging 高优先词条 → 验证全自动闭环跑满 5/5
 
 ### #2 公共能力包市场（capability-market）
 - **节点**: 4/6（规划→注册表→模板→匹配器→自进化脚本→实际运营）
