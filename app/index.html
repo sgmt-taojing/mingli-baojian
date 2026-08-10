@@ -28,8 +28,23 @@
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
 <link rel="stylesheet" href="css/page-header.css">
-<script src="/i18n/i18n-engine.js"></script>
-<script src="/i18n/region-config.js"></script>
+<script>
+// ═══ R502: 国内版守卫——强制 zh-CN + 全功能（防止海外参数污染）═══
+(function() {
+  try {
+    // 清除可能残留的海外激活状态
+    localStorage.removeItem('mbj_region');
+    localStorage.removeItem('mbj_locale');
+    // 忽略 URL 中的 region/locale 参数（海外跳转进来也强制国内）
+    const p = new URLSearchParams(location.search);
+    if (p.get('region') || p.get('locale')) {
+      p.delete('region'); p.delete('locale'); p.delete('activated');
+      const clean = p.toString();
+      history.replaceState(null, '', location.pathname + (clean ? '?' + clean : ''));
+    }
+  } catch (_) {}
+})();
+</script>
 </head>
 <body class="theme-ai">
 <header class="page-header-bar">
@@ -110,105 +125,4 @@
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
-<script>
-// ═══ R500: 激活参数读取 + 合规分层应用 ═══
-(function() {
-  const params = new URLSearchParams(location.search);
-  const region = params.get('region') || localStorage.getItem('mbj_region') || 'cn';
-  const locale = params.get('locale') || localStorage.getItem('mbj_locale') || 'zh-CN';
-  const activated = params.get('activated') || localStorage.getItem('mbj_activated');
-
-  // 应用语言
-  if (typeof I18N !== 'undefined' && I18N.setLocale) {
-    I18N.setLocale(locale);
-  }
-
-  // 应用地区配置
-  if (typeof RegionConfig !== 'undefined') {
-    const rc = RegionConfig;
-    rc.setRegion(region);
-    const f = rc.filterFeatures(region);
-    const cfg = rc.REGION_CONFIG[region] || rc.REGION_CONFIG['cn'];
-
-    // 插入免责声明横幅
-    if (f.showDisclaimerEveryPage) {
-      const banner = document.createElement('div');
-      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;padding:6px 16px;background:rgba(245,185,66,.1);border-bottom:1px solid rgba(245,185,66,.25);font-size:11px;color:#f5b942;text-align:center;font-family:sans-serif';
-      banner.textContent = '⚠ ' + f.disclaimerText;
-      document.body.insertBefore(banner, document.body.firstChild);
-      document.body.style.paddingTop = '32px';
-    }
-
-    // 美国欧盟：命理入口改为 Eastern Astrology
-    if (region === 'us' || region === 'eu') {
-      const title = document.querySelector('.phb-title');
-      if (title) title.textContent = 'Eastern Wisdom';
-    }
-
-    // 插入顶栏语言/地区选择器
-    const header = document.querySelector('.page-header-bar');
-    if (header) {
-      const sel = document.createElement('div');
-      sel.style.cssText = 'margin-left:auto;display:flex;gap:6px;align-items:center';
-      const langSel = document.createElement('select');
-      langSel.style.cssText = 'background:#1a2233;color:#e8edf7;border:1px solid #2c3854;border-radius:8px;padding:4px 8px;font-size:12px';
-      const langs = { 'zh-CN':'简体中文','zh-TW':'繁體中文','en-SG':'English','en-US':'English(US)','ja-JP':'日本語','ko-KR':'한국어','vi-VN':'Tiếng Việt' };
-      for (const [k,v] of Object.entries(langs)) {
-        const o = document.createElement('option'); o.value = k; o.textContent = v; if (k===locale) o.selected = true;
-        langSel.appendChild(o);
-      }
-      langSel.onchange = () => { localStorage.setItem('mbj_locale', langSel.value); if (typeof I18N!=='undefined') I18N.setLocale(langSel.value); };
-      sel.appendChild(langSel);
-
-      const regSel = document.createElement('select');
-      regSel.style.cssText = langSel.style.cssText;
-      const regions = { cn:'🇨🇳 中国',sg:'🇸🇬 SEA',jp:'🇯🇵 日本',us:'🇺🇸 US',eu:'🇪🇺 EU',kr:'🇰🇷 한국',vn:'🇻🇳 VN' };
-      for (const [k,v] of Object.entries(regions)) {
-        const o = document.createElement('option'); o.value = k; o.textContent = v; if (k===region) o.selected = true;
-        regSel.appendChild(o);
-      }
-      regSel.onchange = () => { localStorage.setItem('mbj_region', regSel.value); location.search = '?region='+regSel.value+'&locale='+langSel.value+'&activated=1'; };
-      sel.appendChild(regSel);
-
-      header.appendChild(sel);
-    }
-
-    // 插入全球方剂搜索快捷入口
-    if (activated) {
-      const main = document.getElementById('main-content');
-      if (main) {
-        const gfBox = document.createElement('div');
-        gfBox.style.cssText = 'max-width:600px;margin:20px auto;padding:16px;background:#1a2233;border:1px solid #2c3854;border-radius:14px';
-        gfBox.innerHTML = '<div style="font-size:13px;font-weight:700;margin-bottom:10px;color:#4f8cff">🌍 全球传统医学方剂知识库</div>' +
-          '<div style="display:flex;gap:8px"><input id="gfSearch" placeholder="搜索方剂/症状（如 insomnia, 葛根湯, Ashwagandha）" style="flex:1;background:#202a40;border:1px solid #2c3854;color:#e8edf7;border-radius:8px;padding:8px 12px;font-size:13px">' +
-          '<button onclick="gfDoSearch()" style="background:#4f8cff;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer">搜索</button></div>' +
-          '<div id="gfResult" style="margin-top:10px;font-size:12px;color:#8b98b5;line-height:1.8"></div>';
-        main.insertBefore(gfBox, main.firstChild);
-      }
-    }
-  }
-})();
-
-async function gfDoSearch() {
-  const q = document.getElementById('gfSearch')?.value?.trim();
-  if (!q) return;
-  try {
-    const res = await fetch('http://127.0.0.1:8920/api/global-formulas/search?q=' + encodeURIComponent(q));
-    const d = await res.json();
-    const box = document.getElementById('gfResult');
-    if (!box) return;
-    if (!d.data || !d.data.length) { box.innerHTML = '<span style="color:#8b98b5">未找到匹配方剂</span>'; return; }
-    box.innerHTML = d.data.map(f =>
-      '<div style="padding:8px;margin:4px 0;background:#202a40;border-radius:8px">' +
-      '<b style="color:#4f8cff">' + (f.name || f.key) + '</b>' +
-      (f.name_en ? ' <span style="color:#8b98b5;font-size:11px">' + f.name_en + '</span>' : '') +
-      ' <span style="font-size:10px;color:#a78bfa">[' + f.tradition + ']</span><br>' +
-      '<span style="font-size:11px">' + (f.actions || '').slice(0, 60) + '</span><br>' +
-      '<span style="font-size:10px;color:#8b98b5">适应症: ' + (f.indications || '').slice(0, 80) + '</span>' +
-      '</div>'
-    ).join('');
-  } catch (e) { document.getElementById('gfResult').innerHTML = '搜索失败: ' + e.message; }
-}
-</script>
-</body>
 </html>

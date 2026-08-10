@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+<meta name="description" content="Eastern Wisdom - Traditional Knowledge Platform. Fortune, wellness and traditional medicine references.">
+<title>Eastern Wisdom · Traditional Knowledge Platform</title>
+<script src="/i18n/i18n-engine.js"></script>
+<script src="/i18n/region-config.js"></script>
+<style>
+:root{--bg:#0f1420;--card:#1a2233;--card2:#202a40;--line:#2c3854;--text:#e8edf7;--dim:#8b98b5;--accent:#4f8cff;--green:#2ecc71;--amber:#f5b942}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei","Hiragino Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.topbar{display:flex;align-items:center;gap:12px;padding:14px 20px;background:var(--card);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.topbar h1{font-size:16px;font-weight:700}
+.topbar .sub{font-size:12px;color:var(--dim)}
+.topbar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.topbar select{background:var(--card2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px}
+#discBanner{display:none;padding:8px 16px;background:rgba(245,185,66,.08);border-bottom:1px solid rgba(245,185,66,.25);font-size:11px;color:var(--amber);text-align:center}
+.container{max-width:720px;margin:0 auto;padding:24px 20px}
+.hero{text-align:center;padding:30px 0}
+.hero .icon{font-size:52px}
+.hero h2{font-size:24px;font-weight:800;margin-top:12px}
+.hero p{font-size:13px;color:var(--dim);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:16px}
+.card h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.mod{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;transition:.12s;text-decoration:none;color:var(--text);display:block}
+.mod:hover{border-color:var(--accent);transform:translateY(-1px)}
+.mod .ic{font-size:22px}
+.mod .nm{font-size:13px;font-weight:700;margin-top:6px}
+.mod .ds{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.5}
+.search-box{display:flex;gap:8px;margin-top:8px}
+.search-box input{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 14px;font-size:13px;outline:none}
+.search-box button{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer}
+#gfResult{margin-top:10px;font-size:12px;color:var(--dim);line-height:1.8}
+.gf-item{padding:10px;margin:6px 0;background:var(--card2);border-radius:10px}
+.gf-item b{color:var(--accent)}
+.gf-item .tag{font-size:10px;color:var(--purple,#a78bfa);margin-left:6px}
+.activate-cta{margin-top:16px;text-align:center}
+.btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;border:none;border-radius:12px;padding:14px 32px;font-size:15px;font-weight:600;cursor:pointer}
+.btn.ghost{background:var(--card2);color:var(--dim);border:1px solid var(--line)}
+.btn-row{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+footer{text-align:center;padding:20px;font-size:11px;color:rgba(255,255,255,.25)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <h1 id="brandTitle">Eastern Wisdom</h1>
+  <span class="sub" id="brandSub">Traditional Knowledge Platform</span>
+  <div class="right">
+    <select id="langSel" onchange="changeLocale(this.value)"></select>
+    <select id="regionSel" onchange="changeRegion(this.value)"></select>
+    <a href="/activate.html" class="btn" style="padding:6px 14px;font-size:12px;border-radius:8px" id="reActivateBtn">⚙ 设置</a>
+  </div>
+</div>
+<div id="discBanner"></div>
+
+<div class="container">
+  <div class="hero">
+    <div class="icon">🦞</div>
+    <h2 id="heroTitle">Eastern Wisdom</h2>
+    <p id="heroSub">Traditional fortune & wellness knowledge from East Asian cultures</p>
+  </div>
+
+  <div class="card">
+    <h3>🧭 <span data-i18n="nav.home">Modules</span></h3>
+    <div class="grid" id="moduleGrid"></div>
+  </div>
+
+  <div class="card">
+    <h3>🌍 <span id="gfTitle">Global Traditional Medicine Library</span></h3>
+    <div class="search-box">
+      <input id="gfSearch" placeholder="Search formulas / symptoms… e.g. insomnia, Ashwagandha, 葛根湯" onkeydown="if(event.key==='Enter')gfDoSearch()">
+      <button onclick="gfDoSearch()">Search</button>
+    </div>
+    <div id="gfResult"></div>
+  </div>
+
+  <div class="activate-cta">
+    <div style="font-size:12px;color:var(--dim);margin-bottom:10px" id="activatedState"></div>
+    <div class="btn-row">
+      <a href="/activate.html" class="btn" id="activateBtn">🚀 Change Country / Language</a>
+      <a href="/collab-diagnosis.html" class="btn ghost" id="diagBtn">🩺 Collaborative Diagnosis</a>
+    </div>
+  </div>
+</div>
+
+<footer id="footerNote">Eastern Wisdom · For cultural education and wellness reference only</footer>
+
+<script>
+const API = 'http://127.0.0.1:8920';
+const MODULES = {
+  zh: {
+    title: '东方智慧', sub: '传统文化知识平台',
+    modules: [
+      { ic: '🩺', name: 'AI 视觉诊断', desc: '舌/面/眼/手四诊分析', url: '/tcm-visual-reference.html' },
+      { ic: '🗣', name: 'AI 助手', desc: '知识问答 · 语音交互', url: '/ai-assistant.html' },
+      { ic: '📜', name: '命理排盘', desc: '八字/紫微/奇门/六爻', url: '/divination-hub.html' },
+      { ic: '🏠', name: '风水堪舆', desc: '飞星/八宅/玄空', url: '/fengshui-chart.html' },
+      { ic: '🍵', name: '中医养生', desc: '体质/证型/方剂知识', url: '/tcm-portal.html' },
+      { ic: '👥', name: '协作诊断', desc: '患者×AI×医生', url: '/collab-diagnosis.html' },
+    ]
+  },
+  en: {
+    title: 'Eastern Wisdom', sub: 'Traditional Knowledge Platform',
+    modules: [
+      { ic: '🩺', name: 'AI Wellness Scan', desc: 'Face/Tongue/Eye/Hand analysis', url: '/tcm-visual-reference.html' },
+      { ic: '🗣', name: 'AI Assistant', desc: 'Q&A · Voice interaction', url: '/ai-assistant.html' },
+      { ic: '📜', name: 'Eastern Astrology', desc: 'Bazi · Ziwei · Qi Men', url: '/divination-hub.html' },
+      { ic: '🏠', name: 'Feng Shui', desc: 'Flying Star · Eight Mansions', url: '/fengshui-chart.html' },
+      { ic: '🍵', name: 'TCM Wellness', desc: 'Constitution · Formulas', url: '/tcm-portal.html' },
+      { ic: '👥', name: 'Collaborative Diagnosis', desc: 'Patient × AI × Doctor', url: '/collab-diagnosis.html' },
+    ]
+  },
+  ja: {
+    title: '東洋智慧', sub: '伝統知識プラットフォーム',
+    modules: [
+      { ic: '🩺', name: 'AI ウェルネススキャン', desc: '舌/顔/目/手の分析', url: '/tcm-visual-reference.html' },
+      { ic: '🗣', name: 'AI アシスタント', desc: 'Q&A · 音声対話', url: '/ai-assistant.html' },
+      { ic: '📜', name: '四柱推命', desc: '四柱 · 紫微 · 奇門', url: '/divination-hub.html' },
+      { ic: '🏠', name: '風水', desc: '飛星 · 八宅', url: '/fengshui-chart.html' },
+      { ic: '🍵', name: '漢方ウェルネス', desc: '体質 · 方剤知識', url: '/tcm-portal.html' },
+      { ic: '👥', name: '協調診断', desc: '患者 × AI × 医師', url: '/collab-diagnosis.html' },
+    ]
+  },
+};
+
+let currentRegion = 'sg';
+
+function getRegion() {
+  return localStorage.getItem('mbj_region') || 'sg';
+}
+function getLocale() {
+  return localStorage.getItem('mbj_locale') || 'en-SG';
+}
+
+function changeLocale(code) {
+  localStorage.setItem('mbj_locale', code);
+  if (typeof I18N !== 'undefined') I18N.setLocale(code);
+  renderUI();
+}
+
+function changeRegion(code) {
+  localStorage.setItem('mbj_region', code);
+  renderUI();
+}
+
+function renderUI() {
+  const region = getRegion();
+  const locale = getLocale();
+  currentRegion = region;
+
+  // 品牌语言
+  const langKey = locale.startsWith('ja') ? 'ja' : locale.startsWith('zh') ? 'zh' : 'en';
+  const M = MODULES[langKey] || MODULES.en;
+  document.getElementById('brandTitle').textContent = M.title;
+  document.getElementById('brandSub').textContent = M.sub;
+  document.getElementById('heroTitle').textContent = M.title;
+  document.getElementById('heroSub').textContent = M.sub;
+
+  // 模块网格
+  document.getElementById('moduleGrid').innerHTML = M.modules.map(m =>
+    `<a class="mod" href="${m.url}"><div class="ic">${m.ic}</div><div class="nm">${m.name}</div><div class="ds">${m.desc}</div></a>`
+  ).join('');
+
+  // 合规免责（按地区）
+  if (typeof RegionConfig !== 'undefined') {
+    const f = RegionConfig.filterFeatures(region);
+    const banner = document.getElementById('discBanner');
+    if (f.showDisclaimerEveryPage) {
+      banner.style.display = 'block';
+      banner.textContent = '⚠ ' + f.disclaimerText;
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  // 激活状态
+  const activated = localStorage.getItem('mbj_activated');
+  const regionName = { cn: '🇨🇳 China', sg: '🇸🇬 Singapore / SEA', jp: '🇯🇵 Japan', us: '🇺🇸 United States', eu: '🇪🇺 Europe', kr: '🇰🇷 Korea', vn: '🇻🇳 Vietnam' }[region] || region;
+  document.getElementById('activatedState').textContent = activated
+    ? '✅ Activated: ' + regionName + ' · ' + locale
+    : '⚠ Not activated yet — choose your country & language';
+
+  // footer 免责
+  document.getElementById('footerNote').textContent = 'Eastern Wisdom · ' +
+    (RegionConfig ? RegionConfig.REGION_CONFIG[region]?.disclaimer?.text || 'For cultural reference' : 'For cultural reference');
+}
+
+// 语言选择器初始化
+(function initSelectors() {
+  const langSel = document.getElementById('langSel');
+  const langs = { 'zh-CN':'简体中文','zh-TW':'繁體中文','en-SG':'English (SEA)','en-US':'English (US)','ja-JP':'日本語','ko-KR':'한국어','vi-VN':'Tiếng Việt' };
+  langSel.innerHTML = Object.entries(langs).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  langSel.value = getLocale();
+
+  const regionSel = document.getElementById('regionSel');
+  const regions = { sg:'🇸🇬 SEA', jp:'🇯🇵 日本', us:'🇺🇸 US', eu:'🇪🇺 EU', kr:'🇰🇷 한국', vn:'🇻🇳 VN', cn:'🇨🇳 China' };
+  regionSel.innerHTML = Object.entries(regions).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  regionSel.value = getRegion();
+})();
+
+async function gfDoSearch() {
+  const q = document.getElementById('gfSearch').value.trim();
+  if (!q) return;
+  try {
+    const res = await fetch(API + '/api/global-formulas/search?q=' + encodeURIComponent(q));
+    const d = await res.json();
+    const box = document.getElementById('gfResult');
+    if (!d.data || !d.data.length) { box.innerHTML = '<span>No matching formulas found</span>'; return; }
+    box.innerHTML = d.data.map(f =>
+      `<div class="gf-item"><b>${f.name || f.key}</b><span class="tag">[${f.tradition}]</span>` +
+      (f.name_en ? `<div style="font-size:11px;color:var(--dim)">${f.name_en}</div>` : '') +
+      `<div style="font-size:11px">${f.actions || ''}</div>` +
+      `<div style="font-size:10px;color:var(--dim)">Indications: ${f.indications || ''}</div></div>`
+    ).join('');
+  } catch (e) {
+    document.getElementById('gfResult').innerHTML = 'Search failed: ' + e.message;
+  }
+}
+
+// 初始化
+renderUI();
+// i18n 引擎可用时同步
+if (typeof I18N !== 'undefined') {
+  I18N.setLocale(getLocale()).then(renderUI);
+}
+</script>
+</body>
+</html>
