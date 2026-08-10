@@ -83,7 +83,7 @@ footer{color:var(--ink2);font-size:11px;text-align:center;padding:16px 0}
 <body>
 <div class="wrap">
   <header>
-    <div class="brand">实时智能助手<small>语音 × 知识库 × 视觉 · 零延迟</small></div>
+    <div class="brand">命理宝鉴 · 命理宝鉴 · 命理宝鉴 · 命理宝鉴 · 命理宝鉴 · 命理宝鉴 · 命理宝鉴 · 实时智能助手<small>语音 × 知识库 × 视觉 · 零延迟</small></div>
     <div class="chips">
       <span class="chip">状态：<b id="stateLabel">待命</b></span>
       <span class="chip">KB <b id="kbLat">–</b></span>
@@ -105,7 +105,22 @@ footer{color:var(--ink2);font-size:11px;text-align:center;padding:16px 0}
         <button id="micBtn" class="micbtn" aria-label="开始语音输入">🎙</button>
         <div class="vbar" aria-hidden="true"><i id="volBar"></i></div>
       </div>
-      <div class="transcript" id="transcript"><div class="hint">点击麦克风开始说话——您还没说完，知识库已在同步检索</div></div>
+      <div class="row" style="margin-top:10px;gap:14px">
+        <label style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="autoSubmit" checked> 说完自动识别
+        </label>
+        <label style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="autoRelisten" checked> 答完继续听
+        </label>
+        <label style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px">语言
+          <select id="langSel" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:12px">
+            <option value="zh-CN" selected>普通话</option>
+            <option value="zh-TW">粤语/繁体</option>
+            <option value="en-US">English</option>
+          </select>
+        </label>
+      </div>
+      <div class="transcript" id="transcript"><div class="hint">点击麦克风或<b>按住空格</b>说话——您还没说完，知识库已在同步检索</div></div>
       <div class="textinput">
         <input id="textInput" type="text" placeholder="或直接输入问题（八字 / 紫微 / 奇门 / 中医四诊…）" aria-label="问题输入">
         <button id="sendBtn" type="button">提问</button>
@@ -148,7 +163,7 @@ footer{color:var(--ink2);font-size:11px;text-align:center;padding:16px 0}
     </div>
   </div>
 
-  <footer>Realtime Interaction Engine v2.0 · mingli-baojian 落地版 · 共享引擎源：projects/_shared/realtime-interaction/</footer>
+  <footer>命理宝鉴 · 八字/紫微/奇门/六爻 + TCM 四诊 · Realtime Engine v2.1 · 提示词：prompts/mingli-baojian.md · 共享引擎源：projects/_shared/realtime-interaction/</footer>
 </div>
 
 <script src="js/realtime/realtime-voice.js"></script>
@@ -169,22 +184,41 @@ var els = {
   stateLabel:$('stateLabel'), kbLat:$('kbLat'), kbHitChip:$('kbHitChip'), modeChip:$('modeChip'),
   tabVoice:$('tabVoice'), tabVision:$('tabVision'), paneVoice:$('paneVoice'), paneVision:$('paneVision'),
   cam:$('cam'), visStart:$('visStart'), visStop:$('visStop'), visState:$('visState'),
-  visFeats:$('visFeats'), visMatches:$('visMatches'), visErr:$('visErr'), modeRow:$('modeRow')
+  visFeats:$('visFeats'), visMatches:$('visMatches'), visErr:$('visErr'), modeRow:$('modeRow'),
+  autoSubmit:$('autoSubmit'), autoRelisten:$('autoRelisten'), langSel:$('langSel')
 };
-var directCount = 0, currentMode = 'face';
+var directCount = 0, currentMode = 'face', speaking = false, listenAfterAnswer = true;
 
 function esc(s){ return String(s == null ? '' : s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function speak(text){
   if (!TTS_API || !text) return;
   try {
+    stopSpeak();
+    speaking = true;
+    els.stateLabel.textContent = '正在答复…';
     var a = new Audio(TTS_API + '/tts?text=' + encodeURIComponent(text.substring(0, 300)) + '&voice=female');
-    a.play().catch(function(){});
+    window.__rtAudio = a;
+    a.onended = function(){ speaking = false; els.stateLabel.textContent = '待命'; maybeRelisten(); };
+    a.onerror = function(){ speaking = false; els.stateLabel.textContent = '待命'; maybeRelisten(); };
+    a.play().catch(function(){ speaking = false; els.stateLabel.textContent = '待命'; });
   } catch(e){ /* TTS 失败不影响回答 */ }
 }
+function stopSpeak(){
+  speaking = false;
+  try { if (window.__rtAudio) { window.__rtAudio.pause(); window.__rtAudio = null; } } catch(e){ /* ignore */ }
+}
+function maybeRelisten(){
+  // turn-taking：答完继续听（主流语音助手连续对话模式）
+  if (listenAfterAnswer && voice.isSupported() && !voice.isListening()) {
+    setTimeout(function(){ voice.start(); }, 400);
+  }
+}
 
-/* ═════════ 语音引擎 ═════════ */
+/* ═════════ 语音引擎（VAD 自动提交 + PTT + 打断就绪） ═════════ */
 var voice = new RealtimeVoice({
   continuous: true, interimResults: true, volumeMeter: true, autoRestart: true,
+  autoSubmitMs: 900,          // 停顿 0.9s 视为说完（主流语音助手模式）
+  emitFinalOnStop: true,      // PTT 松开即提交
   onState: function(s){
     var listening = (s === 'listening' || s === 'starting');
     els.micBtn.classList.toggle('recording', listening);
@@ -213,7 +247,7 @@ function renderTranscript(interim, accum){
 
 /* ═════════ KB 引擎（实时互通） ═════════ */
 var kb = new RealtimeKB({
-  apiBase: API + '/api/public/kb/search-fts',
+  apiBase: API + '/api/public/kb/realtime-search',
   maxResults: 5,
   onResult: function(r){ renderKb(r); },
   onStatus: function(st){
@@ -269,8 +303,20 @@ var vision = new RealtimeVision({
 var engine = new RealtimeEngine({
   voice: voice, kb: kb, vision: vision, kbDirectSpeak: false, // 朗读由本页 speak 统一处理
   onEvent: function(type, p){
-    if (type === 'statechange') { els.stateLabel.textContent = p.label; }
-    else if (type === 'interim') { renderTranscript(p.text, p.accum); }
+    if (type === 'statechange') {
+      els.stateLabel.textContent = p.label;
+      // 三态反馈：聆听金 / 思考蓝 / 说话绿 / 待命灰
+      var dot = document.querySelector('.card h2 .dot');
+      if (dot) {
+        dot.style.background = p.state === 'listening' ? 'var(--amber)' : (p.state === 'searching' ? 'var(--blue)' : (p.state === 'answering' ? 'var(--green)' : 'var(--gold)'));
+        dot.style.boxShadow = p.state === 'listening' ? '0 0 8px var(--amber)' : 'none';
+      }
+    }
+    else if (type === 'interim') {
+      renderTranscript(p.text, p.accum);
+      // barge-in：用户再次开口 → 立即打断朗读（主流语音助手标配）
+      if (speaking) stopSpeak();
+    }
     else if (type === 'final') { renderTranscript('', p.accum); }
     else if (type === 'voice_error' && p && p.code === 'unsupported') {
       els.voiceErr.textContent = p.message; els.voiceErr.classList.add('show');
@@ -278,8 +324,38 @@ var engine = new RealtimeEngine({
   }
 });
 
-/* ═════════ 交互 ═════════ */
+/* ═════════ 交互绑定（点击 + PTT 空格 + 开关 + 语言） ═════════ */
 els.micBtn.addEventListener('click', function(){ voice.toggle(); });
+
+// PTT：按住空格说话，松开提交（对讲机式，主流对讲/语音输入模式）
+var pttActive = false;
+document.addEventListener('keydown', function(e){
+  if (e.code !== 'Space' || e.repeat) return;
+  var tag = (document.activeElement && document.activeElement.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return; // 输入框内不劫持空格
+  e.preventDefault();
+  pttActive = true;
+  if (!voice.isListening()) voice.start();
+});
+document.addEventListener('keyup', function(e){
+  if (e.code !== 'Space' || !pttActive) return;
+  e.preventDefault();
+  pttActive = false;
+  if (voice.isListening()) voice.stop(); // emitFinalOnStop → 自动提交
+});
+
+// 开关：说完自动识别 / 答完继续听
+els.autoSubmit.addEventListener('change', function(){ voice._opts.autoSubmitMs = els.autoSubmit.checked ? 900 : 0; });
+els.autoRelisten.addEventListener('change', function(){ listenAfterAnswer = els.autoRelisten.checked; });
+
+// 语言切换：重建识别器
+els.langSel.addEventListener('change', function(){
+  voice._opts.lang = els.langSel.value;
+  var wasListening = voice.isListening();
+  if (wasListening) voice.stop();
+  voice._createRecognition();
+  if (wasListening) voice.start();
+});
 
 function ask(text){
   text = (text || '').trim();
@@ -294,29 +370,35 @@ els.textInput.addEventListener('keydown', function(e){ if (e.key === 'Enter') el
 
 // Tab 切换
 els.tabVoice.addEventListener('click', function(){
-  els.tabVoice.classList.add('active'); els.tabVision.classList.remove('active');
-  els.paneVoice.classList.add('active'); els.paneVision.classList.remove('active');
+  els.tabVoice.classList.add('active'); if (els.tabVision) els.tabVision.classList.remove('active');
+  els.paneVoice.classList.add('active'); if (els.paneVision) els.paneVision.classList.remove('active');
 });
-els.tabVision.addEventListener('click', function(){
-  els.tabVision.classList.add('active'); els.tabVoice.classList.remove('active');
-  els.paneVision.classList.add('active'); els.paneVoice.classList.remove('active');
-});
-els.visStart.addEventListener('click', function(){
-  vision._opts.mode = currentMode;
-  if (vision.getStatus() === 'scanning') vision.stop();
-  else vision.start();
-});
-els.visStop.addEventListener('click', function(){ vision.stop(); });
-els.modeRow.addEventListener('click', function(e){
-  var btn = e.target.closest('.mode-btn');
-  if (!btn) return;
-  currentMode = btn.getAttribute('data-mode');
-  els.modeRow.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  vision._opts.mode = currentMode;
-});
+if (els.tabVision && VISION_API) {
+  els.tabVision.addEventListener('click', function(){
+    els.tabVision.classList.add('active'); els.tabVoice.classList.remove('active');
+    els.paneVision.classList.add('active'); els.paneVoice.classList.remove('active');
+  });
+} else if (els.tabVision) {
+  els.tabVision.style.display = 'none';   // 视觉未接入：隐藏 Tab，避免装饰性无响应按钮
+  if (els.paneVision) els.paneVision.style.display = 'none';
+}
+if (els.visStart && VISION_API) {
+  els.visStart.addEventListener('click', function(){
+    vision._opts.mode = currentMode;
+    if (vision.getStatus() === 'scanning') vision.stop();
+    else vision.start();
+  });
+  els.visStop.addEventListener('click', function(){ vision.stop(); });
+  els.modeRow.addEventListener('click', function(e){
+    var btn = e.target.closest('.mode-btn');
+    if (!btn) return;
+    currentMode = btn.getAttribute('data-mode');
+    els.modeRow.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    vision._opts.mode = currentMode;
+  });
+}
 
-console.log('[realtime-assistant] 就绪 | API:', API || '(同域)', '| voice:', voice.isSupported() ? 'Web Speech API' : '降级粘贴');
 })();
 </script>
 </body>
