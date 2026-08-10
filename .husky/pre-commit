@@ -25,5 +25,11 @@ if [ "$HTML_CHANGED" -gt 0 ] 2>/dev/null; then
   fi
 fi
 
+# --- 3. 修真闭环快扫（R682 反向追溯，仅提示不阻断） ---
+HEALTH_ALL="$HOME/.openclaw-autoclaw/workspace/scripts/health-check-all.sh"
+if [ -f "$HEALTH_ALL" ]; then
+  bash "$HEALTH_ALL" --quick 2>/dev/null || echo "⚠️ health-check-all 快扫完成（有提示项，详见报告）"
+fi
+
 echo "🎯 pre-commit 完成"
 exit 0
