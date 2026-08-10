@@ -55,6 +55,8 @@
       restartDelayMs: 350,        // 重启间隔
       maxRestarts: 5,             // 连续重启上限（超出则停止并提示，防死循环）
       silenceTimeoutMs: 3500,     // 静音自动重启阈值
+      autoSubmitMs: 900,          // VAD 式自动提交：interim 停顿该时长视为说完（0=关闭，主流语音助手模式）
+      emitFinalOnStop: true,      // 手动停止时把未定稿 interim 作为 final 提交（PTT 松开即提交）
       volumeMeter: false,         // 是否启用音量可视化（额外申请麦克风）
       volumeLevel: 0,             // 只读：当前音量 0-100
       onState: null, onInterim: null, onFinal: null, onVolume: null, onError: null, onRestart: null
@@ -72,6 +74,7 @@
     this._volumeAnalyser = null;
     this._volumeRaf = 0;
     this._finalAccum = '';        // 本次会话累计最终文本
+    this._lastInterimText = '';   // 最近一次未定稿文本（VAD 自动提交用）
     this._supported = this._detectSupport();
   }
 
@@ -146,6 +149,13 @@
     this._shouldListen = false;
     this._clearTimers();
     this._stopVolumeMeter();
+    // PTT 松开即提交：未定稿文本作为 final 提交（emitFinalOnStop）
+    if (this._opts.emitFinalOnStop && this._lastInterimText) {
+      var text = this._lastInterimText;
+      this._lastInterimText = '';
+      this._finalAccum += text;
+      this.emit('final', text, this._finalAccum, { ptt: true });
+    }
     if (this._recognition && this._state !== STATE.IDLE) {
       this._setState(STATE.STOPPING);
       try { this._recognition.stop(); } catch (e) { /* 已停止则忽略 */ }
@@ -195,7 +205,12 @@
         }
       }
       if (finals.length) this.emit('final', finals.join(''), this._finalAccum);
-      if (interim) this.emit('interim', interim, this._finalAccum);
+      if (interim) {
+        this._lastInterimText = interim;
+        this.emit('interim', interim, this._finalAccum);
+      } else {
+        this._lastInterimText = '';
+      }
       // 有结果即重置静音计时
       if (this._silenceTimer) { clearTimeout(this._silenceTimer); this._watchSilence(); }
     } catch (e) {
@@ -242,16 +257,26 @@
     }, this._opts.restartDelayMs);
   };
 
-  /* ================= 静音检测 ================= */
+  /* ================= 静音检测（VAD 自动提交 + 断连重启双计时） ================= */
   RealtimeVoice.prototype._watchSilence = function () {
     var self = this;
     if (this._silenceTimer) clearTimeout(this._silenceTimer);
+    var autoMs = this._opts.autoSubmitMs;
     this._silenceTimer = setTimeout(function () {
-      // 持续静音超过阈值且仍期望收音 → 自动重启识别（解决"哑火"）
-      if (self._shouldListen && self._state === STATE.LISTENING) {
+      // ① VAD 自动提交：interim 停顿超过 autoSubmitMs → 视为说完（主流语音助手“说完自动识别”）
+      if (autoMs > 0 && self._lastInterimText) {
+        var text = self._lastInterimText;
+        self._lastInterimText = '';
+        self._finalAccum += text;
+        self.emit('final', text, self._finalAccum, { auto: true });
+        self._lastResultAt = Date.now(); // 重置，避免紧接触发重启
+      }
+      // ② 持续静音超过 silenceTimeoutMs 且仍期望收音 → 自动重启识别（解决“哑火”）
+      if (self._shouldListen && self._state === STATE.LISTENING &&
+          Date.now() - self._lastResultAt >= self._opts.silenceTimeoutMs) {
         try { if (self._recognition) self._recognition.stop(); } catch (e) { /* ignore */ }
       }
-    }, this._opts.silenceTimeoutMs);
+    }, Math.min(autoMs > 0 ? autoMs : self._opts.silenceTimeoutMs, self._opts.silenceTimeoutMs));
   };
 
   RealtimeVoice.prototype._clearTimers = function () {
