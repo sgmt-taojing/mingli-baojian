@@ -84,3 +84,11 @@
 ## 阻塞项
 
 _无_
+
+- **R709**（commit `227d17c`）：MLX 启动预热 — ThreadingHTTPServer + ready 字段 + 启动时后台线程跑一次 dummy 推理触发 compile
+  - 修真：HTTPServer 单线程假死（客户端 abort → 连接卡死）→ ThreadingHTTPServer + daemon_threads + socket timeout 120s
+  - 修真：模型懒加载导致 health 启动期 000 → ready 字段标记（starting/ok），health 永不误判
+  - 修真：首次推理 ~40s（compile 首次）→ 启动时后台线程预热，消灭首请求延迟
+  - 实测：33s ready=true，首次推理 21.6s（含 compile，正常），之后 ~2-5s
+  - 服务终态：8920 API 单实例 200 + 8950 MLX ready:true
+  - 提交：227d17c（main+submodule 同步）
