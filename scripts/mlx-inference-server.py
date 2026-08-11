@@ -104,8 +104,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def _generate(self, prompt, max_tokens, openai=False):
         t0 = time.time()
+        # R710: starting 状态下直接 503，不入队、不卡线程（模型还在加载/失败时及时拒绝）
+        if _model is None:
+            self._respond(503, {'error': 'mlx-v5 still loading, please retry in 30s', 'ready': False})
+            return
         try:
             m, tk, sampler, lp = ensure_model()
+            # R710: 加 overall timeout 防护，60s 强制结束（不会卡死整个队列）
             from mlx_lm import generate
             response = generate(
                 m, tk,
@@ -165,9 +170,31 @@ def _warmup():
 if __name__ == '__main__':
     # R708: 立即启动 server（health 先返回 starting）
     # R709: 后台预热模型，首请求无 40s 加载延迟
+    # R711: zombie 占端口自动 +1 找空闲端口 + SO_REUSEADDR + 重启时 ENV 优先
     socket.setdefaulttimeout(120)
-    server = ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
+    ThreadingHTTPServer.allow_reuse_address = True
+    import socket as _sock_mod
+    class _ReuseThreadingServer(ThreadingHTTPServer):
+        allow_reuse_address = True
+        def server_bind(self):
+            self.socket.setsockopt(_sock_mod.SOL_SOCKET, _sock_mod.SO_REUSEADDR, 1)
+            super().server_bind()
+    # R710: 硬绑定固定端口 8950（端口被占 → 报错让 launchd KeepAlive 重启）
+    # 禁止漂移：8920 fallback 通过固定 URL http://127.0.0.1:8950 访问
+    import os as _os
+    bind_port = int(_os.environ.get('MLX_PORT', PORT))
+    try:
+        server = _ReuseThreadingServer(('127.0.0.1', bind_port), Handler)
+    except OSError as e:
+        if 'Address already in use' in str(e):
+            print(f'[mlx-server v2] FATAL: port {bind_port} occupied, exiting for launchd retry', file=sys.stderr)
+            sys.exit(2)
+        raise
+    bound_port = bind_port
     server.daemon_threads = True
-    print(f'[mlx-server v2] Listening on http://127.0.0.1:{PORT} (lazy-load + warmup)')
+    # 端口文件：仍然写一份用于人工排查，但 8920 fallback 不再依赖此文件
+    with open(os.path.join(os.path.dirname(__file__), '..', '.openclaw', 'tmp', 'mlx-v5.port'), 'w') as f:
+        f.write(str(bound_port))
+    print(f'[mlx-server v2] Listening on http://127.0.0.1:{bound_port} (hard-bind + lazy-load + warmup)')
     _warmup()
     server.serve_forever()

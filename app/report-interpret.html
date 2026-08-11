@@ -300,8 +300,12 @@ function loadPaipanReport(){
   }catch(e){console.warn('排盘报告加载失败',e);}
 }
 
+// R708: 顶层检测 i18n（renderPaipanReport 是顶层函数，IIFE 内的 isEn 不可见）
+var _reportIsEn = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) || (typeof i18n !== 'undefined' && i18n.getLang && i18n.getLang() === 'en');
+
 function renderPaipanReport(report){
   if(!report) return '';
+  var isEn = _reportIsEn;
   var html = '';
   if(report.summary) html += '<div style="margin-bottom:12px"><strong style="color:#ffb44d">'+(isEn?'Summary: ':'概要：')+'</strong> '+report.summary+'</div>';
   if(report.segments && Array.isArray(report.segments)){
@@ -309,19 +313,21 @@ function renderPaipanReport(report){
       var isSeg5 = s.id === 'seg5' || (s.title && s.title.indexOf('优化建议') >= 0);
       var bg = isSeg5 ? 'rgba(201,162,39,0.06)' : 'rgba(255,255,255,.03)';
       var border = isSeg5 ? '1px solid rgba(201,162,39,0.2)' : 'none';
-      html += '<div style="margin-bottom:10px;padding:10px;background:'+bg+';border:'+border+';border-radius:8px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+s.title+'</div><div style="font-size:13px;line-height:1.7;color:#e4e8ee;white-space:pre-wrap">'+s.content+'</div></div>';
+      var sContent = (typeof i18n !== 'undefined' && i18n.translateReportContent) ? i18n.translateReportContent(s.content || '') : (s.content || '');
+      html += '<div style="margin-bottom:10px;padding:10px;background:'+bg+';border:'+border+';border-radius:8px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+s.title+'</div><div style="font-size:13px;line-height:1.7;color:#e4e8ee;white-space:pre-wrap">'+sContent+'</div></div>';
     });
   }
   // 化解板块独立渲染
-  if(report.huajie){
+  var tRC = function(text){ return (typeof i18n !== 'undefined' && i18n.translateReportContent) ? i18n.translateReportContent(text || '') : (text || ''); };
+    if(report.huajie){
     var h = report.huajie;
     html += '<div style="margin-top:16px;padding:14px;background:linear-gradient(135deg,rgba(201,162,39,0.08),rgba(201,162,39,0.02));border:1px solid rgba(201,162,39,0.3);border-radius:10px">';
-    html += '<div style="font-size:16px;font-weight:bold;color:#c9a227;margin-bottom:10px;border-bottom:1px solid rgba(201,162,39,0.2);padding-bottom:8px">🌿 '+(isEn?'Remedies · ':'化解方案 · ')+h.risk_label+'</div>';
+    html += '<div style="font-size:16px;font-weight:bold;color:#c9a227;margin-bottom:10px;border-bottom:1px solid rgba(201,162,39,0.2);padding-bottom:8px">🌿 '+(isEn?'Remedies · ':'化解方案 · ')+tRC(h.risk_label)+'</div>';
     // 段一
     if(h.risk_traces && h.risk_traces.length){
       html += '<div style="margin-bottom:10px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+(isEn?'1. Chart Source':'一、盘面问题溯源')+'</div>';
       h.risk_traces.forEach(function(t){
-        html += '<div style="font-size:13px;margin:4px 0;padding:4px 8px;background:rgba(255,255,255,.03);border-radius:4px">▸ <strong>'+(t['\u76d8\u9762\u7b26\u53f7']||'')+'</strong> → '+(t['\u73b0\u5b9e\u4f53\u611f']||'')+'<br><span style="font-size:11px;color:#aaa">'+(t['\u98ce\u9669\u7b49\u7ea7']||'')+'</span></div>';
+        html += '<div style="font-size:13px;margin:4px 0;padding:4px 8px;background:rgba(255,255,255,.03);border-radius:4px">▸ <strong>'+tRC(t['\u76d8\u9762\u7b26\u53f7']||'')+'</strong> → '+tRC(t['\u73b0\u5b9e\u4f53\u611f']||'')+'<br><span style="font-size:11px;color:#aaa">'+tRC(t['\u98ce\u9669\u7b49\u7ea7']||'')+'</span></div>';
       });
       html += '</div>';
     }
@@ -329,7 +335,7 @@ function renderPaipanReport(report){
     if(h.behavior_fixes && h.behavior_fixes.length){
       html += '<div style="margin-bottom:10px"><div style="color:#4caf50;font-weight:600;margin-bottom:6px">'+(isEn?'2. Behavior Adjustment':'二、行为心性整改（最高优先级）')+'</div>';
       h.behavior_fixes.forEach(function(f){
-        html += '<div style="font-size:13px;margin:3px 0;padding-left:12px;border-left:2px solid #4caf50">'+f+'</div>';
+        html += '<div style="font-size:13px;margin:3px 0;padding-left:12px;border-left:2px solid #4caf50">'+tRC(f)+'</div>';
       });
       html += '</div>';
     }
@@ -339,13 +345,13 @@ function renderPaipanReport(report){
       html += '<div style="margin-bottom:10px"><div style="color:#8ab4d8;font-weight:600;margin-bottom:6px">'+(isEn?'3. Environment & Carry Items':'三、环境与随身物品化解')+'</div>';
       if(env.home && env.home.length){
         html += '<div style="font-size:12px;color:#aaa;margin:4px 0">🏠 '+(isEn?'Home Layout':'居家布局')+'</div>';
-        env.home.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+i+'</div>'; });
+        env.home.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+tRC(i)+'</div>'; });
       }
       if(env.carry && env.carry.length){
         html += '<div style="font-size:12px;color:#aaa;margin:4px 0">📿 '+(isEn?'Carry Items':'随身物品')+'</div>';
-        env.carry.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+i+'</div>'; });
+        env.carry.forEach(function(i){ html += '<div style="font-size:13px;margin:2px 0;padding-left:12px">'+tRC(i)+'</div>'; });
       }
-      if(env.cost_range) html += '<div style="font-size:12px;color:#888;margin-top:4px">💰 '+(isEn?'Cost: ':'成本参考：')+''+env.cost_range+'</div>';
+      if(env.cost_range) html += '<div style="font-size:12px;color:#888;margin-top:4px">💰 '+(isEn?'Cost: ':'成本参考：')+''+tRC(env.cost_range)+'</div>';
       html += '</div>';
     }
     // 段四
