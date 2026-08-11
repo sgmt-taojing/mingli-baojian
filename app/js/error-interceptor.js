@@ -291,6 +291,9 @@
       const url = (typeof input === 'string') ? input : (input && input.url) || '';
       const method = (init.method || 'GET').toUpperCase();
       const headers = init.headers || {};
+      // R707: 非业务 API（静态资源/语言包/知识库 JS）原样放行——避免 normalize 破坏 Response 对象
+      const isApi = url.indexOf('/api/') >= 0;
+      if (!isApi) return origFetch(input, init);
       // 豁免单次
       const skipHeaderVal = (typeof headers === 'object' && headers[CONFIG.skipHeader]) ||
         (input && input.headers && input.headers[CONFIG.skipHeader]);
