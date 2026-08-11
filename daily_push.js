@@ -106,7 +106,7 @@ ${shichenLine}
 
   if (d.jieqi_info) {
     msg += `
-━━━ 🌿 今日节气：${d.jieqi} ━━━
+━━━ 🌿 ${d.jieqi} ━━━
 ${d.jieqi_info}
 `;
   }
