@@ -1,6 +1,6 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-11 06:20 CST（停滞告警后盘点：实际有 R702-R705 + 蒸馏闭环推进未上板）
+> 最后更新: 2026-08-11 09:40 CST（R704-R706: 国内外版本修真 + 7排盘API双语闭环 + 25页i18n接入）
 
 ## 进行中
 
@@ -30,6 +30,14 @@
 
 | 日期 | 任务 | 产出物 |
 |------|------|--------|
+| 2026-08-11 | R706: 7排盘API双语完整闭环 | _translatePaipan/Ziwei/Qimen/Liuyao/Liuren/MeiHua/Fengshui + 7前端lang对接 |
+| 2026-08-11 | R706: 10核心页i18n基础设施接入 | paipan-center/tcm-portal/tcm-clinic/voice-consult/camera-capture/kb-explorer/report-interpret/lifeplan-detail/clinic-consultation/naming-portal |
+| 2026-08-11 | R706: divination-hub data-i18n标注 + 6语言包hub key | heroBadge/divination/tcm/knowledge/wearable |
+| 2026-08-11 | R705: MLX v5推理路由修真 | /v1/models 路由 + launchd 冷启动 |
+| 2026-08-11 | R705: region-banner公共横幅组件 | 9页自动海外免责 + bazi模板script转义 |
+| 2026-08-11 | R705: bazi排盘lang=en前端对接 | 5处英文适配 + 5页data-i18n标注 |
+| 2026-08-11 | R705: index-global 合规过滤 | 6模块cat标注 + region-config过滤 |
+| 2026-08-11 | R704: 国内外版本混淆全面修真 | i18n引擎修复+knowledge映射87处+/app双前缀54处+bazi模板修真 |
 | 2026-08-10 | 蒸馏闭环全链路验证 | distill-server.js module 透传修真 + 2 条 staging 词条 |
 | 2026-08-10 | ai-vision-toolkit git 初始化 | commit 3ca0830, 70 文件入仓 |
 | 2026-08-10 | Phase 6 评估（divination-core 全量拆分） | 结论：低优先级，不做全量拆分 |
