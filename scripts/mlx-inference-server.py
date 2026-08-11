@@ -8,8 +8,8 @@ API：
   POST /v1/chat/completions — OpenAI 兼容（messages）
 环境：.venv-mlx（mlx 0.31.3）
 """
-import json, time, traceback
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import json, time, traceback, socket
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import sys, os
 
 BASE = os.path.dirname(os.path.abspath(__file__)) + '/..'
@@ -61,7 +61,8 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == '/v1/models':
             self._respond(200, {'object': 'list', 'data': [{'id': 'mingli-v5', 'object': 'model'}]})
         elif self.path in ('/', '/health'):
-            self._respond(200, {'status': 'ok', 'model': MODEL, 'adapter': ADAPTER})
+            ready = _model is not None
+            self._respond(200, {'status': 'ok' if ready else 'starting', 'model': MODEL, 'adapter': ADAPTER, 'ready': ready})
         else:
             self._respond(404, {'error': 'not found'})
 
@@ -144,8 +145,29 @@ class Handler(BaseHTTPRequestHandler):
             self._respond(500, {'error': str(e)})
 
 
+def _warmup():
+    """R709: 启动时后台预热 — 加载模型 + 跑一次 dummy 推理，避免首请求延迟 ~40s"""
+    import threading
+    def _run():
+        try:
+            t0 = time.time()
+            ensure_model()
+            from mlx_lm import generate
+            m, tk, sampler, lp = ensure_model()
+            # 最小 token 推理触发 compile / cache 暖机
+            _ = generate(m, tk, prompt='助手:', max_tokens=4, sampler=sampler, logits_processors=lp)
+            print(f'[mlx-server v2] Warmup done in {round(time.time()-t0,1)}s — model ready')
+        except Exception as e:
+            print(f'[mlx-server v2] Warmup failed (non-fatal): {e}', file=sys.stderr)
+    threading.Thread(target=_run, daemon=True).start()
+
+
 if __name__ == '__main__':
-    ensure_model()
-    server = HTTPServer(('127.0.0.1', PORT), Handler)
-    print(f'[mlx-server v2] Listening on http://127.0.0.1:{PORT}')
+    # R708: 立即启动 server（health 先返回 starting）
+    # R709: 后台预热模型，首请求无 40s 加载延迟
+    socket.setdefaulttimeout(120)
+    server = ThreadingHTTPServer(('127.0.0.1', PORT), Handler)
+    server.daemon_threads = True
+    print(f'[mlx-server v2] Listening on http://127.0.0.1:{PORT} (lazy-load + warmup)')
+    _warmup()
     server.serve_forever()
