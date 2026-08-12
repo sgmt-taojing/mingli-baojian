@@ -1,18 +1,26 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-11 09:40 CST（R704-R706: 国内外版本修真 + 7排盘API双语闭环 + 25页i18n接入）
+> 最后更新: 2026-08-12 12:36 CST（心跳：6服务全绿 + 系统刚重启4min + staging实际729+8）
+
+## 08-12 心跳快照（12:36）
+
+- **6 服务全绿**：static:8900 / paipan:8911 / api-v2:8920(149端点) / tts:8912 / face-ocr:8913 / kb-api:8901
+- **系统刚重启**：uptime 4min，load 5.63（启动回落中），mem 97%（启动峰值）
+- **KB 库存**：kb_formal 14714 条 / formal_knowledge 4022 条 / staging 729+8 pending
+- **staging 实际**：pending 8（wangzhen临床蒸馏07-28, conf 0.7-0.8）/ staging 729 / promoted 1470 / approved 47
+- **今日无新蒸馏入库**（kb_distill_log 最近 07-28）
 
 ## 进行中
 
 ### #1 蒸馏闭环常态化
 - **节点**: 4/5（采集→KB检查→蒸馏入库→审核上线→反馈闭环）
-- **进度**: 低分反馈提取 + KB覆盖检查 + 蒸馏入库已验证 ✅；**feedback loop 已打通**（commit ac32801，aggregator→staging 带噪声过滤）✅；3 个 launchd cron 已挂载（auto-distill / distill-link / distill-feedback-loop）✅；08-11 03:45 自动蒸馏运行：流年班 PDF×2 + 天相天梁 pptx → 12 词条入库（ziwei 模块，KB 总量 44399）
-- **阻塞**: staging 待审核 1155 条（feedback-loop 00:34 自动入库 10 条）；distill-kb-link 路径修真完成（绝对路径修复 + 验证通过：38 insights, 24 linked, avg_conf 0.84）
-- **下一步**: 审核 staging 高优先词条 → 验证全自动闭环跑满 5/5
+- **进度**: 08-12 09:05 健康检查 6 服务全绿 ✅；08-11 03:45 自动蒸馏 12 词条已入库（KB 44399），feedback-loop 00:34 自动入库 10 条；distill-kb-link 路径修真完成（38 insights, 24 linked, avg_conf 0.84）
+- **阻塞**: staging 729条（status=staging）+ 8条pending待审核；auto-promote 要求 conf≥0.85+audit_status=approved，8条pending conf 0.7-0.8 不达标需手动审核
+- **下一步**: ① 审核提升8条pending wangzhen临床蒸馏（conf≥0.7可手动promote）② 清理729条staging积压（批量audit或归档）
 
 ### #2 公共能力包市场（capability-market）
 - **节点**: 4/6（规划→注册表→模板→匹配器→自进化脚本→实际运营）
-- **进度**: 6 大能力包已注册 + matcher 6 场景全绿 + evolve 4 场景全绿
+- **进度**: 6 大能力包已注册 + matcher 6 场景全绿 + evolve 4 场景全绿（无新推进）
 - **下一步**: 对接第一个外部训练需求验证完整流程
 
 ### #3 AI 助手语音 + KB 实时互通
@@ -21,15 +29,20 @@
 - **下一步**: 端到端延迟优化（P95 < 1.5s 验收）
 
 ### #4 多源实时交互诊断闭环（R694）
-- **节点**: 5/5（采集→四路并行→分层结论→医生审核处方→进化预留）
-- **进度**: commit `a18788f` + `901dd37`，四路引擎 + SSE + 处方签发/驳回 + 前端页面 + 导航入口
-- **实测**: 端到端 1.5s，诊断→处方→驳回全链路 ✓
-- **下一步**: mode=auto 无人化自主诊断（医生审核步骤可配置跳过）
+- **节点**: 5/5（采集→四路并行→分层结论→医生审核处方→进化预留）✅ 已完结
+- **进度**: commit `a18788f` + `901dd37`，四路引擎 + SSE + 处方签发/驳回 + 前端页面 + 导航入口。实测端到端 1.5s
+- **下一步**: mode=auto 无人化自主诊断（可配置跳过医生审核）
 
 ## 已完结
 
 | 日期 | 任务 | 产出物 |
 |------|------|--------|
+| 2026-08-12 | 日结健康检查 6 服务全绿 | .openclaw/tmp/health-today.log |
+| 2026-08-11 | R709: MLX v5 启动预热修真 | commit `227d17c`（ThreadingHTTPServer + ready 字段 + daemon 预热） |
+| 2026-08-11 | R710: server 同步 lang 优先级修真 + MLX_BASE 硬绑定 | commit `2fda255` |
+| 2026-08-11 | R708+: 23页 i18n.js?v=708i 缓存戳 + 精准推荐标题修真 + 字典扩 precise+wellness+lucky | commit `69d20fc` |
+| 2026-08-11 | 节气展示修真（区分当天/期间） | commit `97dbe2c` |
+| 2026-08-11 | R708: 5页导航 data-i18n 标注 + 全站 23 页英文渲染验证 | commit `3fa2207` |
 | 2026-08-11 | R706: 7排盘API双语完整闭环 | _translatePaipan/Ziwei/Qimen/Liuyao/Liuren/MeiHua/Fengshui + 7前端lang对接 |
 | 2026-08-11 | R706: 10核心页i18n基础设施接入 | paipan-center/tcm-portal/tcm-clinic/voice-consult/camera-capture/kb-explorer/report-interpret/lifeplan-detail/clinic-consultation/naming-portal |
 | 2026-08-11 | R706: divination-hub data-i18n标注 + 6语言包hub key | heroBadge/divination/tcm/knowledge/wearable |
