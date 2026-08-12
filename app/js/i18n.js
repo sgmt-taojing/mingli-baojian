@@ -219,10 +219,12 @@
     }
   }
 
-  global.i18n = { t: t, setLang: setLang, getLang: getLang, applyTranslations: applyTranslations, autoTranslate: autoTranslate, CORE_TERMS: CORE_TERMS };
+  global.i18n = { t: function(key){return t(key);}, setLang: setLang, getLang: getLang, applyTranslations: applyTranslations, autoTranslate: autoTranslate, CORE_TERMS: CORE_TERMS };
   init();
 })(typeof window !== 'undefined' ? window : globalThis);
 
+(function (global) {
+  'use strict';
   // === 报告正文术语（用于替换 segments content 硬编码中文）===
   if (typeof REPORT_CONTENT_TERMS === 'undefined') {
     var REPORT_CONTENT_TERMS = {
@@ -404,27 +406,366 @@
       '行动清单': 'Action Checklist',
       '执行须知': 'Execution Notes',
       '礼制': 'Etiquette',
+      // === R498 增补：天干地支 / 方位 / 八字关系 / 中医术语 ===
+      '天干': 'Heavenly Stems',
+      '地支': 'Earthly Branches',
+      '十天干': 'Ten Heavenly Stems',
+      '十二地支': 'Twelve Earthly Branches',
+      '甲': 'Jia', '乙': 'Yi', '丙': 'Bing', '丁': 'Ding', '戊': 'Wu',
+      '己': 'Ji', '庚': 'Geng', '辛': 'Xin', '壬': 'Ren', '癸': 'Gui',
+      '子': 'Zi', '丑': 'Chou', '寅': 'Yin', '卯': 'Mao', '辰': 'Chen',
+      '巳': 'Si', '午': 'Wu', '未': 'Wei', '申': 'Shen', '酉': 'You',
+      '戌': 'Xu', '亥': 'Hai',
+      '木': 'Wood', '火': 'Fire', '土': 'Earth', '金': 'Metal', '水': 'Water',
+      '东': 'East', '南': 'South', '西': 'West', '北': 'North', '中': 'Center',
+      '东南': 'Southeast', '东北': 'Northeast', '西南': 'Southwest', '西北': 'Northwest',
+      '方位': 'Direction',
+      '财运': 'Wealth Luck',
+      '事业': 'Career',
+      '婚姻': 'Marriage',
+      '感情': 'Relationships',
+      '健康': 'Health',
+      '学业': 'Academics',
+      '人脉': 'Social Network',
+      '贵人': 'Noble Person',
+      '小人': '小人',
+      '官运': 'Official Luck',
+      '工作': 'Work',
+      '求学': 'Study',
+      '创业': 'Entrepreneurship',
+      '理财': 'Finance',
+      '投资': 'Investment',
+      '置业': 'Property',
+      '搬迁': 'Relocation',
+      '桃花': 'Peach Blossom',
+      '红鸾': 'Red Phoenix',
+      '天喜': 'Heavenly Joy',
+      '天乙': 'Heavenly Noble',
+      '太极': 'Tai Chi',
+      '文昌': 'Wen Chang',
+      '驿马': 'Travel Star',
+      '华盖': 'Canopy Star',
+      '将星': 'General Star',
+      '咸池': 'Salt Lake',
+      '禄存': 'Lu Cun',
+      '天同': 'Tian Tong',
+      '天机': 'Tian Ji',
+      '太阳': 'Sun',
+      '太阴': 'Moon',
+      '武曲': 'Wu Qu',
+      '天相': 'Tian Xiang',
+      '紫微': 'Zi Wei',
+      '天府': 'Tian Fu',
+      '贪狼': 'Tan Lang',
+      '巨门': 'Ju Men',
+      '廉贞': 'Lian Zhen',
+      '破军': 'Po Jun',
+      '七杀': 'Seven Killings',
+      '舌': '舌',
+      '舌苔': 'Coated Tongue',
+      '舌色': 'Tongue Color',
+      '舌质': 'Tongue Body',
+      '脉': 'Pulse',
+      '脉象': 'Pulse Pattern',
+      '沉': 'Deep',
+      '浮': 'Floating',
+      '迟': 'Slow',
+      '数': 'Rapid',
+      '虚': 'Deficient',
+      '实': 'Excess',
+      '寒': 'Cold',
+      '热': 'Heat',
+      '湿': 'Dampness',
+      '燥': 'Dryness',
+      '脾': 'Spleen',
+      '胃': 'Stomach',
+      '肝': 'Liver',
+      '心': 'Heart',
+      '肺': 'Lung',
+      '肾': 'Kidney',
+      '虚证': 'Deficiency Pattern',
+      '实证': 'Excess Pattern',
+      '寒证': 'Cold Pattern',
+      '热证': 'Heat Pattern',
+      '虚寒': 'Deficiency Cold',
+      '实热': 'Excess Heat',
+      '脾虚': 'Spleen Deficiency',
+      '肾虚': 'Kidney Deficiency',
+      '肝郁': 'Liver Qi Stagnation',
+      '气滞': 'Qi Stagnation',
+      '血瘀': 'Blood Stasis',
+      '痰湿': 'Phlegm Dampness',
+      '阴虚': 'Yin Deficiency',
+      '阳虚': 'Yang Deficiency',
+      '气血不足': 'Qi-Blood Insufficiency',
+      '湿困': 'Dampness Trapped',
+      '调和': 'Harmonize',
+      '滋补': 'Nourish',
+      '清热': 'Clear Heat',
+      '温阳': 'Warm Yang',
+      '活血': 'Invigorate Blood',
+      '化瘀': 'Resolve Stasis',
+      '行气': 'Move Qi',
+      '补气': 'Tonify Qi',
+      '养血': 'Nourish Blood',
+      '健脾': 'Strengthen Spleen',
+      '疏肝': 'Soothe Liver',
+      '为木': 'as Wood', '为火': 'as Fire', '为土': 'as Earth', '为金': 'as Metal', '为水': 'as Water',
+      '见化禄': 'sees Hua Lu',
+      '走财运': 'walks Wealth Luck',
+      '见七杀': 'sees Seven Killings',
+      '见': 'sees',
+      '走': 'walks',
+      '入': 'enters',
+      '主事业': 'indicates Career',
+      '主婚姻': 'indicates Marriage',
+      '主健康': 'indicates Health',
+      '主': 'governs',
+      // === R718 i18n 报告补充翻译（针对 9 条样例的剩余片段） ===
+      '日主为木': 'Day Master is Wood',
+      '八字喜用神为火': 'Bazi Favorable Element is Fire',
+      '事业突破': 'career breakthrough',
+      '当前大运走财运': 'Current Major Luck walks Wealth',
+      '2026 流年见化禄入命宫': '2026 Annual sees Hua Lu enters Life Palace',
+      '化解方案': 'Remedy Plan',
+      '盘面问题溯源于五行失衡': 'Chart issue traces to Five-Element imbalance',
+      '调整居住方位朝东': 'Adjust residence facing East',
+      '脉象沉细': 'Pulse deep and thin',
+      '证属脾虚湿困': 'Pattern Spleen Deficiency with Damp',
+      '八字用神为水': 'Bazi Useful God is Water',
+      '喜金来生': 'favors Metal to generate',
+      '忌土克水': 'avoids Earth restraining Water',
+      '平衡图显示': 'Balance Chart shows',
+      '火元素，需要补火': 'Fire element, needs Fire supplement',
+      '元素，需要补': 'element, needs supplement',
+      '需要补火': 'needs Fire supplement',
+      '化解建议': 'Remedy Advice',
+      '农历七月十五': 'Lunar July 15',
+      '吉方南方': 'Auspicious Direction South',
+      '五行属水，主智慧，性格内敛': 'Five Elements Water, governs wisdom, introverted',
+      '主智慧': 'governs wisdom',
+      '性格内敛': 'introverted personality',
+      '五行属水': 'Five Elements Water',
+      '走财运，主事业': 'walks Wealth, governs Career',
+      '见化禄入命宫，主事业突破': 'sees Hua Lu enters Life Palace, career breakthrough',
+      '为木，八字喜用神为火': 'is Wood, Bazi Favorable Element is Fire',
+      '见七杀星': 'sees Seven Killings',
+      '舌苔白腻': 'white greasy coating',
+      '属脾虚湿困': 'pattern Spleen Deficiency Damp',
+      '属水，主智慧': 'Water, governs wisdom',
+      '（农历七月十五）': '(Lunar July 15)',
+      '吉日 8月15日': 'Auspicious Day Aug 15',
+      '方南方': 'Direction South',
+      '时午时': 'Time Wu Hour',
+      '方南方': 'Direction South',
+      '示 lacking element': 'shows lacking element',
+      '示 lacking element Fire': 'shows lacking element Fire',
+      'Fire元素': 'Fire element',
+      '需要补Fire': 'needs Fire supplement',
+      'balance-chart 平衡图显示': 'balance-chart Balance Chart shows',
+      '舌诊见': 'Tongue diagnosis shows',
+      '配偶宫': 'Spouse Palace',
+      '配偶宫见': 'Spouse Palace sees',
+      '婚姻感情需注意': 'Marriage relationships need attention to',
+      '婚姻感情': 'Marriage relationships',
+      '沟通方式': 'communication style',
+      '生于': 'born in',
+      '日主甲木': 'Day Master Jia Wood',
+      '八字身强': 'Bazi body strong',
+      '水旺木相': 'Water prosperous Wood mutual',
+      '八字用神为水': 'Bazi useful god is Water',
+      '大运流年分析': 'Major Luck Annual Luck Analysis',
+      '火旺利事业': 'Fire prosperous benefits Career',
+      '流年分析': 'Annual Luck Analysis',
+      '大运分析': 'Major Luck Analysis',
+      '十神': 'Ten Gods',
+      '甲乙丙丁戊己庚辛壬癸': 'Jia Yi Bing Ding Wu Ji Geng Xin Ren Gui',
+      '子丑寅卯辰巳午未申酉戌亥': 'Zi Chou Yin Mao Chen Si Wei Wu Shen You Xu Hai',
+      '天干': 'Heavenly Stems',
+      '地支': 'Earthly Branches',
+      '格局': 'Pattern',
+      '身强': 'Body Strong',
+      '身弱': 'Body Weak',
+      '喜用神': 'Favorable Element',
+      '忌神': 'Unfavorable Element',
+      '用神': 'Useful God',
+      '调候': 'Climate Adjustment',
+      '通关': 'Bridge Element',
+      '旺衰': 'Prosperity Decline',
+      '五行旺衰': 'Five Element Prosperity',
+      '十神格局': 'Ten Gods Pattern',
+      '木': 'Wood',
+      '火': 'Fire',
+      '土': 'Earth',
+      '金': 'Metal',
+      '水': 'Water',
+      '东方': 'East',
+      '西方': 'West',
+      '南方': 'South',
+      '北方': 'North',
+      '中央': 'Center',
+      '春季': 'Spring',
+      '夏季': 'Summer',
+      '秋季': 'Autumn',
+      '冬季': 'Winter',
+      '长夏': 'Late Summer',
+      '生克制化': 'Generate Restrain Transform',
+      '生扶': 'Generate Support',
+      '泄耗': 'Drain Consume',
+      '制化': 'Restrain Transform',
+      '喜': 'favors',
+      '忌': 'avoids',
+      '旺': 'prosperous',
+      '衰': 'declining',
+      '相': 'mutual',
+      '休': 'rest',
+      '囚': 'imprisoned',
+      '死': 'dead',
+      '胎': 'fetal',
+      '养': 'nurture',
+      '长生': 'Long Life',
+      '沐浴': 'Bath',
+      '冠带': 'Cap Belt',
+      '临官': 'Officer',
+      '帝旺': 'Emperor',
+      '墓': 'Tomb',
+      '日主甲': 'Day Master Jia',
+      '日主乙': 'Day Master Yi',
+      '日主丙': 'Day Master Bing',
+      '日主丁': 'Day Master Ding',
+      '日主戊': 'Day Master Wu',
+      '日主己': 'Day Master Ji',
+      '日主庚': 'Day Master Geng',
+      '日主辛': 'Day Master Xin',
+      '日主壬': 'Day Master Ren',
+      '日主癸': 'Day Master Gui',
+      '生于亥月': 'born in Hai month',
+      '日主甲木生于亥月': 'Day Master Jia Wood born in Hai month',
+      '喜用神为火土': 'favorable elements Fire Earth',
+      '火旺利': 'Fire prosperous benefits',
+      '年乙巳年': 'year Yi Si',
+      '年丙午年': 'year Bing Wu',
+      '2025年乙巳年': '2025 year Yi Si',
+      '2026年丙午年': '2026 year Bing Wu',
+      '甲木': 'Jia Wood',
+      '乙木': 'Yi Wood',
+      '丙火': 'Bing Fire',
+      '丁火': 'Ding Fire',
+      '戊土': 'Wu Earth',
+      '己土': 'Ji Earth',
+      '庚金': 'Geng Metal',
+      '辛金': 'Xin Metal',
+      '壬水': 'Ren Water',
+      '癸水': 'Gui Water',
+      '亥月': 'Hai month',
+      '子月': 'Zi month',
+      '丑月': 'Chou month',
+      '寅月': 'Yin month',
+      '卯月': 'Mao month',
+      '辰月': 'Chen month',
+      '巳月': 'Si month',
+      '午月': 'Wu month',
+      '未月': 'Wei month',
+      '申月': 'Shen month',
+      '酉月': 'You month',
+      '戌月': 'Xu month',
+      '需注意': 'need attention to',
+      '需': 'need',
+      '方式': 'method',
+      '分析': 'Analysis',
     };
 
     global.REPORT_CONTENT_TERMS = REPORT_CONTENT_TERMS;
   }
 
+  // 辅助：CJK 字符检测（CJK Unified Ideographs + 扩展 A 区）
+  function _isCJK(ch) {
+    if (!ch) return false;
+    var code = ch.charCodeAt(0);
+    return (code >= 0x4E00 && code <= 0x9FFF) ||
+           (code >= 0x3400 && code <= 0x4DBF) ||
+           (code >= 0x3040 && code <= 0x30FF); // 日文假名（中文报告中也偶有）
+  }
+
+  // 辅助：英文字符检测
+  function _isAsciiLetter(ch) {
+    if (!ch) return false;
+    var code = ch.charCodeAt(0);
+    return (code >= 0x41 && code <= 0x5A) || (code >= 0x61 && code <= 0x7A);
+  }
+
+  // 智能替换：中文键 → 英文值，前后自动补空格（避免 "Day Masteras Wood" 这种粘连）
+  function _smartReplace(text, key, val) {
+    if (text.indexOf(key) < 0) return text;
+    var result = '';
+    var idx = 0;
+    var pad = String.fromCharCode(32); // 空格
+    while (idx < text.length) {
+      var pos = text.indexOf(key, idx);
+      if (pos < 0) { result += text.substring(idx); break; }
+      // 前缀：从 idx 到 pos
+      var prevChar = pos > 0 ? text.charAt(pos - 1) : '';
+      var nextChar = pos + key.length < text.length ? text.charAt(pos + key.length) : '';
+      var prefix = text.substring(idx, pos);
+      var needSpaceBefore = false;
+      var needSpaceAfter = false;
+      // 英文前接中文 → 中文键被英文值替换 → 如果 key 前是 ASCII 字母则需要空格；否则 key 前是 CJK 不需要
+      // 英文后接中文 → 同理
+      // 空格策略：
+      // needSpaceBefore = 上一字符是 ASCII 字母 且 key 首个字符是 CJK（中文 key 前接英文字母 → 需空格隔开）
+      // needSpaceAfter  = value 末尾是 ASCII 字母 且 下一字符是 ASCII 字母（避免英文词粘连，如 "governs" + "career"）
+      // needSpaceAfter 也 = value 末尾是 ASCII 字母 且 下一字符是 CJK（避免英文后接中文）
+      // 例外：上一字符或下一字符已经是空格 → 不重复补
+      if (prevChar && _isAsciiLetter(prevChar) && _isCJK(key.charAt(0)) && prevChar !== pad) {
+        needSpaceBefore = true;
+      }
+      if (nextChar && nextChar !== pad && _isAsciiLetter(val.charAt(val.length - 1))) {
+        // 英文 value 后接任何非空格字符 → 补空格
+        needSpaceAfter = true;
+      }
+      result += prefix + (needSpaceBefore ? pad : '') + val + (needSpaceAfter ? pad : '');
+      idx = pos + key.length;
+    }
+    return result;
+  }
+
   function translateReportContent(content) {
-    if (_lang === 'zh' || !content) return content;
+    var _curLang = (global.i18n && global.i18n.getLang) ? global.i18n.getLang() : 'zh';
+    if (_curLang === 'zh' || !content) return content;
     var text = content;
     var zh, en;
-    for (zh in REPORT_CONTENT_TERMS) {
-      if (REPORT_CONTENT_TERMS.hasOwnProperty(zh) && text.indexOf(zh) >= 0) {
-        text = text.split(zh).join(REPORT_CONTENT_TERMS[zh]);
+    // 按 key 长度倒序（先长后短），避免短串误匹配
+    var keys = Object.keys(REPORT_CONTENT_TERMS);
+    keys.sort(function (a, b) { return b.length - a.length; });
+    for (var i = 0; i < keys.length; i++) {
+      zh = keys[i];
+      if (!REPORT_CONTENT_TERMS.hasOwnProperty(zh)) continue;
+      en = REPORT_CONTENT_TERMS[zh];
+      if (text.indexOf(zh) >= 0) {
+        text = _smartReplace(text, zh, en);
       }
     }
     return text;
   }
 
-  global.i18n = {
-    t: t, setLang: setLang, getLang: getLang,
-    applyTranslations: applyTranslations, autoTranslate: autoTranslate,
-    translateReportContent: translateReportContent,
-    CORE_TERMS: CORE_TERMS, REPORT_CONTENT_TERMS: REPORT_CONTENT_TERMS
-  };
-}
+  // 将两个 IIFE 的能力合并到 window.i18n
+    // 保护现场，避免覆盖第一个 IIFE 已注册的函数
+    if (!global.i18n) global.i18n = {};
+    var existing = global.i18n;
+    var mergeFields = {
+      t: function (key) { return existing.t ? existing.t(key) : key; },
+      getLang: existing.getLang || function () { return 'zh'; },
+      setLang: existing.setLang || function (l) { existing._lang = l; },
+      applyTranslations: existing.applyTranslations || function () {},
+      autoTranslate: existing.autoTranslate || function () {},
+      CORE_TERMS: existing.CORE_TERMS || {},
+      REPORT_CONTENT_TERMS: REPORT_CONTENT_TERMS
+    };
+    // 保留第一个 IIFE 的引用
+    Object.keys(existing).forEach(function (k) { mergeFields[k] = existing[k]; });
+    mergeFields.translateReportContent = translateReportContent;
+    mergeFields.REPORT_CONTENT_TERMS = REPORT_CONTENT_TERMS;
+    global.i18n = mergeFields;
+    // 同步关键字段供浏览器直接使用
+    if (!global.REPORT_CONTENT_TERMS) global.REPORT_CONTENT_TERMS = REPORT_CONTENT_TERMS;
+})(typeof window !== 'undefined' ? window : globalThis);

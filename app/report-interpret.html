@@ -300,12 +300,15 @@ function loadPaipanReport(){
   }catch(e){console.warn('排盘报告加载失败',e);}
 }
 
-// R708: 顶层检测 i18n（renderPaipanReport 是顶层函数，IIFE 内的 isEn 不可见）
-var _reportIsEn = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) || (typeof i18n !== 'undefined' && i18n.getLang && i18n.getLang() === 'en');
+// R708: 动态检测 i18n 语言（renderPaipanReport 调用时再读，IIFE + defer 都能拿到）
+function _detectReportIsEn(){
+  return (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh'))
+      || (typeof i18n !== 'undefined' && i18n.getLang && i18n.getLang() === 'en');
+}
 
 function renderPaipanReport(report){
   if(!report) return '';
-  var isEn = _reportIsEn;
+  var isEn = _detectReportIsEn();
   var html = '';
   if(report.summary) html += '<div style="margin-bottom:12px"><strong style="color:#ffb44d">'+(isEn?'Summary: ':'概要：')+'</strong> '+report.summary+'</div>';
   if(report.segments && Array.isArray(report.segments)){
