@@ -1,56 +1,86 @@
 {
-  "lastRun": "2026-08-11T03:45:00+08:00",
-  "runSummary": "增量蒸馏 3 文件 → 12 KB 条目入库（kb_formal + FTS5）",
+  "lastRun": "2026-08-12T13:30:00+08:00",
+  "runSummary": "夜间采集蒸馏·桌面周易中医 P2 DOCX + P0 PDF 3 个 → 10 KB-NIGHT 条目入库",
   "processed": [
     {
-      "file": "~/Desktop/周易-中医/流年班分手离婚，结婚，生子.pdf",
-      "type": "scanned-pdf",
-      "method": "AI vision 3段截图",
-      "srcId": "SRC-LD-FENSHOU-20260811",
-      "entries": 4,
-      "modules": ["ziwei"],
-      "topics": ["分手离婚论断公式", "结婚论断", "不孕论断", "生子论断+案例"]
+      "file": "~/Desktop/周易-中医/先知智镜 智慧中医穿戴设备.docx",
+      "type": "docx",
+      "method": "python-docx 文本提取",
+      "srcId": "SRC-DOCX-XIANZHI-20260812",
+      "entries": 3,
+      "modules": ["tcm-vision"],
+      "topics": ["硬件规格(5组摄像模组+骨传导+NPU)", "产品核心功能架构", "接诊完整闭环时序"],
+      "trustScore": 0.85
     },
     {
-      "file": "~/Desktop/周易-中医/流年班看盘步骤.pdf",
+      "file": "~/Desktop/周易-中医/流年班职业规划.pdf",
       "type": "scanned-pdf",
-      "method": "AI vision 3段截图",
-      "srcId": "SRC-LD-KANPAN-20260811",
-      "entries": 4,
+      "method": "PyMuPDF截图→内置image工具AI视觉识别3段",
+      "srcId": "SRC-LD-ZHIYE-20260812",
+      "entries": 3,
       "modules": ["ziwei"],
-      "topics": ["定盘四法", "看盘询问流程+财官论断", "同梁盘案例", "合伙论断+立太极法"]
+      "topics": ["职业选择总论(六大道)", "副业与开店适宜", "迁移宫实战案例(2007男命空宫)"],
+      "trustScore": 0.85
     },
     {
-      "file": "~/Desktop/周易-中医/流年班第七课 —— 天相，天梁.pptx",
-      "type": "pptx",
-      "method": "python-pptx 文本提取",
-      "srcId": "SRC-LD-13A109A2",
-      "entries": 4,
+      "file": "~/Desktop/周易-中医/流年班开店成败论断.pdf",
+      "type": "scanned-pdf",
+      "method": "PyMuPDF截图→内置image工具AI视觉识别2段",
+      "srcId": "SRC-LD-KAIDIAN-20260812",
+      "entries": 2,
       "modules": ["ziwei"],
-      "topics": ["天相总论", "天相遇吉遇煞", "天梁总论", "天梁遇吉遇煞"]
+      "topics": ["三宫基础+生年盘", "合伙+赚钱公式+开店形态区分"],
+      "trustScore": 0.85
+    },
+    {
+      "file": "~/Desktop/周易-中医/流年班看学业.pdf",
+      "type": "scanned-pdf",
+      "method": "PyMuPDF截图→内置image工具AI视觉识别2段",
+      "srcId": "SRC-LD-XUEYE-20260812",
+      "entries": 2,
+      "modules": ["ziwei"],
+      "topics": ["官禄宫星耀+煞忌+生年四化+宫位表现", "吉星变因+大限+5个实战案例"],
+      "trustScore": 0.85
     }
   ],
+  "skipped": [
+    {
+      "file": "~/Desktop/周易-中医/56d15a4716fc8a5c7c1fc391a09bbaa9.docx",
+      "reason": "内容为「易加医」中台架构方案（IT项目管理文档），不属于命理/中医知识范畴，跳过"
+    }
+  ],
+  "pending": [
+    "流年班不动产相关.pdf (P0)",
+    "流年班桃花对带关系.pdf (P0)",
+    "流年班合婚，对外遇.pdf (P0)",
+    "流年班健康疾病飞星版本.pdf (P0)",
+    "流年班分手离婚，结婚，生子.pdf (P0 - 2026-08-11 已蒸馏过4条)",
+    "流年班看盘步骤.pdf (P0 - 2026-08-11 已蒸馏过4条)",
+    "流年班职业规划.pdf (P0 - 本次已完成)",
+    "流年班开店成败论断.pdf (P0 - 本次已完成)",
+    "流年班看学业.pdf (P0 - 本次已完成)",
+    "古籍: 精刻看命一掌经 / 秘藏大六壬大全 / 玉匣记 / 御定六壬直指 (P1 - 需大规模截图+识别)",
+    "流年班 PPTX 第二十课/二十一课/第二十课创业副业篇 (P2)"
+  ],
   "kbCounts": {
-    "before": { "luzong": 139, "shuhan": 223 },
-    "added": 12,
-    "totalKbFormal": 44399,
-    "totalFts5": 44411
+    "before": { "totalFormal": 14711, "kbNight": 0 },
+    "added": 10,
+    "totalKbFormal": 14721,
+    "totalFts5": 14731
   },
-  "p1Status": "shuhan-kb-combined.js mtime 2026-07-28 未变；daotu L21(空亡480字)/L24(门迫665字) 尚未蒸馏，留待下次",
-  "p2Status": "~/Desktop 无新增专利/论文 PDF",
   "nextCandidates": [
-    "流年班第八课 —— 七杀，破军.pptx (SRC-LD-8CAF560C 已注册0条)",
-    "流年班第十课 ——禄存，42颗杂耀.pptx (SRC-LD-33AAD342 已注册0条)",
-    "流年班第十一课 —— 三代四化（1）.pptx",
-    "流年班第十二课 —— 十喻歌，强宫弱宫，星耀喜忌.pptx",
-    "流年班第十三课 —— 天地人三盘.pptx",
-    "流年班第十四课 ——宫和星的拓展，墓桃花四马.pptx",
-    "流年班第十五课 —— 三代四化（2）.pptx",
-    "流年班第十八课 —— 飞星（1），自化，1616.pptx",
-    "流年班第十九课 —— 飞星（2）.pptx",
-    "流年班第二十课 —— 四季法则.pptx",
-    "案例.pptx",
-    "流年班第二十课 —— 事业专题之创业副业篇.pptx",
+    "流年班不动产相关.pdf",
+    "流年班桃花对带关系.pdf",
+    "流年班合婚，对外遇.pdf",
+    "流年班健康疾病飞星版本.pdf",
+    "古籍类 PDF 的章节选择性截图蒸馏",
     "舒晗 daotu L21/L24 蒸馏"
+  ],
+  "notes": [
+    "FTS5 使用 trigram 分词器对 entry_id LIKE 'KB-NIGHT-%' 不命中（UNINDEXED列），但通过 MATCH 内容关键词查询正常工作（已验证『开店成败』查询命中）",
+    "DOCX 56d15a47 内容识别为「易加医」医易分离中台方案，不属于 mingli-baojian KB 范畴，跳过入库",
+    "所有 PDF 为单页扫描图，PyMuPDF 2x zoom + 2000px 宽缩放 + 2-3段切片，单个 PDF 处理约 3-5 分钟",
+    "vision model 优先调用内置 image 工具（无需上传公网URL），相比 autoglm-image-recognition 更轻量",
+    "trust_score 0.85 (路总亲授实战课件)，entry_id 命名规范 KB-NIGHT-{主题}-{序号}"
   ]
 }
