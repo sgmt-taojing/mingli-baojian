@@ -8,7 +8,7 @@ MEM_MAX=96
 ALERTS=()
 
 # 1. 核心服务端口
-for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8950:MLX-v5"; do
+for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8950:MLX-v5" "8941:face-diag" "8942:tongue-diag" "8943:eye-diag" "8944:hand-diag" "8945:vision-gw"; do
     PORT=${p%%:*}
     NAME=${p##*:}
     lsof -i :$PORT >/dev/null 2>&1 || ALERTS+=("$NAME(:$PORT) 未在监听")
@@ -76,7 +76,7 @@ if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "✅ 全部健康"
     echo "  · 内存: ${MEM_USED}%"
     echo "  · v6 训练: PID ${V6_PID:-N/A} (${V6_STAT:-N/A})"
-    echo "  · 端口: 8900/8911/8912/8913/8920/8950 全部正常"
+    echo "  · 端口: 8900/8911/8912/8913/8920/8950 + 8941-8945 ONNX 全部正常"
     echo "  · 视觉推理: ${VIS_STATUS}"
     exit 0
 else
