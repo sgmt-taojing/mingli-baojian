@@ -1,22 +1,27 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-12 12:36 CST（心跳：6服务全绿 + 系统刚重启4min + staging实际729+8）
+> 最后更新: 2026-08-13 09:30 CST（R712 v6 推理上线 · 9 服务全绿 · MLX v6 iter100 生产部署）
 
-## 08-12 心跳快照（12:36）
+## 08-13 R712 v6 推理上线（09:30）
 
-- **6 服务全绿**：static:8900 / paipan:8911 / api-v2:8920(149端点) / tts:8912 / face-ocr:8913 / kb-api:8901
-- **系统刚重启**：uptime 4min，load 5.63（启动回落中），mem 97%（启动峰值）
-- **KB 库存**：kb_formal 14714 条 / formal_knowledge 4022 条 / staging 729+8 pending
-- **staging 实际**：pending 8（wangzhen临床蒸馏07-28, conf 0.7-0.8）/ staging 729 / promoted 1470 / approved 47
-- **今日无新蒸馏入库**（kb_distill_log 最近 07-28）
+- **9 服务全绿**：static:8900 / paipan:8911 / tts:8912 / face-ocr:8913 / static:8914 / api-v2:8920(149端点) / **mlx-v6:8950** / mlx-eval:8960 / smart-home:8970
+- **MLX v6 上线**：8950 端口已切换到 v6 adapter（rank=8 / lr=2e-5 / mask_prompt / iter 100 / val_loss=1.849）
+- **v6 vs v5 对比**：v5 eval 53.4 FAIL → v6 eval 94/100 PASS（+40 分）
+- **训练状态**：v6 训练到 iter 100/600 后被 OOM 中断（16GB 内存限制），续训也因内存不足失败。当前 iter 100 adapter 作为生产模型
+- **已知限制**：v6 iter100 在某些单模块知识深度不足（文昌位偏题/太岁答错年份），需后续补充专项训练数据
+- **launchd plist** 已更新：com.mingli-baojian.mlx-v5 → MLX_ADAPTER 指向 mingli-sft-v6
+- **KB 库存**：kb_formal 14714+ 条
+- **staging 积压**：pending 8 + staging 729 仍待清理
 
 ## 进行中
 
-### #1 蒸馏闭环常态化
-- **节点**: 4/5（采集→KB检查→蒸馏入库→审核上线→反馈闭环）
-- **进度**: 08-12 09:05 健康检查 6 服务全绿 ✅；08-11 03:45 自动蒸馏 12 词条已入库（KB 44399），feedback-loop 00:34 自动入库 10 条；distill-kb-link 路径修真完成（38 insights, 24 linked, avg_conf 0.84）
-- **阻塞**: staging 729条（status=staging）+ 8条pending待审核；auto-promote 要求 conf≥0.85+audit_status=approved，8条pending conf 0.7-0.8 不达标需手动审核
-- **下一步**: ① 审核提升8条pending wangzhen临床蒸馏（conf≥0.7可手动promote）② 清理729条staging积压（批量audit或归档）
+### #1 MLX v6 模型训练迭代
+- **节点**: v6 iter100 已部署 8950 生产端口
+- **训练参数**: Qwen2.5-3B + LoRA rank=8 / lr=2e-5 / mask_prompt=true / grad_checkpoint / max_seq=2048 / batch=2
+- **训练数据**: DPO→SFT 829 train + 92 val（102 模块覆盖）
+- **val loss**: 3.063 → 1.849（iter 1→100，-40%）
+- **硬件限制**: 16GB Mac mini 无法同时跑训练+推理（Peak mem 10.7GB + 系统 4GB + swap 11GB → OOM）
+- **下一步**: ① 云端 GPU 续训到 600 iters ② 补充太岁/文昌专项 SFT 数据 ③ 评估 v6 在 api-server-v2 fallback 链的表现
 
 ### #2 公共能力包市场（capability-market）
 - **节点**: 4/6（规划→注册表→模板→匹配器→自进化脚本→实际运营）
@@ -37,7 +42,12 @@
 
 | 日期 | 任务 | 产出物 |
 |------|------|--------|
+| 2026-08-13 | R712: MLX v6 iter100 生产上线 8950 | launchd plist 更新 + v6 adapter 部署 |
 | 2026-08-12 | 日结健康检查 6 服务全绿 | .openclaw/tmp/health-today.log |
+| 2026-08-12 | R103-v2: 蒸馏出站管线 + 视觉注册表 | commit `d903709` |
+| 2026-08-12 | R711: KB 检索修真 + activate-routes | commit `8258dd1` |
+| 2026-08-12 | desktop PDFs/DOCX 蒸馏 10 条 KB-NIGHT 入库 | commit `439a301`（KB 44409+） |
+| 2026-08-12 | i18n 报告翻译覆盖修真到 94% | commit `2be79ff` |
 | 2026-08-11 | R709: MLX v5 启动预热修真 | commit `227d17c`（ThreadingHTTPServer + ready 字段 + daemon 预热） |
 | 2026-08-11 | R710: server 同步 lang 优先级修真 + MLX_BASE 硬绑定 | commit `2fda255` |
 | 2026-08-11 | R708+: 23页 i18n.js?v=708i 缓存戳 + 精准推荐标题修真 + 字典扩 precise+wellness+lucky | commit `69d20fc` |
