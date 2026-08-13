@@ -37,6 +37,19 @@ MEM_USED=$(vm_stat | awk '/Pages active/ {a=$3} /Pages wired/ {w=$3} /Pages occu
 MLX_RC=$(curl -s -o /dev/null -w "%{http_code}" -m 5 http://localhost:8950/health)
 [ "$MLX_RC" != "200" ] && ALERTS+=("MLX v5 HTTP $MLX_RC")
 
+# 6. 蒸馏 cron 日志 mtime（48h 静默告警）
+NOW=$(date +%s)
+CRON_STALE_LIMIT=172800  # 48h
+for cf in "/tmp/distill-mingli-outbound.log" "/tmp/distill-tcm-outbound.log" "/tmp/vision-distill.log"; do
+    if [ -f "$cf" ]; then
+        MT=$(stat -f "%m" "$cf" 2>/dev/null)
+        if [ -n "$MT" ]; then
+            AGE=$((NOW - MT))
+            [ $AGE -gt $CRON_STALE_LIMIT ] && ALERTS+=("$(basename $cf) ${AGE}s 未更新 > ${CRON_STALE_LIMIT}s")
+        fi
+    fi
+done
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"
