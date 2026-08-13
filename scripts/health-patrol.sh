@@ -37,15 +37,35 @@ MEM_USED=$(vm_stat | awk '/Pages active/ {a=$3} /Pages wired/ {w=$3} /Pages occu
 MLX_RC=$(curl -s -o /dev/null -w "%{http_code}" -m 5 http://localhost:8950/health)
 [ "$MLX_RC" != "200" ] && ALERTS+=("MLX v5 HTTP $MLX_RC")
 
-# 6. 蒸馏 cron 日志 mtime（48h 静默告警）
-NOW=$(date +%s)
-CRON_STALE_LIMIT=172800  # 48h
-for cf in "/tmp/distill-mingli-outbound.log" "/tmp/distill-tcm-outbound.log" "/tmp/vision-distill.log"; do
-    if [ -f "$cf" ]; then
-        MT=$(stat -f "%m" "$cf" 2>/dev/null)
-        if [ -n "$MT" ]; then
-            AGE=$((NOW - MT))
-            [ $AGE -gt $CRON_STALE_LIMIT ] && ALERTS+=("$(basename $cf) ${AGE}s 未更新 > ${CRON_STALE_LIMIT}s")
+# 5b. 视觉推理微服务详情（face-ocr-server 8913）
+FACE_HEALTH=$(curl -s -m 3 http://localhost:8913/health 2>/dev/null)
+if echo "$FACE_HEALTH" | grep -q '"ok": true'; then
+    ONNX_LOADED=$(echo "$FACE_HEALTH" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('pillow','?'))" 2>/dev/null)
+    VIS_STATUS="✓ ONNX 微服务 + PIL=$ONNX_LOADED"
+else
+    ALERTS+=("视觉推理 8913 离线")
+    VIS_STATUS="❌ 离线"
+fi
+
+# 5c. cron 蒸馏管线日志 mtime 监控（日频 48h / 周频 8d）
+for LOG_PATH in \
+    "/tmp/distill-mingli-outbound.log" \
+    "/tmp/distill-tcm-outbound.log" \
+    "/tmp/vision-distill.log" \
+    "$PROJECT_ROOT/.openclaw/tmp/distill-mingli-outbound.log"; do
+    if [ -f "$LOG_PATH" ]; then
+        LOG_AGE_HR=$(( ( $(date +%s) - $(stat -f %m "$LOG_PATH") ) / 3600 ))
+        if [ "$LOG_AGE_HR" -gt 48 ]; then
+            ALERTS+=("cron 日志静默 ${LOG_AGE_HR}h: $(basename "$LOG_PATH")")
+        fi
+    fi
+done
+# 周频任务单独处理（8d = 192h）
+for LOG_PATH in "$PROJECT_ROOT/.openclaw/tmp/distill-feedback-loop.log"; do
+    if [ -f "$LOG_PATH" ]; then
+        LOG_AGE_HR=$(( ( $(date +%s) - $(stat -f %m "$LOG_PATH") ) / 3600 ))
+        if [ "$LOG_AGE_HR" -gt 192 ]; then
+            ALERTS+=("周频 cron 静默 ${LOG_AGE_HR}h: $(basename "$LOG_PATH")")
         fi
     fi
 done
@@ -57,6 +77,7 @@ if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "  · 内存: ${MEM_USED}%"
     echo "  · v6 训练: PID ${V6_PID:-N/A} (${V6_STAT:-N/A})"
     echo "  · 端口: 8900/8911/8912/8913/8920/8950 全部正常"
+    echo "  · 视觉推理: ${VIS_STATUS}"
     exit 0
 else
     echo "[$TS] ❌ ${#ALERTS[@]} 项异常" >> "$LOG"
