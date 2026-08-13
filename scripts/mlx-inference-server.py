@@ -27,8 +27,9 @@ def ensure_model():
     from mlx_lm import load, generate
     from mlx_lm.sample_utils import make_sampler, make_logits_processors
     _model, _tokenizer = load(MODEL, adapter_path=ADAPTER)
-    _sampler = make_sampler(temp=0.7, top_p=0.9)
-    _lp = make_logits_processors(repetition_penalty=1.2)
+    # R712: 修真循环乱码 — 降温度 + 加强 repetition_penalty
+    _sampler = make_sampler(temp=0.4, top_p=0.85)
+    _lp = make_logits_processors(repetition_penalty=1.5)
     print(f'[mlx-server v2] Model loaded OK')
     return _model, _tokenizer, _sampler, _lp
 
@@ -38,7 +39,17 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
     def _respond(self, status, data):
-        body = json.dumps(data, ensure_ascii=False).encode()
+        # R712: 修真 — sanitize 字符串字段中的控制字符（mlx-lm 0.31.3 偶发 raw \x00/\r）
+        def _sanitize(o):
+            if isinstance(o, str):
+                # 去掉 raw 控制字符（保留 \t\n\r 用于合法场景，但默认也清理掉以保 JSON 安全）
+                return ''.join(c for c in o if ord(c) >= 0x20 or c in '\t')
+            if isinstance(o, dict):
+                return {k: _sanitize(v) for k, v in o.items()}
+            if isinstance(o, list):
+                return [_sanitize(v) for v in o]
+            return o
+        body = json.dumps(_sanitize(data), ensure_ascii=False).encode()
         self.send_response(status)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
         self.send_header('Content-Length', str(len(body)))
