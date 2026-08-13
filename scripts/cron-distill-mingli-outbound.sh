@@ -59,3 +59,31 @@ cp "$EXPORT" /Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/k
 echo "  ✓ 推送到 SHF + TCM-aux" >> "$LOG_FILE"
 find training-data/distill-outbound -name "mingli-pure-*.json" -mtime +7 -delete
 echo "[$TS] === 完成 ===" >> "$LOG_FILE"
+# R104-W1.2: 更新蒸馏注册表
+python3 - <<'PYEOF'
+import json, os, time
+REG = "/Users/tom/.openclaw-autoclaw/workspace/projects/_shared/distill-status.json"
+data = {}
+if os.path.exists(REG):
+    with open(REG) as f: data = json.load(f)
+if 'chains' not in data: data['chains'] = {}
+data['chains']['mingli-shf'] = {
+    "domain": "命理",
+    "source": "mingli-baojian",
+    "target": "smart-home-family",
+    "total": len(open("/Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json").read()) // 500,
+    "last_run": time.strftime('%Y-%m-%d %H:%M:%S'),
+    "state": "updated",
+}
+data['chains']['mingli-tcm'] = {
+    "domain": "医学",
+    "source": "mingli-baojian",
+    "target": "tcm-agent",
+    "total": len(open("/Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json").read()) // 500,
+    "last_run": time.strftime('%Y-%m-%d %H:%M:%S'),
+    "state": "updated",
+}
+data['last_check'] = time.strftime('%Y-%m-%d %H:%M:%S')
+with open(REG, 'w') as f: json.dump(data, f, ensure_ascii=False, indent=2)
+print("✓ distill-status.json 已更新")
+PYEOF
