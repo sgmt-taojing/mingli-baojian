@@ -29,7 +29,7 @@ def ensure_model():
     _model, _tokenizer = load(MODEL, adapter_path=ADAPTER)
     # R712: 修真循环乱码 — 降温度 + 加强 repetition_penalty
     _sampler = make_sampler(temp=0.4, top_p=0.85)
-    _lp = make_logits_processors(repetition_penalty=1.5)
+    _lp = make_logits_processors(repetition_penalty=1.2)
     print(f'[mlx-server v2] Model loaded OK')
     return _model, _tokenizer, _sampler, _lp
 
