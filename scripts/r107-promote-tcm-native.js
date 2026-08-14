@@ -10,8 +10,11 @@
 const path = require('path');
 const { promoteToFormal } = require('../server/kb-management-engine');
 
+// R107-G1 修真：entry_id 与 kb_formal 旧条目冲突（KB-00185/189 曾被 GAPFILL-R657 占用）
+// → 换新 entry_id 再 promote；"已在 formal" 判定改为同 src_id + 同标题
 const APPROVE = ['KB-00185', 'KB-00189', 'KB-00190', 'KB-00191', 'KB-00192', 'KB-00193',
   'KB-00194', 'KB-00195', 'KB-00196', 'KB-00197', 'KB-00198'];
+const EID_REMAP = { 'KB-00185': 'KB-00199', 'KB-00189': 'KB-00200' };
 const REJECT = {
   'KB-00186': '商业营销文案（含服务定价/产品附加值等内容），非中医知识条目',
   'KB-00187': '经验碎片（51字），知识密度不足，<300字不可独立成条',
@@ -38,10 +41,16 @@ function withRetry(fn, label, retries = 4) {
 // 1. promote 过审条目
 let promoted = 0;
 for (const eid of APPROVE) {
-  const exists = db.prepare('SELECT 1 FROM kb_formal WHERE entry_id = ?').get(eid);
-  if (exists) { console.log(`  ⏭ ${eid} 已在 kb_formal`); continue; }
+  const realEid = EID_REMAP[eid] || eid;
+  const st = db.prepare('SELECT * FROM kb_staging WHERE entry_id = ?').get(eid);
+  const exists = st ? db.prepare('SELECT 1 FROM kb_formal WHERE src_id = ? AND title = ?').get(st.src_id, st.title) : null;
+  if (exists) { console.log(`  ⏭ ${eid} 内容已在 kb_formal`); continue; }
+  if (realEid !== eid) {
+    db.prepare('UPDATE kb_staging SET entry_id = ? WHERE entry_id = ?').run(realEid, eid);
+    console.log(`  🔀 ${eid} → ${realEid}（entry_id 冲突重排）`);
+  }
   try {
-    withRetry(() => promoteToFormal(eid), eid);
+    withRetry(() => promoteToFormal(realEid), realEid);
     promoted++;
     console.log(`  ✅ ${eid} → kb_formal`);
   } catch (e) {
