@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-"""R718 v8 修真后 30 题评估（走 8920 api-v2 → 8960 MLX v8）
+"""R718 v8/v8.1 修真后 30 题评估（走 8920 api-v2 → 8960 MLX）
 评估维度：套话开头 / 内部标签泄漏 / 字符级重复 / 答案长度 / 关键词命中 / 免责声明
+用法：python3 scripts/eval-v8-r718-30q.py [version-tag]
+  默认 version = 'v8-postR105'；v8.1 用 'v8.1-postR718'
 """
+import sys as _sys
+_VERSION = _sys.argv[1] if len(_sys.argv) > 1 else 'v8-postR105'
 import http.cookiejar
 import json, time, re, urllib.request, urllib.error, sys, os
 
@@ -211,7 +215,7 @@ def main():
     print(f'平均长度: {avg_len:.0f}字 | 平均耗时: {avg_time:.1f}s | 总耗时: {total_elapsed:.0f}s')
 
     out = {
-        'version': 'v8-postR105',
+        'version': _VERSION,
         'timestamp': time.strftime('%Y-%m-%d %H:%M:%S'),
         'average_score': round(avg, 1),
         'verdict': verdict,
@@ -226,7 +230,7 @@ def main():
         },
         'samples': results,
     }
-    out_path = BASE + '/training/eval-results-v8-r718-30q.json'
+    out_path = BASE + '/training/eval-results-' + _VERSION + '.json'
     with open(out_path, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(f'\n结果已保存: {out_path}')

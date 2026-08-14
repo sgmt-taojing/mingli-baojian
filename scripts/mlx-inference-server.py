@@ -14,15 +14,32 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import sys, os
 
 BASE = os.path.dirname(os.path.abspath(__file__)) + '/..'
-MODEL = os.environ.get('MLX_MODEL', BASE + '/training/models/mingli-v8-fused')
+# R718 v8.1：默认指向 clean3 数据重训后的 v8.1 fused 模型
+# 回滚方案：export MLX_MODEL=$BASE/training/models/mingli-v8-fused（修真前 v8 fused）
+DEFAULT_MODELS = [
+    BASE + '/training/mlx-models/mingli-sft-v8.1-7b',  # R718 v8.1（去内部标签 + 修真后重训）
+    BASE + '/training/models/mingli-v8-fused',         # v8 修真前（兜底）
+    BASE + '/training/mlx-models/mingli-sft-v8-7b',    # 旧 v8 备用
+]
+MODEL = os.environ.get('MLX_MODEL', None)
+if MODEL is None:
+    for cand in DEFAULT_MODELS:
+        if os.path.isdir(cand) and any(f.endswith('.safetensors') for f in os.listdir(cand) if os.path.isfile(os.path.join(cand, f))):
+            MODEL = cand
+            break
+    if MODEL is None:
+        MODEL = DEFAULT_MODELS[0]  # fallback：让 launchd 重启时尝试
 ADAPTER = os.environ.get('MLX_ADAPTER', None)  # fused 模式无 adapter；回滚 v5 时设为 mingli-sft-v5
 PORT = int(os.environ.get('MLX_PORT', '8960'))
-# R105: 模型版本号由路径派生（v8-fused → mingli-sft-v8；adapter 模式 → 目录名）
+# R105: 模型版本号由路径派生
 MODEL_TAG = os.path.basename(os.path.dirname(MODEL.rstrip('/'))) if '/models/' in MODEL else 'mingli-sft-' + os.path.basename(MODEL.rstrip('/')).replace('mingli-', '')
 if ADAPTER:
     MODEL_TAG = os.path.basename(ADAPTER.rstrip('/'))
+# 兼容旧版本目录名
 if 'mingli-v8-fused' in MODEL:
     MODEL_TAG = 'mingli-sft-v8'
+elif 'mingli-sft-v8.1-7b' in MODEL:
+    MODEL_TAG = 'mingli-sft-v8.1'
 
 print(f'[mlx-server v3] Loading {MODEL}' + (f' + adapter {ADAPTER}' if ADAPTER else ' (fused, no adapter)') + ' ...')
 _model, _tokenizer, _sampler, _lp = None, None, None, None
