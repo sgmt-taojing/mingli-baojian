@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-MLX 本地推理服务 v2 — 命理宝鉴 R704/R705
-端口：8950
-模型：Qwen2.5-3B + mingli-sft-v5 adapter（微调生产版）
+MLX 本地推理服务 v3 — 命理宝鉴 R704/R705/R105
+端口：8960
+模型：Qwen2.5-3B + mingli-sft-v8（fused 完整模型，生产默认）
+回滚：设 MLX_MODEL=base 路径 + MLX_ADAPTER=mingli-sft-v5 可切回 v5 适配器模式
 API：
   POST /generate        — 简版（prompt/max_tokens）
   POST /v1/chat/completions — OpenAI 兼容（messages）
@@ -13,11 +14,17 @@ from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import sys, os
 
 BASE = os.path.dirname(os.path.abspath(__file__)) + '/..'
-MODEL = os.environ.get('MLX_MODEL', '/Users/tom/.cache/qwen25-3b')
-ADAPTER = os.environ.get('MLX_ADAPTER', BASE + '/training/mlx-checkpoints/mingli-sft-v5')
-PORT = int(os.environ.get('MLX_PORT', '8950'))
+MODEL = os.environ.get('MLX_MODEL', BASE + '/training/models/mingli-v8-fused')
+ADAPTER = os.environ.get('MLX_ADAPTER', None)  # fused 模式无 adapter；回滚 v5 时设为 mingli-sft-v5
+PORT = int(os.environ.get('MLX_PORT', '8960'))
+# R105: 模型版本号由路径派生（v8-fused → mingli-sft-v8；adapter 模式 → 目录名）
+MODEL_TAG = os.path.basename(os.path.dirname(MODEL.rstrip('/'))) if '/models/' in MODEL else 'mingli-sft-' + os.path.basename(MODEL.rstrip('/')).replace('mingli-', '')
+if ADAPTER:
+    MODEL_TAG = os.path.basename(ADAPTER.rstrip('/'))
+if 'mingli-v8-fused' in MODEL:
+    MODEL_TAG = 'mingli-sft-v8'
 
-print(f'[mlx-server v2] Loading {MODEL} + adapter {ADAPTER} ...')
+print(f'[mlx-server v3] Loading {MODEL}' + (f' + adapter {ADAPTER}' if ADAPTER else ' (fused, no adapter)') + ' ...')
 _model, _tokenizer, _sampler, _lp = None, None, None, None
 
 def ensure_model():
@@ -26,11 +33,15 @@ def ensure_model():
         return _model, _tokenizer, _sampler, _lp
     from mlx_lm import load, generate
     from mlx_lm.sample_utils import make_sampler, make_logits_processors
-    _model, _tokenizer = load(MODEL, adapter_path=ADAPTER)
+    if ADAPTER:
+        _model, _tokenizer = load(MODEL, adapter_path=ADAPTER)
+    else:
+        _model, _tokenizer = load(MODEL)
     # R712: 修真循环乱码 — 降温度 + 加强 repetition_penalty
-    _sampler = make_sampler(temp=0.4, top_p=0.85)
+    # R105: 温度 0.4→0.5 适度放开（v8 SFT 后重复倾向已大幅下降）
+    _sampler = make_sampler(temp=0.5, top_p=0.85)
     _lp = make_logits_processors(repetition_penalty=1.2)
-    print(f'[mlx-server v2] Model loaded OK')
+    print(f'[mlx-server v3] Model loaded OK')
     return _model, _tokenizer, _sampler, _lp
 
 
@@ -70,7 +81,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == '/v1/models':
-            self._respond(200, {'object': 'list', 'data': [{'id': 'mingli-v5', 'object': 'model'}]})
+            self._respond(200, {'object': 'list', 'data': [{'id': MODEL_TAG, 'object': 'model'}]})
         elif self.path in ('/', '/health'):
             ready = _model is not None
             self._respond(200, {'status': 'ok' if ready else 'starting', 'model': MODEL, 'adapter': ADAPTER, 'ready': ready})
@@ -146,7 +157,7 @@ class Handler(BaseHTTPRequestHandler):
                     'id': 'chatcmpl-' + str(int(time.time() * 1000)),
                     'object': 'chat.completion',
                     'created': int(time.time()),
-                    'model': 'mingli-sft-v5',
+                    'model': MODEL_TAG,
                     'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': text}, 'finish_reason': 'stop'}],
                     'usage': {'prompt_tokens': len(prompt), 'completion_tokens': len(text), 'total_tokens': len(prompt) + len(text)},
                 })
@@ -154,7 +165,7 @@ class Handler(BaseHTTPRequestHandler):
                 self._respond(200, {
                     'text': text,
                     'latency_s': round(elapsed, 2),
-                    'model': 'mingli-sft-v5',
+                    'model': MODEL_TAG,
                 })
         except Exception as e:
             traceback.print_exc()
@@ -190,8 +201,8 @@ if __name__ == '__main__':
         def server_bind(self):
             self.socket.setsockopt(_sock_mod.SOL_SOCKET, _sock_mod.SO_REUSEADDR, 1)
             super().server_bind()
-    # R710: 硬绑定固定端口 8950（端口被占 → 报错让 launchd KeepAlive 重启）
-    # 禁止漂移：8920 fallback 通过固定 URL http://127.0.0.1:8950 访问
+    # R710: 硬绑定固定端口 8960（端口被占 → 报错让 launchd KeepAlive 重启）
+    # 禁止漂移：8920 fallback 通过固定 URL http://127.0.0.1:8960 访问
     import os as _os
     bind_port = int(_os.environ.get('MLX_PORT', PORT))
     try:
