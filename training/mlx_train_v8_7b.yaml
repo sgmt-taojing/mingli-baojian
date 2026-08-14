@@ -1,0 +1,49 @@
+# v8 SFT 训练配置 — Qwen2.5-7B-Instruct (MLX 4bit)
+# 目标：从根本上解决 3B 模型的重复问题
+#
+# 2026-08-13 实测：7B 4bit 加载 9.5s，单次生成 37.9s
+# LoRA rank=8 + 7B base ≈ 4.3GB + 2GB ≈ 6.3GB（16GB 够用）
+
+model: "/Users/tom/.cache/models/mlx-community--Qwen2.5-7B-Instruct-4bit/snapshots/master"
+train: true
+test: false
+
+# v8.1 数据（R105 清洗：去除套话开头 1303 条 + 过滤 47 条噪声）
+train_file: "train.clean2.jsonl"
+valid_file: "valid.clean2.jsonl"
+data: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-r105-data"
+
+# LoRA（7B 用较小 scale，因为 base 已足够好）
+fine_tune_type: "lora"
+num_layers: 20
+lora_parameters:
+  rank: 8
+  dropout: 0.05
+  scale: 8.0
+
+# 训练
+iters: 300
+batch_size: 1
+grad_accumulation_steps: 4
+learning_rate: 5e-6
+optimizer: "adamw"
+optimizer_config:
+  adamw:
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    weight_decay: 0.01
+
+# 关键配置
+max_seq_length: 768
+mask_prompt: true
+grad_checkpoint: true
+
+# 保存与评估
+save_every: 50
+steps_per_eval: 50
+steps_per_report: 10
+val_batches: 30
+seed: 42
+
+# 输出
+adapter_path: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-checkpoints/mingli-sft-v8-7b"
