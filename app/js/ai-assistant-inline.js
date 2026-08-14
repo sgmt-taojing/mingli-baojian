@@ -692,11 +692,12 @@ function _submitKbFeedback(fbId, score, query, module){
     module: module || '',
     session_id: sessionId
   };
-  fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', { signal: AbortSignal.timeout(15000),
+  fetch((typeof API !== 'undefined' ? API : '') + '/api/public/kb-feedback', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload), signal: AbortSignal.timeout(15000) }).then(function(r){ return r.json(); }).then(function(j){
-    if (j && j.code === 0 && j.data && j.data.logged) {
+    // R108-E 修真:后端成功响应为 {code:0, data:{ok:true,...}},原判断要求 j.data.logged(后端从未返回)→ 成功也被误判失败
+    if (j && j.code === 0) {
       if (statusEl) statusEl.textContent = score === 1 ? '✓ 感谢反馈' : score === -1 ? '✓ 已记录，会优化' : '✓ 已记录';
       // 隐藏按钮
       var container = document.getElementById(fbId);
@@ -4954,13 +4955,18 @@ function submitFeedback(type){
   fetch(API+'/api/feedback/submit', { signal: AbortSignal.timeout(15000),
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':token?('Bearer '+token):''},
-    body:JSON.stringify({type:type,content:text||'点赞鼓励',module:state.module||'general'}), signal: AbortSignal.timeout(15000) }).then(r=>r.json()).then(data=>{
-    if(data.success!==false){
-      showToast('感谢反馈！+'+(data.points||0)+'积分');
+    body:JSON.stringify({type:type,content:text||'点赞鼓励',target:state.module||'ai-assistant',module:state.module||'general'}), signal: AbortSignal.timeout(15000) }).then(r=>r.json()).then(data=>{
+    // R108-E 修真:后端成功为 {ok:true};失败为 {ok:false, code/message}。原判断 data.success!==false 会把校验失败误报成功。
+    if(data && data.ok === true){
+      showToast('感谢反馈！');
       document.getElementById('feedbackText').value='';
       closeFeedback();
     } else {
-      showToast('提交失败：'+(data.error||'未知错误'));
+      showToast('提交失败：'+(data.message||data.error||'未知错误'));
+      // 失败也进本地队列,不丢反馈(网络错误/校验失败统一兑底)
+      const arr=JSON.parse(localStorage.getItem('feedback_pending')||'[]');
+      arr.push({type:type,content:text,module:state.module,time:Date.now()});
+      localStorage.setItem('feedback_pending',JSON.stringify(arr));
     }
   }).catch(err=>{
     showToast('网络错误，已保存到本地');

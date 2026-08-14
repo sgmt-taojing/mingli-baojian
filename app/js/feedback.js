@@ -146,6 +146,10 @@
     _save(STORAGE_KEYS.STREAK, streak);
     _save(STORAGE_KEYS.LAST_DATE, today);
 
+    // R108-E: 服务端同步(写 kb_feedback,供周度聚合器/监控采数)。
+    // 本地 localStorage 仍为权威(积分/连续天数),服务端同步尽力而为,失败静默不阻塞。
+    _syncToServer(record);
+
     return {
       success: true,
       points: earnPoints,
@@ -155,6 +159,30 @@
       streak: streak,
       record: record
     };
+  }
+
+  // R108-E: 反馈同步到服务端 /api/public/feedback/record(CSRF 白名单·无需登录)
+  // score 1-5 映射:like=5 dislike=1 suggest=4 correct=2
+  function _syncToServer(record) {
+    try {
+      if (typeof fetch !== 'function' || !record) return;
+      const scoreMap = { 'like': 5, 'dislike': 1, 'suggest': 4, 'correct': 2 };
+      const payload = {
+        query: (record.content || '').slice(0, 200),
+        entry_id: '',
+        source: 'wechat-h5:' + (record.type || 'like'),
+        score: scoreMap[record.type] || 3,
+        comment: (record.content || '').slice(0, 500),
+        module: record.target || 'wechat-h5',
+        session_id: 'h5-' + String(record.id || Date.now()).slice(0, 40)
+      };
+      fetch((typeof API !== 'undefined' ? API : '') + '/api/public/feedback/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(15000)
+      }).catch(function () { /* 离线/失败静默,本地已存 */ });
+    } catch (e) { /* 静默 */ }
   }
 
   function _getTargetLabel(target) {

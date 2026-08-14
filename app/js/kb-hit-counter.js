@@ -29,6 +29,9 @@
   const EVT_PREFIX = '_kb_hit_events/';
   const ENGINE_PREFIX = '_kb_engine_count/';
 
+  // R108-E: 服务端同步节流(同进程 5s 内最多 1 条,避免高频打点淹没 kb_hit_log)
+  let _lastServerSync = 0;
+
   // ── 工具 ──────────────────────────────────────────────
   function _safeGet(k, fallback) {
     try { return localStorage.getItem(k); } catch (e) { return fallback; }
@@ -116,6 +119,28 @@
       // 只保留最近 200 条避免膨胀
       if (events.length > 200) events.splice(0, events.length - 200);
       _safeSet(dayKey, JSON.stringify(events));
+
+      // R108-E: 服务端同步打点 → /api/ai/kb-hit-log(CSRF 白名单·公开可调)
+      // 修复前 kb_hit_log 仅靠服务端检索(R253)写入;前端命中(localStorage 计数器)从不落库 → 监控 46h 零新增。
+      // 尽力而为:失败静默,不阻塞主流程。
+      try {
+        const nowTs = Date.now();
+        if (nowTs - _lastServerSync > 5000 && typeof fetch === 'function') {
+          _lastServerSync = nowTs;
+          fetch((typeof API !== 'undefined' ? API : '') + '/api/ai/kb-hit-log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: '[kb-hit] ' + m,
+              hits: bucket === 'direct' ? 1 : 0,
+              module: m,
+              source: 'ai-assistant-client',
+              responseTime: 0
+            }),
+            signal: AbortSignal.timeout(15000)
+          }).catch(function () { /* 静默 */ });
+        }
+      } catch (e) { /* 隐私模式/离线静默 */ }
 
       return { bucket: bucket, score: s, moduleId: m };
     },
