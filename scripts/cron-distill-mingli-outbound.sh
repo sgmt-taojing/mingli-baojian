@@ -67,11 +67,21 @@ data = {}
 if os.path.exists(REG):
     with open(REG) as f: data = json.load(f)
 if 'chains' not in data: data['chains'] = {}
+# R106 修真：真实条目计数（原 bytes//500 hack 误差 6.5×）
+def count_json(path):
+    try:
+        with open(path) as f:
+            d = json.load(f)
+        return len(d) if isinstance(d, list) else sum(len(v) for v in d.values() if isinstance(v, list))
+    except Exception:
+        return -1
+shf_total = count_json("/Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json")
+tcm_total = count_json("/Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json")
 data['chains']['mingli-shf'] = {
     "domain": "命理",
     "source": "mingli-baojian",
     "target": "smart-home-family",
-    "total": len(open("/Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json").read()) // 500,
+    "total": shf_total,
     "last_run": time.strftime('%Y-%m-%d %H:%M:%S'),
     "state": "updated",
 }
@@ -79,7 +89,7 @@ data['chains']['mingli-tcm'] = {
     "domain": "医学",
     "source": "mingli-baojian",
     "target": "tcm-agent",
-    "total": len(open("/Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json").read()) // 500,
+    "total": tcm_total,
     "last_run": time.strftime('%Y-%m-%d %H:%M:%S'),
     "state": "updated",
 }
