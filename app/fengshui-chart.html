@@ -155,7 +155,7 @@ async function doPaipan(){
   const tyEl = document.getElementById('fs-target-year');
   const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
   const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
-  const body={year:+y,sittingMountain:s,facingMountain:f,name,buildingType,floor:floor?+floor:null,birthYear:birthYear?+birthYear:null,annual,lng,targetYear,lang:_lang },lang:_lang ,lang:_lang };
+  const body={year:+y,sittingMountain:s,facingMountain:f,name,buildingType,floor:floor?+floor:null,birthYear:birthYear?+birthYear:null,annual,lng,targetYear,lang:_lang };
   if(birthYear) body.currentAge = +targetYear - +birthYear;
   let r, rSvg;
   try {

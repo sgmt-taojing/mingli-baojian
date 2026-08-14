@@ -46,13 +46,18 @@ const db = new Database(KB_DB);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
-// 现有指纹（kb_formal + kb_staging）
+// 现有指纹（kb_formal + kb_staging 全部行）
+// R108-P2-2 修真：原实现只比对 status='pending' 的 staging，rejected 行不参与去重
+// → 重跑导入会把已拒条目（如 KB-00186/187/188）重新入 staging（非幂等）。
+// 现覆盖全部 staging 行（pending/promoted/rejected/approved…），已拒同指纹内容视为已存在，跳过。
+// R108-P2-2b：指纹统一按 trim 后内容计算（导出链路 .strip() 会去掉首尾空白，
+// 而 staging 原内容可能带尾部换行 → 原实现两侧哈希不一致，重跑会插入仅空白差异的重复条目）。
 const existing = new Set();
 for (const row of db.prepare('SELECT content FROM kb_formal').all()) {
-  if (row.content) existing.add(crypto.createHash('md5').update(String(row.content)).digest('hex'));
+  if (row.content) existing.add(crypto.createHash('md5').update(String(row.content).trim()).digest('hex'));
 }
-for (const row of db.prepare("SELECT content FROM kb_staging WHERE status='pending'").all()) {
-  if (row.content) existing.add(crypto.createHash('md5').update(String(row.content)).digest('hex'));
+for (const row of db.prepare('SELECT content FROM kb_staging').all()) {
+  if (row.content) existing.add(crypto.createHash('md5').update(String(row.content).trim()).digest('hex'));
 }
 console.log(`现有指纹: ${existing.size} 条`);
 

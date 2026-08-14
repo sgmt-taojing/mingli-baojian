@@ -72,6 +72,62 @@ for LOG_PATH in "$PROJECT_ROOT/.openclaw/tmp/distill-feedback-loop.log"; do
     fi
 done
 
+# 6. 内联 script 语法校验（R108 P1-5）
+# 提取 4 项目 app/*.html 中无 src 的 <script>...</script> 块，逐个 node --check 验证
+# 容错：node 不存在时跳过并提示；目录缺失/提取失败的文件跳过不误报
+SCRIPT_STATUS="跳过（node 不存在）"
+SCRIPT_BAD=0
+SCRIPT_TOTAL=0
+if command -v node >/dev/null 2>&1; then
+    SCRIPTS_DIR="$PROJECT_ROOT/.openclaw/tmp/script-checks"
+    mkdir -p "$SCRIPTS_DIR" 2>/dev/null || SCRIPTS_DIR="/tmp/script-checks-$$"
+    # 清理上次残留（失败不留脏）
+    find "$SCRIPTS_DIR" -name 'inline_*.js' -type f -delete 2>/dev/null
+    PROJECTS_DIR="$(dirname "$PROJECT_ROOT")"
+    for PROJ in mingli-baojian tcm-agent smart-home-family ai-vision-toolkit; do
+        APP_DIR="$PROJECTS_DIR/$PROJ/app"
+        [ -d "$APP_DIR" ] || { echo "  ⚠ 跳过缺失目录: $APP_DIR"; continue; }
+        while IFS='|' read -r HTML_FILE TMP_FILE IDX; do
+            [ -f "$TMP_FILE" ] || continue
+            SCRIPT_TOTAL=$((SCRIPT_TOTAL+1))
+            if ! node --check "$TMP_FILE" >/dev/null 2>&1; then
+                SCRIPT_BAD=$((SCRIPT_BAD+1))
+                ALERTS+=("内联script语法错误: $PROJ/app/$(basename "$HTML_FILE") #$IDX")
+            fi
+            rm -f "$TMP_FILE" 2>/dev/null
+        done < <(python3 - "$APP_DIR" "$SCRIPTS_DIR" <<'PY'
+import re, sys, os, glob
+app_dir, out_dir = sys.argv[1], sys.argv[2]
+pat = re.compile(r'<script\b([^>]*)>(.*?)</script>', re.S | re.I)
+idx = 0
+for html in sorted(glob.glob(os.path.join(app_dir, '*.html'))):
+    try:
+        with open(html, 'r', encoding='utf-8', errors='replace') as f:
+            src = f.read()
+    except Exception:
+        continue
+    for m in pat.finditer(src):
+        attrs = m.group(1) or ''
+        if re.search(r'\bsrc\s*=', attrs, re.I):
+            continue  # 外部脚本（有 src）跳过
+        idx += 1
+        tmp = os.path.join(out_dir, 'inline_%s_%d.js' % (os.path.basename(html), idx))
+        try:
+            with open(tmp, 'w', encoding='utf-8') as f:
+                f.write(m.group(2))
+        except Exception:
+            continue
+        print('%s|%s|%d' % (html, tmp, idx))
+PY
+)
+    done
+    if [ "$SCRIPT_BAD" -gt 0 ]; then
+        SCRIPT_STATUS="❌ ${SCRIPT_BAD} 处错误 / 共 ${SCRIPT_TOTAL} 块"
+    else
+        SCRIPT_STATUS="✅ ${SCRIPT_TOTAL} 块全部通过"
+    fi
+fi
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"
@@ -80,6 +136,7 @@ if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "  · v6 训练: PID ${V6_PID:-N/A} (${V6_STAT:-N/A})"
     echo "  · 端口: 8900/8911/8912/8913/8920/8960 + 8941-8945 ONNX 全部正常"
     echo "  · 视觉推理: ${VIS_STATUS}"
+    echo "  · 内联 script 校验: ${SCRIPT_STATUS}"
     exit 0
 else
     echo "[$TS] ❌ ${#ALERTS[@]} 项异常" >> "$LOG"
@@ -87,5 +144,6 @@ else
         echo "[$TS] $a" >> "$ALERTS_FILE"
         echo "  ❌ $a"
     done
+    echo "  · 内联 script 校验: ${SCRIPT_STATUS}"
     exit 1
 fi
