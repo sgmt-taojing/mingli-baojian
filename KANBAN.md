@@ -1,27 +1,24 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-13 09:30 CST（R712 v6 推理上线 · 9 服务全绿 · MLX v6 iter100 生产部署）
+> 最后更新: 2026-08-14 10:30 CST（R713 故障处理 · 8 服务恢复全绿 · MLX 实际回退 v5@8960）
 
-## 08-13 R712 v6 推理上线（09:30）
+## 08-14 R713 故障处理（10:30）
 
-- **9 服务全绿**：static:8900 / paipan:8911 / tts:8912 / face-ocr:8913 / static:8914 / api-v2:8920(149端点) / **mlx-v6:8950** / mlx-eval:8960 / smart-home:8970
-- **MLX v6 上线**：8950 端口已切换到 v6 adapter（rank=8 / lr=2e-5 / mask_prompt / iter 100 / val_loss=1.849）
-- **v6 vs v5 对比**：v5 eval 53.4 FAIL → v6 eval 94/100 PASS（+40 分）
-- **训练状态**：v6 训练到 iter 100/600 后被 OOM 中断（16GB 内存限制），续训也因内存不足失败。当前 iter 100 adapter 作为生产模型
-- **已知限制**：v6 iter100 在某些单模块知识深度不足（文昌位偏题/太岁答错年份），需后续补充专项训练数据
-- **launchd plist** 已更新：com.mingli-baojian.mlx-v5 → MLX_ADAPTER 指向 mingli-sft-v6
-- **KB 库存**：kb_formal 14714+ 条
-- **staging 积压**：pending 8 + staging 729 仍待清理
+- **事件**：08-14 08:50 起 health-patrol 持续报异常（峰值 13 项），10:06 系统重启后服务陆续拉起，但 api-v2(8920) crash loop（stderr `ERR_SQLITE_ERROR: database is locked`，根因：重启后 Spotlight 重建索引 I/O 风暴 500-660MB/s → SQLite 大查询饿死）
+- **处理**：确认 8960/8913 为脚本超时误报（已修真 health-patrol.sh：8913 3s→8s+retry、8960 5s→15s+retry）；api-v2 kickstart 后恢复（149 端点正常）
+- **⚠️ MLX 状态修正**：实际 8960 跑的是 **mingli-sft-v5**（launchd plist 于 08-14 09:32 被改回 v5，mtime 可证），8950 端口无监听、v6 未在生产！R712 记录「8950 已切 v6」与实际不符，v6 iter100 仍需重新部署（或先解决知识缺陷）
+- **服务终态**：8900/8901/8911/8912/8913/8914/8920/8960 全部 200，内存 49%
+- **根因待查**：08-14 09:32 是谁把 plist 回滚 v5（疑似为保服务稳定手动回退，需用户确认 v6 是否重新上线）
 
 ## 进行中
 
 ### #1 MLX v6 模型训练迭代
-- **节点**: v6 iter100 已部署 8950 生产端口
+- **节点**: ⚠️ 实际回退 v5@8960（plist 09:32 被改回），v6 iter100 曾部署 8950 但现无监听
 - **训练参数**: Qwen2.5-3B + LoRA rank=8 / lr=2e-5 / mask_prompt=true / grad_checkpoint / max_seq=2048 / batch=2
 - **训练数据**: DPO→SFT 829 train + 92 val（102 模块覆盖）
 - **val loss**: 3.063 → 1.849（iter 1→100，-40%）
 - **硬件限制**: 16GB Mac mini 无法同时跑训练+推理（Peak mem 10.7GB + 系统 4GB + swap 11GB → OOM）
-- **下一步**: ① 云端 GPU 续训到 600 iters ② 补充太岁/文昌专项 SFT 数据 ③ 评估 v6 在 api-server-v2 fallback 链的表现
+- **下一步**: ① 云端 GPU 续训到 600 iters ② 补充太岁/文昌专项 SFT 数据 ③ 确认 v6 重新上线计划（当前生产 v5）
 
 ### #2 公共能力包市场（capability-market）
 - **节点**: 4/6（规划→注册表→模板→匹配器→自进化脚本→实际运营）
