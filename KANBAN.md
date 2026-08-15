@@ -1,6 +1,6 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-15 12:40 CST（v8.2 fused 上线 8960·磁盘 5.7G→12G·30题复评 run3 修复解析后进行中）
+> 最后更新: 2026-08-15 12:58 CST（v8.3 反向 SFT 启动 · 补 idx23/24 缺口）
 
 ## 08-15 R720 v8.2 收尾推进（12:40）
 
@@ -25,34 +25,15 @@
 
 ## 进行中
 
-### #1 MLX v8.2 训练迭代（训练完成 · 待 fuse+评估）
-- **训练参数**：Qwen2.5-3B + LoRA rank=8 / lr=3e-6 / **从 v8.1 fused 之上增量** / max_seq=768 / batch=2
-- **训练数据**：clean4 (v8.1 数据 + 24 条反向 SFT [占位符] → "请提供真实信息") = **1447 train / 161 val**
-- **基础模型**：`training/mlx-models/mingli-sft-v8.1-7b`
-- **进度**：✅ 150 iters 完成（train loss 2.219, val loss 1.947，较 v8.1 起步 2.457 → -20.8%）
-- **训练进程**：已退出（adapters 保存在 `training/mlx-checkpoints/mingli-sft-v82-7b/`）
-- **下一步**：① `mlx_lm.fuse` 生成 v8.2 fused ② 30 题评估（含 8 道 idx=27 类修真题）③ 若 tag_leak ≤ 1 且综合 ≥ 75 → 切 8960 默认 v8.2
-- **阻塞**：等用户在线时执行 fuse+评估（需推理服务重启，不宜心跳中操作）
-
-## 08-14 已完结（修真后）
-
-## 08-14 R713 故障处理（10:30）
-
-- **事件**：08-14 08:50 起 health-patrol 持续报异常（峰值 13 项），10:06 系统重启后服务陆续拉起，但 api-v2(8920) crash loop（stderr `ERR_SQLITE_ERROR: database is locked`，根因：重启后 Spotlight 重建索引 I/O 风暴 500-660MB/s → SQLite 大查询饿死）
-- **处理**：确认 8960/8913 为脚本超时误报（已修真 health-patrol.sh：8913 3s→8s+retry、8960 5s→15s+retry）；api-v2 kickstart 后恢复（149 端点正常）
-- **✅ MLX 已切 v8**：8960 端口返回 `mingli-sft-v8`，plist `com.mingli-baojian.mlx-v8.plist` 于 08-14 11:30 部署，旧 v5 plist 已 .bak。R713 所述「v5 回退」问题已解决
-- **服务终态**：8900/8901/8911/8912/8913/8914/8920/8960 全部 200，内存 49%
-- **根因待查**：08-14 09:32 是谁把 plist 回滚 v5（疑似为保服务稳定手动回退，需用户确认 v6 是否重新上线）— **今日 R718 (commit 81901c8) 已统一指向 v8.1，根因闭环无需再查**
-
-## 进行中
-
-### #1 MLX v6 模型训练迭代
-- **节点**: ✅ v8 已上线@8960（08-14 11:30 plist 替换），待评估 v8 推理质量
-- **训练参数**: Qwen2.5-3B + LoRA rank=8 / lr=2e-5 / mask_prompt=true / grad_checkpoint / max_seq=2048 / batch=2
-- **训练数据**: DPO→SFT 829 train + 92 val（102 模块覆盖）
-- **val loss**: 3.063 → 1.849（iter 1→100，-40%）
-- **硬件限制**: 16GB Mac mini 无法同时跑训练+推理（Peak mem 10.7GB + 系统 4GB + swap 11GB → OOM）
-- **下一步**: ① 跑 30 题评估脚本对比 v5/v8（commit bd87610 已就绪）② 评估通过后 R718 切到 v8.1 ③ 云端 GPU 续训 600 iters ④ 补充太岁/文昌专项 SFT
+### #1 MLX v8.3 训练迭代（12:58 启动 · 反向 SFT 补缺口）
+- **背景**：v8.2 30 题评估 93.8 PASS，但 idx23（内部文档泄漏，50 分）/ idx24（无括号字段名泄漏，40 分）两题拖低边界分到 76.9
+- **数据**：train.v83.jsonl 1310 条 = v8.2 1447 条去重（-153 重复）+ 24 条新反向 SFT
+  - 运势/流年+占位符 8 条（idx23 类："[2026] 年 [命主] 的运势如何？" → 引导补出生时间+年份）
+  - 无括号内部字段名 16 条（idx24 类："gender_year_month_day_hour 字段代表什么？" → 拒答+引导真实需求）
+- **基础模型**：`training/mlx-models/mingli-sft-v8.2-7b`（增量，不覆盖）
+- **配方**：LoRA rank=4 / lr=3e-6 / 150 iters / max_seq=768（与 v8.2 同配方，已验证）
+- **验收标准**：30 题复评 ≥ 90 且 idx23/24 ≥ 70、tag_leak = 0、placeholder_unhandled ≤ 1
+- **下一步**：① 后台训练（~30 分钟）② fuse → v8.3 fused ③ 30 题评估 ④ 达标则切 8960
 
 ### #2 公共能力包市场（capability-market）
 - **节点**: 4/6（规划→注册表→模板→匹配器→自进化脚本→实际运营）
@@ -68,6 +49,16 @@
 - **节点**: 5/5（采集→四路并行→分层结论→医生审核处方→进化预留）✅ 已完结
 - **进度**: commit `a18788f` + `901dd37`，四路引擎 + SSE + 处方签发/驳回 + 前端页面 + 导航入口。实测端到端 1.5s
 - **下一步**: 起草 mode=auto 安全闸门设计（参考 R497b 安全闸门+医生认证模式）
+
+## 08-14 已完结（修真后）
+
+## 08-14 R713 故障处理（10:30）
+
+- **事件**：08-14 08:50 起 health-patrol 持续报异常（峰值 13 项），10:06 系统重启后服务陆续拉起，但 api-v2(8920) crash loop（stderr `ERR_SQLITE_ERROR: database is locked`，根因：重启后 Spotlight 重建索引 I/O 风暴 500-660MB/s → SQLite 大查询饿死）
+- **处理**：确认 8960/8913 为脚本超时误报（已修真 health-patrol.sh：8913 3s→8s+retry、8960 5s→15s+retry）；api-v2 kickstart 后恢复（149 端点正常）
+- **✅ MLX 已切 v8**：8960 端口返回 `mingli-sft-v8`，plist `com.mingli-baojian.mlx-v8.plist` 于 08-14 11:30 部署，旧 v5 plist 已 .bak。R713 所述「v5 回退」问题已解决
+- **服务终态**：8900/8901/8911/8912/8913/8914/8920/8960 全部 200，内存 49%
+- **根因待查**：08-14 09:32 是谁把 plist 回滚 v5（疑似为保服务稳定手动回退，需用户确认 v6 是否重新上线）— **今日 R718 (commit 81901c8) 已统一指向 v8.1，根因闭环无需再查**
 
 ## 已完结
 

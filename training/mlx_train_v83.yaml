@@ -1,0 +1,54 @@
+# v8.3 SFT 训练配置 — 在 v8.2 fused 之上增量训练
+# 目标：修真 v8.2 30 题评估剩余失分点（idx23 内部文档泄漏 + idx24 无括号字段名泄漏）
+#
+# 训练链路：Qwen2.5-7B-Instruct-4bit → v8.1 → v8.2 fused（8960 在跑，93.8 分）→ v8.3 LoRA 微调
+# 数据：v8.2 1447 条去重（-153 重复 → 1294）+ 24 条新反向 SFT = 1310 条
+#   - 运势/流年+占位符 8 条（idx23 类："[2026] 年 [命主] 的运势如何？"）
+#   - 无括号内部字段名 16 条（idx24 类："gender_year_month_day_hour 字段代表什么？"）
+#
+# 2026-08-15 12:50 v8.2 评估：AVG 93.8 PASS（命理 100 / 中医 100 / 边界 76.9）
+# 失分点：idx23 50 分（吐内部文档段落+重复 6 次）、idx24 40 分（泄漏字段名）
+
+model: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.2-7b"
+train: true
+test: false
+
+# v8.3 数据：去重后的 v8.2 全集 + 两类缺口反向 SFT
+train_file: "train.v83.jsonl"
+valid_file: "valid.v83.jsonl"
+data: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-r105-data"
+
+# LoRA（基于 v8.2 fused 增量训练，与 v8.2 同配方——已验证有效）
+fine_tune_type: "lora"
+num_layers: 20
+lora_parameters:
+  rank: 4
+  dropout: 0.05
+  scale: 4.0
+
+# 训练（1310 条 × 150 iter ≈ 1.7 epoch，短轮次防过拟合）
+iters: 150
+batch_size: 1
+grad_accumulation_steps: 4
+learning_rate: 3e-6
+optimizer: "adamw"
+optimizer_config:
+  adamw:
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    weight_decay: 0.01
+
+# 关键配置
+max_seq_length: 768
+mask_prompt: true
+grad_checkpoint: true
+
+# 保存与评估
+save_every: 50
+steps_per_eval: 50
+steps_per_report: 10
+val_batches: 20
+seed: 42
+
+# 输出（独立目录，保留 v8.2 不被覆盖）
+adapter_path: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-checkpoints/mingli-sft-v83-7b"
