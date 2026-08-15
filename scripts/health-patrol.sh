@@ -60,11 +60,12 @@ else
 fi
 
 # 5c. cron 蒸馏管线日志 mtime 监控（日频 48h / 周频 8d）
+# R111 更新：distill-mingli-outbound.log 已废弃（旧 cron），现行权威产出是
+# mingli-tcm-daily-distill（每日 03:00）写的 server/kb/mingli-log.jsonl —— 改监控它
 for LOG_PATH in \
-    "/tmp/distill-mingli-outbound.log" \
     "/tmp/distill-tcm-outbound.log" \
     "/tmp/vision-distill.log" \
-    "$PROJECT_ROOT/.openclaw/tmp/distill-mingli-outbound.log"; do
+    "$PROJECT_ROOT/server/kb/mingli-log.jsonl"; do
     if [ -f "$LOG_PATH" ]; then
         LOG_AGE_HR=$(( ( $(date +%s) - $(stat -f %m "$LOG_PATH") ) / 3600 ))
         if [ "$LOG_AGE_HR" -gt 48 ]; then
@@ -137,6 +138,12 @@ PY
         SCRIPT_STATUS="✅ ${SCRIPT_TOTAL} 块全部通过"
     fi
 fi
+
+# ===== R111 触发器巡检：kb_formal 关键触发器存在性 + hit_count NULL =====
+TRIG_OK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND tbl_name='kb_formal' AND name='kb_formal_hit_count_default';" 2>/dev/null)
+[ "$TRIG_OK" != "1" ] && ALERTS+=("触发器丢失: kb_formal_hit_count_default（FTS 重建可能吞掉，用 scripts/fix-fts5-unicode61.py 重跑可恢复）")
+NULL_CNT=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM kb_formal WHERE hit_count IS NULL;" 2>/dev/null)
+[ "$NULL_CNT" != "0" ] && [ -n "$NULL_CNT" ] && ALERTS+=("kb_formal hit_count NULL: $NULL_CNT 条")
 
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
