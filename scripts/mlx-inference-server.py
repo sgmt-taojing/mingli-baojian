@@ -17,9 +17,9 @@ BASE = os.path.dirname(os.path.abspath(__file__)) + '/..'
 # R718 v8.1：默认指向 clean3 数据重训后的 v8.1 fused 模型
 # 回滚方案：export MLX_MODEL=$BASE/training/models/mingli-v8-fused（修真前 v8 fused）
 DEFAULT_MODELS = [
-    BASE + '/training/mlx-models/mingli-sft-v8.1-7b',  # R718 v8.1（去内部标签 + 修真后重训）
-    BASE + '/training/models/mingli-v8-fused',         # v8 修真前（兜底）
-    BASE + '/training/mlx-models/mingli-sft-v8-7b',    # 旧 v8 备用
+    BASE + '/training/mlx-models/mingli-sft-v8.3-3b',  # R726 v8.3（修真 idx23/24 + 命名修正：实际是 3B base）
+    BASE + '/training/models/mingli-v8.1-3b-fused',    # v8.1 修真前（兜底，3B）
+    BASE + '/training/mlx-models/mingli-sft-v8.3-7b', # 旧名兼容（symlink 到 v8.3-3b）
 ]
 MODEL = os.environ.get('MLX_MODEL', None)
 if MODEL is None:
@@ -124,6 +124,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == '/v1/chat/completions':
             messages = req.get('messages', [])
             max_tokens = int(req.get('max_tokens', 256))
+            stream = bool(req.get('stream', False))
             if not messages:
                 self._respond(400, {'error': 'messages required'})
                 return
@@ -139,9 +140,74 @@ class Handler(BaseHTTPRequestHandler):
                 elif role == 'assistant':
                     prompt += f'助手: {content}\n'
             prompt += '助手:'
-            self._generate(prompt, max_tokens, openai=True)
+            if stream:
+                self._generate_stream(prompt, max_tokens)
+            else:
+                self._generate(prompt, max_tokens, openai=True)
         else:
             self._respond(404, {'error': 'not found'})
+
+    def _generate_stream(self, prompt, max_tokens):
+        """R726: SSE 流式生成 — 首字延迟 ~1-2s，逐 token 推送，满足无延迟交互规则。
+        OpenAI 兼容 chunk 格式；出错时发 data: {"error":...} 后收尾。"""
+        t0 = time.time()
+        if _model is None:
+            # 503 不能用 SSE 语义，直接 JSON 拒绝
+            self._respond(503, {'error': 'model still loading, please retry in 30s', 'ready': False})
+            return
+        try:
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/event-stream; charset=utf-8')
+            self.send_header('Cache-Control', 'no-cache')
+            self.send_header('Connection', 'keep-alive')
+            self.end_headers()
+
+            def _send(obj):
+                self.wfile.write(('data: ' + json.dumps(obj, ensure_ascii=False) + '\n\n').encode('utf-8'))
+                self.wfile.flush()
+
+            cid = 'chatcmpl-' + str(int(time.time() * 1000))
+            _send({'id': cid, 'object': 'chat.completion.chunk', 'created': int(time.time()), 'model': MODEL_TAG,
+                   'choices': [{'index': 0, 'delta': {'role': 'assistant'}, 'finish_reason': None}]})
+
+            from mlx_lm import stream_generate
+            m, tk, sampler, lp = ensure_model()
+            first = True
+            text_parts = []
+            for chunk in stream_generate(m, tk, prompt=prompt, max_tokens=max_tokens,
+                                         sampler=sampler, logits_processors=lp):
+                piece = chunk.text if hasattr(chunk, 'text') else str(chunk)
+                # R705 同款 EOS / 续写截断（流式：在标记处直接停）
+                stop = False
+                for eos in ['</s>', '<|endoftext|>']:
+                    if eos in piece:
+                        piece = piece.split(eos)[0]
+                        stop = True
+                for marker in ['\n用户:', '\n助手:', '\nUser:', '\nAssistant:']:
+                    if marker in piece:
+                        piece = piece.split(marker)[0]
+                        stop = True
+                if piece:
+                    text_parts.append(piece)
+                    _send({'id': cid, 'object': 'chat.completion.chunk', 'created': int(time.time()), 'model': MODEL_TAG,
+                           'choices': [{'index': 0, 'delta': {'content': piece}, 'finish_reason': None}]})
+                if first:
+                    print(f'[mlx-server v3] stream first-token {round(time.time()-t0,2)}s')
+                    first = False
+                if stop:
+                    break
+            _send({'id': cid, 'object': 'chat.completion.chunk', 'created': int(time.time()), 'model': MODEL_TAG,
+                   'choices': [{'index': 0, 'delta': {}, 'finish_reason': 'stop'}]})
+            _send('[DONE]')
+        except BrokenPipeError:
+            print(f'[mlx-server v3] stream client disconnected at {round(time.time()-t0,1)}s')
+        except Exception as e:
+            traceback.print_exc()
+            try:
+                self.wfile.write(('data: ' + json.dumps({'error': str(e)}) + '\n\n').encode('utf-8'))
+                self.wfile.flush()
+            except Exception:
+                pass
 
     def _generate(self, prompt, max_tokens, openai=False):
         t0 = time.time()
