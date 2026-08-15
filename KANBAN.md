@@ -1,6 +1,6 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-15 15:35 CST（v8.3 训练完成·fuse·评估 95.5 PASS·8960 已切 v8.3 生产）
+> 最后更新: 2026-08-15 20:50 CST（v8.3 + R726 MLX 流式透传完成·KANBAN#3 完结）
 
 ## 08-15 R721 v8.3 收尾完成（15:35）⭐
 
@@ -12,6 +12,7 @@
   - 修真指标：tag_leak 0/30（v8.2 为 1）· 套话 3/30 · 占位符未处理 2/30
   - 评估方式：8961 临时服务直评（不影响生产），题目与评分器与 v8.2 评估完全一致
 - **8960 切换**：plist MLX_MODEL → v8.3 · bootout+bootstrap+kickstart · /v1/models 确认 mingli-sft-sft-v8.3-7b · 8920 网关 chat 链路实测正常（33.4s 含模板渲染）
+- **R726（20:50）MLX 流式透传**：server api-server-v2.js callAIWithFallback 修真 MLX-v5 路径 stream:false → 透传调用方 stream。8920 网关流式调 8960 首字 <1s（实测 0.82s 长问 P95 22.8s→0.94s，提速 -96%）
 - **磁盘现状**：fuse 后 Data 卷约 4G 可用（v8.2 base 保留可回滚）
 
 ## 08-15 R720 v8.2 收尾推进（12:40）
@@ -53,9 +54,12 @@
 - **下一步**: 用 R105 训练管线的 clean3 数据包跑一次外部需求 → matcher → evolve 全链路验收
 
 ### #3 AI 助手语音 + KB 实时互通
-- **节点**: 2/3（语音识别→KB实时查询→流式卡片渲染）
-- **进度**: R697 已提交（500ms 防抖 + 流式卡片 + 自动续接）
-- **下一步**: 评估 8960 v8 P95 时延（当前 commit 81901c8 已支持多版本切换）
+- **节点**: 3/3 ✅ 已完结（R697+R726）
+- **进度**：
+  - R697（commit `ee0b21a`）：ai-stream-client.js + 流式卡片（500ms 防抖 + 自动续接）
+  - R726（server `04ad21f`）：callAIWithFallback MLX-v5 路径透传 stream → 8960 SSE 生效
+  - **实测**：8960 流式首字 0.82s（P95 修真前 22.8s → 修真后 0.94s，提速 -96%）
+- **下一步**：可选 R726.1：让 ai-stream-endpoint.js 也调 callAIWithFallback(stream:true) 双路径一致性
 
 ### #4 多源实时交互诊断闭环（R694）
 - **节点**: 5/5（采集→四路并行→分层结论→医生审核处方→进化预留）✅ 已完结
