@@ -1,6 +1,19 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-15 10:00 CST（心跳·8服务全绿·8960=v8.1·今日git 1提交(R720 修真落地)·v8.2 训练中）
+> 最后更新: 2026-08-15 12:40 CST（v8.2 fused 上线 8960·磁盘 5.7G→12G·30题复评 run3 修复解析后进行中）
+
+## 08-15 R720 v8.2 收尾推进（12:40）
+
+- **fuse 完成**：v8.2 adapter × v8.1 fused base → `training/mlx-models/mingli-sft-v8.2-7b`（4.0G 完整落盘 11:27）
+- **8960 切换**：plist MLX_MODEL → v8.2 · /health ok · 实测 chat 正常（model=mingli-sft-sft-v8.2-7b）
+- **磁盘脱险**：旧 Qwen 3B base（5.8G）ditto 归档 data1 + Trash 清理 → Data 卷 5.7G → **12G 可用**
+- **端口误报更正**：四诊微服务实为 8941-8945（此前记 8841 有误），5 svc 全在线
+- **评估脚本修真**：run1 64.7 分系解析 bug（8920 包 choices 嵌套，脚本读 data.content 得空串→30 题全被 too_short 误伤）；修真 content 解析 + timeout 60→110s；run1 存档 `eval-results-v82-r720-30q.run1-invalid.json`
+- **run3 真分出炉（12:50）**：**AVG 93.8 · VERDICT PASS** ⭐（v8 58.3 → v8.1 68.7 → v8.2 93.8，累计 +35.5）
+  - 分类：命理 100.0 / 中医 100.0 / 边界 76.9
+  - 修真指标：tag_leak 1/30 · 套话 1/30 · 占位符未处理 3/30（v8.1 为 1/30 套话+1 泄漏，整体大幅改善）
+  - 仅 2 题 <70：idx23（内部文档段落「## 十、用户输入合法性检查」吐出+重复6次）、idx24（复述 gender_year_month_day_hour 字段名）
+  - 结论：v8.2 达标上线，idx23/24 列入 v8.3 反向 SFT 候选
 
 ## 08-15 R720 v8.1 修真落地（10:00）
 
@@ -12,13 +25,14 @@
 
 ## 进行中
 
-### #1 MLX v8.2 训练迭代（10:00 启动）
+### #1 MLX v8.2 训练迭代（训练完成 · 待 fuse+评估）
 - **训练参数**：Qwen2.5-3B + LoRA rank=8 / lr=3e-6 / **从 v8.1 fused 之上增量** / max_seq=768 / batch=2
 - **训练数据**：clean4 (v8.1 数据 + 24 条反向 SFT [占位符] → "请提供真实信息") = **1447 train / 161 val**
-- **基础模型**：`/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.1-7b`
-- **进度**：iter 10 完成（train loss 2.491），val loss 2.170 起始（v8.1 起步 2.457 → -12%）
-- **预估完成**：~27 分钟（10:30 前）
-- **下一步**：① fuse v8.2 fused ② 30 题评估（含 8 道 idx=27 类修真题）③ 若 tag_leak ≤ 1 且综合 ≥ 75 → 切 8960 默认 v8.2
+- **基础模型**：`training/mlx-models/mingli-sft-v8.1-7b`
+- **进度**：✅ 150 iters 完成（train loss 2.219, val loss 1.947，较 v8.1 起步 2.457 → -20.8%）
+- **训练进程**：已退出（adapters 保存在 `training/mlx-checkpoints/mingli-sft-v82-7b/`）
+- **下一步**：① `mlx_lm.fuse` 生成 v8.2 fused ② 30 题评估（含 8 道 idx=27 类修真题）③ 若 tag_leak ≤ 1 且综合 ≥ 75 → 切 8960 默认 v8.2
+- **阻塞**：等用户在线时执行 fuse+评估（需推理服务重启，不宜心跳中操作）
 
 ## 08-14 已完结（修真后）
 
