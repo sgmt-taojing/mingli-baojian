@@ -32,7 +32,9 @@ if MODEL is None:
 ADAPTER = os.environ.get('MLX_ADAPTER', None)  # fused 模式无 adapter；回滚 v5 时设为 mingli-sft-v5
 PORT = int(os.environ.get('MLX_PORT', '8960'))
 # R105: 模型版本号由路径派生
-MODEL_TAG = os.path.basename(os.path.dirname(MODEL.rstrip('/'))) if '/models/' in MODEL else 'mingli-sft-' + os.path.basename(MODEL.rstrip('/')).replace('mingli-', '')
+_bn = os.path.basename(MODEL.rstrip('/'))
+MODEL_TAG = os.path.basename(os.path.dirname(MODEL.rstrip('/'))) if '/models/' in MODEL else (
+    _bn if _bn.startswith('mingli-') else 'mingli-sft-' + _bn.replace('mingli-', ''))
 if ADAPTER:
     MODEL_TAG = os.path.basename(ADAPTER.rstrip('/'))
 # 兼容旧版本目录名
