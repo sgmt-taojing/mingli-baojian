@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>v8.3 达标上线 · 全量推进盘点 — 2026-08-15</title>
+<style>
+  :root{--ink:#1a2233;--sub:#5a6478;--line:#e4e8f0;--bg:#f7f8fb;--card:#ffffff;--gold:#8a6d1f;--ok:#1e7e4e;--warn:#b25e09;--blue:#2b5fd9;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--bg);line-height:1.75;padding:32px 16px;}
+  .wrap{max-width:960px;margin:0 auto;}
+  header{background:linear-gradient(135deg,#1a2233 0%,#2c3a54 100%);color:#fff;border-radius:14px;padding:28px 32px;margin-bottom:24px;}
+  header h1{font-size:22px;font-weight:600;letter-spacing:.5px;}
+  header p{color:#b8c2d8;font-size:13px;margin-top:6px;}
+  .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px;}
+  .metric{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;text-align:center;}
+  .metric .v{font-size:30px;font-weight:700;color:var(--blue);}
+  .metric .v.gold{color:var(--gold);}
+  .metric .v.ok{color:var(--ok);}
+  .metric .l{font-size:12px;color:var(--sub);margin-top:4px;}
+  section.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 26px;margin-bottom:20px;}
+  section.card>h2{font-size:16px;font-weight:600;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{background:#eef1f7;text-align:left;padding:9px 12px;font-weight:600;color:var(--sub);border:1px solid var(--line);}
+  td{padding:9px 12px;border:1px solid var(--line);}
+  tr:nth-child(even) td{background:#fafbfd;}
+  .ok{color:var(--ok);font-weight:600;}
+  .warn{color:var(--warn);font-weight:600;}
+  .muted{color:var(--sub);font-size:12.5px;}
+  .timeline{list-style:none;}
+  .timeline li{position:relative;padding:0 0 16px 28px;border-left:2px solid var(--line);margin-left:10px;}
+  .timeline li:last-child{padding-bottom:0;}
+  .timeline li::before{content:"";position:absolute;left:-6px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--blue);}
+  .timeline li.done::before{background:var(--ok);}
+  .timeline .t{font-size:12px;color:var(--sub);font-family:ui-monospace,monospace;}
+  .timeline .b{font-size:13.5px;}
+  footer{text-align:center;color:var(--sub);font-size:12px;margin-top:8px;}
+  .bar{height:8px;border-radius:4px;background:#e8ebf2;overflow:hidden;margin-top:6px;}
+  .bar>i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#2b5fd9,#4d84f0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>v8.3 达标上线 · 全量推进盘点</h1>
+    <p>2026-08-15 15:50 CST · commit ba7daa0 · 8960 生产实跑 mingli-sft-v8.3-7b</p>
+  </header>
+
+  <div class="metrics">
+    <div class="metric"><div class="v gold">95.5</div><div class="l">30 题综合分（基线 93.8）</div></div>
+    <div class="metric"><div class="v ok">89.4</div><div class="l">边界类得分（原 76.9 → +12.5）</div></div>
+    <div class="metric"><div class="v ok">0/30</div><div class="l">tag_leak 硬性 + 残留双零</div></div>
+    <div class="metric"><div class="v">11 端口</div><div class="l">全部在线 · 巡检全绿</div></div>
+  </div>
+
+  <section class="card">
+    <h2>模型版本进化（30 题评估）</h2>
+    <table>
+      <tr><th>版本</th><th>综合分</th><th>命理</th><th>中医</th><th>边界</th><th>关键修真点</th></tr>
+      <tr><td>v8</td><td>58.3</td><td>—</td><td>—</td><td>—</td><td class="muted">首版基线（choices 解析 bug 修真前）</td></tr>
+      <tr><td>v8.1</td><td>68.7</td><td>—</td><td>—</td><td>—</td><td class="muted">+10.4 · R718 数据修真</td></tr>
+      <tr><td>v8.2</td><td>93.8</td><td>100</td><td>100</td><td>76.9</td><td class="muted">+25.1 · 144 条反向 SFT 修 tag_leak</td></tr>
+      <tr><td><b>v8.3（当前）</b></td><td class="ok">95.5</td><td>97.9</td><td>97.5</td><td class="ok">89.4</td><td>+1.7 · idx23/24 定向补缺（50→75 / 40→100）</td></tr>
+    </table>
+    <div class="muted" style="margin-top:10px">累计提升：v8 → v8.3 = +37.2 分。idx23（内部文档泄漏）与 idx24（无括号字段名泄漏）为本轮定向修真目标，全部达标。</div>
+  </section>
+
+  <section class="card">
+    <h2>本轮推进时间线</h2>
+    <ul class="timeline">
+      <li class="done"><span class="t">12:58</span><div class="b">v8.3 训练首发：1310 条数据（去重 1294 + 缺口样本 24）+ 配置入库 commit 53e8e66</div></li>
+      <li><span class="t">13:07</span><div class="b">⚠️ 首轮训练被 exec 600s 超时杀（iter 50 后阵亡）；13:43 cron 代理重启失败（数据混入 27 条坏行）</div></li>
+      <li class="done"><span class="t">14:35</span><div class="b">事故链修复：git 恢复干净数据 + 转换抢救 27 条 = 1337 条；nohup 脱离第三次启动（commit bfd762e）</div></li>
+      <li class="done"><span class="t">15:05</span><div class="b">训练完整跑完 150 iters，val loss 2.223 → 2.055，peak mem 6.06GB</div></li>
+      <li class="done"><span class="t">15:12-15:23</span><div class="b">cron 收尾自动执行：fuse 4.0G 模型落盘 → 30 题评估 <b>95.5 PASS</b></div></li>
+      <li class="done"><span class="t">15:30</span><div class="b">8960 生产切换 v8.3（/health ready + 冒烟问答正常），8961 临时评估服务关闭</div></li>
+      <li class="done"><span class="t">15:45</span><div class="b">磁盘急救：v8.2 fused（4G）归档 data1，98% → 94%（13G 可用）</div></li>
+      <li class="done"><span class="t">15:50</span><div class="b">全量巡检全绿：11 端口在线 + 337 内联 script 校验通过 + commit ba7daa0 推送 GitHub</div></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>遗留事项与下一步</h2>
+    <table>
+      <tr><th>事项</th><th>状态</th><th>计划</th></tr>
+      <tr><td>idx23 占位符未主动询问（75 分）</td><td class="warn">v8.4 候选</td><td>补「占位符 → 主动追问」反向 SFT 样本</td></tr>
+      <tr><td>套话 3/30、占位符未处理 2/30</td><td class="warn">低优</td><td>随 v8.4 一并处理</td></tr>
+      <tr><td>KANBAN #2 能力包市场全链路验收</td><td class="muted">4/6</td><td>用 clean3 数据包跑 matcher → evolve 全链路</td></tr>
+      <tr><td>KANBAN #3 语音+KB 实时互通 P95 评估</td><td class="muted">2/3</td><td>基于 v8.3 实测 P95 时延</td></tr>
+    </table>
+  </section>
+
+  <footer>命理宝鉴 · R724 交付 · 数据来源：training/eval-results-v83-r721-30q.json + scripts/health-patrol.sh</footer>
+</div>
+</body>
+</html>
