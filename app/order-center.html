@@ -456,7 +456,7 @@
 
   // ── 取消订单 ──
   window._cancelOrder = async function(orderId) {
-    if (!confirm('确定要取消此订单吗？')) return;
+    if (!confirmInline('确定要取消此订单吗？')) return;
     try {
       const r = await apiFetch(`/api/order/cancel`, {
         method: 'POST',
@@ -470,7 +470,7 @@
 
   // ── 退款 ──
   window._refundOrder = async function(orderId) {
-    const reason = prompt('请输入退款原因（可选）：') || '用户申请退款';
+    const reason = promptInline('请输入退款原因（可选）：') || '用户申请退款';
     try {
       const r = await apiFetch(`/api/order/refund`, {
         method: 'POST',

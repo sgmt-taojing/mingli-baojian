@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="今日黄历 · 权威干支宜忌 · 易道智鉴">
+<title>今日黄历 · 易道智鉴</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  :root{--ink:#0a0a0f;--paper:#e8e0d0;--gold:#c9a84c;--gold2:#e8cc7a;--jade:#10b981;--cinn:#ef4444;--border:rgba(201,168,76,.18)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--ink);color:var(--paper);min-height:100vh;padding:14px;line-height:1.6}
+  .wrap{max-width:680px;margin:0 auto}
+  h1{font-size:22px;color:var(--gold2);margin:14px 0 4px}
+  .date{font-size:13px;color:var(--paper);opacity:.7;margin-bottom:14px}
+  .panel{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+  .panel-title{font-size:14px;color:var(--gold);margin-bottom:10px;letter-spacing:1px}
+  .gzz{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin-bottom:8px}
+  .gzz span{background:rgba(201,168,76,.08);padding:4px 10px;border-radius:6px}
+  .yj{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .yj-box{padding:10px;border-radius:8px}
+  .yi{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.3)}
+  .ji{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3)}
+  .yj-box h3{font-size:13px;margin-bottom:6px}
+  .yi h3{color:var(--jade)}
+  .ji h3{color:var(--cinn)}
+  .tag{display:inline-block;background:rgba(201,168,76,.1);padding:3px 8px;border-radius:4px;font-size:12px;margin:2px}
+  .pos{display:flex;gap:10px;font-size:13px;flex-wrap:wrap}
+  .pos div{flex:1;background:rgba(255,255,255,.02);padding:8px;border-radius:6px;text-align:center}
+  .pos strong{color:var(--gold2);display:block;font-size:14px;margin-top:2px}
+  .sc{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  .sc div{text-align:center;padding:6px 2px;border-radius:4px;font-size:12px}
+  .sc .g{background:rgba(16,185,129,.15);color:var(--jade)}
+  .sc .x{background:rgba(239,68,68,.15);color:var(--cinn)}
+  .src{font-size:11px;opacity:.5;text-align:center;margin-top:14px}
+  .loading{text-align:center;padding:30px;color:var(--gold)}
+  .err{color:var(--cinn);text-align:center;padding:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📜 今日黄历</h1>
+  <div class="date" id="date">加载中…</div>
+
+  <div id="content">
+    <div class="loading">⏳ 正在调取权威干支宜忌…</div>
+  </div>
+</div>
+
+<script>
+const API = (location.protocol === 'file:' ? 'http://127.0.0.1:8920' : '');
+
+async function load() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth()+1, d = now.getDate();
+  document.getElementById('date').textContent = `${y}年${m}月${d}日`;
+  try {
+    const r = await fetch(`${API}/api/daily-almanac?year=${y}&month=${m}&day=${d}`, { signal: AbortSignal.timeout(10000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '接口失败');
+    render(j);
+  } catch(e) {
+    document.getElementById('content').innerHTML = `<div class="err">❌ 加载失败：${e.message}<br><br>请检查网络后刷新</div>`;
+  }
+}
+
+function render(d) {
+  const gz = d.ganzhi || {};
+  const yi = (d.yi || []).join(' · ');
+  const ji = (d.ji || []).join(' · ');
+  document.getElementById('content').innerHTML = `
+    <div class="panel">
+      <div class="panel-title">干支</div>
+      <div class="gzz">
+        <span>年：${gz.year_gz || ''}</span>
+        <span>月：${gz.month_gz || ''}</span>
+        <span>日：${gz.day_gz || ''}</span>
+        <span>生肖：${gz.shengxiao || ''}</span>
+      </div>
+      <div style="font-size:13px;opacity:.8">建除：${d.jianchu || ''}（${d.jianchu_desc || ''}）</div>
+      <div style="font-size:13px;opacity:.8">黄黑道：${d.huangdao || ''}</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">宜 · 忌</div>
+      <div class="yj">
+        <div class="yj-box yi">
+          <h3>✅ 宜（${(d.yi||[]).length}）</h3>
+          <div>${yi || '—'}</div>
+        </div>
+        <div class="yj-box ji">
+          <h3>❌ 忌（${(d.ji||[]).length}）</h3>
+          <div>${ji || '—'}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">贵神方位</div>
+      <div class="pos">
+        <div>喜神<strong>${d.posXishen || '—'}</strong></div>
+        <div>财神<strong>${d.posCaishen || '—'}</strong></div>
+        <div>福神<strong>${d.posFushen || '—'}</strong></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">时辰吉凶</div>
+      <div class="sc">
+        ${(d.shichenJi||[]).map(s=>`<div class="g">${s} 吉</div>`).join('')}
+        ${(d.shichenXiong||[]).map(s=>`<div class="x">${s} 凶</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="src">数据源：${d.source || '—'}</div>
+  `;
+}
+
+load();
+</script>
+</body>
+</html>

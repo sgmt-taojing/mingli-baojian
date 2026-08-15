@@ -442,48 +442,69 @@ async function fetchMinsuHuangli(dateStr) {
 
 // ===== 获取黄历数据（自动补充） =====
 function getAlmanacData(dateStr) {
-  // 如果有内置数据，直接返回
+  // 1) 优先使用权威 API 预取缓存（lunar_python 推算，与每日推送同源）
+  const cached = (window.__ALMANAC_API_CACHE || {})[dateStr];
+  if (cached && cached.yi && cached.yi.length) {
+    return cached;
+  }
+
+  // 2) 内置静态表兜底（2026 年手填数据）
   if (ALMANAC_DATA[dateStr]) {
     return ALMANAC_DATA[dateStr];
   }
-  
-  // 无内置数据时，基于干支推算宜忌（非随机，基于日柱五行生克）
-  const date = new Date(dateStr);
-  const dayOfYear = getDayOfYear(date);
-  const dayIndex = dayOfYear % 60;
-  
-  // 基于日期生成宜忌
-  const allYi = ['祭祀','沐浴','祈福','出行','纳财','开市','立券','嫁娶','安床','动土','安门'];
-  const allJi = ['安葬','破土','开仓','伐木','上梁','嫁娶','动土','出行'];
-  const jishenList = ['天德','月德','天喜','玉堂','天恩','月恩'];
-  const xiongshaList = ['五黄','三煞','太岁','月破','大耗'];
-  const chongList = ['冲鼠','冲牛','冲虎','冲兔','冲龙','冲蛇','冲马','冲羊','冲猴','冲鸡','冲狗','冲猪'];
-  const shaList = ['煞北','煞南','煞东','煞西'];
-  
-  // 简单的伪随机生成
-  const seed = dayOfYear;
-  const yiCount = 2 + (seed % 3);
-  const jiCount = 2 + ((seed + 7) % 2);
-  
-  const yi = [];
-  const ji = [];
-  
-  for (let i = 0; i < yiCount; i++) {
-    yi.push(allYi[(seed + i * 3) % allYi.length]);
-  }
-  for (let i = 0; i < jiCount; i++) {
-    ji.push(allJi[(seed + i * 5) % allJi.length]);
-  }
-  
+
+  // 3) 静默降级：无数据时返回「暂无权威数据」而非伪随机值（P0-2 修真：禁止伪造宜忌）
   return {
-    yi: [...new Set(yi)],
-    ji: [...new Set(ji)],
-    chong: chongList[dayIndex % 12],
-    sha: shaList[dayIndex % 4],
-    jishen: [jishenList[dayIndex % 6]],
-    xiongsha: [xiongshaList[dayIndex % 5]]
+    yi: [],
+    ji: [],
+    chong: '',
+    sha: '',
+    jishen: [],
+    xiongsha: [],
+    noData: true
   };
 }
+
+// ===== 权威黄历 API 异步预取（lunar_python 同源，替代伪随机） =====
+function prefetchAlmanacFromAPI(dateStr) {
+  if (!window.fetch) return;
+  const date = new Date(dateStr);
+  const y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+  fetch('/api/minsu/huangli?year=' + y + '&month=' + m + '&day=' + d)
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+    .then(function(j) {
+      if (!j || !j.ok || !j.chart) throw new Error('bad payload');
+      const c = j.chart;
+      const entry = {
+        yi: (c.yiji && c.yiji.yi ? String(c.yiji.yi).split(/[,，、;；]/).map(function(s){return s.trim();}).filter(Boolean) : []),
+        ji: (c.yiji && c.yiji.ji ? String(c.yiji.ji).split(/[,，、;；]/).map(function(s){return s.trim();}).filter(Boolean) : []),
+        chong: (c.chongsha || '').split(' ')[0] || '',
+        sha: ((c.chongsha || '').match(/煞[东西南北]/) || [''])[0],
+        jishen: [],
+        xiongsha: [],
+        huangdao: c.huangdao || '',
+        jianchu: c.jianchu || ''
+      };
+      window.__ALMANAC_API_CACHE = window.__ALMANAC_API_CACHE || {};
+      window.__ALMANAC_API_CACHE[dateStr] = entry;
+      // 若当前渲染中的正是该日期，重渲染一次（幂等，最多一次防抖动）
+      if (window.__ALMANAC_CURRENT_DATE === dateStr && !window.__ALMANAC_API_RETRY) {
+        window.__ALMANAC_API_RETRY = true;
+        try { renderAlmanacInfo(dateStr, getAlmanacData(dateStr)); } catch (e) { /* 渲染失败保持降级展示 */ }
+      }
+    })
+    .catch(function() { /* API 失败走静态表/暂无数据展示，不伪造 */ });
+}
+
+// ===== 页面加载时预取今日数据 =====
+(function prefetchInit() {
+  try {
+    const now = new Date();
+    const today = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    window.__ALMANAC_CURRENT_DATE = today;
+    prefetchAlmanacFromAPI(today);
+  } catch (e) { /* 预取失败静默 */ }
+})();
 
 // ===== 获取一年中的第几天 =====
 function getDayOfYear(date) {

@@ -457,7 +457,7 @@ var PatientArchive = {
 
   runDistill: function(){
     if(this.allPatients.length === 0){ showToast('暂无患者数据可蒸馏'); return; }
-    if(!confirm('将从 ' + this.allPatients.length + ' 位患者的 ' + this.allHistory.length + ' 条诊疗记录中蒸馏经验知识，写入知识库待审核队列。\n\n确认开始？')) return;
+    if(!confirmInline('将从 ' + this.allPatients.length + ' 位患者的 ' + this.allHistory.length + ' 条诊疗记录中蒸馏经验知识，写入知识库待审核队列。\n\n确认开始？')) return;
     // 导出数据到临时文件
     var data = { patients: this.allPatients, history: this.allHistory, exportDate: new Date().toISOString() };
     // 前端蒸馏（简化版）

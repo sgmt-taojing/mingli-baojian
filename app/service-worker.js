@@ -56,7 +56,7 @@ self.addEventListener('install', event => {
       return Promise.all(
         SHELL_ASSETS.map(url =>
           cache.add(new Request(url, { cache: 'reload' }))
-              .catch(err => console.warn('[SW] skip', url, err.message))
+              .catch(err => _devWarn('[SW] skip', url, err.message))
         )
       );
     }).then(() => self.skipWaiting())
@@ -168,6 +168,6 @@ self.addEventListener('message', event => {
 // ================================================================
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-reports') {
-    console.warn('[SW] sync-reports triggered (offline queue replay placeholder)');
+    _devWarn('[SW] sync-reports triggered (offline queue replay placeholder)');
   }
 });

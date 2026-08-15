@@ -232,7 +232,7 @@ async function fetchCsrf() {
     const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000),  credentials:'same-origin' });
     const d = await r.json();
     csrfToken = d.csrfToken || d.data?.csrfToken || '';
-  } catch(e) { console.warn('csrf fetch fail', esc(e.message)); }
+  } catch(e) { _devWarn('csrf fetch fail', esc(e.message)); }
 }
 
 function toast(msg) {
@@ -345,7 +345,7 @@ function drawPie(byMode) {
 }
 
 async function clearAll() {
-  if (!confirm('确认清空所有 OCR 历史记录？')) return;
+  if (!confirmInline('确认清空所有 OCR 历史记录？')) return;
   try {
     const r = await fetch('/api/ocr/history', { signal: AbortSignal.timeout(15000),
       method:'DELETE', credentials:'same-origin',

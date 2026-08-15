@@ -491,7 +491,7 @@ function loadPatient(id){
 }
 
 function delPatient(id){
-  if(!confirm('确定删除此患者档案？'))return;
+  if(!confirmInline('确定删除此患者档案？'))return;
   let list = JSON.parse(localStorage.getItem('mlbj_doctor_patients')||'[]');
   list = list.filter(p=>p.id!==id);
   localStorage.setItem('mlbj_doctor_patients', JSON.stringify(list));
@@ -562,7 +562,7 @@ function loadRx(id){
 }
 
 function delRx(id){
-  if(!confirm('确定删除此处方？'))return;
+  if(!confirmInline('确定删除此处方？'))return;
   let list = JSON.parse(localStorage.getItem('mlbj_doctor_rx')||'[]');
   list = list.filter(r=>r.id!==id);
   localStorage.setItem('mlbj_doctor_rx', JSON.stringify(list));

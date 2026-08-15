@@ -640,7 +640,7 @@
     }
 
     function r502Delete(type, id) {
-      if (!confirm('确认删除？')) return;
+      if (!confirmInline('确认删除？')) return;
       const url = type === 'favorites' ? R502_API + '/api/user/favorites/' + encodeURIComponent(id) :
                   type === 'preferences' ? R502_API + '/api/user/preferences/' + encodeURIComponent(id) :
                   type === 'history' ? R502_API + '/api/user/search-history/' + encodeURIComponent(id) :

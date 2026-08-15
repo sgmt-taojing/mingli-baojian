@@ -852,7 +852,7 @@ async function reviewRx(action) {
 }
 
 async function cancelSession() {
-  if (!currentSession || !confirm('确定取消该会话？')) return;
+  if (!currentSession || !confirmInline('确定取消该会话？')) return;
   const res = await fetch(API + `/api/collab/session/${currentSession.id}/cancel`, {
     method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ by: docId })
   });

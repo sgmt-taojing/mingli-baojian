@@ -1110,7 +1110,7 @@ $$('[data-filter]').forEach(b => b.onclick = () => {
   State.historyFilter = b.dataset.filter;
   renderHistory();
 });
-$('#histClear').onclick = () => { if (confirm('清空所有历史？')) { State.history = []; localStorage.removeItem('glass_history'); renderHistory(); } };
+$('#histClear').onclick = () => { if (confirmInline('清空所有历史？')) { State.history = []; localStorage.removeItem('glass_history'); renderHistory(); } };
 $('#histExport').onclick = () => {
   const blob = new Blob([JSON.stringify(State.history, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -1258,9 +1258,9 @@ refreshStatus();
 fetch('/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(d => {
   if (d.csrfToken) {
     State.csrfToken = d.csrfToken;
-    console.warn('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');
+    _devWarn('[CSRF] 已获取 token:', d.csrfToken.slice(0, 12) + '...');
   }
-}).catch(e => console.warn('[CSRF] 获取失败：', esc(e.message)));
+}).catch(e => _devWarn('[CSRF] 获取失败：', esc(e.message)));
 $('#btnRefreshLive').onclick = () => {
   $('#liveFortune').textContent = '运势 ' + (60 + (++State.tickCount % 40));
   $('#liveHealth').textContent = ['气血充盈','注意作息','多饮温水','疏肝解郁','脾胃调养'][(State.tickCount) % 5];

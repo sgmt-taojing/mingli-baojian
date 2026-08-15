@@ -154,7 +154,7 @@ async function loadAll() {
   try {
     r = await fetch(API + '/api/public/config', {signal: AbortSignal.timeout(10000)});
   } catch(e) {
-    console.warn('[R514] fetch error:', esc(e.message));
+    _devWarn('[R514] fetch error:', esc(e.message));
     toast('加载失败：' + (e && esc(e.message) || '网络异常') + '，请稍后重试', true);
     return;
   }
@@ -244,7 +244,7 @@ async function saveOne(key) {
 }
 
 async function delOne(key) {
-  if (!confirm('确认删除配置 ' + key + '？')) return;
+  if (!confirmInline('确认删除配置 ' + key + '？')) return;
   try {
     const r = await fetch(API + '/api/public/config/' + encodeURIComponent(key), {method: 'DELETE',signal: AbortSignal.timeout(15000)});    const d = await r.json();
     if (d.ok) { toast('🗑️ 已删除 ' + key); _configs = _configs.filter(c => c.key !== key); _groups = new Set(_configs.map(c => c.group || 'uncategorized')); renderAll(); }

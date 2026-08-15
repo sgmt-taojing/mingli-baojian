@@ -1745,39 +1745,59 @@ function drawWuxingChart(counts) {
 function calcYiji() {
   let dateStr = document.getElementById('yijiDate').value;
   if (!dateStr) return;
-  let d = new Date(dateStr);
-  let dayOfYear = Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000);
-  // 简化计算：基于日期推算奇门值符和吉门
-  let menList = ['休门','生门','伤门','杜门','景门','死门','惊门','开门'];
-  let menJi = ['休门','生门','开门'];
-  let menXiong = ['伤门','死门','惊门'];
-  let todayMen = menList[dayOfYear % 8];
-  let isJi = menJi.indexOf(todayMen) >= 0;
-  // 吉时简化：基于日期hash
-  let shiChen = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  let jiShi = shiChen.filter(function(_,i){return ((dayOfYear * 7 + i * 13) % 12) < 5;});
-  let xiongShi = shiChen.filter(function(_,i){return ((dayOfYear * 7 + i * 13) % 12) >= 8;});
-  // 黄历宜忌简化
-  let yiList = ['祭祀','祈福','出行','移徙','入宅','开市','交易','纳财','求嗣','栽种','牧养'];
-  let jiList = ['动土','上梁','入殓','安葬','破土','伐木','作灶','安门'];
-  let todayYi = yiList.filter(function(_,i){return ((dayOfYear*3+i*7)%11)<5;});
-  let todayJi = jiList.filter(function(_,i){return ((dayOfYear*5+i*3)%8)<3;});
-  let advice = isJi ? '今日'+todayMen+'当值，利'+todayYi.slice(0,2).join('、')+'，慎'+todayJi.slice(0,2).join('、')+'。' :
-    '今日'+todayMen+'值，不宜大事，宜静不宜动。';
-
-  let result = document.getElementById('toolResult');
-  result.innerHTML = buildConclusion({
-    core: isJi ? '今日吉门当值，诸事顺遂' : '今日凶门当值，宜守不宜进',
-    good: isJi,
-    wuxing: '奇门'+todayMen+'，吉时：'+jiShi.join('、')+'时',
-    xingge: '',
-    huajie: advice,
-    extra: '<div style="margin-top:12px;padding:12px;background:rgba(201,168,76,.04);border-radius:6px;font-size:13px">' +
-      '<span style="color:var(--jade)">✅ 宜：</span>'+todayYi.join('、')+'<br>' +
-      '<span style="color:var(--cinn2)">❌ 忌：</span>'+todayJi.join('、')+'<br>' +
-      '<span style="color:var(--gold)">🕐 吉时：</span>'+jiShi.join('、')+'时<br>' +
-      '<span style="color:var(--cinn2)">⚠️ 凶时：</span>'+xiongShi.join('、')+'时</div>'
-  });
+  let _d = dateStr.split('-');
+  let _y = parseInt(_d[0], 10), _m = parseInt(_d[1], 10), _day = parseInt(_d[2], 10);
+  // 调用后端权威 /api/minsu/huangli（基于 lunar_python 黄历权威计算）
+  fetch('/api/minsu/huangli?year=' + _y + '&month=' + _m + '&day=' + _day, {
+    headers: { 'User-Agent': 'Mozilla/5.0' },
+    credentials: 'omit'
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data || !data.ok || !data.chart) throw new Error('黄历数据为空');
+      let ch = data.chart;
+      let yiStr = ((ch.yiji || {}).yi || '').replace(/[、·]/g, '、');
+      let jiStr = ((ch.yiji || {}).ji || '').replace(/[、·]/g, '、');
+      let yi = yiStr ? yiStr.split('、').filter(Boolean) : [];
+      let ji = jiStr ? jiStr.split('、').filter(Boolean) : [];
+      let jiShi = (ch.shichenJi || []);
+      let xiongShi = (ch.shichenXiong || []);
+      let ganzhi = ch.dayGanZhi || '';
+      let shengxiao = ch.shengxiao || '';
+      let chongsha = ch.chongsha || '';
+      let taishen = ch.taishen || '';
+      let zhishen = ch.zhishen || '';
+      let huangdao = ch.huangdao || '';
+      let jieqi = ch.jieqi || '';
+      let jianchu = ch.jianchu || '';
+      let isJi = yi.length > 0;
+      let advice = isJi
+        ? '今日日柱「' + ganzhi + '」（' + shengxiao + '年），利' + yi.slice(0, 3).join('、') + '，慎' + ji.slice(0, 3).join('、') + '。'
+        : '今日日柱「' + ganzhi + '」（' + shengxiao + '年），黄道日宜守，进退需谨慎。';
+      let result = document.getElementById('toolResult');
+      result.innerHTML = buildConclusion({
+        core: isJi ? '今日日柱「' + ganzhi + '」吉多凶少' : '今日日柱「' + ganzhi + '」宜静守',
+        good: isJi,
+        wuxing: '日干支：' + ganzhi + '　属相：' + shengxiao,
+        xingge: '',
+        huajie: advice,
+        extra: '<div style="margin-top:12px;padding:12px;background:rgba(201,168,76,.04);border-radius:6px;font-size:13px">' +
+          '<span style="color:var(--jade)">✅ 宜：</span>' + yi.join('、') + '<br>' +
+          '<span style="color:var(--cinn2)">❌ 忌：</span>' + ji.join('、') + '<br>' +
+          '<span style="color:var(--gold)">🕐 吉时：</span>' + (jiShi.length ? jiShi.join('、') + '时' : '依事而择') + '<br>' +
+          '<span style="color:var(--paper2)">⚠️ 凶时：</span>' + (xiongShi.length ? xiongShi.join('、') + '时' : '无') + '<br>' +
+          '<span style="color:var(--paper2)">🐾 冲煞：</span>' + chongsha + '<br>' +
+          '<span style="color:var(--paper2)">🪑 胎神：</span>' + taishen + '<br>' +
+          '<span style="color:var(--paper2)">⭐ 黄道/黑道：</span>' + huangdao + '<br>' +
+          '<span style="color:var(--paper2)">🌾 节气：</span>' + jieqi + '<br>' +
+          '<span style="color:var(--paper2);font-size:11px">来源：服务端 /api/minsu/huangli（lunar_python 黄历权威计算）</span>' +
+          '</div>'
+      });
+    })
+    .catch(function (e) {
+      let result = document.getElementById('toolResult');
+      result.innerHTML = '<div style="padding:16px;color:var(--cinn2)">⚠️ 黄历查询失败：' + e.message + '，请稍后重试。</div>';
+    });
 }
 
 function calcHunyin() {

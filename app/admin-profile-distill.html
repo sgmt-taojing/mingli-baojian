@@ -257,7 +257,7 @@ async function showBeliever(uid){
 }
 
 async function triggerDistill(){
-  if(!confirm('确认立即对所有档案执行全量蒸馏？\n（生产环境由 cron 每日 02:00 自动执行）'))return;
+  if(!confirmInline('确认立即对所有档案执行全量蒸馏？\n（生产环境由 cron 每日 02:00 自动执行）'))return;
   toast('正在执行全量蒸馏...');
   try{
 var resp=await fetch(API+'/api/profile/distill-all',H({method:'POST',headers:Object.assign({'Authorization':'***'+TOK,'Content-Type':'application/json'}),signal:AbortSignal.timeout(15000)}));

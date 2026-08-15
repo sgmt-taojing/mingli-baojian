@@ -1,6 +1,18 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-15 20:50 CST（v8.3 + R726 MLX 流式透传完成·KANBAN#3 完结）
+> **R730+ 双修真深度校正（2026-08-16 07:30）**：修真 #4 daily_push.js（db2d038）+ 修真 #5 daily-push-bridge.py（v3）二轮深度校正 14/14 全绿——三模式实测（HTTP public/simple/默认 execFile）+ 错误端口 9999 降级复现 + bridge --http 8921 临时拉起验证（31 字段 payload、127.0.0.1 绑定）+ 双出口数据一致性 5/5（date/年/月/日柱/生肖）+ 宜忌归一化全等（yi 18=18、ji 9=9，数组 vs 顿号串为格式差异非数据分歧）+ KB 47,653+5,772 持续入库 + 临时进程零残留。报告：workspace/DELIVERY/双修真深度校正报告-2026-08-16.html
+> 最后更新: 2026-08-15 21:15 CST（v8.3 + R730 daily_push HTTP 同源修真·KANBAN#4 完结）
+
+## 08-15 R730 P0-4 daily_push.js HTTP 模式修真（21:15）
+
+- **触发**：修真排期要求 daily_push.js 增加 `--http` 模式走 `8920/api/daily-almanac` 同源端点
+- **修真**：`daily_push.js` 支持 `DAILY_PUSH_HTTP_BASE` 环境变量 + `--http` 命令行参数；HTTP 拉取后字段归一化（`ganzhi/yi_ji`），私域字段（`shichen[]/weather/wisdom/chong_zhi/sha/pengzu/shensha/deities/jieqi_info`）缺失 → 自动 execFile bridge 兜底补齐
+- **降级**：env 未设置/服务未启动 → 静默回退原 execFile 路径，向后兼容 100%
+- **验证**：
+  - `DAILY_PUSH_HTTP_BASE=http://127.0.0.1:8920 node daily_push.js public` → ✅ HTTP+bridge 合并全字段
+  - `DAILY_PUSH_HTTP_BASE=http://127.0.0.1:8920 node daily_push.js simple` → ✅ 同源 simple 输出
+  - `node daily_push.js public`（不设 env）→ ✅ execFile 兜底与原行为一致
+- **commit**：`db2d038`（已推 main + gh-pages）
 
 ## 08-15 R721 v8.3 收尾完成（15:35）⭐
 
@@ -86,6 +98,10 @@
 
 | 日期 | 任务 | 产出物 |
 |------|------|--------|
+| 2026-08-15 | R721 v8.3 训练 + 评估 + 上线（AVG 95.5 PASS）| adapters.safetensors 28MB + `mingli-sft-v8.3-7b` 4.0G + eval-results-v83-r721-30q.json |
+| 2026-08-15 | R726 MLX 流式透传（8920→8960 首字 0.82s·提速 -96%）| server commit `04ad21f` |
+| 2026-08-15 | R725 KB 蒸馏入库（桌面流年班禄存杂耀 10 条）| DELIVERY/distill-report-2026-08-15.json |
+| 2026-08-15 | R720 v8.2 fuse + 评估 + 上线（AVG 93.8 PASS）| `mingli-sft-v8.2-7b` + eval-results-v82-r720-30q.json |
 | 2026-08-15 | R720: v8.1 修真落地 + clean4 + v8.2 训练 | commit `0603467` |
 | 2026-08-14 | R718: 推理服务默认切 v8.1 + 训练守护 + 多版本评估脚本 | commit `81901c8` |
 | 2026-08-14 | R105 v8 修真 + clean3 去内部标签 + 30题评估脚本 | commit `bd87610` |
@@ -163,16 +179,23 @@
 
 ## 阻塞项
 
-_无_
+- **8946 端口暴露**：node(71710) 监听 `*:8946`，未登记白名单（health-patrol 08-15 21:00 报警）
+- **6 个 cron 连败**（health-patrol 08-15 21:00 报警）：
+  - 命理宝jian 晚间知识库审计（21:30）· 连败 6 次
+  - Desktop-ZYZX 夜间采集蒸馏 · 连败 3 次
+  - mingli-tcm-daily-distill · 连败 4 次
+  - smart-home-family 地层能力诊断审计与优化 · 连败 3 次
+  - festival-wishes-daily · 连败 5 次
+  - 待修真：cron list 排查 launchd plist 状态 + 8946 进程归属定位
 
-## 运行时指标（21:00 心跳实测）
+## 运行时指标（21:00 心跳实测 · 2026-08-15）
 
-- 端口：8900/8901/8911/8912/8913/8914/8920/8960 全 200
-- 8960 模型：`mingli-sft-v8`（R718 已切 v8.1 待重启生效）
-- 内存：used 93%（14.95G/16G）⚠️ 接近警戒线，需关注 swap 压力
-- CPU load：1min 2.26（5min 1.67，15min 1.52，趋于平稳）
-- KB db 行数：14745（kb_formal 表，含历史口径；看板 47055 含派生/缓存视图）
-- 蒸馏：上次 2026-08-13 13:45，今日 cron 未触发（需检查 cron 状态）
+- 端口：8900/8901/8911/8912/8913/8914/8920/8960 全 200（root 端点实测）
+- 8920 /api/health=200, 8960 /v1/models = mingli-sft-v8.3-7b（生产实跑 v8.3）
+- 内联 script 校验：✅ 347 块全部通过
+- Data 卷：185G/228G（92%，17G 可用）⚠️ v8.2 fused 需归档
+- 内存：used 93%（14.95G/16G）⚠️ 接近警戒线
+- CPU load：1min 2.26（5min 1.67，15min 1.52，平稳）
 
 - **R709**（commit `227d17c`）：MLX 启动预热 — ThreadingHTTPServer + ready 字段 + 启动时后台线程跑一次 dummy 推理触发 compile
   - 修真：HTTPServer 单线程假死（客户端 abort → 连接卡死）→ ThreadingHTTPServer + daemon_threads + socket timeout 120s

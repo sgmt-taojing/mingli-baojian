@@ -553,11 +553,11 @@ function setupWSClient() {
             if (ta) ta.value += '\n\n【命理大师批注】\n' + (msg.annotations || '');
           }
         }
-      } catch(e) { console.warn('[R505] WS msg parse error:', e); }
+      } catch(e) { _devWarn('[R505] WS msg parse error:', e); }
     };
     ws.onclose = () => setTimeout(setupWSClient, 5000);
     ws.onerror = () => {};
-  } catch (e) { console.warn('[R505] WS init failed:', e); }
+  } catch (e) { _devWarn('[R505] WS init failed:', e); }
 }
 
 function showNotification(text, type) {
@@ -622,7 +622,7 @@ async function startCamera() {
     // Show overlay tags
     updateOverlay();
   } catch (e) {
-    console.warn('[摄像头] 启动失败:', esc(e.message)); showNotification('摄像头启动失败: ' + esc(e.message), 'error');
+    _devWarn('[摄像头] 启动失败:', esc(e.message)); showNotification('摄像头启动失败: ' + esc(e.message), 'error');
   }
 }
 
@@ -681,7 +681,7 @@ async function captureAll() {
 
   const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
   if (!base64 || base64.length < 100) {
-    console.warn('[图像] 采集失败'); showNotification('图像采集失败', 'error');
+    _devWarn('[图像] 采集失败'); showNotification('图像采集失败', 'error');
     return;
   }
 
@@ -1085,7 +1085,7 @@ function savePrescription() {
 function finalizePrescription() {
   const rx = document.getElementById('finalRx').value;
   if (!rx.trim()) {
-    console.warn('[处方] 缺少内容'); showNotification('请先填写处方', 'warn');
+    _devWarn('[处方] 缺少内容'); showNotification('请先填写处方', 'warn');
     return;
   }
   document.getElementById('docStatus').textContent = '已开具';
@@ -1127,7 +1127,7 @@ async function submitFeedback(rx) {
       // R507 反馈已记录
     }
   } catch (e) {
-    console.warn('[R507] feedback failed:', e);
+    _devWarn('[R507] feedback failed:', e);
   }
 }
 
@@ -1142,7 +1142,7 @@ async function syncFinalToMaster() {
       signal: AbortSignal.timeout(15000),
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-  } catch (e) { console.warn('[unified-diagnosis] sync failed', e); }
+  } catch (e) { _devWarn('[unified-diagnosis] sync failed', e); }
 }
 
 // ═══ Run vision diagnosis shortcut ═══
@@ -1156,7 +1156,7 @@ let sttActive = false;
 function toggleSTT() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
-    console.warn('[STT] 浏览器不支持'); showNotification('当前浏览器不支持语音识别，请使用 Chrome / Edge', 'warn');
+    _devWarn('[STT] 浏览器不支持'); showNotification('当前浏览器不支持语音识别，请使用 Chrome / Edge', 'warn');
     return;
   }
   if (sttActive) {
@@ -1204,7 +1204,7 @@ let wearableConnected = false;
 let wearableInterval = null;
 async function connectWearable(type) {
   if (type === 'ble') {
-    if (!navigator.bluetooth) { console.warn('[BLE] 不支持'); showNotification('浏览器不支持 BLE', 'warn'); return; }
+    if (!navigator.bluetooth) { _devWarn('[BLE] 不支持'); showNotification('浏览器不支持 BLE', 'warn'); return; }
     try {
       const device = await navigator.bluetooth.requestDevice({
         acceptAllDevices: true,
@@ -1213,15 +1213,15 @@ async function connectWearable(type) {
       document.getElementById('sttStatus').textContent = '已连接: ' + (device.name || 'BLE设备');
       wearableConnected = true;
       startWearableMock();
-    } catch (e) { console.warn('[BLE] 连接失败', esc(e.message)); showNotification('连接失败: ' + esc(e.message), 'error'); }
+    } catch (e) { _devWarn('[BLE] 连接失败', esc(e.message)); showNotification('连接失败: ' + esc(e.message), 'error'); }
   } else if (type === 'rokid') {
     wearableConnected = true;
     document.getElementById('sttStatus').textContent = 'Rokid 眼镜已连接';
     startWearableMock();
   } else if (type === 'manual') {
-    const hr = prompt('心率 (bpm)', '72');
-    const sp = prompt('血氧 (%)', '98');
-    const tp = prompt('体温 (°C)', '36.5');
+    const hr = promptInline('心率 (bpm)', '72');
+    const sp = promptInline('血氧 (%)', '98');
+    const tp = promptInline('体温 (°C)', '36.5');
     if (hr) document.getElementById('wsHR').textContent = '心率 ' + hr;
     if (sp) document.getElementById('wsSpO2').textContent = '血氧 ' + sp;
     if (tp) document.getElementById('wsTemp').textContent = '体温 ' + tp;
@@ -1251,7 +1251,7 @@ function addFollowup() {
   const name = document.getElementById('pName').value || '当前患者';
   const reports = JSON.parse(localStorage.getItem('unified_diag_followups') || '{}');
   if (!reports[name]) reports[name] = [];
-  const note = prompt('随访记录 (例如：3天后复诊，症状减轻)', '已服药3日，胃痛减轻，睡眠改善');
+  const note = promptInline('随访记录 (例如：3天后复诊，症状减轻)', '已服药3日，胃痛减轻，睡眠改善');
   if (!note) return;
   reports[name].push({
     ts: Date.now(),
@@ -1302,7 +1302,7 @@ function openMasterWorkstation() {
   if (state.syncToken) {
     window.open('master-workstation.html?token=' + encodeURIComponent(state.syncToken), '_blank');
   } else {
-    console.warn('[同步] 缺诊断'); showNotification('请先完成一次诊断并同步给命理大师', 'warn');
+    _devWarn('[同步] 缺诊断'); showNotification('请先完成一次诊断并同步给命理大师', 'warn');
   }
 }
 

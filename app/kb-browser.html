@@ -1334,10 +1334,10 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
           favBtn.textContent = '✅ 已收藏';
         }
         const cur = window.KbFavorites.getAll().find(f => f.id === node.id);
-        const note = prompt('📝 笔记（可选）：', cur?.note || '');
+        const note = promptInline('📝 笔记（可选）：', cur?.note || '');
         if(note !== null){
           window.KbFavorites.updateNote(node.id, note);
-          const tagsRaw = prompt('🏷️ 标签（逗号分隔，可留空）：', (cur?.tags || []).join(', '));
+          const tagsRaw = promptInline('🏷️ 标签（逗号分隔，可留空）：', (cur?.tags || []).join(', '));
           if(tagsRaw !== null){
             const tags = tagsRaw.split(/[,，]/).map(t => t.trim()).filter(t => t);
             window.KbFavorites.updateTags(node.id, tags);
@@ -1525,7 +1525,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
         <p>当前 <b style="color:#ffd700">${arr.length}</b> 条收藏 · 跨页面同步生效 · 可导出 JSON / 一键清空 · <span id="favSelectedInfo" style="color:var(--paper3)"></span></p>
         <button class="btn primary" onclick="KbFavorites.export?.();">出 导出 JSON</button>
         <button class="btn" id="favExportCsvBtn" style="background:var(--card);color:var(--paper2);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.82rem">出 导出 CSV</button>
-        <button class="btn danger" onclick="if(confirm('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">清空</button>
+        <button class="btn danger" onclick="if(confirmInline('清空所有收藏？')){localStorage.removeItem('***');renderFavs();document.getElementById('favBadge').textContent='0项';}">清空</button>
       </div>
     `;
     c.innerHTML = html;
@@ -1546,7 +1546,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
         return;
       }
       const count = checked.length;
-      if(!confirm(`确定取消 ${count} 个收藏？`)) return;
+      if(!confirmInline(`确定取消 ${count} 个收藏？`)) return;
       checked.forEach(cb => {
         const id = cb.dataset.favId;
         const name = cb.dataset.favName;

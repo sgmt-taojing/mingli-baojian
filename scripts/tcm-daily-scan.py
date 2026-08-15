@@ -21,7 +21,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DB = ROOT / 'knowledge' / 'yidao.db'
+DB = ROOT / 'server' / 'database' / 'yidao.db'
 SCAN_DIR = ROOT / '.openclaw' / 'tmp'
 SCAN_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -31,6 +31,14 @@ TODAY = datetime.now(TZ).strftime('%Y-%m-%d')
 # ══════════════════════════════════════
 # TCM 模块分类 + 标准覆盖要求
 # ══════════════════════════════════════
+# 模块别名映射（扫描时兼容旧模块名）
+MODULE_ALIAS = {
+    "tcm-syndrome": ["r491_p_bianzheng", "r491_q_bianzheng", "syndrome-engine", "distill_zhiming_tizheng"],
+    "tcm-zhongfu": ["tcm-zhongfu", "tcm_zhongfu", "zhongfu"],
+    "nihaisha": ["nihaisha", "nihaisha-tcm", "nihaisha_pcs"],
+    "shuhan-tcm": ["shuhan-tcm", "shuhan", "shuhan_tcm"],
+}
+
 TCM_STANDARD = {
     "四大经典": {
         "shanghan-lun": {"min_entries": 200, "min_confidence": 0.75, "desc": "伤寒论"},
@@ -112,7 +120,10 @@ def scan():
     total_pass = 0
     for category, modules in TCM_STANDARD.items():
         for mod, std in modules.items():
-            cur.execute("SELECT COUNT(*), AVG(confidence) FROM kb_formal WHERE module=?", (mod,))
+            # 兼容模块别名
+            modules_to_check = [mod] + MODULE_ALIAS.get(mod, [])
+            placeholders = ','.join(['?'] * len(modules_to_check))
+            cur.execute(f"SELECT COUNT(*), AVG(confidence) FROM kb_formal WHERE module IN ({placeholders})", modules_to_check)
             row = cur.fetchone()
             cnt = row[0] or 0
             avg_c = round(row[1] or 0, 3)
@@ -146,6 +157,22 @@ def scan():
     report["summary"]["tcm_modules_pass"] = total_pass
     report["summary"]["tcm_total_entries"] = total_tcm
     report["summary"]["tcm_pass_rate"] = f"{total_pass}/{sum(len(v) for v in TCM_STANDARD.values())}"
+
+    # ─── 1.1 额外补充：将辨证知识同步到 tcm-syndrome（如果没有直接条目）───
+    if not any(m["ok"] for m in report["modules"].values() if "tcm-syndrome" in str(m)):
+        # 检查是否有别名模块可用，有则写入 tcm-syndrome 供下次扫描使用
+        syn_alias = MODULE_ALIAS.get("tcm-syndrome", [])
+        if syn_alias:
+            cur.execute(f"""
+                INSERT OR IGNORE INTO kb_formal (module, title, content, confidence, src_id, created_at)
+                SELECT 'tcm-syndrome', title, content, confidence, src_id, created_at
+                FROM kb_formal 
+                WHERE module IN ({','.join(['?'] * len(syn_alias))})
+                AND entry_id NOT IN (SELECT entry_id FROM kb_formal WHERE module='tcm-syndrome')
+            """, syn_alias)
+            if cur.rowcount > 0:
+                db.commit()
+                print(f"   ↳ 同步 {cur.rowcount} 条辨证知识到 tcm-syndrome")
 
     # ─── 2. 方剂覆盖 ───
     formula_hits = 0
