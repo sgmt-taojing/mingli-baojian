@@ -139,6 +139,30 @@ PY
     fi
 fi
 
+# ===== R112 cron 蒸馏任务健康巡检：consecutiveErrors ≥3 告警 =====
+CRON_JOBS_JSON="/Users/tom/.openclaw-autoclaw/cron/jobs.json"
+if [ -f "$CRON_JOBS_JSON" ]; then
+    BAD_CRON=$(python3 -c "
+import json
+try:
+    data = json.load(open('$CRON_JOBS_JSON'))
+    jobs = data.get('jobs', data)
+    for j in jobs:
+        if not j.get('enabled', True):
+            continue
+        errs = j.get('state', {}).get('consecutiveErrors', 0)
+        if errs >= 3:
+            print(f\"{j.get('name','?')} 连败{errs}次\")
+except Exception:
+    pass
+" 2>/dev/null)
+    if [ -n "$BAD_CRON" ]; then
+        while IFS= read -r line; do
+            [ -n "$line" ] && ALERTS+=("cron 任务连败: $line")
+        done <<< "$BAD_CRON"
+    fi
+fi
+
 # ===== R111 触发器巡检：kb_formal 关键触发器存在性 + hit_count NULL =====
 TRIG_OK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND tbl_name='kb_formal' AND name='kb_formal_hit_count_default';" 2>/dev/null)
 [ "$TRIG_OK" != "1" ] && ALERTS+=("触发器丢失: kb_formal_hit_count_default（FTS 重建可能吞掉，用 scripts/fix-fts5-unicode61.py 重跑可恢复）")
