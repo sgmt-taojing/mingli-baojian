@@ -37,8 +37,59 @@ function runPython(script) {
   }
 }
 
-/** 获取桥接层 JSON 数据 */
+/** 获取桥接层 JSON 数据
+ * 修真 P0-4（2026-08-15 R730）：可选 HTTP 模式
+ *   - 修真 DAILY_PUSH_HTTP_BASE=http://127.0.0.1:8920 → 走 /api/daily-almanac 端点（推送+移动端+站内共用同源）
+ *   - 不修真 → 兜底 execFile python3 BRIDGE（向后兼容，不影响 launchd 调用）
+ */
 function getBridgeData() {
+  const httpBase = process.env.DAILY_PUSH_HTTP_BASE;
+  if (httpBase) {
+    try {
+      const http = require('http');
+      const url = new URL(httpBase.replace(/\/$/, '') + '/api/daily-almanac');
+      const payload = JSON.parse(require('child_process').execFileSync('curl', ['-s', '-m', '8', `http://${url.hostname}:${url.port}${url.pathname}`], { encoding: 'utf8', timeout: 10000 }));
+      if (payload && payload.ok) {
+        // 修真 P0-4 字段名归一化：/api/daily-almanac 字段名 → bridge 形状，供 buildPublic/buildSimple 复用
+        const gz = payload.ganzhi || {};
+        // 修真：HTTP 端点不提供 shichen[]/weather/wisdom/chong_zhi/sha/pengzu/shensha/deities/huanghei/jieqi_info/holiday 等私域字段。
+        // public/simple 版本需要这些 → 标记需要补全，execFile bridge 补齐缺失字段以保证推送全量。
+        const needsBridge = !payload.shichen || !payload.weather || !payload.wisdom;
+        if (needsBridge) {
+          // execFile 兜底取 bridge 全文，与 HTTP 端点字段合并（HTTP 优先）
+          const raw = runPython(BRIDGE);
+          const lines = raw.split('\n').filter(Boolean);
+          try {
+            const bridgeData = JSON.parse(lines[lines.length - 1]);
+            return {
+              ...bridgeData,
+              gz: {
+                ...bridgeData.gz,
+                ...gz,
+              },
+              yi_ji: bridgeData.yi_ji || { yi: payload.yi || [], ji: payload.ji || [] },
+            };
+          } catch (e) {
+            console.error(`[daily_push] HTTP+bridge 合并失败，纯 HTTP 回填字段：${e.message}`);
+          }
+        }
+        return {
+          ...payload,
+          gz: {
+            year_gz: gz.year_gz, year_gan: gz.year_gan, year_zhi: gz.year_zhi, year_nayin: gz.year_nayin,
+            month_gz: gz.month_gz, month_gan: gz.month_gan, month_zhi: gz.month_zhi,
+            day_gz: gz.day_gz, day_gan: gz.day_gan, day_zhi: gz.day_zhi, day_nayin: gz.day_nayin,
+          },
+          yi_ji: payload.yi_ji || { yi: payload.yi || [], ji: payload.ji || [] },
+        };
+      }
+      console.error(`[daily_push] HTTP 端点返回 ok=false：${JSON.stringify(payload).slice(0, 200)}`);
+      // fall through to execFile
+    } catch (e) {
+      console.error(`[daily_push] HTTP 模式失败，回退 execFile：${e.message}`);
+      // fall through to execFile
+    }
+  }
   const raw = runPython(BRIDGE);
   // 取最后一个 JSON 行（兼容 python 侧误打印其他内容）
   const lines = raw.split('\n').filter(Boolean);
@@ -130,7 +181,7 @@ ${d.jieqi_info}
   msg += `
 ━━━ 🌤️ 天气与穿搭 ━━━
 
-天气：${d.weather.condition} 气温：${d.weather.temp} 湿度：${d.weather.humidity} 风速：${d.weather.wind}
+天气：${d.weather.condition} 气温：${d.weather.temp}° 湿度：${d.weather.humidity}% 风速：${d.weather.wind}（${d.weather.city || '本地'}）
 ${d.clothing_temp}
 
 ━━━ 📖 今日${d.wisdom.type}家智慧 ━━━
