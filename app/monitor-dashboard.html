@@ -390,7 +390,33 @@ async function render(){
     /* ── 右栏：安全 / 蒸馏 / 磁盘 ── */
     const dist = D.distillation||[];
     const hist = D.distillHistory||[];
+    /* R113: 规划拓扑六流状态（来自采集器 distillTopology 区块，缺省兜底） */
+    const topo = D.distillTopology||{};
+    const topoFlows = topo.flows||[];
+    const stBadge = s => ({ok:'<span class="pill green" style="padding:1px 8px;font-size:9px"><span class="dot"></span>通</span>',
+                            partial:'<span class="pill yellow" style="padding:1px 8px;font-size:9px"><span class="dot"></span>部分</span>',
+                            gap:'<span class="pill red" style="padding:1px 8px;font-size:9px"><span class="dot"></span>缺口</span>',
+                            dep:'<span class="pill dim" style="padding:1px 8px;font-size:9px"><span class="dot"></span>依赖</span>'}[s]||'');
     const right = `
+      <div class="panel" style="grid-column:1/-1">
+        <div class="panel-head">🗺️ 蒸馏规划拓扑（目标形态） <span class="n">${topo.updated?esc(String(topo.updated).slice(5,16))+' 口径':'R113 静态口径'}</span></div>
+        <div class="panel-body" style="display:grid;grid-template-columns:minmax(280px,1.1fr) minmax(240px,1fr);gap:10px;align-items:start">
+          <div style="text-align:center">
+            <a href="assets/distill-topology.png" target="_blank" title="点击看大图">
+              <img src="assets/distill-topology.png" alt="蒸馏目标拓扑图" style="max-width:100%;border-radius:8px;border:1px solid var(--line);cursor:zoom-in">
+            </a>
+            <div style="font-size:9px;color:var(--dim);margin-top:4px">三源六流：命理只出自命理宝鉴 · 医学只出自中医标准 · 算法只出自视频平台 · 用法遵从消费方</div>
+          </div>
+          <div>
+            ${topoFlows.length?topoFlows.map(f=>`<div class="flow" style="padding:5px 4px">
+              <span class="tag {{'命理':'lm','医学':'med','视觉':'vis'}[f.domain]||'lm'}">${f.domain}</span>
+              <span class="path" style="flex:1">${esc(f.name)}</span>
+              ${stBadge(f.status)}
+            </div>
+            <div style="font-size:9px;color:var(--dim);padding:2px 4px 0 30px">${esc(f.note||'')}</div>`).join(''):'<div class="alert" style="color:var(--dim)">拓扑流数据待采集器下次刷新注入（distillTopology）</div>'}
+          </div>
+        </div>
+      </div>
       <div class="panel">
         <div class="panel-head">🔒 知识蒸馏链路 <span class="n">动态 · ${D.distillLastCheck?esc(D.distillLastCheck.slice(11,16)):'-'} 检查</span></div>
         <div class="panel-body">
