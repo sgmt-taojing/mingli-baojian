@@ -152,3 +152,25 @@ _无_
 - **当前 8960 状态**：`/health` ready · model=mingli-sft-v8.1-7b · adapter=null · 生产默认指向 v8.1
 - **commit 待**：本次 commit R720 把 30 题评估结果 + KANBAN 修真段落固化
 
+
+## 08-15 02:35 桌面周易-中医 第1轮蒸馏(R684)
+
+**任务**: 夜间 cron · 桌面 ~/Desktop/周易-中医 资料采集蒸馏
+**本轮**: 流年班第十课「禄存+42颗杂耀」PPTX (41 slide)
+
+**✅ 入库 10 条**:
+- entry_id: `R684-ziwei-DSK-001 ~ 010`
+- module: `ziwei`
+- confidence: `0.85` (路总亲授)
+- 来源标签: `desktop:liunianban_l10_lucun_42`
+- distill_log: `batch-liunian-lucun-20260815-023825`
+- 覆盖: 禄存详解(765字) / 阴阳双星(346) / 贵星凶星(895) / 破耗空亡(411) / 化解辅佐(430) / 礼仪空亡(334) / 艺术官禄(641) / 桃花解厄(434) / 玄术虚耗(534) / 寿元病厄(413)
+
+**🛠️ 工具**: `scripts/distill-desktop-liunian-lucun.py` (主题合并策略:相邻 slide 合并凑足 ≥300字)
+**质检**: FTS5 同步 ✅ / staging promoted ✅ / 前端 LIKE 命中 ✅
+
+**待办(留给后续 cron/白天)**:
+- P0 流年班 10 个 PDF(图片型,需 PDF→image→AI视觉识别)
+- P1 玉匣记/六壬/一掌经 古籍 PDF(同样图片型)
+- P2 DOCX: 56d15a...16fc391a09bbaa9.docx (15KB) + 先知智镜.docx (359KB)
+- 剩余 14 个流年班 PPTX(禄存/42 杂耀之外的课程,套路相同)

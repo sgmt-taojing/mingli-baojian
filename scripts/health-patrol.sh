@@ -14,6 +14,16 @@ for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8
     lsof -i :$PORT >/dev/null 2>&1 || ALERTS+=("$NAME(:$PORT) 未在监听")
 done
 
+# 1b. 端口绑定安全扫描（R-2026-08-15：修真 8941-8945/8787/8931-8933 共 9 服务 0.0.0.0→127.0.0.1）
+# scan-bind-exposure.sh 检测：监听 *:port 服务 + PORTS 字典漏列的 Python/Node 进程
+BIND_EXPOSURE=$(bash /Users/tom/.openclaw-autoclaw/workspace/projects/_shared/scripts/scan-bind-exposure.sh 2>&1)
+BIND_EXPOSURE_RC=$?
+if [ $BIND_EXPOSURE_RC -ne 0 ]; then
+    while IFS= read -r line; do
+        echo "$line" | grep -q 'P0!' && ALERTS+=("端口暴露: $(echo "$line" | sed 's/.*P0!//;s/^ //')")
+    done <<< "$BIND_EXPOSURE"
+fi
+
 # 2. launchd 异常状态
 LAUNCHD_BAD=$(launchctl list 2>/dev/null | grep "mingli-baojian" | awk '$1 ~ /^-[0-9]+/' | awk '{print $3}')
 [ -n "$LAUNCHD_BAD" ] && ALERTS+=("launchd 异常: $LAUNCHD_BAD")
