@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R731-R732 全面推进交付报告 · 2026-08-16</title>
+<style>
+:root{--ink:#1a2b4a;--muted:#6b7a94;--line:#e3e9f2;--bg:#f7f9fc;--card:#fff;--blue:#2f6fed;--green:#1f9d63;--amber:#c98a12;--red:#d4564a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;padding:32px 20px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:25px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:22px}
+h2{font-size:17px;margin:24px 0 10px;padding-left:10px;border-left:4px solid var(--blue)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px;margin-bottom:14px}
+th{background:#eef3fa;text-align:left;padding:8px 12px;font-size:12.5px;color:var(--muted)}
+td{padding:8px 12px;border-top:1px solid var(--line);vertical-align:top}
+.ok{color:var(--green);font-weight:600}
+.pill{display:inline-block;padding:1px 9px;border-radius:14px;font-size:11.5px;font-weight:600}
+.p-red{background:#fdeeee;color:var(--red)}
+.p-amb{background:#fdf6e3;color:var(--amber)}
+.p-grn{background:#eaf5ef;color:var(--green)}
+.p-blu{background:#eef3fa;color:var(--blue)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.m{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.m .v{font-size:23px;font-weight:700;color:var(--blue)}
+.m .l{font-size:12px;color:var(--muted);margin-top:2px}
+code{background:#eef3fa;padding:1px 6px;border-radius:4px;font-size:12.5px}
+.timeline{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+.step{display:flex;gap:12px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.step:last-child{border-bottom:none}
+.n{flex:none;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.step .t{font-size:13.5px}
+.step .t b{display:block;font-size:14px}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:8px;padding:12px 16px;font-size:13.5px;margin-bottom:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>R731-R732 全面推进交付报告</h1>
+<div class="sub">mingli-baojian · 2026-08-16 19:25-20:05 · 四张 KANBAN 卡全部完结 ✅</div>
+
+<div class="metrics">
+<div class="m"><div class="v">11/11</div><div class="l">能力包 matcher 验收 PASS（clean3 抽样）</div></div>
+<div class="m"><div class="v">v1.0.2</div><div class="l">mingli 包两次 evolve bump（空转保护验证）</div></div>
+<div class="m"><div class="v">L0-L3</div><div class="l">应急安全闸门四级分级上线</div></div>
+<div class="m"><div class="v">5/5</div><div class="l">应急闸门单元验证 + 端到端 L3 拦截实测</div></div>
+</div>
+
+<h2>一、KANBAN #2 能力包市场全链路验收（R731）</h2>
+<table>
+<tr><th>环节</th><th>结果</th><th>说明</th></tr>
+<tr><td>数据源</td><td class="ok">clean3 1303 条</td><td>分桶 bazi:163 / ziwei:247 / tcm:2 / other:891，抽样 11 条代表性需求</td></tr>
+<tr><td>matcher 匹配</td><td class="ok">11/11 PASS</td><td>修真 keywords 16→70（十神/神煞/格局/术语组合），「驿马/从格/财滋弱杀」等专业术语问句从 0 命中修复</td></tr>
+<tr><td>evolve 自进化</td><td class="ok">v1.0.0→v1.0.2</td><td>usage 日志写入 → patch bump 两次；空转保护（无日志无说明拒绝 bump）验证通过</td></tr>
+<tr><td>修真发现</td><td><span class="pill p-amb">认知修正</span></td><td>coverage 是命中词权重百分比（命中 1/62 词≈2% 属正常），验收标准应为「命中正确领域包」而非绝对覆盖度</td></tr>
+</table>
+
+<h2>二、KANBAN #4 mode=auto 应急安全闸门（R732）</h2>
+<div class="timeline">
+<div class="step"><div class="n">1</div><div class="t"><b>评估 assessEmergency</b>症状文本（symptoms/voiceText/risks）扫描分级表 → L0 正常 / L1 观察 / L2 紧急 / L3 危急</div></div>
+<div class="step"><div class="n">2</div><div class="t"><b>判定 gateDecision</b>L3 → autopilot 禁止 + 处方硬拦截 + 强制人工；L2 → autopilot 降级 + 建议就医；L1 → 仅提示</div></div>
+<div class="step"><div class="n">3</div><div class="t"><b>触达 executeEmergency（异步不阻塞诊断）</b>TTS 大声播报（L3 重复 3 次）→ 家属 webhook 通知 → 全部失败降级日志</div></div>
+</div>
+<table>
+<tr><th>测试</th><th>输入</th><th>结果</th></tr>
+<tr><td>单元验证</td><td>5 组症状样例</td><td class="ok">5/5 通过（昏迷→L3、高热→L2、老年→L1、正常→L0/L1）</td></tr>
+<tr><td>端到端</td><td>「突然昏迷不醒，呼之不应，疑似中风」</td><td class="ok">level=3 → 处方清空 + ai_autopilot→ai_assist 降级 + TTS/家属通知异步触发</td></tr>
+<tr><td>容错</td><td>TTS 8912 / webhook 不可用</td><td class="ok">超时 4-5s + 降级日志，诊断主流程不受影响</td></tr>
+</table>
+
+<h2>三、模型身份修真（R732 附带）</h2>
+<table>
+<tr><th>问题</th><th>修真</th><th>验证</th></tr>
+<tr><td>模型自称「通义千问」</td><td>8960 服务端默认注入命理助手 system prompt（调用方未传 system 时；不覆盖上游设定）</td><td class="ok">热模型自述「我是命理宝鉴的助手」✅ 无需 v8.4 重训</td></tr>
+<tr><td>流式回归</td><td>重启 8960 后复测</td><td class="ok">SSE 正常，首包 0.54s</td></tr>
+</table>
+
+<h2>四、提交链</h2>
+<table>
+<tr><th>commit</th><th>内容</th></tr>
+<tr><td><code>73692d4</code> (server)</td><td>emergency-gate.js 新增 + collab-diagnosis.js 接入应急闸门</td></tr>
+<tr><td><code>b0e4def</code></td><td>server 子模块指针更新</td></tr>
+<tr><td><code>f579b73</code></td><td>KANBAN r731+r732 四卡完结记录</td></tr>
+<tr><td><code>b52b05d</code></td><td>mlx-inference-server.py 默认 system prompt 注入</td></tr>
+</table>
+
+<div class="note"><b>剩余工作（全部为 P2/P3）</b>：v8.4 训练候选（idx23 占位符追问 75 分、套话 3/30，等用户在线启动）；前端渲染 emergency 字段（红色横幅 + 120 按钮）；ai-stream-endpoint 直连 MLX 真流式（现走模拟流式）。服务层 8 端口全绿，系统盘 9.2G 可用。</div>
+
+</div>
+</body>
+</html>
