@@ -73,6 +73,7 @@ h1{font-size:24px;color:#e8c87a;text-align:center;margin-bottom:6px;letter-spaci
   <div class="row">
     <input id="plan" value="专业版" readonly>
     <input id="contact" placeholder="联系方式（手机/邮箱）">
+    <select id="pay-method"><option value="wechat">微信支付</option><option value="alipay">支付宝</option><option value="transfer">对公转账</option></select>
     <input id="org" placeholder="企业/组织名（选填）">
   </div>
   <button onclick="submitOrder()">提交订单</button>
@@ -89,7 +90,7 @@ function submitOrder(){
     document.getElementById('result').textContent='请填写联系方式'; return; }
   try{
     var orders = JSON.parse(localStorage.getItem('shop_orders')||'[]');
-    orders.push({plan:document.getElementById('plan').value, contact:contact, org:document.getElementById('org').value.trim(), ts:new Date().toISOString()});
+    orders.push({plan:document.getElementById("plan").value, contact:contact, org:document.getElementById("org").value.trim(), pay:document.getElementById("pay-method").value, status:"pending", ts:new Date().toISOString()});
     localStorage.setItem('shop_orders', JSON.stringify(orders));
   }catch(e){}
   document.getElementById('result').style.display='block';
@@ -98,5 +99,6 @@ function submitOrder(){
   document.getElementById('result').textContent='✓ 订单已提交（演示模式），工作人员将联系您开通。订单号 #' + Date.now().toString(36);
 }
 </script>
+<div class="sub" style="margin-top:20px;font-size:11px;color:#5a6a90;border-top:1px solid rgba(120,160,255,.15);padding-top:12px">⚠ 本系统输出仅供参考，不构成医疗/法律/金融等专业建议。涉及疾病诊断、处方、剂量请咨询持证专业人士；急症请立即就医。</div>
 </body>
 </html>
