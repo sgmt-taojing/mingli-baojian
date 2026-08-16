@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>站在巨人肩上 · 命理模型快速进化路径 · 2026-08-16</title>
+<style>
+:root{--ink:#1a2b4a;--muted:#6b7a94;--line:#e3e9f2;--bg:#f7f9fc;--card:#fff;--blue:#2f6fed;--green:#1f9d63;--amber:#c98a12;--red:#d4564a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;padding:32px 20px}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:25px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+h2{font-size:17px;margin:26px 0 12px;padding-left:10px;border-left:4px solid var(--blue)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px;margin-bottom:16px}
+th{background:#eef3fa;text-align:left;padding:9px 12px;font-size:12.5px;color:var(--muted)}
+td{padding:9px 12px;border-top:1px solid var(--line);vertical-align:top}
+a{color:var(--blue)}
+.pill{display:inline-block;padding:2px 10px;border-radius:14px;font-size:11.5px;font-weight:600}
+.p-grn{background:#eaf5ef;color:var(--green)}
+.p-amb{background:#fdf6e3;color:var(--amber)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.m{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.m .v{font-size:22px;font-weight:700;color:var(--blue)}
+.m .l{font-size:12px;color:var(--muted);margin-top:2px}
+.phase{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:12px;display:flex;gap:14px}
+.phase .n{flex:none;width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px}
+.phase b{display:block;font-size:15px;margin-bottom:4px}
+.phase p{font-size:13px;color:#3a4a63}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--green);border-radius:8px;padding:13px 16px;font-size:13.5px;margin:14px 0}
+.warn{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:8px;padding:13px 16px;font-size:13.5px;margin:14px 0}
+code{background:#eef3fa;padding:1px 6px;border-radius:4px;font-size:12.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.mini{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px}
+.mini b{display:block;margin-bottom:6px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🧗 站在巨人肩上：命理模型快速进化路径</h1>
+<div class="sub">mingli-baojian · 2026-08-16 · 适配本机能力：Qwen2.5-3B + LoRA（MLX/Mac mini）· 自有 47k KB · 采集工作台 · 30 题评估闭环</div>
+
+<div class="metrics">
+<div class="m"><div class="v">3-5k</div><div class="l">v8.4 目标训练量（小而精，不是百万级）</div></div>
+<div class="m"><div class="v">3 源</div><div class="l">开源数据集 + 确定性引擎 + KB 推理合成</div></div>
+<div class="m"><div class="v">0.95</div><div class="l">双实现交叉验证数据的信任分</div></div>
+<div class="m"><div class="v">200-300</div><div class="l">v8.4 增量 iters（v8.3 基础上）</div></div>
+</div>
+
+<h2>一、为什么不能直接吞大库（容量账）</h2>
+<div class="warn"><b>3B + LoRA rank=4 的物理约束</b>：可训练参数约 28MB（v8.3 adapter 实测），配 6GB 统一内存、150 iters 约 1.5 小时的训练预算——百万级数据既存不进权重也训不完。垂域小模型进化的正确姿势是<b>高密度小数据 + 多源交叉验证 + 快速迭代评估</b>，而不是堆量。v8.3 用 1337 条到 95.5 分已证明此路线有效。</div>
+
+<h2>二、巨人资源清单（2026-08-16 实搜核实）</h2>
+<table>
+<tr><th>资源</th><th>内容</th><th>对我们的价值</th><th>合规动作</th></tr>
+<tr><td><a href="https://huggingface.co/datasets/czuo03/bazi-reasoning-300">bazi-reasoning-300</a></td><td>327 条八字问答 + DeepSeek-R1 合成推理链</td><td>直接补 v8.3 推理深度弱项；格式接近 clean3</td><td>下载时核 license 标签，无 license 则只用其方法论</td></tr>
+<tr><td>czuo03/bazi-reasoning-100</td><td>八字问答 + 豆包思维链推理</td><td>与 300 版互补，验证推理链一致性</td><td>同上</td></tr>
+<tr><td><a href="https://huggingface.co/michaelwzhu/ShenNong-TCM-LLM">ShenNong-TCM-LLM</a></td><td>中医药指令数据集（ChatGLM 系开源）</td><td>中医模块指令多样性补充（抽样 300-500）</td><td>Apache 系开源可商用</td></tr>
+<tr><td><a href="https://huggingface.co/michaelwzhu/ChatMed-Consult">ChatMed-Consult</a></td><td>2.6 万条实体中心中医药指令</td><td><b>方法论</b>：entity-centric self-instruct 用于自家 KB</td><td>开源</td></tr>
+<tr><td><a href="https://huggingface.co/datasets/shibing624/medical">shibing624/medical</a></td><td>中文医疗百万级大库</td><td>只抽全科边界/转介/免责话术样本（~100 条）</td><td>Apache-2.0</td></tr>
+<tr><td><a href="https://github.com/topics/traditional-chinese-numerology">GitHub 六术计算引擎专题</a></td><td>八字/紫微/六爻/梅花/大六壬/奇门排盘库</td><td><b>真值数据工厂</b>：批量生成排盘+规则解读</td><td>逐仓核 license（MIT/Apache 居多），只用代码不抄数据</td></tr>
+<tr><td><a href="https://github.com/datawhalechina/self-llm">Datawhale self-llm</a></td><td>Qwen LoRA 微调最佳实践</td><td>超参对齐：rank=4 偏小，v8.4 可试 rank=8/16</td><td>开源教程</td></tr>
+</table>
+
+<h2>三、四阶段落地路径</h2>
+<div class="phase"><div class="n">1</div><div><b>直接取用开源垂域数据（本周）</b><p>bazi-reasoning 300+100 → license 核验 → 格式转换（注入自家 system prompt）→ 采集工作台入库（trust 0.6-0.7）→ 与 clean3 指纹去重。中医侧从 ShenNong/ChatMed 抽样 300-500 条对齐自家中医 KB 领域。预计净增 ~600-800 条。</p></div></div>
+<div class="phase"><div class="n">2</div><div><b>确定性排盘引擎 = 无限真值工厂（核心差异化）</b><p>拉取 1-2 个 MIT 排盘引擎 → 随机生成生辰批量排盘（八字/紫微各 300+）→ 与自家 8911 排盘 API <b>双实现交叉验证</b> → 一致样本配规则解读入池（trust 0.95，最高级）→ 不一致样本留作修真线索（可能发现自家引擎 bug 或流派差异）。零幻觉、可无限扩展、每次 v8.x 迭代都能重新生成新题。</p></div></div>
+<div class="phase"><div class="n">3</div><div><b>R1 式推理合成 × 自家 47k KB（质变关键）</b><p>学 bazi-reasoning 的合成方法论但用自己的弹药：以倪海厦/舒晗结构化 KB 为底料，entity-centric self-instruct（ChatMed 方法）批量生成问题骨架 → 强模型（g2claw/智谱/AutoGLM）合成思维链回答 → 合规扫描 + KB 事实一致性校验。专攻 30 题评估暴露的弱点：idx23 占位符追问、边界类拒绝、套话抑制。目标 300-500 条高密度 CoT 样本。</p></div></div>
+<div class="phase"><div class="n">4</div><div><b>v8.4 训练与验收</b><p>三源合并（开源 ~700 + 交叉验证排盘 1-2k + KB 合成 300-500 + 人工窗口补充）→ 去重后 3-5k → 人工窗口过目终审 → v8.3 adapter 基础上增量 200-300 iters（rank 可升 8）→ 30 题评估 + v8.3 优势项回归（确保 97.9 命理/97.5 中医不回退）→ 达标切 8960 生产。</p></div></div>
+
+<h2>四、三源信任分级</h2>
+<table>
+<tr><th>来源</th><th>信任分</th><th>用量占比</th><th>说明</th></tr>
+<tr><td>人工补充窗口</td><td><span class="pill p-grn">0.95</span></td><td>5-10%</td><td>用户独家素材/纠正样本，构建时优先</td></tr>
+<tr><td>双实现交叉验证排盘</td><td><span class="pill p-grn">0.95</span></td><td>40-50%</td><td>两个独立引擎一致 = 接近真值</td></tr>
+<tr><td>KB 推理合成（带校验）</td><td><span class="pill p-amb">0.8</span></td><td>20-30%</td><td>事实一致性校验通过的 CoT 样本</td></tr>
+<tr><td>开源数据集直接取用</td><td><span class="pill p-amb">0.6-0.7</span></td><td>20-30%</td><td>license 合规 + 去重 + 格式适配后</td></tr>
+<tr><td>网页搜索蒸馏</td><td><span class="pill p-amb">0.6</span></td><td>补充</td><td>带来源 URL，可剔除</td></tr>
+</table>
+
+<h2>五、我们独有三件套（别人拿不走）</h2>
+<div class="grid2">
+<div class="mini"><b>📚 47k 结构化 KB</b>倪海厦/舒晗蒸馏知识库——推理合成的独家底料，开源世界没有等价物。</div>
+<div class="mini"><b>⚙️ 8911 自家排盘引擎</b>既是交叉验证器（对开源引擎），也是真值生成器（配合开源引擎互验）。</div>
+<div class="mini"><b>📏 30 题评估闭环</b>v8→v8.3 四轮迭代验证过的快速尺子，每次进化 30 分钟出分。</div>
+<div class="mini"><b>🎯 采集工作台</b>R733 刚落地：方向→采集→人工窗口→一键构建，全流程留痕可溯。</div>
+</div>
+
+<h2>六、红线对齐（AGENTS.md 蒸馏规范）</h2>
+<div class="note">
+✅ MIT/Apache/BSD/GPL 开源代码与数据集 · ✅ 公开学术/技术文档 · ✅ 记录 license 来源 · ✅ FTS5 去重 · ✅ trust 分级入库（≥0.7 直入训练，0.6 待审）<br>
+❌ 付费墙内容 · ❌ 违反 ToS 爬取 · ❌ GPL 闭源商用 · ❌ 无 license 数据直接商用（只借鉴方法论）
+</div>
+
+<h2>七、立即行动清单</h2>
+<table>
+<tr><th>#</th><th>动作</th><th>执行者</th><th>产出</th></tr>
+<tr><td>1</td><td>拉取 bazi-reasoning 300+100，license 核验 + 格式转换 + 去重</td><td>智能体自动</td><td>~400 条入采集池</td></tr>
+<tr><td>2</td><td>GitHub 选 1-2 个 MIT 排盘引擎，批量生成 + 与 8911 交叉验证</td><td>智能体自动</td><td>500-1000 条 trust 0.95 真值</td></tr>
+<tr><td>3</td><td>KB 推理合成（针对 idx23/边界弱点）</td><td>智能体自动</td><td>300-500 条 CoT</td></tr>
+<tr><td>4</td><td>三源合并 → 人工窗口终审</td><td><b>用户</b></td><td>v8.4 训练集定稿</td></tr>
+<tr><td>5</td><td>v8.4 增量训练 + 30 题评估 + 回归</td><td>智能体自动</td><td>达标切生产</td></tr>
+</table>
+
+</div>
+</body>
+</html>
