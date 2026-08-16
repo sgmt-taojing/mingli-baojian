@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>剩余工作盘点 · 2026-08-16</title>
+<style>
+:root{--ink:#1a2b4a;--muted:#6b7a94;--line:#e3e9f2;--bg:#f7f9fc;--card:#ffffff;--blue:#2f6fed;--green:#1f9d63;--amber:#c98a12;--red:#d4564a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;padding:32px 20px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:26px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:14px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:26px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.metric .v{font-size:26px;font-weight:700}
+.metric .l{font-size:13px;color:var(--muted);margin-top:2px}
+.metric.g .v{color:var(--green)}.metric.b .v{color:var(--blue)}.metric.a .v{color:var(--amber)}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14px;margin-bottom:26px}
+th{background:#eef3fa;text-align:left;padding:10px 14px;font-size:13px;color:var(--muted)}
+td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.b-p1{background:#fdeeee;color:var(--red)}
+.b-p2{background:#fdf6e3;color:var(--amber)}
+.b-p3{background:#eaf5ef;color:var(--green)}
+.b-done{background:#eef3fa;color:var(--blue)}
+.note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:14px 18px;font-size:14px;margin-bottom:26px}
+.note b{display:block;margin-bottom:6px}
+ul.tight{padding-left:20px}
+ul.tight li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>剩余工作盘点</h1>
+<div class="sub">mingli-baojian · 2026-08-16 19:10 · 基于 KANBAN R730+ 与实时服务巡检</div>
+
+<div class="grid">
+<div class="metric g"><div class="v">11/11</div><div class="l">端口全部在线（8960=v8.3 生产）</div></div>
+<div class="metric b"><div class="v">0.5s</div><div class="l">SSE 热态首字延迟（冷启动 4s 属 MLX compile 正常）</div></div>
+<div class="metric g"><div class="v">28/28</div><div class="l">古籍视觉蒸馏任务全部 ok</div></div>
+<div class="metric g"><div class="v">118G</div><div class="l">data1 可用（15%）；系统盘 8.2G 余</div></div>
+</div>
+
+<table>
+<tr><th style="width:90px">优先级</th><th>事项</th><th style="width:120px">来源</th><th>说明 / 下一步</th></tr>
+<tr><td><span class="badge b-p1">P1 待办</span></td><td>能力包市场全链路验收（节点 4/6）</td><td>KANBAN #2</td><td>用 R105 训练管线 clean3 数据包跑：外部需求 → matcher → evolve 全链路，完成「实际运营」节点后 6/6 收口</td></tr>
+<tr><td><span class="badge b-p1">P1 待办</span></td><td>mode=auto 安全闸门设计</td><td>KANBAN #4 遗留</td><td>诊断闭环已完结；需起草 auto 模式安全闸门（参考 R497b 安全闸门 + 医生认证模式），对应医学应急合规要求</td></tr>
+<tr><td><span class="badge b-p2">P2 候选</span></td><td>v8.4 训练迭代（idx23 追问 + 套话）</td><td>v8.3 评估残留</td><td>idx23=75（占位符未主动询问）、cliché 3/30、占位符未处理 2/30；等用户在线再启动</td></tr>
+<tr><td><span class="badge b-p2">P2 待办</span></td><td>chat_template 补 system prompt</td><td>R726 修真发现</td><td>模型偶尔回答「我是通义千问」——chat_template 无系统角色引导「命理助手」身份；需在 fuse 环节注入模板（v8.4 一并做）</td></tr>
+<tr><td><span class="badge b-p3">P3 可选</span></td><td>ai-stream-endpoint 直连 MLX 流式</td><td>R726.1</td><td>现走 public-chat 整段拉回再模拟流式；改为直调 callAIWithFallback(stream:true) 可获真流式首字 &lt;1s</td></tr>
+<tr><td><span class="badge b-p3">P3 收尾</span></td><td>古籍蒸馏覆盖确认</td><td>R119 视觉蒸馏</td><td>28 任务全部 ok（末单 18:04 一掌经 5 页入库）；待比对 17 本古籍清单确认无遗漏后关闭该线</td></tr>
+<tr><td><span class="badge b-done">已完成</span></td><td>MLX v8.3 上线 + SSE 流式 + 命名修真</td><td>#1 / #3</td><td>95.5 PASS · 流式热态 0.5s · 3b symlink 修真 · callAIWithFallback stream 透传（server 04ad21f）</td></tr>
+<tr><td><span class="badge b-done">已完成</span></td><td>多源实时交互诊断闭环</td><td>#4</td><td>四路引擎 + 医生审核 + 处方签发，端到端 1.5s</td></tr>
+</table>
+
+<div class="note">
+<b>当前状态一句话</b>
+四张 KANBAN 卡中 #1/#3/#4 已完结，唯一进行中的主线是 <b>#2 能力包市场验收</b>（差一次全链路实跑）；其余为 v8.4 训练候选与体验优化。服务层全绿：11 端口在线、8960 生产模型 mingli-sft-v8.3-7b、磁盘健康。KANBAN 与 distill-topology.png 进度已随 <code>a707172</code> 提交推送。
+</div>
+
+</div>
+</body>
+</html>
