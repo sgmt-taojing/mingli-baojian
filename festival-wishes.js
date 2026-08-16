@@ -337,8 +337,13 @@ function findByName(name) {
   return null;
 }
 
-// R119 修真：动态农历节日 + 节气（lunar_python 权威计算，替代固定 MM-DD 表）
-// 修复：FESTIVAL_2026 固定日期 → 2027 春节(2/6 vs 2/17)、端午(6/9 vs 6/19)、中秋(9/15 vs 9/25) 全错
+// R119 修真 v2：规则驱动引擎（73 项全量语义规则，lunar_python 动态）
+// festival-rules.json：lunar(29) + solar(9) + terms(24) + special(11)
+var FESTIVAL_RULES = null;
+try {
+  FESTIVAL_RULES = require('./festival-rules.json');
+} catch (e) { FESTIVAL_RULES = null; }
+
 function lookupDynamic(today) {
   try {
     var execSync = require('child_process').execSync;
@@ -347,21 +352,55 @@ function lookupDynamic(today) {
     var out = execSync("python3 -c \"" + script.replace(/"/g, '\\"') + "\"", { timeout: 5000, encoding: 'utf8' }).trim();
     var parts = out.split(/[\s,]+/).filter(Boolean);
     var lm = parseInt(parts[0], 10), ld = parseInt(parts[1], 10), jieqi = parts[2] || '';
-    // 农历节日（春节/端午/中秋，2026-2030 动态准确）
-    var lunarFest = null;
-    if (lm === 1 && ld === 1) lunarFest = '春节';
-    else if (lm === 5 && ld === 5) lunarFest = '端午节';
-    else if (lm === 8 && ld === 15) lunarFest = '中秋节';
-    if (lunarFest) {
-      var fb = findByName(lunarFest);
-      if (fb) return { name: fb.name, kind: fb.kind, theme: fb.theme, wish: fb.wish, img: fb.img };
+    var key = m.toString().padStart(2, '0') + '-' + d.toString().padStart(2, '0');
+    var lunarKey = lm + '-' + ld;
+    var rules = FESTIVAL_RULES;
+    var hitName = null, hitKind = null;
+    // 1) 特殊规则优先（伊斯兰历/藏历年度校准表权威；感恩节规则计算）
+    if (rules && rules.special) {
+      for (var s0 = 0; s0 < rules.special.length; s0++) {
+        var sp0 = rules.special[s0];
+        var matched0 = false;
+        if (sp0.rule === 'thanksgiving') {
+          if (m === 11) {
+            var first0 = new Date(y, 10, 1);
+            var firstThu0 = 1 + ((4 - first0.getDay() + 7) % 7);
+            if (d === firstThu0 + 21) matched0 = true;
+          }
+        } else if (typeof sp0.rule === 'object') {
+          var ys0 = String(y);
+          if (sp0.rule[ys0] === y + '-' + m.toString().padStart(2, '0') + '-' + d.toString().padStart(2, '0')) matched0 = true;
+        }
+        if (matched0) { hitName = sp0.name; hitKind = sp0.kind; break; }
+      }
     }
-    // 节气（含清明节日/节气合一）
-    if (jieqi) {
-      var fb2 = findByName(jieqi);
-      if (fb2 && fb2.kind === 'jie') return { name: fb2.name, kind: fb2.kind, theme: fb2.theme, wish: fb2.wish, img: fb2.img };
+    // 2) 农历节日（29 项，lunar_python 动态准确；R119 v2：!hitName 保护防覆盖特殊规则命中）
+    if (!hitName && rules && rules.lunar) {
+      for (var i = 0; i < rules.lunar.length; i++) {
+        if (rules.lunar[i].lunar === lunarKey) { hitName = rules.lunar[i].name; hitKind = rules.lunar[i].kind; break; }
+      }
+    } else if (!hitName) {
+      // 回退：内置三项
+      if (lm === 1 && ld === 1) { hitName = '春节'; hitKind = 'tradition'; }
+      else if (lm === 5 && ld === 5) { hitName = '端午节'; hitKind = 'tradition'; }
+      else if (lm === 8 && ld === 15) { hitName = '中秋节'; hitKind = 'tradition'; }
     }
-    return null;
+    // 2) 节气（24 项）
+    if (!hitName && jieqi && rules && rules.terms && rules.terms.indexOf(jieqi) >= 0) {
+      hitName = jieqi; hitKind = 'jie';
+    }
+    // 3) 公历固定（9 项）
+    if (!hitName && rules && rules.solar) {
+      for (var j = 0; j < rules.solar.length; j++) {
+        if (rules.solar[j].solar === key) { hitName = rules.solar[j].name; hitKind = rules.solar[j].kind; break; }
+      }
+    }
+    // 4) 特殊规则已在前置处理（R119 v2：优先级高于农历，防开斋节被龙抬头/文昌诞覆盖）
+    if (!hitName) return null;
+    // 文案：优先表内（FESTIVAL_2026 按 name），无则通用兜底
+    var fb = findByName(hitName);
+    if (fb) return { name: fb.name || hitName, kind: fb.kind || hitKind, theme: fb.theme, wish: fb.wish, img: fb.img };
+    return { name: hitName, kind: hitKind, theme: hitName + '吉日', wish: '今日' + hitName + '。愿您顺遂安康、万事胜意。', img: '' };
   } catch (e) { return null; }
 }
 
@@ -572,16 +611,24 @@ if (require.main === module) {
       ['2026-09-25', '中秋节'], ['2027-09-15', '中秋节'], ['2028-10-03', '中秋节'], ['2029-09-22', '中秋节'], ['2030-09-12', '中秋节'],
       ['2026-04-05', '清明'], ['2027-04-05', '清明'], ['2028-04-04', '清明'],
       ['2026-08-07', '立秋'], ['2027-02-04', '立春'], ['2028-02-04', '立春'],
+      // R119 v2：佛道民俗日（农历动态）
+      ['2026-03-03', '上元节'], ['2027-02-20', '上元节'], ['2026-02-25', '玉皇大帝圣诞'], ['2027-02-14', '玉皇大帝圣诞'],
+      ['2026-03-19', '龙抬头'], ['2027-03-09', '龙抬头'], ['2026-08-29', '七夕节'], ['2027-08-08', '七夕节'],
+      ['2028-01-04', '腊八节'], ['2027-05-13', '佛陀诞'], ['2027-03-26', '观音圣诞'],
+      ['2026-10-09', '重阳节'], ['2027-10-08', '重阳节'],
+      // 特殊规则
+      ['2026-11-26', '感恩节'], ['2027-11-25', '感恩节'], ['2026-03-20', '开斋节'], ['2027-03-10', '开斋节'],
     ];
-    var pass = 0, fail = 0;
+    var pass = 0, fail = 0, fails = [];
     checks.forEach(function (c) {
       var d = new Date(c[0] + 'T08:00:00');
       var hit = lookup(d);
-      var ok = hit && (hit.name === c[1] || (hit.name || '').indexOf(c[1]) >= 0 || (c[1].indexOf(hit.name || '') >= 0 && hit.kind !== 'weekend'));
+      var ok = hit && (hit.name === c[1] || (hit.name || '').indexOf(c[1]) >= 0 || (c[1].indexOf(hit.name || '') >= 0 && hit.kind !== 'weekend' && hit.kind !== 'ru_dao_fo'));
       if (ok) { pass++; console.log('✅', c[0], c[1], '→', hit.name); }
-      else { fail++; console.log('❌', c[0], c[1], '→', hit ? (hit.name + '/' + hit.kind) : 'null'); }
+      else { fail++; fails.push(c[0] + ' ' + c[1] + '→' + (hit ? hit.name + '/' + hit.kind : 'null')); console.log('❌', c[0], c[1], '→', hit ? (hit.name + '/' + hit.kind) : 'null'); }
     });
     console.log('\n校验结果: ' + pass + ' 通过 / ' + fail + ' 失败');
+    if (fails.length) console.log('失败项: ' + fails.join('; '));
     process.exit(fail > 0 ? 1 : 0);
   }
   var date = null;
