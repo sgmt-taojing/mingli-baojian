@@ -216,7 +216,6 @@ var FESTIVAL_2026 = {
     img: '张天师持剑骑虎,符箓飞扬,松风阵阵' },
 
   // 儒家补缺
-  '01-01': null, // 元旦已有
   '04-15': { name: '曾子诞', kind: 'ru', theme: '宗圣薪传',
     wish: '宗圣曾子圣诞,吾日三省吾身。值此佳日,愿您修身齐家、德业日新、内外兼修。',
     img: '曾子讲学图,松柏长青,弟子环坐,晨光初照' },
@@ -226,8 +225,8 @@ var FESTIVAL_2026 = {
 
   // ===== 少数民族节日 =====
   '02-21': null, // 财神日已有,下方覆盇
-  // 藏历新年(2026年约 2/21,取近似)
-  '02-21': { name: '藏历新年', kind: 'ethnic', theme: '洛萨吉祥',
+  // 藏历新年(2026年约 2/21,取近似;R119:改键避免覆盖财神日)
+  '02-21b': { name: '藏历新年', kind: 'ethnic', theme: '洛萨吉祥',
     wish: '藏历新年洛萨吉祥!值此佳节,愿您如雪山般坚毅、如哈达般纯洁、如格桑花般灿烂。',
     img: '布达拉宫雪景,经幡飘扬,酥油灯点点,藏式写意' },
   // 泼水节(傣族,4月中旬)
@@ -330,7 +329,46 @@ var RU_DAO_FO_WISHES = [
     img: '佛手拈花微笑,莲花盛开,祥云金光,柔和庄严' }
 ];
 
+// R119：按名称反查文案（动态节日命中后用）
+function findByName(name) {
+  for (var k in FESTIVAL_2026) {
+    if (FESTIVAL_2026[k] && FESTIVAL_2026[k].name === name) return FESTIVAL_2026[k];
+  }
+  return null;
+}
+
+// R119 修真：动态农历节日 + 节气（lunar_python 权威计算，替代固定 MM-DD 表）
+// 修复：FESTIVAL_2026 固定日期 → 2027 春节(2/6 vs 2/17)、端午(6/9 vs 6/19)、中秋(9/15 vs 9/25) 全错
+function lookupDynamic(today) {
+  try {
+    var execSync = require('child_process').execSync;
+    var y = today.getFullYear(), m = today.getMonth() + 1, d = today.getDate();
+    var script = "import sys;sys.path.insert(0,'/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server');from lunar_python import Solar;l=Solar.fromYmd(" + y + "," + m + "," + d + ").getLunar();print(l.getMonth(),l.getDay(),l.getJieQi() or '')";
+    var out = execSync("python3 -c \"" + script.replace(/"/g, '\\"') + "\"", { timeout: 5000, encoding: 'utf8' }).trim();
+    var parts = out.split(/[\s,]+/).filter(Boolean);
+    var lm = parseInt(parts[0], 10), ld = parseInt(parts[1], 10), jieqi = parts[2] || '';
+    // 农历节日（春节/端午/中秋，2026-2030 动态准确）
+    var lunarFest = null;
+    if (lm === 1 && ld === 1) lunarFest = '春节';
+    else if (lm === 5 && ld === 5) lunarFest = '端午节';
+    else if (lm === 8 && ld === 15) lunarFest = '中秋节';
+    if (lunarFest) {
+      var fb = findByName(lunarFest);
+      if (fb) return { name: fb.name, kind: fb.kind, theme: fb.theme, wish: fb.wish, img: fb.img };
+    }
+    // 节气（含清明节日/节气合一）
+    if (jieqi) {
+      var fb2 = findByName(jieqi);
+      if (fb2 && fb2.kind === 'jie') return { name: fb2.name, kind: fb2.kind, theme: fb2.theme, wish: fb2.wish, img: fb2.img };
+    }
+    return null;
+  } catch (e) { return null; }
+}
+
 function lookup(today) {
+  // R119：动态优先（农历节日/节气按年准确），失败回退固定表
+  var dyn = lookupDynamic(today);
+  if (dyn) return dyn;
   var key = (today.getMonth() + 1).toString().padStart(2, '0') + '-' + today.getDate().toString().padStart(2, '0');
   var festival = FESTIVAL_2026[key];
   if (festival) return festival;
@@ -526,6 +564,26 @@ if (require.main === module) {
   var arg = process.argv[2];
   var withImg = process.argv.includes('--img');
   var withKb  = process.argv.includes('--kb');
+  // R119：--verify 全量校验模式（2026-2030 节日/节气日期命中测试）
+  if (arg === '--verify') {
+    var checks = [
+      ['2026-02-17', '春节'], ['2027-02-06', '春节'], ['2028-01-26', '春节'], ['2029-02-13', '春节'], ['2030-02-03', '春节'],
+      ['2026-06-19', '端午节'], ['2027-06-09', '端午节'], ['2028-05-28', '端午节'], ['2029-06-16', '端午节'], ['2030-06-05', '端午节'],
+      ['2026-09-25', '中秋节'], ['2027-09-15', '中秋节'], ['2028-10-03', '中秋节'], ['2029-09-22', '中秋节'], ['2030-09-12', '中秋节'],
+      ['2026-04-05', '清明'], ['2027-04-05', '清明'], ['2028-04-04', '清明'],
+      ['2026-08-07', '立秋'], ['2027-02-04', '立春'], ['2028-02-04', '立春'],
+    ];
+    var pass = 0, fail = 0;
+    checks.forEach(function (c) {
+      var d = new Date(c[0] + 'T08:00:00');
+      var hit = lookup(d);
+      var ok = hit && (hit.name === c[1] || (hit.name || '').indexOf(c[1]) >= 0 || (c[1].indexOf(hit.name || '') >= 0 && hit.kind !== 'weekend'));
+      if (ok) { pass++; console.log('✅', c[0], c[1], '→', hit.name); }
+      else { fail++; console.log('❌', c[0], c[1], '→', hit ? (hit.name + '/' + hit.kind) : 'null'); }
+    });
+    console.log('\n校验结果: ' + pass + ' 通过 / ' + fail + ' 失败');
+    process.exit(fail > 0 ? 1 : 0);
+  }
   var date = null;
   if (arg && /^\d{4}-\d{2}-\d{2}$/.test(arg)) {
     date = new Date(arg + 'T08:00:00');
