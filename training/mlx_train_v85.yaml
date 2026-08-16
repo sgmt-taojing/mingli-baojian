@@ -1,0 +1,47 @@
+# v8.5 SFT 训练配置 — BaziQA 选择题专项修真
+# 目标：修真 v8.4 BaziQA 35% → 60%+（v8.4 只加 5 条风格样本，远不足以教会选择题推理）
+#
+# 数据：BaziQA 全量 488 题蒸馏（40 人训练 390 / 10 人评估 98，人物级隔离）
+#  - prompt：出生信息 + 题目 + 5 选项，要求只回复字母
+#  - completion：标准答案字母
+# 修真：v8.4 失败题与 v8.3 完全相同（增量未改变选择题能力）——根因是训练样本不足
+#
+# 训练链路：Qwen2.5-3B base → v8.4 fused → v8.5 LoRA（BaziQA 专项）
+
+model: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.4-7b"
+train: true
+test: false
+
+train_file: "train.baziqa.jsonl"
+valid_file: "valid.baziqa.jsonl"
+data: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-r105-data-v85"
+
+fine_tune_type: "lora"
+num_layers: 20
+lora_parameters:
+  rank: 4
+  dropout: 0.05
+  scale: 4.0
+
+iters: 200
+batch_size: 1
+grad_accumulation_steps: 4
+learning_rate: 5e-6
+optimizer: "adamw"
+optimizer_config:
+  adamw:
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    weight_decay: 0.01
+
+max_seq_length: 768
+mask_prompt: true
+grad_checkpoint: true
+
+save_every: 50
+steps_per_eval: 50
+steps_per_report: 10
+val_batches: 20
+seed: 42
+
+adapter_path: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-checkpoints/mingli-sft-v85-7b"
