@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>训练素材采集工作台 · 命理宝鉴</title>
+<style>
+:root{--ink:#1a2b4a;--muted:#6b7a94;--line:#e3e9f2;--bg:#f4f7fb;--card:#fff;--blue:#2f6fed;--green:#1f9d63;--amber:#c98a12;--red:#d4564a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding:0 0 60px}
+header{background:linear-gradient(135deg,#1a3a6b,#2f6fed);color:#fff;padding:26px 24px 22px}
+header h1{font-size:21px;margin-bottom:4px}
+header p{opacity:.85;font-size:13px}
+main{max-width:1080px;margin:-14px auto 0;padding:0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(20,40,80,.05)}
+h2{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+label{font-size:12.5px;color:var(--muted);display:block;margin:10px 0 4px}
+input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13.5px;font-family:inherit;background:#fbfcfe}
+textarea{min-height:70px;resize:vertical}
+textarea.tall{min-height:120px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>div{flex:1;min-width:160px}
+button{border:none;border-radius:8px;padding:10px 20px;font-size:13.5px;font-weight:600;cursor:pointer;transition:opacity .15s}
+button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:var(--blue);color:#fff}
+.success{background:var(--green);color:#fff}
+.ghost{background:#eef3fa;color:var(--blue)}
+.danger{background:#fdeeee;color:var(--red)}
+.badge{display:inline-block;padding:2px 10px;border-radius:14px;font-size:11.5px;font-weight:600}
+.b-collecting{background:#eef3fa;color:var(--blue)}
+.b-reviewing{background:#fdf6e3;color:var(--amber)}
+.b-built{background:#eaf5ef;color:var(--green)}
+.item{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fbfcfe}
+.item.sel{border-color:var(--blue);background:#f0f5ff}
+.item .q{font-size:13px;font-weight:600;margin-bottom:4px}
+.item .a{font-size:12.5px;color:#3a4a63;white-space:pre-wrap;max-height:110px;overflow:hidden;position:relative}
+.item .meta{font-size:11px;color:var(--muted);margin-top:6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.item .chk{margin-right:6px}
+.pool-tabs{display:flex;gap:8px;margin-bottom:12px}
+.pool-tabs button{padding:6px 16px;font-size:12.5px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:#f8fafd;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.stat .v{font-size:20px;font-weight:700}
+.stat .l{font-size:11.5px;color:var(--muted)}
+.msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:10px;display:none}
+.msg.err{background:#fdeeee;color:var(--red)}
+.msg.ok{background:#eaf5ef;color:var(--green)}
+.taskrow{display:flex;justify-content:space-between;align-items:center;padding:10px 6px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13px}
+.taskrow:hover{background:#f6f9fd}
+.build-out{background:#0e1c33;color:#9fd3a8;border-radius:8px;padding:12px 14px;font-family:menlo,monospace;font-size:12px;margin-top:10px;white-space:pre-wrap;word-break:break-all}
+.hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+<h1>🎯 训练素材采集工作台</h1>
+<p>训练方向 → 互联网自动采集 → 人工补充 → 一键构建增量 SFT → 快速进化</p>
+</header>
+<main>
+
+<div class="card">
+<h2><span class="dot"></span>第一步：给出训练方向</h2>
+<div class="row">
+<div style="flex:2">
+<label>训练方向描述（想让模型在哪个方向进化）</label>
+<input type="text" id="direction" placeholder="例：提升八字格局判断精度——从格/化格/身强身弱的辨别与用神选取">
+</div>
+<div>
+<label>领域</label>
+<select id="domain"><option value="bazi">八字</option><option value="ziwei">紫微</option><option value="tcm">中医</option><option value="general">综合</option><option value="boundary">边界防御</option></select>
+</div>
+<div>
+<label>目标素材量</label>
+<select id="target"><option>100</option><option>200</option><option>500</option><option>1000</option></select>
+</div>
+</div>
+<div style="margin-top:12px"><button class="primary" id="btnCreate" onclick="createTask()">创建采集任务</button>
+<span class="hint">创建后由智能体自动从互联网采集素材进入待审区</span></div>
+<div class="msg" id="msgCreate"></div>
+</div>
+
+<div class="card">
+<h2><span class="dot"></span>第二步：任务看板（采集结果 + 人工补充窗口）</h2>
+<div id="taskList"><div class="hint">暂无任务——先在上方创建</div></div>
+<div id="taskDetail" style="display:none">
+<div class="stats" id="stats"></div>
+<div class="pool-tabs">
+<button class="ghost" id="tabCollected" onclick="switchPool('collected')">🌐 互联网采集</button>
+<button class="ghost" id="tabSupplemented" onclick="switchPool('supplemented')">✍️ 人工补充</button>
+<button class="danger" onclick="rejectSelected()">剔除选中</button>
+</div>
+<div id="items"></div>
+<div style="display:flex;gap:10px;margin-top:8px">
+<button class="ghost" onclick="loadPage(-1)">上一页</button>
+<span class="hint" id="pageInfo" style="align-self:center"></span>
+<button class="ghost" onclick="loadPage(1)">下一页</button>
+</div>
+
+<h2 style="margin-top:18px"><span class="dot"></span>补充素材（边缘案例 / 纠正样本）</h2>
+<div class="hint" style="margin-bottom:6px">人工素材信任度 0.95（高于互联网采集的 0.6），优先进入训练集</div>
+<label>问题 / 指令（prompt）</label>
+<textarea id="supPrompt" placeholder="例：[2026] 年 [命主] 的流年运势如何？"></textarea>
+<label>期望回答（completion）</label>
+<textarea id="supCompletion" class="tall" placeholder="例：为了准确分析流年运势，需要完整的出生信息……请问您的出生年份、月份、日期和时辰是？"></textarea>
+<div style="margin-top:10px"><button class="success" onclick="addSupplement()">提交补充素材</button></div>
+<div class="msg" id="msgSup"></div>
+</div>
+</div>
+
+<div class="card">
+<h2><span class="dot"></span>第三步：一键构建增量 SFT</h2>
+<p class="hint" style="margin-bottom:10px">合并「人工补充 + 采集素材」（人工优先），自动去重 + 合规扫描，产出可直接训练的 train.*.inc.*.jsonl</p>
+<button class="primary" onclick="buildSft()">🚀 构建增量训练集</button>
+<div class="build-out" id="buildOut" style="display:none"></div>
+<div class="msg" id="msgBuild"></div>
+</div>
+
+</main>
+<script>
+'use strict';
+let currentTask = null, pool = 'collected', page = 1, size = 20, total = 0;
+const $ = id => document.getElementById(id);
+const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+function show(id, text, ok){ const el=$(id); el.textContent=text; el.className='msg '+(ok?'ok':'err'); el.style.display='block'; setTimeout(()=>el.style.display='none', 5000); }
+
+async function api(path, opts){ try{ const r=await fetch(BASE+path,{headers:{'Content-Type':'application/json'},...opts}); return await r.json(); }catch(e){ return {code:-1,message:e.message}; } }
+
+async function createTask(){
+const direction=$('direction').value.trim();
+if(!direction) return show('msgCreate','请填写训练方向',false);
+const d=await api('/api/training/collect/task',{method:'POST',body:JSON.stringify({direction,domain:$('domain').value,targetCount:Number($('target').value)})});
+if(d.code!==0) return show('msgCreate','创建失败：'+d.message,false);
+show('msgCreate','✅ 任务已创建：'+d.data.taskId+'（智能体即将开始采集）',true);
+$('direction').value=''; setTimeout(loadTasks, 600);
+}
+
+async function loadTasks(){
+const d=await api('/api/training/collect/tasks');
+if(d.code!==0||!d.data.length){ $('taskList').innerHTML='<div class="hint">暂无任务</div>'; return; }
+$('taskList').innerHTML=d.data.map(t=>{
+const st={collecting:'采集中',reviewing:'待审阅',building:'构建中',built:'已构建'}[t.status]||t.status;
+return `<div class="taskrow" onclick="openTask('${t.id}')"><div><b>${esc(t.direction)}</b><div class="hint">${t.domain} · 采集 ${t.collected} 条 · 人工 ${t.supplemented} 条 · ${st}</div></div><span class="badge b-${t.status}">${st}</span></div>`;
+}).join('');
+}
+
+async function openTask(id){
+currentTask=id; page=1; $('taskDetail').style.display='block';
+await loadDetail();
+}
+
+async function loadDetail(){
+if(!currentTask) return;
+const d=await api(`/api/training/collect/task/${currentTask}?pool=${pool}&page=${page}&size=${size}`);
+if(d.code!==0) return;
+const t=d.data; total=Math.ceil((t.counts[pool]||0)/size);
+$('stats').innerHTML=`<div class="stat"><div class="v" style="color:var(--blue)">${t.counts.collected}</div><div class="l">互联网采集</div></div><div class="stat"><div class="v" style="color:var(--green)">${t.counts.supplemented}</div><div class="l">人工补充</div></div><div class="stat"><div class="v" style="color:var(--red)">${t.counts.rejected}</div><div class="l">已剔除</div></div><div class="stat"><div class="v">${t.targetCount}</div><div class="l">目标量</div></div>`;
+$('tabCollected').style.background=pool==='collected'?'#d8e6fb':'';
+$('tabSupplemented').style.background=pool==='supplemented'?'#d8e6fb':'';
+$('items').innerHTML=(t.items||[]).map(it=>`<div class="item" data-id="${it.id}"><label style="margin:0"><input type="checkbox" class="chk">${it.prompt.slice(0,160).replace(/</g,'&lt;')}</label><div class="a">${esc(it.completion.slice(0,300))}</div><div class="meta"><span class="badge ${it.source==='human'?'b-built':'b-collecting'}">${it.source==='human'?'人工':'采集'}</span><span>信任 ${it.trust}</span>${it.sourceUrl?`<a href="${esc(it.sourceUrl)}" target="_blank" style="color:var(--blue)">来源</a>`:''}</div></div>`).join('')||'<div class="hint">本页无素材</div>';
+$('pageInfo').textContent=`第 ${page} / ${Math.max(total,1)} 页`;
+}
+
+function switchPool(p){ pool=p; page=1; loadDetail(); }
+function loadPage(d){ const np=page+d; if(np<1||np>Math.max(total,1)) return; page=np; loadDetail(); }
+
+async function addSupplement(){
+const p=$('supPrompt').value.trim(), c=$('supCompletion').value.trim();
+if(!p||!c) return show('msgSup','问题和期望回答都不能为空',false);
+if(!currentTask) return show('msgSup','请先在任务看板中选择任务',false);
+const d=await api(`/api/training/collect/task/${currentTask}/supplement`,{method:'POST',body:JSON.stringify({items:[{prompt:p,completion:c}]})});
+if(d.code!==0) return show('msgSup','提交失败：'+d.message,false);
+show('msgSup','✅ 已加入（累计人工素材 '+d.data.total+' 条）',true);
+$('supPrompt').value=''; $('supCompletion').value=''; loadDetail(); loadTasks();
+}
+
+async function rejectSelected(){
+const ids=[...document.querySelectorAll('.item')].filter(el=>el.querySelector('.chk').checked).map(el=>el.dataset.id);
+if(!ids.length) return;
+const d=await api(`/api/training/collect/task/${currentTask}/reject`,{method:'POST',body:JSON.stringify({ids,reason:'人工剔除'})});
+if(d.code===0){ loadDetail(); loadTasks(); }
+}
+
+async function buildSft(){
+if(!currentTask) return show('msgBuild','请先选择任务',false);
+$('msgBuild').className='msg'; $('msgBuild').style.display='none';
+const d=await api(`/api/training/collect/task/${currentTask}/build`,{method:'POST',body:JSON.stringify({})});
+if(d.code!==0) return show('msgBuild','构建失败：'+d.message,false);
+const b=d.data;
+$('buildOut').style.display='block';
+$('buildOut').textContent=`✅ 构建完成\n文件: ${b.filename}\n总条数: ${b.count}（人工 ${b.fromHuman} + 采集 ${b.fromWeb}，去重剔除 ${b.deduped}）\n合规违规: ${b.violations}\n路径: ${b.file}`;
+show('msgBuild','增量训练集已生成，可并入下一次训练',true); loadTasks(); loadDetail();
+}
+
+loadTasks();
+</script>
+</body>
+</html>
