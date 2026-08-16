@@ -129,7 +129,16 @@ class Handler(BaseHTTPRequestHandler):
                 self._respond(400, {'error': 'messages required'})
                 return
             # 拼 prompt（Qwen chat 格式）
+            # R732: 服务端默认注入命理助手 system prompt（防 base 模型自称通义千问）
+            # 仅当调用方未传 system 时注入，不覆盖上游角色设定
+            DEFAULT_SYSTEM = (
+                '你是命理宝鉴的命理与中医知识助手，不自称通义千问或其他模型名。'
+                '回答基于传统命理与中医理论，客观中立，不做绝对判断，不提供医疗诊断替代。'
+            )
+            has_system = any(m.get('role') == 'system' for m in messages)
             prompt = ''
+            if not has_system:
+                prompt += f'<s>{DEFAULT_SYSTEM}\n'
             for m in messages:
                 role = m.get('role', 'user')
                 content = m.get('content', '')
