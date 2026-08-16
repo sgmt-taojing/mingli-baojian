@@ -169,6 +169,20 @@ TRIG_OK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT 
 NULL_CNT=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM kb_formal WHERE hit_count IS NULL;" 2>/dev/null)
 [ "$NULL_CNT" != "0" ] && [ -n "$NULL_CNT" ] && ALERTS+=("kb_formal hit_count NULL: $NULL_CNT 条")
 
+# ===== R118 KB 隔离巡检：跨项目 module 一旦出现在 mingli 正式 KB 表中 → 立即 ERROR =====
+# 修真背景：2026-08-16 发现 distill-all-projects.py 误把 6 个跨项目（smart-home-family /
+# epb-assistant / family-life / wechat-platform / digital-workshop / digital-ecosystem）
+# 蒸馏进了 mingli 主 KB。本规则确保未来再混入时秒级告警。
+# 范围限定：仅 kb_formal + formal_knowledge（正式 KB）。kb_staging 是待审核区，污染了不
+# 影响检索结果，但外键约束需保留以便审计。
+CROSS_MODULES="'family-life','smart-home-family','epb-assistant','wechat-platform','digital-ecosystem','digital-workshop'"
+CROSS_F=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM kb_formal WHERE module IN (${CROSS_MODULES});" 2>/dev/null)
+CROSS_K=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM formal_knowledge WHERE module IN (${CROSS_MODULES});" 2>/dev/null)
+CROSS_TOTAL=$(( ${CROSS_F:-0} + ${CROSS_K:-0} ))
+if [ "$CROSS_TOTAL" -gt 0 ]; then
+  ALERTS+=("R118 KB 污染: mingli 主 KB 正式表出现跨项目 module ${CROSS_TOTAL} 条（kb_formal=${CROSS_F:-0} / formal_knowledge=${CROSS_K:-0}）。修真脚本 distill-all-projects.py 或运行 scripts/cleanup-outbound-20260816.sh 迁回")
+fi
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"
