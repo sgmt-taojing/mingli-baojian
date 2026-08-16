@@ -82,21 +82,42 @@ h1{font-size:24px;color:#e8c87a;text-align:center;margin-bottom:6px;letter-spaci
 
 <script>
 function buy(name, price){ document.getElementById('plan').value = name + ' ¥' + price + '/月'; }
+var ORDER_API = 'http://127.0.0.1:8961/api/order';
 function submitOrder(){
   var contact = document.getElementById('contact').value.trim();
   if(!contact){ document.getElementById('result').style.display='block';
     document.getElementById('result').style.background='rgba(255,93,115,.1)';
     document.getElementById('result').style.borderColor='rgba(255,93,115,.3)';
     document.getElementById('result').textContent='请填写联系方式'; return; }
+  var plan = document.getElementById('plan').value;
+  var pay = (document.getElementById('pay-method')||{}).value || 'wechat';
+  var org = document.getElementById('org').value.trim();
+  var planName = plan.split(' ')[0];
+  var payload = {plan: planName, contact: contact, org: org, pay_method: pay};
+  function showResult(msg, ok){
+    document.getElementById('result').style.display='block';
+    document.getElementById('result').style.background = ok ? 'rgba(61,220,151,.1)' : 'rgba(255,93,115,.1)';
+    document.getElementById('result').style.borderColor = ok ? 'rgba(61,220,151,.3)' : 'rgba(255,93,115,.3)';
+    document.getElementById('result').textContent = msg;
+  }
+  function localFallback(){
+    try{
+      var orders = JSON.parse(localStorage.getItem('shop_orders')||'[]');
+      orders.push({plan: planName, contact: contact, org: org, pay: pay, status:'pending', ts:new Date().toISOString()});
+      localStorage.setItem('shop_orders', JSON.stringify(orders));
+    }catch(e){}
+    showResult('✓ 订单已提交（本地登记），工作人员将联系您开通。', true);
+  }
   try{
-    var orders = JSON.parse(localStorage.getItem('shop_orders')||'[]');
-    orders.push({plan:document.getElementById("plan").value, contact:contact, org:document.getElementById("org").value.trim(), pay:document.getElementById("pay-method").value, status:"pending", ts:new Date().toISOString()});
-    localStorage.setItem('shop_orders', JSON.stringify(orders));
-  }catch(e){}
-  document.getElementById('result').style.display='block';
-  document.getElementById('result').style.background='rgba(61,220,151,.1)';
-  document.getElementById('result').style.borderColor='rgba(61,220,151,.3)';
-  document.getElementById('result').textContent='✓ 订单已提交（演示模式），工作人员将联系您开通。订单号 #' + Date.now().toString(36);
+    fetch(ORDER_API, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload), timeout: 5000})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d && d.ok && d.order){
+          showResult('✓ 订单已提交，订单号 ' + d.order.id + '（支付方式：' + d.order.pay_method + '），工作人员将联系您开通。', true);
+        } else { localFallback(); }
+      })
+      .catch(function(){ localFallback(); });
+  }catch(e){ localFallback(); }
 }
 </script>
 <div class="sub" style="margin-top:20px;font-size:11px;color:#5a6a90;border-top:1px solid rgba(120,160,255,.15);padding-top:12px">⚠ 本系统输出仅供参考，不构成医疗/法律/金融等专业建议。涉及疾病诊断、处方、剂量请咨询持证专业人士；急症请立即就医。</div>

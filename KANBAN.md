@@ -1,7 +1,15 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
 > **R730+ 双修真深度校正（2026-08-16 07:30）**：修真 #4 daily_push.js（db2d038）+ 修真 #5 daily-push-bridge.py（v3）二轮深度校正 14/14 全绿——三模式实测（HTTP public/simple/默认 execFile）+ 错误端口 9999 降级复现 + bridge --http 8921 临时拉起验证（31 字段 payload、127.0.0.1 绑定）+ 双出口数据一致性 5/5（date/年/月/日柱/生肖）+ 宜忌归一化全等（yi 18=18、ji 9=9，数组 vs 顿号串为格式差异非数据分歧）+ KB 47,653+5,772 持续入库 + 临时进程零残留。报告：workspace/DELIVERY/双修真深度校正报告-2026-08-16.html
-> 最后更新: 2026-08-15 21:15 CST（v8.3 + R730 daily_push HTTP 同源修真·KANBAN#4 完结）
+> **R119 全面推进（2026-08-16 12:20）**：跨项目隔离 + 医学物理迁移 + 双源修真三线收口——
+> - **隔离**：kb_staging 262 条跨项目条目迁回各项目（shf 87/epb 70/fla 46/wx 59）；DPO 130 + SFT 1 条迁出归档；防御脚本 no-cross-project-tag.py 接入巡检
+> - **医学物理迁移**：26,386 条 authority=pending → tcm-agent 权威库（+9,745 去重后入库），权威库 27,988 条；authority-mapping v1.2 active；蒸馏六流 6/6 全绿
+> - **双源消除**：knowledge-qa + public/kb-search 医学域优先 8932 权威库（authority-tcm 引擎），本地 trigram FTS5 双字静默 0 命中 bug 修真（空结果强制 LIKE 兜底）
+> - **cron 修真**：视觉同步幽灵 audit.py 移除 / YZX v4 固化脚本 / TCM日扫描+mignli-tcm+临床蒸馏纯脚本禁 LLM；新增 03:10 标记更新 + 03:40 正向同步
+> - **提交**：f059cff / ece53cc / ee4b1b4 / f82eae8 / f6ffa1b / 141c6b6 / 5ffee44(shf) / 75b8232
+> - 报告：DELIVERY/r119-全面推进-2026-08-16.html
+>
+> > 最后更新: 2026-08-15 21:15 CST（v8.3 + R730 daily_push HTTP 同源修真·KANBAN#4 完结）
 
 ## 08-15 R730 P0-4 daily_push.js HTTP 模式修真（21:15）
 
