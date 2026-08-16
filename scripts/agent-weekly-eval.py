@@ -25,6 +25,33 @@ API_STATS = "http://127.0.0.1:8920/api/agent/stats"
 INTERNAL_UA = "MingliAgentEval/1.0 (internal weekly eval)"  # 本地内部服务标识，避免被反爬拦截
 
 
+def _probe_uptime_days():
+    """探测 8920 端口 api-server 进程已运行天数（无 ps 权限时返回 None）"""
+    try:
+        import subprocess
+        out = subprocess.run(
+            ["ps", "-o", "lstart=", "-p", str(_pid_on_port(8920))],
+            capture_output=True, text=True, timeout=5
+        ).stdout.strip()
+        if not out:
+            return None
+        from datetime import datetime as _dt
+        start = _dt.strptime(out[:19], "%a %b %d %H:%M:%S")
+        now = _dt.now()
+        # 处理跨年（ps lstart 无年份）：若解析时间晚于现在则视为去年
+        start = start.replace(year=now.year if start.replace(year=now.year) <= now else now.year - 1)
+        return (now - start).total_seconds() / 86400.0
+    except Exception:
+        return None
+
+
+def _pid_on_port(port):
+    """通过 lsof 获取监听端口对应 PID"""
+    import subprocess
+    out = subprocess.run(["lsof", "-tiTCP:%d" % port, "-sTCP:LISTEN"], capture_output=True, text=True, timeout=5).stdout.strip()
+    return out.splitlines()[0] if out else "0"
+
+
 def fetch_api_stats():
     try:
         req = urllib.request.Request(API_STATS, headers={"User-Agent": INTERNAL_UA})
@@ -48,12 +75,12 @@ def fetch_db(conn, days):
     except Exception as e:
         kb_hits = {"error": str(e)}
 
-    # 反馈统计（只统计有效评分 score>0）
+    # 反馈统计（只统计有效评分 score>0；count=0 时 avg 为 NULL，由 build_report 区分「无样本」与「低分」）
     fb = {}
     try:
         c.execute("SELECT COUNT(*), AVG(score) FROM kb_feedback WHERE created_at >= ? AND score > 0", (since,))
         row = c.fetchone()
-        fb = {"count": row[0] or 0, "avg_score": round(row[1] or 0, 2)}
+        fb = {"count": row[0] or 0, "avg_score": round(row[1] or 0, 2) if row[1] is not None else None}
     except Exception as e:
         fb = {"error": str(e)}
 
@@ -80,12 +107,20 @@ def build_report(api_stats, kb_hits, fb, repair, days):
     if api_stats.get("error"):
         lines.append(f"⚠️ API 统计不可用：{api_stats['error']}")
     elif api_stats.get("runs", 0) == 0:
-        lines.append(f"⚠️ 暂无编排运行数据（服务刚启动或无人调用）")
+        # 2026-08-17 R: 区分「进程刚启动/窗口不完整」与「无人调用」，避免误导
+        up_days = _probe_uptime_days()
+        if up_days is None:
+            lines.append(f"⚠️ 暂无编排运行数据（无法探测服务 uptime；编排记录自 2026-08-17 起已落库 orchestration_log）")
+        elif up_days < days:
+            lines.append(f"⚠️ 暂无编排运行数据（api-server 进程仅运行 {up_days:.1f} 天，统计窗口不足 {days} 天；编排记录自 2026-08-17 起已持久化 orchestration_log，下期可完整回溯）")
+        else:
+            lines.append(f"⚠️ 暂无编排运行数据（服务运行 {up_days:.1f} 天且无调用 → 编排入口未被前端触发，检查 ai-assistant 弱命中兑底链路）")
     else:
         lines.append(f"| 指标 | 数值 | 评价 |")
         lines.append(f"|---|---|---|")
         s = api_stats
-        lines.append(f"| 调用次数 | {s['runs']} | - |")
+        src = "（库）" if s.get("source") == "db" else "（内存）"
+        lines.append(f"| 调用次数{src} | {s['runs']} | - |")
         lines.append(f"| 平均耗时 | {s['avgDurationMs']}ms | {'✅ P95达标(<500ms)' if s['avgDurationMs'] < 500 else '⚠️ 超时风险'} |")
         lines.append(f"| 降级率 | {s['degradedRate']*100:.1f}% | {'✅' if s['degradedRate'] < 0.05 else '⚠️ 需排查'} |")
         lines.append(f"| 超时率 | {s['timeoutRate']*100:.1f}% | {'✅' if s['timeoutRate'] < 0.05 else '⚠️ 需排查'} |")
@@ -110,6 +145,10 @@ def build_report(api_stats, kb_hits, fb, repair, days):
     lines.append(f"")
     if fb.get("error"):
         lines.append(f"⚠️ {fb['error']}")
+    elif fb["count"] == 0:
+        # R 修真(2026-08-17):0 样本时显示 0/5 ⚠️ 属误导（无反馈 ≠ 低满意度）
+        # 反馈按钮仅挂在 AI 助手对话回复上，KB 搜索命中(search-fts/realtime-search)不触发
+        lines.append(f"- 反馈条数：0（本周无反馈样本 ℹ️，不参与满意度评价；反馈按钮仅挂在 AI 助手对话回复）")
     else:
         lines.append(f"- 反馈条数：{fb['count']}")
         lines.append(f"- 平均评分：{fb['avg_score']}/5 {'✅' if fb['avg_score'] >= 4 else '⚠️ 满意度待提升'}")
