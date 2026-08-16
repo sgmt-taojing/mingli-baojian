@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>R119 全面推进报告 · 2026-08-16</title>
+<style>
+  :root { --bg:#0f1115; --card:#171a21; --card2:#1c2029; --line:#2a2f3a; --tx:#e8e6e3; --mut:#8b8f98; --gold:#d4a94e; --green:#4ec98a; --blue:#5b9cf5; --red:#e0655c; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--tx); font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif; line-height:1.7; padding:32px 20px; }
+  .wrap { max-width:960px; margin:0 auto; }
+  h1 { font-size:26px; margin-bottom:6px; }
+  .sub { color:var(--mut); font-size:14px; margin-bottom:28px; }
+  h2 { font-size:19px; margin:30px 0 14px; padding-left:10px; border-left:4px solid var(--gold); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin-bottom:14px; }
+  .metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:14px; }
+  .metric { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; text-align:center; }
+  .metric .num { font-size:26px; font-weight:700; color:var(--gold); }
+  .metric .lab { font-size:12px; color:var(--mut); margin-top:4px; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--mut); font-weight:600; font-size:12px; text-transform:uppercase; }
+  .ok { color:var(--green); font-weight:600; }
+  .warn { color:var(--gold); font-weight:600; }
+  code { background:var(--card2); padding:1px 6px; border-radius:4px; font-size:12.5px; font-family:'SF Mono',Menlo,monospace; }
+  .tag { display:inline-block; padding:1px 8px; border-radius:20px; font-size:11px; margin-right:6px; }
+  .tag.g { background:rgba(78,201,138,.15); color:var(--green); }
+  .tag.b { background:rgba(91,156,245,.15); color:var(--blue); }
+  .tag.y { background:rgba(212,169,78,.15); color:var(--gold); }
+  ul { padding-left:20px; }
+  li { margin-bottom:6px; }
+  .foot { margin-top:40px; color:var(--mut); font-size:12px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>R119 全面推进报告</h1>
+  <div class="sub">2026-08-16 · 跨项目隔离 → 医学物理迁移 → 双源消除 → cron 修真 · 四线收口</div>
+
+  <div class="metrics">
+    <div class="metric"><div class="num">27,988</div><div class="lab">医学权威库条数</div></div>
+    <div class="metric"><div class="num">6/6</div><div class="lab">蒸馏六流全绿</div></div>
+    <div class="metric"><div class="num">392</div><div class="lab">污染条目迁回/迁出</div></div>
+    <div class="metric"><div class="num">8</div><div class="lab">commit 落地</div></div>
+  </div>
+
+  <h2>一、跨项目隔离（混入盘点 + 归还）</h2>
+  <div class="card">
+    <table>
+      <tr><th>项目</th><th>KB 迁回</th><th>训练集迁出</th><th>落库位置</th></tr>
+      <tr><td>smart-home-family 家庭生活助手</td><td class="ok">87 条</td><td>DPO 30 条</td><td><code>knowledge/yidao.db</code></td></tr>
+      <tr><td>epb-assistant 环保</td><td class="ok">70+16 条</td><td>DPO 30 条</td><td><code>db/epb.db</code></td></tr>
+      <tr><td>family-life 家庭助手</td><td class="ok">46 条</td><td>—</td><td><code>knowledge/yidao.db</code></td></tr>
+      <tr><td>wechat-platform 微信</td><td class="ok">59 条</td><td>—</td><td><code>knowledge/yidao.db</code></td></tr>
+    </table>
+    <p style="margin-top:10px">DPO 训练集 130 条 + SFT 1 条跨项目样本 → <code>data/archived-dpo/</code>；防御脚本 <code>no-cross-project-tag.py</code> 接入巡检（kb_formal/kb_staging/DPO/SFT 四层扫描）。</p>
+  </div>
+
+  <h2>二、医学物理迁移（一子落三流绿）</h2>
+  <div class="card">
+    <ul>
+      <li><b>导出</b>：mingli 26,386 条 <code>authority=tcm-agent-pending-migration</code>（只读，零改动源库）</li>
+      <li><b>去重</b>：fingerprint(sha1) 对比 → 16,641 条重复跳过、<b>+9,745 条</b>新增入库</li>
+      <li><b>权威库</b>：<code>tcm-synced-kb.json</code> 17,461 → <b>27,988 条 / 15 模块</b>（备份 .bak-pre-r119-migration）</li>
+      <li><b>权威映射</b>：authority-mapping v1.2 → tcm domain <span class="tag g">active</span></li>
+      <li><b>六流</b>：①②③④⑤⑥ 全绿（monitor-collect.py 修真为数据驱动，②③⑥ 不再硬编码 partial/dep）</li>
+    </ul>
+  </div>
+
+  <h2>三、双源消除 + 检索修真</h2>
+  <div class="card">
+    <table>
+      <tr><th>端点</th><th>修真</th><th>实测</th></tr>
+      <tr><td><code>8920 /api/ai/knowledge-qa</code></td><td>医学域优先 8932 权威库（TCM_HINT_RE），失败降级本地</td><td class="ok">湿热蕴脾 → authority-tcm 0.92（金匮溯源+指征+方药）</td></tr>
+      <tr><td><code>8920 /api/public/kb-search</code></td><td>特征词优先 + 本地 0 命中权威兜底</td><td class="ok">三路径实测全通（authority-tcm / authority-tcm / like-primary）</td></tr>
+      <tr><td><code>8932 /api/tcm/kb/search</code></td><td>中文双字滑动窗口切词（原整句匹配 0 命中）</td><td class="ok">长句 → 2,306 命中，top1 湿热蕴脾证 0.92</td></tr>
+      <tr><td>本地 <code>kb_fts5</code>（trigram）</td><td>双字查询静默 0 命中 bug → 空结果强制 LIKE 兜底</td><td class="ok">八字正官格 → kb 0.95（原返回 empty）</td></tr>
+      <tr><td><code>8932 /api/tcm/kb</code></td><td>内存缓存 + mtime 失效（原每次 parse 83.7MB）</td><td class="ok">0.48s → 0.23s</td></tr>
+    </table>
+  </div>
+
+  <h2>四、cron 修真 + 错峰链</h2>
+  <div class="card">
+    <table>
+      <tr><th>cron</th><th>根因</th><th>修真</th></tr>
+      <tr><td>视觉算法同步</td><td>幽灵 <code>audit.py</code>（不存在）</td><td>移除，sync 自带审计 12/12</td></tr>
+      <tr><td>Desktop-ZYZX 蒸馏</td><td>v3 现场决策超时</td><td class="ok">v4 固化脚本（实测入库 5 条）</td></tr>
+      <tr><td>TCM 日扫描</td><td>LLM provider rejected</td><td>纯脚本禁 LLM</td></tr>
+      <tr><td>mingli-tcm 蒸馏</td><td>model-call 超时</td><td>纯脚本禁 LLM</td></tr>
+      <tr><td>临床经验蒸馏</td><td>违规 sqlite 探索</td><td>硬禁</td></tr>
+      <tr><td>festival-wishes</td><td>脚本曾删</td><td>已恢复，手动 exit=0</td></tr>
+    </table>
+    <p style="margin-top:10px">新增错峰：<code>03:10</code> authority 标记更新（幂等分批）· <code>03:40</code> 正向同步（tcm→shf/mingli）</p>
+  </div>
+
+  <h2>五、正向同步闭环（六流③）</h2>
+  <div class="card">
+    <ul>
+      <li><code>sync-tcm-forward.js</code>：权威库 → shf + mingli 的 <code>tcm-authoritative.json</code>（shf 旧 26 条 → 27,988 条）</li>
+      <li>shf loader 修真：兼容 list / entries / {data:{module:[]}} 三结构，实测 load 27,988 条</li>
+      <li>昼夜闭环：03:00 反向（mingli→tcm）→ 03:10 标记 → 03:40 正向（tcm→shf/mingli）</li>
+    </ul>
+  </div>
+
+  <h2>六、状态与遗留</h2>
+  <div class="card">
+    <table>
+      <tr><th>项</th><th>状态</th></tr>
+      <tr><td>服务健康（7 端口）</td><td class="ok">全 200</td></tr>
+      <tr><td>KB 污染</td><td class="ok">0（巡检防线生效）</td></tr>
+      <tr><td>cron 连败</td><td class="warn">历史计数（提示词已修真，跑通自清）</td></tr>
+      <tr><td>nihaixia 8,394 归属</td><td class="ok">误报澄清（实际 34 条，倪师系列全属中医）</td></tr>
+    </table>
+    <p style="margin-top:10px">遗留：① KANBAN 已更新 ② 前端 app 直连 8932 可选 ③ 明晨错峰链自动验证</p>
+  </div>
+
+  <div class="foot">R119 · 2026-08-16 · mingli-baojian / tcm-agent / smart-home-family · AutoClaw</div>
+</div>
+</body>
+</html>
