@@ -23,12 +23,13 @@ const LINE = '━━━━━━━━━━━━━━━━━━';
 const SEP = '════════════════════════';
 
 /** 运行 python 脚本并取回 stdout（去尾部空白） */
-function runPython(script) {
+function runPython(script, env) {
   try {
     return execFileSync('python3', [script], {
       encoding: 'utf8',
       timeout: 60000,
       maxBuffer: 10 * 1024 * 1024,
+      env: env ? Object.assign({}, process.env, env) : undefined,
     }).trim();
   } catch (e) {
     const stderr = (e.stderr || '').toString().trim();
@@ -42,12 +43,19 @@ function runPython(script) {
  *   - 修真 DAILY_PUSH_HTTP_BASE=http://127.0.0.1:8920 → 走 /api/daily-almanac 端点（推送+移动端+站内共用同源）
  *   - 不修真 → 兜底 execFile python3 BRIDGE（向后兼容，不影响 launchd 调用）
  */
-function getBridgeData() {
+function getBridgeData(isTomorrow) {
   const httpBase = process.env.DAILY_PUSH_HTTP_BASE;
+  // R119：--tomorrow 目标日期计算
+  let targetDate = null;
+  if (isTomorrow) {
+    const t = new Date();
+    t.setDate(t.getDate() + 1);
+    targetDate = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+  }
   if (httpBase) {
     try {
       const http = require('http');
-      const url = new URL(httpBase.replace(/\/$/, '') + '/api/daily-almanac');
+      const url = new URL(httpBase.replace(/\/$/, '') + '/api/daily-almanac' + (targetDate ? ('?year=' + targetDate.split('-')[0] + '&month=' + targetDate.split('-')[1] + '&day=' + targetDate.split('-')[2]) : ''));
       const payload = JSON.parse(require('child_process').execFileSync('curl', ['-s', '-m', '8', `http://${url.hostname}:${url.port}${url.pathname}`], { encoding: 'utf8', timeout: 10000 }));
       if (payload && payload.ok) {
         // 修真 P0-4 字段名归一化：/api/daily-almanac 字段名 → bridge 形状，供 buildPublic/buildSimple 复用
@@ -57,7 +65,7 @@ function getBridgeData() {
         const needsBridge = !payload.shichen || !payload.weather || !payload.wisdom;
         if (needsBridge) {
           // execFile 兜底取 bridge 全文，与 HTTP 端点字段合并（HTTP 优先）
-          const raw = runPython(BRIDGE);
+          const raw = runPython(BRIDGE, targetDate ? { DAILY_PUSH_OVERRIDE_DATE: targetDate } : {});
           const lines = raw.split('\n').filter(Boolean);
           try {
             const bridgeData = JSON.parse(lines[lines.length - 1]);
@@ -90,7 +98,7 @@ function getBridgeData() {
       // fall through to execFile
     }
   }
-  const raw = runPython(BRIDGE);
+  const raw = runPython(BRIDGE, targetDate ? { DAILY_PUSH_OVERRIDE_DATE: targetDate } : {});
   // 取最后一个 JSON 行（兼容 python 侧误打印其他内容）
   const lines = raw.split('\n').filter(Boolean);
   const jsonLine = lines[lines.length - 1];
@@ -248,17 +256,40 @@ ${koujue}
 }
 
 // === 入口 ===
-const mode = (process.argv[2] || '').toLowerCase();
+const args = process.argv.slice(2).map(a => a.toLowerCase());
+const mode = args[0] || '';
+const isTomorrow = args.includes('--tomorrow');
+const isVerify = args.includes('--verify');
 let output;
 try {
-  if (mode === 'full') {
+  if (mode === 'verify' || isVerify) {
+    // R119：全量校验模式（三模式 + 数据一致性）
+    const full = buildFull();
+    const pub = buildPublic(getBridgeData(isTomorrow));
+    const sim = buildSimple(getBridgeData(isTomorrow));
+    const checks = [
+      ['full 非空', !!(full && full.trim())],
+      ['public 非空', !!(pub && pub.trim())],
+      ['simple 非空', !!(sim && sim.trim())],
+      ['full 含宜忌', /宜：/.test(full) && /忌：/.test(full)],
+      ['public 含干支', /丙午|乙巳|甲辰|癸卯|壬寅|辛丑|庚子|己亥|戊戌|丁酉|丙申|乙未|甲午|癸巳|壬辰|辛卯|庚寅|己丑|戊子|丁亥|丙戌|乙酉|甲申|癸未|壬午|辛巳|庚辰|己卯|戊寅|丁丑|丙子|乙亥|甲戌|癸酉|壬申|辛未|庚午|己巳|戊辰|丁卯|丙寅|乙丑|甲子/.test(pub)],
+      ['public 含黄历', /宜：/.test(pub) && /忌：/.test(pub)],
+      ['含建除/神煞', /建除|满日|司命|冲煞/.test(pub)],
+      ['含免责', /仅供.*参考|不构成.*依据/.test(pub)],
+    ];
+    const fails = checks.filter(c => !c[1]);
+    console.log('═══ daily_push --verify ═══');
+    checks.forEach(c => console.log((c[1] ? '✅' : '❌') + ' ' + c[0]));
+    console.log('校验结果: ' + (checks.length - fails.length) + ' 通过 / ' + fails.length + ' 失败');
+    process.exit(fails.length ? 1 : 0);
+  } else if (mode === 'full') {
     output = buildFull();
   } else if (mode === 'public') {
-    output = buildPublic(getBridgeData());
+    output = buildPublic(getBridgeData(isTomorrow));
   } else if (mode === 'simple') {
-    output = buildSimple(getBridgeData());
+    output = buildSimple(getBridgeData(isTomorrow));
   } else {
-    console.error('用法: node daily_push.js <full|public|simple>');
+    console.error('用法: node daily_push.js <full|public|simple|verify> [--tomorrow]');
     process.exit(1);
   }
 } catch (e) {
