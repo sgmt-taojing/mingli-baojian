@@ -255,10 +255,10 @@
       qa = d && d.data ? d.data : null;
     } catch (e) { /* 降级 */ }
 
-    if (qa && qa.source === 'kb' && qa.reply) {
+    if (qa && (qa.source === 'kb' || qa.source === 'authority-tcm') && qa.reply) {
       clearTimeout(to);
       const top = qa.topEntry || {};
-      addMessage('bot', qa.reply, { kbRef: 'KB · ' + (top.module || '') + ' · 置信度 ' + (top.trust || qa.confidence || 0).toFixed(2) });
+      addMessage('bot', qa.reply, { kbRef: (qa.source === 'authority-tcm' ? '中医权威库 · ' : 'KB · ') + (top.module || '') + ' · 置信度 ' + (top.trust || qa.confidence || 0).toFixed(2) });
       return;
     }
     if (qa && qa.source === 'kb-summary' && qa.hits && qa.hits.length > 0) {
