@@ -366,6 +366,19 @@ function renderPaipanReport(report){
       });
       html += '</div>';
     }
+    // 案例参考（R119 紫微断病教学案例）
+    if(h.case_refs && h.case_refs.length){
+      html += '<div style="margin-bottom:10px"><div style="color:#ff8fb1;font-weight:600;margin-bottom:6px">📖 '+(isEn?'Case Reference (Teaching)':'案例参考（教学对照）')+'</div>';
+      h.case_refs.forEach(function(cr){
+        html += '<div style="margin:6px 0;padding:8px;background:rgba(255,143,177,.05);border-radius:6px;border-left:3px solid #ff8fb1">';
+        html += '<div style="font-weight:600;font-size:14px">🩺 '+tRC(cr.disease||'')+'</div>';
+        html += '<div style="font-size:12px;color:#aaa;margin:3px 0">盘面要点：'+tRC(cr.points||'')+'</div>';
+        html += '<div style="font-size:12px;color:#ffb44d;margin:3px 0">调理方向：'+tRC(cr.advice||'')+'</div>';
+        if(cr.note) html += '<div style="font-size:11px;color:#888;margin-top:4px;border-top:1px dashed rgba(255,255,255,.1);padding-top:4px">'+tRC(cr.note)+'</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
     // 分流指引
     if(h.referrals && h.referrals.length){
       html += '<div style="margin-bottom:10px"><div style="color:#e91e63;font-weight:600;margin-bottom:6px">'+(isEn?'Referral Guidance':'专业分流指引')+'</div>';
