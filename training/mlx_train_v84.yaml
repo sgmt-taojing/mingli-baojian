@@ -1,0 +1,55 @@
+# v8.4 SFT 训练配置 — 在 v8.3 fused 之上增量训练
+# 目标：修真 BaziQA 选择题精度（v8.3 基线 42.5% → 目标 60%+）
+#
+# ⚠️ R726 修真：v8.x 训练/fuse 统一是 3B Qwen2.5 base，命名"-7b"为历史遗留。
+#
+# 训练链路：Qwen2.5-3B base → v8.3 fused（30 题 95.5 分 / BaziQA 42.5%）→ v8.4 LoRA 微调
+# 数据：v8.3 全量 1474 + R733 增量 19（fatecat 真值/yueyuan 方法论/人工补充）+ BaziQA 风格 5 = 1498 条
+#  - R733 增量针对：从格判定/化气/病型/调候/五行偏枯（v8.3 短板）
+#  - BaziQA 风格针对：选择题推理（感情/事业/财富/健康四主题 + 身强弱推理）
+# 修真：v8.3 数据内部 179 条 prompt 前 64 字重复——v8.4 全量保留（更多学习样本），
+#       增量与风格样本指纹去重（仅对新增部分）。
+
+model: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.3-7b"  # R726：命名沿用，真实 base 是 3B Qwen2.5
+train: true
+test: false
+
+# v8.4 数据
+train_file: "train.v84.jsonl"
+valid_file: "valid.v84.jsonl"
+data: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-r105-data-v84"
+
+# LoRA（与 v8.2/v8.3 同配方——已验证有效）
+fine_tune_type: "lora"
+num_layers: 20
+lora_parameters:
+  rank: 4
+  dropout: 0.05
+  scale: 4.0
+
+# 训练（1498 条 × 160 iter ≈ 1.7 epoch，短轮次防过拟合）
+iters: 160
+batch_size: 1
+grad_accumulation_steps: 4
+learning_rate: 3e-6
+optimizer: "adamw"
+optimizer_config:
+  adamw:
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    weight_decay: 0.01
+
+# 关键配置
+max_seq_length: 768
+mask_prompt: true
+grad_checkpoint: true
+
+# 保存与评估
+save_every: 50
+steps_per_eval: 50
+steps_per_report: 10
+val_batches: 20
+seed: 42
+
+# 输出（独立目录，保留 v8.3 不被覆盖）
+adapter_path: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-checkpoints/mingli-sft-v84-7b"
