@@ -8,11 +8,17 @@ MEM_MAX=96
 ALERTS=()
 
 # 1. 核心服务端口
-for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8960:MLX-v5" "8941:face-diag" "8942:tongue-diag" "8943:eye-diag" "8944:hand-diag" "8945:vision-gw"; do
+for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8960:MLX-v5" "8941:face-diag" "8942:tongue-diag" "8943:eye-diag" "8944:hand-diag" "8945:vision-gw" "8932:tcm-agent" "8930:tcm-diagnosis"; do
     PORT=${p%%:*}
     NAME=${p##*:}
     lsof -i :$PORT >/dev/null 2>&1 || ALERTS+=("$NAME(:$PORT) 未在监听")
 done
+
+# 1a. 医学权威库在线（R119：8932 搜索端点存活验证）
+if lsof -i :8932 >/dev/null 2>&1; then
+    AUTH_CHECK=$(curl -s -m 5 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('ok','') and d.get('total_hits',0))" 2>/dev/null)
+    [ -z "$AUTH_CHECK" ] || [ "$AUTH_CHECK" = "0" ] && ALERTS+=("医学权威库 8932 搜索异常（total_hits=0）")
+fi
 
 # 1b. 端口绑定安全扫描（R-2026-08-15：修真 8941-8945/8787/8931-8933 共 9 服务 0.0.0.0→127.0.0.1）
 # scan-bind-exposure.sh 检测：监听 *:port 服务 + PORTS 字典漏列的 Python/Node 进程
