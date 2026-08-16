@@ -183,6 +183,13 @@ if [ "$CROSS_TOTAL" -gt 0 ]; then
   ALERTS+=("R118 KB 污染: mingli 主 KB 正式表出现跨项目 module ${CROSS_TOTAL} 条（kb_formal=${CROSS_F:-0} / formal_knowledge=${CROSS_K:-0}）。修真脚本 distill-all-projects.py 或运行 scripts/cleanup-outbound-20260816.sh 迁回")
 fi
 
+# R119 训练集跨项目污染（KB staging + DPO/SFT 数据集）
+if [ -f "$PROJECT_ROOT/scripts/no-cross-project-tag.py" ]; then
+  if ! python3 "$PROJECT_ROOT/scripts/no-cross-project-tag.py" >/dev/null 2>&1; then
+    ALERTS+=("R119 训练集污染: kb_staging 或 DPO/SFT 数据集出现跨项目标签，跑 python3 scripts/no-cross-project-tag.py 查看详情")
+  fi
+fi
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"
