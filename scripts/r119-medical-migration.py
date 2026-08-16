@@ -68,6 +68,17 @@ def main():
             dup += 1
             continue
         mod = MODULE_MAP.get(r['module'], 'tcm-misc')
+        # R745 蒸馏规范修真：命理模块黑名单——含命理关键词的模块名不得迁入医学权威库
+        # 除非内容经医学前缀豁免（如 'tcm,fengshui' 实际为倪师诊疗案例）
+        _raw_mod = str(r['module'] or '')
+        _mingli_mod_kw = ['ziwei', 'bazi', 'fengshui', 'qimen', 'liuyao', 'meihua', 'liuren', 'yijing']
+        _hit_mod = [k for k in _mingli_mod_kw if k in _raw_mod.lower()]
+        if _hit_mod:
+            _title = str(r.get('title') or '')
+            _med_prefix = ['金匮', '伤寒', '人纪', '医案', '本草', '汤头', '黄帝内经', '神农', '药性', '方剂', '针灸', '艾灸', '穴位', '经络', '倪海厦人纪', '汉唐中医', '五运六气']
+            if not any(p in _title for p in _med_prefix):
+                print(f"⏭ R745 跳过命理模块条目: [{_raw_mod}] {_title[:40]}")
+                continue
         # keywords 容错解析：JSON 数组 / 逗号串 / 单值
         kw_raw = (r['keywords'] or '').strip()
         kw = []
