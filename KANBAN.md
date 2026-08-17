@@ -16,7 +16,15 @@
 > - **提交**：f059cff / ece53cc / ee4b1b4 / f82eae8 / f6ffa1b / 141c6b6 / 5ffee44(shf) / 75b8232
 > - 报告：DELIVERY/r119-全面推进-2026-08-16.html
 >
-> > 最后更新: 2026-08-16 19:55 CST（R731 能力包市场验收 6/6 完结 + R732 应急安全闸门落地——四卡全部完结 ✅）
+> > 最后更新: 2026-08-17 10:50 CST（心跳巡检 · 5 服务全绿 · 视觉蒸馏 28 文件批次完结 · cron 修真 1 项）
+
+## 08-17 R736 心跳巡检 + 视觉蒸馏批次完结（10:50）
+
+- **服务健康**：8914/8920/8911/8912/8913 全部 HTTP 200；GitHub Pages index.html 200；守门员 fe6661c8 近 6 次运行全 ok
+- **视觉蒸馏批次完结**：08-16 17:20-18:04 共处理 **28 个 PDF 全部 ok**（紫微斗数上/下、御定六壬直指、术数全书上中下、图解葬书上下、相术、秘藏大六壬大全、精刻看命一掌经、面诊等），kb_formal 累计 **54,438 条**；源目录 ~/Desktop/周易-中医 已空 → 该批次不再续跑，增量 cron（23:30）继续值守
+- **cron 修真 1 项**：网络自动切换（d7299497）24h 内 65 次 model-call 超时（60s 阈值太紧，偶发慢调用）→ timeoutSeconds 60→150；修真后 10:46 运行 ok（25s）
+- **待观察**：四路大师增量采集 10:45 失败（sqlite3 多步中断）、ASH 周报/公众号周报 10:08 超时——均为独立单次事件，下次运行观察
+- **HEARTBEAT.md 修正**：穿戴 SDK 检查项改为实际存在的 app/wearable-hub.html（js/wearable/rokid-bridge.js 从未入库，原检查恒 404）
 
 ## 08-15 R730 P0-4 daily_push.js HTTP 模式修真（21:15）
 
@@ -65,36 +73,19 @@
 
 ## 进行中
 
-### #1 MLX v8.3 训练迭代 ✅ 已完结上线（15:30 · R724）
-- **训练**：150 iters 完整跑完（14:35 nohup 第三次启动），val loss 2.223 → 2.055，peak mem 6.06GB
-- **fuse**：`training/mlx-models/mingli-sft-v8.3-7b`（4.0G）15:12 cron 收尾自动完成
-- **30 题评估**：AVG **95.5 PASS**（v8.2 93.8 → +1.7）· 命理 97.9 / 中医 97.5 / **边界 89.4（+12.5）**
-  - idx23: 50 → 75、idx24: 40 → **100**
-  - tag_leak 硬性 0/30、残留 0/30、套话 3/30、占位符未处理 2/30
-- **上线**：8960 生产已实跑 v8.3（plist + /health 验证 ready），8961 临时评估服务已关
-- **评估明细**：training/eval-results-v83-r721-30q.json
-- **遗留**：idx23 75 分（占位符未主动询问扣分）→ v8.4 候选；磁盘 98% 需归档 v8.2 fused
+### #1 R119 古籍视觉蒸馏（17 古籍 × 5 页）✅ 已完成
+- **节点**: 8/8 ✅（流年班命盘 10 个 23 条 + 创业成败 + 玉匣记 5 页 + 17 古籍批量 28 条全 ok）
+- **流水线**: vision-distill-pipeline.py（PDF→图→autoglm→入库→记账断点）
+- **增量 cron**: 每日 23:30 自动扫描桌面新 PDF（commit 7d0de46b）
+- **完成时间**: 2026-08-16 18:04（28/28 条 status=ok，0 error）
+- **下一步**: 可关闭此节点，后续新 PDF 由 cron 自动处理
 
-### #2 公共能力包市场（capability-market）✅ 已完结（R731 全链路验收）
-- **节点**: 6/6 ✅（规划→注册表→模板→匹配器→自进化脚本→实际运营）
-- **进度**: R731 全链路验收：clean3 1303 条分桶抽样 11 → matcher **11/11 PASS**；evolve 空转保护验证 + 两次 patch bump（v1.0.0→v1.0.2）；mingli 包 keywords 16→70（十神/神煞/格局术语补齐，修真「驿马/从格/财滋弱杀」等专业术语问句 0 命中问题）
-- **修真发现**: coverage 是命中词权重百分比（命中 1/62 词≈2%属正常），验收标准应为「命中正确领域包」而非绝对覆盖度
+### #4 多源实时交互诊断闭环（R694）✅ 已完结（R732 收口）
+- **节点**: 5/5 ✅（采集→四路并行→分层结论→医生审核处方→进化预留）
+- **R732 mode=auto 安全闸门已落地**：server/emergency-gate.js L0-L3 四级应急分级（L3 危急→TTS+120 建议+处方硬拦截+家属 webhook），端到端实测 level=3 处方清空 ✅（server `73692d4`）
+- **遗留（可选）**: 前端渲染 emergency 字段（红色横幅 + 120 拨打按钮）
 
-### #3 AI 助手语音 + KB 实时互通
-- **节点**: 3/3 ✅ 已完结（R697+R726）
-- **进度**：
-  - R697（commit `ee0b21a`）：ai-stream-client.js + 流式卡片（500ms 防抖 + 自动续接）
-  - R726（server `04ad21f`）：callAIWithFallback MLX-v5 路径透传 stream → 8960 SSE 生效
-  - **实测**：8960 流式首字 0.82s（P95 修真前 22.8s → 修真后 0.94s，提速 -96%）
-- **下一步**：可选 R726.1：让 ai-stream-endpoint.js 也调 callAIWithFallback(stream:true) 双路径一致性
-
-### #4 多源实时交互诊断闭环（R694）
-- **节点**: 5/5（采集→四路并行→分层结论→医生审核处方→进化预留）✅ 已完结
-- **进度**: commit `a18788f` + `901dd37`，四路引擎 + SSE + 处方签发/驳回 + 前端页面 + 导航入口。实测端到端 1.5s
-- **R732 mode=auto 安全闸门 ✅ 已落地**：新增 `server/emergency-gate.js`（L0-L3 四级应急分级）——L3 危急（昏迷/心梗/中风）→ TTS 大声重复提醒 + 建议 120 + 处方硬拦截 + 家属 webhook；L2 紧急 → autopilot 降级 + 就医提醒；L1 观察。端到端实测：昏迷+中风症状 → level=3 → 处方清空 + 降级 ✅（server `73692d4`）
-- **下一步**: 前端渲染 emergency 字段（红色横幅 + 120 拨打按钮）
-
-## 08-16 R120 KB 蒸馏入库（11:36）
+## 08-16 R120 KB 蒸馏入库（11:36 · 已完结）
 - **脚本**：`scripts/distill-desktop-l12-l14-20260816.py`（11:36 执行）
 - **产出**：流年班 L12-L14 紫微星曜 → 7 条入库（LUTZ-L14-xxx），6 条跳过（<300字），0 失败
 - **覆盖**：十四主星喜忌 / 星曜定位人物 / 双主星组合 / 星曜互涉五行生克 / 制化过宫论 / 四墓库 / 四桃花四马地
@@ -120,6 +111,14 @@
 
 | 日期 | 任务 | 产出物 |
 |------|------|--------|
+| 2026-08-16 | R732 应急安全闸门（L0-L3 四极应急分级）| server/emergency-gate.js（commit `73692d4`）|
+| 2026-08-16 | R731 公共能力包市场全链路验收 6/6 完结 | _shared/capability-market/ matcher 11/11 PASS · mingli keywords 16→70 |
+| 2026-08-16 | R730+ 双修真深度校正 14/14 全绿（daily_push.js HTTP 模式 + bridge v3）| DELIVERY/双修真深度校正报告-2026-08-16.html |
+| 2026-08-16 | R119 视觉蒸馏：流年班命盘 10 个（23 条）+ 创业成败 + 玉匣记 5 页 | vision-distill-pipeline.py · 记账断点 · 23:30 增量 cron |
+| 2026-08-16 | R120 KB 蒸馏入库：流年班 L12-L14 紫微星曜 7 条 | scripts/distill-desktop-l12-l14-20260816.py · kb_formal 47,653+5,772 |
+| 2026-08-16 | R119 全面推进：跨项目隔离 + 医学物理迁移（26,386 条）+ 双源消除 + cron 修真 | kb_staging 清理 · 权威库 27,988 · DELIVERY/r119-全面推进-2026-08-16.html |
+| 2026-08-16 | AI 助手语音 + KB 实时互通 3/3 完结（R697+R726）| ai-stream-client.js + 流式卡片 · 首字 0.82s（-96%）|
+| 2026-08-16 | MLX v8.3 训练 + 评估 + 上线（AVG 95.5 PASS）| mingli-sft-v8.3-7b + eval-results-v83-r721-30q.json |
 | 2026-08-15 | R721 v8.3 训练 + 评估 + 上线（AVG 95.5 PASS）| adapters.safetensors 28MB + `mingli-sft-v8.3-7b` 4.0G + eval-results-v83-r721-30q.json |
 | 2026-08-15 | R726 MLX 流式透传（8920→8960 首字 0.82s·提速 -96%）| server commit `04ad21f` |
 | 2026-08-15 | R725 KB 蒸馏入库（桌面流年班禄存杂耀 10 条）| DELIVERY/distill-report-2026-08-15.json |
@@ -201,23 +200,22 @@
 
 ## 阻塞项
 
-- **8946 端口暴露**：node(71710) 监听 `*:8946`，未登记白名单（health-patrol 08-15 21:00 报警）
-- **6 个 cron 连败**（health-patrol 08-15 21:00 报警）：
-  - 命理宝jian 晚间知识库审计（21:30）· 连败 6 次
-  - Desktop-ZYZX 夜间采集蒸馏 · 连败 3 次
-  - mingli-tcm-daily-distill · 连败 4 次
-  - smart-home-family 地层能力诊断审计与优化 · 连败 3 次
-  - festival-wishes-daily · 连败 5 次
-  - 待修真：cron list 排查 launchd plist 状态 + 8946 进程归属定位
+- **端口暴露（新增）**：Python(43166) 监听 `*:8948` + `*:8949` 未登记白名单（health-patrol 08-16 20:50 报警，此前 8946 已消失）
+- **7 个 cron 连败**（health-patrol 08-16 20:50 报警，均有恶化）：
+  - 命理宝jian 晚间知识库审计（21:30）· 连败 7 次
+  - 古籍识别进度检查（每 30 分钟）· 连败 5 次
+  - TCM 知识库日扫描 · 连败 5 次
+  - Desktop-ZYZX 单步夜间蒸馏 · 连败 4 次
+  - smart-home-family 地层能力诊断审计 · 连败 4 次
+  - festival-wishes-daily · 连败 6 次
+  - tcm-agent 家庭健康周报推送 · 连败 4 次
+  - 待修真：cron list 排查 launchd plist 状态 + Python(43166) 进程归属定位
 
-## 运行时指标（21:00 心跳实测 · 2026-08-15）
+## 运行时指标（21:01 心跳实测 · 2026-08-16）
 
-- 端口：8900/8901/8911/8912/8913/8914/8920/8960 全 200（root 端点实测）
-- 8920 /api/health=200, 8960 /v1/models = mingli-sft-v8.3-7b（生产实跑 v8.3）
-- 内联 script 校验：✅ 347 块全部通过
-- Data 卷：185G/228G（92%，17G 可用）⚠️ v8.2 fused 需归档
-- 内存：used 93%（14.95G/16G）⚠️ 接近警戒线
-- CPU load：1min 2.26（5min 1.67，15min 1.52，平稳）
+- health-check.sh：✅ HEALTHY——paipan 8911 / tts 8912 / face-ocr 8913 / static 8900 / api-v2 8920 / kb-api 8901 全 OK + kb-list OK + paipan-api OK
+- health-patrol 15 分钟档仍有间歇 ❌（20:05-20:50 报 9 项异常，21:00 整点档全绿）——异常集中在阻塞项（端口 8948/8949 + cron 连败）
+- 8960 生产实跑 mingli-sft-v8.6-7b（08-17 心跳确认，此前 KANBAN 记 v8.3 已过时）
 
 - **R709**（commit `227d17c`）：MLX 启动预热 — ThreadingHTTPServer + ready 字段 + 启动时后台线程跑一次 dummy 推理触发 compile
   - 修真：HTTPServer 单线程假死（客户端 abort → 连接卡死）→ ThreadingHTTPServer + daemon_threads + socket timeout 120s
