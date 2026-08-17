@@ -300,3 +300,10 @@
 - **修真记录**：resnet-fire 0%（真实图）→ MIT 36.4% 替换；车牌权重从 ★471 MIT 仓库拉取；跌倒专利规避自研
 - 提交：ai-vision-toolkit 180994e1（12 规则） + 5c0e9d49（车牌） + 6e84c50d（烟火） + d016d0f4（YOLO11）
 - 服务：13 端口全绿，系统盘 16G
+
+## 08-17 R737 收口（15:08）
+- **布控状态 API**：8959 /api/deploy-status（19/29 可落地，供超市双态查询）
+- **爬虫 cron**：每日 06:00 自动扫描（launchd StartCalendarInterval）
+- **安全帽/劳保 ALG-050**：MIT 候选（数据集需外部下载，待自训）
+- 反光衣 relective-clothes（★21 MIT）：百度云权重，网络受限待下载
+- 提交：d3857f54（状态 API + cron）→ 13 端口全绿
