@@ -38,6 +38,14 @@ function runPython(script, env) {
   }
 }
 
+/** R119 修真补丁（2026-08-17）：计算 --tomorrow 目标日期 YYYY-MM-DD，供 bridge 与 full 共用 */
+function getTargetDate(isTomorrow) {
+  if (!isTomorrow) return null;
+  const t = new Date();
+  t.setDate(t.getDate() + 1);
+  return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+}
+
 /** 获取桥接层 JSON 数据
  * 修真 P0-4（2026-08-15 R730）：可选 HTTP 模式
  *   - 修真 DAILY_PUSH_HTTP_BASE=http://127.0.0.1:8920 → 走 /api/daily-almanac 端点（推送+移动端+站内共用同源）
@@ -45,13 +53,8 @@ function runPython(script, env) {
  */
 function getBridgeData(isTomorrow) {
   const httpBase = process.env.DAILY_PUSH_HTTP_BASE;
-  // R119：--tomorrow 目标日期计算
-  let targetDate = null;
-  if (isTomorrow) {
-    const t = new Date();
-    t.setDate(t.getDate() + 1);
-    targetDate = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
-  }
+  // R119：--tomorrow 目标日期计算（与 full 版共用同一 helper，保证三版日期一致）
+  const targetDate = getTargetDate(isTomorrow);
   if (httpBase) {
     try {
       const http = require('http');
@@ -110,9 +113,11 @@ function getBridgeData(isTomorrow) {
   }
 }
 
-/** 完整版：直接复用 daily-recommendation.py 的原文（含化解全文+拼音注解） */
-function buildFull() {
-  return runPython(FULL_SCRIPT);
+/** 完整版：直接复用 daily-recommendation.py 的原文（含化解全文+拼音注解）
+ * 修真补丁（2026-08-17）：--tomorrow 时透传 DAILY_PUSH_OVERRIDE_DATE，修复 full 版日期不随 --tomorrow 的问题 */
+function buildFull(isTomorrow) {
+  const targetDate = getTargetDate(isTomorrow);
+  return runPython(FULL_SCRIPT, targetDate ? { DAILY_PUSH_OVERRIDE_DATE: targetDate } : undefined);
 }
 
 /** 修行建议（与 daily-recommendation.py 保持一致，拼音注解完整保留） */
@@ -149,7 +154,7 @@ ${LINE}
 🚫 忌：${yiJi.ji}
 
 📌 建除十二神：${yiJi.jianchu}
-⭐ 值日星宿：${yiJi.xingxiu}宿
+⭐ 值日星宿：${yiJi.xingxiu}
 ☀️ 黄道黑道：${d.huanghei}
 ⚔️ 冲煞：${chong} · ${sha}
 📜 彭祖百忌：${d.pengzu}
@@ -276,13 +281,23 @@ let output;
 try {
   if (mode === 'verify' || isVerify) {
     // R119：全量校验模式（三模式 + 数据一致性）
-    const full = buildFull();
+    const targetDate = getTargetDate(isTomorrow);
+    const full = buildFull(isTomorrow);
     const pub = buildPublic(getBridgeData(isTomorrow));
     const sim = buildSimple(getBridgeData(isTomorrow));
+    // 修真补丁（2026-08-17）：--tomorrow 时三版必须含目标日期（防止 full 版漏透传日期覆盖）
+    let dateStr = '';
+    if (targetDate) {
+      const m = targetDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (m) dateStr = `${m[1]}年${parseInt(m[2], 10)}月${parseInt(m[3], 10)}日`;
+    }
     const checks = [
       ['full 非空', !!(full && full.trim())],
       ['public 非空', !!(pub && pub.trim())],
       ['simple 非空', !!(sim && sim.trim())],
+      ['full 日期=目标日', !targetDate || full.includes(dateStr)],
+      ['public 日期=目标日', !targetDate || pub.includes(dateStr)],
+      ['simple 日期=目标日', !targetDate || sim.includes(dateStr)],
       ['full 含宜忌', /宜：/.test(full) && /忌：/.test(full)],
       ['public 含干支', /丙午|乙巳|甲辰|癸卯|壬寅|辛丑|庚子|己亥|戊戌|丁酉|丙申|乙未|甲午|癸巳|壬辰|辛卯|庚寅|己丑|戊子|丁亥|丙戌|乙酉|甲申|癸未|壬午|辛巳|庚辰|己卯|戊寅|丁丑|丙子|乙亥|甲戌|癸酉|壬申|辛未|庚午|己巳|戊辰|丁卯|丙寅|乙丑|甲子/.test(pub)],
       ['public 含黄历', /宜：/.test(pub) && /忌：/.test(pub)],
@@ -295,7 +310,7 @@ try {
     console.log('校验结果: ' + (checks.length - fails.length) + ' 通过 / ' + fails.length + ' 失败');
     process.exit(fails.length ? 1 : 0);
   } else if (mode === 'full') {
-    output = buildFull();
+    output = buildFull(isTomorrow);
   } else if (mode === 'public') {
     output = buildPublic(getBridgeData(isTomorrow));
   } else if (mode === 'simple') {
