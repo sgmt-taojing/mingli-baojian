@@ -1,61 +1,51 @@
 {
-  "lastRun": "2026-08-13T13:45:00+08:00",
-  "runSummary": "✅ P0 望诊数据.docx 5条入库 + P2 恶性肿瘤舌目面部望诊.docx 2条入库（路大师方向）",
+  "lastRun": "2026-08-17T12:40:51+08:00",
+  "runSummary": "✅ 发现8/16已大规模蒸馏(ld-hardware/ld-flowspec/LDS-PATENT)，7条拟入库条目全部判定重复已删除；✅ 补入 wangzhen-kb-data.json 缺口 33 条（R201穴位理疗20+美容5+AI标签3+风险分级1+穴位3+降噪1）",
   "kbCounts": {
-    "kb_formal_total": 46563,
-    "kb_fts5_total": 46563,
-    "addedThisRun": 7
+    "wangzhen_R200": 50,
+    "wangzhen_R201": 33,
+    "wangzhen_total": 83
   },
+  "addedThisRun": 33,
   "thisRunProcessed": [
     {
-      "file": "~/Desktop/周易-中医/望诊数据.docx",
-      "priority": "P0",
-      "size": "41KB",
-      "paragraphs": 406,
-      "totalChars": 9710,
-      "entriesAdded": 5,
+      "file": "~/Desktop/yanshi/knowledge/wangzhen-kb-data.json",
+      "priority": "P1替代",
+      "entriesAdded": 33,
       "entryIds": [
-        "zy-desk-fedb51ee41bd - 面部脏腑全息分区-AI视觉识别标准",
-        "zy-desk-420205669637 - 五色辨证体系-寒热虚实病色推理规则",
-        "zy-desk-c26b7c8c84a6 - 头部毛发颅诊子系统-AI儿科高危信号",
-        "zy-desk-17f9b2f2e447 - 眼耳鼻舌五官全息诊断-AI视觉高精度识别",
-        "zy-desk-bf1a095cfec8 - AI推理执行总规则+面诊标准化操作流程"
+        "KB-wangzhen-R201-T01~T20(穴位理疗20种)",
+        "KB-wangzhen-R201-B01~B05(美容5种)",
+        "KB-wangzhen-R201-AI01~AI03(AI标签体系)",
+        "KB-wangzhen-R201-R01(风险分级)",
+        "KB-wangzhen-R201-A01~A03(反射穴/耳穴/头部经络)",
+        "KB-wangzhen-R201-D01(AI降噪规则)"
       ],
-      "module": "tcm/wangzhen",
+      "module": "wangzhen",
       "trust": 0.85,
-      "tags": "中医,望诊,面诊,脏腑分区,AI视觉,路总"
-    },
-    {
-      "file": "~/Desktop/zhongyi/恶性肿瘤舌目面部望诊.docx",
-      "priority": "P2",
-      "size": "约20KB",
-      "paragraphs": 107,
-      "totalChars": 4861,
-      "entriesAdded": 2,
-      "entryIds": [
-        "zy-desk-c3796e557bc9 - 肿瘤舌诊专项辨证体系-恶性肿瘤高危舌象中西医结合规范化",
-        "zy-desk-c2a678d6f12f - 肿瘤目诊+面诊专项辨证体系-三联联合辨证分型"
-      ],
-      "module": "tcm/wangzhen",
-      "trust": 0.85,
-      "tags": "中医,望诊,舌诊,目诊,面诊,肿瘤,恶性肿瘤,三联辨证,路大师"
+      "tags": "中医,望诊,穴位理疗,美容,AI标签"
     }
   ],
+  "dedupRemoved": [
+    "zy-patent-5e7b25f34306/4cda460f87a8/511041dfd2ea(技术交底书-重复LDS-PATENT-V2)",
+    "zy-hardware-4ed12b76a1ee/cb59782fdc57/c970305d795c(硬件方案-重复ld-hardware-v1)",
+    "zy-flow-4db9b606ed28(知识流转规范-重复ld-flowspec-v1-001)"
+  ],
   "FTS5Verified": {
-    "肝瘿线": ["KB-tcm-7e6cc03f", "zy-desk-c3796e557bc9", "zy-desk-c2a678d6f12f"],
-    "面诊": "已索引",
-    "三联联合辨证": "已索引"
+    "穴位理疗": "kb_fts5 9命中",
+    "面部全息穴": "kb_fts5 14命中",
+    "KB-wangzhen-R201%": "kb_formal_fts 33条已索引"
   },
   "nextCandidates": [
-    "P2: AI视觉相关.docx (17MB) - 体积大，可能含图片需特殊处理",
-    "P2: 中医标准智能体专利申请材料/*.docx - 专利技术交底书",
-    "P1: 古籍选择性章节蒸馏 - 大文件按目录选择性处理",
-    "P1: 察舌辩证 温热派.docx - 温病学派舌诊"
+    "P0: ~/Desktop/周易-中医/ 目录已不存在，需确认新路径",
+    "P1: shuhan daotu 32课已全覆盖(V3精要+V10/V13深度)，无增量",
+    "P2: 专利材料已全量入库(LDS-PATENT-V2-*)，无增量",
+    "待办: 检查 ~/Desktop/yanshi/knowledge/ 其他JS知识库(ziwei-knowledge-base等)的覆盖率"
   ],
   "notes": [
-    "本次增量7条全部入库 formal_knowledge + kb_formal 双表，触发器自动更新 FTS5",
-    "P0望诊数据.docx是AI专用知识库版，价值高于普通PDF扫描，包含完整AI推理执行规则+知识边界限制",
-    "P2路大师恶性肿瘤舌目面望诊首次入库，补充肿瘤专科望诊空白",
-    "FTS5 trigram检索验证通过（新肿瘤条目可被'肝瘿线'精确匹配）"
+    "8/16存在一次大规模蒸馏运行(ld-*/LDS-PATENT-V2/KB-VIS/r491q等)，本次7条候选全部重复已删",
+    "wangzhen-kb-data.json 83条全量覆盖(50已有+33本次补入)",
+    "修复33条keywords字段(keyword单数字段映射)",
+    "kb_formal_fts为unicode61分词，中文整串token无法子串匹配；生产检索走kb_fts5(trigram)正常",
+    "触发器的FTS5同步验证通过"
   ]
 }
