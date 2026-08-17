@@ -784,6 +784,7 @@ function detectModule(text){
   if(/五行|缺什么/.test(t))return 'wuxing';
   if(/姓名|改名|名字/.test(t))return 'xingming';
   if(/奇门|遁甲/.test(t))return 'qimen';
+  if(/天纪|易经|六十四卦|倪师/.test(t))return 'tianji';
   if(/紫微|斗数/.test(t))return 'ziwei';
   if(/体检报告|血常规|化验单|生化指标|ct|mri|x光|超声|影像|健康报告/.test(t))return 'wellness-report';
   if(/六爻|占卜/.test(t))return 'liuyao';
