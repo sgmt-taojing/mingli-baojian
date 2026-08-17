@@ -380,6 +380,22 @@ async function aiDivineInterpret(type, baziData, question) {
 
   // 🔥 创业四步法专题路由：缘主问创业/开店/合伙/副业时，注入路总四步法分析框架（KB-ziwei-chuangye 15条专题）
   const CHUANGYE_KEYWORDS = /创业|开公司|开店|做生意|当老板|合伙|副业|项目启动|辞職创业|辞职创业|下海/;
+  // 🔥 飞星1616/三代四化 专题路由：凡涉及宫位互动/大运流年/事件应期，注入路总核心分析法
+  const FEIXING_KEYWORDS = /飞星|飞化|四化|自化|化忌|化禄|化权|化科|发射|宫干|三代|大限|流年|应期|一六|冲六|逆水忌|反弓忌|射出忌|纠缠|种子/;
+  let feixingFramework = '';
+  if (FEIXING_KEYWORDS.test(question || '') || (type === 'ziwei' && FEIXING_KEYWORDS.test(paipanText))) {
+    feixingFramework = `
+【飞星1616分析法——宫位互动论断必按此框架】
+①发射台定主动方：谁飞化出来谁是主动——我宫(命官财)飞禄他宫=我对他好；他宫飞忌回=是非忌(恩将仇报)
+②自化：A宫飞A宫——自化忌=自己贬低自己；忌+自化忌=解脱止损
+③射出忌：飞忌去对宫=流失/周转/往外跑(命→迁移/财→福德/官→夫妻)
+④四大格局：逆水忌(对宫生年忌=水坝反增，对宫自化则崩溃)/洩水忌(越补越亏)/纠缠忌(互冲)/反弓忌(159宫忌冲159宫=大凶)
+⑤1616一六：一为表六为里，冲六死一——命←→疾厄、田宅←→财帛(风水影响财)、福德=灵魂→疾厄=身体→命
+【三代四化时效】生年=终身底色/大限=十年主题(禄不被新忌袭则积累)/流年=一年吉凶(可冲本命不可冲大运)
+计数法：三代同宫职数禄忌相抵论净值；主语：生年=我/大限=我们/流年=他
+种子效应：起始年种树开花不同年——种子忌次年转流年财帛=第二年亏损。
+`;
+  }
   let chuangyeFramework = '';
   if (CHUANGYE_KEYWORDS.test(question || '') || (type === 'ziwei' && CHUANGYE_KEYWORDS.test(paipanText))) {
     chuangyeFramework = `
@@ -411,6 +427,9 @@ async function aiDivineInterpret(type, baziData, question) {
 
   if (chuangyeFramework) {
     userPrompt += chuangyeFramework + '\n';
+  }
+  if (feixingFramework) {
+    userPrompt += feixingFramework + '\n';
   }
 
   if (question) {
