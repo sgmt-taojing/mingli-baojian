@@ -86,7 +86,30 @@
   <button class="qa-btn" onclick="quickAsk('五行音乐推荐')" aria-label="五行音乐" style="padding:6px 12px;background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.4);border-radius:14px;color:#ba68c8;font-size:12px;cursor:pointer">音 五行音乐</button>
   <button class="qa-btn" onclick="quickAsk('人生规划建议')" aria-label="人生规划" style="padding:6px 12px;background:rgba(255,152,0,0.15);border:1px solid rgba(255,152,0,0.4);border-radius:14px;color:#ffb74d;font-size:12px;cursor:pointer">向 人生规划</button>
   <button class="qa-btn" onclick="window.open('monthly-report.html','_blank')" aria-label="逐月运势" style="padding:6px 12px;background:rgba(8,145,178,0.15);border:1px solid rgba(8,145,178,0.4);border-radius:14px;color:#22d3ee;font-size:12px;cursor:pointer">历 逐月运势</button>
+  <button class="qa-btn" onclick="todayPick()" aria-label="今日一签" title="冷知识今日一签" style="padding:6px 12px;background:rgba(233,30,99,0.15);border:1px solid rgba(233,30,99,0.4);border-radius:14px;color:#f06292;font-size:12px;cursor:pointer">签 今日一签</button>
 </div>
+<div id="todayPickCard" style="display:none;margin:10px 14px;padding:12px 14px;background:linear-gradient(135deg,rgba(233,30,99,0.08),rgba(233,30,99,0.02));border:1px solid rgba(233,30,99,0.25);border-radius:10px;font-size:13px;line-height:1.7"></div>
+<script>
+// R119 修真：今日一签（冷知识曝光）
+function todayPick() {
+  fetch((typeof API!=='undefined'?API:'http://127.0.0.1:8920')+'/api/kb/today-pick?n=3',{signal:AbortSignal.timeout(8000)})
+    .then(r=>r.json()).then(d=>{
+      var items=(d.data||d).items||[];
+      var card=document.getElementById('todayPickCard');
+      if(!items.length){card.style.display='none';return;}
+      var html='<div style="color:#f06292;font-weight:600;margin-bottom:6px">📖 今日一签（古籍·课程精选）</div>';
+      items.forEach(function(it){
+        html+='<div style="margin:8px 0;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid #f06292">';
+        html+='<div style="font-weight:600">'+it.title+'</div>';
+        html+='<div style="color:#bbb;font-size:12px;margin-top:2px">'+it.snippet+'…</div>';
+        html+='<div style="color:#888;font-size:11px;margin-top:4px">'+it.keywords.map(k=>'#'+k).join(' ')+'</div></div>';
+      });
+      html+='<div style="font-size:11px;color:#666;margin-top:6px">点击卡片提问可获取全文解释</div>';
+      card.innerHTML=html;card.style.display='block';
+      card.querySelectorAll('div[style*="font-weight:600"]').forEach(function(el){el.style.cursor='pointer';el.onclick=function(){quickAsk(el.textContent);};});
+    }).catch(function(){var c=document.getElementById('todayPickCard');if(c)c.style.display='none';});
+}
+</script>
 <div class="chat" id="chat"></div>
 
 <!-- R477-C 主动澄清卡片容器 -->
