@@ -8,14 +8,20 @@ kb_formal: authority='tcm-agent-pending-migration' → 'tcm-agent-active'
 import sqlite3, sys, time
 
 DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
-BATCH = 5000
+BATCH = 2000
 MAX_RETRY = 3
 
 def main():
     conn = sqlite3.connect(DB, timeout=15)
     conn.execute("PRAGMA busy_timeout = 15000")
     total = 0
-    for batch_no in range(1, 200):  # 安全上限 100 万条
+    # R119 修真：渐进式 — 小批量 2000/批，总预算 90s，超时留给下一夜（cron 5 分钟窗口安全）
+    import time as _t
+    _budget_end = _t.time() + 90
+    for batch_no in range(1, 200):
+        if _t.time() > _budget_end:
+            print(f"预算耗尽，本轮 {total} 条，剩余待下夜", flush=True)
+            break
         for attempt in range(1, MAX_RETRY + 1):
             try:
                 cur = conn.execute(
