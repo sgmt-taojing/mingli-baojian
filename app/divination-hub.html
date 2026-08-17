@@ -691,6 +691,30 @@ a[href="divination-hub.html"]:hover {
 
   <!-- 一级目录 + 功能卡片 纵向平铺 -->
   <div class="nav-flat" id="navFlat"></div>
+  <!-- R119 修真：今日一签（冷知识曝光）— Hero 下悬浮卡 -->
+  <div id="hubPickCard" style="display:none;margin:0 auto 18px;max-width:640px;padding:14px 16px;background:linear-gradient(135deg,rgba(233,30,99,.06),rgba(233,30,99,.015));border:1px solid rgba(233,30,99,.22);border-radius:12px;font-size:13px;line-height:1.7"></div>
+  <script>
+  (function () {
+    try {
+      fetch('http://127.0.0.1:8920/api/kb/today-pick?n=2', { signal: AbortSignal.timeout(6000) })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          var items = (d.data || d).items || [];
+          var card = document.getElementById('hubPickCard');
+          if (!items.length || !card) return;
+          var html = '<div style="color:#f06292;font-weight:600;margin-bottom:4px;font-size:12px">📖 今日一签 · 古籍课程精选</div>';
+          items.forEach(function (it) {
+            html += '<div style="margin:6px 0;padding:7px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid #f06292">';
+            html += '<span style="font-weight:600">' + it.title + '</span>';
+            html += '<span style="color:#999;font-size:12px;margin-left:8px">' + it.snippet + '…</span></div>';
+          });
+          card.innerHTML = html;
+          card.style.display = 'block';
+        })
+        .catch(function () { /* 静默降级 */ });
+    } catch (e) { /* 静默降级 */ }
+  })();
+  </script>
 </section>
 
 <!-- ===== 更多功能网格 ===== -->

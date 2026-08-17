@@ -232,6 +232,17 @@ function buildSimple(d) {
   const yiJi = d.yi_ji;
   const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）· 煞${d.sha}`;
   const koujue = KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
+  // R119 修真：今日一签（冷知识曝光）— 尾部挂一条
+  let pickLine = '';
+  try {
+    const cp = require('child_process');
+    const pickRaw = cp.execFileSync('curl', ['-s', '-m', '4', 'http://127.0.0.1:8920/api/kb/today-pick?n=1'], { encoding: 'utf8', timeout: 6000 });
+    const pick = JSON.parse(pickRaw);
+    const items = (pick.data || pick).items || [];
+    if (items.length) {
+      pickLine = `\n━━━ 📖 今日一签 ━━━\n\n${items[0].title}\n${(items[0].snippet || '').slice(0, 60)}…`;
+    }
+  } catch (e) { /* 一签不可用不影响主推送 */ }
 
   return `📅 乾元命理宝鉴 · ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 ${SEP}
@@ -250,6 +261,7 @@ ${SEP}
 「${d.wisdom.text}」—— ${d.wisdom.source}
 
 ${koujue}
+${pickLine}
 
 ⚠️ 内容仅供文化参考，不构成决策依据。
 🙏 愿缘主今日顺遂安康！`;
