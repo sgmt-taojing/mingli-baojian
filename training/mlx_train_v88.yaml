@@ -1,0 +1,43 @@
+# v8.8 SFT 训练配置 — v8.7 全量 + 自由问答补足
+# 目标：BaziQA ≥ 55%（v8.7 51.8%）+ 自由问答全面性
+# 数据：v8.7 610 条（BaziQA 推理链 + 自由问答抽样）+ v8.3 补足 400 = 1010 条
+#
+# 训练链路：Qwen2.5-3B base → v8.7 fused → v8.8 LoRA
+
+model: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.7-7b"
+train: true
+test: false
+
+train_file: "train.v88.jsonl"
+valid_file: "valid.v88.jsonl"
+data: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-r105-data-v88"
+
+fine_tune_type: "lora"
+num_layers: 20
+lora_parameters:
+  rank: 4
+  dropout: 0.05
+  scale: 4.0
+
+iters: 220
+batch_size: 1
+grad_accumulation_steps: 4
+learning_rate: 5e-6
+optimizer: "adamw"
+optimizer_config:
+  adamw:
+    betas: [0.9, 0.999]
+    eps: 1e-8
+    weight_decay: 0.01
+
+max_seq_length: 1024
+mask_prompt: true
+grad_checkpoint: true
+
+save_every: 50
+steps_per_eval: 50
+steps_per_report: 10
+val_batches: 20
+seed: 42
+
+adapter_path: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-checkpoints/mingli-sft-v88-7b"
