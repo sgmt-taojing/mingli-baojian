@@ -116,6 +116,15 @@ def main():
         if is_mingli_pollution(title, module, content):
             skipped_pollution += 1
             continue
+        # R752 修真：测试条目跳过（测试-高质量条目等不入对齐面）
+        if title.startswith('测试') or '测试-' in title:
+            skipped_pollution += 1
+            continue
+        # R752 修真：nihaisha 文档索引元数据跳过（README/index/sources 等工具文档，
+        # 非医学知识本体也非命理污染，属 KB 构建元数据）
+        if title.startswith('[nihaisha]') and any(k in title for k in ['README', 'index.md', 'sources.md', 'SKILL', 'USE_AND_RISK', 'BUILD_AND_UPDATE', 'correction-decisions', 'learning-entry', 'lesson-map', 'usage-scenarios', 'beginner-questions', 'symptom-index', 'ebooks', 'classics.md']):
+            skipped_pollution += 1
+            continue
 
         if f in auth_fps:
             continue  # 双侧一致
