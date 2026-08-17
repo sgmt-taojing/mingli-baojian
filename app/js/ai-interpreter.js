@@ -378,6 +378,20 @@ async function aiDivineInterpret(type, baziData, question) {
   let sanyuanCtx = _aiGetSanyuanContext();
   let paipanText = _aiGetPaipanDataText(type, baziData);
 
+  // 🔥 创业四步法专题路由：缘主问创业/开店/合伙/副业时，注入路总四步法分析框架（KB-ziwei-chuangye 15条专题）
+  const CHUANGYE_KEYWORDS = /创业|开公司|开店|做生意|当老板|合伙|副业|项目启动|辞職创业|辞职创业|下海/;
+  let chuangyeFramework = '';
+  if (CHUANGYE_KEYWORDS.test(question || '') || (type === 'ziwei' && CHUANGYE_KEYWORDS.test(paipanText))) {
+    chuangyeFramework = `
+【创业分析必须按路总四步法逐步展开——每步给出明确结论】
+第一步·创业倾向：看本命三方——煞星(擎羊陀罗火铃)=勇敢型；地空地劫=追自由型；强星(紫微天府武曲天相坐命)=独立型；无强星无煞=保守型(须等大限触发)。倒三角(命之迁/官之迁/财之迁)强=机会多。同样标准必须在大限重现才有效。
+第二步·管理天赋：紫微+武曲+廉贞=综合型全能；武曲+太阴=理财型；天机+天同=团队型。下属关系看子女宫(下属宫)：子冲命/官/疾=下属不服；子入命/官=得力；子有生科生权=贵人下属。
+第三步·创业条件：财帛四化为主(生年禄=想轻松赚钱；财禄入命=钱轻松进来；化忌=资金谨慎)；资金来源看昌曲/化科=需周转，父禄入命财官=家里提供(以父母宫立太极看爸爸有没有钱)；顾客看交友宫性质+飞化入财帛/官禄的组合宫。
+第四步·创业时机：大限架构重現倾向+财官双禄=窗口期；太阳=正业巨门=副业，太阳化忌=正业出问题倒逼创业；副业转正看年官自化禄。命主财商看福财线+武曲太阴状态，兄弟宫=储蓄习惯，数目感不强者合伙易被坑。
+【结论要求】四步各自给出✅适合/❌不适合/⚠️条件不足+证据，最后经综合判断：适合立即创业/先副业验证/不宜创业三项择一。
+`;
+  }
+
   const systemPrompt = '你是一位精通八字命理、奇门遁甲、紫微斗数、梅花易数、大六壬等传统术数的资深命理师，基于中华古老智慧知识体系进行推演解读。\n\n';
   systemPrompt += '解读原则：\n';
   systemPrompt += '1. 专业准确：基于排盘数据，运用传统命理学理论进行解读\n';
@@ -394,6 +408,10 @@ async function aiDivineInterpret(type, baziData, question) {
 
   let userPrompt = sanyuanCtx + '\n';
   userPrompt += paipanText + '\n';
+
+  if (chuangyeFramework) {
+    userPrompt += chuangyeFramework + '\n';
+  }
 
   if (question) {
     userPrompt += '【缘主提问】\n' + question + '\n\n';
@@ -437,6 +455,10 @@ async function aiGenerateReport(type, baziData) {
 
   let userPrompt = sanyuanCtx + '\n';
   userPrompt += paipanText + '\n';
+  // 紫微报告：事业章节强制套用创业四步法评估
+  if (type === 'ziwei') {
+    userPrompt += '【报告要求·事业财运章节必须按路总创业四步法评估】\n若缘主问及或报告涉及创业/开店/合伙/副业，按四步法展开：①创业倾向(本命三方煞星/空劫/强星/倒三角，须大限重現) ②管理天赋(紫武廉综合/武太阴理财/机同团队，下属看子女宫) ③创业条件(财帛四化+资金来源+顾客群) ④创业时机(大限财官双禄窗口；太阳正业巨门副业)\n每步✅/❌/⚠️+证据，综合结论三选一：适合立即创业/先副业验证/不宜创业。\n\n';
+  }
   userPrompt += '请生成一份完整的命理报告，包含以下章节：\n\n';
   userPrompt += '## 一、命盘总论\n（整体命局分析，五行强弱，格局特点）\n\n';
   userPrompt += '## 二、性格分析\n（基于命盘的性格特质解读）\n\n';
