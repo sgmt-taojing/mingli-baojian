@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>医保人脸核对 · 命理宝鉴</title>
+<style>
+:root{--ink:#1a2b4a;--muted:#6b7a94;--line:#e3e9f2;--bg:#f4f7fb;--card:#fff;--blue:#2f6fed;--green:#1f9d63;--amber:#c98a12;--red:#d4564a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;padding:0 0 50px}
+header{background:linear-gradient(135deg,#0f3d6e,#2f6fed);color:#fff;padding:24px;text-align:center}
+header h1{font-size:20px}
+header p{opacity:.85;font-size:12.5px;margin-top:4px}
+main{max-width:1000px;margin:0 auto;padding:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+h2{font-size:14.5px;margin-bottom:12px;color:var(--ink)}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.col{flex:1;min-width:280px}
+label{font-size:12px;color:var(--muted);display:block;margin:8px 0 4px}
+input[type=text]{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px}
+.cam-box{width:100%;aspect-ratio:4/3;background:#0e1c33;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#5a7295;font-size:12px;overflow:hidden;position:relative}
+.cam-box video,.cam-box img{width:100%;height:100%;object-fit:cover}
+.cam-box canvas{position:absolute;inset:0;width:100%;height:100%}
+button{border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;margin:4px}
+.primary{background:var(--blue);color:#fff}
+.success{background:var(--green);color:#fff}
+.ghost{background:#eef3fa;color:var(--blue)}
+.danger{background:#fdeeee;color:var(--red)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.result{border-radius:10px;padding:14px;margin-top:12px;font-size:13px;display:none}
+.result.ok{background:#eaf5ef;border:1px solid #bfe6cf;color:#1a6b3a;display:block}
+.result.no{background:#fdeeee;border:1px solid #f3c1bd;color:#a03a30;display:block}
+.result.warn{background:#fdf6e3;border:1px solid #ecd9a8;color:#8a6d1a;display:block}
+.result .big{font-size:22px;font-weight:700;margin:4px 0}
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}
+.metric{background:#f8fafd;border:1px solid var(--line);border-radius:10px;padding:10px 12px;text-align:center}
+.metric .v{font-size:18px;font-weight:700}
+.metric .l{font-size:11px;color:var(--muted)}
+.msg{padding:9px 12px;border-radius:8px;font-size:12.5px;margin-top:8px;display:none}
+.msg.err{background:#fdeeee;color:var(--red)}
+.msg.ok{background:#eaf5ef;color:var(--green)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--muted);font-weight:600;font-size:11.5px}
+.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.b-ok{background:#eaf5ef;color:var(--green)}
+.b-no{background:#fdeeee;color:var(--red)}
+</style>
+</head>
+<body>
+<header>
+<h1>🏥 医保人脸核对终端</h1>
+<p>现场拍照 → 特征提取 → 与参保人库比对 · 支持 1:1 核对与 1:N 检索</p>
+</header>
+<main>
+
+<div class="card">
+<h2>📸 现场采集</h2>
+<div class="row">
+<div class="col">
+<div class="cam-box" id="camBox">
+<video id="video" autoplay playsinline style="display:none"></video>
+<canvas id="canvas"></canvas>
+<span id="camHint">点击「开启摄像头」开始采集</span>
+</div>
+<div class="btn-row">
+<button class="ghost" id="btnCam" onclick="toggleCam()">📷 开启摄像头</button>
+<button class="primary" id="btnCapture" onclick="capture()" disabled>📷 拍照采集</button>
+</div>
+<div class="msg" id="camMsg"></div>
+</div>
+<div class="col">
+<label>参保人编号（1:1 核对应填）</label>
+<input type="text" id="personId" placeholder="如 MB0001（留空 = 1:N 全库检索）">
+<label>姓名（注册时填写）</label>
+<input type="text" id="personName" placeholder="注册用姓名">
+<div class="btn-row">
+<button class="success" onclick="doRegister()">📝 注册入库</button>
+<button class="primary" onclick="doVerify()">🔍 医保核对</button>
+</div>
+<div class="result" id="result"></div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>🗂️ 参保人人脸库 <span id="dbCount" style="color:var(--muted);font-weight:400">(0 人)</span></h2>
+<table>
+<thead><tr><th>编号</th><th>姓名</th><th>注册时间</th><th>操作</th></tr></thead>
+<tbody id="dbTable"><tr><td colspan="4" style="color:var(--muted);text-align:center">暂无注册人员</td></tr></tbody>
+</table>
+</div>
+
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8958' : '';
+let stream = null, capturedB64 = null;
+
+async function api(path, body){
+  try{
+    const r = await fetch(API+path, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    return await r.json();
+  }catch(e){ return {ok:false, error:e.message}; }
+}
+
+async function toggleCam(){
+  if(stream){ stream.getTracks().forEach(t=>t.stop()); stream=null; $('video').style.display='none'; $('camHint').style.display=''; $('btnCam').textContent='📷 开启摄像头'; $('btnCapture').disabled=true; return; }
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user', width:960, height:720}});
+    const v = $('video'); v.srcObject = stream; v.style.display='block'; $('camHint').style.display='none';
+    $('btnCam').textContent='⏹ 关闭摄像头'; $('btnCapture').disabled=false;
+    showMsg('camMsg', '摄像头已开启，请正对镜头保持光线充足', true);
+  }catch(e){ showMsg('camMsg', '摄像头开启失败：'+e.message, false); }
+}
+
+function capture(){
+  const v = $('video');
+  if(!v.videoWidth){ showMsg('camMsg', '摄像头未就绪', false); return; }
+  const canvas = $('canvas');
+  canvas.width = v.videoWidth; canvas.height = v.videoHeight;
+  canvas.getContext('2d').drawImage(v, 0, 0);
+  capturedB64 = canvas.toDataURL('image/jpeg', 0.92).split(',')[1];
+  showMsg('camMsg', '✅ 已采集 ' + v.videoWidth + 'x' + v.videoHeight + ' 照片，可注册或核对', true);
+}
+
+async function doRegister(){
+  if(!capturedB64) return showMsg('camMsg','请先拍照采集',false);
+  const pid = $('personId').value.trim();
+  if(!pid) return showMsg('camMsg','请输入参保人编号',false);
+  const name = $('personName').value.trim() || pid;
+  showMsg('camMsg','注册中...',true);
+  const r = await api('/api/face/register', {image: capturedB64, person_id: pid, name});
+  if(r.ok && r.registered){
+    showResult('ok', '✅ 注册成功', `参保人 ${r.registered}（${name}）已入库，当前共 ${r.persons} 人`);
+    loadDb();
+  } else {
+    showResult('no', '❌ 注册失败', r.error || '未检测到清晰人脸，请重新拍摄');
+  }
+}
+
+async function doVerify(){
+  if(!capturedB64) return showMsg('camMsg','请先拍照采集',false);
+  const pid = $('personId').value.trim();
+  showMsg('camMsg','核对中...',true);
+  const r = await api('/api/face/verify', {image: capturedB64, person_id: pid || undefined});
+  if(r.error){ showResult('no','❌ 核对失败', r.error); return; }
+  if(r.ok === false){ showResult('no','❌ 未检测到人脸', '请正对镜头重新拍摄，确保光线充足'); return; }
+  const sim = (r.similarity !== undefined ? r.similarity : (r.best ? r.best.similarity : 0));
+  const pct = (sim*100).toFixed(1);
+  if(r.match){
+    showResult('ok', '✅ 身份核对一致', `相似度 ${pct}%（阈值 ${r.threshold}）`);
+    $('result').innerHTML += `<div class="metric-row">
+      <div class="metric"><div class="v" style="color:var(--green)">${pct}%</div><div class="l">相似度</div></div>
+      <div class="metric"><div class="v">${r.name || (r.best && r.best.name) || '-'}</div><div class="l">匹配人员</div></div>
+      <div class="metric"><div class="v">${r.person_id || (r.best && r.best.person_id) || '-'}</div><div class="l">参保人编号</div></div>
+      <div class="metric"><div class="v">${r.ms}ms</div><div class="l">响应耗时</div></div>
+    </div>`;
+  } else {
+    showResult('no', '❌ 身份核对不一致', `相似度 ${pct}%（低于阈值 ${r.threshold}），请确认本人或重新拍摄`);
+    $('result').innerHTML += `<div class="metric-row">
+      <div class="metric"><div class="v" style="color:var(--red)">${pct}%</div><div class="l">相似度</div></div>
+      <div class="metric"><div class="v">${r.best ? r.best.name + ' (' + r.best.similarity + ')' : '-'}</div><div class="l">最接近人员</div></div>
+    </div>`;
+  }
+}
+
+function showResult(type, title, detail){
+  const el = $('result');
+  el.className = 'result ' + (type==='ok'?'ok':type==='no'?'no':'warn');
+  el.innerHTML = `<div style="font-size:15px;font-weight:600">${title}</div><div style="margin-top:4px">${detail}</div>`;
+}
+
+function showMsg(id, text, ok){
+  const el = $(id); el.textContent = text; el.className = 'msg ' + (ok?'ok':'err'); el.style.display='block';
+  setTimeout(()=>el.style.display='none', 6000);
+}
+
+async function loadDb(){
+  try{
+    const r = await fetch(API+'/api/face/db');
+    const d = await r.json();
+    if(!d.ok) return;
+    $('dbCount').textContent = `(${d.count} 人)`;
+    if(d.count === 0){
+      $('dbTable').innerHTML = '<tr><td colspan="4" style="color:var(--muted);text-align:center">暂无注册人员</td></tr>';
+      return;
+    }
+    $('dbTable').innerHTML = d.persons.map(p => `<tr>
+      <td>${p.person_id}</td><td>${p.name}</td><td>${p.registered_at || '-'}</td>
+      <td><button class="ghost" style="padding:4px 10px;font-size:11.5px" onclick="fillId('${p.person_id}')">选此编号</button></td>
+    </tr>`).join('');
+  }catch(e){}
+}
+function fillId(id){ $('personId').value = id; }
+
+// 加载时轮询健康
+loadDb();
+setInterval(loadDb, 15000);
+</script>
+</body>
+</html>
