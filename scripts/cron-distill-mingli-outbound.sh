@@ -20,20 +20,16 @@ def safe_str(v):
     if v is None: return ''
     if isinstance(v, bytes): return v.decode('utf-8', errors='ignore')
     return str(v)
-PURE_MINGLI = [
-    'bazi', 'ziwei', 'qimen', 'liuyao', 'liuren', 'meihua',
-    'fengshui', 'yijing', 'hehun', 'qiming', 'mingli',
-    'tianji-mingli', 'tianji-jiangjie', 'daodejing',
-    'liuyao-basics', 'bazi-teaching',
-    'r45_palace_ext', 'r45_shishen_ext', 'r39_dual_core',
-    'r39_career_core', 'r39_health_core',
-    'case_bazi', 'case_fengshui', 'case_liuren', 'case_liuyao', 'case_meihua', 'case_qimen', 'case_ziwei',
-]
+# R735-g8 修真：静态白名单 → 动态全量导出（源头新模块自动纳入次日同步）
+# 旧白名单仅 28 模块漏 96 模块；现 SQL NOT IN 排除内部模块，其余 formal 全量导出
+EXCLUDE_MODULES = ('engine_compare', 'ai-prompt', 'mingli-cross-moved')
 EXPORT = "training-data/distill-outbound/mingli-pure-${DATE}.json"
 conn = sqlite3.connect("server/database/yidao.db")
 conn.row_factory = sqlite3.Row
-placeholders = ','.join(['?'] * len(PURE_MINGLI))
-rows = conn.execute(f"SELECT entry_id, module, title, content, keywords, trust_score FROM kb_formal WHERE status='formal' AND module IN ({placeholders})", PURE_MINGLI).fetchall()
+ph = ','.join(['?'] * len(EXCLUDE_MODULES))
+rows = conn.execute(
+    f"SELECT entry_id, module, title, content, keywords, trust_score FROM kb_formal "
+    f"WHERE status='formal' AND module NOT IN ({ph})", EXCLUDE_MODULES).fetchall()
 entries = []
 for r in rows:
     entries.append({
@@ -52,6 +48,7 @@ with open(EXPORT, 'w', encoding='utf-8') as f:
 print(f"导出 {len(entries)} 条命理 KB")
 for m, n in modules.most_common():
     print(f"  {m}: {n}")
+
 PYEOF
 
 cp "$EXPORT" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json
