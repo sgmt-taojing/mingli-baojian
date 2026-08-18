@@ -714,6 +714,7 @@ function renderSession(s) {
     vb.innerHTML = `
       <div class="syndrome">${_esc(v.syndrome || '未识别')} <span class="conf">置信度 ${(v.confidence * 100).toFixed(0)}%</span></div>
       <div style="font-size:12px;color:var(--dim)">八纲: ${_esc(v.eight_principles || '—')}</div>
+      ${v.ai_report ? `<div style="margin:8px 0;padding:8px 10px;background:var(--soft,#f5f0e8);border-radius:8px;font-size:13px;line-height:1.6">💬 ${_esc(v.ai_report)}</div>` : ''}
       <ul class="evidence">${(v.findings || []).slice(0, 4).map(f => `<li>${_esc(typeof f === 'string' ? f : (f.label || f.feature || JSON.stringify(f)))}</li>`).join('')}</ul>
       ${(v.formulas || []).length ? `<div class="formulas">${v.formulas.map(f => `<span class="formula">${_esc(f)}</span>`).join('')}</div>` : ''}
       <div class="conf">治法: ${_esc((v.treatments || []).join('、') || '—')}</div>`;
