@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>全站导航 · 易道智鉴</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1020;color:#e8eefc;font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:26px 16px;max-width:1060px;margin:0 auto;line-height:1.6}
+h1{font-size:22px;color:#e8c87a;text-align:center;letter-spacing:3px;margin-bottom:4px}
+.sub{text-align:center;color:#7a8aab;font-size:12.5px;margin-bottom:20px}
+.search{position:sticky;top:0;background:#0b1020;padding:12px 0;z-index:9}
+.search input{width:100%;max-width:640px;display:block;margin:0 auto;padding:13px 20px;border-radius:26px;border:1.5px solid rgba(232,200,122,.4);background:#101a2e;color:#e8eefc;font-size:15px;outline:none}
+.search input:focus{border-color:#e8c87a}
+.search .cnt{text-align:center;color:#5e6f94;font-size:12px;margin-top:6px}
+.group-title{color:#4da3ff;font-size:15px;font-weight:700;margin:22px 4px 8px;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.group-title .n{background:rgba(77,163,255,.15);padding:1px 10px;border-radius:10px;font-size:11px;color:#9dc8ff}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.card{background:#101a2e;border:1px solid rgba(120,160,255,.16);border-radius:10px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;transition:border-color .15s}
+.card:hover{border-color:#e8c87a}
+.card .t{color:#e8eefc;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .f{color:#5e6f94;font-size:10.5px;flex:none}
+.empty{text-align:center;color:#5e6f94;padding:30px;display:none}
+.kw{color:#8fa2c9;font-size:10.5px;margin-left:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:none;max-width:110px}
+</style>
+</head>
+<body>
+<h1>全站导航</h1>
+<div class="sub">178 个页面 · 搜索即达 · 分组浏览</div>
+
+<div class="search">
+  <input id="q" type="text" placeholder="搜索页面，如：排盘、知识库、商城、视觉…" autofocus>
+  <div class="cnt" id="cnt"></div>
+</div>
+<div class="empty" id="empty">没有匹配的页面</div>
+<div id="groups"></div>
+
+<script>
+var INDEX = null;
+fetch('data/site-index.json').then(function(r){return r.json()}).then(function(d){
+  INDEX = d;
+  render('');
+  document.getElementById('cnt').textContent = '共 ' + d.length + ' 页';
+}).catch(function(){ document.getElementById('groups').innerHTML = '<div class="empty" style="display:block">索引加载失败（需经 8900 静态服务访问）</div>'; });
+
+function render(q){
+  q = (q||'').trim().toLowerCase();
+  var groups = {};
+  var total = 0;
+  INDEX.forEach(function(p){
+    var hay = (p.title + ' ' + (p.kws||[]).join(' ') + ' ' + p.file).toLowerCase();
+    if(q && hay.indexOf(q) < 0) return;
+    total++;
+    (groups[p.group] = groups[p.group] || []).push(p);
+  });
+  var g = document.getElementById('groups');
+  var keys = Object.keys(groups).sort(function(a,b){return groups[b].length - groups[a].length});
+  g.innerHTML = keys.map(function(k){
+    var cards = groups[k].map(function(p){
+      var kw = (p.kws||[]).slice(0,2).join(' · ');
+      return '<a class="card" href="'+p.file+'" target="_blank"><span class="t">'+p.title+'</span><span class="kw">'+kw+'</span><span class="f">'+p.file+'</span></a>';
+    }).join('');
+    return '<div class="group-title">'+k+' <span class="n">'+groups[k].length+'</span></div><div class="cards">'+cards+'</div>';
+  }).join('');
+  document.getElementById('cnt').textContent = q ? ('匹配 ' + total + ' 页') : ('共 ' + INDEX.length + ' 页');
+  document.getElementById('empty').style.display = (total === 0 && q) ? 'block' : 'none';
+}
+document.getElementById('q').addEventListener('input', function(){ render(this.value); });
+document.addEventListener('keydown', function(e){
+  if(e.key === '/' && document.activeElement.tagName !== 'INPUT'){ e.preventDefault(); document.getElementById('q').focus(); }
+});
+</script>
+</body>
+</html>
