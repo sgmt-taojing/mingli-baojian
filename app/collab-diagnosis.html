@@ -743,7 +743,7 @@ function renderSession(s) {
     document.getElementById('suggestRxRationale').innerHTML =
       (sr.rationale || []).map(r => '· ' + _esc(r)).join('<br>') +
       `<br>· 融合置信: <b>${sr.fused_confidence ? (sr.fused_confidence * 100).toFixed(0) + '%' : '—'}</b>（视觉 ${sr.vision_confidence ? (sr.vision_confidence * 100).toFixed(0) + '%' : '—'} + KB ${sr.kb_score ? (sr.kb_score * 100).toFixed(0) + '分' : '—'}）` +
-      `<br>· 建议来源: <b>${sr.suggested_by === 'ai_autopilot' ? '🤖 AI 自主（无人化）' : 'AI 辅助（需医生审核）'}</b>`;
+      `<br>· 建议来源: <b>${sr.suggested_by === 'ai_autopilot' ? '🤖 AI 自主（无人化）' : '辅助（需医生审核）'}</b>`;
   } else srBox.classList.add('hidden');
 
   // 医生区（当前角色是医生才显示操作）

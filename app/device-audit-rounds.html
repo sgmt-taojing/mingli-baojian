@@ -179,7 +179,7 @@
         note:'完整链路 200 · 响应 <5ms（离线 PIL）· 降级：图片尺寸不足时提示重拍'
       },
       { chain:'语音交互链', from:'ai-assistant.html / tcm-report.html', via:'SpeechRecognition → interimResults → window.speakText', to:'8912 /api/tts?text=&voice=', status:'pass', score:82,
-        steps:['用户按住说话 → SR.continuous=true','interimResults 实时转录 → chat','AI 生成报告 → showReport(text)','window.speakText(text) → Audio(url)','8912 /api/tts?text=... → MP3 流'],
+        steps:['用户按住说话 → SR.continuous=true','interimResults 实时转录 → chat','生成报告 → showReport(text)','window.speakText(text) → Audio(url)','8912 /api/tts?text=... → MP3 流'],
         note:'语音输入+输出闭环 · 降级：SR 不可用时提示"浏览器不支持"'
       },
       { chain:'设备管理链', from:'device-management.html', via:'device-platform.js discoverAll/authorizeWebMedia', to:'getUserMedia → platform.userProfile', status:'pass', score:78,
