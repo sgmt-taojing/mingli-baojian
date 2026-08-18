@@ -1,69 +1,49 @@
 {
-  "lastRun": "2026-08-18T13:35:00+08:00",
-  "runSummary": "✅ P1舒晗密训班02蒸馏2条(信息场四论+高级布局思维 / 反伏吟调理选物逻辑框架)；修真:弃用12条OCR噪音条目(KB-qimen-shuhan-*×6+shuhan_daotu_L2X×6，由DEEP-20260812干净版替代)；P0 周易-中医目录不存在 noop；P2 专利材料已全覆盖 noop",
+  "lastRun": "2026-08-18T15:40:38.796441",
+  "runSummary": "P1: shuhan-mixun-tianji.js#extras 未蒸馏3章（patterns格局体系/concepts概念整理×2/resolve化解精要）蒸馏4条; P0: 周易-中医目录不存在 noop; P2: 专利目录无新增 noop",
   "kbCounts": {
-    "qimen_shuihan_tcm": 107,
-    "addedThisRun": 2,
-    "deprecatedThisRun": 12
+    "addedThisRun": 4
   },
-  "addedThisRun": 2,
+  "addedThisRun": 4,
   "thisRunProcessed": [
     {
-      "file": "~/Desktop/yanshi/knowledge/ocr_cache/MIXUN_【密训班】02.txt",
+      "file": "server/kb-store/premium/shuhan-mixun-tianji.js#extras",
       "priority": "P1",
-      "entriesAdded": 2,
+      "sections": [
+        "patterns",
+        "concepts",
+        "resolve"
+      ],
+      "entriesAdded": 4,
       "entryIds": [
-        "SH-MIXUN-KE2-XINXI-20260818",
-        "SH-MIXUN-KE2-FYFYX-20260818"
+        "KB-SH-MX-PATTERNS-GEJU-20260818",
+        "KB-SH-MX-CONCEPTS-SHITIANGAN-20260818",
+        "KB-SH-MX-CONCEPTS-DIZHI-SHENSHA-20260818",
+        "KB-SH-MX-RESOLVE-JINGYAO-20260818"
       ],
       "module": "qimen",
       "trust": 0.85,
-      "tags": "舒晗,密训班,第2课,信息场四论,高级布局,反伏吟调理,选物逻辑"
+      "tags": "舒晗,格局体系,十天干象义,地支关系,神煞,化解精要,锁单宫"
     }
   ],
   "dedupRemoved": [],
-  "xiuzhenThisRun": {
-    "action": "deprecate-ocr-noise-batch",
-    "entriesDeprecated": 12,
-    "entryIds": [
-      "KB-qimen-shuhan-财运-20260807-094132",
-      "KB-qimen-shuhan-事业-20260807-094132",
-      "KB-qimen-shuhan-婚恋-20260807-094132",
-      "KB-qimen-shuhan-学业-20260807-094132",
-      "KB-qimen-shuhan-健康-20260807-094132",
-      "KB-qimen-shuhan-官非-20260807-094132",
-      "shuhan_daotu_L25",
-      "shuhan_daotu_L26",
-      "shuhan_daotu_L27",
-      "shuhan_daotu_L28",
-      "shuhan_daotu_L29",
-      "shuhan_daotu_L30"
-    ],
-    "replacement": "SHUHAN-DAOTU-L25~L30-DEEP-20260812 (active) + SHUHAN-DAOTU-L25/L26-DEEP-20260817 (promoted)",
-    "reason": "daotu OCR原文含形近错字(领學/福镱/穗定/和诺/解诶/头邵/阳力等)，污染用户搜索；知识已由干净版全覆盖(催财五步法由KB-LZ-7da1c7fd、KB-SH-MX-210257e7覆盖)",
-    "auditLog": "audit_logs: kb-deprecate-ocr-noise-batch",
-    "reversible": "status='deprecated' 可随时回滚，content 完整保留"
-  },
   "FTS5Verified": {
-    "信息场四论": "kb_fts5(trigram) 命中 SH-MIXUN-KE2-XINXI-20260818",
-    "天干合冲": "kb_fts5(trigram) 命中 SH-MIXUN-KE2-FYFYX-20260818",
-    "伏吟反吟": "kb_fts5(trigram) 命中 SH-MIXUN-KE2-FYFYX-20260818",
-    "主搜索过滤验证": "模拟api-server-v2.js:3371查询(财运类)：弃用条目0命中，返回干净DEEP版",
-    "fitnessGap": "kb_formal=54959 vs kb_formal_fts=54959 无缺口；kb_fts5 由触发器同步"
+    "fitnessGap": "kb_formal vs kb_formal_fts 落差: 0"
   },
   "nextCandidates": [
-    "P0: ~/Desktop/周易-中医/ 仍不存在，保持noop；建议人工确认路总流年班/紫微文件存放位置（8/15脚本路径已失效）",
-    "P1: 密训班01/02/04已深度蒸馏；剩余可挖：密训导图01/03与既有DAOTU条目细节比对(导图多为目录性内容,价值有限)、舒晗基础课PPT逐课二次挖掘",
-    "P2: 无新专利/论文文件；中医标准智能体专利材料已全覆盖(12条LDS-PATENT-V2-*)",
-    "质量项: 已修真12条OCR噪音；剩余可查KB-shuhan-ocr-*原始片段276条(formal状态,抽样干净,暂不需处理)"
+    "P0: ~/Desktop/周易-中医/ 仍不存在，保持noop",
+    "P1: extras 剩余未蒸馏：notes_day1（第1天课程笔记-用神体系/五行生克吉凶判断/命盘事盘分析要素）、notes_day2 剩余（八门应用详解/门迫通关法/八门节气对应/日主对应事物/四害化解汇总/马星）、liunian_table（流年宫位查询表-查表法）",
+    "P1: shuhan-knowledge-base.js 32课daotu已全覆盖，密训KE1/KE2/KE4已采，KE3(密训班03)待查",
+    "P2: 无新专利/论文文件",
+    "质量项: SHUHAN-DAOTU-L2X 条目 GBK 乱码仍待修复"
   ],
   "notes": [
-    "8/18 13:35 运行：P1 密训班02 蒸馏2条 + 修真弃用12条OCR噪音条目",
-    "密训班02真缺口分析：六维模型/伏吟反吟定义/化解总则/命盘调理实例已被KB-LZ-MIXUN-56f31e79等3条覆盖；真缺口=信息场四论(系统论/感应论/全息论/心易论)+六十四元素+八十一阵法，以及反伏吟选物逻辑表(天干合冲→属相人→方位→事物)",
-    "P0: 周易-中医 目录不存在(8/18两次确认)；8/15脚本中 流年班第十四课.pptx 路径已失效，建议排查文件去向",
-    "P2: 发明专利申请书.md/技术交底书 已于8/11-8/12蒸馏为LDS-PATENT-V2-* 12条，本轮验证无新缺口",
-    "修真盘点：src_id LIKE '%shuhan-kb-combined.js%' 全量70+条，OCR噪音集中在2代：KB-qimen-shuhan-*(active)+shuhan_daotu_L2X(approved)，均被DEEP-20260812干净版覆盖，弃用安全",
-    "kb_collect_state 表结构已变更(collector/last_run/last_file/file_count/notes)，旧脚本的key/value字段写法已失效，本轮已按新schema写入",
-    "指纹去重(sha256 content)+entry_id唯一约束双重防护，0重复"
+    "8/18 15:36 运行：P1 extras 3章蒸馏 4 条（格局体系/十天干象义/地支关系神煞/化解精要）",
+    "patterns 格局体系含奇门源流(1080局→72局→18局)+五大成事因素+催财五步法，此前无结构化条目",
+    "concepts 十天干象义含身体部位+十种达成方式+三奇定位，为断病断性格核心速查表",
+    "resolve 化解精要含太极点+十二地支固定方位分布+秘法等级定位(乾坤定位初级vs锁单宫最高级)",
+    "P0 周易-中医目录8/18仍不存在；Desktop 13:35后零新增PDF/PPTX/DOCX",
+    "P2 专利材料目录8/13后零新增",
+    "指纹去重（sha1 content + entry_id 唯一约束）双重防护"
   ]
 }
