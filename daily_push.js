@@ -169,7 +169,7 @@ function buildPublic(d) {
   }
 
   msg += `
-🌤️ ${d.weather.condition} ${d.weather.temp}°C（${d.weather.city || '本地'}）｜👕 ${d.clothing_temp}
+🌤️ ${d.weather.condition} ${d.weather.temp}°C（${d.weather.city || '本地'}）
 
 📖 「${d.wisdom.text}」—— ${d.wisdom.source}
 ${d.wisdom.meaning ? '💡 ' + d.wisdom.meaning : ''}
