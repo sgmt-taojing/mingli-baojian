@@ -384,3 +384,10 @@
 - **修真**：重写为完整 XML plist（KeepAlive + 日志 + RunAtLoad + WorkingDirectory）+ face-ocr 路径修正
 - **验证**：face-diag 杀后 6s 自动拉起 ✅ 三服务全绿
 - 服务自愈体系：核心 17 服务全部 KeepAlive 就位
+
+## 08-18 15:10 v9.0 训练中（R739 建设推进）
+- 数据：mlx-r105-data-v90（推理链584+自由584=1:1，去AI味，共1168）
+- 训练：Iter 240/300，loss 3.56→1.68 收敛，从 v8.7 fused 继续 LoRA（rank4/layers20/5e-6）
+- 修真：文件名 train.jsonl 标准（mlx_lm 要求）；fuse 时 MLX_BASE_MODEL 必须=v8.7（adapter 是 v8.7 增量）
+- P2：smart-home-family venv 已建（pycryptodome 隔离）；告警微信通道暂缓（微信平台无通用推送 API）
+- 场景推荐前端接入 marketplace（ai-vision 域内，已提交）
