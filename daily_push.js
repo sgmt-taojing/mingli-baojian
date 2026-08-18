@@ -140,7 +140,8 @@ function buildPublic(d) {
   const yiJi = d.yi_ji;
   const shichenLine = d.shichen.map(([s, j]) => `${s}${j}`).join(' ');
   const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）`;
-  const koujue = KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
+  // R142 知识服务当下当天：KB 按日期检索古籍口诀优先，本地列表降级
+  const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
 
   let msg = `📅 乾元命理宝鉴 · ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
@@ -201,7 +202,7 @@ function buildSimple(d) {
   const gz = d.gz;
   const yiJi = d.yi_ji;
   const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}`;
-  const koujue = KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
+  const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
   // 吉时提取（白天 7-19 点实用时段）
   let jishi = '';
   try {
