@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>命理档案审核 · 命理师工作台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1020;color:#e8eefc;font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:24px 16px;max-width:900px;margin:0 auto;line-height:1.7}
+h1{font-size:22px;color:#e8c87a;text-align:center;letter-spacing:2px;margin-bottom:4px}
+.sub{text-align:center;color:#7a8aab;font-size:13px;margin-bottom:20px}
+.panel{background:#101a2e;border:1px solid rgba(120,160,255,.2);border-radius:14px;padding:16px;margin-bottom:14px}
+.panel h3{color:#e8c87a;margin-bottom:10px;font-size:15px}
+.muted{color:#7a8aab;font-size:12px}
+.meta{color:#7a8aab;font-size:11px;margin:4px 0}
+textarea{width:100%;min-height:80px;padding:10px;border-radius:8px;border:1px solid rgba(120,160,255,.3);background:#0b1020;color:#e8eefc;font-size:13px;resize:vertical}
+.btn{display:inline-block;padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;margin:4px 4px 0 0}
+.btn.gold{background:#e8c87a;color:#0b1020}
+.btn.ghost{background:transparent;border:1px solid #e8c87a;color:#e8c87a}
+.item{background:#0b1020;border:1px solid rgba(120,160,255,.15);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.item .row{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.badge{display:inline-block;padding:1px 8px;border-radius:8px;font-size:10px;background:rgba(255,200,87,.12);color:#ffc857;border:1px solid rgba(255,200,87,.3)}
+#result{margin-top:10px;padding:10px;border-radius:8px;font-size:13px;display:none}
+#result.ok{background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.3)}
+#result.err{background:rgba(255,93,115,.1);border:1px solid rgba(255,93,115,.3)}
+</style>
+</head>
+<body>
+<h1>命理档案审核 · 命理师工作台</h1>
+<div class="sub">AI 生成初稿 → 命理师修订定稿 · 人脸核验留痕</div>
+
+<div class="panel">
+  <h3>📋 待审核档案（AI 初稿）</h3>
+  <div id="list"></div>
+</div>
+
+<div class="panel" id="edit-panel" style="display:none">
+  <h3>✏️ 修订档案 <span id="case-id" style="font-size:12px;color:#7a8aab"></span></h3>
+  <div class="muted">AI 初稿（可修改后定稿）：</div>
+  <textarea id="mingli-text"></textarea>
+  <div class="meta" id="orig-meta"></div>
+  <button class="btn gold" onclick="finalize()">✅ 定稿</button>
+  <button class="btn ghost" onclick="closeEdit()">返回</button>
+  <div id="result"></div>
+</div>
+
+<script>
+var API = 'http://127.0.0.1:8920';
+var current = null;
+
+function load(){
+  fetch(API + '/api/mingli/case-list?status=pending_review&limit=20')
+    .then(function(r){return r.json()}).then(function(d){
+      var box = document.getElementById('list');
+      if(!d.ok || !d.cases || d.cases.length === 0){
+        box.innerHTML = '<div class="muted">没有待审核档案（全部已处理 ✅）</div>'; return;
+      }
+      box.innerHTML = '';
+      d.cases.forEach(function(c){
+        var div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = '<div class="row"><div><b>' + (c.voice_text || '（无主诉）').slice(0, 40) + '</b> <span class="badge">' + (c.status||'') + '</span></div>' +
+          '<button class="btn ghost" onclick="openEdit(' + JSON.stringify(c.case_uuid) + ')">✏️ 修订</button></div>' +
+          '<div class="meta">' + (c.created_ts||'').slice(0,16) + ' · 初稿：' + (c.mingli_text||'').slice(0, 60) + '</div>';
+        box.appendChild(div);
+      });
+    }).catch(function(){ document.getElementById('list').innerHTML = '<div class="muted">加载失败</div>'; });
+}
+
+function openEdit(uuid){
+  fetch(API + '/api/mingli/case-get?case_uuid=' + uuid)
+    .then(function(r){return r.json()}).then(function(d){
+      if(!d.ok){ alert('获取失败'); return; }
+      current = d.case;
+      document.getElementById('edit-panel').style.display = 'block';
+      document.getElementById('case-id').textContent = d.case.case_uuid.slice(0, 14);
+      document.getElementById('mingli-text').value = d.case.mingli_text || '';
+      document.getElementById('orig-meta').textContent = '主诉：' + (d.case.voice_text||'').slice(0,60) + ' · 面相：' + (d.case.visual_summary||'');
+    }).catch(function(){ alert('获取失败'); });
+}
+
+function finalize(){
+  var text = document.getElementById('mingli-text').value.trim();
+  if(!text){ show('请填写命理解读内容', false); return; }
+  var expert = prompt('命理师标识（如 ML-001）：');
+  if(!expert) return;
+  var face = prompt('请上传/拍摄命理师本人照片核验（base64 或留空跳过）：');
+  fetch(API + '/api/mingli/case-finalize', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({case_uuid: current.case_uuid, mingli_text: text, expert: expert, face_image: face || ''})})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.ok){ show('✅ 已定稿：' + d.case_uuid.slice(0, 14), true); closeEdit(); load(); }
+      else { show('定稿失败：' + (d.error||''), false); }
+    }).catch(function(){ show('服务不可用', false); });
+}
+
+function show(msg, ok){ var r = document.getElementById('result'); r.style.display='block'; r.className = ok?'ok':'err'; r.textContent = msg; }
+function closeEdit(){ document.getElementById('edit-panel').style.display = 'none'; current = null; }
+load();
+</script>
+</body>
+</html>
