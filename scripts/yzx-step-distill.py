@@ -14,7 +14,7 @@ import os, sys, json, hashlib, sqlite3, traceback
 from datetime import datetime, timezone, timedelta
 
 ROOT = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
-SRC_DIR = os.path.expanduser("~/Desktop/周易-中医")
+SRC_DIR = "/Volumes/data1/训练素材-20260816/周易-中医"  # R121：源目录已移至 data1
 ACCT_FILE = f"{ROOT}/.openclaw/tmp/yzx-processed.json"
 DB_PATH = f"{ROOT}/server/database/yidao.db"
 SRC_ID_PREFIX = "SRC-LD-DESKTOP"

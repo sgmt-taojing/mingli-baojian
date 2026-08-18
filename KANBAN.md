@@ -371,3 +371,10 @@
   - **修真教训**：量化必须在 base 模型层做（先量化 Qwen2.5-3B base 再 fuse adapter），不能直接量化 fused 产物
   - 量化模型进 quarantine 待修真（正确路径：quantize base → fuse）
 - 提交：30438005（规则 AI 化）→ 13 端口全绿
+
+## 08-18 R739 项目边界盘点修真（10:50）
+- **品牌词隔离**：check-cross-brand 全项目纯净 ✅
+- **磁盘修真**：11G → 19G（归档 v8.9 fused + 量化失败产物 → data1）
+- **venv 修真**：ai-vision-toolkit（42 py）+ tcm-agent（18 py）建 venv（依赖隔离）
+- **遗留**：smart-home-family 172 py 无 venv（大项目后续）；edge-tts 在系统 Python（归属 mingli TTS）
+- 服务：14 端口全绿（8900/8920/8961 的 404 为无 /health 路由，正常）
