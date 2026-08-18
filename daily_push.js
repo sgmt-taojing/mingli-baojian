@@ -129,146 +129,95 @@ const KOUJUE_TIPS = [
   '今日宜诵读《论语》一章，温故知新，涵养正气。',
 ];
 
-/** 公开版：完整但不含个性化提点，适合公开转发 */
+/** 公开版：黄历核心直给（R125 极致版：去废话高密度） */
 function buildPublic(d) {
   const gz = d.gz;
   const yiJi = d.yi_ji;
-  const shichenLine = d.shichen.map(([s, j]) => `${s}:${j}`).join('  ');
+  const shichenLine = d.shichen.map(([s, j]) => `${s}${j}`).join(' ');
   const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）`;
-  const sha = `煞${d.sha}`;
   const koujue = KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
 
-  let msg = `📅 乾元命理宝鉴 · 每日推荐
-${SEP}
+  let msg = `📅 乾元命理宝鉴 · ${d.year}年${d.month}月${d.day}日 ${d.weekday}
+🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
 
-⏰ ${d.year}年${d.month}月${d.day}日 ${d.weekday}
-🌍 阳历：${d.year}年${d.month}月${d.day}日 | ${d.lunar}
-🏮 ${gz.year}年（${gz.year_shengxiao}年）
-🌙 ${gz.month}月 · ${gz.day}日
-
-${LINE}
-
-━━━ 📋 今日黄历 ━━━
-
+━━━ 黄历 ━━━
 ✅ 宜：${yiJi.yi}
 🚫 忌：${yiJi.ji}
-
-📌 建除十二神：${yiJi.jianchu}
-⭐ 值日星宿：${yiJi.xingxiu}
-☀️ 黄道黑道：${d.huanghei}
-⚔️ 冲煞：${chong} · ${sha}
-📜 彭祖百忌：${d.pengzu}
-✨ 今日神煞：${d.shensha}
-
-🧭 喜神：${d.xishen}
-💰 财神：${d.caishen}
-🙏 福神：${d.fushen}
-
-⏰ 时辰吉凶：
-${shichenLine}
+📌 ${yiJi.jianchu}｜⭐ ${yiJi.xingxiu}｜☀️ ${d.huanghei}
+⚔️ ${chong}·煞${d.sha}｜📜 ${d.pengzu}
+✨ ${d.shensha}
+🧭 喜${d.xishen}·财${d.caishen}·福${d.fushen}
+⏰ 吉凶：${shichenLine}
 `;
 
   if (d.jieqi_info) {
     msg += `
-━━━ 🌿 ${d.jieqi} ━━━
-${d.jieqi_info}
+🌿 ${d.jieqi}｜${d.jieqi_info}
 `;
   }
 
   if (d.holiday) {
     msg += `
-━━━ 🎉 今日节日：${d.holiday} ━━━
-祝${d.holiday}快乐！
+🎉 ${d.holiday}
 `;
   }
 
   if (d.deities && d.deities.length) {
-    msg += `\n━━━ 🙏 今日神仙吉日 ━━━\n`;
-    for (const de of d.deities) {
-      msg += `\n✨ ${de.name}诞辰（${de.type}教）\n`;
-      msg += `   ${de.intro}\n`;
-      msg += `   🎁 供奉建议：香花灯水果\n`;
-    }
+    msg += `
+🙏 ${d.deities.map(de => de.name + '诞辰').join('·')}
+`;
   }
 
   msg += `
-━━━ 🌤️ 天气与穿搭 ━━━
+🌤️ ${d.weather.condition} ${d.weather.temp}°C（${d.weather.city || '本地'}）｜👕 ${d.clothing_temp}
 
-天气：${d.weather.condition} 气温：${d.weather.temp}° 湿度：${d.weather.humidity}% 风速：${d.weather.wind}（${d.weather.city || '本地'}）
-${d.clothing_temp}
+📖 「${d.wisdom.text}」—— ${d.wisdom.source}
+${d.wisdom.meaning ? '💡 ' + d.wisdom.meaning : ''}
 
-━━━ 📖 今日${d.wisdom.type}家智慧 ━━━
-
-「${d.wisdom.text}」
-—— ${d.wisdom.source}
-
-💡 白话：${d.wisdom.meaning}
-
-━━━ 🧘 今日修行建议 ━━━
-
-${koujue}
+🧘 ${koujue}
 `;
 
   if (d.daily_knowledge) {
     msg += `
-━━━ 📖 今日命理知识 ━━━
-
-🔖 分类：${d.daily_knowledge.tag}
-
-${d.daily_knowledge.title}
-
+📚 ${d.daily_knowledge.title}
 ${d.daily_knowledge.summary}
 `;
   }
 
   msg += `
-${LINE}
-
-⚠️ 以上内容仅供文化交流与生活参考，不构成任何决策依据。
-
-🙏 祝缘主今日吉祥如意，平安喜顺！`;
+⚠️ 仅供文化参考
+🙏 愿缘主今日顺遂安康！`;
 
   return msg;
 }
 
-/** 极简版：一句话速览 */
+/** 极简版：一句话速览（R125：砍一签长文，纯核心） */
 function buildSimple(d) {
   const gz = d.gz;
   const yiJi = d.yi_ji;
-  const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）· 煞${d.sha}`;
+  const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}`;
   const koujue = KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
-  // R119 修真：今日一签（冷知识曝光）— 尾部挂一条
-  let pickLine = '';
+  // 吉时提取（白天 7-19 点实用时段）
+  let jishi = '';
   try {
-    const cp = require('child_process');
-    const pickRaw = cp.execFileSync('curl', ['-s', '-m', '4', 'http://127.0.0.1:8920/api/kb/today-pick?n=1'], { encoding: 'utf8', timeout: 6000 });
-    const pick = JSON.parse(pickRaw);
-    const items = (pick.data || pick).items || [];
-    if (items.length) {
-      pickLine = `\n━━━ 📖 今日一签 ━━━\n\n${items[0].title}\n${(items[0].snippet || '').slice(0, 60)}…`;
-    }
-  } catch (e) { /* 一签不可用不影响主推送 */ }
+    const DAY_HOURS = ['辰', '巳', '午', '未', '申', '酉'];
+    const gt = (d.shichen || []).filter(([s, j]) => j === '吉' && DAY_HOURS.includes(s));
+    if (gt.length) jishi = '⏰ 吉时 ' + gt.map(([s]) => s + '时').join('/');
+  } catch (e) { /* ignore */ }
 
-  return `📅 乾元命理宝鉴 · ${d.year}年${d.month}月${d.day}日 ${d.weekday}
-${SEP}
+  return `📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}
+🏮 ${gz.year}（${gz.year_shengxiao}）·${gz.month}·${gz.day}
 
-🏮 ${gz.year}年（${gz.year_shengxiao}年）· ${gz.month}月 · ${gz.day}日
-📆 ${d.lunar}
+✅ 宜 ${yiJi.yi.slice(0, 30)}${yiJi.yi.length > 30 ? '…' : ''}
+🚫 忌 ${yiJi.ji.slice(0, 20)}${yiJi.ji.length > 20 ? '…' : ''}
+⚔️ ${chong}｜☀️ ${d.huanghei}${jishi ? '｜' + jishi : ''}
+💰 财${d.caishen}·喜${d.xishen}
 
-✅ 宜：${yiJi.yi}
-🚫 忌：${yiJi.ji}
-⚔️ 冲煞：${chong}
-💰 财神：${d.caishen} · 🧭 喜神：${d.xishen}
-☀️ 黄道：${d.huanghei} · ✨ ${d.shensha}
-
-━━━ 📖 今日${d.wisdom.type}家智慧 ━━━
-
-「${d.wisdom.text}」—— ${d.wisdom.source}
+📖 「${d.wisdom.text}」——${d.wisdom.source}
 
 ${koujue}
-${pickLine}
 
-⚠️ 内容仅供文化参考，不构成决策依据。
+⚠️ 仅供文化参考
 🙏 愿缘主今日顺遂安康！`;
 }
 
@@ -301,7 +250,7 @@ try {
       ['full 含宜忌', /宜：/.test(full) && /忌：/.test(full)],
       ['public 含干支', /丙午|乙巳|甲辰|癸卯|壬寅|辛丑|庚子|己亥|戊戌|丁酉|丙申|乙未|甲午|癸巳|壬辰|辛卯|庚寅|己丑|戊子|丁亥|丙戌|乙酉|甲申|癸未|壬午|辛巳|庚辰|己卯|戊寅|丁丑|丙子|乙亥|甲戌|癸酉|壬申|辛未|庚午|己巳|戊辰|丁卯|丙寅|乙丑|甲子/.test(pub)],
       ['public 含黄历', /宜：/.test(pub) && /忌：/.test(pub)],
-      ['含建除/神煞', /建除|满日|司命|冲煞/.test(pub)],
+      ['含建除/神煞', /定日|满日|司命|冲戊|冲己|冲庚|冲辛|冲壬|冲癸|冲甲|冲乙|冲丙|冲丁|冲.{1,2}（|吉神|凶煞/.test(pub)],
       ['含免责', /仅供.*参考|不构成.*依据/.test(pub)],
     ];
     const fails = checks.filter(c => !c[1]);
