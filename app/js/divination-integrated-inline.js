@@ -617,7 +617,7 @@ async function analyzeReport(){
       }
     } catch(e){
       clearTimeout(timeoutId);
-      let errorMsg = 'AI自动识别失败：';
+      let errorMsg = '识别失败：';
       if (e.name === 'AbortError') {
         errorMsg += 'API请求超时（30秒），请稍后重试';
       } else {
@@ -1593,7 +1593,7 @@ function previewAIFile(file){
   reader.readAsDataURL(file);
 }
 
-// ====== AI自动分析核心函数 ======
+// ====== 自动分析核心函数 ======
 let aiAnalysisAbortController = null;
 
 async function callLLMForAnalysis(){
