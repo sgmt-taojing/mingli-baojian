@@ -378,3 +378,9 @@
 - **venv 修真**：ai-vision-toolkit（42 py）+ tcm-agent（18 py）建 venv（依赖隔离）
 - **遗留**：smart-home-family 172 py 无 venv（大项目后续）；edge-tts 在系统 Python（归属 mingli TTS）
 - 服务：14 端口全绿（8900/8920/8961 的 404 为无 /health 路由，正常）
+
+## 08-18 R739 高质量优化：launchd 修真（11:05）
+- **发现**：face-diag-svc / vision-gateway-svc / face-ocr 三个 plist 是残缺 JSON（无 KeepAlive 无日志），face-ocr 脚本路径错误
+- **修真**：重写为完整 XML plist（KeepAlive + 日志 + RunAtLoad + WorkingDirectory）+ face-ocr 路径修正
+- **验证**：face-diag 杀后 6s 自动拉起 ✅ 三服务全绿
+- 服务自愈体系：核心 17 服务全部 KeepAlive 就位
