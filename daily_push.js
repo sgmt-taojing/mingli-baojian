@@ -247,7 +247,7 @@ try {
       ['full 日期=目标日', !targetDate || full.includes(dateStr)],
       ['public 日期=目标日', !targetDate || pub.includes(dateStr)],
       ['simple 日期=目标日', !targetDate || sim.includes(dateStr)],
-      ['full 含宜忌', /宜[：白事基建婚嫁日常财事]/.test(full) && /忌[：无嫁娶入宅开市交易]/.test(full)],
+      ['full 含宜忌', /宜[：白事基建婚嫁日常财事]/.test(full) && /忌[：无嫁娶入宅开市交易斋醮作灶开仓]/.test(full)],
       ['public 含干支', /丙午|乙巳|甲辰|癸卯|壬寅|辛丑|庚子|己亥|戊戌|丁酉|丙申|乙未|甲午|癸巳|壬辰|辛卯|庚寅|己丑|戊子|丁亥|丙戌|乙酉|甲申|癸未|壬午|辛巳|庚辰|己卯|戊寅|丁丑|丙子|乙亥|甲戌|癸酉|壬申|辛未|庚午|己巳|戊辰|丁卯|丙寅|乙丑|甲子/.test(pub)],
       ['public 含黄历', /宜：/.test(pub) && /忌：/.test(pub)],
       ['含建除/神煞', /定日|满日|司命|冲戊|冲己|冲庚|冲辛|冲壬|冲癸|冲甲|冲乙|冲丙|冲丁|冲.{1,2}（|吉神|凶煞/.test(pub)],
