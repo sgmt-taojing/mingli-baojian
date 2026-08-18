@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>系统全方式梳理 · 功能/流程/逻辑 · 2026-08-18</title>
+<style>
+  :root { --bg:#0f1115; --card:#171a21; --card2:#1c2029; --line:#2a2f3a; --tx:#e8e6e3; --mut:#8b8f98; --gold:#d4a94e; --green:#4ec98a; --blue:#5b9cf5; --red:#e0655c; --pink:#f06292; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--tx); font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif; line-height:1.75; padding:32px 18px; }
+  .wrap { max-width:1000px; margin:0 auto; }
+  h1 { font-size:26px; margin-bottom:4px; }
+  .sub { color:var(--mut); font-size:13.5px; margin-bottom:26px; }
+  h2 { font-size:19px; margin:34px 0 14px; padding-left:10px; border-left:4px solid var(--gold); }
+  h3 { font-size:15px; margin:18px 0 10px; color:#d8d5d0; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin-bottom:12px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--mut); font-size:11.5px; text-transform:uppercase; }
+  .ok { color:var(--green); font-weight:600; } .warn { color:var(--gold); font-weight:600; } .bad { color:var(--red); font-weight:600; }
+  code { background:var(--card2); padding:1px 6px; border-radius:4px; font-size:12px; }
+  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:10px 0; font-size:12.5px; }
+  .node { background:var(--card2); border:1px solid var(--line); padding:5px 12px; border-radius:8px; }
+  .arrow { color:var(--gold); }
+  .branch { background:rgba(212,169,78,.1); border:1px dashed rgba(212,169,78,.4); }
+  .tag { display:inline-block; padding:1px 8px; border-radius:20px; font-size:11px; margin-right:5px; }
+  .tag.g { background:rgba(78,201,138,.15); color:var(--green); } .tag.b { background:rgba(91,156,245,.15); color:var(--blue); }
+  .tag.y { background:rgba(212,169,78,.15); color:var(--gold); } .tag.p { background:rgba(240,98,146,.15); color:var(--pink); }
+  ul { padding-left:20px; } li { margin-bottom:5px; font-size:13px; }
+  .foot { margin-top:40px; color:var(--mut); font-size:12px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>系统全方式梳理</h1>
+  <div class="sub">功能 · 流程 · 逻辑 全景 · 2026-08-18 · 数据快照：KB 54,975 条 / 13 端口在线 / cron 59 启用</div>
+
+  <h2>一、能力全景（16 项 × 4 项目）</h2>
+  <div class="card">
+    <table>
+      <tr><th>项目</th><th>能力</th><th>入口</th><th>状态</th></tr>
+      <tr><td rowspan="8"><b>mingli-baojian</b><br><span class="tag b">主平台</span></td>
+        <td>知识问答</td><td><code>POST /api/ai/knowledge-qa</code></td><td class="ok">KB 直答≥0.7 → AI 摘要</td></tr>
+      <tr><td>知识检索</td><td><code>GET /api/public/kb-search</code></td><td class="ok">本地+权威双源，conf 统一</td></tr>
+      <tr><td>今日一签</td><td><code>GET /api/kb/today-pick</code></td><td class="ok">五行相关性（今日修真生效）</td></tr>
+      <tr><td>排盘</td><td><code>POST /api/paipan/calculate</code></td><td class="ok">八字/紫微/奇门/六爻</td></tr>
+      <tr><td>黄历</td><td><code>GET /api/daily-almanac</code></td><td class="ok">lunar_python 单一真相源</td></tr>
+      <tr><td>节日</td><td><code>node festival-wishes.js</code></td><td class="ok">73 规则 38 校验</td></tr>
+      <tr><td>推送</td><td><code>node daily_push.js</code></td><td class="ok">三版 + 一签尾部</td></tr>
+      <tr><td>语音</td><td><code>POST :8912/tts</code></td><td class="ok">Edge-TTS</td></tr>
+      <tr><td rowspan="5"><b>video-ai</b><br><span class="tag p">一帧多用</span></td>
+        <td>中医望诊</td><td><code>POST :8948/api/dev/emit-event</code></td><td class="ok">本地 ONNX 舌/面/手</td></tr>
+      <tr><td>AI 命理相学</td><td><code>同上 fortune_reading</code></td><td class="ok">fortune ×3 softmax</td></tr>
+      <tr><td>医保人脸核验</td><td><code>POST /api/identity/verify</code></td><td class="ok">w600k 本地 512 维</td></tr>
+      <tr><td>实时事件流</td><td><code>GET /api/events/sse</code></td><td class="ok">SSE P95 22ms</td></tr>
+      <tr><td>录像留存</td><td><code>POST /api/cameras/save-ring</code></td><td class="ok">12s 环缓冲 72h 清理</td></tr>
+      <tr><td><b>tcm-agent</b></td><td>权威检索</td><td><code>GET :8932/api/tcm/kb/search</code></td><td class="ok">27,221 条</td></tr>
+      <tr><td rowspan="2"><b>shf</b></td><td>开药核验</td><td><code>add_medication(face…)</code></td><td class="ok">人脸比对强制前置</td></tr>
+      <tr><td>家庭 KB</td><td><code>load_synced_kb()</code></td><td class="ok">mingli 4,816 + tcm 27,221</td></tr>
+    </table>
+    <p style="margin-top:10px">统一调度：<code>ai-toolkit.sh</code>（10 命令）→ 能力注册表 <code>capability-registry.json</code>（16 项）→ <code>GET /api/capabilities</code> 自描述</p>
+  </div>
+
+  <h2>二、核心流程（5 条主线）</h2>
+
+  <h3>① 用户问答流程</h3>
+  <div class="card">
+    <div class="flow">
+      <span class="node">提问</span><span class="arrow">→</span>
+      <span class="node branch">医学域？<br>(TCM_HINT_RE)</span><span class="arrow">→</span>
+      <span class="node">权威库 8932<br>命中≥0.7 直答</span><span class="arrow">→</span>
+      <span class="node">回复（含免责）</span>
+    </div>
+    <div class="flow">
+      <span class="node">非医学</span><span class="arrow">→</span>
+      <span class="node">FTS5 trigram</span><span class="arrow">→</span>
+      <span class="node">空? LIKE 兜底<br>(title 6 权重多词)</span><span class="arrow">→</span>
+      <span class="node">仍空? AI 兜底</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--mut)">修真链：trigram 静默 0 → LIKE 强制兜底 → title 权重修真 → 数字变体 → 候选 200 → 两两 AND → 跨引擎 conf 统一。问答质量回归 5/5。</p>
+  </div>
+
+  <h3>② 每日推送流程</h3>
+  <div class="card">
+    <div class="flow">
+      <span class="node">06:00 晨间 cron</span><span class="arrow">→</span>
+      <span class="node">verify 前置校验<br>(8 项)</span><span class="arrow">→</span>
+      <span class="node">三版生成<br>(full/public/simple)</span><span class="arrow">→</span>
+      <span class="node">尾部挂今日一签</span><span class="arrow">→</span>
+      <span class="node">微信投递</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--mut)">修真链：--tomorrow 支持（晚间推明日）→ bridge env 读取 → verify 前置失败不推 → 去 message 工具依赖。连续 2 天全通。</p>
+  </div>
+
+  <h3>③ 节日推送流程</h3>
+  <div class="card">
+    <div class="flow">
+      <span class="node">06:05 cron</span><span class="arrow">→</span>
+      <span class="node">--verify 38 项校验</span><span class="arrow">→</span>
+      <span class="node">lunar_python 动态<br>农历/节气/公历/特殊</span><span class="arrow">→</span>
+      <span class="node">命中? 推送 : 跳过</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--mut)">73 项语义规则（农历 29/公历 9/节气 24/特殊 11），2026-2030 自动准确。</p>
+  </div>
+
+  <h3>④ 视频一帧多用流程</h3>
+  <div class="card">
+    <div class="flow">
+      <span class="node">摄像头帧<br>(全量不跳帧)</span><span class="arrow">→</span>
+      <span class="node">三类并行<br>命理+中医+核验</span><span class="arrow">→</span>
+      <span class="node">融合报告<br>unified_frame</span><span class="arrow">→</span>
+      <span class="node">SSE 秒级</span><span class="arrow">→</span>
+      <span class="node">桌面三色卡<br>+ P0 语音播报</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--mut)">修真链：零跨项目（模型全本地 409MB）→ 安防算法移除 → 融合报告 → 录像 ring buffer → 开药核验 API。P95 22ms。</p>
+  </div>
+
+  <h3>⑤ 冷知识盘活流程</h3>
+  <div class="card">
+    <div class="flow">
+      <span class="node">今日干支五行<br>(lunar_python)</span><span class="arrow">→</span>
+      <span class="node">冷池抽签<br>(hit_count=0 优先新知识)</span><span class="arrow">→</span>
+      <span class="node">曝光即计数</span><span class="arrow">→</span>
+      <span class="node">4 触点<br>API/助手/首页/推送</span><span class="arrow">→</span>
+      <span class="node">点击提问全文</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--mut)">修真链：相关性引擎路径修复（静默失效→五行匹配）→ 周报 API（本周转热 237 条）。</p>
+  </div>
+
+  <h2>三、逻辑要点与修真记录</h2>
+  <div class="card">
+    <table>
+      <tr><th>层</th><th>关键逻辑</th><th>修真</th></tr>
+      <tr><td>检索</td><td>FTS5 trigram 双字静默 0 命中</td><td class="ok">空结果强制 LIKE 兜底</td></tr>
+      <tr><td>排序</td><td>title 命中被 trust 0.95 噪声压过</td><td class="ok">title 权重 6 + 候选 200 + 多词累计</td></tr>
+      <tr><td>节日</td><td>固定 MM-DD 表 → 2027 春节错 11 天</td><td class="ok">73 项语义规则动态计算</td></tr>
+      <tr><td>推送</td><td>晚间"明日"实际推今天</td><td class="ok">--tomorrow + bridge env</td></tr>
+      <tr><td>视频</td><td>跨项目调用（8940/8958/8950）</td><td class="ok">模型本地化 + 端点删除（零跨项目）</td></tr>
+      <tr><td>一签</td><td>相关性引用下划线模块静默失效</td><td class="ok">importlib 文件路径加载</td></tr>
+      <tr><td>cron</td><td>jobs.json stale 镜像误导修真</td><td class="ok">以 sqlite 权威 id 为准</td></tr>
+    </table>
+  </div>
+
+  <h2>四、自动化链路（24h 闭环）</h2>
+  <div class="card">
+    <table>
+      <tr><th>时间</th><th>任务</th><th>状态</th></tr>
+      <tr><td>02:00</td><td>tcm-agent 夜间蒸馏</td><td class="ok">ok</td></tr>
+      <tr><td>03:00</td><td>tcm 反向同步</td><td class="ok">ok</td></tr>
+      <tr><td>03:10</td><td>authority 标记渐进（2,000/夜）</td><td class="warn">剩余 4,386（索引后正常）</td></tr>
+      <tr><td>03:40</td><td>权威库正向同步</td><td class="ok">ok</td></tr>
+      <tr><td>06:00/06:05</td><td>晨间推送 + 节日</td><td class="ok">连续 2 天全通</td></tr>
+      <tr><td>21:00/21:30</td><td>进度同步 + 知识库审计</td><td class="ok">连续 2 天全通</td></tr>
+      <tr><td>23:30</td><td>桌面新 PDF 增量蒸馏（data1 源）</td><td class="ok">ok</td></tr>
+    </table>
+  </div>
+
+  <h2>五、数据现状与待办</h2>
+  <div class="card">
+    <ul>
+      <li><b>KB 54,975 条</b> / 211 模块 / 跨项目污染 0 / 冷数据 52,724（96%，一签持续盘活）</li>
+      <li><b>五缺口领域补齐</b>：温病 27 / 妇科 16 / 儿科 10 / 眼科 6 / 相学 15</li>
+      <li><b>cron 13 连败</b>：多为修真待自愈（ZYZX 明晚路径验证 / shf 明晨 / ASH 外部）</li>
+      <li><b>相学视觉进程</b>：3 次尝试后页级断点成功（15 条）</li>
+    </ul>
+  </div>
+
+  <div class="foot">全方式梳理 · 2026-08-18 · mingli-baojian / tcm-agent / video-ai / smart-home-family · AutoClaw</div>
+</div>
+</body>
+</html>

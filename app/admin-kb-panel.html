@@ -20,7 +20,7 @@
 </head>
 <body data-need-admin="true" class="theme-ops">
 <!-- R504: 新诊疗中心入口 -->
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="javascript:void(0)" onclick="toggleStaging()" style="padding:6px 14px;border:1px solid rgba(61,220,151,.35);border-radius:8px;background:rgba(61,220,151,.07);color:#3ddc97;text-decoration:none;font-size:12px;font-weight:600">🧪 知识审核（staging 158 待审）</a><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a></div>
 
 <header class="page-header-bar">
   <div class="phb-left">
@@ -124,5 +124,70 @@
   <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
+
+<div id="staging-panel" style="display:none;margin-top:16px">
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+    <h3 style="color:#e8c87a;font-size:15px;margin:0">知识审核（staging → formal）</h3>
+    <span id="staging-cnt" style="color:#7a8aab;font-size:12px"></span>
+    <button class="btn small primary" onclick="stagingApprove()">✅ 批量通过选中</button>
+    <button class="btn small danger" onclick="stagingReject()">❌ 批量拒绝选中</button>
+    <button class="btn small" onclick="stagingLoad()">↻ 刷新</button>
+  </div>
+  <div id="staging-list" style="max-height:520px;overflow:auto;border:1px solid rgba(120,160,255,.2);border-radius:10px;padding:8px">
+    <div class="muted" style="color:#7a8aab;font-size:12px;padding:20px;text-align:center">加载中…</div>
+  </div>
+</div>
+<script>
+function toggleStaging(){
+  var p = document.getElementById('staging-panel');
+  if(p){ p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display !== 'none') stagingLoad(); }
+}
+var STAGING_SEL = {};
+function stagingLoad(){
+  var box = document.getElementById('staging-list');
+  fetch('/api/kb/staging/list?status=staged&limit=100').then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){ box.innerHTML = '<div class="muted">加载失败</div>'; return; }
+    document.getElementById('staging-cnt').textContent = '共 ' + d.total + ' 条待审（每条入库前自动跑引擎审计）';
+    STAGING_SEL = {};
+    if(!d.rows.length){ box.innerHTML = '<div class="muted" style="color:#2e8b57">✅ 无待审条目</div>'; return; }
+    box.innerHTML = '<table style="width:100%;font-size:12px;border-collapse:collapse"><tr style="color:#e8c87a"><th style="padding:6px;text-align:left"><input type="checkbox" id="staging-all" onchange="stagingAll(this)"></th><th>模块</th><th>标题</th><th>来源</th><th>创建时间</th></tr>' +
+      d.rows.map(function(r){
+        return '<tr data-id="'+r.entry_id+'"><td style="padding:5px"><input type="checkbox" class="staging-chk" value="'+r.entry_id+'" onchange="stagingChk()"></td>' +
+        '<td style="padding:5px;color:#4da3ff">'+r.module+'</td><td style="padding:5px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+r.title+'">'+(r.title||'')+'</td>' +
+        '<td style="padding:5px;color:#7a8aab;font-size:11px">'+(r.summary||'').slice(0,40)+'</td><td style="padding:5px;color:#7a8aab;font-size:11px">'+(r.created_at||'').slice(0,10)+'</td></tr>';
+      }).join('') + '</table>';
+  }).catch(function(){ box.innerHTML = '<div class="muted">服务不可用</div>'; });
+}
+function stagingAll(cb){
+  document.querySelectorAll('.staging-chk').forEach(function(c){ c.checked = cb.checked; });
+  stagingChk();
+}
+function stagingChk(){
+  STAGING_SEL = {};
+  document.querySelectorAll('.staging-chk:checked').forEach(function(c){ STAGING_SEL[c.value] = 1; });
+}
+function stagingApprove(){
+  var ids = Object.keys(STAGING_SEL);
+  if(!ids.length){ alert('请先勾选条目'); return; }
+  if(!confirm('确认通过 ' + ids.length + ' 条？将执行引擎审计（内容/来源/置信度/医疗声明），通过后进入正式库。')) return;
+  fetch('/api/kb/staging/approve', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids})})
+    .then(function(r){return r.json()}).then(function(d){
+      alert('✅ 通过 ' + (d.promoted||0) + ' 条 · 拒绝 ' + (d.rejected||0) + ' 条' + (d.errors&&d.errors.length ? ' · 错误 ' + d.errors.length : ''));
+      stagingLoad();
+    }).catch(function(){ alert('服务不可用'); });
+}
+function stagingReject(){
+  var ids = Object.keys(STAGING_SEL);
+  if(!ids.length){ alert('请先勾选条目'); return; }
+  if(!confirm('确认拒绝 ' + ids.length + ' 条？拒绝后不进正式库（可留审计记录）。')) return;
+  var notes = prompt('拒绝原因（留审计）：', 'R735-g10 人工审核拒绝');
+  if(notes === null) return;
+  fetch('/api/kb/staging/reject', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids, notes: notes})})
+    .then(function(r){return r.json()}).then(function(d){
+      alert('✅ 已拒绝 ' + (d.rejected||0) + ' 条');
+      stagingLoad();
+    }).catch(function(){ alert('服务不可用'); });
+}
+</script>
 </body>
 </html>
