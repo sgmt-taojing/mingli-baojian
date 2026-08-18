@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R739 全面推进建设 · 交付报告</title>
+<style>
+:root{--bg:#f7f5f2;--card:#fff;--ink:#2b2b2b;--mut:#777;--accent:#b8893a;--ok:#2e7d32;--err:#c62828;--line:#e8e4dd}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;padding:32px 16px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:26px;margin-bottom:4px}
+.sub{color:var(--mut);margin-bottom:24px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin-bottom:16px}
+.card h2{font-size:17px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.badge{display:inline-block;background:#f0e9dc;color:var(--accent);border-radius:20px;padding:2px 12px;font-size:12px;font-weight:600}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+.metric .num{font-size:30px;font-weight:700;color:var(--accent)}
+.metric .lbl{font-size:12px;color:var(--mut);margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:600;font-size:12px}
+.ok{color:var(--ok);font-weight:600}
+.err{color:var(--err);font-weight:600}
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.step{position:relative;margin-bottom:16px}
+.step::before{content:'';position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.step .t{font-weight:600;font-size:14px}
+.step .d{font-size:13px;color:var(--mut)}
+code{background:#f0ede7;border-radius:4px;padding:1px 6px;font-size:12px}
+.foot{margin-top:24px;color:var(--mut);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>R739 全面推进建设 · 交付报告</h1>
+<div class="sub">2026-08-18 · 异常告警 + 输入校验加固 + 去 AI 味数据工具</div>
+
+<div class="metrics">
+  <div class="metric"><div class="num">15/15</div><div class="lbl">端口健康</div></div>
+  <div class="metric"><div class="num">23G</div><div class="lbl">系统盘可用</div></div>
+  <div class="metric"><div class="num">6.0%</div><div class="lbl">数据去AI味命中率</div></div>
+  <div class="metric"><div class="num">53条</div><div class="lbl">清洗数据条数</div></div>
+</div>
+
+<div class="card">
+<h2><span class="badge">①</span> 异常告警闭环（服务挂了自动通知）</h2>
+<table>
+<tr><th>环节</th><th>实现</th><th>验证</th></tr>
+<tr><td>检测</td><td><code>verify-services.sh</code> 34 项四维自检（15 端口 + 5 模型 + 13 launchd + 磁盘）</td><td class="ok">34/34 通过</td></tr>
+<tr><td>触发</td><td><code>alert-on-fail.sh</code> 失败时自动判定（首次必报，30 分钟去重）</td><td class="ok">停服→告警</td></tr>
+<tr><td>通知</td><td>macOS 桌面通知（osascript）+ 告警日志留痕 <code>/tmp/health-alert.log</code></td><td class="ok">已发桌面通知</td></tr>
+<tr><td>排班</td><td>launchd 每日 07:00 自动执行</td><td class="ok">已挂载</td></tr>
+</table>
+<div style="margin-top:10px;font-size:13px;color:var(--mut)">修真过程中发现并修复状态文件格式不一致导致的告警脚本误报（<code>ok &lt;ts&gt;</code> 与纯数字混用 → 统一规范化）。</div>
+</div>
+
+<div class="card">
+<h2><span class="badge">②</span> 8920 网关输入校验加固</h2>
+<table>
+<tr><th>防护层</th><th>已有</th><th>本轮新增</th></tr>
+<tr><td>Body 大小</td><td class="ok">express.json limit 10mb</td><td>—</td></tr>
+<tr><td>CSRF</td><td class="ok">csrf.verify 中间件</td><td>—</td></tr>
+<tr><td>关键字段</td><td class="ok">sanitizeInput（手机号/姓名/出生地等）</td><td>—</td></tr>
+<tr><td>全局净化</td><td>—</td><td class="ok">统一中间件：控制字符剥离 + &lt;script&gt; 剥离 + 超长截断（body 100k / 数组 10k / query 1k）</td></tr>
+</table>
+<div style="margin-top:10px;font-size:13px;color:var(--mut)">净化失败不阻塞主链路（try/catch 兜底），语法校验通过，服务已重启验证。</div>
+</div>
+
+<div class="card">
+<h2><span class="badge">③</span> 去 AI 味数据清洗工具</h2>
+<div class="timeline">
+<div class="step"><div class="t">规则引擎</div><div class="d">humanizer-zh 核心模式批处理：删「首先/其次/最后」「此外/综上所述」「仅供参考」「作为AI」、破折号堆砌、「不仅…而且…」拆分</div></div>
+<div class="step"><div class="t">批处理</div><div class="d"><code>scripts/de-ai-flavor.py</code> 支持 instruction/response、messages 双格式，<code>--dry-run</code> 统计模式</div></div>
+<div class="step"><div class="t">全量实测</div><div class="d">sft-general-input 885 条 → 命中 53 条 / 63 处（6.0%），说明训练数据已较自然（第①层 system prompt 约束生效）</div></div>
+<div class="step"><div class="t">产出</div><div class="d">清洗后数据 <code>training-data/sft-general-input.deai.jsonl</code>，v9.0 训练可直接使用</div></div>
+</div>
+</div>
+
+<div class="card">
+<h2><span class="badge">✓</span> 质量体系全景（R739 系列累计）</h2>
+<table>
+<tr><th>维度</th><th>状态</th></tr>
+<tr><td>健康检查</td><td class="ok">15 端口 /health 标准化 + 每日自动自检 + 异常告警</td></tr>
+<tr><td>服务自愈</td><td class="ok">13 常驻 KeepAlive（杀后 6s 拉起验证）</td></tr>
+<tr><td>安全</td><td class="ok">全 127.0.0.1 绑定 + CSRF + 全局输入净化</td></tr>
+<tr><td>项目隔离</td><td class="ok">品牌词纯净 + 三域收窄（AI命理/AI中医/医保人脸核对）</td></tr>
+<tr><td>数据质量</td><td class="ok">去 AI 味清洗工具就绪（v9.0 可直接重训）</td></tr>
+<tr><td>磁盘</td><td class="ok">23G（归档策略持续生效）</td></tr>
+</table>
+</div>
+
+<div class="foot">mingli-baojian @ 5e2d00a · ai-vision-toolkit @ fcadf4e9+r739b · 2026-08-18</div>
+</div>
+</body>
+</html>
