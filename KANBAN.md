@@ -391,3 +391,9 @@
 - 修真：文件名 train.jsonl 标准（mlx_lm 要求）；fuse 时 MLX_BASE_MODEL 必须=v8.7（adapter 是 v8.7 增量）
 - P2：smart-home-family venv 已建（pycryptodome 隔离）；告警微信通道暂缓（微信平台无通用推送 API）
 - 场景推荐前端接入 marketplace（ai-vision 域内，已提交）
+
+## 08-18 15:20 v9.0 训练完成 + 评估中
+- 训练：300 iters 完成，Val loss 2.252 / Train 1.668（从 v8.7 fused 继续）
+- fuse：MLX_BASE_MODEL=v8.7 → mingli-sft-v9.0-7b（4.28GB）
+- 评估：BaziQA 全量 488 题 @ 临时 8962 推理服务（不动生产 8960）
+- 待：评估结果 → 对比 v8.7 51.8% → 达标切换生产
