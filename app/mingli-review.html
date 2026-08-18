@@ -38,6 +38,16 @@ textarea{width:100%;min-height:80px;padding:10px;border-radius:8px;border:1px so
 <div class="panel" id="edit-panel" style="display:none">
   <h3>✏️ 修订档案 <span id="case-id" style="font-size:12px;color:#7a8aab"></span></h3>
   <div class="muted">AI 初稿（可修改后定稿）：</div>
+  <div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap">
+    <select id="tpl" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(120,160,255,.3);background:#0b1020;color:#e8eefc;font-size:12.5px">
+      <option value="">常用解读模板…</option>
+      <option value="今年整体平稳，宜守正出奇。事业上稳扎稳打，人际关系多走动，健康方面注意规律作息。">平稳版</option>
+      <option value="流年有助，可积极进取。把握贵人助力，遇事多沟通少独断，财务上量入为出。">进取版</option>
+      <option value="今年宜静养心神，多亲近自然。工作节奏放慢，家人关系多包容，身体有小恙及时调理。">养生版</option>
+    </select>
+    <button class="btn ghost" onclick="useDraft()">📋 一键采用 AI 初稿</button>
+    <button class="btn ghost" onclick="appendTpl()">＋ 模板追加</button>
+  </div>
   <textarea id="mingli-text"></textarea>
   <div class="meta" id="orig-meta"></div>
   <button class="btn gold" onclick="finalize()">✅ 定稿</button>
@@ -80,12 +90,24 @@ function openEdit(uuid){
     }).catch(function(){ alert('获取失败'); });
 }
 
+function useDraft(){
+  var box = document.getElementById('mingli-text');
+  if(current && current.mingli_text && confirm('用 AI 初稿替换当前内容？')){ box.value = current.mingli_text; }
+}
+function appendTpl(){
+  var t = document.getElementById('tpl').value;
+  if(t){ document.getElementById('mingli-text').value += (document.getElementById('mingli-text').value ? '\n' : '') + t; }
+}
 function finalize(){
   var text = document.getElementById('mingli-text').value.trim();
   if(!text){ show('请填写命理解读内容', false); return; }
-  var expert = prompt('命理师标识（如 ML-001）：');
-  if(!expert) return;
-  var face = prompt('请上传/拍摄命理师本人照片核验（base64 或留空跳过）：');
+  var expert = localStorage.getItem('ml-expert') || '';
+  if(!expert){ expert = prompt('命理师标识（如 ML-001，仅首次输入，之后自动记住）：'); }
+  if(!expert || !expert.trim()){ show('请填写命理师标识', false); return; }
+  expert = expert.trim();
+  localStorage.setItem('ml-expert', expert);
+  if(!confirm('确认定稿？定稿后档案进入 finalized 状态，可追溯 ' + expert + '。')) return;
+  var face = '';
   fetch(API + '/api/mingli/case-finalize', {method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({case_uuid: current.case_uuid, mingli_text: text, expert: expert, face_image: face || ''})})
     .then(function(r){return r.json()}).then(function(d){
