@@ -363,3 +363,11 @@
 - **修真**：MLX 分支 max_tokens 512→256；MLX 优先保留
 - **效果**：22.7s 完整回答（不再卡死）；流式首字 <2s 主路径不受影响
 - **教训**：KANBAN 曾记「33.4s 含模板渲染正常」——慢响应被当正常，实际是性能债；长 prompt 是生成速度第一杀手
+
+## 08-18 R739 全面 AI 化（10:30）
+- **✅ 规则引擎 AI 化**：8959 /process?ai=true → 报警事件 → 8960 生成事件定性+风险等级+处置建议（端到端 12.5s 验证通过）
+- **✅ 前端流式化确认**：R726 已全量落地（public-chat?stream=1 + orchestrate?stream=1）
+- **❌ 4-bit 量化修真**：LoRA fused 权重量化后输出乱码（回答「根」），BaziQA 0/8 → 回滚 bf16
+  - **修真教训**：量化必须在 base 模型层做（先量化 Qwen2.5-3B base 再 fuse adapter），不能直接量化 fused 产物
+  - 量化模型进 quarantine 待修真（正确路径：quantize base → fuse）
+- 提交：30438005（规则 AI 化）→ 13 端口全绿
