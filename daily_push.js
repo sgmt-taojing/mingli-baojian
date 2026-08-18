@@ -146,7 +146,7 @@ function buildPublic(d) {
 📌 ${yiJi.jianchu}｜⭐ ${yiJi.xingxiu}｜☀️ ${d.huanghei}
 ⚔️ ${chong}·煞${d.sha}｜📜 ${d.pengzu}
 ✨ ${d.shensha}
-🧭 喜${d.xishen}·财${d.caishen}·福${d.fushen}
+🧭 喜${d.xishen}·财${d.caishen}·福${d.fushen}｜求财面朝${d.caishen}坐
 ⏰ 吉凶：${shichenLine}
 `;
 
