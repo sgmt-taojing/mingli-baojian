@@ -70,7 +70,7 @@ case "${1:-}" in
     ;;
   ganzhi)
     # 今日干支/五行（一签相关性同源）
-    curl -s -m 6 "$MINGLI/api/daily-almanac" | python3 -c "import sys,json;d=json.load(sys.stdin);g=(d.get('data') or d).get('ganzhi',{});g2=(d.get('data') or d).get('gz',{});wx=(g.get('day_wx') or g2.get('day_wx') or '');print('干支:',g.get('year_gz') or g2.get('year_gz'),g.get('month_gz') or g2.get('month_gz'),g.get('day_gz') or g2.get('day_gz'),'| 五行:',wx)"
+    python3 -c "import sys,importlib.util;spec=importlib.util.spec_from_file_location('dr','/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/daily-recommendation.py');DR=importlib.util.module_from_spec(spec);spec.loader.exec_module(DR);import datetime;g=DR.get_ganzhi(datetime.date.today().year,datetime.date.today().month,datetime.date.today().day);wx={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}.get(g['day_gan'],'?');print('干支:',g['year_gz'],g['month_gz'],g['day_gz'],'| 日主五行:',wx)"
     ;;
   medication)
     # shf 开药登记（人脸核验能力入口）
