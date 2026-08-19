@@ -116,7 +116,9 @@
 - **下一步动作**：v9.2 = contest8 赛题真实均衡样本 + 以 v9.0 fused 为 base 增量训练（300 iters / lr 5e-6）
 - **经验固化**：推理链与自由问答 1:1 配比最优；增量训练 base 必须是上一版最优 fused
 
-### #6 staging 积压审核（152 条 pending）🔄
+### #6 staging 积压审核 ✅ 完成（2026-08-19 R735-g11）
+- **处理结果**：approved 4 条（路总紫微学业 2 + 舒晗奇门择吉/风水 2）引擎 promote 入正式库（kb_formal 3642）；中医望诊 3 条按域隔离拒绝（tcm-agent 域，备注转运）；测试残留 1 条删除；rejected 归档 1 条
+- **终态**：staging 队列 0 待审（promoted 3642 / rejected 405 / staging 3→0 域隔离处理）
 - **构成**：KB-tcm-* 139 条（08-09 批量 QA）+ 路总流年班合婚技法 entry-* 4 条 + lm-* 路大师专利 5 条 + fb_* 反馈蒸馏 2 条 + 其他
 - **节点进度（08-18）**：今日未推进（v9.x 训练链占满）；待办不变
 - **下一步动作**：先确认 KB-tcm-* 139 条是否走 tcm-agent 权威库流程，再逐批比对 kb_formal / authority-tcm，重复拒绝、有效 promote
