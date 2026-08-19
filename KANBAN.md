@@ -458,3 +458,11 @@
 - **data1 外置卷未挂载**：YZYX 蒸馏源（训练素材-20260816/周易-中医）+ 1,297 扫描件 PDF 视觉蒸馏源 + 备份全受影响
 - **GitHub 建仓**：无 gh CLI / 无 token（9 项目含 shf 无法 push）
 - 生产短信网关（需商户号）
+
+## 08-19 08:18 残留清理 + 记忆定位优化（R764）
+- **临时资产清理**：giant-shoulders 的 BaziQA 数据/日志/脚本已清（diff 验证项目内副本一致后删）
+- **历史成绩归档**：v8.6-v8.9 全量日志入 baziqa-results/（成绩链 8 版完整：v8.6 44.5% → v9.0 53.9%）
+- **deprecated 脚本删除**：build-v90/91/92-data.py（git 历史可查，新构建统一走 build-baziqa-sft.py）
+- **零残留验证**：全项目 grep giant-shoulders 零命中；其他项目零泄漏；品牌词扫描纯净
+- **记忆优化**：MEMORY.md 顶部固化 BaziQA 管线记忆（项目内自足 + 7 条教训）；TOOLS.md 加管线笔记
+- **v9.2 训练**：launchd 拉起重跑中（base=v9.0 ✅，Iter 30/300，日志 /tmp/baziqa-v92-train.log）
