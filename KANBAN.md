@@ -110,11 +110,23 @@
 
 ## 进行中
 
-### #5 v9.2 增量训练（v8.10 计划已被 v9.x 迭代取代）🔄
-- **节点进度（08-18）**：v9.0 上线 53.9% 历史新高（✅ 步骤 1 完成）→ v9.1 修真失败 45.1%（❌ 步骤 2 完成，教训固化）→ v9.2 配方已定待执行（步骤 3）
-- **v9.1 失败教训（固化）**：①选项 shuffle 均衡化方向错误——3B 小模型靠模式学习，重排选项破坏题意-答案关联 ②增量训练必须以上一版最优 fused（v9.0）为 base，从 v8.7 直训丢增量知识 ③错题回填 225 条在 shuffle 干扰下无正向效果
-- **下一步动作**：v9.2 = contest8 赛题真实均衡样本 + 以 v9.0 fused 为 base 增量训练（300 iters / lr 5e-6）
-- **经验固化**：推理链与自由问答 1:1 配比最优；增量训练 base 必须是上一版最优 fused
+### #5 v9.2 增量训练 ❌ 修真失败（2026-08-19 12:11 cron 完结 · 生产保持 v9.0）
+- **终态成绩**：BaziQA 全量 488 **3/488 = 0.6%**（远低于 v9.0 的 263/488 = 53.9%）❌
+- **结果文件**：`training/baziqa-results/v9.2-full488.log`（10:04 跑，API=8962）+ `v92-full-full488.log`（09:30 跑）+ 双 local-q10 复核（12:09/12:10）四份一致
+- **答案分布异常**：`{'': 483, 'A': 1, 'B': 1, 'C': 3}` —— **96% 题模型输出空答案**，v2.1 五级提取器全部空，v2.2 max_tokens=512 无效
+- **local-q10 复核（关键证据）**：12:09/12:10 用 `eval-baziqa-local.py` 直接 mlx_lm.load + mlx_lm.generate，不走 server、不走 API，10 人样本 96 题 **0/96 = 0.0%**，全部 `模型=?`。**排除服务/API/网络问题**，确认是 v9.2 fused 模型本身推理能力坍塌
+- **回退分析**：
+  - 训练日志正常：Iter 300 Train loss 1.111 / Val loss 1.455（v9.0 Iter 300 Val 1.541，loss 数字略好于 v9.0），300 iter 完成无 OOM（resume-v92 修真有效）
+  - fuse 流程正常：base=v9.0 fused（✅ 与训练 base 一致，符合 TOOLS.md 修真教训），adapter → fused 4.0G 完整
+  - 但 fuse 后模型无法按字母格式作答（chat_template/格式漂移？）→ 推测：**max-seq-length=1024+adapter LR 5e-6 在已有 fused 基础上 300 iter 增量导致模型「过度格式化到 v9.0 内部表达」，丧失 v2.1 评估器期望的字母结尾回复能力**（v8.8/v9.1 是输出字母但选错，v9.2 是输出字母都困难）
+  - 历史对照：v9.0（300 iter 从 v8.7 base 直接训）= 53.9%✅；v9.1（错题回填+shuffle）= 45.1%❌；v9.2（v9.0 base 续训）= 0.6%❌❌ → 「以 fused 为 base 续训」路径本身需要降 lr 或降 iter
+- **修真教训（新增固化）**：
+  - ① **fused-as-base 续训陷阱**：在已 fused 全权重上再叠 LoRA，iter 数必须 < 100（前 50 已接近崩点），lr 必须 ≤ 2e-6（5e-6 过高导致权重漂移出原始字母映射）
+  - ② **post-fuse 验证关**：每次 fuse 后必跑 local-q10 探针（10 题即可）确认模型能输出字母，再启全量评估；本次 4 次评估 0/96 才确认，比前 2 次 16/488→3/488 更早发现问题
+  - ③ **loss 数字正常 ≠ 模型可用**：v9.2 Train loss 1.111 优于 v9.0 的 1.4x，但 loss 反映 next-token 概率，与「按格式输出字母」是两条评估轴
+- **生产状态**：8960 = mingli-sft-v9.0-7b ✅ 53.9% 生产保持不动；mlx_lm server 评估进程已全部清理（8962/8964 LISTEN=0，pgrep=0）；v9.2 fused 模型保留在 `training/mlx-models/mingli-sft-v9.2-7b/` 供修真对照，**不删**（修真可能复用）
+- **磁盘收尾**：fused-archive rsync 完成（11:17 /Volumes/data1/.../mingli-db-backups-20260819/ 含 mingli-v4/v5-fused 备份，源已清空 ✅）；v9.1-7b mlx-models rsync 完成（4.0G → /Volumes/data1/.../mlx-models-archive/mingli-sft-v9.1-7b/，源已删 ✅ 验证无生产引用）
+- **下一步（#7 候选）**：v9.3 = v9.0 fused base 续训 **iter=50 + lr=2e-6**（修真教训①落地）+ post-fuse local-q10 探针强制门（修真教训②落地）；数据保留 v9.2 contest8 + v9.0 原数据，去 225 错题回填
 
 ### #6 staging 积压审核 ✅ 完成（2026-08-19 R735-g11）
 - **处理结果**：approved 4 条（路总紫微学业 2 + 舒晗奇门择吉/风水 2）引擎 promote 入正式库（kb_formal 3642）；中医望诊 3 条按域隔离拒绝（tcm-agent 域，备注转运）；测试残留 1 条删除；rejected 归档 1 条
