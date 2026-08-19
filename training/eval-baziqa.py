@@ -118,6 +118,8 @@ def main():
         per_person.append((p['name'], p_ok, len(qs)))
         log_lines.append(f'→ {p["name"]}: {p_ok}/{len(qs)}')
         print(f'→ {p["name"]}: {p_ok}/{len(qs)}', flush=True)
+        with open(out_path, 'w') as f:  # v2.4: 增量写盘，崩溃也可看进度
+            f.write('\n'.join(log_lines) + '\n')
 
     rate = correct / max(total, 1) * 100
     log_lines.append('')
