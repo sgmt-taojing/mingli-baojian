@@ -25,7 +25,7 @@ DATA = os.path.join(BASE, 'baziqa', 'data', 'celebrity50_zh.json')
 RESULTS_DIR = os.path.join(BASE, 'baziqa-results')
 
 
-def ask(api, prompt, max_tokens=200):  # v2.1: 30→200 防推理截断
+def ask(api, prompt, max_tokens=512):  # v2.2: 200→512（v9.2 起输出带完整选项辨析，200 会截断字母）
     body = json.dumps({
         'messages': [{'role': 'user', 'content': prompt}],
         'max_tokens': max_tokens,
@@ -70,8 +70,8 @@ def extract_answer(text):
     m = re.search(r'[（(]\s*([A-E])\s*[）)]', t)
     if m:
         return m.group(1)
-    # 4) 关键词: 答案 B / 选 B / 是 B / 选：B
-    m = re.search(r'(?:答案|选|选择|是)[以为：:\s]*([A-E])', t)
+    # 4) 关键词: 答案 B / 选 B / 是 B / 选：B / 选项是 B / 选择项 B
+    m = re.search(r'(?:答案|选项|选择项|选择|选|是)[以为：:\s]*([A-E])', t)
     if m:
         return m.group(1)
     # 5) 孤立字母: '... B ...'（前后非字母数字）
