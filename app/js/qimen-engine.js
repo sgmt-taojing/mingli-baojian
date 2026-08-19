@@ -719,7 +719,7 @@ function getDayBranchIndex(year, month, day) {
 }
 
 // ═══ 黑格命理引擎移植：立春定年柱 + 节气定月柱 + 真太阳时 (v1.0 2026-06-22) ═══
-// 参考: HeiGe-SuanMing paipan.py v1.2 — 将Python精确排盘逻辑移植为JS
+// 精确排盘逻辑（Python 引擎移植 JS）
 // 核心修正: 年柱以立春分界(非正月初一)、月柱以节气分界(非公历月份)
 
 // 12节精确日期查找表 (1900-2050, 从 lunar_python 生成)

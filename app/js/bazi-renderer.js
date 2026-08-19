@@ -8,7 +8,7 @@
 //  NEW BAZI MODULES RENDERER
 // ================================================================
 
-// ═══ HeiGe 精确排盘（调用 Python 引擎）═══
+// ═══ 精确排盘（调用 Python 引擎）═══
 async function computeBaziHeige() {
   let btn = document.getElementById('baziHeigeBtn');
   if(btn){ btn.disabled=true; btn.textContent='排盘中...'; }
@@ -23,13 +23,13 @@ async function computeBaziHeige() {
     let lm = parseInt(document.getElementById('lunarMonth').value);
     let ld = parseInt(document.getElementById('lunarDay').value);
     let isLeap = document.getElementById('lunarLeapMonth').checked;
-    if (!ly || !lm || !ld) { showToast('请输入完整的农历出生日期'); if(btn){btn.disabled=false;btn.textContent='🔬 HeiGe 精确排盘（Python引擎）';} return; }
+    if (!ly || !lm || !ld) { showToast('请输入完整的农历出生日期'); if(btn){btn.disabled=false;btn.textContent='🔬 精确排盘（Python引擎）';} return; }
     let solar = lunarToSolar(ly, lm, ld, isLeap);
-    if (!solar) { showToast('农历日期无效'); if(btn){btn.disabled=false;btn.textContent='🔬 HeiGe 精确排盘（Python引擎）';} return; }
+    if (!solar) { showToast('农历日期无效'); if(btn){btn.disabled=false;btn.textContent='🔬 精确排盘（Python引擎）';} return; }
     year = solar.year; month = solar.month; day = solar.day;
   } else {
     let dateStr = document.getElementById('baziDate').value;
-    if (!dateStr) { showToast('请输入出生日期'); if(btn){btn.disabled=false;btn.textContent='🔬 HeiGe 精确排盘（Python引擎）';} return; }
+    if (!dateStr) { showToast('请输入出生日期'); if(btn){btn.disabled=false;btn.textContent='🔬 精确排盘（Python引擎）';} return; }
     let parts = dateStr.split('-'); year = parseInt(parts[0]); month = parseInt(parts[1]); day = parseInt(parts[2]);
   }
   let hour = hourVal ? parseInt(hourVal) : 12;
@@ -40,24 +40,24 @@ async function computeBaziHeige() {
   if (lng && !isNaN(lng)) params.lng = lng;
   document.getElementById('loadingOverlay').classList.add('visible');
   try {
-    let result = await HeiGeEngine.paipan(params);
+    let result = await PaipanEngine.paipan(params);
     if (result.error) {
       showToast(result.error);
       // 降级到JS引擎
       computeBazi();
       return;
     }
-    // 渲染 HeiGe 方法论框架
+    // 渲染方法论框架
     let resultDiv = document.getElementById('baziResult');
     if (resultDiv) {
       let html = '<div class="result-banner"><h2 class="rb-name">' + name + '</h2>';
       html += '<p class="rb-meta">' + (result.input && result.input.solar || '') + ' ' + (result.input && result.input.gender || '') + '</p></div>';
-      html += HeiGeEngine.renderFramework(result);
+      html += PaipanEngine.renderFramework(result);
       // 调候趋避
       let dayGan = result.day_master ? result.day_master.charAt(0) : '';
       let monthZhi = result.pillars && result.pillars.month ? result.pillars.month.charAt(1) : '';
       if (dayGan && monthZhi) {
-        let th = HeiGeEngine.getTiaohou(dayGan, monthZhi);
+        let th = PaipanEngine.getTiaohou(dayGan, monthZhi);
         if (th) {
           html += '<div style="background:rgba(46,204,113,0.05);border-left:3px solid var(--jade);padding:10px 14px;margin:8px 0;border-radius:0 6px 6px 0">';
           html += '<div style="font-size:12px;color:var(--jade)"><b>调候用神：</b>' + th + '</div></div>';
@@ -72,7 +72,7 @@ async function computeBaziHeige() {
     computeBazi();
   } finally {
     document.getElementById('loadingOverlay').classList.remove('visible');
-    if(btn){btn.disabled=false;btn.textContent='🔬 HeiGe 精确排盘（Python引擎）';}
+    if(btn){btn.disabled=false;btn.textContent='🔬 精确排盘（Python引擎）';}
   }
 }
 
