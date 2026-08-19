@@ -426,3 +426,35 @@
   3. 错题回填 225 条在 shuffle 干扰下无正向效果
 - 正确自优化路径（v9.2 候选）：真实均衡样本（contest8 赛题）+ 以 v9.0 fused 为 base 继续训练
 - 生产确认：8960 = v9.0（53.9%）不受影响
+
+## 08-19 07:45 R762 全面盘点收口（用户"全面盘点未完成的任务高质量完成"）
+
+### Cron 修真（8 个报错任务全处理）
+- **网络自动切换（真实故障 9h）**：模型 402 → 脚本 9 小时未执行 → **迁移 launchd**（com.mingli-baojian.network-failover，StartInterval=300，PID 9083 已运行）；cron 降级为每日 08:00 汇报（d7299497）
+- Desktop-ZYZX：payload v5（src_dir_not_found → NO_REPLY 不累积错误）
+- 四路大师采集：payload v3（源目录缺失 → NO_REPLY；sqlite 单步命令防中断）
+- 临床经验蒸馏：payload v2（纯脚本，禁止探索查表）
+- shf 地层能力审计：拆为轻量自检版（7 脚本秒级，失败才深入）
+- 每日报告推送：加 fallback zai_auto + 纯脚本输出
+- ASH 订单提醒：轻量版 v2（180s）
+- tcm 家庭周报：gateway restart 一次性中断，服务 8932/8945 实测健康
+
+### Staging 审核闭环（310 条待审 → 0）
+- 发现引擎 bug：**rejectEntry 只写 audit_status 不写 status** → 审计失败条目无限滞留（R762 修真，commit 22174d6）
+- 修真 2：医疗合规声明支持多种表达（仅供参考/仅供学习参考/不构成医疗建议/请遵医嘱）
+- 处理：4 条测试残留拒绝 / R490 重复拒绝（与 formal 重复）/ tcm 139 补 source_ids / nihaisha 62 source_ids 规范化 / 46 条补合规声明 / 62 条确认已在 formal（重复拒绝正确）
+- 终态：pending 0 · staged 0 · promoted 3638 · formal 68,761
+
+### Git
+- mingli-baojian 24c709c 已 push ✅（server 22174d6 + 主仓）
+- smart-home-family ed3ed67 已 commit，**push 阻塞**（无 GitHub 远端，需建仓）
+
+### 模型评估（KANBAN #5 前置）
+- v9.0 v2.1 评估运行中（8960 = v9.0-7b 生产）
+- v87-baseline-pipeline.sh 后台流水线：v9.0 完成 → 回切 v8.7 → 评估 → 恢复 v9.0
+- 上次 v8.7 v2.1 从未真正执行（空日志）
+
+### 阻塞项（需用户/外部）
+- **data1 外置卷未挂载**：YZYX 蒸馏源（训练素材-20260816/周易-中医）+ 1,297 扫描件 PDF 视觉蒸馏源 + 备份全受影响
+- **GitHub 建仓**：无 gh CLI / 无 token（9 项目含 shf 无法 push）
+- 生产短信网关（需商户号）

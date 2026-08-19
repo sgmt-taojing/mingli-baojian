@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-BaziQA 命理能力评估（命理宝鉴版 · 从 giant-shoulders 收拢）
+BaziQA 命理能力评估（命理宝鉴版）
 评估 LLM 在八字命理推理的准确率（全量 488 题：50 名人 × ~10 题）
 
 用法：

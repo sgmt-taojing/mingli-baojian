@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# [deprecated] 历史版本存档：数据源在临时目录，新构建请用 build-baziqa-sft.py（项目内数据）
 # -*- coding: utf-8 -*-
 """
 R739 v9.1 自优化数据构建（错误驱动自我强化）
