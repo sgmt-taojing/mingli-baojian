@@ -25,7 +25,7 @@ DATA = os.path.join(BASE, 'baziqa', 'data', 'celebrity50_zh.json')
 RESULTS_DIR = os.path.join(BASE, 'baziqa-results')
 
 
-def ask(api, prompt, max_tokens=30):
+def ask(api, prompt, max_tokens=200):  # v2.1: 30→200 防推理截断
     body = json.dumps({
         'messages': [{'role': 'user', 'content': prompt}],
         'max_tokens': max_tokens,
@@ -55,16 +55,27 @@ def build_prompt(person, q):
 
 
 def extract_answer(text):
-    """兼容多格式提取选项字母：'B' / 'B。xxx' / 'B <s>...' / '答案 B'"""
+    """v2.1 五级提取：fence / leading / punct 全角 / keyword / lone"""
     if not text:
         return ''
     t = text.strip().replace('<s>', '').replace('</s>', '').strip()
-    if t and t[0] in 'ABCDE':
-        return t[0]
-    m = re.search(r'[（(]?([A-E])[）)]', t)
+    # 1) fence 格式: ```B``` 或 ```\nB\n```
+    m = re.search(r'```\s*([A-E])\s*```', t)
     if m:
         return m.group(1)
-    m = re.search(r'答案[是为：:]\s*([A-E])', t)
+    # 2) 开头字母: 'B' / 'B。xxx' / 'B xxx'
+    if t and t[0] in 'ABCDE':
+        return t[0]
+    # 3) 括号（含全角）: (B) / （B）
+    m = re.search(r'[（(]\s*([A-E])\s*[）)]', t)
+    if m:
+        return m.group(1)
+    # 4) 关键词: 答案 B / 选 B / 是 B / 选：B
+    m = re.search(r'(?:答案|选|选择|是)[以为：:\s]*([A-E])', t)
+    if m:
+        return m.group(1)
+    # 5) 孤立字母: '... B ...'（前后非字母数字）
+    m = re.search(r'(?<![A-Za-z0-9])([A-E])(?![A-Za-z0-9])', t)
     if m:
         return m.group(1)
     return ''
