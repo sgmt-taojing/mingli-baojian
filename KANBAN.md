@@ -474,3 +474,10 @@
 - **修真发现**：_shared/order-service 与 toolkit_server 端口冲突（都要 8961），且 order-service launchd 因 node 路径失效挂了 3 天（exit 127）
 - **修真**：order-service → 8963（node 绝对路径 + plist 端口）+ shop.html 指向更新；8961 归还算法超市；34 条订单数据保留
 - **边界终态**：mingli 调用面 = 自有三域服务 + _shared 订单（合法共享），零跨项目误引
+
+## 08-19 08:45 .qclaw 命理资产隔离完成（R767 · 用户指令「抓紧处理和隔离」）
+- **重大修真发现 1**：生产 KB（8901）整套跑在废弃 .qclaw/workspace（29 分类 KB JS + knowledge-server.py）→ 已回迁 mingli-baojian（knowledge/ 28 文件 + server/knowledge-server.py + launchd com.mingli-baojian.knowledge）
+- **重大修真发现 2**：HeiGe-SuanMing（PolyForm Noncommercial 红线）双残留——.qclaw/workspace/skills/bazi-mingli + ~/.openclaw-autoclaw/skills/bazi-mingli（活跃技能！）→ **两处已删**（license 红线：禁止商用，依据 MEMORY 蒸馏红线 v2）
+- **性格画像缺口补齐**：personality-knowledge.js 入 KB（十神性格×格局声誉×推断链）——「十神性格/性格特质/声誉评价」检索 0→1+ 命中（BaziQA 错题 76 题性格类短板）
+- **归档隔离**：.qclaw 命理资产 40 文件 + 工具 + 50 历史文档 → /Volumes/data1/archive/qclaw-mingli-kb-20260819/（保留历史，隔离出智能体工作区）
+- **验证**：.qclaw 命理关键词清零；项目 KB 检索正常（七杀 2 条 + personality 命中）；8901 服务项目内运行
