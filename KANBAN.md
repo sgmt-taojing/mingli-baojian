@@ -468,3 +468,9 @@
 - **零残留验证**：全项目 grep giant-shoulders 零命中；其他项目零泄漏；品牌词扫描纯净
 - **记忆优化**：MEMORY.md 顶部固化 BaziQA 管线记忆（项目内自足 + 7 条教训）；TOOLS.md 加管线笔记
 - **v9.2 训练**：launchd 拉起重跑中（base=v9.0 ✅，Iter 30/300，日志 /tmp/baziqa-v92-train.log）
+
+## 08-19 08:25 定位终态复查（R765）：发现并修真端口冲突
+- **三域资产归属**：命理（BaziQA 管线+排盘+MLX）/中医（四诊+Step7）/医保人脸核对（face-embed）全在 mingli ✅ 零泄漏
+- **修真发现**：_shared/order-service 与 toolkit_server 端口冲突（都要 8961），且 order-service launchd 因 node 路径失效挂了 3 天（exit 127）
+- **修真**：order-service → 8963（node 绝对路径 + plist 端口）+ shop.html 指向更新；8961 归还算法超市；34 条订单数据保留
+- **边界终态**：mingli 调用面 = 自有三域服务 + _shared 订单（合法共享），零跨项目误引
