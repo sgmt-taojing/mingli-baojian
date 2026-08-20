@@ -1426,7 +1426,7 @@ function updateDailyAdvice(almanac) {
 function copyFullDailyAdvice(){
   let d=window._currentDynamicAdvice;
   if(!d){showToast('暂无数据');return;}
-  let t='【易道智鉴·每日推荐】\n';
+  let t='【命理宝鉴·每日推荐】\n';
   t+='\n🌍 '+d.date+'\n';
   t+='🔥 年柱信息\n';
   t+='🌙 月柱·日柱\n';
@@ -1467,7 +1467,7 @@ function copyFullDailyAdvice(){
     t+=d.knowledge.summary+'\n';
   }
   t+='\n⚠️ 以上内容仅供文化交流与生活参考，不构成任何法律依据。\n';
-  t+='\n—— 易道智鉴';
+  t+='\n—— 命理宝鉴';
 
   if(navigator.clipboard){
     navigator.clipboard.writeText(t).then(function(){showToast('✅ 已复制到剪贴板');});

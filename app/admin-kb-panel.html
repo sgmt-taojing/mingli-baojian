@@ -3,7 +3,7 @@
 <head>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta charset="UTF-8">
-<meta name="description" content="KB 知识库管理面板 - 命理宝鉴 · 易道智鉴平台">
+<meta name="description" content="KB 知识库管理面板 - 命理宝鉴 · 命理宝鉴平台">
 <meta name="keywords" content="KB 知识库管理面板 - 命理宝鉴">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -116,7 +116,7 @@
   .card, .panel { border: 1px solid #ddd !important; page-break-inside: avoid; }
 }
 </style>
-<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
+<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 
   <!-- R505b AI 语音助手 -->
   <div id="ai-assistant-mount"></div>
@@ -143,6 +143,11 @@ function toggleStaging(){
   if(p){ p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display !== 'none') stagingLoad(); }
 }
 var STAGING_SEL = {};
+function toast(msg,type){
+  var w=document.querySelector('.toast-wrap')||(()=>{var d=document.createElement('div');d.className='toast-wrap';document.body.appendChild(d);return d})();
+  var el=document.createElement('div');el.className='toast '+(type||'ok');el.textContent=msg;w.appendChild(el);
+  setTimeout(function(){el.style.opacity='0';setTimeout(function(){el.remove();},200);},2200);
+}
 function stagingLoad(){
   var box = document.getElementById('staging-list');
   fetch('/api/kb/staging/list?status=staged&limit=100').then(function(r){return r.json()}).then(function(d){
@@ -168,25 +173,25 @@ function stagingChk(){
 }
 function stagingApprove(){
   var ids = Object.keys(STAGING_SEL);
-  if(!ids.length){ alert('请先勾选条目'); return; }
+  if(!ids.length){ toast('请先勾选条目','err'); return; }
   if(!confirm('确认通过 ' + ids.length + ' 条？将执行引擎审计（内容/来源/置信度/医疗声明），通过后进入正式库。')) return;
   fetch('/api/kb/staging/approve', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids})})
     .then(function(r){return r.json()}).then(function(d){
-      alert('✅ 通过 ' + (d.promoted||0) + ' 条 · 拒绝 ' + (d.rejected||0) + ' 条' + (d.errors&&d.errors.length ? ' · 错误 ' + d.errors.length : ''));
+      toast('通过 ' + (d.promoted||0) + ' 条 · 拒绝 ' + (d.rejected||0) + ' 条' + (d.errors&&d.errors.length ? ' · 错误 ' + d.errors.length : ''), d.errors&&d.errors.length?'err':'ok');
       stagingLoad();
-    }).catch(function(){ alert('服务不可用'); });
+    }).catch(function(){ toast('服务不可用','err'); });
 }
 function stagingReject(){
   var ids = Object.keys(STAGING_SEL);
-  if(!ids.length){ alert('请先勾选条目'); return; }
+  if(!ids.length){ toast('请先勾选条目','err'); return; }
   if(!confirm('确认拒绝 ' + ids.length + ' 条？拒绝后不进正式库（可留审计记录）。')) return;
   var notes = prompt('拒绝原因（留审计）：', 'R735-g10 人工审核拒绝');
   if(notes === null) return;
   fetch('/api/kb/staging/reject', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids, notes: notes})})
     .then(function(r){return r.json()}).then(function(d){
-      alert('✅ 已拒绝 ' + (d.rejected||0) + ' 条');
+      toast('已拒绝 ' + (d.rejected||0) + ' 条','ok');
       stagingLoad();
-    }).catch(function(){ alert('服务不可用'); });
+    }).catch(function(){ toast('服务不可用','err'); });
 }
 </script>
 </body>

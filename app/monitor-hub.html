@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目管理监控总览 · Monitor Hub</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #facc15;
+    --border: #475569;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #fff;
+  }
+  .subtitle { color: var(--muted); margin-bottom: 20px; font-size: 12px; }
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .controls input, .controls select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+  }
+  .controls input:focus, .controls select:focus { border-color: var(--accent); }
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    transition: border-color 0.2s;
+  }
+  .project-card:hover { border-color: var(--accent); }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .project-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+  }
+  .port-badge {
+    font-size: 11px;
+    background: var(--surface-2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: var(--accent);
+    font-family: monospace;
+  }
+  .health-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 6px;
+    flex-shrink: 0;
+  }
+  .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot-red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .dot-yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+  .page-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .page-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 8px;
+    background: var(--surface-2);
+    border-radius: 5px;
+    font-size: 12px;
+  }
+  .page-list li a {
+    color: var(--accent);
+    text-decoration: none;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .page-list li a:hover { text-decoration: underline; }
+  .page-status {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    flex-shrink: 0;
+  }
+  .status-200 { background: rgba(74,222,128,0.15); color: var(--green); }
+  .status-404 { background: rgba(248,113,113,0.15); color: var(--red); }
+  .status-000 { background: rgba(250,204,21,0.15); color: var(--yellow); }
+  .banner {
+    display: none;
+    padding: 10px 16px;
+    background: rgba(248,113,113,0.1);
+    border: 1px solid var(--red);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--red);
+  }
+  .banner.show { display: block; }
+  .meta-info {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .filter-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--surface-2);
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+</style>
+</head>
+<body>
+
+<h1>项目管理监控总览</h1>
+<p class="subtitle">所有项目运行状态一览 · 端口均已分配 · 红色=不可达 · 绿色=正常 · 黄色=超时</p>
+
+<div id="alertBanner" class="banner"></div>
+
+<div class="controls">
+  <input type="text" id="searchInput" placeholder="🔍 搜索页面名称..." />
+  <select id="filterHealth">
+    <option value="all">全部</option>
+    <option value="200">只看正常 (200)</option>
+    <option value="err">只看异常</option>
+  </select>
+  <select id="filterProject">
+    <option value="all">全部项目</option>
+    <option value="mingli-baojian">命理宝鉴</option>
+    <option value="tcm-service">中医智能体</option>
+    <option value="smart-home-family">家庭助手</option>
+    <option value="platform">视觉母引擎</option>
+    <option value="video-monitor">视频服务</option>
+  </select>
+  <button onclick="runHealthCheck()" style="background:var(--accent);color:#000;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;">🔄 重新检测</button>
+</div>
+
+<div id="projectGrid" class="project-grid"></div>
+
+<script>
+const PROJECTS = [
+  {
+    id: "mingli-baojian",
+    name: "命理宝鉴",
+    port: 8900,
+    prefix: "",
+    pages: [
+      { name: "总览看板", url: "dashboard.html" },
+      { name: "管理后台", url: "admin.html" },
+      { name: "蒸馏缓存", url: "distill-cache-status.html" },
+      { name: "商户看板", url: "merchant-dashboard.html" },
+      { name: "评估看板", url: "eval-dashboard.html" },
+      { name: "健康监测", url: "health-monitor.html" },
+      { name: "KB 模块健康", url: "kb-module-health.html" },
+      { name: "KB 命中看板", url: "kb-hit-dashboard.html" },
+      { name: "后台总览", url: "admin/dashboard.html" },
+      { name: "玻璃审批", url: "admin/glass-approve.html" },
+      { name: "IM 监控", url: "admin/im-monitor.html" },
+      { name: "KB 命中(adm)", url: "admin/kb-hit-dashboard.html" },
+      { name: "元助看板", url: "admin/yuanzhu-dashboard.html" }
+    ]
+  },
+  {
+    id: "tcm-service",
+    name: "中医智能体",
+    port: 8931,
+    prefix: "",
+    pages: [
+      { name: "总览", url: "dashboard.html" },
+      { name: "医生看板", url: "doctor-dashboard.html" },
+      { name: "门诊统计", url: "clinic-stats.html" },
+      { name: "服务监控", url: "server-monitor.html" },
+      { name: "监控总览", url: "monitor-dashboard.html" },
+      { name: "监控页", url: "monitor.html" },
+      { name: "穿戴监控", url: "wearable-monitor.html" },
+      { name: "健康档案", url: "health-archive.html" }
+    ]
+  },
+  {
+    id: "smart-home-family",
+    name: "家庭助手",
+    port: 8898,
+    prefix: "app/",
+    pages: [
+      { name: "总览", url: "dashboard.html" },
+      { name: "系统监控", url: "system-monitor.html" },
+      { name: "健康", url: "health.html" },
+      { name: "训练看板", url: "training-dashboard.html" },
+      { name: "数据完整性", url: "monitoring/data-integrity.html" },
+      { name: "HCI 漏斗", url: "monitoring/hci-funnel.html" },
+      { name: "应急资产库", url: "emergency-vault.html" },
+      { name: "成员 onboarding", url: "onboarding-modules.html" }
+    ]
+  },
+  {
+    id: "platform",
+    name: "视觉母引擎",
+    port: 8946,
+    prefix: "",
+    pages: [
+      { name: "总览", url: "dashboard.html" },
+      { name: "算法管理", url: "algorithm-manager.html" },
+      { name: "模型状态", url: "models-status.html" },
+      { name: "数据集管理", url: "dataset-manager.html" },
+      { name: "集成器", url: "integrator-manager.html" },
+      { name: "审核工作台", url: "review-workspace.html" },
+      { name: "计费", url: "billing.html" },
+      { name: "AI 助手", url: "ai-assistant.html" },
+      { name: "自动训练", url: "auto-train.html" }
+    ]
+  },
+  {
+    id: "video-monitor",
+    name: "视频服务",
+    port: 8949,
+    prefix: "",
+    pages: [
+      { name: "布控告警指挥中心", url: "surveillance-dashboard.html" }
+    ]
+  }
+];
+
+const cache = {};
+
+async function checkHealth(project) {
+  const results = [];
+  for (const page of project.pages) {
+    const fullUrl = `http://127.0.0.1:${project.port}/${project.prefix}${page.url}`;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      const res = await fetch(fullUrl, { method: "GET", mode: "no-cors", signal: controller.signal });
+      clearTimeout(timeout);
+      results.push({ ...page, status: "200", url: fullUrl });
+    } catch (e) {
+      results.push({ ...page, status: "000", url: fullUrl });
+    }
+  }
+  return results;
+}
+
+async function runHealthCheck() {
+  const banner = document.getElementById("alertBanner");
+  banner.classList.remove("show");
+  const grid = document.getElementById("projectGrid");
+  grid.style.opacity = "0.5";
+
+  for (const proj of PROJECTS) {
+    cache[proj.id] = await checkHealth(proj);
+  }
+  grid.style.opacity = "1";
+  render();
+}
+
+function render() {
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  const healthFilter = document.getElementById("filterHealth").value;
+  const projFilter = document.getElementById("filterProject").value;
+  const grid = document.getElementById("projectGrid");
+  grid.innerHTML = "";
+
+  let errorCount = 0;
+  let totalCount = 0;
+
+  for (const proj of PROJECTS) {
+    if (projFilter !== "all" && projFilter !== proj.id) continue;
+    const results = cache[proj.id] || [];
+    const filtered = results.filter(r => {
+      if (search && !r.name.toLowerCase().includes(search) && !r.url.toLowerCase().includes(search)) return false;
+      if (healthFilter === "200" && r.status !== "200") return false;
+      if (healthFilter === "err" && r.status === "200") return false;
+      return true;
+    });
+
+    if (filtered.length === 0) continue;
+
+    const allOk = results.every(r => r.status === "200");
+    const someErr = results.some(r => r.status !== "200");
+    const dotClass = allOk ? "dot-green" : someErr ? "dot-red" : "dot-yellow";
+    const errCount = results.filter(r => r.status !== "200").length;
+    if (errCount > 0) errorCount += errCount;
+    totalCount += results.length;
+
+    const card = document.createElement("div");
+    card.className = "project-card";
+
+    const pagesHtml = filtered.map(r => {
+      const statusClass = r.status === "200" ? "status-200" : r.status === "000" ? "status-000" : "status-404";
+      return `<li>
+        <a href="${r.url}" target="_blank">${r.name}</a>
+        <span class="page-status ${statusClass}">${r.status === "200" ? "✓" : "✗"}</span>
+      </li>`;
+    }).join("");
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div>
+          <span class="project-name">${proj.name}</span>
+          <span class="health-dot ${dotClass}"></span>
+        </div>
+        <span class="port-badge">:${proj.port}</span>
+      </div>
+      <ul class="page-list">${pagesHtml}</ul>
+      <div class="meta-info">${results.length} 个监控页${errCount > 0 ? ` · ${errCount} 个异常` : " · 全绿"}</div>
+    `;
+    grid.appendChild(card);
+  }
+
+  if (errorCount > 0) {
+    banner.textContent = `⚠️ ${errorCount} / ${totalCount} 个监控页异常，请检查对应服务`;
+    banner.classList.add("show");
+  }
+}
+
+document.getElementById("searchInput").addEventListener("input", render);
+document.getElementById("filterHealth").addEventListener("change", render);
+document.getElementById("filterProject").addEventListener("change", render);
+
+// 首次加载自检
+runHealthCheck();
+</script>
+</body>
+</html>

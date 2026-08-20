@@ -36,6 +36,47 @@ MINGLI_TITLE_KW = ['紫微', '八字', '风水', '阳宅', '阴宅', '奇门', '
 # R746-2 修真：拼音命理关键词（易道知识·shishen 等拼音标题逃逸中文黑名单）
 MINGLI_TITLE_KW_PINYIN = ['shishen', 'shensha', 'hechong', 'bazi', 'qimen', 'daliuren', 'fengshui', 'huxing', 'zhishitupu', 'jiazinayin', 'ziwei', 'liuyao', 'meihua', 'liuren', 'xingxiu', 'yaoxing', 'mingli', 'yangzhai', 'tianji', 'dizhi', 'tiangan', 'bagua', 'dayun', 'liunian', 'feixing', 'sihua']
 MED_TITLE_PREFIX = ['金匮', '伤寒', '人纪', '医案', '本草', '汤头', '黄帝内经', '神农', '药性', '方剂', '针灸', '艾灸', '穴位', '经络', '倪海厦人纪', '汉唐中医', '五运六气']
+# R765 修真：KB 元数据豁免（行号引用、目录页、笔记片段、舒罕课程笔记、KB 索引碎片）
+# 这些不是医学知识条目，是构建碎片/索引页，不应归位 tcm-agent
+META_TITLE_KW = [
+    'KB-store·',           # JS 行号引用
+    'Knowledge小·',         # 模块索引
+    'Knowledge·',           # 模块路径
+    '人纪金匮目录',          # 目录页
+    '请介绍',                # SFT 训练问答模板
+    '请引用',                # SFT 训练问答模板
+    '§1',                   # 章节编号片段
+    '舒晗',                  # 舒罕课程笔记（非医学本体）
+    '人间道听课笔记',        # 课程笔记
+    'MIXUN_',               # 密训班笔记
+    '先知智镜',              # 穿戴设备架构笔记
+    'AI色彩识别核心算法',    # 视觉管线说明
+    'AI穿戴设备',            # 设备架构
+    '察目辨证规范体系',      # 视觉辨证说明（非临床条目）
+    '舌诊体系',              # 视觉辨证体系说明
+    '舌诊专项辨证',          # 视觉辨证说明
+    '目诊与面诊专项',        # 视觉辨证说明
+    '五色辨证完整体系',      # 视觉辨证说明
+    '易道知识详情·',         # 易道命理内容污染（拼音标题）
+    '中药十八反',            # SFT 训练问答对
+    '中药十九畏',
+    '中药妊娠禁忌',
+    '中药毒性药用量警戒',
+    '中药老年人用药',
+    'PDF 完整页级证据',     # PDF 页级证据元数据
+    '中药',                 # SFT 训练问答对（中药剂量/儿童/合规/高血压等）
+    '中医AI辅助诊断',
+    '中医面诊',             # 视觉辨证体系说明
+    '舌诊、面诊、穿戴设备数据融合',  # 视觉辨证说明
+    '人纪针灸目录',         # 目录页
+    '高血压的用药时间',       # 临床问答模板
+    '糖尿病的用药时间',       # 临床问答模板
+    '肾着汤方解（E2E测试）', # E2E 测试条目
+    '中医望诊数据采集',      # 望诊标准化规范
+    '中医望诊全链路',        # 望诊流程说明
+    '中医望诊终端',          # 望诊安全规范
+]
+META_MODULE_KW = ['tcm,shanghan-lun,jinkui', 'qimen/shuihan-tcm']  # 混合模块碎片
 
 
 def fp(text):
@@ -123,6 +164,17 @@ def main():
         # R752 修真：nihaisha 文档索引元数据跳过（README/index/sources 等工具文档，
         # 非医学知识本体也非命理污染，属 KB 构建元数据）
         if title.startswith('[nihaisha]') and any(k in title for k in ['README', 'index.md', 'sources.md', 'SKILL', 'USE_AND_RISK', 'BUILD_AND_UPDATE', 'correction-decisions', 'learning-entry', 'lesson-map', 'usage-scenarios', 'beginner-questions', 'symptom-index', 'ebooks', 'classics.md']):
+            skipped_pollution += 1
+            continue
+        # R765 修真：KB 构建碎片/课程笔记/问答模板/混合模块 → 非对齐面
+        if any(k in title for k in META_TITLE_KW):
+            skipped_pollution += 1
+            continue
+        if any(k in module for k in META_MODULE_KW):
+            skipped_pollution += 1
+            continue
+        # [nihaisha] <file>.md → 文档索引元数据（PDF 页级证据），不参与对齐
+        if (title.startswith('[nihaisha]') or title.startswith('[nihaisha_pcs]')) and title.endswith('.md'):
             skipped_pollution += 1
             continue
 

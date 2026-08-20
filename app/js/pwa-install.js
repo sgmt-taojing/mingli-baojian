@@ -21,7 +21,7 @@
            z-index:99999;font-family:system-ui">\
         <span style="font-size:28px">📱</span>\
         <div>\
-          <div style="color:var(--gold);font-weight:600;font-size:14px">安装易道智鉴</div>\
+          <div style="color:var(--gold);font-weight:600;font-size:14px">安装命理宝鉴</div>\
           <div style="color:var(--text-dim);font-size:12px">添加到主屏幕，离线可用</div>\
         </div>\
         <button id="pwa-install-btn" style="\

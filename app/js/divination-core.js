@@ -99,7 +99,7 @@ function exportWord() {
     html += '</table>';
   }
 
-  html += '<footer><p>易道智鉴 · 专业命理分析报告 · '+new Date().toLocaleString('zh-CN')+'</p></footer>';
+  html += '<footer><p>命理宝鉴 · 专业命理分析报告 · '+new Date().toLocaleString('zh-CN')+'</p></footer>';
   html += '<\/body><\/html>';
 
   downloadBlob(html, name+'.doc', 'application/msword;charset=utf-8');
@@ -7332,7 +7332,7 @@ function renderHuajie(hj) {
   // 平台理念标语（始终显示）
   html += '<div style="text-align:center;padding:16px 0 8px;border-top:1px solid rgba(201,168,76,0.1);margin-top:8px">';
   html += '<div style="font-size:14px;color:var(--gold);letter-spacing:6px;font-family:\'Ma Shan Zheng\',serif">知命 · 改运 · 修心持善守静</div>';
-  html += '<div style="font-size:11px;color:var(--paper3);margin-top:4px">易道智鉴 · 仅供参考</div>';
+  html += '<div style="font-size:11px;color:var(--paper3);margin-top:4px">命理宝鉴 · 仅供参考</div>';
   html += '</div>';
 
   out.innerHTML = html;
@@ -20407,7 +20407,7 @@ ${resultEl.innerHTML}
 <div class="personalized-recommendations">
 ${generatePersonalizedRecommendations(bazi, sex)}
 </div>
-<p class="report-footer">易道智鉴 · 仅供参考 · 如有疑问请咨询专业人士</p>
+<p class="report-footer">命理宝鉴 · 仅供参考 · 如有疑问请咨询专业人士</p>
 </body>
 
 <script>
@@ -20734,7 +20734,7 @@ function exportHuajieReport() {
     showToast('请先计算化解方案后再导出');
     return;
   }
-  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>化解方案报告</title><style>body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);padding:40px;max-width:800px;margin:0 auto}h1{color:var(--gold);text-align:center;letter-spacing:6px}h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:8px}.result{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:24px;margin:16px 0}</style></head><body><h1>化解方案报告</h1><div class="result">${resultEl.innerHTML}</div><p style="text-align:center;opacity:.4;margin-top:40px">易道智鉴 · 仅供参考</p></body>
+  const html = `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>化解方案报告</title><style>body{font-family:'Noto Serif SC',serif;background:var(--ink);color:var(--paper);padding:40px;max-width:800px;margin:0 auto}h1{color:var(--gold);text-align:center;letter-spacing:6px}h2{color:var(--gold2);border-bottom:1px solid rgba(201,168,76,.2);padding-bottom:8px}.result{background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:24px;margin:16px 0}</style></head><body><h1>化解方案报告</h1><div class="result">${resultEl.innerHTML}</div><p style="text-align:center;opacity:.4;margin-top:40px">命理宝鉴 · 仅供参考</p></body>
 <script>
 // ===== 商城分类切换 =====
 
@@ -32561,7 +32561,7 @@ function renderJiaziCycleReport(data) {
   html += '<div style="margin-top:20px;padding:16px;background:rgba(231,76,60,0.05);border:1px solid rgba(231,76,60,0.15);border-radius:8px;text-align:center"><div style="font-size:12px;color:var(--cinn2);font-weight:600;margin-bottom:4px">⚠ 免责声明</div><div style="font-size:11px;color:' + paper2 + ';line-height:1.8">本平台内容仅供国学文化学习与娱乐参考，不构成任何专业建议。占卜结果不作为决策依据。</div></div>';
 
   // 页脚
-  html += '<div style="text-align:center;padding:16px;font-size:12px;color:' + paper2 + ';opacity:0.5;letter-spacing:2px">易道智鉴 · 六十甲子周期推算 · ' + new Date().toLocaleDateString('zh-CN') + '</div>';
+  html += '<div style="text-align:center;padding:16px;font-size:12px;color:' + paper2 + ';opacity:0.5;letter-spacing:2px">命理宝鉴 · 六十甲子周期推算 · ' + new Date().toLocaleDateString('zh-CN') + '</div>';
 
   return html;
 }
@@ -33571,11 +33571,11 @@ function exportReportAsText() {
   let text = resultEl.innerText || resultEl.textContent || '';
   let name = '';
   try { let bz = safeGetJSON('userBazi', {}); name = bz.name || ''; } catch(e){void 0}
-  let header = '易道智鉴 · 命理报告\n';
+  let header = '命理宝鉴 · 命理报告\n';
   if (name) header += '缘主：' + name + '\n';
   header += '生成时间：' + new Date().toLocaleString('zh-CN') + '\n';
   header += '══════════════════════════\n\n';
-  let footer = '\n══════════════════════════\n易道智鉴 · 仅供参考';
+  let footer = '\n══════════════════════════\n命理宝鉴 · 仅供参考';
   let fullText = header + text + footer;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -33630,7 +33630,7 @@ function exportReportAsHTMLFile() {
   html += '<p class="report-meta">生成时间：' + new Date().toLocaleString('zh-CN') + '</p>';
   html += '</div>\n';
   html += '<div class="report-body">' + resultEl.innerHTML + '</div>\n';
-  html += '<p class="report-footer">易道智鉴 · 仅供参考 · 如有疑问请咨询专业人士</p>\n';
+  html += '<p class="report-footer">命理宝鉴 · 仅供参考 · 如有疑问请咨询专业人士</p>\n';
   html += '</body>\n</html>';
 
   let blob = new Blob([html], {type: 'text/html;charset=utf-8'});

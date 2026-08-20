@@ -2,138 +2,471 @@
 <html lang="zh-CN">
 <head>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <meta charset="UTF-8">
-<meta name="description" content="易道智鉴 - 首页 · 易道智鉴平台">
-<meta name="keywords" content="易道智鉴 - 首页">
+<meta charset="UTF-8">
+<meta name="description" content="命理宝鉴 · 命理宝鉴平台首页入口大厅">
+<meta name="keywords" content="命理宝鉴,首页,入口大厅,AI问诊,AI命理,医生工作台,命理师工作台">
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/index.html">
 <meta name="robots" content="index, follow">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#050608">
-<meta property="og:title" content="易道智鉴 - 首页">
-<meta property="og:description" content="易道智鉴 - 首页 · 易道智鉴平台">
+<meta property="og:title" content="命理宝鉴 - 入口大厅">
+<meta property="og:description" content="命理宝鉴首页 · 三角色入口大厅（患者/医生/命理师）">
 <meta property="og:type" content="website">
-    <title>易道智鉴 - 首页</title>
-    <meta http-equiv="refresh" content="0; url=divination-hub.html">
-<style>
-:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--cinn:#c0392b;--cinn2:#e74c3c;--jade:#27ae60;--cyan:#2980b9;--cyan2:#5dade2;--border:rgba(201,168,76,.15);--bg:#080808;--success:#2ecc71;--warn:#e67e22;--steel:#7f8c8d;--violet:#8e44ad;--violet2:#9b59b6}
-
-/* R-P3-17.4 通用 reflow */
-@media(max-width:768px){body{font-size:14px}h1{font-size:22px!important}h2{font-size:19px!important}[style*="grid-template-columns:repeat(3"],[style*="grid-template-columns:repeat(4)"]{grid-template-columns:repeat(2,1fr)!important}.wrap,.container{padding:12px!important;max-width:100vw!important;overflow-x:hidden!important}table{display:block!important;overflow-x:auto!important}}
-@media(max-width:480px){body{font-size:13px}[style*="grid-template-columns:repeat(2)"]{grid-template-columns:1fr!important}}
-@media(max-width:320px){body{font-size:12px;padding:0!important}h1{font-size:18px!important}input[type=text],input[type=search],textarea,select{width:100%!important}}
-@media print{body{background:#fff!important;color:#000!important}header.page-header-bar,.phb-back,nav,.nav-bar,.mobile-nav,.sidebar,.no-print,footer,.btn,button{display:none!important}main,.container,.wrap,.body{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}a{color:#000!important;text-decoration:none!important}h1{font-size:16px!important}h2{font-size:14px!important}h3{font-size:12px!important}.card,.entry,.grid-card,.module,.tile{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid!important}table{width:100%!important;font-size:11px!important}img{max-width:100%!important}.theme-ai{background:#fff!important;color:#000!important}}
-</style>
-  <link rel="stylesheet" href="css/a11y-fix.css">
+<title>命理宝鉴 · 入口大厅</title>
+<link rel="stylesheet" href="css/a11y-fix.css">
 <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
 <link rel="stylesheet" href="css/page-header.css">
-<script>
-// ═══ R502+R703: 地区版本守卫——消费激活参数，不强制国内 ═══
-// R703 修真：不再删除 mbj_region/mbj_locale；URL 参数优先写入 localStorage
-// （修复国内外版本混淆：激活选国外 → 跳转后被打回国内版）
-(function() {
-  try {
-    const p = new URLSearchParams(location.search);
-    // URL 参数优先（激活向导跳转时携带 region/locale）
-    const urlRegion = p.get('region');
-    const urlLocale = p.get('locale');
-    if (urlRegion) localStorage.setItem('mbj_region', urlRegion);
-    if (urlLocale) localStorage.setItem('mbj_locale', urlLocale);
-    // 清理 URL 参数（已持久化，避免刷新时参数残留）
-    if (urlRegion || urlLocale || p.get('activated')) {
-      p.delete('region'); p.delete('locale'); p.delete('activated');
-      const clean = p.toString();
-      history.replaceState(null, '', location.pathname + (clean ? '?' + clean : ''));
-    }
-    // R703 分流：非国内 region → 海外版（index-global.html），国内 → 全功能国内版
-    const region = localStorage.getItem('mbj_region');
-    if (region && region !== 'cn' && !location.pathname.includes('index-global')) {
-      location.replace('index-global.html?region=' + encodeURIComponent(region) +
-                       '&locale=' + encodeURIComponent(localStorage.getItem('mbj_locale') || 'en-SG'));
-    }
-  } catch (_) {}
-})();
-</script>
+<style>
+:root{--ink:#080808;--ink2:#111;--ink3:#1a1a1a;--ink4:#222;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#a08030;--cinn:#c0392b;--cinn2:#e74c3c;--jade:#27ae60;--cyan:#2980b9;--cyan2:#5dade2;--steel:#7f8c8d;--violet:#8e44ad;--violet2:#9b59b6;--bg:#080808;--border:rgba(201,168,76,.15);--success:#2ecc71;--warn:#e67e22}
+
+.hall{
+  max-width:1280px;margin:0 auto;padding:24px 24px 64px;
+  display:flex;flex-direction:column;gap:24px;
+}
+.hall-hero{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:18px 22px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(201,168,76,.10),rgba(142,68,173,.06));
+  border:1px solid rgba(201,168,76,.18);
+}
+.hall-hero-title{font-family:'Noto Serif SC',serif;font-size:22px;color:var(--paper);letter-spacing:1px}
+.hall-hero-sub{font-size:12px;color:var(--paper3);margin-top:4px;letter-spacing:.5px}
+.hall-hero-stats{display:flex;gap:18px;font-size:11px;color:var(--paper3)}
+.hall-hero-stat strong{display:block;font-size:18px;color:var(--gold2);font-weight:600;letter-spacing:1px}
+
+/* 角色切换胶囊 */
+.role-switch{
+  display:flex;gap:6px;background:rgba(0,0,0,.35);
+  border:1px solid rgba(201,168,76,.15);border-radius:999px;padding:4px;
+}
+.role-switch button{
+  border:none;background:transparent;color:var(--paper3);font-size:13px;
+  padding:8px 16px;border-radius:999px;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;gap:6px;letter-spacing:1px;
+  transition:all .2s;
+}
+.role-switch button.active{
+  background:linear-gradient(135deg,var(--gold),var(--gold3));color:#1a1a1a;font-weight:600;
+}
+.role-switch button:hover:not(.active){color:var(--paper2);background:rgba(201,168,76,.08)}
+
+/* 图标网格 */
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+@media(max-width:768px){.icon-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.icon-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+
+.icon-card{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:22px 14px;border-radius:12px;
+  background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.10);
+  text-decoration:none;color:inherit;
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;min-height:140px;
+}
+.icon-card:hover{
+  transform:translateY(-3px);
+  background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.35);
+  box-shadow:0 8px 24px rgba(0,0,0,.4),0 0 0 1px rgba(201,168,76,.2) inset;
+}
+.icon-card:active{transform:translateY(-1px)}
+.icon-card[data-hot="true"]::before{
+  content:"";position:absolute;top:8px;right:8px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--cinn2);box-shadow:0 0 8px var(--cinn2);
+}
+.icon-card[data-pending]::after{
+  content:"修真中";position:absolute;top:8px;right:8px;
+  font-size:9px;color:var(--warn);background:rgba(230,126,34,.1);
+  border:1px solid rgba(230,126,34,.3);border-radius:3px;padding:1px 4px;
+}
+
+.icon-glyph{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;font-family:'Noto Serif SC',serif;font-weight:600;
+  letter-spacing:0;
+}
+.glyph-gold{background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08));color:var(--gold2);border:1px solid rgba(201,168,76,.3)}
+.glyph-jade{background:linear-gradient(135deg,rgba(39,174,96,.22),rgba(39,174,96,.08));color:var(--jade);border:1px solid rgba(39,174,96,.3)}
+.glyph-cyan{background:linear-gradient(135deg,rgba(41,128,185,.22),rgba(41,128,185,.08));color:var(--cyan2);border:1px solid rgba(41,128,185,.3)}
+.glyph-cinn{background:linear-gradient(135deg,rgba(192,57,43,.22),rgba(192,57,43,.08));color:var(--cinn2);border:1px solid rgba(192,57,43,.3)}
+.glyph-violet{background:linear-gradient(135deg,rgba(142,68,173,.22),rgba(142,68,173,.08));color:var(--violet2);border:1px solid rgba(142,68,173,.3)}
+.glyph-steel{background:linear-gradient(135deg,rgba(127,140,141,.22),rgba(127,140,141,.08));color:var(--steel);border:1px solid rgba(127,140,141,.3)}
+
+.icon-name{font-size:14px;color:var(--paper);font-weight:500;letter-spacing:1px;text-align:center}
+.icon-sub{font-size:11px;color:var(--paper3);letter-spacing:.5px;text-align:center;margin-top:-4px}
+
+/* 分组标题 */
+.group-title{
+  display:flex;align-items:center;gap:10px;font-size:13px;color:var(--paper2);
+  font-family:'Noto Serif SC',serif;letter-spacing:2px;
+  padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.12);margin-bottom:6px;
+}
+.group-title .badge{
+  font-size:10px;padding:2px 8px;border-radius:10px;
+  background:rgba(201,168,76,.12);color:var(--gold2);letter-spacing:1px;
+  border:1px solid rgba(201,168,76,.2);
+}
+.group-title .badge.patient{background:rgba(41,128,185,.12);color:var(--cyan2);border-color:rgba(41,128,185,.3)}
+.group-title .badge.doctor{background:rgba(39,174,96,.12);color:var(--jade);border-color:rgba(39,174,96,.3)}
+.group-title .badge.master{background:rgba(142,68,173,.12);color:var(--violet2);border-color:rgba(142,68,173,.3)}
+
+[data-role]:not(.active){display:none}
+
+/* 流程条提示 */
+.flow-hint-hall{
+  font-size:12px;color:var(--paper3);letter-spacing:.5px;
+  padding:10px 14px;border-radius:8px;
+  background:rgba(201,168,76,.04);border:1px dashed rgba(201,168,76,.15);
+  display:flex;align-items:center;gap:10px;
+}
+.flow-hint-hall::before{
+  content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 6px var(--gold);
+}
+
+@media(max-width:768px){
+  .hall{padding:16px 16px 48px;gap:18px}
+  .hall-hero{flex-direction:column;align-items:flex-start;gap:14px;padding:16px}
+  .hall-hero-title{font-size:18px}
+  .hall-hero-stats{gap:14px}
+  .icon-card{padding:18px 10px;min-height:120px}
+  .icon-glyph{width:46px;height:46px;font-size:22px}
+}
+@media(max-width:480px){
+  .role-switch button{padding:6px 10px;font-size:12px}
+  .hall-hero-title{font-size:16px}
+}
+@media print{.icon-card,.role-switch{display:none!important}}
+</style>
 </head>
 <body class="theme-ai">
 <header class="page-header-bar">
   <div class="phb-left">
     <span class="phb-theme-dot"></span>
-    <span class="phb-title">易道智鉴 - 首页</span>
+    <span class="phb-title">命理宝鉴 · 入口大厅</span>
   </div>
-  <a class="phb-back" href="divination-hub.html">← 返回</a>
+  <a class="phb-back" href="integrated-clinic.html">返回问诊台</a>
 </header>
 
-<div class="flow-steps-wrap" style="padding:12px 24px 0">
-<div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择入口</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>浏览功能</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>开始使用</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>享受服务</span></div></div>
-<div class="flow-hint">查看易道智鉴 - 首页，了解功能详情与使用方式。</div>
-</div>
-  <a class="skip-link" href="#main-content">跳到主内容</a>
-<main id="main-content" role="main">
-<div style="position:fixed;top:12px;right:12px;z-index:99998">
-  <a href="clinic-consultation.html"display:inline-block;padding:6px 16px;background:rgba(201,168,76,0.12);color:var(--gold,#c9a84c);border:1px solid rgba(201,168,76,0.25);border-radius:16px;font-size:12px;text-decoration:none;font-family:'Noto Serif SC',serif;letter-spacing:1px">医 中医诊疗</a>
-</div>
-    <p>正在跳转到<a href="divination-hub.html">易道智鉴主页面</a>...</p>
+<main id="main-content" role="main" class="hall">
+  <div class="hall-hero">
+    <div>
+      <div class="hall-hero-title">三角色入口大厅</div>
+      <div class="hall-hero-sub">患者问诊 / 医生复核 / 命理师断事 · 按角色精准分流</div>
+    </div>
+    <div class="hall-hero-stats" id="hallStats">
+      <div class="hall-hero-stat"><strong id="statKb">—</strong><span>知识条数</span></div>
+      <div class="hall-hero-stat"><strong id="statCases">—</strong><span>已归档</span></div>
+      <div class="hall-hero-stat"><strong id="statMaster">—</strong><span>命理师</span></div>
+    </div>
+  </div>
+
+  <div class="flow-hint-hall">
+    <span>选择左侧角色进入对应工作台；同会话内可随时切换。点击任意功能图标进入。</span>
+  </div>
+
+  <div class="role-switch" role="tablist" aria-label="角色切换">
+    <button id="rolePatient" class="active" data-role-tab="patient" role="tab" aria-selected="true">患者</button>
+    <button id="roleDoctor" data-role-tab="doctor" role="tab" aria-selected="false">医生</button>
+    <button id="roleMaster" data-role-tab="master" role="tab" aria-selected="false">命理师</button>
+    <button id="roleAll" data-role-tab="all" role="tab" aria-selected="false">全部</button>
+  </div>
+
+  <!-- 患者 -->
+  <section data-role="patient" class="active" aria-label="患者入口">
+    <div class="group-title">
+      <span class="badge patient">患者入口</span>
+      <span>看诊 · 排盘 · 问事</span>
+    </div>
+    <div class="icon-grid">
+      <a class="icon-card" data-hot="true" href="integrated-clinic.html" aria-label="综合问诊台">
+        <div class="icon-glyph glyph-gold">诊</div>
+        <div class="icon-name">综合问诊台</div>
+        <div class="icon-sub">采集→AI→复核→EMR</div>
+      </a>
+      <a class="icon-card" href="ai-assistant.html" aria-label="AI 助手">
+        <div class="icon-glyph glyph-gold">AI</div>
+        <div class="icon-name">AI 助手</div>
+        <div class="icon-sub">24+ 模块对话</div>
+      </a>
+      <a class="icon-card" href="tcm-symptom.html" aria-label="症状自查">
+        <div class="icon-glyph glyph-jade">症</div>
+        <div class="icon-name">症状自查</div>
+        <div class="icon-sub">问诊 → 辨证</div>
+      </a>
+      <a class="icon-card" href="camera-capture.html" aria-label="望诊采集">
+        <div class="icon-glyph glyph-jade">望</div>
+        <div class="icon-name">望诊采集</div>
+        <div class="icon-sub">面/舌/体一键拍照</div>
+      </a>
+      <a class="icon-card" href="paipan-center.html" aria-label="排盘中心">
+        <div class="icon-glyph glyph-violet">盘</div>
+        <div class="icon-name">排盘中心</div>
+        <div class="icon-sub">八字/紫微/六壬</div>
+      </a>
+      <a class="icon-card" href="yijing-oracle.html" aria-label="易经起卦">
+        <div class="icon-glyph glyph-violet">卦</div>
+        <div class="icon-name">易经起卦</div>
+        <div class="icon-sub">天/地/人/时四爻</div>
+      </a>
+      <a class="icon-card" href="yijing-qimen.html" aria-label="奇门遁甲">
+        <div class="icon-glyph glyph-violet">奇</div>
+        <div class="icon-name">奇门遁甲</div>
+        <div class="icon-sub">九星八门盘</div>
+      </a>
+      <a class="icon-card" href="divination-almanac.html" aria-label="黄历">
+        <div class="icon-glyph glyph-steel">历</div>
+        <div class="icon-name">黄历</div>
+        <div class="icon-sub">宜忌 · 时辰</div>
+      </a>
+      <a class="icon-card" href="patient-journey.html" aria-label="我的就医记录">
+        <div class="icon-glyph glyph-cyan">录</div>
+        <div class="icon-name">我的就医记录</div>
+        <div class="icon-sub">报告 / 处方 / 复诊</div>
+      </a>
+      <a class="icon-card" href="patient-portal.html" aria-label="患者门户">
+        <div class="icon-glyph glyph-cyan">户</div>
+        <div class="icon-name">患者门户</div>
+        <div class="icon-sub">挂号 / 预约</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 医生 -->
+  <section data-role="doctor" aria-label="医生入口">
+    <div class="group-title">
+      <span class="badge doctor">医生入口</span>
+      <span>复核 · 处方 · 病案归档</span>
+    </div>
+    <div class="icon-grid">
+      <a class="icon-card" data-hot="true" href="doctor-panel.html" aria-label="医生工作台">
+        <div class="icon-glyph glyph-jade">医</div>
+        <div class="icon-name">医生工作台</div>
+        <div class="icon-sub">复核队列 · 采纳即提交</div>
+      </a>
+      <a class="icon-card" href="doctor-consult.html" aria-label="医生会诊">
+        <div class="icon-glyph glyph-jade">会</div>
+        <div class="icon-name">医生会诊</div>
+        <div class="icon-sub">多医生协同</div>
+      </a>
+      <a class="icon-card" href="doctor-intake.html" aria-label="初诊采集">
+        <div class="icon-glyph glyph-jade">采</div>
+        <div class="icon-name">初诊采集</div>
+        <div class="icon-sub">主诉/病史/体征</div>
+      </a>
+      <a class="icon-card" href="doctor-elder.html" aria-label="名老中医">
+        <div class="icon-glyph glyph-violet">老</div>
+        <div class="icon-name">名老中医</div>
+        <div class="icon-sub">经验方检索</div>
+      </a>
+      <a class="icon-card" href="doctor-response.html" aria-label="处方开方">
+        <div class="icon-glyph glyph-jade">方</div>
+        <div class="icon-name">处方开方</div>
+        <div class="icon-sub">辨证 → 组方</div>
+      </a>
+      <a class="icon-card" href="tcm-syndromes.html" aria-label="辨证论治">
+        <div class="icon-glyph glyph-jade">辨</div>
+        <div class="icon-name">辨证论治</div>
+        <div class="icon-sub">八纲/脏腑/六经</div>
+      </a>
+      <a class="icon-card" href="tcm-visual-reference.html" aria-label="舌脉图谱">
+        <div class="icon-glyph glyph-jade">图</div>
+        <div class="icon-name">舌脉图谱</div>
+        <div class="icon-sub">对照辨证</div>
+      </a>
+      <a class="icon-card" href="tcm-clinic.html" aria-label="中医诊所">
+        <div class="icon-glyph glyph-jade">馆</div>
+        <div class="icon-name">中医诊所</div>
+        <div class="icon-sub">患者档案总览</div>
+      </a>
+      <a class="icon-card" href="patient-archive.html" aria-label="患者档案">
+        <div class="icon-glyph glyph-cyan">档</div>
+        <div class="icon-name">患者档案</div>
+        <div class="icon-sub">EMR 历史检索</div>
+      </a>
+      <a class="icon-card" href="tcm-report.html" aria-label="报告中心">
+        <div class="icon-glyph glyph-cyan">报</div>
+        <div class="icon-name">报告中心</div>
+        <div class="icon-sub">中西医报告</div>
+      </a>
+      <a class="icon-card" href="admin.html" aria-label="运营后台">
+        <div class="icon-glyph glyph-steel">管</div>
+        <div class="icon-name">运营后台</div>
+        <div class="icon-sub">医生 / 财务 / 系统</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 命理师 -->
+  <section data-role="master" aria-label="命理师入口">
+    <div class="group-title">
+      <span class="badge master">命理师入口</span>
+      <span>断事 · 排盘 · 复盘</span>
+    </div>
+    <div class="icon-grid">
+      <a class="icon-card" data-hot="true" href="master-workstation.html" aria-label="命理师工作台">
+        <div class="icon-glyph glyph-violet">师</div>
+        <div class="icon-name">命理师工作台</div>
+        <div class="icon-sub">复核队列 · 采纳即归档</div>
+      </a>
+      <a class="icon-card" href="master-intake.html" aria-label="命理采集">
+        <div class="icon-glyph glyph-violet">问</div>
+        <div class="icon-name">命理采集</div>
+        <div class="icon-sub">事项/时辰/背景</div>
+      </a>
+      <a class="icon-card" href="master-class.html" aria-label="分类断事">
+        <div class="icon-glyph glyph-violet">类</div>
+        <div class="icon-name">分类断事</div>
+        <div class="icon-sub">婚恋/事业/健康</div>
+      </a>
+      <a class="icon-card" href="master-review.html" aria-label="复核">
+        <div class="icon-glyph glyph-violet">核</div>
+        <div class="icon-name">复核</div>
+        <div class="icon-sub">采纳 / 修订 / 退回</div>
+      </a>
+      <a class="icon-card" href="master-archive.html" aria-label="命理档案">
+        <div class="icon-glyph glyph-violet">归</div>
+        <div class="icon-name">命理档案</div>
+        <div class="icon-sub">历史盘例归档</div>
+      </a>
+      <a class="icon-card" href="master-elder.html" aria-label="命理名家">
+        <div class="icon-glyph glyph-violet">家</div>
+        <div class="icon-name">命理名家</div>
+        <div class="icon-sub">名家验方检索</div>
+      </a>
+      <a class="icon-card" href="master-disease.html" aria-label="病案合参">
+        <div class="icon-glyph glyph-cinn">参</div>
+        <div class="icon-name">病案合参</div>
+        <div class="icon-sub">命理 × 中医双诊</div>
+      </a>
+      <a class="icon-card" href="master-zidise-illness.html" aria-label="紫微病象">
+        <div class="icon-glyph glyph-violet">紫</div>
+        <div class="icon-name">紫微病象</div>
+        <div class="icon-sub">十二宫 × 疾厄</div>
+      </a>
+      <a class="icon-card" href="divination-knowledge.html" aria-label="知识库">
+        <div class="icon-glyph glyph-gold">库</div>
+        <div class="icon-name">知识库</div>
+        <div class="icon-sub">KB 全量检索</div>
+      </a>
+      <a class="icon-card" href="divination-tools.html" aria-label="命理工具">
+        <div class="icon-glyph glyph-steel">具</div>
+        <div class="icon-name">命理工具</div>
+        <div class="icon-sub">神煞/纳音/万年历</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 全部（合集视图） -->
+  <section data-role="all" aria-label="全部入口">
+    <div class="group-title">
+      <span class="badge">全部入口</span>
+      <span>三角色 + 公共能力</span>
+    </div>
+    <div class="icon-grid" id="allGrid"></div>
+  </section>
+
+  <div class="flow-hint-hall" style="margin-top:24px">
+    <span>返回 <a href="integrated-clinic.html" style="color:var(--gold2);text-decoration:none;border-bottom:1px dashed rgba(201,168,76,.3)">综合问诊台</a> 进入流程驱动模式 · 首页只做入口分流。</span>
+  </div>
+</main>
 
 <script src="js/ui-toast.js" defer></script>
-  <script src="js/a11y-divination-hub.js" defer></script>
-  
-</main>
-<script src="js/mobile-nav.js" defer></script>
-
-<style>
-/* R98-k 480+360 紧凑断点 */
-@media(max-width:480px){
-  body{font-size:13px}
-  .container,.main,.body,.wrap{max-width:100%;padding:8px}
-  h1{font-size:18px}
-  h2{font-size:15px}
-  h3{font-size:13px}
-  .btn{padding:6px 10px;font-size:12px}
-  table{font-size:11px}
-  .row{flex-wrap:wrap;gap:4px}
-}
-@media(max-width:360px){
-  body{font-size:12px}
-  .container,.main,.body,.wrap{padding:6px}
-  h1{font-size:16px}
-  h2{font-size:14px}
-  h3{font-size:12px}
-  .btn{padding:5px 8px;font-size:11px;width:100%}
-  table{font-size:10px}
-  .nav-bar a{padding:4px 6px;font-size:11px}
-  .row{flex-direction:column;align-items:flex-start}
-}
-</style>
-
-<style>
-/* R98-k 480+360 紧凑断点 */
-@media(max-width:480px){
-  body{font-size:13px}
-  .container,.main,.body,.wrap{max-width:100%;padding:8px}
-  h1{font-size:18px}
-  h2{font-size:15px}
-  h3{font-size:13px}
-  .btn{padding:6px 10px;font-size:12px}
-  table{font-size:11px}
-  .row{flex-wrap:wrap;gap:4px}
-}
-@media(max-width:360px){
-  body{font-size:12px}
-  .container,.main,.body,.wrap{padding:6px}
-  h1{font-size:16px}
-  h2{font-size:14px}
-  h3{font-size:12px}
-  .btn{padding:5px 8px;font-size:11px;width:100%}
-  table{font-size:10px}
-  .nav-bar a{padding:4px 6px;font-size:11px}
-  .row{flex-direction:column;align-items:flex-start}
-}
-</style>
-<footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">易道智鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
-  <script src="js/i18n.js?v=708i" defer></script>
+<script src="js/mobile-nav.js" defer></script>
+<script src="js/i18n.js?v=708i" defer></script>
+<script>
+// ═══ 角色切换 ═══
+(function(){
+  function init(){
+    const tabs = document.querySelectorAll('.role-switch button');
+    const sections = document.querySelectorAll('[data-role]');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const role = tab.dataset.roleTab;
+        tabs.forEach(t => {
+          const on = t === tab;
+          t.classList.toggle('active', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        sections.forEach(s => {
+          s.classList.toggle('active', s.dataset.role === role);
+        });
+        try{ sessionStorage.setItem('hall.role', role); }catch(_){}
+      });
+    });
+    // 恢复上次角色（等 DOM 就绪后触发）
+    try{
+      const last = sessionStorage.getItem('hall.role') || 'patient';
+      const target = document.querySelector('[data-role-tab="'+last+'"]');
+      if(target){ setTimeout(() => target.click(), 0); }
+    }catch(_){}
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+
+// ═══ 拉取公开统计（异步降级） ═══
+(function(){
+  const $kb = document.getElementById('statKb');
+  const $cs = document.getElementById('statCases');
+  const $mt = document.getElementById('statMaster');
+  fetch('/api/public/stats', { credentials: 'omit' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      if(!d) return;
+      if(typeof d.kb_total !== 'undefined') $kb.textContent = d.kb_total;
+      if(typeof d.cases_total !== 'undefined') $cs.textContent = d.cases_total;
+      if(typeof d.masters_total !== 'undefined') $mt.textContent = d.masters_total;
+    })
+    .catch(() => {/* 静默降级，统计留默认 */});
+})();
+
+// ═══ "全部"视图：拼接所有角色功能卡 ═══
+(function(){
+  function buildAll(){
+    const all = document.getElementById('allGrid');
+    if(!all) return;
+    document.querySelectorAll('[data-role]:not([data-role="all"])').forEach(sec => {
+      sec.querySelectorAll('.icon-card').forEach(c => {
+        all.appendChild(c.cloneNode(true));
+      });
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', buildAll);
+  } else { buildAll(); }
+})();
+</script>
+
+<style>
+/* 紧凑断点 */
+@media(max-width:480px){
+  body{font-size:13px}
+  .hall{padding:12px 12px 48px}
+  .hall-hero-title{font-size:16px}
+  .icon-card{padding:16px 8px;min-height:110px}
+  .icon-glyph{width:42px;height:42px;font-size:20px}
+  .icon-name{font-size:13px}
+  .icon-sub{font-size:10px}
+}
+@media(max-width:360px){
+  .hall-hero{padding:14px}
+  .role-switch button{padding:5px 8px;font-size:11px}
+  .icon-grid{gap:8px}
+  .icon-card{padding:14px 6px;min-height:100px}
+}
+@media print{
+  .icon-card,.role-switch,.hall-hero-stats{display:none!important}
+}
+</style>
+
+<footer style="text-align:center;padding:14px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 入口大厅 · 三角色精准分流</footer>
+</body>
 </html>

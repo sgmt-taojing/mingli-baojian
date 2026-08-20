@@ -3,71 +3,238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>全站导航 · 易道智鉴</title>
+<title>命理宝鉴 · 站点导航</title>
 <style>
+:root{--bg:#0c0e12;--surface:#161a22;--surface2:#1e2330;--text:#e2e8f0;--muted:#64748b;--gold:#c9a84c;--gold2:#e8cc7a;--accent:#38bdf8;--border:#2a3040;--radius:8px}
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b1020;color:#e8eefc;font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:26px 16px;max-width:1060px;margin:0 auto;line-height:1.6}
-h1{font-size:22px;color:#e8c87a;text-align:center;letter-spacing:3px;margin-bottom:4px}
-.sub{text-align:center;color:#7a8aab;font-size:12.5px;margin-bottom:20px}
-.search{position:sticky;top:0;background:#0b1020;padding:12px 0;z-index:9}
-.search input{width:100%;max-width:640px;display:block;margin:0 auto;padding:13px 20px;border-radius:26px;border:1.5px solid rgba(232,200,122,.4);background:#101a2e;color:#e8eefc;font-size:15px;outline:none}
-.search input:focus{border-color:#e8c87a}
-.search .cnt{text-align:center;color:#5e6f94;font-size:12px;margin-top:6px}
-.group-title{color:#4da3ff;font-size:15px;font-weight:700;margin:22px 4px 8px;letter-spacing:1px;display:flex;align-items:center;gap:8px}
-.group-title .n{background:rgba(77,163,255,.15);padding:1px 10px;border-radius:10px;font-size:11px;color:#9dc8ff}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
-.card{background:#101a2e;border:1px solid rgba(120,160,255,.16);border-radius:10px;padding:9px 13px;display:flex;justify-content:space-between;align-items:center;gap:8px;text-decoration:none;transition:border-color .15s}
-.card:hover{border-color:#e8c87a}
-.card .t{color:#e8eefc;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .f{color:#5e6f94;font-size:10.5px;flex:none}
-.empty{text-align:center;color:#5e6f94;padding:30px;display:none}
-.kw{color:#8fa2c9;font-size:10.5px;margin-left:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:none;max-width:110px}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(12,14,18,0.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-size:18px;font-weight:700;color:var(--gold);letter-spacing:2px;white-space:nowrap}
+.sub{font-size:11px;color:var(--muted)}
+.search{flex:1;min-width:180px;max-width:340px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 14px;border-radius:20px;font-size:13px;outline:none}
+.search:focus{border-color:var(--accent)}
+.role-tabs{display:flex;gap:5px;flex-wrap:wrap}
+.role-tab{padding:5px 12px;border-radius:14px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:all .2s;white-space:nowrap}
+.role-tab:hover{border-color:var(--gold);color:var(--gold2)}
+.role-tab.active{background:rgba(201,168,76,0.12);border-color:var(--gold);color:var(--gold)}
+.main{max-width:1200px;margin:0 auto;padding:20px 24px}
+.role-intro{font-size:12px;color:var(--muted);margin-bottom:16px;padding:10px 14px;background:var(--surface);border-radius:var(--radius);border-left:3px solid var(--gold)}
+.section{margin-bottom:22px}
+.section-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--gold);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.section-title .count{margin-left:auto;font-size:10px;color:var(--muted);font-weight:400}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
+.item{display:flex;flex-direction:column;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-decoration:none;transition:all .2s}
+.item:hover{border-color:var(--accent);background:var(--surface2);transform:translateY(-1px)}
+.item-name{font-size:12px;color:var(--text);font-weight:500;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-url{font-size:10px;color:var(--muted);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item:hover .item-name{color:var(--accent)}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+.badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:8px;background:rgba(56,189,248,0.12);color:var(--accent);margin-left:6px;vertical-align:middle}
 </style>
 </head>
 <body>
-<h1>全站导航</h1>
-<div class="sub">178 个页面 · 搜索即达 · 分组浏览</div>
 
-<div class="search">
-  <input id="q" type="text" placeholder="搜索页面，如：排盘、知识库、商城、视觉…" autofocus>
-  <div class="cnt" id="cnt"></div>
+<div class="topbar">
+  <div>
+    <div class="brand">命理宝鉴 <span class="sub">按角色导航</span></div>
+  </div>
+  <input class="search" id="search" placeholder="🔍 搜索页面..." />
+  <div class="role-tabs" id="roleTabs"></div>
 </div>
-<div class="empty" id="empty">没有匹配的页面</div>
-<div id="groups"></div>
+
+<div class="main">
+  <div id="recent" style="display:none;margin-bottom:18px"></div>
+  <div id="content"></div>
+</div>
 
 <script>
-var INDEX = null;
-fetch('data/site-index.json').then(function(r){return r.json()}).then(function(d){
-  INDEX = d;
-  render('');
-  document.getElementById('cnt').textContent = '共 ' + d.length + ' 页';
-}).catch(function(){ document.getElementById('groups').innerHTML = '<div class="empty" style="display:block">索引加载失败（需经 8900 静态服务访问）</div>'; });
+const P = (n,u) => ({n,u});
+const ROLES = {
+"求测者": {
+  intro: "排盘 · 运势 · 问事 · 报告解读 · 个人中心（无需医学背景，来问命理财事的用户）",
+  sections: [
+    { title:"命理排盘", pages:[
+      P("八字排盘","bazi.html"),P("紫微斗数","ziwei.html"),P("紫微命盘","ziwei-mingli.html"),P("紫微图表","ziwei-chart.html"),P("六爻排盘","liuyao-chart.html"),P("奇门遁甲","qimen-chart.html"),P("奇门易经盘","yijing-qimen.html"),P("梅花易数","meihua-chart.html"),P("六壬排盘","liuren-chart.html"),P("易经占卜","yijing-oracle.html"),P("风水诊断","fengshui.html"),P("风水图表","fengshui-chart.html"),P("面相分析","yanzhi.html"),P("排盘中心","paipan-center.html"),
+    ]},
+    { title:"民俗·信仰·起名", pages:[
+      P("黄历每日","huangli-daily.html"),P("民俗门户","folklore-portal.html"),P("民俗中心","minsu-center.html"),P("起名服务","naming-portal.html"),P("修行参学","practice-portal.html"),P("功德系统","merit-system.html"),P("口诀库","koujue-gallery.html"),P("占卜","zhanbu.html"),
+    ]},
+    { title:"AI 助手·运势报告", pages:[
+      P("AI 命理助手","ai-assistant.html"),P("实时助手","realtime-assistant.html"),P("语音咨询","voice-consult.html"),P("流年报告","lifeflow-report.html"),P("流年时间轴","lifeflow-timeline.html"),P("命格指数","lifeindex-detail.html"),P("人生规划","lifeplan-detail.html"),P("青年规划","youthplan-detail.html"),P("每月运势","monthly-report.html"),P("音乐疗愈","music-detail.html"),P("每日摘要","daily-summary.html"),P("健康预测","health-forecast.html"),
+    ]},
+    { title:"报告解读", pages:[
+      P("报告解读中心","report-interpret.html"),P("报告中心","reports-hub.html"),P("报告样例·八字","report-sample-bazi.html"),
+    ]},
+    { title:"个人中心·消费", pages:[
+      P("我的元助","my-yuanzhu.html"),P("元助收件箱","yuanzhu-inbox.html"),P("每日推送","personal-push.html"),P("激活/续费","activate.html"),P("会员体系","divination-membership.html"),P("服务套餐","shop.html"),P("命理商城","divination-shop.html"),P("订单","order.html"),P("订单中心","order-center.html"),P("个人档案","person-dashboard.html"),P("身份管理","person-center.html"),P("分享中心","share-center.html"),
+    ]},
+  ]
+},
+"患者": {
+  intro: "症状咨询 · 照片采集 · AI 初诊 · 医生复核闭环 · 健康管理（来看中医的用户）",
+  sections: [
+    { title:"问诊入口", pages:[
+      P("中医门户","tcm-portal.html"),P("综合问诊台","integrated-clinic.html"),P("AI 实时诊疗一体化","unified-consultation.html"),P("中医诊所","tcm-clinic.html"),P("症状分析","tcm-symptom.html"),P("体质辨识","tizhi.html"),P("证型索引","tcm-syndromes.html"),P("居家诊疗","home-care.html"),
+    ]},
+    { title:"采集·诊断", pages:[
+      P("摄像头采集","camera-capture.html"),P("视频采集","video-capture.html"),P("移动采集","mobile-capture.html"),P("视觉互动","mobile-interact.html"),P("体检报告 OCR","report-ocr.html"),P("OCR 历史","ocr-history.html"),P("医保人脸核对","medicare-face-check.html"),P("统一诊疗中心","unified-diagnosis.html"),P("多源实时诊断","multi-source-diagnosis.html"),P("四方协作诊断","collab-diagnosis.html"),P("全闭环顾问","closed-loop-advisor.html"),
+    ]},
+    { title:"我的档案", pages:[
+      P("患者门户","patient-portal.html"),P("患者档案","patient-archive.html"),P("患者信息采集","patient-intake.html"),P("患者旅程","patient-journey.html"),P("患者报告","patient-report.html"),
+    ]},
+    { title:"健康管理", pages:[
+      P("养生指南","wellness-guide.html"),P("健康追踪","wellness-track.html"),P("健康周报","wellness-weekly.html"),P("健康事业双核","health-career-dashboard.html"),P("穿戴设备","wearable-hub.html"),P("SOS 急救","sos.html"),P("应急联系","emergency-contacts.html"),
+    ]},
+  ]
+},
+"医生": {
+  intro: "接诊 · 四诊合参 · 名医复核 · 临床工作站（坐堂医生与名师）",
+  sections: [
+    { title:"临床工作台", pages:[
+      P("医生面板","doctor-panel.html"),P("问诊录入","doctor-intake.html"),P("医生咨询","doctor-consult.html"),P("医生响应","doctor-response.html"),P("老年医护","doctor-elder.html"),P("中医电子病历","tcm-report.html"),P("门诊问诊","clinic-consultation.html"),
+    ]},
+    { title:"名医复核闭环", pages:[
+      P("大师工作站","master-workstation.html"),P("大师复核","master-review.html"),P("大师问诊","master-intake.html"),P("大师端·老年版","master-elder.html"),P("名师列表","masters.html"),P("紫微断疾病·大师","master-zidise-illness.html"),P("名师病案","master-disease.html"),P("名师档案库","master-archive.html"),P("命理档案审核","mingli-review.html"),
+    ]},
+    { title:"望诊·视觉", pages:[
+      P("望诊中心","wangzhen-center.html"),P("望诊临床","wangzhen-clinical.html"),P("望诊知识库","wangzhen-kb.html"),P("四诊视觉参考","tcm-visual-reference.html"),
+    ]},
+  ]
+},
+"运营管理": {
+  intro: "KB 运营 · 用户/订单/工单 · 推送/元助/眼镜 · 商户（平台内部运营人员）",
+  sections: [
+    { title:"后台主入口", pages:[
+      P("管理后台","admin.html"),P("管理总览","admin/dashboard.html"),P("管理员登录","admin-login.html"),P("登录","login.html"),
+    ]},
+    { title:"KB 运营", pages:[
+      P("KB 管理面板","admin-kb-panel.html"),P("KB 批量管理","admin-kb-batch.html"),P("KB 浏览中心","kb-browser.html"),P("材料探索台","kb-explore-submit.html"),P("蒸馏缓存状态","distill-cache-status.html"),
+    ]},
+    { title:"用户·订单·工单", pages:[
+      P("工单系统","admin-tickets.html"),P("用户画像蒸馏","admin-profile-distill.html"),P("神店管理","admin-shop.html"),P("通知管理","admin-notify.html"),P("商户看板","merchant-dashboard.html"),P("商户申请","merchant-apply.html"),P("反馈中心","feedback-center.html"),P("反馈详情","feedback-detail.html"),P("站内消息","im.html"),
+    ]},
+    { title:"推送·元助·眼镜", pages:[
+      P("玻璃智镜控制台","glass-console.html"),P("玻璃智镜看板","admin-glass-dashboard.html"),P("玻璃历史","glass-history.html"),P("玻璃审批","admin/glass-approve.html"),P("元助看板","admin/yuanzhu-dashboard.html"),P("缘主档案","yuanzhu-dashboard.html"),P("IM 监控","admin/im-monitor.html"),P("KB 命中看板","admin/kb-hit-dashboard.html"),
+    ]},
+    { title:"安全·配置", pages:[
+      P("数据安全导出","export-guard.html"),P("配置中心","config-center.html"),P("隐私中心","privacy-center.html"),P("报告模块配置","report-config.html"),
+    ]},
+  ]
+},
+"技术运维": {
+  intro: "KB 深度审计 · 训练评估 · 服务监控 · 设备（研发与运维）",
+  sections: [
+    { title:"监控总览", pages:[
+      P("监控总览（跨项目）","monitor-hub.html"),P("监控看板","monitor-dashboard.html"),P("运维门户","monitor-portal.html"),P("健康监测","health-monitor.html"),P("仪表板","dashboard.html"),P("平台总览","platform-overview.html"),P("NN 看板","nn-dashboard.html"),P("视觉引擎健康","vision-engine-health.html"),
+    ]},
+    { title:"KB 深度审计", pages:[
+      P("KB 审计","kb-audit.html"),P("KB 质量","kb-quality.html"),P("KB 覆盖","kb-coverage.html"),P("KB 增长","kb-growth.html"),P("KB 热度","kb-hot.html"),P("KB 模块健康","kb-module-health.html"),P("KB 命中仪表盘","kb-hit-dashboard.html"),P("KB 对比","kb-compare.html"),P("KB 骨架","kb-skeleton.html"),P("知识图谱","kb-graph.html"),P("KB 图谱 R68","kb-graph-r68.html"),P("知识库浏览器","kb-explorer.html"),P("知识面板","knowledge-panel.html"),
+    ]},
+    { title:"训练与评估", pages:[
+      P("评估看板","eval-dashboard.html"),P("训练素材采集","training-collect.html"),P("AI 部署中心","ai-deployment-center.html"),P("AI 引擎配置","ai-engine-config.html"),
+    ]},
+    { title:"设备", pages:[
+      P("设备运维中心","device-management.html"),P("设备诊断","device-diagnostic.html"),P("设备审计轮次","device-audit-rounds.html"),
+    ]},
+  ]
+},
+"知识学习": {
+  intro: "倪师 · 舒晗 · 易学知识 · 课程检索（学习者与研究者）",
+  sections: [
+    { title:"倪海厦体系", pages:[
+      P("倪师知识库","nihaisha-knowledge.html"),P("倪师课程检索","nihaisha-tool.html"),P("倪师学习中心","nihaisha-learning.html"),
+    ]},
+    { title:"其他知识库", pages:[
+      P("舒晗奇门知识库","shuhan-knowledge.html"),P("易学知识库","divination-knowledge.html"),P("命理思维导图","mindmap.html"),P("大师讲堂","master-class.html"),
+    ]},
+    { title:"微信矩阵", pages:[
+      P("微信 H5","wechat-h5.html"),P("微信入口","wechat-hub.html"),P("微信案例模板","wechat-cases.html"),P("微信免责声明","wechat-disclaimer.html"),
+    ]},
+  ]
+},
+"全部": {
+  intro: "全部页面一览（含站点、废弃页）",
+  sections: [
+    { title:"站点", pages:[
+      P("首页","../index.html"),P("全球首页","index-global.html"),P("站点导航","site-nav.html"),P("免责声明","disclaimer.html"),P("离线页","offline.html"),P("API 文档","api-docs.html"),P("易学推演综合","divination-integrated.html"),P("命理中心","divination-hub.html"),P("命理工具","divination-tools.html"),P("命理年历","divination-almanac.html"),P("命理知识","divination-knowledge.html"),P("知识面板","knowledge-panel.html"),
+    ]},
+    { title:"演示·测试·废弃", pages:[
+      P("组件示例","components/demo.html"),P("组件 Demo","components-demo.html"),P("实时 Demo","demo-realtime.html"),P("设备测试","device-test.html"),P("视觉 Demo","vision-demo.html"),P("解析测试","test-parse-natural.html"),P("Rokid 测试","rokid-test.html"),P("重命名工具","rename.html"),P("清缓存","clear-cache.html"),
+    ]},
+  ]
+},
+};
 
-function render(q){
-  q = (q||'').trim().toLowerCase();
-  var groups = {};
-  var total = 0;
-  INDEX.forEach(function(p){
-    var hay = (p.title + ' ' + (p.kws||[]).join(' ') + ' ' + p.file).toLowerCase();
-    if(q && hay.indexOf(q) < 0) return;
-    total++;
-    (groups[p.group] = groups[p.group] || []).push(p);
-  });
-  var g = document.getElementById('groups');
-  var keys = Object.keys(groups).sort(function(a,b){return groups[b].length - groups[a].length});
-  g.innerHTML = keys.map(function(k){
-    var cards = groups[k].map(function(p){
-      var kw = (p.kws||[]).slice(0,2).join(' · ');
-      return '<a class="card" href="'+p.file+'" target="_blank"><span class="t">'+p.title+'</span><span class="kw">'+kw+'</span><span class="f">'+p.file+'</span></a>';
-    }).join('');
-    return '<div class="group-title">'+k+' <span class="n">'+groups[k].length+'</span></div><div class="cards">'+cards+'</div>';
-  }).join('');
-  document.getElementById('cnt').textContent = q ? ('匹配 ' + total + ' 页') : ('共 ' + INDEX.length + ' 页');
-  document.getElementById('empty').style.display = (total === 0 && q) ? 'block' : 'none';
+const ROLE_LIST = Object.keys(ROLES);
+let activeRole = localStorage.getItem("nav-role") || ROLE_LIST[0];
+
+function renderRecent(){
+  const h = JSON.parse(localStorage.getItem("nav-history")||"[]");
+  const el = document.getElementById("recent");
+  if(!h.length){el.style.display="none";return;}
+  el.style.display="block";
+  el.innerHTML = `<div class="role-intro" style="padding:8px 14px;margin-bottom:12px"><b>最近访问</b> · ${h.length} 个页面 <span style="margin-left:auto;cursor:pointer;color:var(--muted)" onclick="localStorage.removeItem('nav-history');renderRecent();render()">[清空]</span></div><div class="grid" style="margin-bottom:14px">` +
+    h.map(p => `<a class="item" href="${p.u}"><div class="item-name">${p.n}</div><div class="item-url">${p.u}</div></a>`).join("") +
+    `</div>`;
 }
-document.getElementById('q').addEventListener('input', function(){ render(this.value); });
-document.addEventListener('keydown', function(e){
-  if(e.key === '/' && document.activeElement.tagName !== 'INPUT'){ e.preventDefault(); document.getElementById('q').focus(); }
+
+function render(){
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  document.getElementById("roleTabs").innerHTML = ROLE_LIST.map(r =>
+    `<button class="role-tab${r===activeRole?" active":""}" data-r="${r}">${r}</button>`
+  ).join("");
+  document.querySelectorAll(".role-tab").forEach(btn=>{
+    btn.onclick=()=>{activeRole=btn.dataset.r;localStorage.setItem("nav-role",activeRole);render();};
+  });
+
+  const role = ROLES[activeRole];
+  let flat=[]; role.sections.forEach(s=>flat=flat.concat(s.pages));
+
+  let html = `<div class="role-intro"><b>${activeRole}</b> · ${role.intro} · 共 ${flat.length} 页</div>`;
+  let shown=0;
+  role.sections.forEach(sec=>{
+    let items = sec.pages;
+    if(q) items = items.filter(p=>p.n.toLowerCase().includes(q)||p.u.toLowerCase().includes(q));
+    if(!items.length) return;
+    shown+=items.length;
+    html += `<div class="section"><div class="section-title">${sec.title}<span class="count">${items.length} 页</span></div><div class="grid">` +
+      items.map(p=>`<a class="item" href="${p.u}" title="${p.u}"><div class="item-name">${p.n}</div><div class="item-url">${p.u}</div></a>`).join("") +
+      `</div></div>`;
+  });
+  document.getElementById("content").innerHTML = html || `<div class="empty">没有匹配的页面</div>`;
+}
+// === 最近访问 ===
+function recordVisit(p){
+  let h = JSON.parse(localStorage.getItem("nav-history") || "[]");
+  h = h.filter(x => x.u !== p.u);
+  h.unshift({n:p.n, u:p.u, t:Date.now()});
+  h = h.slice(0,8);
+  localStorage.setItem("nav-history", JSON.stringify(h));
+}
+const _origRender = render;
+render = function(){
+  renderRecent();
+  _origRender();
+  // 绑定 item 点击 → 记录
+  document.querySelectorAll(".item").forEach(a => {
+    a.addEventListener("click", () => {
+      recordVisit({n:a.querySelector(".item-name").textContent, u:a.getAttribute("href")});
+    });
+  });
+};
+render();
+
+// === ⌘K / Ctrl+K 全局搜索框聚焦 ===
+document.addEventListener("keydown", e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+    e.preventDefault();
+    document.getElementById("search").focus();
+    document.getElementById("search").select();
+  }
+  if (e.key === "Escape" && document.activeElement.id === "search") {
+    document.getElementById("search").value = "";
+    render();
+  }
 });
 </script>
 </body>

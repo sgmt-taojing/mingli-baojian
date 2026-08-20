@@ -1,5 +1,5 @@
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'})}
-// console.warn("易道智鉴 - 快捷栏版");
+// console.warn("命理宝鉴 - 快捷栏版");
 // === 微信环境检测与适配 ===
 function detectWechat(){
   let ua=navigator.userAgent.toLowerCase();

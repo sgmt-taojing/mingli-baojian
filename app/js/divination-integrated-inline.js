@@ -1399,7 +1399,7 @@ function shareCheckin(){
   const data=JSON.parse(localStorage.getItem('checkinData')||'{}')[today];
   if(!data) {showToast('今日尚未打卡');return;}
   const streak=calcStreak(data?{[today]:data}:{});
-  const text=`🧘 今日养生打卡\n📅 ${today}\n🌅 起床：${data.wakeup||'未记录'}\n🍽️ 三餐：${data.breakfast||'未记'} | ${data.lunch||'未记'} | ${data.dinner||'未记'}\n💧 喝水：${data.water||'未记'}\n👟 步行：${data.steps||'未记'}\n🧘 冥想：${data.meditation||'未记'}\n🏆 连续打卡：${streak}天\n——来自 易道智鉴`;
+  const text=`🧘 今日养生打卡\n📅 ${today}\n🌅 起床：${data.wakeup||'未记录'}\n🍽️ 三餐：${data.breakfast||'未记'} | ${data.lunch||'未记'} | ${data.dinner||'未记'}\n💧 喝水：${data.water||'未记'}\n👟 步行：${data.steps||'未记'}\n🧘 冥想：${data.meditation||'未记'}\n🏆 连续打卡：${streak}天\n——来自 命理宝鉴`;
   navigator.clipboard?.writeText(text).then(()=>showToast('📋 已复制到剪贴板，长按分享')).catch(()=>showToast('请手动复制打卡内容'));
 }
 

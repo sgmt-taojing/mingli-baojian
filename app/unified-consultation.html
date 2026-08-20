@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color"="#0a1628">
+<title>AI 实时诊疗一体化平台 · 命理宝鉴</title>
+<link rel="icon" href="favicon.svg">
+<style>
+:root{
+  --bg:#0a1628; --surface:#111d33; --card:rgba(255,255,255,.04);
+  --gold:#c9a84c; --gold2:#e3c97a; --jade:#10b981; --red:#ef4444;
+  --cyan:#38bdf8; --violet:#8b5cf6; --amber:#f59e0b;
+  --paper:#e0d8c8; --muted:#7a8a9e; --border:rgba(201,168,76,.15);
+  --patient:#38bdf8; --doctor:#10b981; --master:#c9a84c; --ai:#8b5cf6;
+  --radius:12px; --gap:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--paper);min-height:100vh;line-height:1.5}
+
+/* ═══ Topbar ═══ */
+.topbar{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:14px;backdrop-filter:blur(10px);flex-wrap:wrap}
+.back{color:var(--muted);text-decoration:none;font-size:13px;padding:5px 12px;border:1px solid var(--border);border-radius:8px;transition:.2s}
+.back:hover{border-color:var(--gold);color:var(--gold)}
+.logo{font-size:16px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:8px}
+.logo .dot{width:8px;height:8px;border-radius:50%;background:var(--jade);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.meta{font-size:11px;color:var(--muted);letter-spacing:1px}
+
+/* ═══ 角色切换 ═══ */
+.role-bar{margin-left:auto;display:flex;gap:4px;align-items:center}
+.role-bar .label{font-size:10px;color:var(--muted);margin-right:4px;letter-spacing:1px}
+.role-btn{padding:5px 12px;border:1px solid var(--border);border-radius:14px;background:transparent;color:var(--muted);font-size:11px;cursor:pointer;font-family:inherit;transition:.2s;display:flex;align-items:center;gap:4px}
+.role-btn:hover{color:var(--paper)}
+.role-btn[data-role="patient"].active{border-color:var(--patient);background:rgba(56,189,248,.1);color:var(--patient)}
+.role-btn[data-role="doctor"].active{border-color:var(--doctor);background:rgba(16,185,129,.1);color:var(--doctor)}
+.role-btn[data-role="master"].active{border-color:var(--master);background:rgba(201,168,76,.1);color:var(--master)}
+
+/* ═══ 状态指示器 ═══ */
+.session-info{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin-left:8px}
+.session-info .stat{display:flex;align-items:center;gap:4px}
+.session-info .dot{width:6px;height:6px;border-radius:50%;background:var(--muted)}
+.session-info .dot.active{background:var(--jade);box-shadow:0 0 6px var(--jade)}
+.session-info .dot.warn{background:var(--amber)}
+.session-info .dot.err{background:var(--red)}
+
+/* ═══ 主布局：三栏 + 底部EMR ═══ */
+.main-container{max-width:1600px;margin:0 auto;padding:16px 20px}
+.grid-tri{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap);margin-bottom:var(--gap)}
+@media(max-width:1100px){.grid-tri{grid-template-columns:1fr}}
+
+/* ═══ Card ═══ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;transition:.2s}
+.card h3{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card h3 .icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.card h3 .icon.cam{background:rgba(56,189,248,.12);color:var(--cyan)}
+.card h3 .icon.voice{background:rgba(16,185,129,.12);color:var(--jade)}
+.card h3 .icon.kb{background:rgba(139,92,246,.12);color:var(--violet)}
+.card h3 .label{margin-left:auto;font-size:10px;color:var(--muted);letter-spacing:1px}
+
+/* ═══ 摄像头面板 ═══ */
+.cam-stage{width:100%;aspect-ratio:4/3;background:#000;border-radius:8px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.cam-stage video{width:100%;height:100%;object-fit:cover;display:none}
+.cam-stage video.live{display:block}
+.cam-placeholder{text-align:center;color:var(--muted);font-size:12px}
+.cam-placeholder .ic{font-size:32px;margin-bottom:6px;display:block;opacity:.4}
+.cam-stage .live-tag{position:absolute;top:8px;left:8px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;display:none;letter-spacing:1px}
+.cam-stage .live-tag.live{display:block;animation:pulse 1s infinite}
+.cam-stage .quality{position:absolute;top:8px;right:8px;font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,.6);color:var(--paper)}
+.cam-stage .quality.ok{color:var(--jade)}
+.cam-stage .quality.fail{color:var(--red)}
+
+.cam-controls{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.btn{padding:8px 14px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:.15s;font-family:inherit;display:inline-flex;align-items:center;gap:4px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--gold);color:#0a1628}
+.btn.primary:hover{background:var(--gold2)}
+.btn.cyan{background:rgba(56,189,248,.15);color:var(--cyan);border:1px solid rgba(56,189,248,.3)}
+.btn.cyan:hover{background:rgba(56,189,248,.25)}
+.btn.green{background:rgba(16,185,129,.15);color:var(--jade);border:1px solid rgba(16,185,129,.3)}
+.btn.green:hover{background:rgba(16,185,129,.25)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn.ghost:hover{color:var(--paper);border-color:var(--gold)}
+.btn.sm{padding:5px 10px;font-size:11px}
+.btn.recording{background:var(--red);color:#fff;animation:pulse 1s infinite}
+
+.vision-result{margin-top:10px;padding:8px;background:rgba(0,0,0,.2);border-radius:6px;font-size:11px;line-height:1.6;max-height:120px;overflow-y:auto}
+.vision-result .feat{display:inline-block;padding:2px 6px;margin:2px;background:rgba(201,168,76,.1);color:var(--gold);border-radius:3px;font-size:10px}
+.vision-result .match{padding:6px;margin:4px 0;background:rgba(0,0,0,.2);border-left:2px solid var(--gold);border-radius:4px}
+.vision-result .match-title{color:var(--gold);font-weight:600;font-size:11px}
+.vision-result .match-content{color:var(--muted);font-size:10px;margin-top:2px}
+
+/* ═══ 语音面板 ═══ */
+.voice-controls{display:flex;gap:6px;margin-bottom:8px}
+.voice-state{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.voice-state .ind{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.voice-state.listening .ind{background:var(--jade);animation:pulse 1s infinite}
+.voice-state.error .ind{background:var(--red)}
+.transcript{background:rgba(0,0,0,.2);border-radius:6px;padding:8px;min-height:100px;max-height:180px;overflow-y:auto;font-size:12px;line-height:1.6}
+.transcript .final{color:var(--paper);margin:2px 0}
+.transcript .interim{color:var(--muted);font-style:italic;margin:2px 0}
+.transcript .empty{color:var(--muted);text-align:center;padding:20px;font-size:11px}
+
+/* ═══ KB 面板 ═══ */
+.kb-search{display:flex;gap:4px;margin-bottom:8px}
+.kb-search input{flex:1;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--paper);font-size:12px;font-family:inherit}
+.kb-search input:focus{outline:none;border-color:var(--violet)}
+.kb-tier{font-size:10px;padding:2px 8px;border-radius:10px;letter-spacing:1px;margin-bottom:8px;display:inline-block}
+.kb-tier.tier1{background:rgba(16,185,129,.15);color:var(--jade)}
+.kb-tier.tier2{background:rgba(245,158,11,.15);color:var(--amber)}
+.kb-tier.tier3{background:rgba(139,92,246,.15);color:var(--violet)}
+.kb-results{max-height:140px;overflow-y:auto}
+.kb-item{padding:6px;margin-bottom:4px;background:rgba(0,0,0,.2);border-radius:4px;border-left:2px solid var(--violet);font-size:11px;line-height:1.5}
+.kb-item .title{color:var(--violet);font-weight:600;font-size:11px}
+.kb-item .score{color:var(--gold);font-size:10px;margin-left:4px}
+.kb-item .content{color:var(--muted);margin-top:2px}
+.kb-empty{color:var(--muted);text-align:center;padding:16px;font-size:11px}
+
+/* ═══ EMR 底部面板 ═══ */
+.emr-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:var(--gap)}
+.emr-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.emr-header h2{font-size:15px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.emr-header h2 .badge{font-size:10px;padding:2px 8px;background:rgba(16,185,129,.15);color:var(--jade);border-radius:10px;font-weight:600;letter-spacing:1px}
+.emr-header h2 .badge.pending{background:rgba(245,158,11,.15);color:var(--amber)}
+.emr-header h2 .badge.approved{background:rgba(16,185,129,.15);color:var(--jade)}
+.emr-header h2 .badge.rejected{background:rgba(239,68,68,.15);color:var(--red)}
+.emr-actions{display:flex;gap:6px;flex-wrap:wrap}
+.emr-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media(max-width:1100px){.emr-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.emr-grid{grid-template-columns:1fr}}
+.emr-field{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.emr-field-label{font-size:10px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;font-weight:600}
+.emr-field-content{font-size:12px;line-height:1.6;color:var(--paper);min-height:30px;word-break:break-word}
+.emr-field-content.empty{color:var(--muted);font-style:italic;font-size:11px}
+.emr-field.complaint{grid-column:span 2}
+.emr-field.examination{grid-column:span 3}
+@media(max-width:1100px){.emr-field.complaint,.emr-field.examination{grid-column:span 1}}
+
+/* ═══ 审核面板（仅医生/命理师可见） ═══ */
+.review-panel{display:none;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.3);border-radius:var(--radius);padding:14px;margin-top:var(--gap)}
+.review-panel.show{display:block}
+.review-panel h3{font-size:13px;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.review-panel .form-group{margin-bottom:8px}
+.review-panel label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.review-panel textarea{width:100%;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--paper);font-size:12px;font-family:inherit;resize:vertical;min-height:50px}
+.review-panel textarea:focus{outline:none;border-color:var(--gold)}
+.review-panel .review-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+
+/* ═══ 历史记录 ═══ */
+.history{max-height:100px;overflow-y:auto;margin-top:8px}
+.history-item{padding:4px 8px;font-size:10px;color:var(--muted);background:rgba(0,0,0,.15);border-radius:3px;margin-bottom:3px;display:flex;justify-content:space-between}
+.history-item .time{color:var(--muted2)}
+
+/* ═══ 通知/状态条 ═══ */
+.toast{position:fixed;bottom:80px;right:20px;background:var(--surface);border:1px solid var(--gold);color:var(--paper);padding:10px 14px;border-radius:8px;font-size:12px;z-index:9999;display:none;max-width:280px;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.toast.show{display:block;animation:slidein .3s ease}
+@keyframes slidein{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ═══ 急救警示 ═══ */
+.emergency{background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.3);border-radius:8px;padding:10px 14px;margin-bottom:var(--gap);font-size:12px;display:flex;align-items:center;gap:10px;color:var(--paper)}
+.emergency .ic{font-size:18px;color:var(--red)}
+.emergency b{color:#fca5a5}
+.emergency .call{margin-left:auto;color:#fff;background:var(--red);padding:4px 12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:12px}
+
+@media(max-width:768px){
+  .topbar{padding:8px 12px}
+  .main-container{padding:12px 14px}
+  .role-bar{order:3;width:100%;justify-content:flex-start;margin-left:0;margin-top:6px}
+  .emr-header{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="divination-hub.html" class="back">← 返回主平台</a>
+  <div class="logo"><span class="dot"></span>AI 实时诊疗一体化平台</div>
+  <div class="meta" id="sessionMeta">会话初始化中…</div>
+
+  <div class="role-bar">
+    <span class="label">角色</span>
+    <button class="role-btn active" data-role="patient" onclick="setRole('patient')">患者</button>
+    <button class="role-btn" data-role="doctor" onclick="setRole('doctor')">医生</button>
+    <button class="role-btn" data-role="master" onclick="setRole('master')">命理师</button>
+  </div>
+
+  <div class="session-info">
+    <div class="stat" title="摄像头"><span class="dot" id="camDot"></span>视</div>
+    <div class="stat" title="语音"><span class="dot" id="voiceDot"></span>音</div>
+    <div class="stat" title="知识库"><span class="dot" id="kbDot"></span>KB</div>
+    <div class="stat" title="EMR"><span class="dot" id="emrDot"></span>EMR</div>
+  </div>
+</div>
+
+<div class="main-container">
+
+  <div class="emergency">
+    <span class="ic">⚠</span>
+    <div>紧急情况请立即拨打 <b>120</b> 或前往最近急诊。本平台不能替代急救。</div>
+    <a href="tel:120" class="call">📞 120</a>
+  </div>
+
+  <div class="grid-tri">
+
+    <!-- 摄像头面板 -->
+    <div class="card">
+      <h3><span class="icon cam">📷</span>摄像头·望诊<span class="label" id="camLabel">未启动</span></h3>
+      <div class="cam-stage" id="camStage">
+        <video id="camVideo" autoplay playsinline muted></video>
+        <div class="live-tag" id="liveTag">LIVE</div>
+        <div class="quality" id="qualityBadge">—</div>
+        <div class="cam-placeholder" id="camPlaceholder">
+          <span class="ic">📹</span>
+          <div>点击下方按钮启动摄像头</div>
+        </div>
+      </div>
+      <div class="cam-controls">
+        <button class="btn cyan" id="camStartBtn" onclick="startCamera()">启动</button>
+        <button class="btn primary" id="captureBtn" onclick="captureOnce()" disabled>📸 拍摄</button>
+        <button class="btn ghost" id="camStopBtn" onclick="stopCamera()" disabled>停止</button>
+      </div>
+      <div class="vision-result" id="visionResult">
+        <div style="color:var(--muted);font-style:italic;text-align:center;padding:10px">采集后展示视觉识别结果</div>
+      </div>
+    </div>
+
+    <!-- 语音面板 -->
+    <div class="card">
+      <h3><span class="icon voice">🎙</span>语音·实时问诊<span class="label" id="voiceLabel">待命</span></h3>
+      <div class="voice-state" id="voiceState"><span class="ind"></span><span>点击下方开始说话</span></div>
+      <div class="voice-controls">
+        <button class="btn green" id="voiceStartBtn" onclick="startVoice()">开始说话</button>
+        <button class="btn ghost" id="voiceStopBtn" onclick="stopVoice()" disabled>停止</button>
+      </div>
+      <div class="transcript" id="transcript">
+        <div class="empty">实时转写将显示在这里<br><span style="font-size:10px;opacity:.6">说"我最近…"或"主诉…"</span></div>
+      </div>
+    </div>
+
+    <!-- KB 面板 -->
+    <div class="card">
+      <h3><span class="icon kb">📚</span>知识库·辨证<span class="label" id="kbLabel">就绪</span></h3>
+      <div class="kb-tier tier1" id="kbTier" style="display:none"></div>
+      <div class="kb-search">
+        <input type="text" id="kbInput" placeholder="症状 / 证型 / 处方关键词…" onkeydown="if(event.key==='Enter')doKbSearch()">
+        <button class="btn violet" style="background:rgba(139,92,246,.15);color:var(--violet);border:1px solid rgba(139,92,246,.3)" onclick="doKbSearch()">查</button>
+      </div>
+      <div class="kb-results" id="kbResults">
+        <div class="kb-empty">实时匹配结果将显示在这里</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ 电子病历 ═══ -->
+  <div class="emr-panel">
+    <div class="emr-header">
+      <h2>📋 实时电子病历 <span class="badge pending" id="reviewBadge">待审核</span></h2>
+      <div class="emr-actions">
+        <button class="btn ghost sm" onclick="resetEmr()">🔄 重置</button>
+        <button class="btn green sm" onclick="exportEmr()">📤 导出</button>
+        <button class="btn primary sm" onclick="saveEmr()">💾 归档</button>
+      </div>
+    </div>
+
+    <div class="emr-grid">
+
+      <div class="emr-field complaint">
+        <div class="emr-field-label">主诉</div>
+        <div class="emr-field-content empty" id="emr-complaint">点击右下方"开始说话"录入</div>
+      </div>
+
+      <div class="emr-field examination">
+        <div class="emr-field-label">四诊（望诊采集）</div>
+        <div class="emr-field-content empty" id="emr-examination">拍照后自动填充</div>
+      </div>
+
+      <div class="emr-field">
+        <div class="emr-field-label">AI 诊断</div>
+        <div class="emr-field-content empty" id="emr-diagnosis">综合判断后生成</div>
+      </div>
+
+      <div class="emr-field">
+        <div class="emr-field-label">证型</div>
+        <div class="emr-field-content empty" id="emr-syndrome">KB 匹配后自动</div>
+      </div>
+
+      <div class="emr-field">
+        <div class="emr-field-label">处方</div>
+        <div class="emr-field-content empty" id="emr-prescription">待医生确认</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ 审核面板（医生/命理师可见） ═══ -->
+  <div class="review-panel" id="reviewPanel">
+    <h3>🔍 审核签字 <span style="font-size:10px;color:var(--muted);margin-left:6px">仅医生/命理师可见</span></h3>
+    <div class="form-group">
+      <label>审核意见（驳回或修改时填写）</label>
+      <textarea id="reviewNotes" placeholder="例：辨证方向正确，建议加强活血化瘀…"></textarea>
+    </div>
+    <div class="form-group">
+      <label>修改后处方（可选）</label>
+      <textarea id="reviewPrescription" placeholder="例：原方 + 丹参 15g"></textarea>
+    </div>
+    <div class="review-btns">
+      <button class="btn green" onclick="reviewApprove()">✅ 通过</button>
+      <button class="btn primary" onclick="reviewModify()">✏ 修改并通过</button>
+      <button class="btn ghost" style="border-color:var(--red);color:var(--red)" onclick="reviewReject()">❌ 驳回</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+</div>
+
+<!-- ═══ 依赖脚本 ═══ -->
+<script src="js/realtime/realtime-voice.js"></script>
+<script src="js/realtime/realtime-vision.js"></script>
+<script src="js/realtime/realtime-kb.js"></script>
+<script src="js/realtime/realtime-engine.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+ * AI 实时诊疗一体化平台 · 客户端主逻辑
+ * ═══════════════════════════════════════════════════════════ */
+
+// 全局状态
+const App = {
+  sessionId: 'session_' + Date.now().toString(36) + '_' + (performance.now() * 1000 | 0).toString(36),
+  role: 'patient',
+  started: false,
+  emr: {
+    complaint: '',
+    examination: '',
+    diagnosis: '',
+    syndrome: '',
+    prescription: '',
+    voiceLog: '',
+    visionFeatures: '',
+    visionMatches: ''
+  },
+  voice: null,
+  vision: null,
+  kb: null,
+  engine: null,
+  reviewing: false
+};
+
+// DOM 引用
+const $ = id => document.getElementById(id);
+
+// 角色切换
+function setRole(r){
+  App.role = r;
+  document.querySelectorAll('.role-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.role === r);
+  });
+  // 医生/命理师可见审核
+  $('reviewPanel').classList.toggle('show', r === 'doctor' || r === 'master');
+  toast('已切换到' + (r==='patient'?'患者':r==='doctor'?'医生':'命理师')+'视角');
+}
+
+// Toast
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// 指示灯
+function setDot(name, state){
+  const el = $('camDot').parentNode.querySelector(`#${name}Dot`);
+  if(el){
+    el.classList.remove('active','warn','err');
+    if(state) el.classList.add(state);
+  }
+}
+
+// Session 信息
+$('sessionMeta').textContent = '会话ID: ' + App.sessionId.slice(-8);
+
+/* ═══ RealtimeEngine 初始化 ═══ */
+function initEngine(){
+  // KB 引擎（走 8920 后端 API，避免 8900 静态代理 404）
+  App.kb = new RealtimeKB({
+    apiBase: 'http://127.0.0.1:8920/api/public/kb/search-fts',
+    module: 'tcm',
+    onResult: r => {
+        const tier = r.tier;
+        const tierLabel = tier === 'direct' ? 'KB 直答' : tier === 'summary' ? 'KB 摘要' : 'AI 兜底';
+        const tierEl = $('kbTier');
+        tierEl.textContent = `${tierLabel} (${r.latencyMs}ms)`;
+        tierEl.className = 'kb-tier tier' + (tier === 'direct' ? 1 : tier === 'summary' ? 2 : 3);
+        tierEl.style.display = 'inline-block';
+
+        const items = (r.items || []).slice(0, 5);
+        if(items.length === 0){
+          $('kbResults').innerHTML = '<div class="kb-empty">未匹配到结果</div>';
+          return;
+        }
+        $('kbResults').innerHTML = items.map(it => `
+          <div class="kb-item">
+            <div><span class="title">${escapeHtml(it.title || '典藏')}</span><span class="score">${(it.score || 0).toFixed(2)}</span></div>
+            <div class="content">${escapeHtml((it.content || '').slice(0, 80))}…</div>
+          </div>
+        `).join('');
+
+        // 自动写入证型
+        if(tier === 'direct' && items.length > 0){
+          setEmr('syndrome', items[0].title || items[0].module || '');
+        }
+      },
+      onStatus: s => {
+        $('kbLabel').textContent = s;
+        $('kbDot').className = 'dot' + (s === 'searching' ? ' active' : '');
+      }
+  });
+
+  // 视觉引擎
+  App.vision = new RealtimeVision({
+    endpoint: 'http://127.0.0.1:8913/api/camera/upload',
+    mode: 'face',
+    intervalMs: 1500,
+    onResult: r => {
+        const fr = (r.features || []).join(' / ') || '无特征';
+        $('visionResult').innerHTML = `
+          <div style="color:var(--gold);font-size:11px;margin-bottom:6px">⏱ ${r.latencyMs}ms · ${(r.features||[]).length} 特征</div>
+          <div>${(r.features||[]).map(f => `<span class="feat">${escapeHtml(f)}</span>`).join('') || '<span style="color:var(--muted)">无特征</span>'}</div>
+          ${(r.matches||[]).slice(0, 2).map(m => `
+            <div class="match">
+              <div class="match-title">${escapeHtml(m.title || m.module || '匹配')}</div>
+              <div class="match-content">${escapeHtml((m.content || '').slice(0, 60))}…</div>
+            </div>
+          `).join('')}
+        `;
+        // 写入四诊
+        if((r.features||[]).length > 0){
+          setEmr('examination', (r.features || []).join('、'));
+        }
+        if((r.matches||[]).length > 0){
+          setEmr('diagnosis', (r.matches[0].title || '') + ': ' + ((r.matches[0].content || '').slice(0, 80)));
+        }
+      },
+      onStatus: s => {
+        $('camLabel').textContent = s;
+        $('camDot').className = 'dot' + (s === 'scanning' ? ' active' : (s === 'paused' || s === 'camera_error' || s === 'service_error') ? ' err' : '');
+      },
+      onError: (code, msg) => toast('视觉: ' + msg)
+  });
+
+  // 语音引擎
+  App.voice = new RealtimeVoice({
+    lang: 'zh-CN',
+    onInterim: t => {
+        const el = $('transcript');
+        // 替换最后一个 interim 标记
+        let interimEl = el.querySelector('.interim');
+        if(!interimEl){
+          interimEl = document.createElement('div');
+          interimEl.className = 'interim';
+          el.appendChild(interimEl);
+        }
+        interimEl.textContent = '... ' + t;
+        el.scrollTop = el.scrollHeight;
+      },
+    onFinal: t => {
+        const el = $('transcript');
+        const empty = el.querySelector('.empty'); if(empty) empty.remove();
+        const interimEl = el.querySelector('.interim'); if(interimEl) interimEl.remove();
+        const div = document.createElement('div');
+        div.className = 'final';
+        div.textContent = '• ' + t;
+        el.appendChild(div);
+        el.scrollTop = el.scrollHeight;
+        // 写入主诉 + 触发 KB
+        appendEmr('complaint', t);
+        App.kb.search(t);
+      },
+    onState: s => {
+        $('voiceLabel').textContent = s;
+        const stateEl = $('voiceState');
+        stateEl.className = 'voice-state ' + (s === 'listening' ? 'listening' : s === 'fallback' ? 'warn' : s === 'error' ? 'error' : '');
+        stateEl.querySelector('span:last-child').textContent =
+          s === 'listening' ? '正在聆听…' :
+          s === 'starting' ? '启动中…' :
+          s === 'idle' ? '点击下方开始说话' :
+          s === 'fallback' ? '请改用文字输入' : '异常：' + s;
+        $('voiceDot').className = 'dot' + (s === 'listening' ? ' active' : '');
+      },
+    onError: (code, msg) => toast('语音: ' + msg)
+  });
+
+  // 引擎编排
+  App.engine = new RealtimeEngine({
+    voice: App.voice, kb: App.kb, vision: App.vision
+  });
+  App.engine.bindVoiceToKb();
+}
+
+// HTML 转义
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ═══ 摄像头控制 ═══ */
+async function startCamera(){
+  if(!App.vision) initEngine();
+  try{
+    await App.vision.start();
+    const v = $('camVideo');
+    if(App.vision._stream){
+      v.srcObject = App.vision._stream;
+      v.classList.add('live');
+      $('camPlaceholder').style.display = 'none';
+      $('liveTag').classList.add('live');
+      $('captureBtn').disabled = false;
+      $('camStopBtn').disabled = false;
+      $('camStartBtn').disabled = true;
+    }
+  }catch(e){
+    toast('摄像头启动失败：' + (e.message || e));
+  }
+}
+function stopCamera(){
+  if(App.vision) App.vision.stop();
+  $('camVideo').classList.remove('live');
+  $('camPlaceholder').style.display = '';
+  $('liveTag').classList.remove('live');
+  $('captureBtn').disabled = true;
+  $('camStopBtn').disabled = true;
+  $('camStartBtn').disabled = false;
+}
+async function captureOnce(){
+  if(!App.vision || !App.vision._running){
+    await startCamera();
+    setTimeout(() => App.vision.captureOnce(), 1500);
+  } else {
+    App.vision.captureOnce();
+  }
+}
+
+/* ═══ 语音控制 ═══ */
+function startVoice(){
+  if(!App.voice) initEngine();
+  try{
+    App.voice.start();
+    $('voiceStartBtn').disabled = true;
+    $('voiceStopBtn').disabled = false;
+    $('voiceStartBtn').classList.add('recording');
+  }catch(e){
+    toast('语音启动失败：' + (e.message || e));
+  }
+}
+function stopVoice(){
+  if(App.voice) App.voice.stop();
+  $('voiceStartBtn').disabled = false;
+  $('voiceStopBtn').disabled = true;
+  $('voiceStartBtn').classList.remove('recording');
+}
+
+/* ═══ KB 手动搜索 ═══ */
+function doKbSearch(){
+  const q = $('kbInput').value.trim();
+  if(!q) return;
+  if(!App.kb) initEngine();
+  App.kb.search(q, {force:true});
+}
+
+/* ═══ EMR 管理 ═══ */
+function setEmr(field, value){
+  if(!value) return;
+  App.emr[field] = value;
+  const el = $('emr-' + field);
+  el.textContent = value;
+  el.classList.remove('empty');
+  $('emrDot').classList.add('active');
+  setTimeout(() => $('emrDot').classList.remove('active'), 1500);
+}
+function appendEmr(field, value){
+  if(!value) return;
+  if(App.emr[field]){
+    App.emr[field] += '；' + value;
+  } else {
+    App.emr[field] = value;
+  }
+  setEmr(field, App.emr[field]);
+}
+function resetEmr(){
+  if(!confirm('确认重置当前电子病历？此操作不可撤销。')) return;
+  Object.keys(App.emr).forEach(k => App.emr[k] = '');
+  ['complaint','examination','diagnosis','syndrome','prescription'].forEach(f => {
+    const el = $('emr-' + f);
+    el.textContent = '';
+    el.classList.add('empty');
+  });
+  $('transcript').innerHTML = '<div class="empty">实时转写将显示在这里</div>';
+  toast('电子病历已重置');
+}
+function exportEmr(){
+  const text = [
+    '【主诉】' + (App.emr.complaint || '—'),
+    '【四诊】' + (App.emr.examination || '—'),
+    '【AI 诊断】' + (App.emr.diagnosis || '—'),
+    '【证型】' + (App.emr.syndrome || '—'),
+    '【处方】' + (App.emr.prescription || '—'),
+    '',
+    '会话ID: ' + App.sessionId,
+    '角色: ' + App.role,
+    '导出时间: ' + new Date().toISOString()
+  ].join('\n');
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `emr_${App.sessionId.slice(-8)}.txt`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('病历已导出');
+}
+function saveEmr(){
+  // 持久化到 localStorage（演示用，生产应走 /api/cases/emr）
+  localStorage.setItem('emr_' + App.sessionId, JSON.stringify({
+    sessionId: App.sessionId,
+    role: App.role,
+    emr: App.emr,
+    savedAt: new Date().toISOString()
+  }));
+  toast('病历已归档到 localStorage');
+}
+
+/* ═══ 审核 ═══ */
+function reviewApprove(){
+  const notes = $('reviewNotes').value || '审核通过';
+  setReviewStatus('approved', notes);
+}
+function reviewModify(){
+  const notes = $('reviewNotes').value;
+  const rx = $('reviewPrescription').value;
+  if(rx) setEmr('prescription', rx);
+  setReviewStatus('approved', (notes || '修改后通过') + (rx ? '；处方已修改' : ''));
+}
+function reviewReject(){
+  const notes = $('reviewNotes').value;
+  if(!notes){ toast('驳回必须填写原因'); return; }
+  setReviewStatus('rejected', notes);
+}
+function setReviewStatus(status, notes){
+  App.reviewing = true;
+  App.emr.reviewStatus = status;
+  App.emr.reviewNotes = notes;
+  App.emr.reviewedBy = App.role;
+  App.emr.reviewedAt = new Date().toISOString();
+  const badge = $('reviewBadge');
+  badge.textContent = status === 'approved' ? '已通过' : status === 'rejected' ? '已驳回' : '待审核';
+  badge.className = 'badge ' + status;
+  saveEmr();
+  toast(`审核${status === 'approved' ? '通过' : status === 'rejected' ? '驳回' : '待审'}已记录`);
+}
+
+// 启动
+initEngine();
+setDot('emr', '');  // 占位
+// 已初始化完成
+</script>
+
+</body>
+</html>

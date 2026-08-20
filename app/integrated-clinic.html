@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>综合问诊台 · 流程驱动 · 命理宝鉴</title>
+<style>
+:root{--bg:#0a0d12;--paper:#e8e0d0;--paper2:#a89878;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#8a7030;--jade:#27ae60;--accent:#38bdf8;--card:rgba(255,255,255,.04);--border:rgba(201,168,76,.2);--danger:#dc2626;--ok:#22c55e;--warn:#f59e0b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(180deg,#0a0d12,#0d1018);color:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6;min-height:100vh;padding:24px 16px}
+.wrap{max-width:760px;margin:0 auto}
+
+.top{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.back{color:var(--gold);text-decoration:none;font-size:13px;padding:5px 10px;border:1px solid var(--border);border-radius:14px}
+.back:hover{background:var(--card)}
+.title-area{flex:1}
+.title-area h1{font-size:20px;color:var(--gold);letter-spacing:3px;margin-bottom:2px}
+.title-area .sub{font-size:11px;color:var(--paper2);letter-spacing:1px}
+
+.role-bar{display:flex;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:3px;margin-bottom:20px}
+.role-btn{flex:1;padding:7px 0;border:none;background:transparent;color:var(--paper2);font-size:12px;border-radius:18px;cursor:pointer;transition:all .2s}
+.role-btn.on{background:var(--gold);color:var(--bg);font-weight:600}
+
+.flow{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:20px;gap:8px;flex-wrap:wrap}
+.flow-step{flex:1;text-align:center;min-width:80px;position:relative}
+.flow-step .num{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.06);color:var(--paper2);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;margin-bottom:4px}
+.flow-step.done .num{background:var(--ok);color:var(--bg)}
+.flow-step.active .num{background:var(--gold);color:var(--bg);box-shadow:0 0 0 4px rgba(201,168,76,.2)}
+.flow-step .lbl{font-size:11px;color:var(--paper2)}
+.flow-step.done .lbl,.flow-step.active .lbl{color:var(--paper)}
+.flow-arrow{color:var(--gold3);font-size:14px}
+
+.start-card{background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(56,189,248,.04));border:1.5px solid var(--gold);border-radius:14px;padding:18px;margin-bottom:18px;cursor:pointer;transition:all .25s}
+.start-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,.2)}
+.start-card .head{display:flex;align-items:center;gap:14px}
+.start-card .ic{font-size:34px}
+.start-card .ti{font-size:16px;color:var(--gold2);font-weight:600;margin-bottom:2px}
+.start-card .de{font-size:12px;color:var(--paper2);line-height:1.5}
+.start-card .cta{margin-top:10px;font-size:11px;color:var(--gold)}
+
+.quick{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:18px}
+.quick h3{font-size:13px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.quick h3 .sub{font-size:10px;color:var(--paper2);font-weight:400;margin-left:auto}
+.qbtns{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.qbtn{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:12px;color:var(--paper);cursor:pointer;text-align:center;transition:all .2s}
+.qbtn:hover{border-color:var(--gold);background:rgba(201,168,76,.08)}
+
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:16px}
+.panel-title{font-size:13px;color:var(--gold);margin-bottom:10px;font-weight:600}
+.panel-title .sub{font-size:10px;color:var(--paper2);font-weight:400;margin-left:8px}
+.empty{font-size:12px;color:var(--paper2);opacity:.6;text-align:center;padding:18px 0}
+
+.session-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.02);margin-bottom:6px;font-size:12px}
+.session-row .tag{font-size:10px;padding:2px 6px;border-radius:6px;background:var(--border);color:var(--gold2);margin-left:auto}
+.session-row.pending .tag{background:rgba(245,158,11,.2);color:var(--warn)}
+.session-row.done .tag{background:rgba(34,197,94,.2);color:var(--ok)}
+
+.actions{display:flex;gap:8px;margin-top:14px}
+.btn{padding:8px 16px;border-radius:10px;font-size:13px;border:1px solid var(--border);background:transparent;color:var(--paper);cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--card)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600}
+
+.callout{background:rgba(220,38,38,.06);border-left:3px solid var(--danger);border-radius:0 8px 8px 0;padding:12px 16px;font-size:12px;color:var(--paper);line-height:1.7}
+.callout b{color:#f87171}
+
+.footer{text-align:center;color:var(--paper2);opacity:.35;font-size:11px;margin-top:32px;letter-spacing:1px}
+
+@media(max-width:520px){.flow{padding:10px}.flow-step .lbl{font-size:10px}.qbtns{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <a href="javascript:history.back()" class="back">← 返回</a>
+  <div class="title-area">
+    <h1>综合问诊台</h1>
+    <div class="sub">一步开始 · AI 初诊 → 医生复核 · 流程驱动</div>
+  </div>
+</div>
+
+<div class="role-bar" id="roleBar">
+  <button class="role-btn on" data-role="patient">我是患者</button>
+  <button class="role-btn" data-role="doctor">我是医生</button>
+  <button class="role-btn" data-role="master">我是命理师</button>
+  <button class="role-btn" data-role="op">我是运营</button>
+</div>
+
+<div class="flow" id="flow">
+  <div class="flow-step active" data-step="1"><div class="num">1</div><div class="lbl">采集</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step" data-step="2"><div class="num">2</div><div class="lbl">AI 初诊</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step" data-step="3"><div class="num">3</div><div class="lbl">复核</div></div>
+  <div class="flow-arrow">→</div>
+  <div class="flow-step" data-step="4"><div class="num">4</div><div class="lbl">EMR</div></div>
+</div>
+
+<div id="patientView">
+  <div class="start-card" id="startCard">
+    <div class="head">
+      <span class="ic">🎥</span>
+      <div>
+        <div class="ti">AI 实时诊疗一体化 · 一键开始</div>
+        <div class="de">摄像头 + 语音 + KB 实时联动，AI 出初步判断，医生/命理师在线复核签字</div>
+      </div>
+    </div>
+    <div class="cta">点击下方任一方式启动 →</div>
+  </div>
+
+  <div class="quick">
+    <h3>快捷启动 <span class="sub">按场景自动驱动完整流程</span></h3>
+    <div class="qbtns">
+      <button class="qbtn" data-way="symptom">文字/语音说症状</button>
+      <button class="qbtn" data-way="camera">拍照看舌面</button>
+      <button class="qbtn" data-way="report">上传体检报告</button>
+      <button class="qbtn" data-way="doctor">直接找医生</button>
+      <button class="qbtn" data-way="realtime">AI 实时诊疗</button>
+      <button class="qbtn" data-way="kb">查 KB 知识</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">最近问诊 <span class="sub">自动保存 · 可继续 · 可导出</span></div>
+    <div id="sessionList"></div>
+  </div>
+
+  <div class="callout">
+    <b>⚠ 紧急情况</b>：胸痛 / 呼吸困难 / 昏迷 / 大出血 → 立即拨打 <b>120</b> 或前往最近急诊。本平台不能替代急救。
+  </div>
+</div>
+
+<div id="doctorView" style="display:none">
+  <div class="start-card" onclick="location.href='doctor-panel.html'">
+    <div class="head">
+      <span class="ic">🩺</span>
+      <div>
+        <div class="ti">临床工作台</div>
+        <div class="de">待审病例队列 · 四诊合参 · 处方 · 自动归档 · 一屏完成</div>
+      </div>
+    </div>
+    <div class="cta">点击进入 →</div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">待复核 <span class="sub">从患者流转过来</span></div>
+    <div id="doctorQueue"></div>
+  </div>
+</div>
+
+<div id="masterView" style="display:none">
+  <div class="start-card" onclick="location.href='master-workstation.html'">
+    <div class="head">
+      <span class="ic">📋</span>
+      <div>
+        <div class="ti">命理师工作站</div>
+        <div class="de">视频回看 · 语音转录 · KB 证据链 · 三动作签字（通过/驳回/修改）</div>
+      </div>
+    </div>
+    <div class="cta">点击进入 →</div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">待审病例 <span class="sub">AI 初诊后自动入队</div>
+    <div id="masterQueue"></div>
+  </div>
+</div>
+
+<div id="opView" style="display:none">
+  <div class="start-card" onclick="location.href='admin.html'">
+    <div class="head">
+      <span class="ic">⚙️</span>
+      <div>
+        <div class="ti">管理后台</div>
+        <div class="de">仪表板 · 用户 · 工单 · KB · 一屏全览</div>
+      </div>
+    </div>
+    <div class="cta">点击进入 →</div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">关键指标 <span class="sub">实时</span></div>
+    <div id="opStats"></div>
+  </div>
+</div>
+
+<div class="footer">命理宝鉴 · 流程驱动 · 减轻负担</div>
+
+</div>
+
+<script>
+// ====== 1. 角色切换 ======
+const roleBar = document.getElementById('roleBar');
+const views = { patient: document.getElementById('patientView'), doctor: document.getElementById('doctorView'), master: document.getElementById('masterView'), op: document.getElementById('opView') };
+roleBar.addEventListener('click', (e) => {
+  const btn = e.target.closest('.role-btn');
+  if (!btn) return;
+  roleBar.querySelectorAll('.role-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  const role = btn.dataset.role;
+  Object.values(views).forEach(v => v.style.display = 'none');
+  views[role].style.display = 'block';
+});
+
+// ====== 2. 流程驱动：6 个快捷方式 → 自动跳对应页+带 session_id ======
+const wayMap = {
+  symptom:  { url: 'tcm-symptom.html',        label: '文字/语音症状',   ready: '症状已录入，AI 已完成初步辨证' },
+  camera:   { url: 'camera-capture.html',      label: '舌面望诊',         ready: '舌/面照片已采集，KB 已匹配' },
+  report:   { url: 'report-ocr.html',          label: '体检报告',         ready: '报告 OCR 完成，AI 已解读' },
+  doctor:   { url: 'doctor-panel.html',        label: '医生工作台',       ready: '待审病例已就绪' },
+  realtime: { url: 'unified-consultation.html', label: 'AI 实时诊疗',     ready: '三路并发已启动，session 已建立' },
+  kb:       { url: 'kb-explorer.html',         label: 'KB 知识库',        ready: '知识条目已锁定' },
+};
+
+document.querySelectorAll('.qbtn').forEach(b => {
+  b.addEventListener('click', () => {
+    const way = wayMap[b.dataset.way];
+    if (!way) return;
+    const sessionId = 'sess_' + Date.now().toString(36) + '_' + (performance.now() * 1000 | 0).toString(36);
+    const caseRec = {
+      sessionId, way: b.dataset.way, label: way.label,
+      startedAt: new Date().toISOString(),
+      status: '采集完成', currentStep: 1,
+    };
+    saveSession(caseRec);
+    markStep(1, 'done');
+    setTimeout(() => {
+      location.href = way.url + '?sid=' + sessionId;
+    }, 400);
+  });
+});
+
+document.getElementById('startCard').addEventListener('click', () => {
+  document.querySelector('.qbtn[data-way="realtime"]').click();
+});
+
+// ====== 3. session 持久化（localStorage）======
+const SESS_KEY = 'clinic_sessions';
+function getSessions() {
+  try { return JSON.parse(localStorage.getItem(SESS_KEY) || '[]'); } catch { return []; }
+}
+function saveSession(s) {
+  const list = getSessions();
+  list.unshift(s);
+  localStorage.setItem(SESS_KEY, JSON.stringify(list.slice(0, 10)));
+  renderSessions();
+}
+function renderSessions() {
+  const list = getSessions();
+  const el = document.getElementById('sessionList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">暂无问诊记录 · 点上方任一方式开始</div>';
+    return;
+  }
+  el.innerHTML = list.map(s => `
+    <div class="session-row ${s.status === '已结束' ? 'done' : 'pending'}">
+      <span>${s.label}</span>
+      <span class="tag">${s.status}</span>
+    </div>
+  `).join('');
+}
+
+// ====== 4. 医生/命理师队列（共用 sessions 过滤）======
+function renderQueue(elId, filterStatus) {
+  const el = document.getElementById(elId);
+  const list = getSessions().filter(s => s.status !== '已结束');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">暂无待审病例</div>';
+    return;
+  }
+  el.innerHTML = list.slice(0, 5).map(s => `
+    <div class="session-row pending">
+      <span>${s.label} · ${new Date(s.startedAt).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}</span>
+      <span class="tag">${s.status}</span>
+    </div>
+  `).join('');
+}
+renderQueue('doctorQueue');
+renderQueue('masterQueue');
+
+// ====== 5. 运营指标（读 /api/public/stats）======
+async function loadStats() {
+  const el = document.getElementById('opStats');
+  try {
+    const r = await fetch('http://127.0.0.1:8920/api/public/stats', { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    if (d.code === 0 && d.data) {
+      el.innerHTML = `
+        <div class="session-row"><span>今日问诊</span><span class="tag">${d.data.todayCases || 0}</span></div>
+        <div class="session-row"><span>KB 模块</span><span class="tag">${d.data.kbModules || 0}</span></div>
+        <div class="session-row"><span>医生在线</span><span class="tag">${d.data.doctorsOnline || 0}</span></div>
+      `;
+    } else { throw new Error('no data'); }
+  } catch {
+    el.innerHTML = '<div class="empty">指标服务暂不可用 · 进入后台查看</div>';
+  }
+}
+loadStats();
+
+// ====== 6. 流程步进指示器 ======
+function markStep(step, status) {
+  const steps = document.querySelectorAll('.flow-step');
+  steps.forEach((s, i) => {
+    s.classList.remove('done', 'active');
+    if (i + 1 < step) s.classList.add('done');
+    else if (i + 1 === step) s.classList.add(status || 'active');
+  });
+}
+
+// 初始化
+renderSessions();
+</script>
+</body>
+</html>

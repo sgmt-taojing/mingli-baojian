@@ -1410,4 +1410,4 @@ function renderGzhPanel(){
 }
 
 // 初始化
-// console.warn('易道智鉴 · 后台管理 v2026.06.27');
+// console.warn('命理宝鉴 · 后台管理 v2026.06.27');

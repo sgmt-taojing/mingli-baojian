@@ -30,7 +30,7 @@ function shareTo(channel){
   try { profile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch(e){console.warn(e.message)}
   var name = profile.name || '缘主';
   var url = location.origin + '/divination-hub.html';
-  var text = name + ' 邀您体验易道智鉴 · 命理宝鉴';
+  var text = name + ' 邀您体验命理宝鉴 · 命理宝鉴';
 
   if (channel === 'link') {
     if (navigator.clipboard) {
@@ -44,7 +44,7 @@ function shareTo(channel){
   }
 
   if (channel === 'wechat' && navigator.share) {
-    navigator.share({ title: '易道智鉴', text: text, url: url }).catch(function(){});
+    navigator.share({ title: '命理宝鉴', text: text, url: url }).catch(function(){});
     return;
   }
 

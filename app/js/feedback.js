@@ -1,5 +1,5 @@
 /**
- * 易道智鉴 · 用户反馈与积分系统
+ * 命理宝鉴 · 用户反馈与积分系统
  * FEEDBACK_SYSTEM
  * 数据存储：localStorage
  * 禁止 (Math.floor(Date.now()/1000)%10000)/10000

@@ -70,12 +70,23 @@ def extract_answer(text):
     m = re.search(r'[（(]\s*([A-E])\s*[）)]', t)
     if m:
         return m.group(1)
-    # 4) 关键词: 答案 B / 选 B / 是 B / 选：B / 选项是 B / 选择项 B
-    m = re.search(r'(?:答案|选项|选择项|选择|选|是)[以为：:\s]*([A-E])', t)
+    # 4a) 强信号：最终答案/答案是/选项是/选择项是/选择是/boxed{X}
+    for pat in [
+        r'最终答案\s*[是为：:\s]*([A-E])',
+        r'(?:选项|选择项|选择)\s*[是为：:\s]*([A-E])',
+        r'答案\s*[是为：:\s]*([A-E])',
+        r'\\boxed\s*\{\s*([A-E])\s*\}',
+    ]:
+        m = re.search(pat, t)
+        if m:
+            return m.group(1)
+    # 4b) 末兑：单纯"是" + X（限最后 1000 字，避免误伤选项列表）
+    tail = t[-1000:]
+    m = re.search(r'(?:是)\s*[为：:]?\s*([A-E])\b', tail)
     if m:
         return m.group(1)
     # 5) 孤立字母: '... B ...'（前后非字母数字）
-    m = re.search(r'(?<![A-Za-z0-9])([A-E])(?![A-Za-z0-9])', t)
+    m = re.search(r'(?<![A-Za-z0-9])([A-E])(?![A-Za-z0-9])', tail)
     if m:
         return m.group(1)
     return ''

@@ -164,6 +164,14 @@ def scan_dir(root_dir, patterns):
                 norm_fpath = fpath.replace(os.sep, "/")
                 if whitelist and (rel_fpath in whitelist or norm_fpath in whitelist or os.path.basename(fpath) in whitelist):
                     continue
+                # R736: console.log 排除调试守卫（if(window.__debug__) console.log / if(MiniCLawDebug) console.log）
+                if pat["type"] == "console":
+                    # 去掉 if(...) console.log(...) 守卫的再匹配
+                    stripped = re.sub(r"if\s*\([^)]+\)\s*console\.log\s*\([^)]*\)\s*;?", "", content)
+                    if not pat["regex"].search(stripped):
+                        continue
+                    findings[pat["type"]].append(fpath)
+                    continue
                 if pat["regex"].search(content):
                     findings[pat["type"]].append(fpath)
     return findings

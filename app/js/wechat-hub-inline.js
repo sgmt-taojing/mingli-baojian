@@ -2,7 +2,7 @@
 
 // === Extracted from wechat-hub.html
 // ═══════════════════════════════════════════════
-// 易道智鉴 · 微信H5 · 核心逻辑
+// 命理宝鉴 · 微信H5 · 核心逻辑
 // ═══════════════════════════════════════════════
 
 // ─── 工具配置 ───
@@ -1224,7 +1224,7 @@ function recommendNearbyTemplesH5() {
     lastTouchEnd = now;
   }, false);
 
-  // console.warn('易道智鉴 · H5 v2026.06.27');
+  // console.warn('命理宝鉴 · H5 v2026.06.27');
 })();
 
 // ═══ 年度预测推送 & 报告 ═══
@@ -1372,7 +1372,7 @@ async function aiSendMsg(){
   try{
     // 收集上下文（最近5轮）
     let ctx = aiChatHistory.slice(-10);
-    let sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
+    let sysMsg = {role:'system', content:'你是命理宝鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
     
     let resp = await fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/public-chat',{ signal: AbortSignal.timeout(15000), method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer sk-g2claw-default'},
@@ -1548,7 +1548,7 @@ async function aiSendMsgWithContext(ctx){
   
   try{
     let ctxPrompt = AI_CTX_PROMPTS[ctx] || '';
-    let sysMsg = {role:'system', content:'你是易道智鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。' + ctxPrompt + '涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
+    let sysMsg = {role:'system', content:'你是命理宝鉴的AI命理助手。用户可能在手机上使用，回答要简洁易懂，避免过长。' + ctxPrompt + '涉及命理、风水、中医、养生等问题时，给出实用建议。提醒用户理性参考。'};
     let chatCtx = aiChatHistory.slice(-10);
     
     let resp = await fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/public-chat',{ signal: AbortSignal.timeout(15000), method:'POST',
