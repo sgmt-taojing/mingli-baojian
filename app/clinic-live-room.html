@@ -667,6 +667,25 @@ function finalizeEmr(){
   if (Room.emr.reviewStatus === 'pending') { toast('请先复核（采纳/修改/驳回）'); return; }
   if (Room.emr.reviewStatus === 'rejected') { toast('已驳回的病历不能出具'); return; }
   saveEmr();
+  archiveEmr();
+}
+// R725: 归档为正式电子病历（medical_cases），幂等可重复出具
+function archiveEmr(){
+  fetch(API_EMR + '/api/public/emr-archive', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(10000),
+    body: JSON.stringify({ sessionId: Room.sessionId, role: 'doctor', emr: Room.emr })
+  }).then(r=>r.json()).then(d=>{
+    if (d.ok) {
+      Room.caseId = d.caseId;
+      toast('电子病历已归档（病历号 #' + d.caseId + '）');
+    } else {
+      toast('归档失败：' + (d.message || d.error || '未知错误'));
+    }
+  }).catch(()=>{
+    toast('归档请求失败（病历已实时同步，可稍后重试归档）');
+  });
 }
 function saveEmr(){
   // 双写：后端 EMR 会话（医生/命理师抽屉实时可见）+ localStorage 兜底
