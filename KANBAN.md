@@ -1,6 +1,6 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-22 13:30 CST（心跳：health-check 全绿 8 服务；KANBAN 修真——「最后更新」行重复 4 次已去重（心跳脚本插入 bug，本轮修复）；#5/#6 完结不变；v9.3 训练仍待用户触发；无新蒸馏入库）
+> 最后更新: 2026-08-22 20:00 CST（心跳：health-check 全绿 8 服务 + kb-list/paipan-api 抽查 OK + 8960=v9.0 ✅ + staging 0 待审/kb_formal 69,215；#5/#6 完结不变；v9.3 待用户触发；无新蒸馏入库；今日 health.log 曾有间歇异常时段（13 项→19:47 收敛为 3 项→20:00 实测 0 项全绿，服务自愈，判定为瞬时负载/网络抖动，非服务宕机，持续观察中；cron 阻塞项=4 任务连败告警（守门员 42 连败=isolated 会话排队+timeout 300s 过紧，已在修真观察中））
 
 > **R730+ 双修真深度校正（2026-08-16 07:30）**：修真 #4 daily_push.js（db2d038）+ 修真 #5 daily-push-bridge.py（v3）二轮深度校正 14/14 全绿——三模式实测（HTTP public/simple/默认 execFile）+ 错误端口 9999 降级复现 + bridge --http 8921 临时拉起验证（31 字段 payload、127.0.0.1 绑定）+ 双出口数据一致性 5/5（date/年/月/日柱/生肖）+ 宜忌归一化全等（yi 18=18、ji 9=9，数组 vs 顿号串为格式差异非数据分歧）+ KB 47,653+5,772 持续入库 + 临时进程零残留。报告：workspace/DELIVERY/双修真深度校正报告-2026-08-16.html
 > **R119 全量视觉蒸馏（2026-08-16 17:45）**：古籍抽样识别后台全量运行中——
@@ -269,16 +269,13 @@
 
 ## 阻塞项
 
-- **端口暴露（新增）**：Python(43166) 监听 `*:8948` + `*:8949` 未登记白名单（health-patrol 08-16 20:50 报警，此前 8946 已消失）
-- **7 个 cron 连败**（health-patrol 08-16 20:50 报警，均有恶化）：
-  - 命理宝jian 晚间知识库审计（21:30）· 连败 7 次
-  - 古籍识别进度检查（每 30 分钟）· 连败 5 次
-  - TCM 知识库日扫描 · 连败 5 次
-  - Desktop-ZYZX 单步夜间蒸馏 · 连败 4 次
-  - smart-home-family 地层能力诊断审计 · 连败 4 次
-  - festival-wishes-daily · 连败 6 次
-  - tcm-agent 家庭健康周报推送 · 连败 4 次
-  - 待修真：cron list 排查 launchd plist 状态 + Python(43166) 进程归属定位
+- **端口暴露已消除**：health-patrol 08-22 14:31 实测无端口报警（08-16 报的 Python(43166) 8948/8949 已不再触发）
+- **4 个 cron 连败**（health-patrol 08-22 14:31 实测，根因已定位）
+  - **命理宝jian 心跳守门员 · 连败 42 次（最严重）**：gateway.log 证实每次 run 卡在 model_call，session `queued_behind_active_work`（排队在主会话活动工作后面）+ payload `timeoutSeconds=300` 过紧 → 12:09 run 精确 300908ms 超时、14:09 run 277s Cron failed；另有 12:08 evolution-write-guard 拦截其 exec（security_control_plane_is_main_owned，守门员不该碰控制面）。**修真建议（需主会话执行，心跳 cron 工具受限无法改他 job）：timeoutSeconds 300→900 或降频 4h；payload 明确禁用 cron 工具与控制面写操作，仅 tail/stat/告警三步**
+  - 四路大师增量采集#1 · 连败 3 次：payload P1 步骤 `scripts/kb-masters/` shuhan 检索工具失败（路径/目录问题，需核对 kb-masters 目录现状）
+  - tcm-agent 家庭健康周报推送 · 连败 4 次：gateway restart 一次性中断（nextRun 08-23，观察下次即可）
+  - 临床经验蒸馏（周一06:00 纯脚本版）· 连败 3 次：sqlite3 命令失败（nextRun 08-24，观察）
+- **需用户/外部**：data1 外置卷未挂载（YZYX 蒸馏源 + 1,297 扫描件受影响）；GitHub 建仓无 token；生产短信网关需商户号
 
 ## 运行时指标（21:01 心跳实测 · 2026-08-16）
 
