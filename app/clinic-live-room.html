@@ -299,7 +299,7 @@ const API_VISION = 'http://127.0.0.1:8913';    // 视觉（面/舌分析）
 const API_EMR    = 'http://127.0.0.1:8920';    // EMR 会话上报
 
 const Room = {
-  sessionId: 'room_' + Date.now().toString(36) + '_' + Math.floor(Math.random()*1e6).toString(36),
+  sessionId: 'room_' + Date.now().toString(36) + '_' + (crypto.getRandomValues(new Uint32Array(1))[0]).toString(36),
   speaker: 'doctor',
   cam: null, camStream: null, autoFrameTimer: null, autoFrame: false,
   voice: null, voiceOn: false,
@@ -571,11 +571,14 @@ function renderMedFindings(){
   let html = '';
   Room.medFindings.forEach((f, i) => {
     html += '<div class="finding"><div class="f-title">🔍 ' + esc(f.query) + '</div>';
-    if (f.error) { html += '<div style="color:#e74c3c;font-size:11px">检索失败（稍后自动重试）</div></div>'; return; }
-    f.items.slice(0,3).forEach(it => {
-      html += '<div style="font-size:11px;color:var(--paper2);margin:3px 0">· ' + esc(it.title) +
-        '<span class="kb-cite">' + esc(it.module||'kb') + (it.trust ? ' · trust ' + it.trust : '') + '</span></div>';
-    });
+    if (f.error) {
+      html += '<div style="color:#e74c3c;font-size:11px">检索失败（稍后自动重试）</div>';
+    } else {
+      f.items.slice(0,3).forEach(it => {
+        html += '<div style="font-size:11px;color:var(--paper2);margin:3px 0">· ' + esc(it.title) +
+          '<span class="kb-cite">' + esc(it.module||'kb') + (it.trust ? ' · trust ' + it.trust : '') + '</span></div>';
+      });
+    }
     html += '</div>';
   });
   box.innerHTML = html;

@@ -517,7 +517,7 @@ toggleEmrDrawer = function(show, sid){
 
 function fetchEmrSession(){
   var sid = (document.getElementById('emrSidInput').value || '').trim();
-  if (!sid) { alert('请输入会话 ID'); return; }
+  if (!sid) { showToast('请输入会话 ID'); return; }
   var body = document.getElementById('emrDrawerBody');
   body.innerHTML = '<div style="color:#888;padding:20px 0">拉取中…</div>';
   fetch('http://127.0.0.1:8920/api/public/emr-session/' + encodeURIComponent(sid), { signal: AbortSignal.timeout(8000) })
@@ -568,9 +568,9 @@ function renderEmrBody(emr, role, ts){
 // ═══ R724: 复核提交（医生端）——POST 后刷新抽屉，徽章显示新状态 ═══
 function submitEmrReview(action){
   var sid = (document.getElementById('emrSidInput').value || '').trim();
-  if (!sid) { alert('请先拉取会话病历'); return; }
+  if (!sid) { showToast('请先拉取会话病历'); return; }
   var notes = (document.getElementById('emrReviewNotes') ? document.getElementById('emrReviewNotes').value : '') || '';
-  if (action === 'rejected' && !notes.trim()) { alert('驳回必须填写原因'); return; }
+  if (action === 'rejected' && !notes.trim()) { showToast('驳回必须填写原因'); return; }
   fetch('http://127.0.0.1:8920/api/public/emr-session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -579,10 +579,10 @@ function submitEmrReview(action){
   })
     .then(function(r){ return r.json(); })
     .then(function(d){
-      if (!d.ok) { alert('复核提交失败，请重试'); return; }
+      if (!d.ok) { showToast('复核提交失败，请重试'); return; }
       fetchEmrSession();
     })
-    .catch(function(){ alert('复核提交失败，请重试'); });
+    .catch(function(){ showToast('复核提交失败，请重试'); });
 }
 // 键盘快捷键：D 呼出实时病历
 document.addEventListener('keydown', function(e){
