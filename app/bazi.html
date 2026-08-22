@@ -44,7 +44,7 @@
   </div>
 <main>
 
-  <a class="phb-back" href="divination-hub.html">← 返回</a>
+  <a class="phb-back" href="index.html">← 返回入口大厅</a>
 </header>
 
 <div class="flow-steps-wrap" style="padding:12px 24px 0">
@@ -52,7 +52,7 @@
 <div class="flow-hint">填写出生年月日时，点击排盘演算。</div>
 </div>
 <nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
-  <a href="divination-hub.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px"><span data-i18n="nav.home">主平台</span></a>
+  <a href="index.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px"><span data-i18n="nav.home">主平台</span></a>
   <a href="ziwei.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">星 紫微斗数</a>
   <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px"><span data-i18n="vision.visualDiagnosis">望诊工作台</span></a>
   <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">医 中医诊疗</a>
@@ -726,7 +726,7 @@ function toast(msg){
 // R180: Safe fallbacks for functions defined in divination-core.js (not loaded standalone)
 if(typeof showToast!=='function'){window.showToast=function(msg,type){var t=document.createElement('div');t.className='toast'+(type?' toast-'+type:'');t.textContent=msg;t.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(8,8,8,.92);color:#c9a84c;padding:10px 20px;border-radius:8px;border:1px solid rgba(201,168,76,.3);z-index:9999;font-size:14px';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);};}
 if(typeof playSound!=='function'){window.playSound=function(t){try{var c=new(window.AudioContext||window.webkitAudioContext)();var o=c.createOscillator();var g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=t==='error'?200:t==='success'?600:440;g.gain.setValueAtTime(0.08,c.currentTime);o.start();o.stop(c.currentTime+0.12);}catch(e){}};}
-if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='divination-hub.html#'+(n||'');}catch(e){history.back();}};}
+if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='index.html'+(n||'');}catch(e){history.back();}};}
 if(typeof runBaziEnhancedFortune!=='function'){window.runBaziEnhancedFortune=function(){try{var r=document.getElementById('baziResult')||document.getElementById('proResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:16px;padding:14px;background:rgba(124,77,255,0.06);border-radius:10px;border:1px solid rgba(124,77,255,0.15)\"><h5 style=\"color:#7c4dff;margin-bottom:8px\">星 运势+健康深度增强</h5><p style=\"font-size:13px;color:var(--paper2)\">年度精解+企业视角增强报告。完整增强分析请在主页八字模块中使用。</p></div>');}if(typeof toast==='function')toast('增强报告已生成（简化版）');}catch(e){console.warn('[runBaziEnhancedFortune]',e);}};}
 if(typeof runHealthForecast!=='function'){window.runHealthForecast=function(){try{var r=document.getElementById('healthForecastResult')||document.getElementById('baziResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:12px;padding:14px;background:rgba(39,174,96,0.06);border-radius:10px;border:1px solid rgba(39,174,96,0.15)\"><h5 style=\"color:var(--jade2);margin-bottom:8px\">医 健康预测</h5><p style=\"font-size:13px;color:var(--paper2)\">基于八字五行强弱分析的健康趋势预测。完整健康预测请在主页使用。</p></div>');}if(typeof toast==='function')toast('健康预测已生成（简化版）');}catch(e){console.warn('[runHealthForecast]',e);}};}
 if(typeof exportBaziReport!=='function'){window.exportBaziReport=function(fmt){try{var data=document.querySelector('.result-section')||document.body;var html=`<!DOCTYPE html><html lang="zh-CN"><head><meta charset=UTF-8><title>八字报告</title><link rel="stylesheet" href="css/theme-systems.css">
