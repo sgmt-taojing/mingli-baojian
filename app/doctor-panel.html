@@ -555,7 +555,34 @@ function renderEmrBody(emr, role, ts){
   var st = statusMap[emr.reviewStatus] || statusMap.pending;
   html = '<div style="margin-bottom:16px"><span style="display:inline-block;padding:4px 12px;border-radius:10px;font-size:11px;font-weight:600;background:' + st[1] + ';color:' + st[2] + '">' + st[0] + '</span>'
     + '<span style="font-size:10px;color:#666;margin-left:8px">更新于 ' + new Date(ts).toLocaleString() + '</span></div>' + (html || '<div style="color:#888;padding:20px 0">病历字段为空</div>');
+  // ═══ R724: 复核操作区（医生端 · 绿色系）——抽屉内直接采纳/驳回 ═══
+  html += '<div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(201,168,76,.15)">'
+    + '<div style="font-size:10px;color:var(--gold,#c9a84c);letter-spacing:1px;margin-bottom:8px">复核操作</div>'
+    + '<input id="emrReviewNotes" placeholder="复核意见（驳回必填）…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:9px 10px;color:#eee;font-size:12px;font-family:inherit;margin-bottom:10px">'
+    + '<div style="display:flex;gap:8px">'
+    + '<button onclick="submitEmrReview(&quot;approved&quot;)" style="flex:1;background:rgba(16,185,129,.12);border:1px solid #10b981;color:#10b981;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">✓ 采纳</button>'
+    + '<button onclick="submitEmrReview(&quot;rejected&quot;)" style="flex:1;background:rgba(231,76,60,.12);border:1px solid #e74c3c;color:#e74c3c;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">✕ 驳回</button>'
+    + '</div></div>';
   document.getElementById('emrDrawerBody').innerHTML = html;
+}
+// ═══ R724: 复核提交（医生端）——POST 后刷新抽屉，徽章显示新状态 ═══
+function submitEmrReview(action){
+  var sid = (document.getElementById('emrSidInput').value || '').trim();
+  if (!sid) { alert('请先拉取会话病历'); return; }
+  var notes = (document.getElementById('emrReviewNotes') ? document.getElementById('emrReviewNotes').value : '') || '';
+  if (action === 'rejected' && !notes.trim()) { alert('驳回必须填写原因'); return; }
+  fetch('http://127.0.0.1:8920/api/public/emr-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId: sid, role: 'doctor', emr: { reviewStatus: action, reviewNotes: notes } }),
+    signal: AbortSignal.timeout(8000)
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.ok) { alert('复核提交失败，请重试'); return; }
+      fetchEmrSession();
+    })
+    .catch(function(){ alert('复核提交失败，请重试'); });
 }
 // 键盘快捷键：D 呼出实时病历
 document.addEventListener('keydown', function(e){
