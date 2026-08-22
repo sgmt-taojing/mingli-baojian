@@ -1,6 +1,6 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
-> 最后更新: 2026-08-22 10:30 CST（心跳：health-check 全绿；health-patrol 修真 1 项——ai-vision-toolkit/algorithm-marketplace-v2.html 内联script死代码块（丢if头致语法错）已删除并 commit 2ada2602，385→384 块全绿；#5/#6 完结不变；v9.3 训练仍待用户触发；cron 连败项为既有阻塞待专项）
+> 最后更新: 2026-08-22 13:30 CST（心跳：health-check 全绿 8 服务；KANBAN 修真——「最后更新」行重复 4 次已去重（心跳脚本插入 bug，本轮修复）；#5/#6 完结不变；v9.3 训练仍待用户触发；无新蒸馏入库）
 
 > **R730+ 双修真深度校正（2026-08-16 07:30）**：修真 #4 daily_push.js（db2d038）+ 修真 #5 daily-push-bridge.py（v3）二轮深度校正 14/14 全绿——三模式实测（HTTP public/simple/默认 execFile）+ 错误端口 9999 降级复现 + bridge --http 8921 临时拉起验证（31 字段 payload、127.0.0.1 绑定）+ 双出口数据一致性 5/5（date/年/月/日柱/生肖）+ 宜忌归一化全等（yi 18=18、ji 9=9，数组 vs 顿号串为格式差异非数据分歧）+ KB 47,653+5,772 持续入库 + 临时进程零残留。报告：workspace/DELIVERY/双修真深度校正报告-2026-08-16.html
 > **R119 全量视觉蒸馏（2026-08-16 17:45）**：古籍抽样识别后台全量运行中——
@@ -20,9 +20,6 @@
 >
 > > **R763 综合恢复 + v9.2 修真（2026-08-20 15:11 CST）**：cron 监控第十六次复核与前 15 次（14:11/13:11/12:11/11:11/09:11/06:11/05:11/03:12/02:11/01:13/00:11/22:11/21:00/17:11 等）完全一致——v9.2=3/488=0.6%（v9.2-full488.log 10:04 API=8962）/16/488=3.3%（v92-full-full488.log 09:30）<< v9.0=263/488=53.9%，修真失败结论不变，生产保持 v9.0，#5 已完结状态不变；崩模型根因=fused-as-base 续训陷阱（lr 5e-6+iter 300+base 已 fused）+ loss 正常≠模型可用 + 483/488 答案空串（`模型=?`）；8960=v9.0-7b ✅ PID 28061 监听（curl /v1/models 200 返 mingli-sft-v9.0-7b）；8962/8964 评估端口无监听已停；eval-baziqa=0 进程干净；/tmp/baziqa-v92-eval.log 不存在；源 fused-archive(空)/v9.1-7b(不存在) 幂等保护跳过；归档目标 41G 已稳；已记 memory/2026-08-20.md
 > > **R763 综合恢复 + v9.2 修真（2026-08-20 14:11 CST）**：cron 监控第十五次复核与第十四次一致——v9.2=3/488=0.6%（v9.2-full488.log 10:04 API=8962）/16/488=3.3%（v92-full-full488.log 09:30）<< v9.0=263/488=53.9%，修真失败结论不变，生产保持 v9.0，#5 已完结状态不变；崩模型根因=fused-as-base 续训陷阱（lr 5e-6+iter 300+base 已 fused）+ loss 正常≠模型可用 + 483/488 答案空串（`模型=?`）；8960=v9.0-7b ✅ PID 28061 监听（mlx-inference-server.py 8/19 12:09 起持续稳定，curl /v1/models 200 ✅ 返 mingli-sft-v9.0-7b）；8962/8964 评估端口无监听已停；eval-baziqa=0 进程干净；/tmp/baziqa-v92-eval.log 不存在；源 fused-archive(空)/v9.1-7b(不存在) 幂等保护跳过；归档目标 41G 已稳；已记 memory/2026-08-20.md
-> 最后更新: 2026-08-22 10:30 CST（心跳：health-check 全绿；health-patrol 修真 1 项——ai-vision-toolkit/algorithm-marketplace-v2.html 内联script死代码块（丢if头致语法错）已删除并 commit 2ada2602，385→384 块全绿；#5/#6 完结不变；v9.3 训练仍待用户触发；cron 连败项为既有阻塞待专项）
-> 最后更新: 2026-08-22 10:30 CST（心跳：health-check 全绿；health-patrol 修真 1 项——ai-vision-toolkit/algorithm-marketplace-v2.html 内联script死代码块（丢if头致语法错）已删除并 commit 2ada2602，385→384 块全绿；#5/#6 完结不变；v9.3 训练仍待用户触发；cron 连败项为既有阻塞待专项）
-> 最后更新: 2026-08-22 10:30 CST（心跳：health-check 全绿；health-patrol 修真 1 项——ai-vision-toolkit/algorithm-marketplace-v2.html 内联script死代码块（丢if头致语法错）已删除并 commit 2ada2602，385→384 块全绿；#5/#6 完结不变；v9.3 训练仍待用户触发；cron 连败项为既有阻塞待专项）
 > 历史: 2026-08-20 16:11 CST（cron 监控第十七次复核：与前 16 次完全一致——v9.2=3/488=0.6% << v9.0=263/488=53.9%，修真失败结论不变，生产保持 v9.0，#5 已完结；8960=v9.0-7b ✅ PID 28061 监听；8962/8964 评估端口无监听已停；eval-baziqa=0 进程干净；源 fused-archive(空)/v9.1-7b(不存在) 幂等保护跳过；归档目标 41G 已稳；mlx-models-archive/v9.1-7b 已存无需重归档）
 > 历史: 2026-08-20 15:11 CST（cron 监控第十六次复核：与前 15 次完全一致——v9.2=3/488=0.6% << v9.0=263/488=53.9%，修真失败结论不变，生产保持 v9.0，#5 已完结；8960=v9.0-7b ✅ PID 28061 监听；8962/8964 评估端口无监听已停；eval-baziqa=0 进程干净；源 fused-archive(空)/v9.1-7b(不存在) 幂等保护跳过；归档目标 41G 已稳）
 > 历史: 2026-08-20 05:11 CST（cron 监控第七次复核：v9.2=3/488=0.6% << v9.0=263/488=53.9%，结论不变：生产保持 v9.0，#5 已完结；崩模型根因=adapter_config max_seq_length 768 不匹配 v9.0/v9.1 的 1024 + iters=50 中断 + seed=0；8960=v9.0-7b ✅ PID 28061 监听；8962 评估服务已停；源 fused-archive(空)/v9.1-7b(不存在) 幂等保护跳过；/tmp/baziqa-v92-eval.log 不存在→eval-baziqa=0 进程干净）
