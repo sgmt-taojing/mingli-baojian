@@ -232,6 +232,11 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
         <button class="btn green" id="voiceStartBtn" onclick="startVoice()">开始说话</button>
         <button class="btn ghost" id="voiceStopBtn" onclick="stopVoice()" disabled>停止</button>
       </div>
+      <div class="ai-followup" id="aiFollowup" style="display:none;margin-top:8px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:10px 12px">
+        <div style="font-size:10px;color:#9b59b6;letter-spacing:1px;margin-bottom:4px">🤖 AI 追问 <span id="aiFollowupProg" style="color:#666"></span></div>
+        <div id="aiFollowupText" style="font-size:13px;color:#d4c9b0;line-height:1.6"></div>
+        <div id="aiFollowupOpts" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"></div>
+      </div>
       <div class="transcript" id="transcript">
         <div class="empty">实时转写将显示在这里<br><span style="font-size:10px;opacity:.6">说"我最近…"或"主诉…"</span></div>
       </div>
@@ -478,6 +483,8 @@ function initEngine(){
         // 写入主诉 + 触发 KB
         appendEmr('complaint', t);
         App.kb.search(t);
+        // R722: AI 主动追问（多轮引导引擎）
+        askAiFollowup(t);
       },
     onState: s => {
         $('voiceLabel').textContent = s;
