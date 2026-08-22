@@ -79,7 +79,7 @@ textarea{resize:vertical;min-height:60px}
     <span class="phb-theme-dot"></span>
     <span class="phb-title">医生端 · 卡片流审核</span>
   </div>
-  <a class="phb-back" href="person-center.html">← 返回</a>
+  <a class="phb-back" href="integrated-clinic.html">← 返回问诊台</a>
 </header>
 <main>
 
@@ -397,5 +397,44 @@ function checkSOS(){
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考 · 处方需医生审核确认</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script>
+// ═══ R720 快捷键（医生工作台）：J/K 上下移动 · A 采纳 · R 驳回 · E 编辑 · F 过滤 \u21aa 帮助面板 ═══
+(function(){
+  const helpHtml = '<div id="kbdHelp" style="display:none;position:fixed;bottom:16px;right:16px;z-index:99999;background:#111;border:1px solid rgba(201,168,76,.3);border-radius:10px;padding:14px 18px;font-size:12px;color:#d4c9b0;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:280px">'
+    + '<div style="color:#e8cc7a;font-weight:600;margin-bottom:8px">\u952e\u76d8\u5feb\u6377\u952e</div>'
+    + '<div>J / K \u2014 \u4e0a\u4e00\u4f8b / \u4e0b\u4e00\u4f8b</div>'
+    + '<div>A \u2014 \u91c7\u7eb3\u5e76\u63d0\u4ea4</div>'
+    + '<div>R \u2014 \u9a73\u56de</div>'
+    + '<div>E \u2014 \u7f16\u8f91\u7231\u606f\u6848</div>'
+    + '<div>? \u2014 \u663e\u793a/\u9690\u85cf\u672c\u9762\u677f</div>'
+    + '</div>';
+  document.body.insertAdjacentHTML('beforeend', helpHtml);
+  let cursor = 0;
+  function visibleCards(){ return Array.from(document.querySelectorAll('.queue-card, .card-item, [data-case-id]')); }
+  document.addEventListener('keydown', function(e){
+    if (e.target.matches('input, textarea, select')) return;
+    const k = e.key.toLowerCase();
+    if (k === '?') { const h = document.getElementById('kbdHelp'); h.style.display = h.style.display === 'none' ? 'block' : 'none'; return; }
+    const cards = visibleCards();
+    if (!cards.length) return;
+    if (k === 'j' || k === 'k') {
+      e.preventDefault();
+      cursor = Math.max(0, Math.min(cards.length - 1, cursor + (k === 'j' ? 1 : -1)));
+      cards[cursor].scrollIntoView({behavior:'smooth', block:'center'});
+      cards[cursor].style.outline = '2px solid rgba(201,168,76,.6)';
+      setTimeout(() => { cards[cursor].style.outline = ''; }, 800);
+      return;
+    }
+    // A/R/E 需要当前案例 id：从高亮卡片上找按钮
+    const card = cards[cursor];
+    if (!card) return;
+    const btns = card.querySelectorAll('button');
+    const findBtn = (txt) => Array.from(btns).find(b => (b.textContent || '').includes(txt));
+    if (k === 'a') { const b = findBtn('采纳'); if (b) { e.preventDefault(); b.click(); } }
+    else if (k === 'r') { const b = findBtn('驳回'); if (b) { e.preventDefault(); b.click(); } }
+    else if (k === 'e') { const b = findBtn('编辑'); if (b) { e.preventDefault(); b.click(); } }
+  });
+})();
+</script>
 </body>
 </html>

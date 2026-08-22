@@ -113,7 +113,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
     <span class="phb-theme-dot" style="background:#3b7dd8"></span>
     <span class="phb-title">命理大师工作台</span>
   </div>
-  <a href="index.html" class="phb-back">← 返回</a>
+  <a href="integrated-clinic.html" class="phb-back">← 返回问诊台</a>
 </header>
 
 
@@ -128,7 +128,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
   <div class="actions">
     <a href="unified-diagnosis.html" target="_blank">📋 诊疗中心</a>
     <a href="kb-explorer.html" target="_blank">🔍 知识库</a>
-    <a href="divination-hub.html">🏠 首页</a>
+    <a href="index.html">🏠 入口大厅</a>
   </div>
 </header>
 
@@ -631,5 +631,37 @@ async function fetchDemoCase() {
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
   <script src="js/smart-search-bootstrap.js" defer></script>
+<script>
+// ═══ R720 快捷键（命理师工作台）：J/K 切换案例 · S 保存批注 · M 标记已复核 \u21aa 帮助面板 ═══
+(function(){
+  const helpHtml = '<div id="kbdHelp" style="display:none;position:fixed;bottom:16px;right:16px;z-index:99999;background:#111;border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:14px 18px;font-size:12px;color:#d4c9b0;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:280px">'
+    + '<div style="color:#9b59b6;font-weight:600;margin-bottom:8px">\u952e\u76d8\u5feb\u6377\u952e</div>'
+    + '<div>J / K \u2014 \u4e0a\u4e00\u4f8b / \u4e0b\u4e00\u4f8b</div>'
+    + '<div>S \u2014 \u4fdd\u5b58\u6279\u6ce8</div>'
+    + '<div>M \u2014 \u6807\u8bb0\u5df2\u590d\u6838</div>'
+    + '<div>? \u2014 \u663e\u793a/\u9690\u85cf\u672c\u9762\u677f</div>'
+    + '</div>';
+  document.body.insertAdjacentHTML('beforeend', helpHtml);
+  let cursor = 0;
+  function caseNodes(){ return Array.from(document.querySelectorAll('.case-item, [data-token]')); }
+  document.addEventListener('keydown', function(e){
+    if (e.target.matches('input, textarea, select')) return;
+    const k = e.key.toLowerCase();
+    if (k === '?') { const h = document.getElementById('kbdHelp'); h.style.display = h.style.display === 'none' ? 'block' : 'none'; return; }
+    const nodes = caseNodes();
+    if (!nodes.length) return;
+    if (k === 'j' || k === 'k') {
+      e.preventDefault();
+      cursor = Math.max(0, Math.min(nodes.length - 1, cursor + (k === 'j' ? 1 : -1)));
+      nodes[cursor].scrollIntoView({behavior:'smooth', block:'center'});
+      nodes[cursor].style.outline = '2px solid rgba(139,92,246,.6)';
+      setTimeout(() => { nodes[cursor].style.outline = ''; }, 800);
+      return;
+    }
+    if (k === 's') { e.preventDefault(); if (typeof saveAnnotation === 'function') saveAnnotation(); }
+    else if (k === 'm') { e.preventDefault(); if (typeof markReviewed === 'function') markReviewed(); }
+  });
+})();
+</script>
 </body>
 </html>
