@@ -436,5 +436,83 @@ function checkSOS(){
   });
 })();
 </script>
+
+<!-- ═══ R721: 实时病历抽屉（医生端） ═══ -->
+<div id="emrDrawer" style="display:none;position:fixed;top:0;right:0;bottom:0;width:380px;max-width:92vw;background:#0d0d0d;border-left:1px solid rgba(201,168,76,.25);z-index:99990;box-shadow:-8px 0 32px rgba(0,0,0,.5);overflow-y:auto">
+  <div style="position:sticky;top:0;background:#0d0d0d;padding:14px 16px;border-bottom:1px solid rgba(201,168,76,.15);display:flex;align-items:center;gap:8px">
+    <span style="color:var(--gold);font-weight:600;font-size:14px">📋 实时病历</span>
+    <span id="emrDrawerSid" style="font-size:10px;color:var(--muted,#888);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <button onclick="toggleEmrDrawer(false)" style="border:none;background:transparent;color:#888;font-size:18px;cursor:pointer">×</button>
+  </div>
+  <div style="padding:14px 16px;display:flex;gap:6px">
+    <input id="emrSidInput" placeholder="输入会话 ID 拉取病历…" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.2);border-radius:6px;padding:8px 10px;color:#eee;font-size:12px;font-family:inherit">
+    <button onclick="fetchEmrSession()" style="background:var(--gold,#c9a84c);color:#111;border:none;border-radius:6px;padding:8px 12px;font-size:12px;cursor:pointer;font-weight:600">拉取</button>
+  </div>
+  <div id="emrDrawerBody" style="padding:0 16px 20px;font-size:13px;line-height:1.7;color:#d4c9b0"></div>
+</div>
+
+<script>
+// ═══ R721: EMR 会话拉取（医生端） ═══
+function toggleEmrDrawer(show, sid){
+  var d = document.getElementById('emrDrawer');
+  d.style.display = show ? 'block' : 'none';
+  if (show && sid) {
+    document.getElementById('emrSidInput').value = sid;
+    fetchEmrSession();
+  }
+}
+function fetchEmrSession(){
+  var sid = (document.getElementById('emrSidInput').value || '').trim();
+  if (!sid) { alert('请输入会话 ID'); return; }
+  var body = document.getElementById('emrDrawerBody');
+  body.innerHTML = '<div style="color:#888;padding:20px 0">拉取中…</div>';
+  fetch('http://127.0.0.1:8920/api/public/emr-session/' + encodeURIComponent(sid), { signal: AbortSignal.timeout(8000) })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.ok) {
+        body.innerHTML = '<div style="color:#e74c3c;padding:20px 0">' + (d.error === 'NOT_FOUND' ? '会话不存在（可能已过期或未开始采集）' : d.error === 'EXPIRED' ? '会话已过期' : '拉取失败') + '</div>';
+        return;
+      }
+      document.getElementById('emrDrawerSid').textContent = sid;
+      renderEmrBody(d.emr, d.role, d.ts);
+    })
+    .catch(function(){ body.innerHTML = '<div style="color:#e74c3c;padding:20px 0">网络错误，请稍后重试</div>'; });
+}
+function renderEmrBody(emr, role, ts){
+  var FIELDS = [
+    ['complaint', '主诉'],
+    ['examination', '望诊所见'],
+    ['diagnosis', 'AI 诊断'],
+    ['syndrome', '证型'],
+    ['prescription', '处方'],
+    ['visionFeatures', '视觉特征'],
+    ['visionMatches', 'KB 匹配'],
+    ['voiceLog', '问诊对话'],
+    ['reviewNotes', '审核意见']
+  ];
+  var html = '';
+  FIELDS.forEach(function(f){
+    var v = emr[f[0]] || '';
+    if (!v) return;
+    html += '<div style="margin-bottom:14px"><div style="font-size:10px;color:var(--gold,#c9a84c);letter-spacing:1px;margin-bottom:4px">' + f[1] + '</div>'
+      + '<div style="background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.1);border-radius:8px;padding:10px;white-space:pre-wrap;word-break:break-word">' + v.replace(/</g,'&lt;') + '</div></div>';
+  });
+  var statusMap = { approved: ['已通过','rgba(46,204,113,.15)','#2ecc71'], rejected: ['已驳回','rgba(231,76,60,.15)','#e74c3c'], pending: ['待审核','rgba(230,126,34,.15)','#e67e22'] };
+  var st = statusMap[emr.reviewStatus] || statusMap.pending;
+  html = '<div style="margin-bottom:16px"><span style="display:inline-block;padding:4px 12px;border-radius:10px;font-size:11px;font-weight:600;background:' + st[1] + ';color:' + st[2] + '">' + st[0] + '</span>'
+    + '<span style="font-size:10px;color:#666;margin-left:8px">更新于 ' + new Date(ts).toLocaleString() + '</span></div>' + (html || '<div style="color:#888;padding:20px 0">病历字段为空</div>');
+  document.getElementById('emrDrawerBody').innerHTML = html;
+}
+// 键盘快捷键：D 呼出实时病历
+document.addEventListener('keydown', function(e){
+  if (e.target.matches('input, textarea, select')) return;
+  if (e.key.toLowerCase() === 'd') {
+    e.preventDefault();
+    var d = document.getElementById('emrDrawer');
+    toggleEmrDrawer(d.style.display === 'none');
+  }
+});
+</script>
+
 </body>
 </html>

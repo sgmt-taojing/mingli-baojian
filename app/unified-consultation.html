@@ -579,6 +579,7 @@ function setEmr(field, value){
   $('emrDot').classList.add('active');
   setTimeout(() => $('emrDot').classList.remove('active'), 1500);
 }
+  emrSyncThrottled();  // R721: 变更后节流上报
 function appendEmr(field, value){
   if(!value) return;
   if(App.emr[field]){
@@ -619,14 +620,33 @@ function exportEmr(){
   toast('病历已导出');
 }
 function saveEmr(){
-  // 持久化到 localStorage（演示用，生产应走 /api/cases/emr）
-  localStorage.setItem('emr_' + App.sessionId, JSON.stringify({
+  // R721: 双写——上报后端 EMR 会话（医生/命理师实时可见）+ localStorage 兜底
+  const snapshot = {
     sessionId: App.sessionId,
     role: App.role,
     emr: App.emr,
     savedAt: new Date().toISOString()
-  }));
-  toast('病历已归档到 localStorage');
+  };
+  try { localStorage.setItem('emr_' + App.sessionId, JSON.stringify(snapshot)); } catch(_) {}
+  // 上报后端（8920 直连，与 KB 引擎同源策略）
+  fetch('http://127.0.0.1:8920/api/public/emr-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(8000),
+    body: JSON.stringify({ sessionId: App.sessionId, role: App.role, emr: App.emr })
+  }).then(r => r.json()).then(d => {
+    if (d.ok) { setDot('emr', 'ok'); } else { setDot('emr', 'warn'); }
+  }).catch(() => {
+    // 后端不可达：localStorage 已兜底，EMR 点转灰
+    setDot('emr', 'warn');
+  });
+}
+
+// R721: 增量上报（setEmr/appendEmr 后节流上报，不打断用户）
+let _emrSyncTimer = null;
+function emrSyncThrottled(){
+  clearTimeout(_emrSyncTimer);
+  _emrSyncTimer = setTimeout(saveEmr, 1500);
 }
 
 /* ═══ 审核 ═══ */
