@@ -260,11 +260,11 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
   <!-- ═══ 电子病历 ═══ -->
   <div class="emr-panel">
     <div class="emr-header">
-      <h2>📋 实时电子病历 <span class="badge pending" id="reviewBadge">待审核</span></h2>
+      <h2>📋 实时电子病历 <span class="badge pending" id="reviewBadge">待审核</span> <span class="badge" id="caseIdBadge" style="display:none;background:rgba(201,168,76,.15);color:#c9a84c;border:1px solid rgba(201,168,76,.3)">病历号 #—</span></h2>
       <div class="emr-actions">
         <button class="btn ghost sm" onclick="resetEmr()">🔄 重置</button>
         <button class="btn green sm" onclick="exportEmr()">📤 导出</button>
-        <button class="btn primary sm" onclick="saveEmr()">💾 归档</button>
+        <button class="btn primary sm" onclick="archiveEmr()">💾 归档</button>
       </div>
     </div>
 
@@ -648,6 +648,47 @@ function saveEmr(){
     setDot('emr', 'warn');
   });
 }
+
+// R727: 正式归档——出具进 medical_cases，回执病历号常显
+function archiveEmr(){
+  if (!App.emr.complaint) { toast('主诉为空，无法归档（请先完成采集）'); return; }
+  fetch('http://127.0.0.1:8920/api/public/emr-archive', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: AbortSignal.timeout(10000),
+    body: JSON.stringify({ sessionId: App.sessionId, role: App.role, emr: App.emr })
+  }).then(r => r.json()).then(d => {
+    if (d.ok) {
+      App.caseId = d.caseId;
+      showCaseId(d.caseId);
+      toast('电子病历已归档（病历号 #' + d.caseId + '）');
+      setDot('emr', 'ok');
+    } else {
+      toast('归档失败：' + (d.message || d.error || '未知错误'));
+    }
+  }).catch(() => {
+    // 后端不可达：先本地保存，联网后重新归档
+    saveEmr();
+    toast('后端不可达：已暂存本地，联网后点「归档」重试');
+  });
+}
+function showCaseId(caseId){
+  const b = document.getElementById('caseIdBadge');
+  if (!b || !caseId) return;
+  b.style.display = 'inline-block';
+  b.textContent = '病历号 #' + caseId;
+  App.caseId = caseId;
+}
+// R727: 会话恢复时回查病历号（病历永久，内存过期也能查到）
+function pollCaseId(){
+  fetch('http://127.0.0.1:8920/api/public/emr-case/' + encodeURIComponent(App.sessionId), { signal: AbortSignal.timeout(6000) })
+    .then(r => r.json())
+    .then(d => { if (d.ok && d.caseId) showCaseId(d.caseId); })
+    .catch(() => {});
+}
+
+// R727: 启动即回查病历号（已归档过的会话刷新页面也能显示）
+try { pollCaseId(); } catch(_) {}
 
 // R721: 增量上报（setEmr/appendEmr 后节流上报，不打断用户）
 let _emrSyncTimer = null;

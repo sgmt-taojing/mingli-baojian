@@ -785,6 +785,7 @@ function renderEmrBody(emr, role, ts){
   // ═══ R724: 复核操作区（命理师端 · 紫色系）——抽屉内直接采纳/驳回 ═══
   html += '<div style="margin-top:18px;padding-top:14px;border-top:1px solid rgba(139,92,246,.15)">'
     + '<div style="font-size:10px;color:#9b59b6;letter-spacing:1px;margin-bottom:8px">复核操作</div>'
+    + '<input id="emrMasterAnn" placeholder="命理合参批注（五行·流年·调理方向，采纳时随病历归档）" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);border-radius:6px;padding:9px 10px;color:#eee;font-size:12px;font-family:inherit;margin-bottom:8px">'
     + '<input id="emrReviewNotes" placeholder="复核意见（驳回必填）…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.05);border:1px solid rgba(139,92,246,.2);border-radius:6px;padding:9px 10px;color:#eee;font-size:12px;font-family:inherit;margin-bottom:10px">'
     + '<div style="display:flex;gap:8px">'
     + '<button onclick="submitEmrReview(&quot;approved&quot;)" style="flex:1;background:rgba(139,92,246,.12);border:1px solid #9b59b6;color:#9b59b6;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">✓ 采纳</button>'
@@ -798,18 +799,49 @@ function submitEmrReview(action){
   if (!sid) { showToast('请先拉取会话病历', 'warn'); return; }
   var notes = (document.getElementById('emrReviewNotes') ? document.getElementById('emrReviewNotes').value : '') || '';
   if (action === 'rejected' && !notes.trim()) { showToast('驳回必须填写原因', 'warn'); return; }
+  // R727: 命理师复核 = 第二签署人。采纳时同时归档（合参批注入正式病历）
+  var payload = { sessionId: sid, role: 'master', emr: { reviewStatus: action, reviewNotes: notes } };
+  var ann = (document.getElementById('emrMasterAnn') ? document.getElementById('emrMasterAnn').value : '') || '';
+  if (ann.trim()) payload.emr.mingli = ann.trim();
   fetch('http://127.0.0.1:8920/api/public/emr-session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sessionId: sid, role: 'master', emr: { reviewStatus: action, reviewNotes: notes } }),
+    body: JSON.stringify(payload),
     signal: AbortSignal.timeout(8000)
   })
     .then(function(r){ return r.json(); })
     .then(function(d){
       if (!d.ok) { showToast('复核提交失败，请重试', 'error'); return; }
+      if (action === 'approved') { archiveAsMaster(sid, ann, notes); }
       fetchEmrSession();
     })
     .catch(function(){ showToast('复核提交失败，请重试', 'error'); });
+}
+// R727: 命理师采纳 → 归档正式病历（命理合参 + 批注为第二签署人落库）
+function archiveAsMaster(sid, ann, notes){
+  fetch('http://127.0.0.1:8920/api/public/emr-session/' + encodeURIComponent(sid), { signal: AbortSignal.timeout(6000) })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.ok) return;
+      var emr = d.emr || {};
+      emr.reviewStatus = 'approved';
+      if (ann.trim()) emr.mingli = ann.trim();
+      if (notes) emr.reviewNotes = notes;
+      return fetch('http://127.0.0.1:8920/api/public/emr-archive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(10000),
+        body: JSON.stringify({ sessionId: sid, role: 'master', emr: emr })
+      });
+    })
+    .then(function(r){
+      if (r && r.json) { return r.json(); }
+      return null;
+    })
+    .then(function(d){
+      if (d && d.ok) showToast('已采纳并归档（病历号 #' + d.caseId + '）');
+    })
+    .catch(function(){ showToast('归档失败：病历已同步，可稍后重试'); });
 }
 // 键盘快捷键：D 呼出实时病历（与医生端一致）
 document.addEventListener('keydown', function(e){

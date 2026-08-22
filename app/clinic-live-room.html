@@ -154,6 +154,7 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
   <span class="farrow">→</span>
   <div class="fstep" data-fs="4"><span class="n">4</span>电子病历</div>
   <span class="room-id" id="roomId">—</span>
+  <span class="room-id" id="caseIdTag" style="display:none;color:var(--gold2)">病历号 #—</span>
 </div>
 
 <main class="room">
@@ -682,6 +683,8 @@ function archiveEmr(){
   }).then(r=>r.json()).then(d=>{
     if (d.ok) {
       Room.caseId = d.caseId;
+      const tag = $('caseIdTag');
+      if (tag) { tag.style.display = 'inline'; tag.textContent = '病历号 #' + d.caseId; }
       toast('电子病历已归档（病历号 #' + d.caseId + '）');
     } else {
       toast('归档失败：' + (d.message || d.error || '未知错误'));
