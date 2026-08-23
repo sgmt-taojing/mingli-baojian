@@ -267,6 +267,28 @@ function renderSessions() {
       <span class="tag">${s.status}</span>
     </div>
   `).join('');
+
+// R732: 云端活跃 EMR 会话补充显示（后端 2h 内的真实会话）
+(function loadCloudSessions(){
+  fetch('http://127.0.0.1:8920/api/public/emr-sessions', { signal: AbortSignal.timeout(6000) })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok || !d.sessions || !d.sessions.length) return;
+      const el = document.getElementById('sessionList');
+      if (!el) return;
+      const cloud = d.sessions.filter(s => s.reviewStatus !== 'pending' || s.complaint).slice(0, 3);
+      if (!cloud.length) return;
+      const html = cloud.map(s => {
+        const st = s.reviewStatus === 'approved' ? '已复核' : s.reviewStatus === 'rejected' ? '已驳回' : '进行中';
+        const mins = Math.round((s.updatedMsAgo || 0) / 60000);
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid rgba(201,168,76,.15);border-radius:8px;margin-top:6px;font-size:12px">' +
+          '<span>' + (s.complaint || '活跃会话').slice(0, 24) + '</span>' +
+          '<span style="color:var(--gold)">' + st + ' · ' + (mins < 60 ? mins + ' 分钟前' : Math.round(mins/60) + ' 小时前') + '</span></div>';
+      }).join('');
+      el.insertAdjacentHTML('beforeend', '<div style="font-size:11px;color:var(--gold);margin-top:10px">☁ 云端进行中</div>' + html);
+    })
+    .catch(() => {});
+})();
 }
 
 // ====== 4. 医生/命理师队列（共用 sessions 过滤）======

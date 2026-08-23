@@ -233,7 +233,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
     </div>
     <div class="empty" id="noReports" style="display:none"><div class="icon">📄</div>暂无诊断报告</div>
 
-    <h5 style="font-size:12px;color:var(--gold);margin:16px 0 8px">⏰ 随访提醒</h5>
+    <h5 style="font-size:12px;color:var(--gold);margin:16px 0 8px">⏰ 随访提醒 <span id="followupSource" style="font-size:10px;color:var(--muted)">（示例）</span></h5>
     <ul class="follow-list" id="followupList">
       <li>
         <span class="dot soon"></span>
@@ -321,7 +321,8 @@ window.saveProfile = function() {
 
 // ═══ Load saved data ═══
 document.addEventListener('DOMContentLoaded', () => {
-  // Try loading reports from localStorage
+  // ① 本地问诊报告（问诊台 clinic-consultation 写入）
+  let localShown = false;
   try {
     const reports = JSON.parse(localStorage.getItem('clinic_reports') || '[]');
     if (reports.length > 0) {
@@ -334,9 +335,77 @@ document.addEventListener('DOMContentLoaded', () => {
         <b>医生诊断：</b>${latest.doctorNote||'—'}<br>
         <b>证型：</b>${latest.doctorSyndrome||'—'}<br>
         <b>命理体质：</b>${latest.mingli?.day_master||''}日主 · ${latest.mingli?.constitution||''}`;
+      localShown = true;
     }
     document.getElementById('visitCount').textContent = (reports.length > 0 ? reports.length : 1) + ' 次';
   } catch(e) {}
+
+  // ② R732: 无本地报告时拉后端（登录态 my-reports → EMR 归档回退）
+  if (!localShown) {
+    var token = '';
+    try { token = localStorage.getItem('token') || localStorage.getItem('auth_token') || ''; } catch(_) {}
+    fetch('http://127.0.0.1:8920/api/clinic/my-reports', {
+      headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+      signal: AbortSignal.timeout(8000)
+    }).then(function(r){ return r.json(); }).then(function(list){
+      if (list && list.length) {
+        var rep = list[0];
+        var text = (rep.filtered_text || rep.report_text || '').slice(0, 500);
+        var card = document.getElementById('latestReport');
+        card.querySelector('h4').textContent = '诊断报告 · ' + (rep.pushed_at || '').slice(0, 10);
+        card.querySelector('.summary').innerHTML = '<b>报告：</b>' + text;
+        localShown = true;
+      } else {
+        loadEmrFallback();
+      }
+    }).catch(function(){ loadEmrFallback(); });
+  }
+
+  function loadEmrFallback(){
+    // ③ 匿名回退：遍历本地 emr_ 前缀找最近归档
+    var latest = null, latestTs = 0;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf('emr_') === 0) {
+          var v = JSON.parse(localStorage.getItem(k));
+          if (v && v.savedAt && new Date(v.savedAt).getTime() > latestTs) {
+            latestTs = new Date(v.savedAt).getTime(); latest = v;
+          }
+        }
+      }
+    } catch(_) {}
+    var card = document.getElementById('latestReport');
+    if (latest && latest.emr && (latest.emr.syndrome || latest.emr.prescription)) {
+      var e = latest.emr;
+      var st = e.reviewStatus === 'approved' ? '已复核' : e.reviewStatus === 'rejected' ? '已驳回' : '待复核';
+      card.querySelector('h4').textContent = '电子病历 · ' + (latest.savedAt || '').slice(0, 10);
+      card.querySelector('.summary').innerHTML =
+        '<b>主诉：</b>' + (e.complaint || '—').slice(0, 80) + '<br>' +
+        '<b>AI辨证：</b>' + (e.syndrome || '—').slice(0, 120) + '<br>' +
+        '<b>处置：</b>' + (e.prescription || '待医生确认') + '<br>' +
+        '<b>状态：</b>' + st + (latest.caseId ? ' · 病历号 #' + latest.caseId : '');
+    } else {
+      card.style.display = 'none';
+      var empty = document.getElementById('noReports');
+      if (empty) empty.style.display = 'block';
+    }
+    // R732: 处方含复诊建议 → 生成真实随访提醒
+    if (latest && latest.emr && latest.emr.prescription && /复诊|复查/.test(latest.emr.prescription)) {
+      var fl = document.getElementById('followupList');
+      var src = document.getElementById('followupSource');
+      if (fl) {
+        var days = (latest.emr.prescription.match(/(\d+)\s*天(后)?复诊/) || [])[1];
+        var d = new Date();
+        if (days) d.setDate(d.getDate() + parseInt(days));
+        var ds = d.toLocaleDateString('zh-CN');
+        fl.innerHTML = '<li><span class="dot soon"></span><span class="date">' + ds + '</span>' +
+          '<span class="desc">复诊 — ' + (latest.emr.prescription || '').slice(0, 40) + '</span>' +
+          '<span class="action">' + (days ? days + ' 天后' : '按医嘱') + '</span></li>';
+      }
+      if (src) src.textContent = '（来自病历处方）';
+    }
+  }
 });
 </script>
 <script src="js/error-interceptor.js" defer></script>
