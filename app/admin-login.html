@@ -179,8 +179,7 @@
 
   <div class="info-box">
     <strong>认证说明：</strong><br>
-    本系统采用邮箱 + 密码认证机制，支持超管/管理员两级权限。<br>
-    测试账号：<strong>admin@mingli.local</strong> / <strong>mingli2026</strong><br>
+    本系统采用邮箱 + 密码认证，由服务端统一验证（支持超管/管理员两级权限）。<br>
     登录后将跳转至后台管理首页。
   </div>
 
@@ -193,26 +192,7 @@
 // ═══════════════════════════════════════════
 // 管理员登录逻辑（前端 + 模拟认证）
 // ═══════════════════════════════════════════
-const ADMIN_CONFIG = {
-  // 测试账号配置（生产环境应替换为后端 API 调用）
-  testAccounts: {
-    'admin@mingli.local': {
-      password: 'mingli2026',
-      name: '超级管理员',
-      role: 'super_admin'
-    },
-    'master@mingli.local': {
-      password: 'master2026',
-      name: '周易大师',
-      role: 'master'
-    },
-    'doctor@mingli.local': {
-      password: 'doctor2026',
-      name: '中医医生',
-      role: 'doctor'
-    }
-  }
-};
+// 账号验证已迁移至服务端 /api/auth/login（前端不存任何密码）
 
 // 表单提交处理
 document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
@@ -253,34 +233,33 @@ document.getElementById('admin-login-form').addEventListener('submit', async fun
   submitBtn.textContent = '登录中...';
 
   try {
-    // 模拟网络请求延迟
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // 验证账号密码
-    const account = ADMIN_CONFIG.testAccounts[email.toLowerCase()];
-    if (!account || account.password !== password) {
+    // 服务端统一验证（前端零密码存储）
+    // shared-auth 以 username/phone 验证：邮箱输入自动取 @ 前部分作用户名
+    const username = email.split('@')[0];
+    const resp = await fetch('http://127.0.0.1:8920/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(10000),
+      body: JSON.stringify({ username: username, password: password })
+    });
+    const d = await resp.json().catch(() => ({}));
+    const token = d.token || '';
+    const role = (d.user && d.user.role) || '';
+    const name = (d.user && d.user.name) || email;
+    if (!resp.ok || !token) {
       passwordInput.classList.add('error');
       passwordError.classList.add('show');
-      passwordError.textContent = '邮箱或密码错误';
+      passwordError.textContent = (d.error || d.message || '邮箱或密码错误');
       submitBtn.disabled = false;
       submitBtn.textContent = '登 录';
       return;
     }
 
-    // 登录成功 - 生成 token（简化版）
-    const token = btoa(JSON.stringify({
-      email: email,
-      role: account.role,
-      name: account.name,
-      iat: Date.now(),
-      exp: Date.now() + 24 * 60 * 60 * 1000 // 24小时有效期
-    }));
-
-    // 存储到 localStorage
+    // 存储到 localStorage（仅存服务端签发的 token）
     localStorage.setItem('admin_token', token);
     localStorage.setItem('admin_email', email);
-    localStorage.setItem('admin_role', account.role);
-    localStorage.setItem('admin_name', account.name);
+    localStorage.setItem('admin_role', role);
+    localStorage.setItem('admin_name', name);
 
     // 跳转至后台首页
     submitBtn.textContent = '登录成功！';
