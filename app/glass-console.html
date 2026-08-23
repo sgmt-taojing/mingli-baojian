@@ -1158,21 +1158,35 @@ function speak(text) {
   try { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang='zh-CN'; u.rate=1.1; window.speechSynthesis.speak(u); } catch(e){}
 }
 
-// === 28 舌象饼图（硬编码示例） ===
-// [TEST_DATA] 硬编码示例数据，上线前替换
+// === R733 舌象饼图（KB 真实数据） ===
 function drawTonguePie() {
   const c = $('#tongue-pie'); if (!c) return;
   const ctx = c.getContext('2d'); if(!ctx) return;
-  const data = [
-    { name:'淡白舌', v:18, c:'#f8d7da' },
-    { name:'红舌', v:22, c:'#f5b5bb' },
-    { name:'绛舌', v:8, c:'#c4384d' },
-    { name:'紫舌', v:6, c:'#7a1f3a' },
-    { name:'胖大舌', v:14, c:'#ffe5b4' },
-    { name:'瘦薄舌', v:10, c:'#ffd089' },
-    { name:'齿痕舌', v:12, c:'#e8d4a0' },
-    { name:'裂纹舌', v:10, c:'#c4a878' },
-  ];
+  // 从 KB 检索舌象条目生成真实分布（失败显示"暂无数据"）
+  const TONGUE_TYPES = ['淡白舌','红舌','绛舌','紫舌','胖大舌','瘦薄舌','齿痕舌','裂纹舌'];
+  fetch('http://127.0.0.1:8920/api/public/kb/search-fts?q=' + encodeURIComponent('舌象') + '&limit=30', { signal: AbortSignal.timeout(6000) })
+    .then(r => r.json())
+    .then(d => {
+      const results = (d.data || d).results || [];
+      const counts = {};
+      TONGUE_TYPES.forEach(t => { counts[t] = 0; });
+      results.forEach(r => {
+        const title = r.title || '';
+        TONGUE_TYPES.forEach(t => { if (title.indexOf(t) >= 0) counts[t]++; });
+      });
+      // KB 无命中时按模块分布展示（真实检索来源）
+      let data = Object.entries(counts).filter(([k,v]) => v > 0).map(([k,v],i) => ({ name:k, v, c:['#f8d7da','#f5b5bb','#c4384d','#7a1f3a','#e8a87c','#d46a6a','#b56576','#8e4444'][i % 8] }));
+      if (!data.length && results.length) {
+        const byMod = {};
+        results.forEach(r => { byMod[r.module || '其他'] = (byMod[r.module || '其他'] || 0) + 1; });
+        data = Object.entries(byMod).map(([k,v],i) => ({ name:k, v, c:['#c9a84c','#8fbf7f','#5dade2','#af7ac5','#e8a87c','#7fb3d5'][i % 6] }));
+      }
+      if (!data.length) { drawPieEmpty(ctx, c); return; }
+      drawPieData(ctx, c, data);
+    })
+    .catch(() => { drawPieEmpty(ctx, c); });
+}
+function drawPieData(ctx, c, data) {
   const cx = 80, cy = 100, R = 70, r = 40;
   const total = data.reduce((s,x)=>s+x.v,0);
   let a0 = -Math.PI/2;
@@ -1183,6 +1197,15 @@ function drawTonguePie() {
     a0 = a1;
   });
   $('#tongue-legend').innerHTML = data.map(d => `<div style="display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 0"><span style="width:12px;height:12px;background:${d.c};border-radius:3px"></span><span style="flex:1">${d.name}</span><span style="color:var(--muted);font-variant-numeric:tabular-nums">${d.v}</span></div>`).join('');
+}
+function drawPieEmpty(ctx, c) {
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = '#7f8c8d';
+  ctx.font = '13px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('暂无舌象数据', 80, 100);
+  const lg = document.getElementById('tongue-legend');
+  if (lg) lg.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">KB 服务不可达或无舌象条目</div>';
 }
 drawTonguePie();
 

@@ -157,7 +157,7 @@ canvas { width: 100%; height: 100%; display: block; }
 
 <script>
 // === 数据：54 模块的 KB 关系（本地硬编码 + 从 quality-report 推断）===
-// [TEST_DATA] 硬编码示例数据，上线前替换为真实API或动态加载
+// R733: 优先从 KB 统计拉取真实分布，离线时兜底
 const MODULES = [
   {id:'bazi', name:'八字命理', n:612, cat:'classical', tr:0.92, tags:['四柱','日主','十神']},
   {id:'ziwei', name:'紫微斗数', n:480, cat:'classical', tr:0.88, tags:['宫位','星曜','四化']},
@@ -216,6 +216,38 @@ const MODULES = [
   {id:'feedback', name:'反馈', n:0, cat:'practice', tr:0, tags:['意见','建议','评价']},
   {id:'history', name:'历史', n:0, cat:'practice', tr:0, tags:['对话','记录','回看']},
 ];
+
+// R733: 动态拉取 KB 统计覆盖硬编码兜底
+(function loadKbStats(){
+  fetch('http://127.0.0.1:8920/api/public/kb/stats', { signal: AbortSignal.timeout(6000) })
+    .then(r => r.json())
+    .then(d => {
+      const top = ((d.data || d).top_modules || []).slice(0, 20);
+      if (!top.length) return;
+      const NAME_MAP = {
+        bazi:'八字命理',ziwei:'紫微斗数',qimen:'奇门遁甲',liuyao:'六爻',meihua:'梅花易数',liuren:'大六壬',
+        fengshui:'风水',cezi:'测字',zeri:'择日',xingming:'姓名',mianxiang:'面相',shouxiang:'手相',
+        zhougong:'周公解梦',huangli:'黄历',tianji:'天纪',yijing:'易经',shuhan:'舒晗',tcm:'中医',
+        acupuncture:'针灸',wangzhen:'望诊',suxing:'宿命',qiming:'起名',liuyue:'六爻',face:'面相'
+      };
+      const newModules = top.map(m => ({
+        id: m.module,
+        name: NAME_MAP[m.module] || m.module,
+        n: m.cnt || 0,
+        cat: ['bazi','ziwei','qimen','liuyao','meihua','liuren','fengshui','cezi','zeri','xingming','mianxiang','shouxiang','zhougong','huangli','tianji','yijing','liuyue','face','qiming','suxing'].includes(m.module) ? 'classical' : 'medical',
+        tr: 0.85,
+        tags: []
+      }));
+      if (newModules.length > 5) {
+        // 替换全局 MODULES（兜底保留原数组引用不变，仅覆盖变量）
+        Object.assign(MODULES, newModules);
+        MODULES.length = newModules.length;
+        // 重新渲染图
+        if (typeof renderGraph === 'function') renderGraph();
+      }
+    })
+    .catch(() => { /* 离线兜底 —— 保留硬编码数据 */ });
+})();
 
 const CAT_COLOR = {
   'classical':'#e6c873',
