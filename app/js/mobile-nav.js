@@ -5,21 +5,28 @@
  */
 (function () {
   'use strict';
-  if (window.location.pathname.indexOf('divination-hub') !== -1) return;
+  // R747: 自包含样式注入（不再依赖页面引 css/mobile-nav.css）
+  if (!document.getElementById('mobileNavStyle')) {
+    var st = document.createElement('style');
+    st.id = 'mobileNavStyle';
+    st.textContent = '.mobile-bottom-nav{position:fixed;bottom:0;left:0;right:0;display:none;justify-content:space-around;align-items:center;background:rgba(12,12,12,.95);backdrop-filter:blur(12px);border-top:1px solid rgba(201,168,76,.2);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:9999}' +
+      '@media(max-width:768px){.mobile-bottom-nav{display:flex}}' +
+      '.mbn-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 10px;text-decoration:none;color:#a09080;font-size:10px;min-width:52px;border-radius:8px;transition:.15s}' +
+      '.mbn-item.active{color:#e8cc7a;background:rgba(201,168,76,.1)}' +
+      '.mbn-item:hover{color:#e8cc7a}' +
+      '.mbn-icon{font-size:20px;line-height:1}';
+    document.head.appendChild(st);
+  }
+  // R747: divination-hub 已是跳转页，不再特殊排除
 
+  // R747: 导航项重构——面向大众的高频功能（去掉运维项，首页指向大厅）
   var ITEMS = [
-    { href: 'divination-hub.html', icon: '🏠', label: '首页', key: 'hub' },
-    { href: 'paipan-center.html', icon: '🌀', label: '排盘', key: 'paipan' },
-    { href: 'ai-assistant.html', icon: '🤖', label: '智能助手', key: 'assistant' },
-    { href: 'kb-hot.html', icon: '🔥', label: 'KB热词', key: 'kb-hot' },
-    { href: 'kb-quality.html', icon: '⭐', label: 'KB质量', key: 'kb-quality' },
-    { href: 'daily-summary.html', icon: '📊', label: '今日完成', key: 'daily' },
-    { href: 'ai-engine-config.html', icon: '⚙️', label: '引擎配置', key: 'engine' },
-    { href: 'kb-graph.html', icon: '🕸️', label: '图谱', key: 'kb-graph' },
-    { href: 'lifeplan-detail.html', icon: '🧭', label: '人生规划', key: 'lifeplan' },
-    { href: 'qimen-chart.html', icon: '🧭', label: '奇门排盘', key: 'qimen-chart' },
-    { href: 'camera-capture.html', icon: '📸', label: '拍照', key: 'camera' },
-    { href: 'vision-demo.html', icon: '👁️', label: '视野', key: 'vision' }
+    { href: 'index.html', icon: '🏠', label: '首页', key: 'home' },
+    { href: 'voice-portal.html', icon: '⚡', label: '直达', key: 'voice' },
+    { href: 'paipan-quick.html', icon: '☯', label: '命理', key: 'paipan' },
+    { href: 'ai-assistant.html', icon: '🤖', label: '助手', key: 'assistant' },
+    { href: 'huangli-daily.html', icon: '📅', label: '黄历', key: 'huangli' },
+    { href: 'patient-journey.html', icon: '📋', label: '我的', key: 'mine' }
   ];
 
   var path = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
