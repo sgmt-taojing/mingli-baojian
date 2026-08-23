@@ -553,6 +553,11 @@ toggleEmrDrawer = function(show, sid){
         if (msg.type === 'emr-update' && _emrCurrentSid && msg.sessionId === _emrCurrentSid) {
           if (document.getElementById('emrDrawer').style.display !== 'none') fetchEmrSession();
         }
+        // R734: 新病历归档/驳回到达 → toast + 队列自动刷新
+        if (msg.type === 'case-archived') {
+          showToast('📥 新病历 #' + msg.caseId + ' 已归档，队列已刷新', 'ok');
+          if (typeof loadQueue === 'function') setTimeout(loadQueue, 500);
+        }
       } catch (_) {}
     };
   } catch (_) {}

@@ -684,7 +684,13 @@ function archiveEmr(){
     if (d.ok) {
       Room.caseId = d.caseId;
       const tag = $('caseIdTag');
-      if (tag) { tag.style.display = 'inline'; tag.textContent = '病历号 #' + d.caseId; }
+      if (tag) {
+        tag.style.display = 'inline';
+        tag.textContent = '病历号 #' + d.caseId;
+        tag.style.cursor = 'pointer';
+        tag.title = '点击查看修订历史';
+        tag.onclick = showVersionHistory;
+      }
       toast('电子病历已归档（病历号 #' + d.caseId + '）');
     } else {
       toast('归档失败：' + (d.message || d.error || '未知错误'));
@@ -725,6 +731,41 @@ function emrSyncThrottled(){
       body: JSON.stringify({ sessionId: Room.sessionId, role: 'doctor', emr: Room.emr })
     }).catch(()=>{});
   }, 1500);
+}
+
+// R734: 版本历史弹窗（修订可追溯）
+function showVersionHistory(){
+  fetch(API_EMR + '/api/public/emr-versions/' + encodeURIComponent(Room.sessionId), { signal: AbortSignal.timeout(8000) })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok || !d.versions.length) { toast('暂无修订历史'); return; }
+      const rows = d.versions.map(v =>
+        '<div style="display:flex;gap:8px;padding:8px;border-bottom:1px solid rgba(201,168,76,.1);font-size:11px">' +
+        '<span style="color:var(--gold);min-width:24px">v' + v.versionNumber + '</span>' +
+        '<span style="min-width:44px">' + (v.actorRole === 'master' ? '命理师' : '医生') + '</span>' +
+        '<span style="color:var(--paper3);min-width:100px">' + (v.createdAt || '').slice(0, 16) + '</span>' +
+        '<span style="min-width:52px">' + (v.reviewStatus === 'approved' ? '✓采纳' : v.reviewStatus === 'modified' ? '✎修订' : v.reviewStatus === 'rejected' ? '✕驳回' : '待复核') + '</span>' +
+        '<span style="flex:1;color:var(--paper2)">' + esc((v.reviewNotes || '').slice(0, 40)) + '</span>' +
+        '<span style="color:var(--paper3)">#' + v.snapshotHash.slice(0, 8) + '</span>' +
+        '</div>'
+      ).join('');
+      // 弹窗
+      let overlay = document.getElementById('verOverlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'verOverlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center';
+        overlay.onclick = function(e){ if (e.target === overlay) overlay.style.display = 'none'; };
+        document.body.appendChild(overlay);
+      }
+      overlay.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;max-width:560px;width:90%;max-height:70vh;overflow-y:auto">' +
+        '<div style="font-size:14px;font-weight:600;color:var(--gold2);margin-bottom:10px">📋 修订历史（' + d.versions.length + ' 版）</div>' +
+        rows +
+        '<div style="text-align:center;margin-top:12px"><button class="btn sm" onclick="document.getElementById(\'verOverlay\').style.display=\'none\'">关闭</button></div>' +
+        '</div>';
+      overlay.style.display = 'flex';
+    })
+    .catch(() => toast('版本历史获取失败'));
 }
 
 // ═══ 工具 ═══
