@@ -171,7 +171,7 @@ function renderQueueBar(){
   allCases.forEach(function(c){if(statuses.indexOf(c.status)<0)statuses.push(c.status)});
   var html='<div class="queue-chip active" onclick="filterQueue(\'\',this)">全部 ('+allCases.length+')</div>';
   statuses.forEach(function(s){
-    var label=s==='pending_doctor'?'待医生':s==='pending_master'?'待大师':s==='completed'?'已完成':s==='approved'?'已批准':s;
+    var label=s==='pending_doctor'?'待医生':s==='pending_master'?'待大师':s==='completed'?'已完成':s==='approved'?'已批准':s==='rejected'?'驳回待修订':s;
     var dot=s==='pending_doctor'?'dot-doctor':s==='pending_master'?'dot-pending':s==='completed'?'dot-done':'dot-pending';
     html+='<div class="queue-chip" onclick="filterQueue(\''+s+'\',this)"><span class="dot '+dot+'"></span>'+label+' ('+allCases.filter(function(c){return c.status===s}).length+')</div>';
   });
@@ -214,18 +214,62 @@ function renderCards(list){
       (photos?'<div class="photo-strip">'+photos+'</div>':'')+
       (kb?'<div style="margin:6px 0">'+kb+'</div>':'')+
       (c.aiDraft?'<div class="ai-draft"><span class="tag">🤖 AI 初稿'+(c.aiGenerated?'<b style="color:#48bb78"> · 自动生成</b>':'')+'</span><br>'+(c.aiDraft||'').slice(0,400)+'</div>':'')+
+      (c.sessionId?'<div class="ai-draft" style="border-color:rgba(201,168,76,.3)"><span class="tag" style="color:#c9a84c">📋 智能问诊室病历'+(c.caseNumber?' · '+c.caseNumber:'')+'</span>'+
+        (c.syndromeType?'<br><b>AI 辨证：</b>'+esc(c.syndromeType):'')+
+        (c.aiDiagnosis?'<br><b>AI 诊断：</b>'+esc(c.aiDiagnosis).slice(0,300):'')+
+        (c.voiceTranscript?'<br><b>对话记录：</b><span style="color:var(--muted);font-size:11px">'+esc(c.voiceTranscript).slice(0,200)+'…</span>':'')+
+        (c.reviewNotes?'<br><b>复核意见：</b>'+esc(c.reviewNotes).slice(0,150):'')+
+      '</div>':'')+
       '<div class="swipe-actions no-print">'+
         '<button class="btn btn-intake" onclick="quickIntake('+JSON.stringify({id:c.id,name:c.patientName||'',sex:c.patientSex||'',year:c.birthYear||'',birthDate:c.birthDate||'',birthHour:c.birthHour||'',symptoms:c.symptoms||'',constitution:c.constitution||''}).replace(/"/g,'&quot;')+')" title="一键带入患者信息到采集工具">⚡ 快速采集</button>'+
         (c.status==='pending_doctor'||c.status==='pending'?
           '<button class="btn btn-reject" onclick="rejectCase('+c.id+')">✕ 驳回</button>'+
           '<button class="btn btn-secondary" onclick="openEdit('+c.id+')">✎ 编辑</button>'+
           '<button class="btn" onclick="acceptCase('+c.id+')">✓ 采纳</button>'
-        :'<div style="text-align:center;color:var(--green);font-size:13px;padding:8px">✔ 已处理</div>')+
+        :(c.status==='rejected'?
+          '<button class="btn btn-reject" disabled style="opacity:.6">✕ 已驳回</button>'+
+          '<button class="btn" onclick="reviseCase('+c.id+')">🔄 修订重出</button>'
+        :'<div style="text-align:center;color:var(--green);font-size:13px;padding:8px">✔ 已处理</div>'))+
       '</div>'+
       '<div class="edit-panel" id="edit-'+c.id+'"></div>'+
     '</div>';
   });
   el.innerHTML=html;
+}
+
+// 🔄 R728: 驳回修订闭环——医生修订后重出（更新归档病历，状态回到复核流）
+function reviseCase(id){
+  var c=allCases.find(function(x){return x.id===id});
+  if(!c||!c.sessionId){showToast('此病历非问诊室归档，请走编辑流程','warn');return}
+  var panel=document.getElementById('edit-'+id);
+  if(panel&&!panel.classList.contains('show')){openEdit(id)}
+  // 修订面板顶部加"修订重出"操作条
+  if(panel){
+    var bar=document.createElement('div');
+    bar.style.cssText='margin-bottom:10px;padding:10px;background:rgba(230,126,34,.08);border:1px solid rgba(230,126,34,.3);border-radius:8px';
+    bar.innerHTML='<div style="font-size:12px;color:#e67e22;margin-bottom:8px">🔄 驳回修订：修改后重新出具，将回到复核流</div>'+
+      '<textarea id="revise-notes-'+id+'" placeholder="修订说明（会覆盖原复核意见）…" style="width:100%;min-height:48px;background:rgba(255,255,255,.05);border:1px solid rgba(230,126,34,.3);border-radius:6px;padding:8px;color:#eee;font-size:12px;font-family:inherit"></textarea>'+
+      '<button class="btn" style="margin-top:8px;width:100%;background:rgba(230,126,34,.15);border-color:#e67e22;color:#e67e22" onclick="submitRevise('+id+')">📤 修订重出（重新进入复核流）</button>';
+    panel.insertBefore(bar, panel.firstChild);
+  }
+}
+function submitRevise(id){
+  var c=allCases.find(function(x){return x.id===id});
+  if(!c||!c.sessionId)return;
+  var notes=(document.getElementById('revise-notes-'+id+'')||{}).value||'';
+  if(!notes.trim()){showToast('请填写修订说明','warn');return}
+  fetch(API+'/api/public/emr-archive',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    signal:AbortSignal.timeout(10000),
+    body:JSON.stringify({
+      sessionId:c.sessionId, role:'doctor',
+      emr:{complaint:(c.symptoms||'').slice(0,2000), syndrome:(c.syndromeType||''), reviewStatus:'modified', reviewNotes:'【修订重出】'+notes.trim()}
+    })
+  }).then(function(r){return r.json()}).then(function(d){
+    if(d.ok){showToast('已修订重出（病历号 #'+d.caseId+'），回到复核流','ok');setTimeout(function(){loadQueue()},600)}
+    else{showToast('修订失败：'+(d.message||d.error||'未知'),'error')}
+  }).catch(function(){showToast('修订请求失败，请重试','error')});
 }
 
 // ⚡ 一键带入采集工具（零重复输入）
