@@ -508,5 +508,31 @@ document.addEventListener("DOMContentLoaded",function(){
   </button>
 
   <script src="js/hci-enhance.js" defer></script>
+
+<script>
+// R735: 一句话直达预填（voice-portal 跳转自动填入问题）
+(function(){
+  var pre = '';
+  try { pre = sessionStorage.getItem('vp_query') || ''; } catch(_) {}
+  if (!pre) {
+    var qs = new URLSearchParams(location.search);
+    pre = qs.get('q') || '';
+  }
+  if (pre) {
+    // 常见输入框 id
+    var el = document.getElementById('chatInput') || document.getElementById('questionInput') || document.getElementById('userInput') || document.querySelector('input[type="text"], textarea');
+    if (el) {
+      el.value = pre;
+      el.focus();
+      // 触发自动提交（500ms 后）
+      setTimeout(function(){
+        var btn = document.getElementById('sendBtn') || document.getElementById('askBtn') || document.querySelector('button.primary, button[class*="send"]');
+        if (btn) btn.click();
+      }, 600);
+    }
+    try { sessionStorage.removeItem('vp_query'); } catch(_) {}
+  }
+})();
+</script>
 </body>
 </html>

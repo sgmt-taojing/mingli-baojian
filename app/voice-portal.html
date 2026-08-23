@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="一句话直达 · 说出您的需求，AI 自动带您到对的功能">
+<title>一句话直达 · 命理宝鉴</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+:root{--bg:#080808;--card:#141414;--border:rgba(201,168,76,.18);--gold:#c9a84c;--gold2:#e8cc7a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--jade:#27ae60;--cyan2:#5dade2;--violet2:#9b59b6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:radial-gradient(ellipse at 50% -10%,rgba(201,168,76,.06),transparent 60%),var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border)}
+header .t{font-size:15px;color:var(--gold2);letter-spacing:2px}
+header a{color:var(--paper3);font-size:12px;text-decoration:none}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;max-width:640px;margin:0 auto;width:100%}
+.hero{text-align:center;margin-bottom:32px}
+.hero .ic{font-size:52px;margin-bottom:12px;animation:breath 3s infinite}
+@keyframes breath{50%{transform:scale(1.06);opacity:.85}}
+.hero h1{font-size:22px;color:var(--paper);font-weight:600;margin-bottom:8px}
+.hero p{font-size:13px;color:var(--paper3);line-height:1.8}
+/* 输入区 */
+.input-zone{width:100%;position:relative;margin-bottom:16px}
+.input-box{display:flex;gap:10px;align-items:center;background:var(--card);border:2px solid var(--border);border-radius:60px;padding:6px 6px 6px 22px;transition:.3s}
+.input-box:focus-within{border-color:var(--gold);box-shadow:0 0 24px rgba(201,168,76,.12)}
+.input-box input{flex:1;background:none;border:none;outline:none;color:var(--paper);font-size:16px;font-family:inherit;padding:10px 0}
+.input-box input::placeholder{color:var(--paper3)}
+.mic-btn{width:52px;height:52px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--gold),#a08030);color:#111;font-size:22px;cursor:pointer;flex-shrink:0;transition:.25s;display:flex;align-items:center;justify-content:center}
+.mic-btn:hover{transform:scale(1.06)}
+.mic-btn.listening{background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 24px rgba(231,76,60,.5)}}
+.go-btn{height:52px;padding:0 26px;border-radius:60px;border:none;background:linear-gradient(135deg,var(--gold),#a08030);color:#111;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0}
+.go-btn:disabled{opacity:.4;cursor:not-allowed}
+/* 识别结果 */
+.intent-card{width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:14px;display:none}
+.intent-card.show{display:block;animation:slideIn .3s}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}}
+.intent-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.intent-head .ic{font-size:28px}
+.intent-head .t{font-size:15px;font-weight:600;color:var(--gold2)}
+.intent-head .conf{margin-left:auto;font-size:10px;color:var(--jade);background:rgba(39,174,96,.1);padding:2px 10px;border-radius:10px}
+.intent-desc{font-size:12px;color:var(--paper3);line-height:1.7;margin-bottom:12px}
+.intent-actions{display:flex;gap:8px}
+.intent-actions button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--paper2);font-size:13px;cursor:pointer;font-family:inherit;transition:.2s}
+.intent-actions button:hover{border-color:var(--gold);color:var(--gold2)}
+.intent-actions button.primary{background:linear-gradient(135deg,var(--gold),#a08030);color:#111;border:none;font-weight:600}
+/* 快捷短语 */
+.quick{margin-top:28px;width:100%}
+.quick h3{font-size:12px;color:var(--paper3);text-align:center;margin-bottom:12px;letter-spacing:1px}
+.quick-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.quick-chip{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,.02);color:var(--paper2);font-size:12px;cursor:pointer;font-family:inherit;transition:.2s}
+.quick-chip:hover{border-color:var(--gold);color:var(--gold2);background:rgba(201,168,76,.06)}
+/* 语音状态 */
+.voice-hint{text-align:center;font-size:12px;color:var(--cyan2);margin-top:10px;display:none}
+.voice-hint.show{display:block}
+footer{padding:14px;text-align:center;font-size:10px;color:rgba(255,255,255,.2)}
+@media(max-width:480px){
+  .hero h1{font-size:18px}
+  .input-box{padding:4px 4px 4px 16px}
+  .mic-btn{width:46px;height:46px;font-size:20px}
+  .go-btn{padding:0 18px;font-size:14px}
+}
+</style>
+</head>
+<body>
+<header>
+  <span class="t">⚡ 一句话直达</span>
+  <a href="index.html">← 返回大厅</a>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="ic">🗣️</div>
+    <h1>说一句话，直达您要的功能</h1>
+    <p>问诊 · 排盘 · 占卜 · 黄历 · 看报告 · 查知识<br>AI 自动识别您的意图，跳过所有菜单</p>
+  </div>
+
+  <div class="input-zone">
+    <div class="input-box">
+      <input type="text" id="userInput" placeholder="试试：我最近失眠多梦怎么办" maxlength="200" autocomplete="off">
+      <button class="mic-btn" id="micBtn" onclick="toggleMic()" title="语音输入">🎤</button>
+      <button class="go-btn" id="goBtn" onclick="handleInput()">直达</button>
+    </div>
+    <div class="voice-hint" id="voiceHint">🎙️ 正在聆听，请说出您的需求…</div>
+  </div>
+
+  <div class="intent-card" id="intentCard">
+    <div class="intent-head">
+      <span class="ic" id="intentIcon"></span>
+      <span class="t" id="intentTitle"></span>
+      <span class="conf" id="intentConf"></span>
+    </div>
+    <div class="intent-desc" id="intentDesc"></div>
+    <div class="intent-actions">
+      <button onclick="dismiss()">再想想</button>
+      <button class="primary" id="goTarget" onclick="goTarget()">立即前往 →</button>
+    </div>
+  </div>
+
+  <div class="quick">
+    <h3>— 或点一句常用的 —</h3>
+    <div class="quick-grid" id="quickGrid"></div>
+  </div>
+</main>
+
+<footer>命理宝鉴 · 一句话直达 · 本地意图识别零延迟</footer>
+
+<script>
+// ═══════════════════════════════════════════
+// 一句话直达 · 本地意图识别引擎（零延迟，不走云端）
+// 规则：关键词命中 → 意图 → 目标页 + 预填数据
+// ═══════════════════════════════════════════
+const INTENTS = [
+  {
+    id: 'health', icon: '🩺', title: '健康问诊',
+    keywords: ['失眠','多梦','头痛','头晕','胃痛','胃胀','咳嗽','便秘','腹泻','乏力','疲劳','口苦','口干','怕冷','怕热','出汗','心悸','胸闷','腰酸','腰痛','耳鸣','眼干','食欲','失眠多梦','不舒服','生病','感冒','发烧','疼痛','症状','调理','体虚','上火','气血','脾虚','肾虚','肝郁','湿热','痰湿','阳虚','阴虚','舌苔','舌象','面诊','望诊'],
+    target: 'tcm-symptom.html', param: 'symptom',
+    desc: '进入症状自诊，AI 辨证 + 知识库匹配',
+    fill: { type: 'symptom', key: 'vp_symptom' }
+  },
+  {
+    id: 'paipan', icon: '🧭', title: '八字排盘',
+    keywords: ['八字','排盘','四柱','生辰','命盘','日主','五行','运势','流年','大运','今年运','明年运','命运','算命','看命','批命','紫微','斗数','星盘'],
+    target: 'bazi.html', param: null,
+    desc: '输入出生信息，AI 排盘分析',
+    fill: { type: 'none' }
+  },
+  {
+    id: 'zhanbu', icon: '🔮', title: '占卜决疑',
+    keywords: ['占卜','卜卦','起卦','摇卦','六爻','卦象','测事','决疑','该不该','能不能','选择','纠结','梅花','铜钱','起局'],
+    target: 'zhanbu.html', param: null,
+    desc: '一事一占，AI 即时解卦',
+    fill: { type: 'none' }
+  },
+  {
+    id: 'yijing', icon: '☯', title: '易经智慧',
+    keywords: ['易经','周易','卦','爻','变卦','六十四卦','乾','坤','道德经','哲理','智慧','人生道理'],
+    target: 'yijing-oracle.html', param: null,
+    desc: '易经人盘事盘，AI 解读',
+    fill: { type: 'none' }
+  },
+  {
+    id: 'huangli', icon: '📅', title: '黄历宜忌',
+    keywords: ['黄历','宜忌','今天','今日','吉日','择日','搬家','结婚','开业','动土','出行','搬家吉日','黄道吉日','节气','农历','阴历'],
+    target: 'huangli-daily.html', param: null,
+    desc: '今日宜忌 · 吉时 · 节气',
+    fill: { type: 'none' }
+  },
+  {
+    id: 'camera', icon: '📷', title: '拍照看诊',
+    keywords: ['拍照','拍舌','舌苔照片','看看舌头','看脸','面色','面部','拍照看','拍照诊断','自拍','摄像头'],
+    target: 'camera-capture.html', param: null,
+    desc: '拍照采集舌象/面色，AI 分析',
+    fill: { type: 'none' }
+  },
+  {
+    id: 'report', icon: '📋', title: '我的报告',
+    keywords: ['报告','病历','诊断结果','结果','看报告','我的病历','上次','复诊','处方'],
+    target: 'patient-journey.html', param: null,
+    desc: '查看历史病历与诊断报告',
+    fill: { type: 'none' }
+  },
+  {
+    id: 'kb', icon: '📚', title: '知识查询',
+    keywords: ['什么是','为什么','怎么回事','解释','知识','百科','原理','含义','意思','代表什么','倪海厦','舒晗','中医知识','养生'],
+    target: 'ai-assistant.html', param: 'q',
+    desc: 'AI 助手即时解答',
+    fill: { type: 'query', key: 'vp_query' }
+  }
+];
+
+const QUICK_PHRASES = [
+  { text: '我最近失眠多梦', intent: 'health' },
+  { text: '帮我排个八字', intent: 'paipan' },
+  { text: '今天适合搬家吗', intent: 'huangli' },
+  { text: '最近工作该不该换', intent: 'zhanbu' },
+  { text: '看看我的舌苔', intent: 'camera' },
+  { text: '什么是肝郁脾虚', intent: 'kb' },
+  { text: '查我的病历', intent: 'report' },
+  { text: '胃胀不消化怎么办', intent: 'health' }
+];
+
+let currentIntent = null;
+let recognizing = false, recognition = null;
+
+// ═══ 意图识别（本地规则，关键词命中数排序）═══
+function detectIntent(text) {
+  if (!text || text.length < 2) return null;
+  let best = null, bestScore = 0;
+  for (const it of INTENTS) {
+    let score = 0;
+    for (const kw of it.keywords) {
+      if (text.indexOf(kw) >= 0) score += kw.length; // 长关键词权重高
+    }
+    if (score > bestScore) { bestScore = score; best = it; }
+  }
+  return best ? { intent: best, score: bestScore } : null;
+}
+
+function handleInput() {
+  const text = document.getElementById('userInput').value.trim();
+  if (!text) { shake(); return; }
+  processText(text);
+}
+
+function processText(text) {
+  const result = detectIntent(text);
+  if (!result) {
+    // 无命中 → 默认 AI 助手兜底（任何问题都能问）
+    showIntent(INTENTS.find(i => i.id === 'kb'), text, '兜底');
+    return;
+  }
+  showIntent(result.intent, text, result.score >= 3 ? '高' : '中');
+}
+
+function showIntent(intent, rawText, conf) {
+  currentIntent = intent;
+  currentIntent._raw = rawText;
+  const card = document.getElementById('intentCard');
+  document.getElementById('intentIcon').textContent = intent.icon;
+  document.getElementById('intentTitle').textContent = intent.title;
+  document.getElementById('intentConf').textContent = '识别' + conf;
+  document.getElementById('intentDesc').textContent = intent.desc + ' · 您说的：「' + rawText.slice(0, 30) + '」';
+  card.classList.add('show');
+  // 存预填数据
+  if (intent.fill && intent.fill.type === 'symptom') {
+    try { sessionStorage.setItem('vp_symptom', rawText); } catch(_) {}
+  }
+  if (intent.fill && intent.fill.type === 'query') {
+    try { sessionStorage.setItem('vp_query', rawText); } catch(_) {}
+  }
+}
+
+function goTarget() {
+  if (!currentIntent) return;
+  let url = currentIntent.target;
+  if (currentIntent.param && currentIntent._raw) {
+    url += '?' + currentIntent.param + '=' + encodeURIComponent(currentIntent._raw);
+  }
+  location.href = url;
+}
+
+function dismiss() {
+  document.getElementById('intentCard').classList.remove('show');
+  currentIntent = null;
+  document.getElementById('userInput').focus();
+}
+
+function shake() {
+  const box = document.querySelector('.input-box');
+  box.style.borderColor = '#e74c3c';
+  setTimeout(() => box.style.borderColor = '', 600);
+}
+
+// ═══ 语音输入 ═══
+function toggleMic() {
+  if (recognizing) { stopMic(); return; }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { alert('此浏览器不支持语音，请用 Chrome/Edge 或直接打字'); return; }
+  recognition = new SR();
+  recognition.lang = 'zh-CN';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = (ev) => {
+    const text = ev.results[0][0].transcript;
+    document.getElementById('userInput').value = text;
+    processText(text);
+  };
+  recognition.onend = () => stopMic();
+  recognition.onerror = (ev) => {
+    stopMic();
+    if (ev.error === 'not-allowed') alert('麦克风权限被拒绝，请在浏览器设置中允许');
+  };
+  try {
+    recognition.start();
+    recognizing = true;
+    document.getElementById('micBtn').classList.add('listening');
+    document.getElementById('micBtn').textContent = '⏹';
+    document.getElementById('voiceHint').classList.add('show');
+  } catch (_) {}
+}
+function stopMic() {
+  recognizing = false;
+  document.getElementById('micBtn').classList.remove('listening');
+  document.getElementById('micBtn').textContent = '🎤';
+  document.getElementById('voiceHint').classList.remove('show');
+  if (recognition) { try { recognition.stop(); } catch(_) {} }
+}
+
+// ═══ 快捷短语 ═══
+(function init() {
+  const grid = document.getElementById('quickGrid');
+  grid.innerHTML = QUICK_PHRASES.map(q =>
+    '<button class="quick-chip" onclick="quickGo(\'' + q.intent + '\',\'' + q.text.replace(/'/g,'') + '\')">' + q.text + '</button>'
+  ).join('');
+})();
+function quickGo(intentId, text) {
+  document.getElementById('userInput').value = text;
+  processText(text);
+}
+
+// 回车直达
+document.getElementById('userInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); handleInput(); }
+});
+</script>
+</body>
+</html>

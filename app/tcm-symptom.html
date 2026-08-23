@@ -217,5 +217,28 @@ placeholder="如：1979" min="1900" max="2030">
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
+
+<script>
+// R735: 一句话直达预填（voice-portal 跳转来自动填充症状）
+(function(){
+  // ① sessionStorage（voice-portal 写入）
+  var pre = '';
+  try { pre = sessionStorage.getItem('vp_symptom') || ''; } catch(_) {}
+  // ② URL 参数（直链也支持）
+  if (!pre) {
+    var qs = new URLSearchParams(location.search);
+    pre = qs.get('symptom') || '';
+  }
+  if (pre) {
+    var el = document.getElementById('symptomText');
+    if (el) {
+      el.value = pre;
+      el.style.borderColor = 'rgba(201,168,76,.5)';
+      setTimeout(function(){ el.style.borderColor = ''; }, 2000);
+    }
+    try { sessionStorage.removeItem('vp_symptom'); } catch(_) {}
+  }
+})();
+</script>
 </body>
 </html>
