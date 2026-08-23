@@ -48,6 +48,20 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei","Hiragino Sans",s
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* R737: 移动端适配 */
+@media(max-width:768px){
+  body{font-size:14px}
+  .container,.wrap,.main,.content{max-width:100%!important;padding:12px!important}
+  table{display:block;overflow-x:auto}
+  img,video,canvas{max-width:100%;height:auto}
+  input,select,textarea{max-width:100%!important;box-sizing:border-box}
+  .grid{grid-template-columns:1fr!important}
+}
+@media(max-width:480px){
+  body{font-size:13px}
+  button{min-height:36px}
+}
 </style>
 </head>
 <body>
