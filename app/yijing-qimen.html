@@ -34,6 +34,23 @@
   <a class="phb-back" href="index.html">← 返回入口大厅</a>
 </header>
 
+<!-- R740: 角色引导——专业排盘工具，大众请用速览版 -->
+<div id="roleGuide" style="display:none;margin:10px 20px;padding:10px 16px;background:rgba(230,126,34,.08);border:1px solid rgba(230,126,34,.25);border-radius:10px;font-size:13px;color:#e67e22;text-align:center">
+  ⚠ 这是<b>专业排盘工具</b>（面向命理师/管理员）。大众缘主推荐使用 <a href="paipan-quick.html" style="color:#c9a84c;border-bottom:1px dashed">命理速览</a> —— 输入生辰即出白话结果+AI解读。
+</div>
+<script>
+(function(){
+  var role = '';
+  try { role = localStorage.getItem('admin_role') || ''; } catch(_) {}
+  // 无角色信息（大众/未登录）→ 显示引导
+  if (!role || ['master','super_admin','admin'].indexOf(role) < 0) {
+    var g = document.getElementById('roleGuide');
+    if (g) g.style.display = 'block';
+  }
+})();
+</script>
+
+
 <div class="flow-steps-wrap" style="padding:12px 24px 0">
 <div class="flow-steps"><div class="flow-step active"><span class="flow-step-num">1</span><span>选择模式</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">2</span><span>输入信息</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">3</span><span>排盘分析</span></div><span class="flow-step-arrow">→</span><div class="flow-step active"><span class="flow-step-num">4</span><span>查看解读</span></div></div>
 <div class="flow-hint">大师/学习者研究易经与奇门遁甲的关联理论。</div>
