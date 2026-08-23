@@ -301,6 +301,20 @@ function generateNamingV2(){
       h+='</div><div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.3)">📜 古籍词汇库119条 · 命盘优选 · 防重名 · 家族避讳 · 三才五格 · 十二长生推荐</div></div>';
       document.getElementById('nv2-result').innerHTML=h;
       document.getElementById('nv2-result').style.display='block';
+      // R739: AI 起名深度解析（日主五行走 KB）
+      setTimeout(function(){
+        var holder = document.getElementById('aiNamingBtn');
+        if (!holder && window.aiMingli) {
+          holder = document.createElement('div');
+          holder.id = 'aiNamingBtn';
+          holder.style.cssText = 'margin:12px 0;text-align:center';
+          document.getElementById('nv2-result').appendChild(holder);
+        }
+        if (holder) {
+          holder.innerHTML = '';
+          aiMingli.attachButton(holder, 'bazi', { dayMaster: (result.dayStem||'') + (result.dayElement||''), wuxing: (result.wuxing_lack||[]).length ? '缺' + result.wuxing_lack.join('') : '' });
+        }
+      }, 400);
       btn.disabled=false;btn.textContent='✨ 重新生成';
     })
     .catch(function(e){
@@ -396,5 +410,6 @@ function analyzeName(){
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){try{I18N.init();}catch(e){}});</script>
+<script src="js/ai-mingli-engine.js" defer></script>
 </body>
 </html>

@@ -330,6 +330,20 @@ aria-label="年" value="1990" min="1900" max="2100">
       html += '</div>';
 
       area.innerHTML = html;
+      // R739: 逐月报告后挂 AI 细化建议
+      setTimeout(function(){
+        var holder = document.getElementById('aiMonthlyBtn');
+        if (!holder && window.aiMingli) {
+          holder = document.createElement('div');
+          holder.id = 'aiMonthlyBtn';
+          holder.style.cssText = 'margin:12px 0;text-align:center';
+          area.appendChild(holder);
+        }
+        if (holder) {
+          holder.innerHTML = '';
+          aiMingli.attachButton(holder, 'default', { query: '逐月运势 流年趋吉避凶' });
+        }
+      }, 500);
       area.style.display = 'block';
       area.scrollIntoView({behavior:'smooth'});
       
@@ -354,5 +368,6 @@ aria-label="年" value="1990" min="1900" max="2100">
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
+<script src="js/ai-mingli-engine.js" defer></script>
 </body>
 </html>

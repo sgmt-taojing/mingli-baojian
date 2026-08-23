@@ -148,6 +148,21 @@ forecastRender(y,mo,dy,h,gender,yS,yE,cyS,cyE,null);
 }
 
 function forecastRender(y,mo,dy,h,gender,yS,yE,cyS,cyE,paipan){
+  // R739: 预测渲染完成后挂 AI 健康建议（setTimeout 等 DOM 渲染完）
+  setTimeout(function(){
+    var holder = document.getElementById('aiHealthBtn');
+    if (!holder) {
+      holder = document.createElement('div');
+      holder.id = 'aiHealthBtn';
+      holder.style.cssText = 'margin:14px 0;text-align:center';
+      var content = document.querySelector('main, .container, .content');
+      if (content) content.appendChild(holder);
+    }
+    holder.innerHTML = '';
+    if (window.aiMingli) {
+      aiMingli.attachButton(holder, 'default', { query: (paipan && paipan.day_master ? paipan.day_master + ' 健康养生' : '健康预测 养生建议') });
+    }
+  }, 800);
 
 // 五行→脏腑映射（精确到具体器官）
 var organDetail={
@@ -355,5 +370,6 @@ return dangerMonths.join('、')||'无特殊高危月份'
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
+<script src="js/ai-mingli-engine.js" defer></script>
 </body>
 </html>

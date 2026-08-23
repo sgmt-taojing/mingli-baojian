@@ -60,6 +60,10 @@
 </div>
   <div class="header">
     <h1 data-i18n="page.koujue">卷 口诀库</h1>
+<div id="kbKoujueList" style="margin:16px 0;padding:14px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);border-radius:10px">
+  <div style="font-size:13px;color:#c9a84c;font-weight:600;margin-bottom:10px">📚 知识库口诀精选 <span id="kbKoujueCount" style="font-size:11px;color:#a09080;font-weight:400">加载中…</span></div>
+  <div id="kbKoujueItems"></div>
+</div>
     <p>儒释道三教修行口诀，共226条经典</p>
   </div>
   
@@ -188,5 +192,58 @@
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
   <script src="js/i18n.js?v=708i" defer></script>
+<script src="js/ai-mingli-engine.js" defer></script>
+<script defer>
+// R739: KB 口诀真数据 + AI 释义
+(function(){
+  function esc(t){ var d=document.createElement('div'); d.textContent=String(t||''); return d.innerHTML; }
+  function loadKoujue(){
+    if (!window.aiMingli) { setTimeout(loadKoujue, 400); return; }
+    // 并行拉 3 类口诀
+    Promise.all([
+      aiMingli.fetchKb('中医面诊口诀', 5),
+      aiMingli.fetchKb('汤头歌诀 方剂', 5),
+      aiMingli.fetchKb('中医诊断口诀', 5)
+    ]).then(function(groups){
+      var all = [];
+      var seen = {};
+      groups.forEach(function(g){ g.forEach(function(r){ if (!seen[r.title]) { seen[r.title]=1; all.push(r); } }); });
+      var box = document.getElementById('kbKoujueItems');
+      var cnt = document.getElementById('kbKoujueCount');
+      if (!box) return;
+      cnt.textContent = '（' + all.length + ' 条）';
+      if (!all.length) { box.innerHTML = '<div style="font-size:12px;color:#a09080;padding:8px 0">口诀数据加载中，请稍后刷新</div>'; return; }
+      box.innerHTML = all.slice(0, 10).map(function(r, i){
+        return '<div style="padding:10px;border-bottom:1px solid rgba(201,168,76,.08);font-size:13px">' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span style="font-size:11px;color:#c9a84c">卷</span>' +
+          '<span style="flex:1;font-weight:600;color:#f0e8d8">' + esc(r.title.slice(0,40)) + '</span>' +
+          '<button onclick="koujueAiExplain(this,\'' + esc(r.title.slice(0,30)).replace(/'/g,'') + '\')" style="padding:4px 12px;border-radius:12px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.08);color:#c9a84c;font-size:11px;cursor:pointer;font-family:inherit">🤖 AI 释义</button>' +
+          '</div>' +
+          '<div class="kj-explain" style="display:none;margin-top:8px;padding:8px;background:rgba(255,255,255,.03);border-radius:6px;font-size:12px;color:#d4c9b0;line-height:1.7"></div>' +
+          '</div>';
+      }).join('');
+    });
+  }
+  window.koujueAiExplain = async function(btn, title){
+    var box = btn.parentElement.parentElement.querySelector('.kj-explain');
+    if (box.style.display === 'block') { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    box.textContent = '⏳ AI 解读中…';
+    try {
+      var result = await aiMingli.interpret('default', { query: title }, { limit: 4 });
+      if (result.ok) {
+        box.innerHTML = esc(result.summary.slice(0, 400));
+        if (result.sources.length) {
+          box.innerHTML += '<div style="margin-top:6px;font-size:10px;color:#a09080">📚 ' + result.sources.map(function(x){return '《'+esc(x.title.slice(0,20))+'》';}).slice(0,3).join('') + '</div>';
+        }
+      } else {
+        box.textContent = '暂无深度释义，建议阅读原文';
+      }
+    } catch(e) { box.textContent = 'AI 释义暂不可用'; }
+  };
+  loadKoujue();
+})();
+</script>
 </body>
 </html>
