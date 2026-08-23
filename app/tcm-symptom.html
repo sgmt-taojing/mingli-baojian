@@ -212,7 +212,12 @@ placeholder="如：1979" min="1900" max="2030">
   .row{flex-direction:column;align-items:flex-start}
 }
 @media print{body{background:#fff!important;color:#000!important}header.page-header-bar,.phb-back,.flow-steps-wrap,.nav-bar,.file-nav-btn,nav,.no-print,footer,.btn,button,.btn-primary,.export-btn,.export-bar,.steps,.step-indicator,a[href*="ai-assistant"],a[style*="position:fixed"]{display:none!important}main,.container,.body,.wrap{width:100%!important;max-width:100%!important;margin:0!important;padding:8px!important}.result-section,.input-section{box-shadow:none!important;border:1px solid #ddd!important;page-break-inside:avoid}.result-title,.header h1{color:#000!important}.result-body{font-size:12px!important;color:#000!important}.warning{border:1px solid #999!important;background:#fffbeb!important;color:#666!important}input,select,textarea{border:1px solid #999!important;background:#fff!important;color:#000!important}h1{color:#000!important;font-size:14px!important}h3{color:#000!important;font-size:12px!important}a{color:#000!important;text-decoration:none!important}.footer{color:#666!important}}
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
@@ -238,6 +243,20 @@ placeholder="如：1979" min="1900" max="2030">
     }
     try { sessionStorage.removeItem('vp_symptom'); } catch(_) {}
   }
+})();
+</script>
+
+<script>
+(function(){
+  setTimeout(function(){
+    var inp = document.querySelector('#symptomText');
+    if (inp && !inp.dataset.enterBound) {
+      inp.dataset.enterBound = '1';
+      inp.addEventListener('keydown', function(e){
+        if (e.key === 'Enter') { e.preventDefault(); var b=document.querySelector('button.primary,[onclick*=submit],[onclick*=analyze]');if(b)b.click(); }
+      });
+    }
+  }, 800);
 })();
 </script>
 </body>

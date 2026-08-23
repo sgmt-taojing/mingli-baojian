@@ -33,7 +33,12 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;pad
 .event-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin:8px 0}
 .event-item .detail{font-size:13px;line-height:1.6}
 .event-item .meta{font-size:11px;color:var(--muted);margin-top:4px}
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/page-header.css">
 </head>

@@ -44,7 +44,12 @@ video{width:100%;display:block;min-height:220px}
 .step-num{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;background:var(--gold);color:#0e1726;border-radius:50%;font-size:11px;font-weight:700;margin-right:6px}
 .flow-steps-wrap{margin-bottom:8px}
 @media(max-width:360px){body{padding:8px 6px}h1{font-size:15px}.card{padding:10px 8px}.card-title{font-size:12px}.btn{padding:10px;font-size:13px}video{min-height:180px}.frame-strip canvas{width:80px;height:80px}}
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
 <link rel="stylesheet" href="css/page-header.css">

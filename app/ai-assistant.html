@@ -416,7 +416,12 @@ if ('serviceWorker' in navigator) {
   img{max-width:100%!important}
   .print-full{display:block!important}
 }
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 
 <script>
 function toggleImmersive(){
@@ -532,6 +537,20 @@ document.addEventListener("DOMContentLoaded",function(){
     }
     try { sessionStorage.removeItem('vp_query'); } catch(_) {}
   }
+})();
+</script>
+
+<script>
+(function(){
+  setTimeout(function(){
+    var inp = document.querySelector('#chatInput, input[type="text"], textarea');
+    if (inp && !inp.dataset.enterBound) {
+      inp.dataset.enterBound = '1';
+      inp.addEventListener('keydown', function(e){
+        if (e.key === 'Enter') { e.preventDefault(); var b=document.getElementById('sendBtn')||document.querySelector('button[class*=send]');if(b)b.click(); }
+      });
+    }
+  }, 800);
 })();
 </script>
 </body>

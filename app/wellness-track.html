@@ -37,7 +37,12 @@ input,select,textarea{width:100%;padding:9px;background:var(--bg);border:1px sol
 .timeline-item::before{content:'';position:absolute;left:-16px;top:14px;width:8px;height:8px;border-radius:50%;background:var(--gold)}
 .sos-float{position:fixed;bottom:20px;right:16px;background:var(--red);color:#fff;width:52px;height:52px;border-radius:50%;font-size:24px;text-align:center;line-height:52px;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:99;text-decoration:none}
 @media(max-width:360px){body{padding:8px 6px}.metric-grid{grid-template-columns:repeat(2,1fr)}}
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/page-header.css">
   <script src="/js/submit-guard.js" defer></script>

@@ -164,7 +164,12 @@
   .nav-bar a{padding:4px 6px;font-size:11px}
   .row{flex-direction:column;align-items:flex-start}
 }
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>

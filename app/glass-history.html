@@ -101,7 +101,12 @@
 }
 @media print{body{background:#fff!important;color:#000!important;font-family:serif;font-size:12pt}header.page-header-bar,.phb-back,nav,.nav-bar,.no-print,footer,.btn,button,a[style*="position:fixed"],a[style*="position: fixed"],.cross-nav,.flow-steps-wrap,.flow-steps,.flow-hint,.toast,.skip-link,.portal-nav{display:none!important}.toolbar{display:none!important}.list{max-width:100%!important}.empty{color:#333!important}.sub{color:#333!important}
 }
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>

@@ -32,7 +32,12 @@ input,select{width:100%;padding:9px;background:var(--bg);border:1px solid var(--
 .empty{text-align:center;color:var(--muted);font-size:13px;padding:20px}
 .sos-tip{background:linear-gradient(135deg,rgba(220,38,38,.12),rgba(201,168,76,.08));border:1px solid rgba(220,38,38,.4);border-radius:10px;padding:12px;font-size:12px;line-height:1.8;margin-bottom:12px}
 @media(max-width:360px){body{padding:8px 6px}.card{padding:10px 8px}}
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/page-header.css">
 </head>

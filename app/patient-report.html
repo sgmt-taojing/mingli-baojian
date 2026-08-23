@@ -32,7 +32,12 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;pad
 .login-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;margin-top:20px}
 .login-box input{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;margin:8px 0;text-align:center}
 @media(max-width:360px){body{padding:8px 6px}.report-head{padding:14px}.card{padding:10px 8px}.section{font-size:12px}}
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/page-header.css">
   <script src="/js/submit-guard.js" defer></script>

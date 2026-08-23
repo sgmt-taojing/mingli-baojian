@@ -29,7 +29,12 @@ textarea{width:100%;min-height:80px;padding:10px;border-radius:8px;border:1px so
 .toast.ok{background:#1f5e3a;border:1px solid #3dc997}
 .toast.err{background:#5c1f2e;border:1px solid #ff5d73}
 @keyframes toastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-</style>
+
+/* R742: 按钮交互三态 */
+.btn:hover:not(:disabled){filter:brightness(1.12)}
+.btn:active:not(:disabled){transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 </head>
 <body>
 <h1>命理档案审核 · 命理师工作台</h1>
