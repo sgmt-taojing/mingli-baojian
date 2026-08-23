@@ -255,6 +255,15 @@ function runZiweiPaipan(){
     html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + '</div>';
     html += '</div>';
     html += '<div style="font-size:11px;line-height:1.8">建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
+    html += '<div id="aiZiweiBtn" style="margin:10px 0;text-align:center"></div>';
+    // R738: AI 星盘解读（主星+命宫走 KB）
+    setTimeout(function(){
+      var holder = document.getElementById('aiZiweiBtn');
+      if (holder && window.aiMingli) {
+        holder.innerHTML = '';
+        aiMingli.attachButton(holder, 'ziwei', { mingGong: '命宫', zhuXing: mingStarName });
+      }
+    }, 400);
     html += '<div style="margin-top:8px"><a href="bazi.html" style="color:var(--zw-gold);font-size:12px">→ 去排八字命盘做比对</a></div>';
     compareEl.innerHTML = html;
   }
@@ -310,5 +319,6 @@ document.addEventListener('DOMContentLoaded', function(){ try { I18N.init(); } c
 </script>
   <script src="defer</script>
 <script src="js/i18n.js?v=708i18n" defer></script>
+<script src="js/ai-mingli-engine.js" defer></script>
 </body>
 </html>

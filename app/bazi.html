@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <script src="/js/escape-html.js" defer></script>
+<script src="js/ai-mingli-engine.js" defer></script>
 <script src="/i18n/region-config.js" defer></script>
 <script src="/i18n/i18n-engine.js" defer></script>
 <script src="/js/region-banner.js" defer></script>
@@ -851,6 +852,22 @@ async function generateBaziReport(){
     if(tags && data.day_master) tags.innerHTML = '<span class="rb-tag">'+data.day_master+'</span><span class="rb-tag">'+(isEn?'Year '+(meta.targetYear||'')+':':meta.targetYear+'年流年')+'</span>';
     var result = document.getElementById('baziResult');
     if(result){ result.classList.add('visible'); result.style.display = 'block'; }
+    // R738: AI 命理解读（日主+五行走 KB）
+    setTimeout(function(){
+      var holder = document.getElementById('aiBaziBtn');
+      if (!holder) {
+        holder = document.createElement('div');
+        holder.id = 'aiBaziBtn';
+        holder.style.cssText = 'margin:10px 0;text-align:center';
+        if(result) result.insertBefore(holder, result.firstChild);
+      }
+      holder.innerHTML = '';
+      if (window.aiMingli && data.day_master) {
+        var pillars2 = data.pillars || {};
+        var pillStr = [pillars2['年'],pillars2['月'],pillars2['日'],pillars2['时']].filter(Boolean).join(' ');
+        aiMingli.attachButton(holder, 'bazi', { dayMaster: data.day_master, pillars: pillStr, wuxing: data.wuxing || '' });
+      }
+    }, 400);
   }
 
   function renderBaziSvg(svg){

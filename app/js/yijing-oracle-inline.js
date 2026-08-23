@@ -441,6 +441,25 @@ function showResult() {
     changedCard.style.display = 'block';
     const changedLines = guaArrayToLines(changedGua);
     renderGuaLines('changedGua', changedLines, null);
+  // R738: AI 深度解读按钮（KB 证据链）
+  setTimeout(function() {
+    var holder = document.getElementById('aiYijingBtn');
+    if (!holder) {
+      var resultSection = document.querySelector('.result-section, #resultSection, [class*="result"]');
+      if (!resultSection) return;
+      holder = document.createElement('div');
+      holder.id = 'aiYijingBtn';
+      holder.style.cssText = 'margin:12px 0;text-align:center';
+      resultSection.appendChild(holder);
+    }
+    holder.innerHTML = '';
+    if (window.aiMingli) {
+      var q = '';
+      try { q = (document.getElementById('questionInput') || document.querySelector('input,textarea') || {}).value || ''; } catch(_) {}
+      aiMingli.attachButton(holder, 'gua', { name: (typeof primaryHex !== 'undefined' && primaryHex ? primaryHex.name + '卦' : '易经'), question: q });
+    }
+  }, 400);
+
     document.getElementById('changedName').textContent = changedHex.name + '卦';
     document.getElementById('changedPinyin').textContent = changedHex.pinyin;
     document.getElementById('changedMeaning').textContent = `${changedHex.judgment} · ${changedHex.meaning}`;

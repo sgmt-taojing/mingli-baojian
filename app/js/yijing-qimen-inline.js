@@ -848,6 +848,25 @@ async function yjCastCoins() {
 }
 
 function showYjResult() {
+  // R738: AI 奇门解读
+  setTimeout(function(){
+    var holder = document.getElementById('aiQimenBtn');
+    if (!holder) {
+      var container = document.querySelector('.result-container, #qimenResult, [class*="result"]');
+      if (!container) return;
+      holder = document.createElement('div');
+      holder.id = 'aiQimenBtn';
+      holder.style.cssText = 'margin:12px 0;text-align:center';
+      container.appendChild(holder);
+    }
+    holder.innerHTML = '';
+    if (window.aiMingli) {
+      var ys = '';
+      try { ys = (document.querySelector('[class*="yongshen"], [id*="yongshen"]') || {}).textContent || ''; } catch(_) {}
+      aiMingli.attachButton(holder, 'qimen', { yongShen: ys.trim().slice(0, 8) || '奇门遁甲' });
+    }
+  }, 600);
+
   const gua = [[0,0,0],[0,0,0]];
   const movingLines = [];
   for (let i = 0; i < 6; i++) {

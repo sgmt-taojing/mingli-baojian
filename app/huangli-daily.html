@@ -61,6 +61,26 @@ async function load() {
     render(j);
   } catch(e) {
     document.getElementById('content').innerHTML = `<div class="err">❌ 加载失败：${e.message}<br><br>请检查网络后刷新</div>`;
+  // R738: AI 宜忌解读（今日宜什么/忌什么的 KB 深度解释）
+  setTimeout(function(){
+    var holder = document.getElementById('aiHuangliBtn');
+    if (!holder) {
+      var content = document.getElementById('content');
+      if (!content) return;
+      holder = document.createElement('div');
+      holder.id = 'aiHuangliBtn';
+      holder.style.cssText = 'margin:14px 0;text-align:center';
+      content.appendChild(holder);
+    }
+    holder.innerHTML = '';
+    if (window.aiMingli) {
+      aiMingli.attachButton(holder, 'huangli', {
+        yiji: ((d.yi||[]).slice(0,3).join(' ') + ' ' + (d.ji||[]).slice(0,2).join(' ')).trim(),
+        jiechi: (d.jieqi || '')
+      });
+    }
+  }, 500);
+
   }
 }
 
@@ -118,5 +138,6 @@ function render(d) {
 
 load();
 </script>
+<script src="js/ai-mingli-engine.js" defer></script>
 </body>
 </html>
