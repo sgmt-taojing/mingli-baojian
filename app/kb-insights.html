@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="KB 洞察中心 · 命中/热度/健康/质量/覆盖 五大仪表盘一页直达">
+<title>KB 洞察中心 · 命理宝鉴</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+:root{--bg:#080808;--card:#141414;--border:rgba(201,168,76,.18);--gold:#c9a84c;--gold2:#e8cc7a;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border)}
+header .t{font-size:15px;color:var(--gold2);letter-spacing:2px}
+header a{color:var(--paper3);font-size:12px;text-decoration:none}
+main{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+.hero{margin-bottom:20px}
+.hero h1{font-size:20px;color:var(--paper);margin-bottom:6px}
+.hero p{font-size:13px;color:var(--paper3)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.card{display:block;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;text-decoration:none;transition:.2s}
+.card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.card .ic{font-size:28px;margin-bottom:10px}
+.card .t{font-size:15px;font-weight:600;color:var(--paper);margin-bottom:6px}
+.card .d{font-size:12px;color:var(--paper3);line-height:1.6}
+.stat{margin-top:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.stat .row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px}
+.stat .row:last-child{border:none}
+.stat .k{color:var(--paper3)}
+.stat .v{color:var(--gold2);font-weight:600}
+footer{text-align:center;padding:20px;font-size:10px;color:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+<header>
+  <span class="t">📚 KB 洞察中心</span>
+  <a href="index.html">← 返回大厅</a>
+</header>
+<main>
+  <div class="hero">
+    <h1>知识库五大洞察，一页直达</h1>
+    <p>命中分析 · 热度排行 · 模块健康 · 质量审计 · 覆盖度——运维与审计的统一入口</p>
+  </div>
+
+  <div class="grid">
+    <a class="card" href="kb-hit-dashboard.html">
+      <div class="ic">🎯</div>
+      <div class="t">命中仪表盘</div>
+      <div class="d">哪些查询命中了 KB · 命中率趋势 · 未命中缺口分析</div>
+    </a>
+    <a class="card" href="kb-hot.html">
+      <div class="ic">🔥</div>
+      <div class="t">热度仪表盘</div>
+      <div class="d">热门模块与条目排行 · 用户最关心什么知识</div>
+    </a>
+    <a class="card" href="kb-module-health.html">
+      <div class="ic">💓</div>
+      <div class="t">模块健康看板</div>
+      <div class="d">各模块条目量/可信度/命中分布 · 哪些模块缺粮</div>
+    </a>
+    <a class="card" href="kb-quality.html">
+      <div class="ic">✨</div>
+      <div class="t">质量审计</div>
+      <div class="d">低质量条目检测 · 重复/空内容/低信任扫描</div>
+    </a>
+    <a class="card" href="kb-coverage.html">
+      <div class="ic">🗺️</div>
+      <div class="t">覆盖审计</div>
+      <div class="d">知识域覆盖地图 · 哪些领域还有空白</div>
+    </a>
+    <a class="card" href="kb-browser.html">
+      <div class="ic">📖</div>
+      <div class="t">知识库浏览</div>
+      <div class="d">直接浏览全部条目 · 检索与筛选</div>
+    </a>
+  </div>
+
+  <div class="stat" id="liveStats">
+    <div class="row"><span class="k">📊 正在加载实时统计…</span><span class="v"></span></div>
+  </div>
+</main>
+<footer>命理宝鉴 · KB 洞察中心</footer>
+<script>
+// 实时统计
+fetch('http://127.0.0.1:8920/api/public/kb/stats', { signal: AbortSignal.timeout(8000) })
+  .then(r => r.json())
+  .then(d => {
+    var data = d.data || d;
+    var el = document.getElementById('liveStats');
+    el.innerHTML = [
+      ['总条目', (data.total || 0).toLocaleString()],
+      ['高信任条目（≥0.7）', (data.hi_trust || 0).toLocaleString()],
+      ['累计命中', (data.total_hits || 0).toLocaleString()],
+      ['最热模块', ((data.top_modules || [])[0] || {}).module || '—']
+    ].map(function(r){
+      return '<div class="row"><span class="k">' + r[0] + '</span><span class="v">' + r[1] + '</span></div>';
+    }).join('');
+  })
+  .catch(function(){
+    document.getElementById('liveStats').innerHTML = '<div class="row"><span class="k">实时统计暂不可用</span><span class="v">刷新重试</span></div>';
+  });
+</script>
+</body>
+</html>
