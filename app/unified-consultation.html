@@ -290,7 +290,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 
       <div class="emr-field">
         <div class="emr-field-label">证型</div>
-        <div class="emr-field-content empty" id="emr-syndrome">KB 匹配后自动</div>
+        <div class="emr-field-content empty" id="emr-syndrome">知识库 匹配后自动</div>
       </div>
 
       <div class="emr-field">
@@ -392,7 +392,7 @@ $('sessionMeta').textContent = '会话ID: ' + App.sessionId.slice(-8);
 
 /* ═══ RealtimeEngine 初始化 ═══ */
 function initEngine(){
-  // KB 引擎（走 8920 后端 API，避免 8900 静态代理 404）
+  // 知识库 引擎（走 8920 后端 API，避免 8900 静态代理 404）
   App.kb = new RealtimeKB({
     apiBase: 'http://127.0.0.1:8920/api/public/kb/search-fts',
     module: 'tcm',
@@ -638,7 +638,7 @@ function saveEmr(){
     savedAt: new Date().toISOString()
   };
   try { localStorage.setItem('emr_' + App.sessionId, JSON.stringify(snapshot)); } catch(_) {}
-  // 上报后端（8920 直连，与 KB 引擎同源策略）
+  // 上报后端（8920 直连，与 知识库 引擎同源策略）
   fetch('http://127.0.0.1:8920/api/public/emr-session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
