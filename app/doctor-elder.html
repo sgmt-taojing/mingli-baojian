@@ -30,10 +30,10 @@
 </head>
 <nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
   <a href="index.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">主平台</a>
-  <a href="patient-archive.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">表 患者档案</a>
-  <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">医 中医诊疗</a>
+  <a href="patient-archive.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">📊 患者档案</a>
+  <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">🩺 中医诊疗</a>
   <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">望诊工作台</a>
-  <a href="tcm-symptom.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">诊 症状分析</a>
+  <a href="tcm-symptom.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">🩺 症状分析</a>
   <a href="ai-assistant.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">机 智能助手</a>
 </nav>
 <body class="theme-tcm">
@@ -67,7 +67,7 @@
 
 <!-- Tab 切换 -->
 <div class="tabs">
-  <button class="tab active" data-tab="consult">表 接诊</button>
+  <button class="tab active" data-tab="consult">📊 接诊</button>
   <button class="tab" data-tab="patients">众 患者</button>
   <button class="tab" data-tab="prescription">药 开方</button>
   <button class="tab" data-tab="knowledge">知识</button>
@@ -109,15 +109,15 @@
           <div class="v"><input aria-label="pt-chief" type="text" id="pt-chief" placeholder="如：头晕、失眠1月"></div>
         </div>
 
-        <h3 style="margin-top:24px;font-size:18px;color:var(--ink2)">历 生辰八字（可选）</h3>
+        <h3 style="margin-top:24px;font-size:18px;color:var(--ink2)">📅 生辰八字（可选）</h3>
         <div class="f-row"><label for="b-year">出生年</label><div class="v"><input aria-label="b-year" type="number" id="b-year" placeholder="YYYY"></div></div>
         <div class="f-row"><label for="b-month">出生月</label><div class="v"><input aria-label="b-month" type="number" id="b-month" placeholder="MM" min="1" max="12"></div></div>
         <div class="f-row"><label for="b-day">出生日</label><div class="v"><input aria-label="b-day" type="number" id="b-day" placeholder="DD" min="1" max="31"></div></div>
         <div class="f-row"><label for="b-hour">出生时</label><div class="v"><input aria-label="b-hour" type="number" id="b-hour" placeholder="HH(0-23)" min="0" max="23"></div></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="consult()">查 开始接诊分析</button>
-          <button class="btn btn-secondary" onclick="savePatient()">存 保存患者</button>
-          <a href="wangzhen-clinical.html" class="btn btn-secondary" style="text-decoration:none;display:inline-block;margin-top:6px">查 去望诊工作台</a>
+          <button class="btn btn-primary" onclick="consult()">🔍 开始接诊分析</button>
+          <button class="btn btn-secondary" onclick="savePatient()">💾 保存患者</button>
+          <a href="wangzhen-clinical.html" class="btn btn-secondary" style="text-decoration:none;display:inline-block;margin-top:6px">🔍 去望诊工作台</a>
         </div>
       </div>
 
@@ -173,12 +173,12 @@
         </div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-success" onclick="savePrescription()">存 保存处方</button>
+        <button class="btn btn-success" onclick="savePrescription()">💾 保存处方</button>
         <button class="btn btn-primary" onclick="printRx()">🖨️ 打印</button>
-        <button class="btn btn-secondary" onclick="clearRx()">更 清空</button>
+        <button class="btn btn-secondary" onclick="clearRx()">🔄 清空</button>
       </div>
 
-      <h3 style="margin-top:32px;font-size:18px;color:var(--ink2)">表 历史处方</h3>
+      <h3 style="margin-top:32px;font-size:18px;color:var(--ink2)">📊 历史处方</h3>
       <div id="rx-history"></div>
     </div>
   </section>
@@ -199,7 +199,7 @@
 
 <!-- 浮动操作 -->
 <div class="float-bar">
-  <button class="btn btn-secondary" onclick="location.href='index.html'">宅 回首页</button>
+  <button class="btn btn-secondary" onclick="location.href='index.html'">🏠 回首页</button>
   <button class="btn btn-secondary" onclick="location.href='master-elder.html'">道 大师端</button>
   <button class="btn btn-primary" onclick="location.href='ai-assistant.html'">机 智能助手</button>
 </div>
@@ -326,7 +326,7 @@ function consult(){
 
   if(!chief){ showToast('请填写主诉', 'err'); return; }
 
-  let html = `<div class="report"><h3>表 接诊记录</h3>`;
+  let html = `<div class="report"><h3>📊 接诊记录</h3>`;
   html += `<p><b>患者：</b>${name} | <b>性别：</b>${gender==='male'?'男':gender==='female'?'女':'-'} | <b>年龄：</b>${age || '-'}</p>`;
   html += `<p><b>主诉：</b>${chief}</p>`;
 
@@ -340,7 +340,7 @@ function consult(){
       const maxWx = sorted[0][0];
       const minWx = sorted[sorted.length-1][0];
 
-      html += `<h3>历 八字排盘</h3>`;
+      html += `<h3>📅 八字排盘</h3>`;
       html += `<p style="font-size:24px;color:var(--ink);text-align:center;font-weight:900;letter-spacing:6px">${bazi.year.stem}${bazi.year.branch} · ${bazi.month.stem}${bazi.month.branch} · ${bazi.day.stem}${bazi.day.branch} · ${bazi.hour.stem}${bazi.hour.branch}</p>`;
       html += `<p style="text-align:center">属相：<b>${bazi.year.animal}</b>　日主：<b>${bazi.day.stem}</b>（${WUXING_DB[STEM_WUXING[bazi.day.stem]].organ}）</p>`;
 
@@ -412,7 +412,7 @@ function consult(){
     }
   } else {
     html += `<div class="alert alert-info">未填写生辰八字，仅基于主诉进行通用分析。</div>`;
-    html += `<h3>表 主诉分析</h3>`;
+    html += `<h3>📊 主诉分析</h3>`;
     html += `<p>主诉"${chief}"，建议：</p>`;
     html += `<ul style="margin-left:24px;font-size:16px">
       <li>详细询问病史、诱因、伴随症状</li>
@@ -536,7 +536,7 @@ function renderRxHistory(){
   if(!list.length){ el.innerHTML='<div class="alert alert-info">暂无历史处方</div>'; return; }
   el.innerHTML = list.slice(0,10).map(r=>`
     <div class="report" style="margin:8px 0">
-      <h3>卷 ${r.name}</h3>
+      <h3>📜 ${r.name}</h3>
       <p><b>病机：</b>${r.pattern || '-'}</p>
       <pre style="font-family:var(--font);font-size:15px;line-height:1.8">${r.herbs}</pre>
       <p><b>用法：</b>${r.usage||'-'}</p>

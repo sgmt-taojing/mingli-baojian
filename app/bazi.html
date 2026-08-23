@@ -55,9 +55,9 @@
 </div>
 <nav style="padding:6px 12px;border-bottom:1px solid rgba(201,168,76,.12);display:flex;gap:6px;flex-wrap:wrap;background:rgba(8,8,8,.95);position:sticky;top:0;z-index:200">
   <a href="index.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px"><span data-i18n="nav.home">主平台</span></a>
-  <a href="ziwei.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">星 紫微斗数</a>
+  <a href="ziwei.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">⭐ 紫微斗数</a>
   <a href="wangzhen-clinical.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px"><span data-i18n="vision.visualDiagnosis">望诊工作台</span></a>
-  <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">医 中医诊疗</a>
+  <a href="tcm-clinic.html" style="color:#c9a84c;font-size:12px;text-decoration:none;padding:4px 10px;border:1px solid rgba(201,168,76,.15);border-radius:6px">🩺 中医诊疗</a>
 </nav>
 
 <script src="js/module-reports-kb.js" defer></script>
@@ -123,7 +123,7 @@
         <option value="21">亥时 21:00-23:00(人定)</option>
       </select>
       <p class="input-hint" id="shichenHint">警 时辰按<b>农历</b>计算，每个时辰相当于2小时。以上时间对应农历时辰，公历时间仅作参考。</p>
-      <p class="input-hint" style="cursor:pointer;color:var(--gold);font-size:11px"><ml-tap type="text" tabindex="0" role="button" aria-label="时辰对照表点击展开" on:tap="toggleShichenTable()" on:keydown="if(event.key==='Enter'||event.key===' ')toggleShichenTable()">表 时辰对照表(点击展开)</ml-tap></p>
+      <p class="input-hint" style="cursor:pointer;color:var(--gold);font-size:11px"><ml-tap type="text" tabindex="0" role="button" aria-label="时辰对照表点击展开" on:tap="toggleShichenTable()" on:keydown="if(event.key==='Enter'||event.key===' ')toggleShichenTable()">📊 时辰对照表(点击展开)</ml-tap></p>
       <!-- 时辰对照表(默认隐藏) -->
       <div id="shichenTable" style="display:none;margin-top:8px;padding:12px;background:rgba(201,168,76,.04);border-radius:8px;font-size:12px;line-height:1.8">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
@@ -268,7 +268,7 @@
 
       <div class="pro-btns">
         <button class="pro-btn pro-btn-secondary" onclick="loadProFields()">↻ 从档案载入</button>
-        <button class="pro-btn pro-btn-primary" onclick="saveProFields()">存 保存全量信息</button>
+        <button class="pro-btn pro-btn-primary" onclick="saveProFields()">💾 保存全量信息</button>
         <button class="pro-btn pro-btn-secondary" onclick="applyPro2Bazi()">↪ 录入八字段</button>
       </div>
       <div class="pro-saved-tip" id="proSavedTip">成 已保存到本地档案</div>
@@ -582,26 +582,26 @@
 
     <!-- 15. 经典出处 (折叠) -->
     <div class="bazi-new-module" id="classicRefModule">
-      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block" aria-label="经典出处 · 命理名著引用">卷 经典出处 · 命理名著引用 <span class="toggle-icon">▼</span></ml-tap>
+      <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" class="d-block" aria-label="经典出处 · 命理名著引用">📜 经典出处 · 命理名著引用 <span class="toggle-icon">▼</span></ml-tap>
       <div class="bazi-module-body collapsed">
         <div class="classic-ref-content" id="classicRefContent"></div>
       </div>
     </div>
 
     <!-- 🏥 健康预测模块 -->
-    <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="display:block;border-color:rgba(39,174,96,.3)" aria-label="健康预测 · 疾病预防预警">医 健康预测 · 疾病预防预警 <span class="toggle-icon">▼</span></ml-tap>
+    <ml-tap role="button" tabindex="0" class="bazi-module-title collapsed" onclick="toggleBaziModule(this)" style="display:block;border-color:rgba(39,174,96,.3)" aria-label="健康预测 · 疾病预防预警">🩺 健康预测 · 疾病预防预警 <span class="toggle-icon">▼</span></ml-tap>
     <div class="bazi-module-body collapsed">
       <div style="padding:12px;background:rgba(39,174,96,.04);border:1px solid rgba(39,174,96,.12);border-radius:8px;margin-bottom:10px">
         <p style="font-size:13px;color:var(--jade2);line-height:1.8;margin:0">基于八字命理+十二长生+五行+大运流年，提供7大板块疾病预防预警分析。</p>
         <p style="font-size:11px;opacity:.95;margin-top:6px">警 仅供养生保健参考，不构成医疗诊断</p>
-        <button class="compute-btn" onclick="runHealthForecast()" id="healthForecastBtn" style="margin-top:10px;padding:8px 24px;font-size:13px;background:rgba(39,174,96,.12);border:1px solid rgba(39,174,96,.3);color:var(--jade2);border-radius:20px;cursor:pointer">医 生成健康预测</button>
+        <button class="compute-btn" onclick="runHealthForecast()" id="healthForecastBtn" style="margin-top:10px;padding:8px 24px;font-size:13px;background:rgba(39,174,96,.12);border:1px solid rgba(39,174,96,.3);color:var(--jade2);border-radius:20px;cursor:pointer">🩺 生成健康预测</button>
       </div>
       <div id="healthForecastResult"></div>
     </div>
 
     <div class="back-row">
       <button class="export-btn" onclick="exportBaziReport('html')">导出HTML</button>
-      <button class="export-btn" onclick="exportBaziReport('pdf')" style="background:rgba(46,204,113,.15);border-color:rgba(46,204,113,.3)">文 导出PDF</button>
+      <button class="export-btn" onclick="exportBaziReport('pdf')" style="background:rgba(46,204,113,.15);border-color:rgba(46,204,113,.3)">📄 导出PDF</button>
       <button class="export-btn" onclick="exportBaziReport('word')" style="background:rgba(52,152,219,.15);border-color:rgba(52,152,219,.3)">记 导出Word</button>
       <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
     </div>
@@ -734,8 +734,8 @@ function toast(msg){
 if(typeof showToast!=='function'){window.showToast=function(msg,type){var t=document.createElement('div');t.className='toast'+(type?' toast-'+type:'');t.textContent=msg;t.style.cssText='position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(8,8,8,.92);color:#c9a84c;padding:10px 20px;border-radius:8px;border:1px solid rgba(201,168,76,.3);z-index:9999;font-size:14px';document.body.appendChild(t);setTimeout(function(){t.remove();},2500);};}
 if(typeof playSound!=='function'){window.playSound=function(t){try{var c=new(window.AudioContext||window.webkitAudioContext)();var o=c.createOscillator();var g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=t==='error'?200:t==='success'?600:440;g.gain.setValueAtTime(0.08,c.currentTime);o.start();o.stop(c.currentTime+0.12);}catch(e){}};}
 if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='index.html'+(n||'');}catch(e){history.back();}};}
-if(typeof runBaziEnhancedFortune!=='function'){window.runBaziEnhancedFortune=function(){try{var r=document.getElementById('baziResult')||document.getElementById('proResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:16px;padding:14px;background:rgba(124,77,255,0.06);border-radius:10px;border:1px solid rgba(124,77,255,0.15)\"><h5 style=\"color:#7c4dff;margin-bottom:8px\">星 运势+健康深度增强</h5><p style=\"font-size:13px;color:var(--paper2)\">年度精解+企业视角增强报告。完整增强分析请在主页八字模块中使用。</p></div>');}if(typeof toast==='function')toast('增强报告已生成（简化版）');}catch(e){console.warn('[runBaziEnhancedFortune]',e);}};}
-if(typeof runHealthForecast!=='function'){window.runHealthForecast=function(){try{var r=document.getElementById('healthForecastResult')||document.getElementById('baziResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:12px;padding:14px;background:rgba(39,174,96,0.06);border-radius:10px;border:1px solid rgba(39,174,96,0.15)\"><h5 style=\"color:var(--jade2);margin-bottom:8px\">医 健康预测</h5><p style=\"font-size:13px;color:var(--paper2)\">基于八字五行强弱分析的健康趋势预测。完整健康预测请在主页使用。</p></div>');}if(typeof toast==='function')toast('健康预测已生成（简化版）');}catch(e){console.warn('[runHealthForecast]',e);}};}
+if(typeof runBaziEnhancedFortune!=='function'){window.runBaziEnhancedFortune=function(){try{var r=document.getElementById('baziResult')||document.getElementById('proResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:16px;padding:14px;background:rgba(124,77,255,0.06);border-radius:10px;border:1px solid rgba(124,77,255,0.15)\"><h5 style=\"color:#7c4dff;margin-bottom:8px\">⭐ 运势+健康深度增强</h5><p style=\"font-size:13px;color:var(--paper2)\">年度精解+企业视角增强报告。完整增强分析请在主页八字模块中使用。</p></div>');}if(typeof toast==='function')toast('增强报告已生成（简化版）');}catch(e){console.warn('[runBaziEnhancedFortune]',e);}};}
+if(typeof runHealthForecast!=='function'){window.runHealthForecast=function(){try{var r=document.getElementById('healthForecastResult')||document.getElementById('baziResult');if(r){r.insertAdjacentHTML('beforeend','<div style=\"margin-top:12px;padding:14px;background:rgba(39,174,96,0.06);border-radius:10px;border:1px solid rgba(39,174,96,0.15)\"><h5 style=\"color:var(--jade2);margin-bottom:8px\">🩺 健康预测</h5><p style=\"font-size:13px;color:var(--paper2)\">基于八字五行强弱分析的健康趋势预测。完整健康预测请在主页使用。</p></div>');}if(typeof toast==='function')toast('健康预测已生成（简化版）');}catch(e){console.warn('[runHealthForecast]',e);}};}
 if(typeof exportBaziReport!=='function'){window.exportBaziReport=function(fmt){try{var data=document.querySelector('.result-section')||document.body;var html=`<!DOCTYPE html><html lang="zh-CN"><head><meta charset=UTF-8><title>八字报告</title><link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
 <link rel="stylesheet" href="css/page-header.css">

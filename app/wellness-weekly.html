@@ -98,14 +98,14 @@ input[type=date]{color-scheme:dark}
 <div class="flow-hint">个人查看每周养生建议，节气调理+运动+饮食指导。</div>
 </div>
 <a href="person-center.html" class="nav-back">← 返回身份中心</a>
-<h1>历 康养人周分析中心</h1>
+<h1>📅 康养人周分析中心</h1>
 <div class="subtitle">周追踪 + 周分析 + KB 自动入库 · 积累人群健康模式</div>
 
 <div class="tabs">
-<div class="tab active" data-tab="weekly" onclick="switchTab('weekly')">图 本周概览</div>
-<div class="tab" data-tab="history" onclick="switchTab('history')">表 历史分析</div>
+<div class="tab active" data-tab="weekly" onclick="switchTab('weekly')">📊 本周概览</div>
+<div class="tab" data-tab="history" onclick="switchTab('history')">📊 历史分析</div>
 <div class="tab" data-tab="followup" onclick="switchTab('followup')">记 周随访提交</div>
-<div class="tab" data-tab="knowledge" onclick="switchTab('knowledge')">典 已入库KB</div>
+<div class="tab" data-tab="knowledge" onclick="switchTab('knowledge')">📚 已入库KB</div>
 </div>
 
 <div id="view-weekly" class="view"></div>
@@ -139,7 +139,7 @@ function loadWeekly(){
 var v=$('view-weekly');v.innerHTML='<div class="card">正在为您查阅典籍...</div>';
 fetch(API+'/api/wellness/weekly-summary',{signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()}).then(function(j){
 var s=j.data.stats,a=j.data.analyses;
-var h='<div class="card"><div class="card-title">历 周 '+s.week_start+' ~ '+s.week_end+'</div>';
+var h='<div class="card"><div class="card-title">📅 周 '+s.week_start+' ~ '+s.week_end+'</div>';
 h+='<div class="stat-row">';
 h+='<div class="stat-box"><div class="stat-num">'+s.total+'</div><div class="stat-label">本周分析</div></div>';
 h+='<div class="stat-box"><div class="stat-num" style="color:var(--green)">'+s.by_outcome.better+'</div><div class="stat-label">改善</div></div>';
@@ -167,12 +167,12 @@ h+='</div></div>';
 
 // 本周分析列表
 if(a.length>0){
-h+='<div class="card"><div class="card-title">表 本周分析明细</div>';
+h+='<div class="card"><div class="card-title">📊 本周分析明细</div>';
 a.forEach(function(r){
 h+='<div class="analysis-item">';
 h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><b>'+esc(r.name||'康养人')+'</b> <span style="font-size:11px;color:var(--muted)">'+r.analysis_date+'</span></div>';
 h+='<div><span class="outcome-badge outcome-'+r.outcome+'">'+({better:'改善',worse:'恶化',stable:'稳定',unknown:'待评估'}[r.outcome]||r.outcome)+'</span>';
-if(r.knowledge_extracted)h+='<span class="kb-badge">典 已入库KB</span>';
+if(r.knowledge_extracted)h+='<span class="kb-badge">📚 已入库KB</span>';
 h+='</div></div>';
 h+='<div style="font-size:11px;color:var(--muted);line-height:1.6">日主: '+esc(r.day_master||'-')+'('+esc(r.day_element||'-')+') | 风险: '+esc(r.risk_level||'-')+' | 体质: '+esc(r.constitution||'-')+'</div>';
 if(r.prediction)h+='<div style="font-size:12px;margin-top:4px">预测: '+esc(r.prediction)+'</div>';
@@ -196,7 +196,7 @@ if(rows.length===0){
 v.innerHTML='<div class="card"><div class="empty" style="text-align:center;color:var(--muted);padding:20px">尚无历史分析</div></div>';
 return;
 }
-var h='<div class="card"><div class="card-title">表 历史分析 ('+rows.length+'条)</div>';
+var h='<div class="card"><div class="card-title">📊 历史分析 ('+rows.length+'条)</div>';
 rows.forEach(function(r){
 h+='<div class="analysis-item">';
 h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><b>'+r.analysis_date+'</b> <span style="font-size:11px;color:var(--muted)">'+r.constitution+'</span></div>';
@@ -205,7 +205,7 @@ h+='<div style="font-size:12px;line-height:1.6">预测: '+esc(r.prediction||'-')
 h+='建议: '+esc(r.recommendations||'-')+'<br>';
 if(r.follow_up)h+='随访: '+esc(r.follow_up)+'<br>';
 h+='</div>';
-if(r.kb_entry_id)h+='<div style="font-size:10px;color:var(--purple);margin-top:4px">典 KB: '+r.kb_entry_id+' '+(r.knowledge_extracted?'✅ 已入库':'⏳ 待提取')+'</div>';
+if(r.kb_entry_id)h+='<div style="font-size:10px;color:var(--purple);margin-top:4px">📚 KB: '+r.kb_entry_id+' '+(r.knowledge_extracted?'✅ 已入库':'⏳ 待提取')+'</div>';
 h+='</div>';
 });
 h+='</div>';
@@ -219,7 +219,7 @@ var today=new Date().toISOString().slice(0,10);
 var h='<div class="card"><div class="card-title">记 周随访提交</div>';
 h+='<div class="hint">每周提交一次随访，对比预测与实际，自动入库KB</div>';
 h+='<div class="form-group"><label>随访日期</label><input aria-label="日期" type="date" id="fu_date" value="'+today+'"></div>';
-h+='<div class="form-group"><label>实际结果</label><select id="fu_outcome" aria-label="fu_outcome"><option value="better">成 改善(预测有效)</option><option value="stable">稳定(预测部分有效)</option><option value="worse">败 恶化(预测偏离)</option><option value="unknown">问 待评估</option></select></div>';
+h+='<div class="form-group"><label>实际结果</label><select id="fu_outcome" aria-label="fu_outcome"><option value="better">成 改善(预测有效)</option><option value="stable">稳定(预测部分有效)</option><option value="worse">败 恶化(预测偏离)</option><option value="unknown">❓ 待评估</option></select></div>';
 h+='<div class="form-group"><label>本周实际症状变化</label><textarea id="fu_symptoms" placeholder="如：头痛减轻了，睡眠改善了，仍有疲劳感" aria-label="如：头痛减轻了，睡眠改善了，仍有疲劳感"></textarea></div>';
 h+='<div class="form-group"><label>本周预测 vs 实际验证</label><textarea id="fu_followup" placeholder="如：预测肝火旺+夏季心脏风险，实际8月体检肝功能异常符合预测" aria-label="如：预测肝火旺+夏季心脏风险，实际8月体检肝功能异常符合预测"></textarea></div>';
 h+='<div class="form-group"><label>额外建议补充</label><textarea id="fu_rec" placeholder="如：建议加强肝脏保护，少饮酒" aria-label="如：建议加强肝脏保护，少饮酒"></textarea></div>';
@@ -261,7 +261,7 @@ if(rows.length===0){
 v.innerHTML='<div class="card"><div class="empty" style="text-align:center;color:var(--muted);padding:20px">尚无入库KB记录<br><br>提交随访(结果非unknown)后会自动入库</div></div>';
 return;
 }
-var h='<div class="card"><div class="card-title">典 已入库KB ('+rows.length+'条)</div>';
+var h='<div class="card"><div class="card-title">📚 已入库KB ('+rows.length+'条)</div>';
 h+='<div class="hint">这些案例已写入 kb_formal(模块=tcm-clinical)，为后续排盘和健康预测提供案例参考</div>';
 rows.forEach(function(r){
 h+='<div class="analysis-item">';

@@ -121,7 +121,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
         <button class="btn" onclick="showTongue()" id="tongueBtn" disabled>采集舌象</button>
         <button class="btn btn-warn" onclick="startVoice()" id="voiceBtn">麦 语音交互</button>
         <button class="btn" onclick="window.location.href='personal-push.html'">面 千人千面</button>
-        <button class="btn btn-danger" onclick="emergencyCall()" style="margin-left:auto">报 紧急呼救</button>
+        <button class="btn btn-danger" onclick="emergencyCall()" style="margin-left:auto">🚨 紧急呼救</button>
       </div>
       <div class="status-bar" id="statusBar">
         <div class="status-item">面诊: 待采集</div>
@@ -135,7 +135,7 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
       <h2>机 辅助处置</h2>
       <div id="actionPanel">
         <div class="action-card" onclick="runDiagnosis()">
-          <div class="title">查 智能辨证</div>
+          <div class="title">🔍 智能辨证</div>
           <div class="desc">八纲辨证 + 六经辨证 + 五行体质综合分析</div>
         </div>
         <div class="action-card" onclick="remotePrescribe()">
@@ -193,10 +193,10 @@ body{background:#0a0c12;color:#e4e6ed;font-family:-apple-system,BlinkMacSystemFo
     </div>
 
     <div class="panel" style="margin-top:12px">
-      <h2>图 健康监测</h2>
+      <h2>📊 健康监测</h2>
       <div id="healthReport" style="font-size:12px;color:#8b8fa3;line-height:1.8">
-        <p>表 诊断结果：待采集症状后生成</p>
-        <p>医 体质分析：待排盘后生成</p>
+        <p>📊 诊断结果：待采集症状后生成</p>
+        <p>🩺 体质分析：待排盘后生成</p>
         <p>药 用药建议：待诊断后生成</p>
         <p>👨‍👩‍👧 紧急联系人：未设置</p>
         <p>点 当前定位：未获取</p>
@@ -458,11 +458,11 @@ function updateStatus(text, level){
 function updateReport(result){
   const report = document.getElementById('healthReport');
   report.innerHTML = `
-    <p>表 诊断结果：${result.summary || '综合辨证完成'}</p>
-    <p>医 置信度：${(result.confidence*100).toFixed(0)}%</p>
+    <p>📊 诊断结果：${result.summary || '综合辨证完成'}</p>
+    <p>🩺 置信度：${(result.confidence*100).toFixed(0)}%</p>
     <p>警 首要关注：${result.topPriority ? result.topPriority.organ+' '+result.topPriority.issue : '无'}</p>
     <p>药 建议：${result.topPriority ? result.topPriority.advice : '保持观察'}</p>
-    <p>典 KB 参考：${result.kbReferences ? result.kbReferences.length+' 条' : '无'}</p>
+    <p>📚 KB 参考：${result.kbReferences ? result.kbReferences.length+' 条' : '无'}</p>
     <p>👨‍👩‍👧 紧急联系人：未设置（请在个人档案中添加）</p>
   `;
 }

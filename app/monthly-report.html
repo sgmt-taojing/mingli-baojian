@@ -100,7 +100,7 @@ h2{font-size:1.1rem;color:var(--gold);margin:14px 0 8px;border-bottom:1px solid 
 <a href="index.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
 
 <div class="container">
-  <h1>历 逐月运势细化报告</h1>
+  <h1>📅 逐月运势细化报告</h1>
   <p class="subtitle">本年逐月 + 当月/次月详细 · 趋吉避凶 · 知命改运</p>
 
   <div class="form-card">
@@ -157,7 +157,7 @@ aria-label="年" value="1990" min="1900" max="2100">
       <label>目标年</label>
       <input type="number" id="inpTargetYear" aria-label="目标年" value="2026" min="2024" max="2100">
     </div>
-    <button class="btn" id="genBtn" onclick="generate()">卦 生成逐月报告</button>
+    <button class="btn" id="genBtn" onclick="generate()">☯ 生成逐月报告</button>
   </div>
 
   <!-- R95 -->
@@ -166,7 +166,7 @@ aria-label="年" value="1990" min="1900" max="2100">
     <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-report.html')" style="font-size:.8rem;padding:6px 12px">海 三维联动</button>
       <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeflow-timeline.html')" style="font-size:.8rem;padding:6px 12px">网 终身三维</button>
-      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">图 人生规划</button>
+      <button class="btn" onclick="LifeflowShare.gotoWithForm('lifeplan-detail.html')" style="font-size:.8rem;padding:6px 12px;background:linear-gradient(135deg,#10b981,#059669)">📊 人生规划</button>
     </div>
   </div>
 
@@ -237,7 +237,7 @@ aria-label="年" value="1990" min="1900" max="2100">
   function renderYearTable(yearOverview, currentMonthNum){
     var rel2cls = {'比和':'st-旺','生':'st-相','泄':'st-休','克':'st-死','被克':'st-囚'};
     var rel2cn = {'比和':'当令','生':'生扶','泄':'泄气','克':'逆克','被克':'受克'};
-    var h = '<div class="result-card"><h2>图 全年总览</h2>';
+    var h = '<div class="result-card"><h2>📊 全年总览</h2>';
     h += '<div class="year-table-wrap"><table class="year-table"><thead><tr>';
     h += '<th>月</th><th>月令</th><th>干支</th><th>五行</th><th>关系</th><th>事业</th><th>财运</th><th>感情</th><th>健康</th>';
     h += '</tr></thead><tbody>';
@@ -314,7 +314,7 @@ aria-label="年" value="1990" min="1900" max="2100">
 
       var html = '';
       // 当前月详细
-      html += '<h2>热 本月详细 ('+esc(curData.name || (curData.month+'月'))+' · '+esc(curData.ganZhi||'')+')</h2>';
+      html += '<h2>🔥 本月详细 ('+esc(curData.name || (curData.month+'月'))+' · '+esc(curData.ganZhi||'')+')</h2>';
       html += renderMonthCard(curData, true);
       // 附加 R90 化解建议（如果有 KB 命中）
       if(report.currentMonth && report.currentMonth.text){

@@ -168,7 +168,7 @@ a.innerHTML='<div class="card"><div class="card-title">'+steps[4].t+'</div>'+
 '<div class="checkbox-item"><input type="checkbox" id="cb-皮肤" aria-label="皮肤问题"><span>皮肤问题</span></div>'+
 '<div class="checkbox-item"><input type="checkbox" id="cb-no-discomfort" aria-label="无明显不适"><span>无明显不适</span></div>'+
 '</div></div>'+
-'<button class="btn" onclick="next()">生成健康预测报告</button></div><div style="margin-top:10px"><a class="btn" href="report-interpret.html" style="text-decoration:none;display:block;text-align:center">表 录入完去报告解读中心</a></div>';
+'<button class="btn" onclick="next()">生成健康预测报告</button></div><div style="margin-top:10px"><a class="btn" href="report-interpret.html" style="text-decoration:none;display:block;text-align:center">📊 录入完去报告解读中心</a></div>';
 }else if(step===6){
 generateReport();
 }
@@ -209,7 +209,7 @@ var cycle={'木':'火','火':'土','土':'金','金':'水','水':'木'};
 var rev={'木':'土','土':'水','水':'火','火':'金','金':'木'};
 function mRisk(mw,de){if(mw===de)return'warn';if(cycle[mw]===de)return'safe';if(cycle[de]===mw)return'warn';if(rev[mw]===de)return'danger';if(rev[de]===mw)return'safe';return'safe'}
 
-var h='<div class="card"><div class="card-title">图 综合健康评估报告</div>';
+var h='<div class="card"><div class="card-title">📊 综合健康评估报告</div>';
 h+='<div style="font-size:13px;line-height:1.8">';
 h+='<b>康养人：</b>'+v('name')+' | '+v('sex')+' | '+v('age')+'岁 | '+v('hw')+'<br>';
 h+='<b>日主五行：</b>'+yE+' → 对应脏腑：'+organMap[yE].join('/')+'<br>';
@@ -223,7 +223,7 @@ if(v('medications'))h+='<b>用药：</b>'+v('medications')+'<br>';
 h+='</div></div>';
 
 // 月度风险日历
-h+='<div class="card"><div class="card-title">历 2026年月度健康风险日历</div><div class="month-grid">';
+h+='<div class="card"><div class="card-title">📅 2026年月度健康风险日历</div><div class="month-grid">';
 monthWx.forEach(function(mw){var r=mRisk(mw.wx,yE);var cls=r==='danger'?'danger':r==='warn'?'warn':'safe';
 h+='<div class="month-box '+cls+'"><div><b>'+mw.m+'</b></div><div>'+mw.wx+'月</div><div style="font-size:9px">'+(r==='danger'?'高风险':r==='warn'?'中风险':'低风险')+'</div></div>'});
 h+='</div><div style="font-size:11px;color:var(--muted);margin-top:4px">危高风险=克我 🟡中风险=泄气/同气 🟢低风险=生我</div></div>';
@@ -280,7 +280,7 @@ h+='</div>';
 }
 
 // 年度体检方案
-h+='<div class="card"><div class="card-title">表 年度体检方案</div>';
+h+='<div class="card"><div class="card-title">📊 年度体检方案</div>';
 h+='<div style="font-size:12px;line-height:1.8">';
 h+='<b>五行专项(日主'+yE+')：</b>'+({金:'肺功能+胸片+过敏原',木:'肝功能+腹部B超+眼底',水:'尿常规+肾B超+骨密度',火:'心电图+心脏彩超+动态血压',土:'血糖+胃肠镜+幽门螺杆菌'}[yE])+'<br>';
 h+='<b>常规项目：</b>血常规/肝肾功/血脂/血糖/尿常规/心电图/胸片<br>';
@@ -315,7 +315,7 @@ fetch(csrfReq, {signal: AbortSignal.timeout(15000), credentials:'include'}).then
     var csrfToken=cs.csrf_token||cs.data&&cs.data.csrf_token||'';
     return fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload),credentials:'include'})
 }).then(function(r){return r.json()}).then(function(d){
-    var saveInfo='<div class="card"><div class="card-title">存 档案已保存</div>';
+    var saveInfo='<div class="card"><div class="card-title">💾 档案已保存</div>';
     saveInfo+='<div style="font-size:12px">风险等级：<b>'+(d.data&&d.data.risk_level||'normal')+'</b> | 操作：'+(d.data&&d.data.action||'created')+'</div>';
     saveInfo+='<div class="hint">您的康养人档案已保存到身份中心</div></div>';
     a.innerHTML=saveInfo+h;

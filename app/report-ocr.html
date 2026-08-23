@@ -96,11 +96,11 @@ h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
 <div class="flow-hint">查看体检报告 OCR · 命理宝鉴，了解功能详情与使用方式。</div>
 </div>
 <a href="person-center.html" class="nav-back">← 返回身份中心</a>
-<h1>表 体检报告 OCR · 智能解读</h1>
+<h1>📊 体检报告 OCR · 智能解读</h1>
 <div class="subtitle">拍照上传 → AI 识别指标 → 自动入档案 → 四维融合解读</div>
 
 <div class="card">
-<div class="card-title">出 上传报告</div>
+<div class="card-title">📤 上传报告</div>
 <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
 <div class="upload-icon">拍</div>
 <div class="upload-hint">点击或拖拽上传体检报告图片<br>支持 JPG / PNG / WEBP · 多页可分次上传</div>
@@ -110,7 +110,7 @@ h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
 </div>
 
 <div class="card" id="previewCard" style="display:none">
-<div class="card-title">查 预览 & 识别</div>
+<div class="card-title">🔍 预览 & 识别</div>
 <div class="preview-row">
 <div class="preview-box">
 <div class="preview-title">原图</div>
@@ -122,17 +122,17 @@ h1{color:var(--gold);font-size:18px;margin-bottom:6px;text-align:center}
 </div>
 </div>
 <div style="margin-top:10px">
-<button class="btn" id="btnOcr" onclick="doOCR()">查 开始 OCR 识别</button>
+<button class="btn" id="btnOcr" onclick="doOCR()">🔍 开始 OCR 识别</button>
 <button class="btn btn-secondary btn-sm" onclick="editOcr()">写 手动修正</button>
-<button class="btn btn-green btn-sm" onclick="parseAndSave()">存 解析并入档案</button>
+<button class="btn btn-green btn-sm" onclick="parseAndSave()">💾 解析并入档案</button>
 </div>
 <div class="hint" id="ocrStatus"></div>
 </div>
 
 <div class="card" id="parsedCard" style="display:none">
-<div class="card-title">图 解析的检查指标</div>
+<div class="card-title">📊 解析的检查指标</div>
 <div id="parsedGrid" class="parsed-grid"></div>
-<button class="btn" style="margin-top:10px" onclick="interpret()">卦 四维融合解读</button>
+<button class="btn" style="margin-top:10px" onclick="interpret()">☯ 四维融合解读</button>
 </div>
 
 <div class="card" id="interpretCard" style="display:none"></div>
@@ -370,7 +370,7 @@ var p=j.data||{};
 var abnormal=parsedItems.filter(function(it){return it.flag&&it.flag.cls==='flag-high'});
 var low=parsedItems.filter(function(it){return it.flag&&it.flag.cls==='flag-low'});
 
-var h='<div class="card-title">卦 四维融合解读</div>';
+var h='<div class="card-title">☯ 四维融合解读</div>';
 
 // 西医层
 h+='<div class="interpret-card" style="border-left-color:var(--blue)">';

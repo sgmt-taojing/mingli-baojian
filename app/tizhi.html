@@ -52,9 +52,9 @@
     <button id="tzTab-selftest" onclick="tzSwitchTab('selftest')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">记 体质自测</button>
     <button id="tzTab-plan" onclick="tzSwitchTab('plan')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">标 养生方案</button>
     <button id="tzTab-food" onclick="tzSwitchTab('food')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">菜 食疗推荐</button>
-    <button id="tzTab-qigong" onclick="tzSwitchTab('qigong')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">修 功法养生</button>
+    <button id="tzTab-qigong" onclick="tzSwitchTab('qigong')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">✏️ 功法养生</button>
     <button id="tzTab-prescription" onclick="tzSwitchTab('prescription')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">药 名医名方</button>
-    <button id="tzTab-bazi" onclick="tzSwitchTab('bazi')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">卦 八字体质</button>
+    <button id="tzTab-bazi" onclick="tzSwitchTab('bazi')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">☯ 八字体质</button>
     <button id="tzTab-checkin" onclick="tzSwitchTab('checkin')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">成 打卡记录</button>
     <button id="tzTab-wuxing" onclick="tzSwitchTab('wuxing')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">道 五行养生</button>
     <button id="tzTab-encyclopedia" onclick="tzSwitchTab('encyclopedia')" style="padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13px">草 养生百科</button>
@@ -63,17 +63,17 @@
   <!-- ===== Tab: 报告分析 ===== -->
   <div id="tz-tab-report" class="tz-panel d-block">
     <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
-      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">表 体检报告分析</h4>
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">📊 体检报告分析</h4>
       <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">上传体检报告图片/PDF，或手动输入指标，AI将为您分析体质并给出理疗建议。</p>
       <div style="margin-bottom:16px">
-        <label for="tizhi-file" style="display:block;margin-bottom:8px;font-size:14px;color:var(--gold)">出 上传体检报告</label>
+        <label for="tizhi-file" style="display:block;margin-bottom:8px;font-size:14px;color:var(--gold)">📤 上传体检报告</label>
         <input type="file" id="tizhi-file" accept="image/*,.pdf" onchange="handleTizhiUpload(this)" aria-label="上传体检报告" style="width:100%;padding:10px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px">
       </div>
       <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px">
         <label style="display:block;margin-bottom:8px;font-size:14px;color:var(--gold)">✍️ 手动输入指标</label>
         <div id="tzManualFields"></div>
-        <button onclick="tzAddMetricField()" style="margin-top:8px;padding:8px 16px;background:rgba(201,168,76,0.1);border:1px solid var(--border);border-radius:6px;color:var(--gold);cursor:pointer;font-size:13px;font-family:inherit">加 添加指标</button>
-        <button onclick="tzAnalyzeManualMetrics()" style="margin-top:8px;margin-left:8px;padding:8px 16px;background:var(--gold);border:none;border-radius:6px;color:var(--paper);cursor:pointer;font-size:13px;font-family:inherit">查 开始分析</button>
+        <button onclick="tzAddMetricField()" style="margin-top:8px;padding:8px 16px;background:rgba(201,168,76,0.1);border:1px solid var(--border);border-radius:6px;color:var(--gold);cursor:pointer;font-size:13px;font-family:inherit">➕ 添加指标</button>
+        <button onclick="tzAnalyzeManualMetrics()" style="margin-top:8px;margin-left:8px;padding:8px 16px;background:var(--gold);border:none;border-radius:6px;color:var(--paper);cursor:pointer;font-size:13px;font-family:inherit">🔍 开始分析</button>
       </div>
       <div id="tizhiResult" class="d-none"></div>
     </div>
@@ -86,7 +86,7 @@
       <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">请根据近一个月的身体状况，如实回答以下问题。系统将根据您的回答判断体质类型。</p>
       <div id="tzQuestionnaire"></div>
       <div style="text-align:center;margin-top:20px">
-        <button class="compute-btn" style="padding:12px 36px;font-size:14px" onclick="tzCalculateResult()">图 查看体质结果</button>
+        <button class="compute-btn" style="padding:12px 36px;font-size:14px" onclick="tzCalculateResult()">📊 查看体质结果</button>
       </div>
       <div id="tzResult" style="display:none;margin-top:20px"></div>
     </div>
@@ -121,7 +121,7 @@
   <!-- ===== Tab: 功法养生 ===== -->
   <div id="tz-tab-qigong" class="tz-panel d-none">
     <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
-      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">修 功法养生</h4>
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">✏️ 功法养生</h4>
       <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">传统功法强身健体，按体质选择适合的功法练习。</p>
       <div id="tzQigongList" style="display:grid;gap:12px;margin-bottom:20px"></div>
       <h5 style="font-size:15px;color:var(--gold);margin-bottom:12px">运动建议</h5>
@@ -160,7 +160,7 @@
   <!-- ===== Tab: 八字体质 ===== -->
   <div id="tz-tab-bazi" class="tz-panel d-none">
     <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">
-      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">卦 八字体质分析</h4>
+      <h4 style="font-size:16px;color:var(--gold);margin-bottom:12px">☯ 八字体质分析</h4>
       <p style="font-size:13px;color:var(--paper2);line-height:1.7;margin-bottom:16px">根据出生日期推算日主五行，分析先天体质倾向。</p>
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
         <div>
@@ -211,7 +211,7 @@ style="padding:8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);bor
             <option value="female">女</option>
           </select>
         </div>
-        <button onclick="tzAnalyzeBazi()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:var(--paper);cursor:pointer;font-size:13px;font-family:inherit;margin-top:20px">查 分析体质</button>
+        <button onclick="tzAnalyzeBazi()" style="padding:8px 20px;background:var(--gold);border:none;border-radius:6px;color:var(--paper);cursor:pointer;font-size:13px;font-family:inherit;margin-top:20px">🔍 分析体质</button>
       </div>
       <div id="tzBaziResult" class="d-none"></div>
     </div>
@@ -383,7 +383,7 @@ if (typeof tzAnalyzeManualMetrics !== 'function') {
       var r = document.getElementById('tizhiResult');
       if (r) {
         r.classList.remove('d-none');
-        r.innerHTML = '<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">图 手动指标分析</h5><p style="font-size:13px;color:var(--paper2)">已记录您的手动输入指标。完整分析功能建议在主页体质辨识模块中使用。</p></div>';
+        r.innerHTML = '<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">📊 手动指标分析</h5><p style="font-size:13px;color:var(--paper2)">已记录您的手动输入指标。完整分析功能建议在主页体质辨识模块中使用。</p></div>';
       }
       if (typeof showToast === 'function') showToast('指标已记录');
     } catch(e) { console.warn('[tzAnalyzeManualMetrics]', e); }

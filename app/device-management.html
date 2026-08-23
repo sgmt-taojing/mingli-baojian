@@ -257,7 +257,7 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
 <nav>
   <a href="index.html">主平台</a>
   <a href="wangzhen-clinical.html">望诊工作台</a>
-  <a href="patient-archive.html">表 患者档案</a>
+  <a href="patient-archive.html">📊 患者档案</a>
 </nav>
 
 <h1>拍 设备运维中心</h1>
@@ -268,7 +268,7 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
 
 <!-- 后端服务健康 -->
 <div class="om-panel">
-  <div class="om-panel-title">屏 后端服务健康 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.checkServices()">更 刷新</button></div>
+  <div class="om-panel-title">屏 后端服务健康 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.checkServices()">🔄 刷新</button></div>
   <div id="om-services"></div>
 </div>
 
@@ -284,10 +284,10 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
         <option value="">点击下方按钮检测</option>
       </select>
       <div style="display:flex;gap:4px;flex-wrap:wrap">
-        <button class="om-btn om-btn-primary" onclick="OpsCenter.detectCameras()">查 检测</button>
+        <button class="om-btn om-btn-primary" onclick="OpsCenter.detectCameras()">🔍 检测</button>
         <button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">拍 测试</button>
         <button class="om-btn om-btn-ghost" onclick="OpsCenter.stopCamera()">⏹ 停止</button>
-        <button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">星 设为默认</button>
+        <button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">⭐ 设为默认</button>
       </div>
       <div id="om-cam-info" class="om-hint"></div>
     </div>
@@ -296,7 +296,7 @@ header p{font-size:11px;color:var(--paper3);letter-spacing:3px;margin-top:8px}
 
 <!-- 设备列表 -->
 <div class="om-panel">
-  <div class="om-panel-title">机 已接入设备 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.scanAll()">更 扫描</button></div>
+  <div class="om-panel-title">机 已接入设备 <button class="om-btn om-btn-ghost" style="font-size:10px" onclick="OpsCenter.scanAll()">🔄 扫描</button></div>
   <div class="om-device-grid" id="om-devices"></div>
 </div>
 
@@ -351,7 +351,7 @@ var OpsCenter = {
   checkServices: function(){
     var container = document.getElementById('om-services');
     if(!container) return;
-    container.innerHTML = '<div class="om-empty">更 正在检测服务...</div>';
+    container.innerHTML = '<div class="om-empty">🔄 正在检测服务...</div>';
     var self = this;
     var results = [];
     var completed = 0;
@@ -557,7 +557,7 @@ var OpsCenter = {
       html += '<div class="om-device-head"><div class="om-device-name">拍 ' + label + (isDefault?' ⭐':'') + '</div><div class="om-device-status online">在线</div></div>';
       html += '<div class="om-device-info"><b>类型:</b> 视频输入<br><b>连接:</b> ' + (cam.label ? 'USB/内置' : '未知') + '<br><b>设备ID:</b> ' + cam.deviceId.substring(0,12) + '...</div>';
       html += '<div class="om-device-actions"><button class="om-btn om-btn-secondary" onclick="OpsCenter.testCamera()">拍 测试</button>';
-      if(!isDefault) html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">星 设为默认</button>';
+      if(!isDefault) html += '<button class="om-btn om-btn-ghost" onclick="OpsCenter.setDefault()">⭐ 设为默认</button>';
       html += '</div></div>';
     });
     
@@ -644,7 +644,7 @@ var OpsCenter = {
       html += '<div class="om-device-info">';
       html += '<b>当前状态:</b> 桌面浏览器未检测到 RokidJSBridge<br>';
       html += '<b>原因:</b> 蓝牙连接的是音频通道(HFP/A2DP)，不暴露 JS Bridge<br><br>';
-      html += '<b>表 接入方案（选一个）:</b><br><br>';
+      html += '<b>📊 接入方案（选一个）:</b><br><br>';
       html += '<b>方案 A — 眼镜内置浏览器（推荐）</b><br>';
       html += '&nbsp;1. 眼镜连 WiFi（和电脑同一网络）<br>';
       html += '&nbsp;2. 眼镜打开「全屏浏览器」App<br>';
@@ -660,7 +660,7 @@ var OpsCenter = {
       html += '&nbsp;2. 选择摄像头 → 测试 → 设为默认<br>';
       html += '&nbsp;3. 直接在望诊工作台拍照分析<br><br>';
       html += '<b>方案 D — Web Bluetooth API（实验性）</b><br>';
-      html += '&nbsp;<button class="om-btn om-btn-secondary" style="margin-top:4px" onclick="OpsCenter.scanBluetooth()">查 扫描蓝牙设备</button>';
+      html += '&nbsp;<button class="om-btn om-btn-secondary" style="margin-top:4px" onclick="OpsCenter.scanBluetooth()">🔍 扫描蓝牙设备</button>';
       html += '&nbsp;<span style="font-size:10px;color:var(--om-paper3)">需 Chrome 开启实验性功能</span><br>';
       html += '&nbsp;<div id="om-bt-result" style="margin-top:4px"></div>';
       html += '</div>';

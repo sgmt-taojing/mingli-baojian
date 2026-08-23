@@ -249,7 +249,7 @@
 
 <header class="wz-topbar">
   <div>
-    <h1 data-i18n="page.clinical">查 望诊临床工作台</h1>
+    <h1 data-i18n="page.clinical">🔍 望诊临床工作台</h1>
     <div class="wz-stepper" id="wz-stepper">
       <div class="wz-step active" data-step="1" onclick="wangzhenClinical.goStep(1)">
         <div class="wz-step-num">1</div>
@@ -280,9 +280,9 @@
   <div style="display:flex;gap:6px;align-items:center">
     <span id="wz-capabilities" class="wz-capabilities">待 检测中...</span>
     <a href="wangzhen-center.html" class="nav-back">经 望诊中心</a>
-    <a href="patient-archive.html" class="nav-back">表 患者档案</a>
-    <a href="tcm-clinic.html" class="nav-back">医 中医诊所</a>
-    <a href="index.html" class="nav-back">宅 主页</a>
+    <a href="patient-archive.html" class="nav-back">📊 患者档案</a>
+    <a href="tcm-clinic.html" class="nav-back">🩺 中医诊所</a>
+    <a href="index.html" class="nav-back">🏠 主页</a>
   </div>
 </header>
 
@@ -384,16 +384,16 @@
           </div>
         </div>
 
-        <button class="btn btn-primary" onclick="wangzhenClinical.saveNewPatient()" style="width:100%;margin-top:8px">存 保存患者</button>
+        <button class="btn btn-primary" onclick="wangzhenClinical.saveNewPatient()" style="width:100%;margin-top:8px">💾 保存患者</button>
       </div>
       <div id="wz-patient-detail" style="margin-top:8px"></div>
       <div style="font-size:11px;color:var(--wz-paper3);margin-top:4px">当前: <b id="wz-current-patient" style="color:var(--wz-gold)">未选择</b></div>
       <!-- 复诊操作区 -->
       <div id="wz-followup-actions" style="display:none;margin-top:8px;padding:8px;border:1px solid rgba(16,185,129,.2);border-radius:6px;background:rgba(16,185,129,.04)">
-        <div style="font-size:11px;color:var(--wz-jade);font-weight:600;margin-bottom:6px">表 复诊操作</div>
+        <div style="font-size:11px;color:var(--wz-jade);font-weight:600;margin-bottom:6px">📊 复诊操作</div>
         <div style="font-size:10px;color:var(--wz-paper3);margin-bottom:6px" id="wz-last-visit-info"></div>
         <div class="wz-btn-row">
-          <button class="btn btn-secondary" style="font-size:11px" onclick="wangzhenClinical.startFollowup()">更 开始复诊</button>
+          <button class="btn btn-secondary" style="font-size:11px" onclick="wangzhenClinical.startFollowup()">🔄 开始复诊</button>
           <button class="btn btn-ghost" style="font-size:11px" onclick="wangzhenClinical.viewPatientHistory()">夹 完整病历</button>
         </div>
       </div>
@@ -401,7 +401,7 @@
 
     <!-- 后台排盘 + 白话健康解读（医生看到的是中医白话，不是周易术语）-->
     <div class="wz-card">
-      <div class="wz-card-title">诊 体质健康评估 <span class="wz-step-tag">步骤4</span> <span class="badge" id="wz-paipan-status">待排盘</span></div>
+      <div class="wz-card-title">🩺 体质健康评估 <span class="wz-step-tag">步骤4</span> <span class="badge" id="wz-paipan-status">待排盘</span></div>
       <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">系统在后台自动排盘分析，结果以中医白话展示</div>
       <!-- 后台排盘（隐藏，不展示给医生）-->
       <div id="wz-paipan-raw" style="display:none">
@@ -480,19 +480,19 @@
         <button class="btn btn-ghost" onclick="wangzhenClinical.speakText(document.getElementById('wz-voice-text').value)">播报</button>
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('prescription')">表 处方</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('prescription')">📊 处方</button>
         <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('lifestyle')">草 调养</button>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('followup')">历 复诊</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('followup')">📅 复诊</button>
         <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('warning')">警 注意</button>
       </div>
     </div>
 
     <!-- 望诊诊断 -->
     <div class="wz-card">
-      <div class="wz-card-title">查 望诊诊断 <span class="wz-step-tag">步骤3</span> <span class="badge" id="wz-kb-badge">KB 加载中</span></div>
+      <div class="wz-card-title">🔍 望诊诊断 <span class="wz-step-tag">步骤3</span> <span class="badge" id="wz-kb-badge">KB 加载中</span></div>
       <div class="section-hint">👆 操作：点击下方区域卡片 → 勾选面部特征 → 点「诊断此区域」</div>
       <div class="wz-tabs">
-        <div class="wz-tab active" onclick="window.wangzhenCenter.switchTab('zones')">图 分区</div>
+        <div class="wz-tab active" onclick="window.wangzhenCenter.switchTab('zones')">📊 分区</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('colors')">设 五色</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('organs')">眼️ 五官</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('therapy')">药 理疗</div>
@@ -503,7 +503,7 @@
         <div id="wangzhen-zone-map"></div>
         <div id="wangzhen-feature-panel"></div>
         <div id="wangzhen-result-panel"></div>
-        <div style="margin-top:10px"><div class="wz-card-title" style="font-size:12px">表 诊断历史</div><div id="wangzhen-history"></div></div>
+        <div style="margin-top:10px"><div class="wz-card-title" style="font-size:12px">📊 诊断历史</div><div id="wangzhen-history"></div></div>
       </div>
       <div data-tab="colors" style="display:none"><div id="wangzhen-five-colors"></div></div>
       <div data-tab="organs" style="display:none"><div id="wangzhen-organs"></div></div>
@@ -514,7 +514,7 @@
 
     <!-- 综合诊疗：西医会诊 + 命理辅助 + 大师协作 + 治疗方案 -->
     <div class="wz-card">
-      <div class="wz-card-title">医 综合诊疗 <span class="wz-step-tag">步骤4</span></div>
+      <div class="wz-card-title">🩺 综合诊疗 <span class="wz-step-tag">步骤4</span></div>
 
       <!-- 西医诊断输入 -->
       <div class="wz-form-row">
@@ -524,7 +524,7 @@
 
       <!-- 综合分析按钮 -->
       <div class="wz-btn-row">
-        <button class="btn btn-primary" onclick="wangzhenClinical.runComprehensiveAnalysis()">查 综合体质分析</button>
+        <button class="btn btn-primary" onclick="wangzhenClinical.runComprehensiveAnalysis()">🔍 综合体质分析</button>
       </div>
 
       <!-- 白话健康解读结果 -->
@@ -535,8 +535,8 @@
         <div style="font-size:12px;color:var(--wz-cyan);font-weight:600;margin-bottom:6px">信 周易大师协助</div>
         <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">一键将患者命理数据推送给周易大师，大师解读后同步回传</div>
         <div class="wz-btn-row">
-          <button class="btn btn-secondary" onclick="wangzhenClinical.pushToMaster()">出 推送给周易大师解读</button>
-          <button class="btn btn-ghost" onclick="wangzhenClinical.refreshMasterReply()">更 刷新大师回复</button>
+          <button class="btn btn-secondary" onclick="wangzhenClinical.pushToMaster()">📤 推送给周易大师解读</button>
+          <button class="btn btn-ghost" onclick="wangzhenClinical.refreshMasterReply()">🔄 刷新大师回复</button>
         </div>
         <div id="wz-master-reply" style="margin-top:8px"></div>
       </div>
@@ -555,9 +555,9 @@
   <!-- ===== 右栏：操作 + 病例 ===== -->
   <aside>
     <div class="wz-card">
-      <div class="wz-card-title">表 操作 <span class="wz-step-tag">步骤5</span></div>
+      <div class="wz-card-title">📊 操作 <span class="wz-step-tag">步骤5</span></div>
       <div class="wz-btn-row" style="flex-direction:column">
-        <button class="btn btn-primary" onclick="wangzhenClinical.saveDiagnosis()">存 保存诊断到病例</button>
+        <button class="btn btn-primary" onclick="wangzhenClinical.saveDiagnosis()">💾 保存诊断到病例</button>
         <button class="btn btn-secondary" onclick="wangzhenClinical.generateReport()">🖨️ 生成报告</button>
         <button class="btn btn-ghost" onclick="wangzhenClinical.speakText('诊断完成，请查看报告')">语音播报</button>
       </div>
@@ -572,13 +572,13 @@
             <div id="wz-fusion-content"></div>
           </div>
           <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
-            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="runFaceTongueFusion()">更 面舌联动分析</button>
-            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('舌诊案例 辨证论治')">典 KB案例推荐</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="runFaceTongueFusion()">🔄 面舌联动分析</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('舌诊案例 辨证论治')">📚 KB案例推荐</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊合参 望闻问切')">经 四诊合参知识</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('28种病理舌象')">28舌象查询</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('面诊 面部脏腑对应')">眼️ 面诊分区</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('目诊 五脏六腑')">眼️ 目诊</button>
-            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊仪 数据采集')">表 四诊仪规范</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊仪 数据采集')">📊 四诊仪规范</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('误诊 鉴别 染苔')">警 误诊鉴别</button>
           </div>
           <div id="wz-kb-cases" style="margin-top:8px"></div>
@@ -587,7 +587,7 @@
     </div>
 
     <div class="wz-card">
-      <div class="wz-card-title">表 望诊历史</div>
+      <div class="wz-card-title">📊 望诊历史</div>
       <div id="wangzhen-history-2"></div>
     </div>
     <div class="wz-card">
@@ -603,9 +603,9 @@
     <div class="wz-card">
       <div class="wz-card-title">快捷入口</div>
       <div class="wz-btn-row" style="flex-direction:column">
-        <a href="tcm-clinic.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">医 中医诊疗</a>
-        <a href="tcm-symptom.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">诊 症状分析</a>
-        <a href="doctor-elder.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">医 接诊台</a>
+        <a href="tcm-clinic.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🩺 中医诊疗</a>
+        <a href="tcm-symptom.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🩺 症状分析</a>
+        <a href="doctor-elder.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">🩺 接诊台</a>
         <a href="vision-demo.html" class="btn btn-ghost" style="text-decoration:none;text-align:center">AI视觉</a>
       </div>
     </div>
@@ -672,7 +672,7 @@ function runFaceTongueFusion(){
     
     var result = MultimodalFusion.fuse(faceData, tongueData, null);
     contentDiv.innerHTML = 
-      '<p>图 综合分析：'+result.summary+'</p>'+
+      '<p>📊 综合分析：'+result.summary+'</p>'+
       '<p>标 置信度：'+(result.confidence*100).toFixed(0)+'%</p>'+
       (result.priorities.length>0?'<p>警 首要关注：'+result.priorities[0].organ+' '+result.priorities[0].issue+'</p>':'')+
       (result.priorities.length>1?'<p>其次：'+result.priorities[1].organ+' '+result.priorities[1].issue+'</p>':'');

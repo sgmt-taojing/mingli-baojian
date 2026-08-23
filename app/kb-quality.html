@@ -129,7 +129,7 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 <a href="index.html" style="position:fixed;top:8px;left:8px;z-index:9999;padding:6px 14px;border:1px solid rgba(201,168,76,.25);border-radius:6px;background:rgba(12,12,12,.9);color:#c9a84c;font-size:12px;letter-spacing:2px;text-decoration:none;backdrop-filter:blur(8px)">← 返回首页</a>
 
 <div class="wrap">
-<h1>图 KB 知识库质量审计</h1>
+<h1>📊 KB 知识库质量审计</h1>
 <p class="sub" id="sub">加载中…</p>
 
 <div class="summary" id="summary"></div>
@@ -163,8 +163,8 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
     <h3 id="modalTitle"></h3>
     <div id="modalStats" class="stats-row"></div>
     <div style="display:flex;gap:8px;margin:16px 0 8px;border-bottom:1px solid var(--gold-dim)">
-      <button class="tab-btn active" data-tab="samples" onclick="switchTab('samples')">表 样本</button>
-      <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">图 Trust 分布</button>
+      <button class="tab-btn active" data-tab="samples" onclick="switchTab('samples')">📊 样本</button>
+      <button class="tab-btn" data-tab="detail" onclick="switchTab('detail')">📊 Trust 分布</button>
     </div>
     <div id="tab-samples">
       <div id="modalSamples"></div>
@@ -363,7 +363,7 @@ function showDetail(mod){
       const topHtml=d.topTrust.map(e=>`<div class="row high"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
       const lowHtml=d.lowTrust.map(e=>`<div class="row low"><div class="title">${esc(e.title||e.entry_id)}</div><div class="score">${e.trust_score?.toFixed(2)||'-'}</div></div>`).join('');
       document.getElementById('modalDetail').innerHTML=`
-        <h4 style="color:#aaa;font-size:.85rem;margin:12px 0 8px">图 Trust 分布（共 ${fmt(total)} 条）</h4>
+        <h4 style="color:#aaa;font-size:.85rem;margin:12px 0 8px">📊 Trust 分布（共 ${fmt(total)} 条）</h4>
         ${distroHtml}
         <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">冠 Trust Top 5</h4>
         <div class="trust-list">${topHtml}</div>

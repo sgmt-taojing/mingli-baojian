@@ -186,7 +186,7 @@ async function showTool(tool){
     if(!data.result || data.result.length===0){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px"><div style="font-size:32px;margin-bottom:8px">📭</div><div>暂无记录</div></div>';return;}
   const c=data.chart;
   if(tool==='huangli'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">历 ${c.date} 黄历</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">📅 ${c.date} 黄历</h3>`;
     html+=`<div style="font-size:12px;line-height:2;color:var(--paper)">`;
     html+=`干支：${c.yearGanZhi}年 ${c.monthGanZhi}月 ${c.dayGanZhi}日（${c.shengxiao}年）<br>`;
     html+=`节气：${c.jieqi} | 建除：${c.jianchu} | 值神：${c.zhishen}(${c.huangdao})<br>`;
@@ -195,7 +195,7 @@ async function showTool(tool){
     html+=`冲煞：${c.chongsha} | 胎神：${c.taishen}`;
     html+='</div>';
   }else if(tool==='zeri'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">历 ${c.year}年${c.month}月「${c.event}」吉日</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">📅 ${c.year}年${c.month}月「${c.event}」吉日</h3>`;
     html+=`<div style="font-size:12px;line-height:1.8">共${c.count}个吉日（建除：${c.goodJianchu}）<br>`;
     for(const g of c.goodDays.slice(0,8)){
       const hd=g.huangdao?'<span style="color:var(--gold)">黄道</span>':'<span style="color:var(--paper3)">黑道</span>';
@@ -223,7 +223,7 @@ async function showTool(tool){
     html+=`评分：${c.score}/100 | ${c.suggestion}`;
     html+='</div>';
   }else if(tool==='liunian'){
-    html=`<h3 style="color:var(--gold);margin-bottom:8px">更 ${c.year}年流年运程</h3>`;
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">🔄 ${c.year}年流年运程</h3>`;
     html+=`<div style="font-size:12px;line-height:2">`;
     html+=`${c.yearGanZhi}(${c.yearSX}) | ${c.age}岁 | 生肖：${c.sxRelation}<br>`;
     html+=`五行：${c.yearWX}vs${c.birthWX} ${c.wxRelation} | 评分：${c.score}<br>`;

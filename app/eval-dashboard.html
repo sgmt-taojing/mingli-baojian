@@ -42,14 +42,14 @@
 
 <header class="dash-header">
   <a href="index.html" class="dash-back">← 主页</a>
-  <h1>图 评估看板</h1>
+  <h1>📊 评估看板</h1>
   <p class="dash-sub">3 benchmark × 8 周趋势 · 跨迭代质量守门员 · <span class="badge">R89-P</span></p>
   <div class="dash-meta">
     <span class="kb-chip">本周 W31</span>
     <span id="updateTime" class="kb-chip">--</span>
-    <button id="refreshBtn" class="btn-refresh">更 刷新</button>
-    <button id="exportBtn" class="btn-refresh">存 导出快照</button>
-    <button id="pdfBtn" class="btn-refresh">文 导出 PDF</button>
+    <button id="refreshBtn" class="btn-refresh">🔄 刷新</button>
+    <button id="exportBtn" class="btn-refresh">💾 导出快照</button>
+    <button id="pdfBtn" class="btn-refresh">📄 导出 PDF</button>
     <span class="dash-source-badge source-none" title="数据来源">警 加载中</span>
   </div>
 </header>
@@ -111,12 +111,12 @@
   </section>
 
   <section class="dash-violations">
-    <h2>报 SLO 违规周报</h2>
+    <h2>📋 SLO 违规周报</h2>
     <div id="violationsTable"></div>
   </section>
 
   <section class="dash-modules">
-    <h2>典 模块健康速览</h2>
+    <h2>📚 模块健康速览</h2>
     <div id="modulesGrid" class="modules-grid">
       <div class="mod-card">模块数据加载中…</div>
     </div>
@@ -129,41 +129,41 @@
   </section>
 
   <section class="dash-module-trend">
-    <h2>更 跨周分模块评分趋势</h2>
+    <h2>🔄 跨周分模块评分趋势</h2>
     <p class="section-hint">仅展示有 per-case 数据的周（当前 W31）· 后续每周 eval 自动积累</p>
     <div id="moduleTrendTable" class="module-trend-wrap">加载中…</div>
   </section>
 
   <section class="dash-weekly-stats">
-    <h2>表 跨周汇总统计</h2>
+    <h2>📊 跨周汇总统计</h2>
     <p class="section-hint">8 周 benchmark 汇总 · 均值/最低/最高/趋势方向 · 快速数字扫描</p>
     <div id="weeklyStatsTable" class="weekly-stats-wrap">加载中…</div>
   </section>
 
   <section class="dash-wow">
-    <h2>图 周环比变化 (WoW) <button class="csv-export-btn" onclick="exportWoWCSV()">⬇ CSV</button></h2>
+    <h2>📊 周环比变化 (WoW) <button class="csv-export-btn" onclick="exportWoWCSV()">⬇ CSV</button></h2>
     <p class="section-hint">连续 7 组周对 · 4 指标环比 Δ% · 绿色改善 / 红色恶化 / 灰色无变化</p>
     <div id="wowInsight" class="wow-insight"></div>
     <div id="wowTable" class="wow-wrap">加载中…</div>
   </section>
 
   <section class="dash-alert-history">
-    <h2>历 告警历史趋势</h2>
+    <h2>📅 告警历史趋势</h2>
     <p class="section-hint">8 周告警等级演变 · 整体 + 三维度 · CRITICAL→WARN→OK 轨迹</p>
     <div id="alertHistoryBody" class="alert-history-body">加载中…</div>
-    <button id="alertHistCSVBtn" class="csv-export-btn">文 导出告警历史 CSV</button>
-    <button id="alertDetailCSVBtn" class="csv-export-btn">文 导出告警详情 CSV</button>
+    <button id="alertHistCSVBtn" class="csv-export-btn">📄 导出告警历史 CSV</button>
+    <button id="alertDetailCSVBtn" class="csv-export-btn">📄 导出告警详情 CSV</button>
   </section>
 
   <section class="dash-module-percase">
-    <h2>查 模块 Per-Case 评分</h2>
+    <h2>🔍 模块 Per-Case 评分</h2>
     <p class="section-hint">选模块 → 展示该模块所有周的 faithfulness 逐 case 评分 · 三色标 + 趋势对比</p>
     <div class="mod-percase-controls">
       <label>模块：</label>
       <select id="modPercaseSel" aria-label="modPercaseSel"></select>
     </div>
     <div id="modPercaseBody" class="mod-percase-body">加载中…</div>
-    <button id="modPercaseCSVBtn" class="csv-export-btn" title="导出当前模块 per-case CSV">文 导出 CSV</button>
+    <button id="modPercaseCSVBtn" class="csv-export-btn" title="导出当前模块 per-case CSV">📄 导出 CSV</button>
   </section>
 
   <section class="dash-percase">
@@ -179,13 +179,13 @@
       </select>
     </div>
     <div id="percaseBody" class="percase-body">加载中…</div>
-    <button id="percaseCSVBtn" class="csv-export-btn" title="导出当前周 per-case CSV">文 导出 CSV</button>
+    <button id="percaseCSVBtn" class="csv-export-btn" title="导出当前周 per-case CSV">📄 导出 CSV</button>
   </section>
   <section class="dash-distill">
     <h2>试 诊疗经验蒸馏</h2>
     <p class="section-hint">R202 蒸馏引擎产出 · 脏腑分布 + 方剂排行 + 候选条目</p>
     <div id="distillBody" class="distill-body">加载中…</div>
-    <button id="distillCSVBtn" class="csv-export-btn">文 导出蒸馏条目 CSV</button>
+    <button id="distillCSVBtn" class="csv-export-btn">📄 导出蒸馏条目 CSV</button>
   </section>
 
   <section class="dash-expanded-modules">
@@ -201,7 +201,7 @@
       </div>
     </div>
     <div id="expandedBody" class="expanded-body">加载中…</div>
-    <button id="expandedCSVBtn" class="csv-export-btn" title="导出当前视图 CSV">文 导出 CSV</button>
+    <button id="expandedCSVBtn" class="csv-export-btn" title="导出当前视图 CSV">📄 导出 CSV</button>
     <div class="expanded-trend-section">
       <h3 class="expanded-trend-title">降 跨周模块趋势 <span class="expanded-trend-hint" id="expandedTrendHint">选定 benchmark 各模块分数随周次变化</span></h3>
       <div class="expanded-trend-controls">
@@ -225,11 +225,11 @@
     </div>
     <div class="chart-wrap cross-bench-chart" id="crossBenchChart"></div>
     <div id="crossBenchLegend" class="cross-bench-legend"></div>
-    <button id="crossBenchCSVBtn" class="csv-export-btn" title="导出散点数据 CSV">文 导出 CSV</button>
+    <button id="crossBenchCSVBtn" class="csv-export-btn" title="导出散点数据 CSV">📄 导出 CSV</button>
   </section>
 
   <section class="dash-heatmap">
-    <h2>热 跨周模块热力图</h2>
+    <h2>🔥 跨周模块热力图</h2>
     <p class="section-hint">R226 周环比热力 · 行=模块 列=周 色深=合规分 · 悬停看详情</p>
     <div class="heatmap-controls">
       <label>指标：</label>
@@ -244,7 +244,7 @@
       <div class="heatmap-legend-bar" id="heatmapLegendBar"></div>
       <span class="heatmap-legend-label">高</span>
     </div>
-    <button id="heatmapCSVBtn" class="csv-export-btn" title="导出热力图 CSV">文 导出 CSV</button>
+    <button id="heatmapCSVBtn" class="csv-export-btn" title="导出热力图 CSV">📄 导出 CSV</button>
   </section>
 
   <section class="dash-radar">
@@ -263,7 +263,7 @@
     </div>
     <div class="radar-svg-wrap" id="radarChartWrap"></div>
     <div class="radar-legend" id="radarLegend"></div>
-    <button id="radarCSVBtn" class="csv-export-btn" title="导出雷达图 CSV">文 导出 CSV</button>
+    <button id="radarCSVBtn" class="csv-export-btn" title="导出雷达图 CSV">📄 导出 CSV</button>
   </section>
 
   <section class="dash-biweekly">

@@ -146,11 +146,11 @@
 <nav>
   <a href="index.html">主平台</a>
   <a href="wangzhen-clinical.html">望诊工作台</a>
-  <a href="tcm-clinic.html">医 中医诊疗</a>
-  <a href="doctor-elder.html">医 接诊台</a>
+  <a href="tcm-clinic.html">🩺 中医诊疗</a>
+  <a href="doctor-elder.html">🩺 接诊台</a>
 </nav>
 
-<h1>表 患者档案中心</h1>
+<h1>📊 患者档案中心</h1>
 <div class="pa-subtitle">患者档案管理 · 诊断历史分析 · 供医生和周易大师参考</div>
 
 <!-- 统计概览 -->
@@ -247,7 +247,7 @@ var PatientArchive = {
       else ageGroups['60+']++;
     });
     var maxAge = Math.max.apply(null, Object.values(ageGroups)) || 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">图 年龄分布</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title">📊 年龄分布</div><div class="pa-bar-chart">';
     Object.keys(ageGroups).forEach(function(k){
       var v = ageGroups[k]; var pct = Math.round(v / maxAge * 100);
       html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '岁</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:var(--pa-cyan)"></div></div><span class="pa-bar-val">' + v + '</span></div>';
@@ -264,7 +264,7 @@ var PatientArchive = {
     });
     var sorted = Object.keys(chiefMap).sort(function(a,b){ return chiefMap[b] - chiefMap[a]; }).slice(0, 5);
     var maxChief = sorted.length > 0 ? chiefMap[sorted[0]] : 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">表 主诉分布 Top5</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title">📊 主诉分布 Top5</div><div class="pa-bar-chart">';
     if(sorted.length === 0){
       html += '<div class="pa-empty">暂无主诉数据</div>';
     } else {
@@ -433,7 +433,7 @@ var PatientArchive = {
 
     // 体质趋势（>=2次就诊）
     if(visits.length >= 2){
-      html += '<div class="pa-section"><div class="pa-section-title">图 趋势分析</div>';
+      html += '<div class="pa-section"><div class="pa-section-title">📊 趋势分析</div>';
       var first = visits[visits.length - 1];
       var last = visits[0];
       var firstTime = first.timestamp ? new Date(first.timestamp).toLocaleDateString('zh-CN') : '';
