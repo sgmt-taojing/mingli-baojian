@@ -1,0 +1,131 @@
+/* ═══════════════════════════════════════════════════════
+   命理宝鉴 · 统一设计规范 v1.0 (R743)
+   全站唯一主题真相源——所有页面的视觉基准
+   色调：暗金宣纸风（品牌金 #c9a84c + 宣纸白 + 墨黑）
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  /* ── 品牌色板 ── */
+  --u-bg: #080808;            /* 页面底色（墨黑） */
+  --u-bg-card: #141414;       /* 卡片底 */
+  --u-bg-elev: #1a1a1a;       /* 浮层/弹出 */
+  --u-border: rgba(201,168,76,.18);   /* 边框 */
+  --u-border-strong: rgba(201,168,76,.35);
+  --u-gold: #c9a84c;          /* 品牌金（主色） */
+  --u-gold-light: #e8cc7a;    /* 亮金（强调/标题） */
+  --u-gold-dim: rgba(201,168,76,.08); /* 金色淡底 */
+  --u-paper: #f0e8d8;         /* 宣纸白（正文亮字） */
+  --u-paper-2: #d4c9b0;       /* 次级文字 */
+  --u-paper-3: #a09080;       /* 弱化文字/占位 */
+  --u-jade: #27ae60;          /* 翠玉绿（成功/确认） */
+  --u-jade-light: #2ecc71;
+  --u-cyan: #5dade2;          /* 青蓝（信息/链接） */
+  --u-violet: #9b59b6;        /* 紫（AI/神秘） */
+  --u-red: #e74c3c;           /* 朱红（危险/驳回） */
+  --u-orange: #e67e22;        /* 橙（警告/待处理） */
+
+  /* ── 语义别名（兼容旧变量名→统一值） ── */
+  --bg: var(--u-bg);
+  --bg-card: var(--u-bg-card);
+  --card: var(--u-bg-card);
+  --ink: var(--u-bg);
+  --border: var(--u-border);
+  --gold: var(--u-gold);
+  --gold2: var(--u-gold-light);
+  --paper: var(--u-paper);
+  --paper2: var(--u-paper-2);
+  --paper3: var(--u-paper-3);
+  --muted: var(--u-paper-3);
+  --jade: var(--u-jade);
+  --cyan2: var(--u-cyan);
+  --violet2: var(--u-violet);
+  --cinn2: var(--u-red);
+  --red: var(--u-red);
+  --blue: var(--u-cyan);
+  --green: var(--u-jade);
+  --wz-bg: var(--u-bg); --wz-paper: var(--u-paper);
+  --zw-bg: var(--u-bg); --zw-gold: var(--u-gold); --zw-paper: var(--u-paper); --zw-paper3: var(--u-paper-3);
+  --tcm-bg: var(--u-bg);
+  --dc-bg: var(--u-bg);
+  --c-bg: var(--u-bg);
+  --pa-bg: var(--u-bg);
+  --dark: var(--u-bg);
+
+  /* ── 字体 ── */
+  --u-font: 'Noto Serif SC', 'Songti SC', 'STSong', serif;
+}
+
+/* ═══ 全局基调（最后加载，覆盖一切） ═══ */
+html { background: var(--u-bg) !important; }
+body {
+  background: var(--u-bg) !important;
+  color: var(--u-paper-2) !important;
+  font-family: var(--u-font) !important;
+}
+
+/* 浅色页强制回归暗色体系（保留内容可读性） */
+body, main, .container, .wrap, .content {
+  color: var(--u-paper-2);
+}
+
+/* ── 标题金色体系 ── */
+h1, h2, h3 { color: var(--u-paper) !important; }
+h1::first-letter, .page-title { color: var(--u-gold-light); }
+
+/* ── 链接统一 ── */
+a { color: var(--u-gold); }
+a:hover { color: var(--u-gold-light); }
+
+/* ── 卡片/面板统一 ── */
+.card, .panel, .info-card, .report-card, .swipe-card,
+.analysis-card, .result-card, .module-card {
+  background: var(--u-bg-card) !important;
+  border: 1px solid var(--u-border) !important;
+  border-radius: 12px;
+}
+
+/* ── 表单控件统一 ── */
+input, select, textarea {
+  background: rgba(255,255,255,.04) !important;
+  border: 1px solid var(--u-border) !important;
+  border-radius: 8px !important;
+  color: var(--u-paper) !important;
+  font-family: var(--u-font) !important;
+}
+input::placeholder, textarea::placeholder { color: var(--u-paper-3); }
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: var(--u-gold) !important;
+}
+
+/* ── 按钮体系 ── */
+button, .btn, .btn-primary {
+  font-family: var(--u-font) !important;
+}
+.btn-primary, button.primary {
+  background: linear-gradient(135deg, var(--u-gold), #a08030) !important;
+  color: #111 !important;
+  border: none !important;
+  font-weight: 600;
+}
+
+/* ── 表格统一 ── */
+table { border-collapse: collapse; }
+th { color: var(--u-gold-light); background: var(--u-gold-dim); }
+td { border-color: var(--u-border); color: var(--u-paper-2); }
+
+/* ── 滚动条统一 ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,76,.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,.45); }
+
+/* ── 选中文本 ── */
+::selection { background: rgba(201,168,76,.3); color: var(--u-paper); }
+
+/* ═══ 打印样式豁免（打印保持白底黑字） ═══ */
+@media print {
+  html, body { background: #fff !important; color: #000 !important; }
+  .card, .panel { background: #fff !important; border: 1px solid #ddd !important; }
+  input, select, textarea { background: #fff !important; color: #000 !important; border: 1px solid #999 !important; }
+}
