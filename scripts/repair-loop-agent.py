@@ -191,10 +191,12 @@ def check_div_balance(root_dir):
                     content = f.read()
             except Exception:
                 continue
-            # 粗略统计（排除注释）
+            # 精确统计（排除注释 + script/style 块，避免 JS 字符串中的 '<div>'/'</div>' 干扰）
             content = re.sub(r"<!--.*?-->", "", content, flags=re.S)
-            opens = len(re.findall(r"<div[\s>]", content))
-            closes = len(re.findall(r"</div>", content))
+            content = re.sub(r"<script\b.*?</script\s*>", "", content, flags=re.S | re.I)
+            content = re.sub(r"<style\b.*?</style\s*>", "", content, flags=re.S | re.I)
+            opens = len(re.findall(r"<div[\s>]", content, re.I))
+            closes = len(re.findall(r"</div\s*>", content, re.I))
             if opens != closes:
                 bad.append(f"{fpath} (open={opens} close={closes})")
     return bad

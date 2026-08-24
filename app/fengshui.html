@@ -3524,7 +3524,7 @@ function generateShopFengshui(){
   var eventDays=SHOP_EVENT_R34C["开业"];
   var h="<div class=\"sh-result\">";
   h+="<div class=\"sh-summary\"><span>营业类型<b>"+conf.name+"</b></span><span>掌柜生肖<b>"+sx+"</b></span><span>坐向<b>"+face+"</b></span><span>年份<b>"+year+"</b></span></div>";
-  h+="<div style=\"padding:10px;background:rgba(0,0,0,.15);border-radius:8px;margin-bottom:12px;border-left:3px solid "+(directionClass==="good"?"#27ae60":(directionClass==="warn"?"#e74c3c":"var(--gold)"))+"\"><div style=\"font-size:11px;line-height:1.8\"><b style=\"color:var(--gold)\">点 方位判定：</b>掌柜坐向<b style=\"color:"+(directionClass==="good"?"#27ae60":(directionClass==="warn"?"#e74c3c":"var(--gold)"))+"\">"+face+"</b>方 · 与生肖<b>"+sx+"</b>本命关系：<b>"+(face===sxFace.best?"最吉":(face===sxFace.good?"小吉":(face===sxFace.avoid?"欠吉":(face===sxFace.bad?"大凶":"中性"))))+"</b>（"+directionText+" · "+directionScore+"分）<br><span style=\"opacity:.7\">· 本命最吉：<b>"+sxFace.best+"</b> 方 · 小吉：<b>"+sxFace.good+"</b> 方 · 欠吉：<b>"+sxFace.avoid+"</b> 方 · 大凶：<b>"+sxFace.bad+"</b> 方</li></ul></div>";
+  h+="<div style=\"padding:10px;background:rgba(0,0,0,.15);border-radius:8px;margin-bottom:12px;border-left:3px solid "+(directionClass==="good"?"#27ae60":(directionClass==="warn"?"#e74c3c":"var(--gold)"))+"\"><div style=\"font-size:11px;line-height:1.8\"><b style=\"color:var(--gold)\">点 方位判定：</b>掌柜坐向<b style=\"color:"+(directionClass==="good"?"#27ae60":(directionClass==="warn"?"#e74c3c":"var(--gold)"))+"\">"+face+"</b>方 · 与生肖<b>"+sx+"</b>本命关系：<b>"+(face===sxFace.best?"最吉":(face===sxFace.good?"小吉":(face===sxFace.avoid?"欠吉":(face===sxFace.bad?"大凶":"中性"))))+"</b>（"+directionText+" · "+directionScore+"分）<br><span style=\"opacity:.7\">· 本命最吉：<b>"+sxFace.best+"</b> 方 · 小吉：<b>"+sxFace.good+"</b> 方 · 欠吉：<b>"+sxFace.avoid+"</b> 方 · 大凶：<b>"+sxFace.bad+"</b> 方</div>";
   h+="<div style=\"margin-top:10px\"><b style=\"color:#9b59b6;font-size:12px\">店 5 大化区布局（"+conf.name+"专属）</b></div><div class=\"sh-areas\">";
   conf.areas.forEach(function(a){h+="<div class=\"sh-area\"><b>"+a+"</b>需"+(a==="收银台"?"聚财":(a==="迎客位"?"纳气":(a==="厨房"?"避煞":(a==="仓库"?"藏财":"避污"))))+"</div>";});
   h+="</div>";
@@ -4152,7 +4152,6 @@ async function generateFengshuiReport(){
 <script>
 document.addEventListener('DOMContentLoaded', function(){ try { I18N.init(); } catch(e){} });
 </script>
-  <script src="defer</script>
 <script src="js/i18n.js?v=708i18n" defer></script>
 <script src="js/ai-mingli-engine.js" defer></script>
 </body>
