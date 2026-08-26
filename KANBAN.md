@@ -1,6 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+> 主会话: 2026-08-26 21:30 CST（**P2.9 互参入实时环**: multi-modal-assess 在 western_evidence×mingli.chart 双全时服务端计算 lab_mingli_cross(同向叠加/后天补位/偏弱三型, 复用 wuxing_score+wuxing_lack), 缺行措辞精确化(明面不见,藏干 X.X 与分数区分); live-room 实时研判面板与 AI 汇总草案均渲染 ☯ 检验×命理 行; 浏览器实测: 检验聚集脾胃(土)3项 × 1990 命盘缺土 → 后天补位提示随 6s 静默自动环滚动出具, 医生问诊现场可见。至此互参三处贯通: 实时环(问诊现场)/审核台(双师签名)/患者报告）
+> 最后更新: 2026-08-26 21:05 CST（**日结**：主会话接管开发大日，五大板块齐收——①问诊台全链路 P1→P2.8 八连击（核心链路/患者报告/实时问诊环/自动研判环/检验旁证/专科判读/签名链/检验×命理互参闭环，端到端 case#18 实测过）；②OneFrame 9 模型齐套（算命组掌纹/面相/痣相 + 问诊组面色/唇/舌色/舌苔/巩膜/指甲，labels 第 20-28 条）；③p0-3 七模块报告修真完毕（五段 filled + kb-module-filter）；④P0-1 密钥轮换 6 处凭证 + cron 402 集群 10 job 切 glm-5.2 + 微信 bot :3900 退役；⑤KB 去重 -9,139（69,327→60,193）+ 蒸馏 361 条入库（→60,554）。心跳全日全绿，21:00 日结实探 6 服务 200 + 8960=v9.0-7b + staging 0；#5/#6 完结不变；v9.3 阈值触发制不变。下一步：主会话沿问诊台 P2.x 续推或全链路收口验收（P2.8 已闭环））
 > 主会话: 2026-08-26 21:00 CST（**P2.8 检验×命理互参闭环**: mingli_annotation 加 lab_evidence 列, mingli/draft 接收存储, ml 公开报告带旁证; live-room toSignature 命理草案也附 labSignText(); review-studio 命理轨新增互参提示盒——从旁证文本解析五行聚集, 实时调排盘算命盘旺衰, 双维度交叉: 同向叠加(检验聚集×命盘最旺→印证主要矛盾)/后天补位(检验聚集×命盘偏弱→先天弱项后天显症)/不同向(综合调养参考), 互参提示自动预填批注框(命理师审订后签名); patient-report 命理报告展示旁证卡; 实测 case#18 土缺×检验聚集脾胃(土)→后天补位提示正确, ml 草案#6 签名报告带旁证）
+> 历史: 2026-08-26 21:00 CST（心跳：health-check 21:00 实探 exit 0 + 6 服务直探全绿（8900/8901/8911/8912/8913/8920 均 200）+ 8960=v9.0-7b 监听正常（/v1/models 200）；无新蒸馏入库（kb_formal=60,554 与 20:30 一致，staging pending 0，今日无 distill-*.py 新执行）；#5/#6 完结不变；v9.3 阈值触发制不变）
 > 主会话: 2026-08-26 20:35 CST（**P2.7 检验旁证入签名链**: e_prescription/medical_cases 加 lab_evidence 加密列(幂等迁移, 修复误插 SQL 模板内的启动 bug); emr-session 白名单+emr-archive 新建/幂等更新均透传; review-queue 携带 labEvidence; live-room labSignText()(旁证结论+危急值+组合判读+衍生异常+逐项映射+复查建议+免责)随 toSignature 入处方草案; review-studio 病例卡一屏展示三方证据(四诊/命理/检验)且签名时自动带入; patient-report 公开报告展示旁证卡; 修复 sanitizeXSS 双重转义; 端到端实测(归档 case#18→队列可见→草案#7 测试医师签名→公开报告带旁证)）
 > 历史: 2026-08-26 20:30 CST（心跳：health-check 20:30 实探 exit 0 + 6 服务直探全绿（8900/8901/8911/8912/8913/8920 均 200）+ 8960=v9.0-7b 监听正常（/v1/models 200）；无新蒸馏入库（kb_formal=60,554 与 16:30 一致，99 条 tcm-agent-forward 已在 16:30 入账，staging pending 0，今日无 distill-*.py 新执行）；#5/#6 完结不变；v9.3 阈值触发制不变）
 
@@ -231,6 +234,8 @@
 ## 进行中
 
 ### #5 BaziQA v9.2 全量评估未达标（t512 · 2026-08-19） ✅ 已评估完结（生产保持 v9.0）
+- **08-26 21:00 日结复核**：6 服务直探全绿（8900/8911/8912/8913/8920 均 200 + 8901 root 200）+ 8960=v9.0-7b（/v1/models 200）+ kb_formal=60,554 与 20:30 一致 + staging pending 0；无训练/评估进程残留。#5/#6 完结态不变，v9.3 阈值触发制不变。
+- **下一步动作（21:05 更新）**：明早执行问诊台全链路 P2.8 后验收冲刺——用 case#18 之外的 2 个新病例走 live-room→AI 草案→双师签名→患者报告全链回归（重点验互参提示盒预填与 labEvidence 加密列），发现缺陷即修真。
 - **08-26 18:30 心跳复核**：六端口 health-check.sh 全绿（18:30 三连跑 HEALTHY，kb-list + paipan-api OK）；staging 0 待审；kb_formal=60,554 与 16:30 一致，无新蒸馏入库、今日无 distill-*.py 新执行、无训练/评估进程；#5/#6 完结态不变。⚠️ 余项不变：家庭健康周报/临床蒸馏 402 计费、四路大师采集 data1 沙箱路径——待用户决策。
 - **08-26 18:00 心跳复核**：六端口全绿（18:00:47/18:01:02 双跑 HEALTHY，kb-list + paipan-api OK）；staging 0 待审；无新蒸馏入库、无训练/评估进程；#5/#6 完结态不变。✅ 已修真 weekly-eval 连败4根因（launchd 无 nvm PATH → `node: command not found`，/tmp/mingli-weekly-eval.err 实锤）：scripts/weekly-eval.sh 加 NODE_BIN 兜底（同 08-22 cron-distill-kb-link 修法）+ git 强制纳入（.gitignore scripts/* 曾漏管）commit a7e0ae2，syntax 校验通过，下周一 06:00 验证。⚠️ 余项：家庭健康周报/临床蒸馏 402 计费、四路大师采集 /Volumes/data1 沙箱路径——仍待用户决策。
 - **08-26 02:00 心跳复核**：六端口 health-check.sh 全绿；8960=v9.0-7b 进程存活；staging 0 待审；无训练/评估进程、无新蒸馏入库。⚠️ 新发现：4 个 cron 任务连败（四路大师采集 连败3「list /Volumes/data1 周易-中医 failed」——疑似沙箱路径权限而非磁盘未挂载（宿主 shell 可 ls，卷已挂载）；家庭健康周报/临床蒸馏 连败 402 Payment Required（模型计费问题）；weekly-eval 连败4 超时 model-call-started）。均已超 3 次阈值，health-patrol 持续告警中，待用户决策（修复计费/调整超时/禁用）。
@@ -280,6 +285,11 @@
 
 | 日期 | 任务 | 产出物 |
 |------|------|--------|
+| 2026-08-26 | 问诊台全链路 P1→P2.8 八连击（核心链路/患者报告/实时问诊环/自动研判环/检验旁证/专科判读/签名链/检验×命理互参闭环）| consult-workbench + live-room + patient-report + lab-evidence + 互参提示盒（case#18 端到端实测）|
+| 2026-08-26 | OneFrame 9 模型齐套（算命组 3：掌纹/面相/痣相 + 问诊组 6：面色/唇/舌色/舌苔/巩膜/指甲）| 9 ONNX + labels.json 第 20-28 条 + 4 svc /health 在册 |
+| 2026-08-26 | p0-3 报告层全模块修真（bazi/ziwei/hehun/family/lifeplan/fengshui/liuyao 七模块五段 filled + KB 模块匹配）| server cff9ad7 + kb-module-filter 共享模块 |
+| 2026-08-26 | P0-1 密钥轮换全链路（6 处凭证）+ P0 cron 402 集群修真（10 job 切 glm-5.2）+ 微信 bot :3900 退役 | auth-profiles/models.json/openclaw.json + archive plist |
+| 2026-08-26 | 接管首批交付：KB 去重 -9,139（69,327→60,193）+ data1 备份补跑 16 快照 + v9.2 收口 + v9.3 阈值触发制 | docs/V93-TRIGGER-SPEC.md + AUD-DEDUP-* 审计留痕 |
 | 2026-08-19 | #6 staging 积压审核闭环（310 pending → 0，promoted 3642 / rejected 405）| kb_audit AUD-20260819-* + audit_notes 落账 |
 | 2026-08-19 | #5 v9.2 增量训练修真失败收口（0.6% ❌）+ 三条修真教训固化 | v9.2-full488.log + local-q10 0/96 证据 |
 | 2026-08-19 | R764 残留清理 + 记忆定位优化 | MEMORY.md/TOOLS.md 固化 BaziQA 管线 |

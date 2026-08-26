@@ -1038,6 +1038,9 @@ function renderLiveAssess(r){
       html += '<div style="color:#9f7aea;margin-top:3px">互参 · ' + esc(ci.insight || '') + '</div>';
     });
   }
+  (r.lab_mingli_cross || []).forEach(c => {
+    html += '<div style="color:#b794f6;margin-top:3px">☯ 检验×命理 · ' + esc(c.insight || '') + '</div>';
+  });
   if (r.missing && r.missing.length) {
     html += '<div style="color:var(--paper3);margin-top:4px;font-size:11px">待补采集:' + esc(r.missing.join('、')) + '</div>';
   }
@@ -1086,6 +1089,9 @@ async function aiSummarize(){
       html += '<div style="margin-top:8px;border-top:1px dashed rgba(159,122,234,.3);padding-top:6px;white-space:pre-wrap;color:#c9b8f0">' + esc(r.mingli.mingli_report || '') + '</div>';
       (r.mingli.cross_insights || []).forEach(ci => {
         html += '<div style="margin-top:4px;font-size:11px;color:#9f7aea">互参 · ' + esc(ci.insight || '') + '</div>';
+      });
+      (r.lab_mingli_cross || []).forEach(c => {
+        html += '<div style="margin-top:4px;font-size:11px;color:#b794f6">☯ 检验×命理 · ' + esc(c.insight || '') + '</div>';
       });
     }
     _sumProg.finish(true, true);
