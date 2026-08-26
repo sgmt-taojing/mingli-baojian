@@ -277,8 +277,12 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
         </div>
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn sm primary" onclick="finalizeEmr()">📤 出具电子病历</button>
+          <button class="btn sm violet" id="aiSumBtn" onclick="aiSummarize()">🧠 AI 汇总草案</button>
+          <button class="btn sm jade" id="toSignBtn" onclick="toSignature()">✍️ 转双师签名</button>
           <span style="font-size:10px;color:var(--paper3);align-self:center" id="syncState">未同步</span>
         </div>
+        <div id="aiDraftBox" style="display:none;margin-top:10px;border:1px solid rgba(159,122,234,.35);border-radius:10px;padding:10px;font-size:12px"></div>
+        <div id="signState" style="font-size:11px;color:var(--paper3);margin-top:6px"></div>
       </div>
     </div>
   </div>
@@ -287,7 +291,7 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
 <div id="toast"></div>
 
 <script src="js/ui-toast.js" defer></script>
-<script src="js/error-interceptor.js" defer></script>
+<!-- 本页全部按原生 fetch(Response) 编写, 不加载 error-interceptor(其标准化包装会破坏 .json()) -->
 <script>
 // ═══════════════════════════════════════════════════════
 // 智能问诊室 · 旁路采集 + 双智能体并行 + EMR
@@ -767,6 +771,94 @@ function showVersionHistory(){
       overlay.style.display = 'flex';
     })
     .catch(() => toast('版本历史获取失败'));
+}
+
+// ═══ P2: AI 汇总草案(实时环 → 一脑双轨定稿) ═══
+let _csrfToken = '';
+fetch(API_MEDICAL + '/api/csrf-token').then(r=>r.json()).then(d=>{ _csrfToken = d.csrfToken || ''; }).catch(()=>{});
+
+async function aiSummarize(){
+  const dialogue = Room.emr.voiceLog || Room.emr.complaint || '';
+  if (!dialogue && !Room.emr.examination) { toast('先开旁听/采帧, 有原料再汇总'); return; }
+  const y = +$('bYear').value, m = +$('bMonth').value, d = +$('bDay').value, h = +$('bHour').value;
+  const body = { scene_type: 'clinic', dialogue: dialogue + '\n' + (Room.emr.examination||'') };
+  if (y && m && d) body.birth = { year: y, month: m, day: d, hour: h || 12, gender: '男' };
+  $('aiSumBtn').disabled = true;
+  $('aiDraftBox').style.display = 'block';
+  $('aiDraftBox').innerHTML = '⏳ AI 汇总中(双轨融合+互参)…';
+  try {
+    const resp = await fetch(API_MEDICAL + '/api/doctor/multi-modal-assess', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-csrf-token': _csrfToken },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(20000)
+    });
+    const r = await resp.json();
+    if (!r.ok) throw new Error(r.error || 'assess failed');
+    Room.aiDraft = r;
+    let html = '<div style="color:var(--gold2);font-weight:600;margin-bottom:6px">🧠 AI 汇总草案(待医生/命理师确认)</div>';
+    html += '<div style="white-space:pre-wrap;color:var(--paper2);max-height:220px;overflow:auto">' + esc(r.output || '') + '</div>';
+    if (r.tcm_specific && r.tcm_specific.comprehensive) {
+      html += '<div style="margin-top:6px;color:#7fd4a8">证候推断:' + esc(r.tcm_specific.comprehensive) + '</div>';
+    }
+    if (r.mingli && r.mingli.available) {
+      html += '<div style="margin-top:8px;border-top:1px dashed rgba(159,122,234,.3);padding-top:6px;white-space:pre-wrap;color:#c9b8f0">' + esc(r.mingli.mingli_report || '') + '</div>';
+      (r.mingli.cross_insights || []).forEach(ci => {
+        html += '<div style="margin-top:4px;font-size:11px;color:#9f7aea">互参 · ' + esc(ci.insight || '') + '</div>';
+      });
+    }
+    $('aiDraftBox').innerHTML = html;
+    // AI 草案预填 EMR 辨证(不覆盖医生已确认的)
+    if (r.tcm_specific && r.tcm_specific.comprehensive && r.tcm_specific.comprehensive.indexOf('不足以') < 0) {
+      Room.emr.syndrome = r.tcm_specific.comprehensive + '(AI 草案,待医生确认)';
+      setEmrField('fSyndrome', Room.emr.syndrome);
+    }
+    if (r.mingli && r.mingli.available && r.mingli.mingli_report) {
+      Room.emr.mingli = r.mingli.mingli_report;
+      setEmrField('fMingli', Room.emr.mingli);
+    }
+    emrSyncThrottled();
+    setFlow(3);
+  } catch (e) {
+    $('aiDraftBox').innerHTML = '<span style="color:#e74c3c">汇总失败:' + esc(e.message) + '</span>';
+  } finally {
+    $('aiSumBtn').disabled = false;
+  }
+}
+
+// ═══ P2: 转双师签名(草案进签名链 → review-studio 审核) ═══
+async function toSignature(){
+  const token = localStorage.getItem('admin_token') || localStorage.getItem('token') || '';
+  if (!token) { $('signState').textContent = '请先在「双师审核台」页粘贴一次签名 Token(全平台记忆), 再回来转签名'; return; }
+  const syndrome = (Room.emr.syndrome || '').replace(/（?待医生确认）?/g, '').trim();
+  const rx = (Room.emr.prescription || '').trim();
+  const y = +$('bYear').value, m = +$('bMonth').value, d = +$('bDay').value, h = +$('bHour').value;
+  if (!syndrome && !rx && !(y && m && d)) { $('signState').textContent = '还没有可转的草案(先 AI 汇总或填复核意见)'; return; }
+  $('toSignBtn').disabled = true;
+  $('signState').textContent = '草案落库中…';
+  const hdr = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token, 'x-csrf-token': _csrfToken };
+  const out = [];
+  try {
+    if (syndrome || rx) {
+      const r1 = await fetch(API_MEDICAL + '/api/clinic/prescription/draft', {
+        method: 'POST', headers: hdr,
+        body: JSON.stringify({ caseId: Room.caseId || null, diagnosis: syndrome, prescription: rx })
+      }).then(r=>r.json());
+      out.push(r1.ok ? '处方草案 #' + r1.id : '处方草案失败:' + (r1.error || r1.message || ''));
+    }
+    if (y && m && d) {
+      const r2 = await fetch(API_MEDICAL + '/api/clinic/mingli/draft', {
+        method: 'POST', headers: hdr,
+        body: JSON.stringify({ caseId: Room.caseId || null, year: y, month: m, day: d, hour: h || 12, gender: '男' })
+      }).then(r=>r.json());
+      out.push(r2.ok ? '命理草案 #' + r2.id : '命理草案失败:' + (r2.error || r2.message || ''));
+    }
+    $('signState').innerHTML = '✅ ' + out.join(' · ') +
+      ' → <a href="review-studio.html" style="color:var(--gold)">去双师审核台签名生效 →</a>';
+    setFlow(4);
+  } catch (e) {
+    $('signState').textContent = '转签名失败:' + e.message;
+  } finally {
+    $('toSignBtn').disabled = false;
+  }
 }
 
 // ═══ 工具 ═══

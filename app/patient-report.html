@@ -120,10 +120,12 @@ function renderSigned(list){
   list.forEach(function(d){
     var r=d.report;
     if(d.type==='rx'){
+      var stMap={signed:'✍️ 已签名生效',dispensed:'🧪 已调剂',archived:'🗄 已归档'};
       html+='<div class="meta-grid">'+
         '<div class="meta-item"><div class="k">电子处方编号</div><div class="v">#'+r.id+'</div></div>'+
         '<div class="meta-item"><div class="k">签名医师 · 时间</div><div class="v" style="font-size:12px">'+escapeHTML(r.signerName)+' · '+escapeHTML((r.signedAt||'').slice(0,16))+'</div></div>'+
-      '</div>';
+      '</div>'+
+      '<div style="font-size:12px;color:var(--green);margin:2px 0 8px">流转状态:'+(stMap[r.status]||'✍️ 已签名生效')+'</div>';
       if(r.diagnosis)html+='<div class="card"><div class="card-title">辨证诊断</div><div class="section">'+escapeHTML(r.diagnosis)+'</div></div>';
       if(r.prescription)html+='<div class="card"><div class="card-title">处方</div><div class="section">'+escapeHTML(r.prescription)+'</div></div>';
       if(r.items&&r.items.length)html+='<div class="card"><div class="card-title">药味明细</div><div class="section">'+r.items.map(function(it){return escapeHTML((it.name||'')+' '+(it.dose||''))}).join('\n')+'</div></div>';
@@ -209,7 +211,7 @@ function escapeHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;
 init();
 </script>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考 · 处方需医生审核确认</footer>
-<script src="js/error-interceptor.js" defer></script>
+<!-- 本页按原生 fetch(Response) 编写, 不加载 error-interceptor(其标准化包装会破坏 .json() 与登录) -->
 <script src="js/mobile-nav.js" defer></script>
 </body>
 </html>

@@ -219,8 +219,10 @@ $('btnRxSign').addEventListener('click',function(){
       .then(function(r){return r.json()}).then(function(s){
         $('btnRxSign').disabled=false;
         if(!s.ok){setSt('rxStatus','签名失败:'+(s.error||''),'err');return}
-        $('rxState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';
-        setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效(draft→signed)','ok');
+        $('rxState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>'+
+          ' <button class="btn" style="padding:4px 10px;font-size:11px" onclick="rxFlow('+s.id+',\'dispense\',this)">🧪 调剂</button>'+
+          ' <button class="btn" style="padding:4px 10px;font-size:11px" onclick="rxFlow('+s.id+',\'archive\',this)">🗄 归档</button>';
+        setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效(draft→signed),可按医学规范继续流转:调剂→归档','ok');
       });
   }).catch(function(e){$('btnRxSign').disabled=false;setSt('rxStatus','请求失败:'+e.message,'err')});
 });
@@ -259,6 +261,16 @@ $('btnMlSign').addEventListener('click',function(){
     setSt('mlStatus','✅ 命理批注 #'+s.id+' 已生效(draft→signed)','ok');
   }).catch(function(e){$('btnMlSign').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
 });
+
+function rxFlow(id,action,btn){
+  btn.disabled=true;
+  fetch(API+'/api/clinic/prescription/'+action,{method:'POST',headers:hdr(),body:JSON.stringify({id:id})})
+  .then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){btn.disabled=false;setSt('rxStatus','流转失败:'+(d.error||'')+'(当前:'+(d.status||'?')+')','err');return}
+    setSt('rxStatus','✅ 处方 #'+id+' 已'+(d.status==='dispensed'?'调剂完成':'归档')+'('+d.status+')','ok');
+    if(d.status==='archived'){var btns=document.querySelectorAll('#rxState .btn');btns.forEach(function(b){b.disabled=true})}
+  }).catch(function(e){btn.disabled=false;setSt('rxStatus','请求失败:'+e.message,'err')});
+}
 
 function setSt(id,txt,cls){var el=$(id);el.textContent=txt;el.className='status-line'+(cls?' '+cls:'')}
 </script>
