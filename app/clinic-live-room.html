@@ -119,6 +119,17 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
 .emr-status.approved{background:rgba(46,204,113,.15);color:#2ecc71}
 .emr-status.rejected{background:rgba(231,76,60,.15);color:#e74c3c}
 
+/* ═══ AI 实时进度条 ═══ */
+.ai-prog{margin:0 0 10px}
+.ai-prog .ap-track{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.ai-prog .ap-bar{height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--cyan2),var(--gold2));transition:width .4s ease;position:relative;overflow:hidden}
+.ai-prog .ap-bar::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:apShine 1.1s linear infinite;transform:translateX(-100%)}
+@keyframes apShine{to{transform:translateX(100%)}}
+.ai-prog .ap-stage{display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--paper3)}
+.ai-prog .ap-stage span.on{color:var(--gold2)}
+.ai-prog .ap-stage span.done{color:var(--jade2)}
+.ai-prog.done .ap-bar{background:var(--jade2);transition:width .2s ease}
+.ai-prog.fail .ap-bar{background:var(--cinn2)}
 /* ═══ Toast ═══ */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold2);padding:10px 20px;border-radius:20px;font-size:13px;z-index:9999;opacity:0;transition:.3s;pointer-events:none;max-width:90vw}
 #toast.show{opacity:1}
@@ -260,8 +271,32 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
         ⚡ 实时研判（随对话/采帧自动出具初步结果）
         <span style="font-size:10px;color:var(--paper3)" id="laTime">待启动</span>
       </div>
-      <div class="panel-body" id="laBody" style="font-size:12px">
-        <div class="placeholder">旁听与采帧进行中,AI 自动滚动出具初步结果（零操作,不打断交流）</div>
+      <div class="panel-body" style="font-size:12px">
+        <div class="ai-prog" id="laProg" style="display:none">
+          <div class="ap-track"><div class="ap-bar"></div></div>
+          <div class="ap-stage"><span>采集汇总</span><span>KB 实时比对</span><span>双轨融合</span><span>生成结论</span></div>
+        </div>
+        <div id="laBody">
+          <div class="placeholder">旁听与采帧进行中,AI 自动滚动出具初步结果（零操作,不打断交流）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2.6: 西医检验旁证 -->
+    <div class="panel">
+      <div class="panel-head">
+        🧪 西医检验旁证（体检/生化 → 中医佐证）
+        <span style="font-size:10px;color:var(--paper3)" id="labState">未录入</span>
+      </div>
+      <div class="panel-body" style="font-size:12px">
+        <textarea id="labText" placeholder="粘贴体检/检验报告文本, 如:&#10;谷丙转氨酶 56 U/L ↑&#10;甘油三酯 3.2 mmol/L&#10;空腹血糖 7.8&#10;或点「导入文件」选择 .txt/.csv 报告" style="width:100%;min-height:88px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--paper2);padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical"></textarea>
+        <div style="display:flex;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn sm primary" id="labBtn" onclick="analyzeLab()">🔬 解析旁证</button>
+          <label class="btn sm" style="cursor:pointer;margin:0">📎 导入文件<input type="file" accept=".txt,.csv,.md" style="display:none" onchange="loadLabFile(this)"></label>
+          <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px"><input type="checkbox" id="labInclude" checked> 纳入实时研判与 EMR</label>
+        </div>
+        <div id="labProgSlot" style="margin-top:8px"></div>
+        <div id="labBody"></div>
       </div>
     </div>
 
@@ -275,6 +310,7 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
         <div class="emr-fields">
           <div class="emr-field"><div class="k">主诉（转写自动提取）</div><div class="v empty" id="fComplaint">交流中自动提取</div></div>
           <div class="emr-field"><div class="k">望诊所见（视频帧分析）</div><div class="v empty" id="fExamination">采帧后自动填充</div></div>
+          <div class="emr-field" style="grid-column:1/-1"><div class="k">西医检验旁证（体检/生化自动映射）</div><div class="v empty" id="fLab">录入检验报告后自动填充</div></div>
           <div class="emr-field"><div class="k">AI 医学辨证</div><div class="v empty" id="fSyndrome">医学智能体输出</div></div>
           <div class="emr-field"><div class="k">AI 命理合参</div><div class="v empty" id="fMingli">命理智能体输出</div></div>
           <div class="emr-field" style="grid-column:1/-1"><div class="k">处方建议（医生确认）</div><div class="v empty" id="fPrescription">复核时可填写</div></div>
@@ -321,7 +357,7 @@ const Room = {
   speaker: 'doctor',
   cam: null, camStream: null, autoFrameTimer: null, autoFrame: false,
   voice: null, voiceOn: false,
-  emr: { complaint:'', examination:'', syndrome:'', mingli:'', prescription:'', voiceLog:'', reviewStatus:'pending', reviewNotes:'' },
+  emr: { complaint:'', examination:'', syndrome:'', mingli:'', prescription:'', voiceLog:'', labEvidence:'', reviewStatus:'pending', reviewNotes:'' },
   medFindings: [], mlFindings: [],
   transcriptLines: []
 };
@@ -612,6 +648,9 @@ async function runMingliAgent(){
   if (!y || !m || !d) { toast('请填写完整出生年月日'); return; }
   try { sessionStorage.setItem('room.birth', JSON.stringify({y,m,d,h})); } catch(_){}
   $('mlPulse').className = 'pulse thinking';
+  $('mlBody').innerHTML = '<div class="ai-prog" id="mlProg"><div class="ap-track"><div class="ap-bar"></div></div>' +
+    '<div class="ap-stage"><span>排四柱</span><span>定五行</span><span>析十神</span><span>出体质</span></div></div>';
+  const _mlProg = aiProgStart('mlProg');
   setFlow(2);
   try {
     const resp = await fetch(API_MINGLI + '/paipan?year='+y+'&month='+m+'&day='+d+'&hour='+h+'&module=bazi', {
@@ -651,6 +690,7 @@ async function runMingliAgent(){
     Room.emr.mingli = summary;
     setEmrField('fMingli', summary);
 
+    _mlProg.finish(true, true);
     $('mlBody').innerHTML =
       '<div class="finding"><div class="f-title">🧭 八字命盘</div>' + esc(ml.pillars) + '</div>' +
       '<div class="finding"><div class="f-title">☯ 五行分布</div>' + esc(ml.wuxing) + '</div>' +
@@ -660,6 +700,7 @@ async function runMingliAgent(){
     emrSyncThrottled();
   } catch (e) {
     $('mlPulse').className = 'pulse';
+    _mlProg.finish(false, true);
     $('mlBody').innerHTML = '<div class="placeholder" style="color:#e74c3c">排盘失败：' + esc(e.message||'服务不可用') + '</div>';
   }
 }
@@ -789,6 +830,93 @@ function showVersionHistory(){
     .catch(() => toast('版本历史获取失败'));
 }
 
+// ═══ P2.6: AI 分析实时进度条(阶段动画) ═══
+function aiProgStart(id){
+  const box = $(id);
+  if (!box) return { finish(){} };
+  box.style.display = 'block'; box.className = 'ai-prog';
+  const bar = box.querySelector('.ap-bar');
+  const spans = box.querySelectorAll('.ap-stage span');
+  const tick = [8, 26, 58, 88];
+  let i = 0, pct = 0;
+  const timer = setInterval(() => {
+    pct += Math.random()*3.5 + 1.5;
+    if (i < tick.length-1 && pct >= tick[i]) i++;
+    bar.style.width = Math.min(pct, 94) + '%';
+    spans.forEach((s, k) => { s.className = k < i ? 'done' : (k === i ? 'on' : ''); });
+  }, 320);
+  return {
+    finish(ok, keep){
+      clearInterval(timer);
+      bar.style.width = '100%';
+      spans.forEach(s => { s.className = ok ? 'done' : ''; });
+      box.classList.add(ok ? 'done' : 'fail');
+      if (!keep) setTimeout(() => { box.style.display = 'none'; }, ok ? 900 : 2000);
+    }
+  };
+}
+
+// ═══ P2.6: 西医检验旁证(报告解析 → 五行归经 → 中医佐证) ═══
+const WUXING_TXT = { '木':'肝胆(木)', '火':'心/血脉(火)', '土':'脾胃(土)', '金':'肺(金)', '水':'肾(水)' };
+function loadLabFile(inp){
+  const f = inp.files && inp.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => { $('labText').value = String(rd.result || '').slice(0, 20000); toast('已导入 ' + f.name + ', 点击「解析旁证」'); };
+  rd.readAsText(f);
+}
+async function analyzeLab(){
+  const text = $('labText').value.trim();
+  if (!text) { toast('请先粘贴或导入报告文本'); return; }
+  Room.labText = text;
+  $('labBtn').disabled = true;
+  $('labProgSlot').innerHTML = '<div class="ai-prog" id="labProg"><div class="ap-track"><div class="ap-bar"></div></div>' +
+    '<div class="ap-stage"><span>识别指标</span><span>对照区间</span><span>五行归经</span><span>生成旁证</span></div></div>';
+  const prog = aiProgStart('labProg');
+  try {
+    const resp = await fetch(API_MEDICAL + '/api/clinic/lab-evidence', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-csrf-token': _csrfToken },
+      body: JSON.stringify({ text }), signal: AbortSignal.timeout(15000)
+    });
+    const r = await resp.json();
+    if (!r.ok) throw new Error(r.error || '解析失败');
+    prog.finish(true, true);
+    $('labProgSlot').innerHTML = '';
+    Room.labResult = r;
+    renderLab(r);
+    if ($('labInclude').checked) {
+      if (Room.emr.reviewStatus === 'pending') {
+        Room.emr.labEvidence = r.corroboration;
+        setEmrField('fLab', r.corroboration);
+        emrSyncThrottled();
+      }
+      _laLastLen = -999;                 // 立即驱动一轮实时研判
+      scheduleLiveAssess();
+    }
+  } catch (e) {
+    prog.finish(false, true);
+    $('labBody').innerHTML = '<div class="placeholder" style="color:#e74c3c">解析失败:' + esc(e.message) + '</div>';
+  } finally {
+    $('labBtn').disabled = false;
+  }
+}
+function renderLab(r){
+  $('labState').textContent = '识别 ' + r.parsed + ' 项 · 异常 ' + r.abnormal_count + ' 项';
+  let html = '';
+  (r.abnormals || []).forEach(a => {
+    const cls = a.status === 'high' ? '#f0b429' : '#5dade2';
+    html += '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed rgba(255,255,255,.06)">' +
+      '<span>' + esc(a.name) + '</span>' +
+      '<span style="color:' + cls + '">' + a.value + ' ' + esc(a.unit) + ' ' + (a.flag || '') + '</span></div>' +
+      '<div style="font-size:10px;color:var(--paper3);padding:2px 0 4px">→ ' + esc(a.tcm_evidence || '') + '</div>';
+  });
+  if (r.wuxing_focus && r.wuxing_focus.length) {
+    html += '<div style="color:#9f7aea;font-size:11px;margin:4px 0">异常聚集:' + r.wuxing_focus.map(w => WUXING_TXT[w] || w).join('、') + '</div>';
+  }
+  html += '<div style="color:var(--paper2);line-height:1.6;white-space:pre-wrap">' + esc(r.corroboration || '') + '</div>';
+  html += '<div style="font-size:10px;color:var(--paper3);margin-top:6px">' + esc(r.disclaimer || '') + '</div>';
+  $('labBody').innerHTML = html;
+}
+
 // ═══ P2.5: 实时自动研判环(零操作, 对话/采帧驱动) ═══
 let _laTimer = null, _laLastAt = 0, _laLastLen = 0, _laBusy = false, _laLastFrameSent = 0;
 function scheduleLiveAssess(){
@@ -815,7 +943,9 @@ async function liveAssess(){
     body.faceImage = Room.lastFrame;             // 仅新帧随发, 省带宽
     _laLastFrameSent = Room.frameSeq;
   }
+  if ($('labInclude') && $('labInclude').checked && Room.labText) body.lab_text = Room.labText;   // P2.6: 检验旁证随发
   $('laTime').textContent = '研判中…';
+  const _laProg = aiProgStart('laProg');
   try {
     const resp = await fetch(API_MEDICAL + '/api/doctor/multi-modal-assess', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-csrf-token': _csrfToken },
@@ -826,7 +956,9 @@ async function liveAssess(){
     _laLastLen = (Room.emr.voiceLog || '').length + (Room.emr.examination || '').length;
     Room.aiDraft = r;
     renderLiveAssess(r);
+    _laProg.finish(true);
   } catch (e) {
+    _laProg.finish(false);
     $('laTime').textContent = '本轮失败, 下轮自动重试';
   } finally {
     _laBusy = false;
@@ -844,6 +976,11 @@ function renderLiveAssess(r){
   (r.sections && r.sections.vital_alerts || []).forEach(a => {
     html += '<div style="color:#f0b429">⚠ ' + esc(a.desc) + '</div>';
   });
+  if (r.western_evidence) {
+    const we = r.western_evidence;
+    html += '<div style="margin-top:5px;color:var(--cyan2)">🧪 检验旁证:识别' + we.parsed + '项/异常' + we.abnormal_count +
+      '项 · ' + esc((we.suggest_syndromes || []).slice(0, 3).join('、')) + '</div>';
+  }
   if (r.mingli && r.mingli.available) {
     (r.mingli.cross_insights || []).forEach(ci => {
       html += '<div style="color:#9f7aea;margin-top:3px">互参 · ' + esc(ci.insight || '') + '</div>';
@@ -877,7 +1014,9 @@ async function aiSummarize(){
   if (y && m && d) body.birth = { year: y, month: m, day: d, hour: h || 12, gender: $('bGender').value };
   $('aiSumBtn').disabled = true;
   $('aiDraftBox').style.display = 'block';
-  $('aiDraftBox').innerHTML = '⏳ AI 汇总中(双轨融合+互参)…';
+  $('aiDraftBox').innerHTML = '<div class="ai-prog" id="sumProg"><div class="ap-track"><div class="ap-bar"></div></div>' +
+    '<div class="ap-stage"><span>汇总原料</span><span>双轨融合</span><span>互参推演</span><span>成稿</span></div></div>';
+  const _sumProg = aiProgStart('sumProg');
   try {
     const resp = await fetch(API_MEDICAL + '/api/doctor/multi-modal-assess', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-csrf-token': _csrfToken },
@@ -897,6 +1036,7 @@ async function aiSummarize(){
         html += '<div style="margin-top:4px;font-size:11px;color:#9f7aea">互参 · ' + esc(ci.insight || '') + '</div>';
       });
     }
+    _sumProg.finish(true, true);
     $('aiDraftBox').innerHTML = html;
     // AI 草案预填 EMR 辨证(不覆盖医生已确认的)
     if (r.tcm_specific && r.tcm_specific.comprehensive && r.tcm_specific.comprehensive.indexOf('不足以') < 0) {
@@ -910,6 +1050,7 @@ async function aiSummarize(){
     emrSyncThrottled();
     setFlow(3);
   } catch (e) {
+    _sumProg.finish(false, true);
     $('aiDraftBox').innerHTML = '<span style="color:#e74c3c">汇总失败:' + esc(e.message) + '</span>';
   } finally {
     $('aiSumBtn').disabled = false;
