@@ -188,7 +188,7 @@ function selectCase(id,el){
   $('workArea').style.display='block';
   $('caseTitle').textContent='#'+curCase.id+' · '+curCase.patientName;
   $('caseMeta').textContent=curCase.status;
-  $('caseInfo').innerHTML='<b>主诉:</b>'+esc(curCase.symptoms||'—')+'<br><b>体质:</b>'+esc(curCase.constitution||'—')+'<br><b>AI 诊断(EMR):</b>'+esc((curCase.aiDiagnosis||'').slice(0,200)||'—')+(curCase.voiceTranscript?'<br><b>语音转写:</b>'+esc(curCase.voiceTranscript.slice(0,150)):'');
+  $('caseInfo').innerHTML='<b>主诉:</b>'+esc(curCase.symptoms||'—')+'<br><b>体质:</b>'+esc(curCase.constitution||'—')+'<br><b>AI 诊断(EMR):</b>'+esc((curCase.aiDiagnosis||'').slice(0,200)||'—')+(curCase.voiceTranscript?'<br><b>语音转写:</b>'+esc(curCase.voiceTranscript.slice(0,150)):'')+(curCase.labEvidence?'<br><b>🧪 西医检验旁证(三方证据·随签名入处方):</b><div style="white-space:pre-wrap;font-size:11px;color:#5dade2;background:rgba(93,173,226,.06);border:1px solid rgba(93,173,226,.25);border-radius:6px;padding:6px 8px;margin-top:3px;max-height:180px;overflow-y:auto">'+esc(curCase.labEvidence)+'</div>':'');
   // 医生轨预填
   $('aiDraft').value=curCase.aiDraft||curCase.masterAnalysis||'(无 AI 草案)';
   $('docDiagnosis').value=curCase.diagnosis||'';
@@ -211,7 +211,7 @@ $('btnRxSign').addEventListener('click',function(){
   if(!diagnosis&&!prescription){setSt('rxStatus','请先填写辨证诊断或处方','err');return}
   $('btnRxSign').disabled=true;setSt('rxStatus','建方中…','');
   fetch(API+'/api/clinic/prescription/draft',{method:'POST',headers:hdr(),
-    body:JSON.stringify({caseId:curCase.id,diagnosis:diagnosis,prescription:prescription})})
+    body:JSON.stringify({caseId:curCase.id,diagnosis:diagnosis,prescription:prescription,labEvidence:curCase.labEvidence||''})})
   .then(function(r){return r.json()}).then(function(d){
     if(!d.ok){setSt('rxStatus','建方失败:'+(d.error||''),'err');$('btnRxSign').disabled=false;return}
     setSt('rxStatus','草案 #'+d.id+' 已建,签名中…','');

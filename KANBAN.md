@@ -1,5 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+> 主会话: 2026-08-26 20:35 CST（**P2.7 检验旁证入签名链**: e_prescription/medical_cases 加 lab_evidence 加密列(幂等迁移, 修复误插 SQL 模板内的启动 bug); emr-session 白名单+emr-archive 新建/幂等更新均透传; review-queue 携带 labEvidence; live-room labSignText()(旁证结论+危急值+组合判读+衍生异常+逐项映射+复查建议+免责)随 toSignature 入处方草案; review-studio 病例卡一屏展示三方证据(四诊/命理/检验)且签名时自动带入; patient-report 公开报告展示旁证卡; 修复 sanitizeXSS 双重转义; 端到端实测(归档 case#18→队列可见→草案#7 测试医师签名→公开报告带旁证)）
+> 历史: 2026-08-26 20:30 CST（心跳：health-check 20:30 实探 exit 0 + 6 服务直探全绿（8900/8901/8911/8912/8913/8920 均 200）+ 8960=v9.0-7b 监听正常（/v1/models 200）；无新蒸馏入库（kb_formal=60,554 与 16:30 一致，99 条 tcm-agent-forward 已在 16:30 入账，staging pending 0，今日无 distill-*.py 新执行）；#5/#6 完结不变；v9.3 阈值触发制不变）
+
 > 主会话: 2026-08-26 20:15 CST（**P2.6+ 检验旁证专科级判读**: lab-evidence 重构为专科检验医师级——70+定量+定性指标(肝/肾/血脂/糖/电解质/心肌酶/凝血/血常规/炎症/甲功/尿常规/肿瘤标志物/营养代谢), 危急值识别(血钾6.8→风险直升 high+红色横幅); 衍生计算 eGFR(CKD-EPI 2021)/De Ritis/non-HDL/AIP/eAG/AG/A:G; 组合判读六模式(黄疸分型/肝损伤R值/贫血分型/血脂表型/感染模式/代谢综合征); 每项带分级复查建议; localStorage 历史趋势对比(改善/恶化标色); 键长优先修复红细胞抢占 MCV 解析 bug + break 逃逸 bug; 浏览器实测 19 项全识别六模式全命中）
 > 历史: 2026-08-26 20:15 CST（自清：`baziqa-v92-t512-评估监控` 僵尸 cron 第三次复活（2af37e66，~19:16 重建，17:45/19:11 已退役两只后仍重现，疑 gateway jobs 状态同步竞争）——本 run 四项实探全部早已完结：8962 无监听+eval-baziqa=0、v9.2=3/488(0.6%) 已 20+ 轮闭环、v9.1-7b 4.0G 已归档 data1 且源删、fused-archive 源已清、KANBAN/memory 在案；已 cron remove 本 job 防四度复活，若再复活需查 jobs.json 写入竞争；8960=v9.0-7b PID 28061 生产正常；#5/#6 完结不变，v9.3 阈值触发制不变）
 

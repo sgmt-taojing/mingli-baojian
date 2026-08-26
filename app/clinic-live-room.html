@@ -1109,6 +1109,21 @@ async function aiSummarize(){
   }
 }
 
+// ═══ P2.7: 检验旁证原文(随签名链带入处方草案) ═══
+function labSignText(){
+  const r = Room.labResult;
+  if (!r || !r.parsed) return '';
+  const L = [];
+  L.push('【西医检验旁证】' + (r.corroboration || ''));
+  (r.critical_alerts || []).forEach(c => L.push('🚨 危急值: ' + c.name + ' ' + c.value + ' ' + (c.unit || '') + ' — 建议立即就医处理'));
+  (r.patterns || []).forEach(p => L.push('组合判读: ' + p.name + (p.detail ? ' — ' + p.detail : '')));
+  (r.derived || []).filter(d => d.status !== 'normal').forEach(d => L.push('衍生指标: ' + d.name + ' ' + d.value + ' ' + (d.unit || '') + ' — ' + (d.note || '')));
+  (r.abnormals || []).forEach(a => L.push(a.name + ' ' + a.value + ' ' + a.unit + (a.flag || '') + ' → ' + (a.tcm_evidence || '')));
+  if (r.recommendations && r.recommendations.length) L.push('复查建议: ' + r.recommendations.slice(0, 4).join('；'));
+  L.push(r.disclaimer || '');
+  return L.join('\n').slice(0, 6000);
+}
+
 // ═══ P2: 转双师签名(草案进签名链 → review-studio 审核) ═══
 async function toSignature(){
   const token = localStorage.getItem('admin_token') || localStorage.getItem('token') || '';
@@ -1125,7 +1140,7 @@ async function toSignature(){
     if (syndrome || rx) {
       const r1 = await fetch(API_MEDICAL + '/api/clinic/prescription/draft', {
         method: 'POST', headers: hdr,
-        body: JSON.stringify({ caseId: Room.caseId || null, diagnosis: syndrome, prescription: rx })
+        body: JSON.stringify({ caseId: Room.caseId || null, diagnosis: syndrome, prescription: rx, labEvidence: labSignText() })
       }).then(r=>r.json());
       out.push(r1.ok ? '处方草案 #' + r1.id : '处方草案失败:' + (r1.error || r1.message || ''));
     }
