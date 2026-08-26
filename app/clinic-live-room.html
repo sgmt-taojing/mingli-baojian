@@ -1126,6 +1126,9 @@ function labSignText(){
   (r.derived || []).filter(d => d.status !== 'normal').forEach(d => L.push('衍生指标: ' + d.name + ' ' + d.value + ' ' + (d.unit || '') + ' — ' + (d.note || '')));
   (r.abnormals || []).forEach(a => L.push(a.name + ' ' + a.value + ' ' + a.unit + (a.flag || '') + ' → ' + (a.tcm_evidence || '')));
   if (r.recommendations && r.recommendations.length) L.push('复查建议: ' + r.recommendations.slice(0, 4).join('；'));
+  // P2.10: 检验×命理互参结论一并归档(取最近一轮实时研判结果)
+  const cross = (Room.aiDraft && Room.aiDraft.lab_mingli_cross) || [];
+  cross.forEach(c => L.push('☯ 检验×命理互参: ' + (c.insight || '')));
   L.push(r.disclaimer || '');
   return L.join('\n').slice(0, 6000);
 }
