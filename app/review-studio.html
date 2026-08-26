@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="双师审核台 · 医生+命理师同页审核签名 · 电子处方/命理批注双终产物 · 命理宝鉴">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>双师审核台 · 电子处方+命理批注 · 命理宝鉴</title>
+<style>
+:root{--bg:#0a0d12;--paper:#e8e0d0;--paper2:#a89878;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#8a7030;--accent:#38bdf8;--card:rgba(255,255,255,.04);--border:rgba(201,168,76,.2);--danger:#dc2626;--ok:#22c55e;--warn:#f59e0b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(180deg,#0a0d12,#0d1018);color:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6;min-height:100vh;padding:24px 16px}
+.wrap{max-width:1280px;margin:0 auto}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.back{color:var(--gold);text-decoration:none;font-size:13px;padding:5px 10px;border:1px solid var(--border);border-radius:14px}
+.title-area{flex:1}
+.title-area h1{font-size:20px;color:var(--gold);letter-spacing:3px;margin-bottom:2px}
+.title-area .sub{font-size:11px;color:var(--paper2);letter-spacing:1px}
+.auth-bar{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:16px;font-size:12px}
+.auth-bar input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--paper);padding:7px 10px;font-size:12px}
+.role-chip{font-size:11px;padding:3px 10px;border-radius:10px;background:rgba(56,189,248,.12);color:var(--accent)}
+.main{display:grid;grid-template-columns:300px 1fr;gap:16px}
+@media(max-width:960px){.main{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+.panel-title{font-size:13px;color:var(--gold);margin-bottom:10px;font-weight:600;display:flex;align-items:center;gap:8px}
+.panel-title .sub{font-size:10px;color:var(--paper2);font-weight:400;margin-left:auto}
+.qitem{padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;font-size:12px;transition:all .15s}
+.qitem:hover{border-color:var(--gold)}
+.qitem.on{border-color:var(--gold);background:rgba(201,168,76,.08)}
+.qitem .nm{color:var(--gold2);font-weight:600}
+.qitem .mt{color:var(--paper2);font-size:11px;margin-top:2px}
+.qitem .st{float:right;font-size:10px;padding:1px 7px;border-radius:8px;background:rgba(245,158,11,.15);color:var(--warn)}
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.dual{grid-template-columns:1fr}}
+.track{border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.track.doc{border-top:3px solid var(--accent)}
+.track.ml{border-top:3px solid var(--gold)}
+.track h3{font-size:14px;margin-bottom:10px}
+.track.doc h3{color:var(--accent)}
+.track.ml h3{color:var(--gold2)}
+textarea,input.small{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--paper);padding:8px 10px;font-size:12.5px;font-family:inherit}
+textarea:focus,input.small:focus{outline:none;border-color:var(--gold)}
+textarea{min-height:90px;resize:vertical}
+textarea.tall{min-height:180px}
+.fld-label{font-size:11px;color:var(--paper2);margin:8px 0 4px}
+.btn{padding:8px 16px;border-radius:10px;font-size:13px;border:1px solid var(--border);background:transparent;color:var(--paper);cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--card)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600}
+.btn.accent{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.status-line{font-size:12px;color:var(--paper2);margin-top:8px;min-height:18px}
+.status-line.ok{color:var(--ok)}
+.status-line.err{color:#f87171}
+.kv{font-size:12px;color:var(--paper2);line-height:1.8}
+.kv b{color:var(--paper)}
+.signed-mark{display:inline-block;font-size:11px;padding:3px 10px;border-radius:10px;background:rgba(34,197,94,.15);color:var(--ok);font-weight:600}
+.empty{font-size:12px;color:var(--paper2);opacity:.6;text-align:center;padding:24px 0}
+.brow{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.brow input{width:70px}
+.footer{text-align:center;color:var(--paper2);opacity:.35;font-size:11px;margin-top:28px;letter-spacing:1px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <a href="integrated-clinic.html" class="back">← 问诊台</a>
+  <div class="title-area">
+    <h1>双师审核台</h1>
+    <div class="sub">医生 × 命理师 同页审核 · 签名后生成电子处方与命理批注</div>
+  </div>
+</div>
+
+<div class="auth-bar">
+  <span>🔑</span>
+  <input id="tokenIn" placeholder="Bearer Token(医生/命理师账号,留空则读 localStorage)">
+  <button class="btn" id="btnAuth">载入队列</button>
+  <span id="roleChips"></span>
+</div>
+
+<div class="main">
+  <!-- 左:审核队列 -->
+  <div>
+    <div class="panel">
+      <div class="panel-title">审核队列 <span class="sub" id="qCount"></span></div>
+      <div id="queueBox"><div class="empty">载入 token 后显示待审病例</div></div>
+    </div>
+  </div>
+
+  <!-- 右:双轨审核 -->
+  <div id="workArea" style="display:none">
+    <div class="panel">
+      <div class="panel-title">病例 <span id="caseTitle"></span> <span class="sub" id="caseMeta"></span></div>
+      <div class="kv" id="caseInfo"></div>
+    </div>
+    <div class="dual">
+      <!-- 医生轨 -->
+      <div class="track doc">
+        <h3>🩺 医生轨 · 诊疗审核 → 电子处方</h3>
+        <div class="fld-label">AI 草案 / 大师分析(只读参考)</div>
+        <textarea id="aiDraft" readonly style="opacity:.75"></textarea>
+        <div class="fld-label">辨证诊断(医生修订)</div>
+        <textarea id="docDiagnosis" placeholder="如:肝郁化火,扰动心神"></textarea>
+        <div class="fld-label">处方(医生修订)</div>
+        <textarea id="docPrescription" placeholder="如:丹栀逍遥散加减:牡丹皮10g 栀子10g……"></textarea>
+        <div class="btn-row">
+          <button class="btn accent" id="btnRxSign">✍️ 医生签名 · 生成电子处方</button>
+          <span id="rxState"></span>
+        </div>
+        <div class="status-line" id="rxStatus"></div>
+      </div>
+      <!-- 命理师轨 -->
+      <div class="track ml">
+        <h3>☯ 命理师轨 · 命理审核 → 命理批注</h3>
+        <div class="fld-label">排盘生辰(可修订后重新生成草案)</div>
+        <div class="brow">
+          <input class="small" id="bYear" type="number" placeholder="年">
+          <input class="small" id="bMonth" type="number" placeholder="月">
+          <input class="small" id="bDay" type="number" placeholder="日">
+          <input class="small" id="bHour" type="number" placeholder="时">
+          <select class="small" id="bGender" style="width:64px"><option>男</option><option>女</option></select>
+        </div>
+        <div class="btn-row" style="margin-top:4px">
+          <button class="btn" id="btnMlDraft">⚡ 生成 AI 命理草案</button>
+        </div>
+        <div class="fld-label">AI 命理草案(只读参考)</div>
+        <textarea class="tall" id="mlDraft" readonly style="opacity:.75" placeholder="点击「生成 AI 命理草案」"></textarea>
+        <div class="fld-label">命理师批注(签名时生效)</div>
+        <textarea id="mlAnnotation" placeholder="命理师专业补充:格局要点、与主诉互参、调候建议……"></textarea>
+        <div class="btn-row">
+          <button class="btn primary" id="btnMlSign">✍️ 命理师签名 · 生成命理批注</button>
+          <span id="mlState"></span>
+        </div>
+        <div class="status-line" id="mlStatus"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">命理宝鉴 · 双师审核台 · 签名即生效,电子处方与命理批注各自归档</div>
+</div>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var $=function(id){return document.getElementById(id)};
+var token='',csrfToken='',roles=[],queue=[],curCase=null,mlDraftId=null;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function decodeRoles(t){
+  try{var p=t.split('.')[1];p=p.replace(/-/g,'+').replace(/_/g,'/');
+    var j=JSON.parse(decodeURIComponent(escape(atob(p))));return j.roles||[]}catch(e){return[]}
+}
+function hdr(){return{'Content-Type':'application/json','Authorization':'Bearer '+token,'x-csrf-token':csrfToken}}
+
+fetch(API+'/api/csrf-token').then(function(r){return r.json()}).then(function(d){csrfToken=d.csrfToken||''}).catch(function(){});
+
+$('btnAuth').addEventListener('click',function(){
+  token=$('tokenIn').value.trim()||localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
+  if(!token){$('queueBox').innerHTML='<div class="empty">请粘贴医生/命理师账号的 Bearer Token</div>';return}
+  if($('tokenIn').value.trim())localStorage.setItem('admin_token',token);
+  roles=decodeRoles(token);
+  $('roleChips').innerHTML=roles.map(function(r){return '<span class="role-chip">'+esc(r)+'</span>'}).join(' ');
+  loadQueue();
+});
+// 自动尝试 localStorage
+(function(){var t=localStorage.getItem('admin_token')||localStorage.getItem('token');if(t){$('tokenIn').value=t;$('btnAuth').click()}})();
+
+function loadQueue(){
+  $('queueBox').innerHTML='<div class="empty">载入中…</div>';
+  fetch(API+'/api/clinic/review-queue',{headers:hdr()}).then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){$('queueBox').innerHTML='<div class="empty">'+(d.error==='NO_ROLE'?'当前账号无医生/命理师角色':'载入失败:'+esc(d.error||d.message||''))+'</div>';return}
+    queue=d.queue||[];$('qCount').textContent=queue.length+' 例 · 身份:'+d.role;
+    if(!queue.length){$('queueBox').innerHTML='<div class="empty">队列空空如也</div>';return}
+    $('queueBox').innerHTML=queue.map(function(c){
+      return '<div class="qitem" data-id="'+c.id+'"><span class="st">'+esc(c.status)+'</span><span class="nm">'+esc(c.patientName)+'</span> '+esc(c.caseNumber)+'<div class="mt">'+esc((c.symptoms||'').slice(0,40))+'</div><div class="mt">'+esc(c.createdAt||'')+'</div></div>';
+    }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('.qitem'),function(el){
+      el.addEventListener('click',function(){selectCase(parseInt(el.dataset.id),el)});
+    });
+  }).catch(function(e){$('queueBox').innerHTML='<div class="empty">请求失败:'+esc(e.message)+'</div>'});
+}
+
+function selectCase(id,el){
+  Array.prototype.forEach.call(document.querySelectorAll('.qitem'),function(x){x.classList.remove('on')});
+  if(el)el.classList.add('on');
+  curCase=queue.find(function(c){return c.id===id});
+  if(!curCase)return;
+  $('workArea').style.display='block';
+  $('caseTitle').textContent='#'+curCase.id+' · '+curCase.patientName;
+  $('caseMeta').textContent=curCase.status;
+  $('caseInfo').innerHTML='<b>主诉:</b>'+esc(curCase.symptoms||'—')+'<br><b>体质:</b>'+esc(curCase.constitution||'—')+'<br><b>AI 诊断(EMR):</b>'+esc((curCase.aiDiagnosis||'').slice(0,200)||'—')+(curCase.voiceTranscript?'<br><b>语音转写:</b>'+esc(curCase.voiceTranscript.slice(0,150)):'');
+  // 医生轨预填
+  $('aiDraft').value=curCase.aiDraft||curCase.masterAnalysis||'(无 AI 草案)';
+  $('docDiagnosis').value=curCase.diagnosis||'';
+  $('docPrescription').value=curCase.prescription||'';
+  $('rxState').innerHTML='';$('rxStatus').textContent='';$('rxStatus').className='status-line';
+  // 命理轨预填生辰
+  var y=curCase.birthYear||'',m='',d='',h=curCase.birthHour!==''?curCase.birthHour:'';
+  if(curCase.birthDate){var mm=String(curCase.birthDate).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);if(mm){y=mm[1];m=mm[2];d=mm[3]}}
+  $('bYear').value=y;$('bMonth').value=m;$('bDay').value=d;$('bHour').value=h;
+  if(curCase.patientSex)$('bGender').value=curCase.patientSex.indexOf('女')>=0?'女':'男';
+  $('mlDraft').value='';$('mlAnnotation').value='';mlDraftId=null;
+  $('mlState').innerHTML='';$('mlStatus').textContent='';$('mlStatus').className='status-line';
+  $('workArea').scrollIntoView({behavior:'smooth'});
+}
+
+// ── 医生:签名生成电子处方 ──
+$('btnRxSign').addEventListener('click',function(){
+  if(!curCase)return;
+  var diagnosis=$('docDiagnosis').value.trim(),prescription=$('docPrescription').value.trim();
+  if(!diagnosis&&!prescription){setSt('rxStatus','请先填写辨证诊断或处方','err');return}
+  $('btnRxSign').disabled=true;setSt('rxStatus','建方中…','');
+  fetch(API+'/api/clinic/prescription/draft',{method:'POST',headers:hdr(),
+    body:JSON.stringify({caseId:curCase.id,diagnosis:diagnosis,prescription:prescription})})
+  .then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){setSt('rxStatus','建方失败:'+(d.error||''),'err');$('btnRxSign').disabled=false;return}
+    setSt('rxStatus','草案 #'+d.id+' 已建,签名中…','');
+    return fetch(API+'/api/clinic/prescription/sign',{method:'POST',headers:hdr(),body:JSON.stringify({id:d.id})})
+      .then(function(r){return r.json()}).then(function(s){
+        $('btnRxSign').disabled=false;
+        if(!s.ok){setSt('rxStatus','签名失败:'+(s.error||''),'err');return}
+        $('rxState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';
+        setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效(draft→signed)','ok');
+      });
+  }).catch(function(e){$('btnRxSign').disabled=false;setSt('rxStatus','请求失败:'+e.message,'err')});
+});
+
+// ── 命理师:生成草案 ──
+$('btnMlDraft').addEventListener('click',function(){
+  if(!curCase)return;
+  var y=parseInt($('bYear').value),m=parseInt($('bMonth').value),d=parseInt($('bDay').value);
+  if(!y||!m||!d){setSt('mlStatus','请补齐出生年月日','err');return}
+  $('btnMlDraft').disabled=true;setSt('mlStatus','排盘生成中(约 2-5 秒)…','');
+  fetch(API+'/api/clinic/mingli/draft',{method:'POST',headers:hdr(),
+    body:JSON.stringify({caseId:curCase.id,year:y,month:m,day:d,
+      hour:($('bHour').value!==''?parseInt($('bHour').value):12),
+      gender:$('bGender').value,name:curCase.patientName})})
+  .then(function(r){return r.json()}).then(function(res){
+    $('btnMlDraft').disabled=false;
+    if(!res.ok){setSt('mlStatus','生成失败:'+(res.error||res.message||''),'err');return}
+    mlDraftId=res.id;
+    $('mlDraft').value=res.draft||'(空)';
+    setSt('mlStatus','✅ 草案 #'+res.id+' 已生成,请审阅后批注签名','ok');
+  }).catch(function(e){$('btnMlDraft').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
+});
+
+// ── 命理师:签名 ──
+$('btnMlSign').addEventListener('click',function(){
+  if(!mlDraftId){setSt('mlStatus','请先生成 AI 命理草案','err');return}
+  var ann=$('mlAnnotation').value.trim();
+  if(!ann){setSt('mlStatus','请填写命理师批注','err');return}
+  $('btnMlSign').disabled=true;setSt('mlStatus','签名中…','');
+  fetch(API+'/api/clinic/mingli/sign',{method:'POST',headers:hdr(),
+    body:JSON.stringify({id:mlDraftId,annotation:ann})})
+  .then(function(r){return r.json()}).then(function(s){
+    $('btnMlSign').disabled=false;
+    if(!s.ok){setSt('mlStatus','签名失败:'+(s.error==='NO_ROLE'?'当前账号非命理师角色':s.error||''),'err');return}
+    $('mlState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';
+    setSt('mlStatus','✅ 命理批注 #'+s.id+' 已生效(draft→signed)','ok');
+  }).catch(function(e){$('btnMlSign').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
+});
+
+function setSt(id,txt,cls){var el=$(id);el.textContent=txt;el.className='status-line'+(cls?' '+cls:'')}
+</script>
+</body>
+</html>

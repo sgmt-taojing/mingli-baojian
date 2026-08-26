@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="description" content="一帧问诊台 · 一屏三步闭环:采集→AI双轨草案→双师签名,电子处方+命理批注+患者报告一次出齐 · 多诊所即配即用 · 命理宝鉴">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>一帧问诊台 · 命理宝鉴</title>
+<style>
+:root{--bg:#0a0d12;--paper:#e8e0d0;--paper2:#a89878;--gold:#c9a84c;--gold2:#e8cc7a;--gold3:#8a7030;--accent:#38bdf8;--card:rgba(255,255,255,.04);--border:rgba(201,168,76,.2);--danger:#dc2626;--ok:#22c55e;--warn:#f59e0b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(180deg,#0a0d12,#0d1018);color:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6;min-height:100vh;padding:20px 16px}
+.wrap{max-width:1180px;margin:0 auto}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.back{color:var(--gold);text-decoration:none;font-size:13px;padding:5px 10px;border:1px solid var(--border);border-radius:14px}
+.title-area{flex:1}
+.title-area h1{font-size:20px;color:var(--gold);letter-spacing:2px;margin-bottom:2px}
+.title-area .sub{font-size:11px;color:var(--paper2);letter-spacing:1px}
+.gear{background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--paper2);padding:6px 12px;font-size:13px;cursor:pointer}
+.gear:hover{color:var(--gold)}
+
+/* 步骤条 */
+.steps{display:flex;gap:6px;margin-bottom:16px}
+.step{flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:var(--card);border:1px solid var(--border);font-size:12px;color:var(--paper2);transition:all .25s}
+.step.on{border-color:var(--gold);color:var(--gold2);background:rgba(201,168,76,.08);font-weight:600}
+.step.done{border-color:var(--ok);color:var(--ok)}
+
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.panel-title{font-size:13px;color:var(--gold);margin-bottom:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+.panel-title .sub{font-size:10px;color:var(--paper2);font-weight:400;margin-left:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.frow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.fld{display:flex;flex-direction:column;gap:4px;flex:1;min-width:84px}
+.fld label{font-size:11px;color:var(--paper2)}
+.fld input,.fld select,textarea,input.small{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--paper);padding:8px 10px;font-size:13px;font-family:inherit}
+.fld input:focus,textarea:focus,input.small:focus{outline:none;border-color:var(--gold)}
+textarea{width:100%;min-height:76px;resize:vertical}
+textarea.tall{min-height:200px}
+.cam-box{position:relative;background:#000;border:1px solid var(--border);border-radius:12px;overflow:hidden;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center}
+.cam-box video{width:100%;height:100%;object-fit:cover;display:none}
+.cam-box canvas{display:none}
+.cam-hint{font-size:12px;color:var(--paper2);text-align:center;padding:12px;line-height:1.8}
+.cam-thumb{position:absolute;right:8px;bottom:8px;width:88px;border:2px solid var(--gold);border-radius:8px;display:none}
+.btn{padding:9px 18px;border-radius:10px;font-size:13px;border:1px solid var(--border);background:transparent;color:var(--paper);cursor:pointer;transition:all .2s}
+.btn:hover{background:var(--card)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--bg);font-weight:600}
+.btn.accent{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600}
+.btn.big{padding:13px 26px;font-size:15px}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-block;font-size:11px;padding:3px 10px;border-radius:10px;font-weight:600;letter-spacing:1px}
+.badge.low{background:rgba(34,197,94,.15);color:var(--ok)}
+.badge.mid{background:rgba(245,158,11,.15);color:var(--warn)}
+.badge.high,.badge.critical{background:rgba(220,38,38,.18);color:#f87171}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:8px;background:rgba(56,189,248,.12);color:var(--accent);margin:2px 4px 2px 0}
+.tag.warn{background:rgba(245,158,11,.12);color:var(--warn)}
+.tag.critical{background:rgba(220,38,38,.15);color:#f87171}
+.rpt{white-space:pre-wrap;font-size:12.5px;line-height:1.8;color:var(--paper);background:rgba(255,255,255,.02);border-radius:10px;padding:12px 14px;max-height:380px;overflow:auto}
+.insight{border-left:3px solid var(--gold);background:rgba(201,168,76,.06);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;margin-bottom:8px;line-height:1.7}
+.insight .t{color:var(--gold2);font-weight:600}
+.empty{font-size:12px;color:var(--paper2);opacity:.6;text-align:center;padding:20px 0}
+.status-line{font-size:12px;color:var(--paper2);margin-top:8px;min-height:18px}
+.status-line.ok{color:var(--ok)}
+.status-line.err{color:#f87171}
+.disc{font-size:10.5px;color:var(--paper2);opacity:.7;margin-top:10px;line-height:1.6}
+.track{border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.track.doc{border-top:3px solid var(--accent)}
+.track.ml{border-top:3px solid var(--gold)}
+.track h3{font-size:14px;margin-bottom:10px}
+.track.doc h3{color:var(--accent)}
+.track.ml h3{color:var(--gold2)}
+.fld-label{font-size:11px;color:var(--paper2);margin:8px 0 4px}
+.signed-mark{display:inline-block;font-size:11px;padding:3px 10px;border-radius:10px;background:rgba(34,197,94,.15);color:var(--ok);font-weight:600}
+.done-card{border:1.5px solid var(--ok);border-radius:14px;padding:16px 18px;background:rgba(34,197,94,.05)}
+.done-card h3{color:var(--ok);font-size:15px;margin-bottom:10px}
+.prod{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.prod:last-child{border-bottom:none}
+.prod .no{color:var(--gold2);font-weight:600;margin-left:auto;font-size:12px}
+.auth-mini{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--paper2);margin-bottom:10px}
+.auth-mini input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;color:var(--paper);padding:6px 10px;font-size:12px}
+.role-chip{font-size:11px;padding:2px 8px;border-radius:8px;background:rgba(56,189,248,.12);color:var(--accent)}
+.cfg-panel{display:none;background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.cfg-panel.show{display:block}
+.footer{text-align:center;color:var(--paper2);opacity:.35;font-size:11px;margin-top:26px;letter-spacing:1px}
+.voice-btn.rec{background:var(--danger);border-color:var(--danger);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <a href="integrated-clinic.html" class="back">← 问诊台</a>
+  <div class="title-area">
+    <h1 id="pageTitle">一帧问诊台</h1>
+    <div class="sub" id="pageSub">一帧采集 · 一脑双轨 · 双师签名 · 三产物齐出</div>
+  </div>
+  <button class="gear" id="btnCfg">⚙ 诊所配置</button>
+</div>
+
+<!-- SaaS 诊所配置(即配即用,存本机) -->
+<div class="cfg-panel" id="cfgPanel">
+  <div class="panel-title">诊所配置 <span class="sub">多诊所复制部署时只需改这里,或用 ?clinic=名称 直达</span></div>
+  <div class="frow">
+    <div class="fld"><label>诊所/医馆名称</label><input id="cfgClinic" placeholder="如:仁和堂中医诊所"></div>
+    <div class="fld"><label>坐诊医师</label><input id="cfgDoctor" placeholder="如:王医师"></div>
+    <div class="fld"><label>命理师</label><input id="cfgMaster" placeholder="如:李师傅"></div>
+  </div>
+  <div class="btn-row"><button class="btn primary" id="btnCfgSave">保存配置</button><span class="status-line" id="cfgStatus"></span></div>
+  <div class="disc">配置仅存本机浏览器。同一套系统复制给任意医院/诊所:改个名字即可开诊,功能零差异。</div>
+</div>
+
+<!-- 步骤条 -->
+<div class="steps">
+  <div class="step on" id="st1">① 采集 · 一帧+主诉</div>
+  <div class="step" id="st2">② AI 双轨草案</div>
+  <div class="step" id="st3">③ 双师签名 · 出产物</div>
+</div>
+
+<!-- ═══ 第一步:采集 ═══ -->
+<div id="step1">
+<div class="panel">
+  <div class="panel-title">患者信息 <span class="sub">生辰用于命理轨排盘 · 本机记忆</span></div>
+  <div class="frow">
+    <div class="fld" style="max-width:120px"><label>姓名</label><input id="pName" placeholder="患者姓名"></div>
+    <div class="fld" style="max-width:76px"><label>性别</label><select id="pGender"><option>男</option><option>女</option></select></div>
+    <div class="fld"><label>出生年</label><input id="pYear" type="number" placeholder="1990"></div>
+    <div class="fld"><label>月</label><input id="pMonth" type="number" min="1" max="12"></div>
+    <div class="fld"><label>日</label><input id="pDay" type="number" min="1" max="31"></div>
+    <div class="fld"><label>时辰(24h)</label><input id="pHour" type="number" min="0" max="23"></div>
+  </div>
+</div>
+<div class="grid2">
+  <div class="panel">
+    <div class="panel-title">一帧采集 <span class="sub" id="camState">望诊(面/舌)</span></div>
+    <div class="cam-box" id="camBox">
+      <video id="camVideo" autoplay playsinline muted></video>
+      <canvas id="camCanvas"></canvas>
+      <div class="cam-hint" id="camHint">点击「开启摄像头」对准患者面部<br>一次抓帧完成望诊采集<br><br>无摄像头 → 用「图片上传」</div>
+      <img class="cam-thumb" id="camThumb" alt="已采集帧">
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btnCamOpen">开启摄像头</button>
+      <button class="btn primary" id="btnCapture" disabled>⚡ 一帧采集</button>
+      <label class="btn" style="margin:0">图片上传<input type="file" id="fileUp" accept="image/*" style="display:none"></label>
+    </div>
+    <div class="status-line" id="capStatus"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">主诉与穿戴指标 <span class="sub">🎤 语音可直接说</span></div>
+    <textarea id="pDialogue" placeholder="患者主诉,如:近一周心悸烦躁,入睡困难,口干口苦,舌红……"></textarea>
+    <div class="btn-row" style="margin-top:6px">
+      <button class="btn" id="btnVoice">🎤 语音录入</button>
+      <span class="status-line" id="voiceStatus" style="margin:0"></span>
+    </div>
+    <div class="frow" style="margin-top:8px">
+      <div class="fld"><label>心率 bpm</label><input id="wHr" type="number" placeholder="选填"></div>
+      <div class="fld"><label>血氧 %</label><input id="wSpo2" type="number" placeholder="选填"></div>
+      <div class="fld"><label>收缩压</label><input id="wSbp" type="number" placeholder="选填"></div>
+      <div class="fld"><label>舒张压</label><input id="wDbp" type="number" placeholder="选填"></div>
+    </div>
+  </div>
+</div>
+<div style="text-align:center;margin:18px 0">
+  <button class="btn accent big" id="btnFuse">🧠 开始 AI 分析 · 出双轨草案</button>
+  <div class="status-line" id="fuseStatus" style="text-align:center"></div>
+</div>
+</div>
+
+<!-- ═══ 第二步:AI 双轨草案 ═══ -->
+<div id="step2" style="display:none">
+<div class="grid2">
+  <div class="panel">
+    <div class="panel-title">诊疗轨 · AI 诊断草案 <span class="sub" id="riskBadge"></span></div>
+    <div id="flagsBox"></div>
+    <div id="vitalBox"></div>
+    <div class="rpt" id="tcmReport">—</div>
+    <div class="disc" id="missingLine"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">命理轨 · AI 命理草案 <span class="sub">待命理师审核</span></div>
+    <div id="insightBox"></div>
+    <div class="rpt" id="mingliReport">—</div>
+    <div class="disc">命理内容属传统文化参考,不构成医疗建议。</div>
+  </div>
+</div>
+<div style="text-align:center;margin:16px 0">
+  <button class="btn primary big" id="btnToSign">进入双师签名 →</button>
+</div>
+</div>
+
+<!-- ═══ 第三步:双师签名 ═══ -->
+<div id="step3" style="display:none">
+<div class="panel">
+  <div class="panel-title">签名身份 <span class="sub">医生/命理师账号 Token · 本机记忆</span></div>
+  <div class="auth-mini">
+    <input id="tokenIn" placeholder="Bearer Token(无 token 请先在后台登录账号)">
+    <button class="btn" id="btnToken">确认</button>
+    <span id="roleChips"></span>
+  </div>
+</div>
+<div class="dual grid2">
+  <div class="track doc">
+    <h3>🩺 医生 · 电子处方</h3>
+    <div class="fld-label">辨证诊断(AI 已预填,修订即可)</div>
+    <textarea id="docDiagnosis"></textarea>
+    <div class="fld-label">处方(药味/剂量/煎服法)</div>
+    <textarea id="docPrescription" placeholder="AI 未给出具体方剂时,请医生开具"></textarea>
+    <div class="btn-row">
+      <button class="btn accent" id="btnRxSign">✍️ 医生签名 · 处方生效</button>
+      <span id="rxState"></span>
+    </div>
+    <div class="status-line" id="rxStatus"></div>
+  </div>
+  <div class="track ml">
+    <h3>☯ 命理师 · 命理批注</h3>
+    <div class="fld-label">AI 命理草案(上方命理轨,审阅后在此批注)</div>
+    <textarea id="mlAnnotation" placeholder="命理师专业批注:格局要点、与主诉互参、调候建议……"></textarea>
+    <div class="btn-row">
+      <button class="btn primary" id="btnMlSign">✍️ 命理师签名 · 批注生效</button>
+      <span id="mlState"></span>
+    </div>
+    <div class="status-line" id="mlStatus"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ 完成态:三产物 ═══ -->
+<div id="doneArea" style="display:none;margin-top:14px">
+  <div class="done-card">
+    <h3>✅ 本次问诊完成 · 产物清单</h3>
+    <div class="prod">📋 电子病历(AI 草案 + 双轨互参)<span class="no" id="prodEmr">已留存</span></div>
+    <div class="prod">🩺 电子处方<span class="no" id="prodRx">待签名</span></div>
+    <div class="prod">☯ 命理批注<span class="no" id="prodMl">待签名</span></div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn primary" id="btnCopyPatient">📄 复制患者版报告(可发微信)</button>
+      <button class="btn" id="btnNext">➕ 下一位患者</button>
+    </div>
+    <div class="status-line" id="doneStatus"></div>
+  </div>
+</div>
+
+<div class="footer" id="footTxt">命理宝鉴 · 一帧问诊台</div>
+</div>
+
+<script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var $=function(id){return document.getElementById(id)};
+var capturedFrame=null,csrfToken='',token='',roles=[];
+var lastResult=null,rxDone=null,mlDone=null,mlDraftId=null;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function setSt(id,txt,cls){var el=$(id);el.textContent=txt;el.className='status-line'+(cls?' '+cls:'')}
+function hdr(){return{'Content-Type':'application/json','Authorization':'Bearer '+token,'x-csrf-token':csrfToken}}
+function decodeRoles(t){try{var p=t.split('.')[1];p=p.replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(p)))).roles||[]}catch(e){return[]}}
+
+/* ── SaaS 诊所配置 ── */
+function applyCfg(){
+  var c=localStorage.getItem('cw_clinic')||'';
+  var q=new URLSearchParams(location.search).get('clinic');
+  if(q){c=q;localStorage.setItem('cw_clinic',c)}
+  if(c){$('pageTitle').textContent=c+' · 一帧问诊台';document.title=c+' · 一帧问诊台';$('footTxt').textContent=c+' · 由命理宝鉴平台驱动'}
+  $('cfgClinic').value=c;
+  $('cfgDoctor').value=localStorage.getItem('cw_doctor')||'';
+  $('cfgMaster').value=localStorage.getItem('cw_master')||'';
+}
+applyCfg();
+$('btnCfg').addEventListener('click',function(){$('cfgPanel').classList.toggle('show')});
+$('btnCfgSave').addEventListener('click',function(){
+  localStorage.setItem('cw_clinic',$('cfgClinic').value.trim());
+  localStorage.setItem('cw_doctor',$('cfgDoctor').value.trim());
+  localStorage.setItem('cw_master',$('cfgMaster').value.trim());
+  applyCfg();setSt('cfgStatus','✅ 已保存,本机永久生效','ok');
+});
+
+/* ── 患者信息记忆 ── */
+['pName','pGender','pYear','pMonth','pDay','pHour'].forEach(function(k){
+  var v=localStorage.getItem('cw_'+k);if(v!==null)$(k).value=v;
+  $(k).addEventListener('change',function(){localStorage.setItem('cw_'+k,$(k).value)});
+});
+
+/* ── Token ── */
+token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
+if(token){$('tokenIn').value=token;roles=decodeRoles(token);$('roleChips').innerHTML=roles.map(function(r){return '<span class="role-chip">'+esc(r)+'</span>'}).join(' ')}
+$('btnToken').addEventListener('click',function(){
+  token=$('tokenIn').value.trim();
+  if(token){localStorage.setItem('admin_token',token);roles=decodeRoles(token);
+    $('roleChips').innerHTML=roles.map(function(r){return '<span class="role-chip">'+esc(r)+'</span>'}).join(' ')}
+});
+
+/* ── CSRF ── */
+fetch(API+'/api/csrf-token').then(function(r){return r.json()}).then(function(d){csrfToken=d.csrfToken||''}).catch(function(){});
+
+/* ── 摄像头 ── */
+var stream=null;
+$('btnCamOpen').addEventListener('click',function(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('camHint').textContent='当前环境不支持摄像头,请用图片上传';return}
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280}},audio:false})
+    .then(function(s){stream=s;$('camVideo').srcObject=s;$('camVideo').style.display='block';$('camHint').style.display='none';
+      $('btnCapture').disabled=false;$('camState').textContent='采集中';$('btnCamOpen').textContent='重开摄像头'})
+    .catch(function(e){$('camHint').innerHTML='摄像头不可用:'+(e.name||e.message)+'<br>请改用图片上传';$('camState').textContent='走上传降级'});
+});
+function grabFrame(){var v=$('camVideo'),c=$('camCanvas');c.width=v.videoWidth||640;c.height=v.videoHeight||480;
+  c.getContext('2d').drawImage(v,0,0,c.width,c.height);return c.toDataURL('image/jpeg',0.82)}
+function setFrame(u,from){capturedFrame=u;$('camThumb').src=u;$('camThumb').style.display='block';
+  setSt('capStatus','✅ 已采集一帧('+from+')','ok')}
+$('btnCapture').addEventListener('click',function(){if(stream)setFrame(grabFrame(),'摄像头')});
+$('fileUp').addEventListener('change',function(){var f=this.files&&this.files[0];if(!f)return;
+  var rd=new FileReader();rd.onload=function(){setFrame(rd.result,'上传图片')};rd.readAsDataURL(f)});
+
+/* ── 语音录入 ── */
+var recog=null,recOn=false;
+$('btnVoice').addEventListener('click',function(){
+  var SR=window.webkitSpeechRecognition||window.SpeechRecognition;
+  if(!SR){setSt('voiceStatus','本浏览器不支持语音,请打字','err');return}
+  if(recOn){try{recog.stop()}catch(e){}return}
+  recog=new SR();recog.lang='zh-CN';recog.continuous=true;recog.interimResults=true;
+  recog.onresult=function(ev){var t='';for(var i=0;i<ev.results.length;i++)t+=ev.results[i][0].transcript;
+    $('pDialogue').value=t};
+  recog.onend=function(){recOn=false;$('btnVoice').classList.remove('rec');$('btnVoice').textContent='🎤 语音录入';setSt('voiceStatus','已停止','')};
+  recog.onerror=function(e){setSt('voiceStatus','语音失败:'+e.error,'err')};
+  try{recog.start();recOn=true;$('btnVoice').classList.add('rec');$('btnVoice').textContent='⏹ 停止录入';setSt('voiceStatus','聆听中,请说主诉…','')}catch(e){setSt('voiceStatus','启动失败','err')}
+});
+
+/* ── 步骤控制 ── */
+function goStep(n){
+  ['st1','st2','st3'].forEach(function(id,i){var el=$(id);el.classList.remove('on','done');
+    if(i+1<n)el.classList.add('done');if(i+1===n)el.classList.add('on')});
+  $('step1').style.display=n===1?'block':'none';
+  $('step2').style.display=n>=2?'block':'none';
+  $('step3').style.display=n>=3?'block':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('btnToSign').addEventListener('click',function(){goStep(3)});
+
+/* ── AI 融合 ── */
+$('btnFuse').addEventListener('click',function(){
+  var y=parseInt($('pYear').value),m=parseInt($('pMonth').value),d=parseInt($('pDay').value);
+  var body={scene_type:'clinic',dialogue:$('pDialogue').value||''};
+  if(y&&m&&d){body.birth={year:y,month:m,day:d,hour:($('pHour').value!==''?parseInt($('pHour').value):12),gender:$('pGender').value,name:$('pName').value||''}}
+  if(capturedFrame)body.faceImage=capturedFrame;
+  var w={};if($('wHr').value)w.heart_rate=parseInt($('wHr').value);if($('wSpo2').value)w.spo2=parseInt($('wSpo2').value);
+  if($('wSbp').value)w.systolic_bp=parseInt($('wSbp').value);if($('wDbp').value)w.diastolic_bp=parseInt($('wDbp').value);
+  if(Object.keys(w).length)body.wearable=w;
+  if(!body.dialogue&&!capturedFrame&&!body.birth){setSt('fuseStatus','请至少填写主诉、采集一帧或录入生辰','err');return}
+  setSt('fuseStatus','AI 分析中(望诊识别+排盘+互参)…','');$('btnFuse').disabled=true;
+  fetch(API+'/api/doctor/multi-modal-assess',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},body:JSON.stringify(body)})
+  .then(function(r){return r.json()}).then(function(d){
+    $('btnFuse').disabled=false;
+    if(!d.ok){setSt('fuseStatus','分析失败:'+(d.error||''),'err');return}
+    lastResult=d;renderResult(d);goStep(2);
+    setSt('fuseStatus','✅ 双轨草案已出('+(d.timing_ms||0)+'ms)','ok');
+  }).catch(function(e){$('btnFuse').disabled=false;setSt('fuseStatus','请求失败:'+e.message,'err')});
+});
+
+function renderResult(d){
+  var lv=d.risk_level||'low';
+  $('riskBadge').innerHTML='<span class="badge '+lv+'">'+({low:'低风险',mid:'中风险',high:'高风险',critical:'危急'}[lv]||lv)+'</span>';
+  var fh='';(d.flags||[]).forEach(function(f){fh+='<span class="tag warn">'+esc(f.desc||f)+'</span>'});
+  $('flagsBox').innerHTML=fh?'<div style="margin-bottom:8px">'+fh+'</div>':'';
+  var vh='';(d.sections&&d.sections.vital_alerts||[]).forEach(function(a){vh+='<span class="tag '+(a.level==='critical'?'critical':'warn')+'">'+esc(a.desc)+'</span>'});
+  $('vitalBox').innerHTML=vh?'<div style="margin-bottom:8px">'+vh+'</div>':'';
+  var txt=d.output||'';
+  if(d.tcm_specific&&d.tcm_specific.comprehensive)txt+='\n\n【证候推断】'+d.tcm_specific.comprehensive;
+  $('tcmReport').textContent=txt||'诊疗轨无显著发现,请补充采集';
+  $('missingLine').textContent=(d.missing&&d.missing.length)?'⚠ 待补采集项:'+d.missing.join('、'):'';
+  if(d.mingli&&d.mingli.available){
+    var ih='';(d.mingli.cross_insights||[]).forEach(function(ci){
+      var head=ci.type==='excess_match'?'五行旺相×主诉':ci.type==='vital_match'?'五行×穿戴指标':'禀赋调养';
+      var bt=ci.insight||ci.text||'';if(ci.advice)bt+='\n调养建议:'+ci.advice;
+      ih+='<div class="insight"><span class="t">互参 · '+esc(head)+'</span><br>'+esc(bt).replace(/\n/g,'<br>')+'</div>'});
+    $('insightBox').innerHTML=ih;
+    $('mingliReport').textContent=d.mingli.mingli_report||'(空)';
+  }else{$('insightBox').innerHTML='';$('mingliReport').textContent='未生成命理草案(缺生辰信息)'}
+  /* AI 预填医生编辑框:从报告提取证候/方向 */
+  var pre='';
+  if(d.tcm_specific&&d.tcm_specific.comprehensive&&d.tcm_specific.comprehensive.indexOf('不足以')<0)pre=d.tcm_specific.comprehensive;
+  $('docDiagnosis').value=pre;
+}
+
+/* ── 医生签名 ── */
+$('btnRxSign').addEventListener('click',function(){
+  var diagnosis=$('docDiagnosis').value.trim(),prescription=$('docPrescription').value.trim();
+  if(!diagnosis&&!prescription){setSt('rxStatus','请先填写辨证诊断或处方','err');return}
+  if(!token){setSt('rxStatus','请先在上方填入签名 Token','err');return}
+  $('btnRxSign').disabled=true;setSt('rxStatus','建方中…','');
+  fetch(API+'/api/clinic/prescription/draft',{method:'POST',headers:hdr(),
+    body:JSON.stringify({diagnosis:diagnosis,prescription:prescription})})
+  .then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){setSt('rxStatus','建方失败:'+(d.error||d.message||''),'err');$('btnRxSign').disabled=false;return}
+    setSt('rxStatus','草案 #'+d.id+' 已建,签名中…','');
+    return fetch(API+'/api/clinic/prescription/sign',{method:'POST',headers:hdr(),body:JSON.stringify({id:d.id})})
+    .then(function(r){return r.json()}).then(function(s){
+      $('btnRxSign').disabled=false;
+      if(!s.ok){setSt('rxStatus','签名失败:'+(s.error||s.message||''),'err');return}
+      rxDone=s;$('rxState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';
+      setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效','ok');
+      $('prodRx').textContent='#'+s.id+' · '+s.signer;checkDone();
+    });
+  }).catch(function(e){$('btnRxSign').disabled=false;setSt('rxStatus','请求失败:'+e.message,'err')});
+});
+
+/* ── 命理师签名(草案+签名一步完成) ── */
+$('btnMlSign').addEventListener('click',function(){
+  var ann=$('mlAnnotation').value.trim();
+  if(!ann){setSt('mlStatus','请填写命理师批注','err');return}
+  if(!token){setSt('mlStatus','请先在上方填入签名 Token','err');return}
+  var y=parseInt($('pYear').value),m=parseInt($('pMonth').value),d=parseInt($('pDay').value);
+  if(!y||!m||!d){setSt('mlStatus','患者生辰不全,无法落批注','err');return}
+  $('btnMlSign').disabled=true;setSt('mlStatus','草案落库中…','');
+  fetch(API+'/api/clinic/mingli/draft',{method:'POST',headers:hdr(),
+    body:JSON.stringify({year:y,month:m,day:d,hour:($('pHour').value!==''?parseInt($('pHour').value):12),gender:$('pGender').value,name:$('pName').value||''})})
+  .then(function(r){return r.json()}).then(function(res){
+    if(!res.ok){setSt('mlStatus','草案失败:'+(res.error||res.message||''),'err');$('btnMlSign').disabled=false;return}
+    mlDraftId=res.id;setSt('mlStatus','草案 #'+res.id+' 落库,签名中…','');
+    return fetch(API+'/api/clinic/mingli/sign',{method:'POST',headers:hdr(),body:JSON.stringify({id:mlDraftId,annotation:ann})})
+    .then(function(r){return r.json()}).then(function(s){
+      $('btnMlSign').disabled=false;
+      if(!s.ok){setSt('mlStatus','签名失败:'+(s.error==='NO_ROLE'?'当前账号非命理师角色':s.error||s.message||''),'err');return}
+      mlDone=s;$('mlState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';
+      setSt('mlStatus','✅ 命理批注 #'+s.id+' 已生效','ok');
+      $('prodMl').textContent='#'+s.id+' · '+s.signer;checkDone();
+    });
+  }).catch(function(e){$('btnMlSign').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
+});
+
+/* ── 完成态 ── */
+function checkDone(){
+  if(rxDone||mlDone){$('doneArea').style.display='block';$('doneArea').scrollIntoView({behavior:'smooth'})}
+}
+$('btnCopyPatient').addEventListener('click',function(){
+  var clinic=localStorage.getItem('cw_clinic')||'命理宝鉴';
+  var t='【'+clinic+' · 问诊报告】\n';
+  t+='患者:'+($('pName').value||'匿名')+' '+$('pGender').value+'\n';
+  if($('pYear').value)t+='生辰:'+$('pYear').value+'-'+$('pMonth').value+'-'+$('pDay').value+' '+($('pHour').value||'12')+'时\n';
+  t+='\n— 诊断 —\n'+($('docDiagnosis').value||'(医生修订中)');
+  if($('docPrescription').value)t+='\n\n— 处方 —\n'+$('docPrescription').value;
+  if(rxDone)t+='\n处方编号:#'+rxDone.id+' 签名:'+rxDone.signer;
+  if(lastResult&&lastResult.mingli&&lastResult.mingli.available){
+    t+='\n\n— 命理参考 —\n'+(lastResult.mingli.mingli_report||'').replace('【AI 命理草案（待命理师审核）】\n\n','').split('※')[0].trim();
+    var ins=(lastResult.mingli.cross_insights||[])[0];
+    if(ins&&ins.advice)t+='\n调养建议:'+ins.advice;
+  }
+  if(mlDone)t+='\n批注编号:#'+mlDone.id+' 签名:'+mlDone.signer;
+  t+='\n\n*本报告由 AI 辅助生成,经医师/命理师审核签名;命理内容属传统文化参考,不构成医疗建议。';
+  function ok(){setSt('doneStatus','✅ 患者版报告已复制,直接粘贴发送即可','ok')}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok).catch(function(){fallback()})}else fallback();
+  function fallback(){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){setSt('doneStatus','复制失败,请手动选择文本','err')}document.body.removeChild(ta)}
+});
+$('btnNext').addEventListener('click',function(){
+  ['pName','pDialogue','wHr','wSpo2','wSbp','wDbp','docDiagnosis','docPrescription','mlAnnotation'].forEach(function(k){$(k).value='';localStorage.removeItem('cw_'+k)});
+  ['pYear','pMonth','pDay','pHour'].forEach(function(k){$(k).value='';localStorage.removeItem('cw_'+k)});
+  capturedFrame=null;$('camThumb').style.display='none';
+  rxDone=null;mlDone=null;mlDraftId=null;lastResult=null;
+  $('rxState').innerHTML='';$('mlState').innerHTML='';$('prodRx').textContent='待签名';$('prodMl').textContent='待签名';
+  $('doneArea').style.display='none';setSt('capStatus','','');setSt('rxStatus','','');setSt('mlStatus','','');setSt('fuseStatus','','');
+  goStep(1);
+});
+</script>
+</body>
+</html>
