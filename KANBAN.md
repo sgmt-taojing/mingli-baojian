@@ -214,6 +214,7 @@
 ## 进行中
 
 ### #5 BaziQA v9.2 全量评估未达标（t512 · 2026-08-19） ✅ 已评估完结（生产保持 v9.0）
+- **08-26 18:00 心跳复核**：六端口全绿（18:00:47/18:01:02 双跑 HEALTHY，kb-list + paipan-api OK）；staging 0 待审；无新蒸馏入库、无训练/评估进程；#5/#6 完结态不变。✅ 已修真 weekly-eval 连败4根因（launchd 无 nvm PATH → `node: command not found`，/tmp/mingli-weekly-eval.err 实锤）：scripts/weekly-eval.sh 加 NODE_BIN 兜底（同 08-22 cron-distill-kb-link 修法）+ git 强制纳入（.gitignore scripts/* 曾漏管）commit a7e0ae2，syntax 校验通过，下周一 06:00 验证。⚠️ 余项：家庭健康周报/临床蒸馏 402 计费、四路大师采集 /Volumes/data1 沙箱路径——仍待用户决策。
 - **08-26 02:00 心跳复核**：六端口 health-check.sh 全绿；8960=v9.0-7b 进程存活；staging 0 待审；无训练/评估进程、无新蒸馏入库。⚠️ 新发现：4 个 cron 任务连败（四路大师采集 连败3「list /Volumes/data1 周易-中医 failed」——疑似沙箱路径权限而非磁盘未挂载（宿主 shell 可 ls，卷已挂载）；家庭健康周报/临床蒸馏 连败 402 Payment Required（模型计费问题）；weekly-eval 连败4 超时 model-call-started）。均已超 3 次阈值，health-patrol 持续告警中，待用户决策（修复计费/调整超时/禁用）。
 - **08-26 00:00 心跳复核**：六端口 health-check.sh 全绿；8960=v9.0-7b ✅；staging 0 待审；无训练/评估进程、无新蒸馏入库（08-26 无 distill-*.py 记录）；tcm-daily-scan 08-25 16/18 通过。#5/#6 保持完结态，无新动作。
 - **08-25 22:00 心跳复核**：六端口 health-check.sh 全绿（8911/8912/8913/8900/8920/8901 + kb-list + paipan-api 全 OK）；8960=v9.0-7b ✅（/v1/models 返回 mingli-sft-v9.0-7b）；staging 0 待审；无进行中训练/评估进程。#5/#6 保持完结态，无新动作。
