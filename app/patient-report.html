@@ -21,7 +21,7 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;pad
 .report-head .sub{font-size:11px;color:var(--muted);margin-top:4px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
 .card-title{font-size:13px;font-weight:600;color:var(--gold);margin-bottom:8px;border-left:3px solid var(--gold);padding-left:8px}
-.section{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0;font-size:13px;line-height:1.9;white-space:pre-wrap}
+.section{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0;font-size:13px;line-height:1.9;white-space:pre-wrap;display:block;min-height:0;max-width:none;animation:none}
 .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .meta-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px}
 .meta-item .k{font-size:11px;color:var(--muted)}
@@ -83,18 +83,62 @@ body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;pad
 
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
-var token=localStem('admin_token')||localStorage.getItem('token')||'';
+var token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
 var caseId=new URLSearchParams(location.search).get('case')||'';
 
 function authHeaders(){var h={'Content-Type':'application/json'};if(token)h['Authorization']='Bearer '+token;return h}
 function showToast(msg){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:#1a2332;border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:20px;font-size:13px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4)';document.body.appendChild(t);setTimeout(function(){t.remove()},2500)}
 
 function init(){
+  // P1-6 签名报告免登录模式: ?rx=<id>&rxcode=<code>&ml=<id>&mlcode=<code>
+  var q=new URLSearchParams(location.search);
+  var rxId=q.get('rx'),rxCode=q.get('rxcode'),mlId=q.get('ml'),mlCode=q.get('mlcode');
+  if((rxId&&rxCode)||(mlId&&mlCode)){loadSigned(rxId,rxCode,mlId,mlCode);return}
   if(token){
     loadReports();
   }else{
     document.getElementById('login-view').style.display='block';
   }
+}
+
+function loadSigned(rxId,rxCode,mlId,mlCode){
+  var jobs=[];
+  if(rxId&&rxCode)jobs.push(fetch(API+'/api/public/signed-report/rx/'+encodeURIComponent(rxId)+'?code='+encodeURIComponent(rxCode),{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}));
+  if(mlId&&mlCode)jobs.push(fetch(API+'/api/public/signed-report/ml/'+encodeURIComponent(mlId)+'?code='+encodeURIComponent(mlCode),{signal:AbortSignal.timeout(15000)}).then(function(r){return r.json()}));
+  Promise.all(jobs).then(function(results){
+    var ok=results.filter(function(d){return d&&d.ok});
+    if(!ok.length){document.getElementById('empty-view').style.display='block';
+      document.querySelector('#empty-view div:nth-child(2)').textContent='报告不存在或链接已失效';
+      document.querySelector('#empty-view div:nth-child(3)').textContent='请核对医生/命理师给的完整链接';return}
+    renderSigned(ok);
+  }).catch(function(){showToast('加载失败')});
+}
+
+function renderSigned(list){
+  document.getElementById('report-view').style.display='block';
+  var html='';
+  list.forEach(function(d){
+    var r=d.report;
+    if(d.type==='rx'){
+      html+='<div class="meta-grid">'+
+        '<div class="meta-item"><div class="k">电子处方编号</div><div class="v">#'+r.id+'</div></div>'+
+        '<div class="meta-item"><div class="k">签名医师 · 时间</div><div class="v" style="font-size:12px">'+escapeHTML(r.signerName)+' · '+escapeHTML((r.signedAt||'').slice(0,16))+'</div></div>'+
+      '</div>';
+      if(r.diagnosis)html+='<div class="card"><div class="card-title">辨证诊断</div><div class="section">'+escapeHTML(r.diagnosis)+'</div></div>';
+      if(r.prescription)html+='<div class="card"><div class="card-title">处方</div><div class="section">'+escapeHTML(r.prescription)+'</div></div>';
+      if(r.items&&r.items.length)html+='<div class="card"><div class="card-title">药味明细</div><div class="section">'+r.items.map(function(it){return escapeHTML((it.name||'')+' '+(it.dose||''))}).join('\n')+'</div></div>';
+    }else{
+      var b=r.birth||{};
+      html+='<div class="meta-grid">'+
+        '<div class="meta-item"><div class="k">命理批注编号</div><div class="v">#'+r.id+'</div></div>'+
+        '<div class="meta-item"><div class="k">签名命理师 · 时间</div><div class="v" style="font-size:12px">'+escapeHTML(r.signerName)+' · '+escapeHTML((r.signedAt||'').slice(0,16))+'</div></div>'+
+      '</div>';
+      if(b.year)html+='<div class="card"><div class="card-title">生辰</div><div class="section">'+escapeHTML((b.name?b.name+' ':'')+b.year+'年'+b.month+'月'+b.day+'日 '+b.hour+'时 · '+(b.gender||''))+'</div></div>';
+      if(r.annotation)html+='<div class="card"><div class="card-title">命理师批注</div><div class="section">'+escapeHTML(r.annotation)+'</div></div>';
+      if(r.draft)html+='<div class="card"><div class="card-title">命理报告全文</div><div class="section">'+escapeHTML(r.draft)+'</div></div>';
+    }
+  });
+  document.getElementById('report-content').innerHTML=html;
 }
 
 function login(){

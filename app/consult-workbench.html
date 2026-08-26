@@ -232,8 +232,10 @@ textarea.tall{min-height:200px}
     <div class="prod">📋 电子病历(AI 草案 + 双轨互参)<span class="no" id="prodEmr">已留存</span></div>
     <div class="prod">🩺 电子处方<span class="no" id="prodRx">待签名</span></div>
     <div class="prod">☯ 命理批注<span class="no" id="prodMl">待签名</span></div>
+    <div class="prod">🔗 患者报告链接<span class="no" id="prodLink" style="font-size:11px;word-break:break-all">签名后生成</span></div>
     <div class="btn-row" style="margin-top:14px">
       <button class="btn primary" id="btnCopyPatient">📄 复制患者版报告(可发微信)</button>
+      <button class="btn accent" id="btnCopyLink">🔗 复制患者查看链接</button>
       <button class="btn" id="btnNext">➕ 下一位患者</button>
     </div>
     <div class="status-line" id="doneStatus"></div>
@@ -425,8 +427,29 @@ $('btnMlSign').addEventListener('click',function(){
 });
 
 /* ── 完成态 ── */
+function patientLink(){
+  var base=location.origin+location.pathname.replace(/[^\/]*$/,'')+'patient-report.html';
+  var q=[];
+  if(rxDone&&rxDone.viewCode){q.push('rx='+rxDone.id);q.push('rxcode='+rxDone.viewCode)}
+  if(mlDone&&mlDone.viewCode){q.push('ml='+mlDone.id);q.push('mlcode='+mlDone.viewCode)}
+  return q.length?base+'?'+q.join('&'):'';
+}
 function checkDone(){
-  if(rxDone||mlDone){$('doneArea').style.display='block';$('doneArea').scrollIntoView({behavior:'smooth'})}
+  if(rxDone||mlDone){
+    $('doneArea').style.display='block';
+    var lk=patientLink();
+    if(lk)$('prodLink').textContent='已生成,点下方按钮复制';
+    $('doneArea').scrollIntoView({behavior:'smooth'});
+  }
+}
+$('btnCopyLink').addEventListener('click',function(){
+  var lk=patientLink();
+  if(!lk){setSt('doneStatus','请先完成至少一个签名','err');return}
+  copyText(lk,function(){setSt('doneStatus','✅ 患者查看链接已复制(免登录,凭证码防窥探)','ok')});
+});
+function copyText(t,ok){
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok).catch(function(){fb()})}else fb();
+  function fb(){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){setSt('doneStatus','复制失败,请手动复制','err')}document.body.removeChild(ta)}
 }
 $('btnCopyPatient').addEventListener('click',function(){
   var clinic=localStorage.getItem('cw_clinic')||'命理宝鉴';
@@ -443,16 +466,16 @@ $('btnCopyPatient').addEventListener('click',function(){
   }
   if(mlDone)t+='\n批注编号:#'+mlDone.id+' 签名:'+mlDone.signer;
   t+='\n\n*本报告由 AI 辅助生成,经医师/命理师审核签名;命理内容属传统文化参考,不构成医疗建议。';
-  function ok(){setSt('doneStatus','✅ 患者版报告已复制,直接粘贴发送即可','ok')}
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok).catch(function(){fallback()})}else fallback();
-  function fallback(){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){setSt('doneStatus','复制失败,请手动选择文本','err')}document.body.removeChild(ta)}
+  var lk=patientLink();
+  if(lk)t+='\n\n🔗 正式签名报告(免登录查看):'+lk;
+  copyText(t,function(){setSt('doneStatus','✅ 患者版报告已复制,直接粘贴发送即可','ok')});
 });
 $('btnNext').addEventListener('click',function(){
   ['pName','pDialogue','wHr','wSpo2','wSbp','wDbp','docDiagnosis','docPrescription','mlAnnotation'].forEach(function(k){$(k).value='';localStorage.removeItem('cw_'+k)});
   ['pYear','pMonth','pDay','pHour'].forEach(function(k){$(k).value='';localStorage.removeItem('cw_'+k)});
   capturedFrame=null;$('camThumb').style.display='none';
   rxDone=null;mlDone=null;mlDraftId=null;lastResult=null;
-  $('rxState').innerHTML='';$('mlState').innerHTML='';$('prodRx').textContent='待签名';$('prodMl').textContent='待签名';
+  $('rxState').innerHTML='';$('mlState').innerHTML='';$('prodRx').textContent='待签名';$('prodMl').textContent='待签名';$('prodLink').textContent='签名后生成';
   $('doneArea').style.display='none';setSt('capStatus','','');setSt('rxStatus','','');setSt('mlStatus','','');setSt('fuseStatus','','');
   goStep(1);
 });
