@@ -196,6 +196,27 @@ if [ -f "$PROJECT_ROOT/scripts/no-cross-project-tag.py" ]; then
   fi
 fi
 
+# R120 生产代码禁止引用已归档的 knowledge/yidao.db（2026-08-26 修真）
+# 背景: kb_matcher.py / kb-matcher.py / kb-syndrome-infer.js 曾指向 knowledge/ 下
+# 0 字节残留文件，导致视觉管线 KB 支撑自 8/16 起静默返回空。
+# 规则: server/ 生产代码（.py/.js）不得出现 knowledge 目录的 yidao.db 引用；
+# 一次性历史脚本（scripts/ 内且已标注 R112-ARCHIVED-REF）豁免。
+STALE_DB_REFS=$(grep -rln "knowledge.{0,3}yidao" \
+  "$PROJECT_ROOT/server" \
+  --include="*.py" --include="*.js" 2>/dev/null | \
+  grep -v "kb-management-engine" || true)
+if [ -n "$STALE_DB_REFS" ]; then
+  ALERTS+=("R120 断链: 生产代码仍引用 knowledge/yidao.db → $(echo "$STALE_DB_REFS" | tr '\n' ' ')。权威库唯一路径是 server/database/yidao.db")
+fi
+
+# R120b knowledge/ 目录不得残留非占位 SQLite 库（防 0 字节残留被误当数据源）
+for _zero_db in "$PROJECT_ROOT"/knowledge/*.db; do
+  [ -e "$_zero_db" ] || continue
+  if [ -s "$_zero_db" ]; then
+    ALERTS+=("R120b 违规: knowledge/ 下存在非空 SQLite 库 $_zero_db（README 规定新库一律进 server/database/）")
+  fi
+done
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"

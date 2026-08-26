@@ -186,6 +186,21 @@ const QUICK_PHRASES = [
 let currentIntent = null;
 let recognizing = false, recognition = null;
 
+// ═══ 页面内轻量提示（替代原生 alert，R修真：alert 已 2 次复发，本次根除）═══
+function vpToast(msg, ms) {
+  let t = document.getElementById('vpToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'vpToast';
+    t.style.cssText = 'position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(20,20,20,.95);border:1px solid rgba(201,168,76,.35);color:#f0e8d8;font-size:13px;line-height:1.7;padding:12px 22px;border-radius:10px;z-index:99999;max-width:86%;text-align:center;opacity:0;transition:opacity .25s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.style.opacity = '0'; }, ms || 3000);
+}
+
 // ═══ 意图识别（本地规则，关键词命中数排序）═══
 function detectIntent(text) {
   if (!text || text.length < 2) return null;
@@ -259,7 +274,7 @@ function shake() {
 function toggleMic() {
   if (recognizing) { stopMic(); return; }
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { alert('此浏览器不支持语音，请用 Chrome/Edge 或直接打字'); return; }
+  if (!SR) { vpToast('此浏览器不支持语音，请用 Chrome/Edge 或直接打字'); return; }
   recognition = new SR();
   recognition.lang = 'zh-CN';
   recognition.interimResults = false;
@@ -272,7 +287,7 @@ function toggleMic() {
   recognition.onend = () => stopMic();
   recognition.onerror = (ev) => {
     stopMic();
-    if (ev.error === 'not-allowed') alert('麦克风权限被拒绝，请在浏览器设置中允许');
+    if (ev.error === 'not-allowed') vpToast('麦克风权限被拒绝，请在浏览器设置中允许');
   };
   try {
     recognition.start();

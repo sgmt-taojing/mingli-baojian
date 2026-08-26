@@ -135,7 +135,11 @@ def build_report(api_stats, kb_hits, fb, repair, days):
     else:
         lines.append(f"- 查询次数：{kb_hits['count']}")
         lines.append(f"- 有命中查询：{kb_hits['hit_queries']}")
-        lines.append(f"- 平均响应：{kb_hits['avg_rt_ms']}ms")
+        # R754: response_time 恒为 0 说明旧代码未测量（R754 已修复埋点，新数据生效后自动展示真实值）
+        if kb_hits["avg_rt_ms"] and kb_hits["avg_rt_ms"] > 0:
+            lines.append(f"- 平均响应：{kb_hits['avg_rt_ms']}ms")
+        else:
+            lines.append("- 平均响应：无测量数据（历史埋点恒 0，R754 修复后新查询生效）")
         if kb_hits["count"] > 0:
             rate = kb_hits["hit_queries"] / kb_hits["count"]
             lines.append(f"- 命中率：{rate*100:.1f}% {'✅ KB直答占比健康' if rate > 0.5 else '⚠️ 直答率偏低，建议扩充KB'}")

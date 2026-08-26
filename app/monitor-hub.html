@@ -35,6 +35,16 @@
     color: #fff;
   }
   .subtitle { color: var(--muted); margin-bottom: 20px; font-size: 12px; }
+  .last-update {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 12px;
+    font-weight: normal;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    background: var(--surface);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
   .controls {
     display: flex;
     gap: 10px;
@@ -157,8 +167,8 @@
 </head>
 <body>
 
-<h1>项目管理监控总览</h1>
-<p class="subtitle">所有项目运行状态一览 · 端口均已分配 · 红色=不可达 · 绿色=正常 · 黄色=超时</p>
+<h1>项目管理监控总览 <span class="last-update" id="lastCheckTime">--</span></h1>
+<p class="subtitle">所有项目运行状态一览 · 端口均已分配 · 红色=不可达 · 绿色=正常 · 黄色=超时 · 每 30 秒自动刷新</p>
 
 <div id="alertBanner" class="banner"></div>
 
@@ -363,6 +373,17 @@ document.getElementById("filterProject").addEventListener("change", render);
 
 // 首次加载自检
 runHealthCheck();
+
+// 更新时间戳（P1-9 修真 2026-08-26）
+function updateTimestamp() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const ts = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  const el = document.getElementById('lastCheckTime');
+  if (el) el.textContent = ts;
+}
+updateTimestamp();
+setInterval(updateTimestamp, 30000);
 </script>
 <script src="js/mobile-nav.js" defer></script>
 </body>

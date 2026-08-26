@@ -57,3 +57,23 @@ bash scripts/agent-selfcheck.sh   # 6/6：api/命理档案/排盘/人脸/KB/档�
 ### 边界红线
 - 命理知识只在本项目承载；对外输出默认脱敏（家庭可读话术），完整内容仅主动选用者可见
 - 出站分发经 outbound 过滤（trust≥0.7 + 命理黑名单医学侧 + 防回流 + 同名冲突消解保最新）
+
+## 训练目录约定
+
+- **训练入口**：`training/`（fuse-v8.sh / mlx_train_v8.yaml / mlx_train_v9.yaml / run-v8-direct.py 等）
+- **训练数据**：`training-data/`（sft-gold-cases / sft-general / sft-reasoning / preference / kb-collector-output / feedback-weekly）
+- **ChatML 产出**：`data/mingli_sft_{train,val,test}.json` + `data/mingli_dpo_{train,val}.json`（LLaMA-Factory 兼容）
+- **模型权重**：`models/`（微调后本地权重 + 量化版）
+- **KB 种子**：`knowledge/` 下的 jsonl 文件
+- **训练指标**：`training/reports/`（BaziQA 历次成绩 + 修真记录）
+- **禁止**：训练数据/产物写到本项目目录之外；不在 scripts/ 之外手改数据文件
+
+## 关键路径速查
+
+- **静态服务**：`server/static-gzip.py`（端口 8900）
+- **排盘 API**：`server/paipan-server.py`（端口 8911）
+- **AI 网关**：`server/api-server-v2.js`（端口 8920）
+- **前端入口**：`app/`（含 monitor-hub.html 监控总览 · 含 lastCheckTime 时间戳）
+- **训练入口**：`training/`（mlx_train_v8.yaml / v9）
+- **训练数据**：`training-data/`
+- **KB 种子**：`knowledge/`

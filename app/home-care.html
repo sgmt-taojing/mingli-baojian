@@ -505,7 +505,7 @@ window.emergencyCall = function(){
   if (isMobile) {
     location.href = 'tel:120';
   } else {
-    alert('已触发紧急呼救流程：\n\n请在手机上拨打 120\n或告知身边人员立即求助\n\n紧急联系人已在「紧急联系人」页配置:\nemergency-contacts.html');
+    addMsg('alert', '已触发紧急呼救流程：请在手机上拨打 120，或告知身边人员立即求助。紧急联系人已在「紧急联系人」页配置（emergency-contacts.html）');
   }
   try { localStorage.setItem('emergency_last_call', new Date().toISOString()); } catch(_) {}
 };
