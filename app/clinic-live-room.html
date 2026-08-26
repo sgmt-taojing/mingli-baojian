@@ -858,6 +858,11 @@ function aiProgStart(id){
 
 // ═══ P2.6: 西医检验旁证(报告解析 → 五行归经 → 中医佐证) ═══
 const WUXING_TXT = { '木':'肝胆(木)', '火':'心/血脉(火)', '土':'脾胃(土)', '金':'肺(金)', '水':'肾(水)' };
+function labPatient(){
+  const y = +($('bYear') && $('bYear').value);
+  return y ? { age: Math.max(1, new Date().getFullYear() - y), gender: $('bGender').value } : {};
+}
+try { Room.labHistory = JSON.parse(localStorage.getItem('ml.lab.history') || 'null'); } catch (_) {}
 function loadLabFile(inp){
   const f = inp.files && inp.files[0]; if (!f) return;
   const rd = new FileReader();
@@ -875,13 +880,15 @@ async function analyzeLab(){
   try {
     const resp = await fetch(API_MEDICAL + '/api/clinic/lab-evidence', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'x-csrf-token': _csrfToken },
-      body: JSON.stringify({ text }), signal: AbortSignal.timeout(15000)
+      body: JSON.stringify({ text, previous: Room.labHistory || undefined, patient: labPatient() }), signal: AbortSignal.timeout(15000)
     });
     const r = await resp.json();
     if (!r.ok) throw new Error(r.error || '解析失败');
     prog.finish(true, true);
     $('labProgSlot').innerHTML = '';
     Room.labResult = r;
+    Room.labHistory = { ts: new Date().toISOString().slice(0, 10), items: (r.indicators || []).map(i => ({ key: i.key, value: i.value })) };
+    try { localStorage.setItem('ml.lab.history', JSON.stringify(Room.labHistory)); } catch (_) {}
     renderLab(r);
     if ($('labInclude').checked) {
       if (Room.emr.reviewStatus === 'pending') {
@@ -900,19 +907,64 @@ async function analyzeLab(){
   }
 }
 function renderLab(r){
-  $('labState').textContent = '识别 ' + r.parsed + ' 项 · 异常 ' + r.abnormal_count + ' 项';
+  $('labState').textContent = '识别 ' + r.parsed + ' 项 · 异常 ' + r.abnormal_count + (r.critical_count ? ' · 🚨危急 ' + r.critical_count : '');
   let html = '';
-  (r.abnormals || []).forEach(a => {
-    const cls = a.status === 'high' ? '#f0b429' : '#5dade2';
-    html += '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed rgba(255,255,255,.06)">' +
-      '<span>' + esc(a.name) + '</span>' +
-      '<span style="color:' + cls + '">' + a.value + ' ' + esc(a.unit) + ' ' + (a.flag || '') + '</span></div>' +
-      '<div style="font-size:10px;color:var(--paper3);padding:2px 0 4px">→ ' + esc(a.tcm_evidence || '') + '</div>';
+  // 危急值红色横幅
+  (r.critical_alerts || []).forEach(c => {
+    html += '<div style="background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.45);border-radius:8px;padding:8px 10px;margin-bottom:6px;color:#ff6b5e">' +
+      '🚨 危急值 ' + esc(c.name) + ' ' + c.value + ' ' + esc(c.unit || '') + ' — 建议立即就医处理</div>';
   });
-  if (r.wuxing_focus && r.wuxing_focus.length) {
-    html += '<div style="color:#9f7aea;font-size:11px;margin:4px 0">异常聚集:' + r.wuxing_focus.map(w => WUXING_TXT[w] || w).join('、') + '</div>';
+  // 历史趋势
+  if (r.deltas && r.deltas.length) {
+    html += '<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--gold2);margin-bottom:3px">📈 较上次变化' + (r.deltas[0].prev_ts ? '（' + esc(r.deltas[0].prev_ts) + '）' : '') + '</div>';
+    r.deltas.forEach(d => {
+      const cls = d.improved ? 'var(--jade2)' : 'var(--cinn2)';
+      html += '<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0"><span>' + esc(d.name) + '</span>' +
+        '<span style="color:' + cls + '">' + d.prev + ' → ' + d.value + '（' + (d.delta > 0 ? '+' : '') + d.delta + '）' + (d.improved ? '改善' : '恶化') + '</span></div>';
+    });
+    html += '</div>';
   }
-  html += '<div style="color:var(--paper2);line-height:1.6;white-space:pre-wrap">' + esc(r.corroboration || '') + '</div>';
+  // 组合判读
+  (r.patterns || []).forEach(p => {
+    const border = p.level === 'warn' ? 'rgba(240,180,41,.4)' : 'rgba(93,173,226,.3)';
+    html += '<div style="border:1px solid ' + border + ';border-radius:8px;padding:7px 10px;margin-bottom:6px">' +
+      '<div style="color:' + (p.level === 'warn' ? '#f0b429' : '#5dade2') + ';font-size:12px">🧬 ' + esc(p.name) + '</div>' +
+      '<div style="font-size:11px;color:var(--paper2);margin-top:2px">' + esc(p.detail || '') + '</div>' +
+      (p.tcm ? '<div style="font-size:10px;color:#9f7aea;margin-top:2px">' + esc(p.tcm) + '</div>' : '') + '</div>';
+  });
+  // 衍生计算
+  if (r.derived && r.derived.length) {
+    html += '<div style="margin-bottom:8px"><div style="font-size:11px;color:var(--cyan2);margin-bottom:3px">🧮 衍生计算</div>';
+    r.derived.forEach(d => {
+      const cls = d.status === 'normal' ? 'var(--paper2)' : (d.status === 'high' ? '#f0b429' : '#5dade2');
+      html += '<div style="font-size:11px;padding:2px 0"><span style="color:' + cls + '">' + esc(d.name) + ' ' + d.value + ' ' + esc(d.unit || '') + '</span>' +
+        '<span style="color:var(--paper3)"> — ' + esc(d.note || '') + '</span></div>';
+    });
+    html += '</div>';
+  }
+  // 异常明细(按系统分组)
+  const groups = {};
+  (r.abnormals || []).forEach(a => { (groups[a.category] = groups[a.category] || []).push(a); });
+  Object.entries(groups).forEach(([cat, list]) => {
+    html += '<div style="font-size:11px;color:var(--gold2);margin:6px 0 2px">' + esc(cat) + '</div>';
+    list.forEach(a => {
+      const cls = a.critical ? '#ff6b5e' : (a.status === 'high' ? '#f0b429' : '#5dade2');
+      html += '<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,.06)">' +
+        '<span>' + esc(a.name) + '</span><span style="color:' + cls + '">' + a.value + ' ' + esc(a.unit) + ' ' + (a.flag || '') + (a.critical ? ' 🚨' : '') + '</span></div>' +
+        '<div style="font-size:10px;color:var(--paper3);padding:1px 0 3px">→ ' + esc(a.tcm_evidence || '') + (a.rec ? ' · 建议:' + esc(a.rec) : '') + '</div>';
+    });
+  });
+  // 五行聚集
+  if (r.wuxing_focus && r.wuxing_focus.length) {
+    html += '<div style="color:#9f7aea;font-size:11px;margin:6px 0 2px">异常聚集:' + r.wuxing_focus.map(w => WUXING_TXT[w] || w).join('、') + '</div>';
+  }
+  // 旁证结论 + 建议
+  html += '<div style="color:var(--paper2);line-height:1.6;white-space:pre-wrap;margin-top:4px">' + esc(r.corroboration || '') + '</div>';
+  if (r.recommendations && r.recommendations.length) {
+    html += '<div style="margin-top:6px;font-size:11px"><div style="color:var(--gold2);margin-bottom:2px">📋 复查/处置建议</div>';
+    r.recommendations.slice(0, 5).forEach(x => { html += '<div style="color:var(--paper2);padding:1px 0">· ' + esc(x) + '</div>'; });
+    html += '</div>';
+  }
   html += '<div style="font-size:10px;color:var(--paper3);margin-top:6px">' + esc(r.disclaimer || '') + '</div>';
   $('labBody').innerHTML = html;
 }
@@ -978,8 +1030,8 @@ function renderLiveAssess(r){
   });
   if (r.western_evidence) {
     const we = r.western_evidence;
-    html += '<div style="margin-top:5px;color:var(--cyan2)">🧪 检验旁证:识别' + we.parsed + '项/异常' + we.abnormal_count +
-      '项 · ' + esc((we.suggest_syndromes || []).slice(0, 3).join('、')) + '</div>';
+    html += '<div style="margin-top:5px;color:' + (we.critical_count ? '#ff6b5e' : 'var(--cyan2)') + '">🧪 检验旁证:识别' + we.parsed + '项/异常' + we.abnormal_count +
+      '项' + (we.critical_count ? '/🚨危急' + we.critical_count + '项' : '') + ' · ' + esc((we.suggest_syndromes || []).slice(0, 3).join('、')) + '</div>';
   }
   if (r.mingli && r.mingli.available) {
     (r.mingli.cross_insights || []).forEach(ci => {
