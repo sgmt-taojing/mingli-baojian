@@ -7,7 +7,7 @@
  * 2. 智能分析问答 - 针对排盘结果提问
  * 3. AI报告生成 - 生成完整命理报告
  * 
- * API: https://api.g2claw.com/v1/chat/completions
+ * API: 经 :8920 网关 /api/ai/public-chat 代理（本地 MLX 优先，密钥不出服务端）
  * 模型: auto
  */
 
@@ -33,10 +33,10 @@ async function callG2ClawAPI(messages, options) {
   let timeoutId = setTimeout(function() { controller.abort(); }, 30000);
 
   try {
-    const response = await fetch('/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
+    const AI_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
+    const response = await fetch(AI_BASE + '/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer b720753afe0845f5a7611a1b56b6d77c',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
