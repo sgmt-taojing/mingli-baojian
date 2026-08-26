@@ -100,7 +100,7 @@ SCAN_PATTERNS = [
             "app/js/agent-ui.js", "app/js/master-elder-inline.js",
             "app/js/yijing-oracle-inline.js", "app/js/im-inline.js",
             "app/js/test-parse-natural-inline.js", "app/js/kb-search-engine.js",
-            "app/js/divination-core.js", "app/js/yijing-qimen-inline.js",
+            "app/js/yijing-qimen-inline.js",
             "app/collab-diagnosis.html",  # R695 已审计：_esc() 29处
             "app/voice-consult.html",      # R697 已审计：动态拼接均 escapeHtml，tags 静态词表
         ],
