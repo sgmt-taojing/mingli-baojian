@@ -510,6 +510,119 @@ function initEngine(){
   App.engine.bindVoiceToKb();
 }
 
+/* ═══ R-COPILOT: 医生副驾驶 · 智能问诊追问 ═══ */
+App.copilot = { asked: [], timer: null, inflight: false, lastSig: '' };
+
+function askAiFollowup(latestText){
+  if(!App.copilot) return;
+  clearTimeout(App.copilot.timer);
+  App.copilot.timer = setTimeout(() => _copilotFetch(latestText), 800);
+}
+
+async function _copilotFetch(latestText){
+  if(App.copilot.inflight) return;
+  // 汇总当前对话全文作为上下文
+  const transcript = [...document.querySelectorAll('#transcript .final')].map(d => d.textContent.replace(/^•\s*/,'')).join('\n');
+  const sig = transcript.length + '|' + App.copilot.asked.length;
+  if(sig === App.copilot.lastSig) return; // 无新内容不重复请求
+  App.copilot.lastSig = sig;
+  App.copilot.inflight = true;
+  try {
+    const r = await fetch('http://127.0.0.1:8920/api/consult/copilot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Skip-Interceptor': '1' },
+      signal: AbortSignal.timeout(8000),
+      body: JSON.stringify({
+        transcript,
+        chiefComplaint: App.emr.complaint || '',
+        asked: App.copilot.asked
+      })
+    }).then(r => r.json());
+    const data = r && r.data ? r.data : r; // 兼容新壳/旧壳
+    if(data && data.ok !== false) renderCopilot(data);
+  } catch(e) {
+    console.warn('[copilot]', e && e.message);
+  } finally {
+    App.copilot.inflight = false;
+  }
+}
+
+function renderCopilot(data){
+  const box = $('aiFollowup');
+  if(!box) return;
+  const nq = data.nextQuestion;
+  const cov = data.coverage || { coveredCount: 0, total: 10, percent: 0, items: [] };
+  if(!nq){ box.style.display = 'none'; return; }
+  box.style.display = '';
+
+  // 覆盖度进度（十问 n/10 + 已覆盖维度标签）
+  const covered = (cov.items || []).filter(i => i.covered).map(i => i.label);
+  const missed = (cov.items || []).filter(i => !i.covered).map(i => i.label);
+  $('aiFollowupProg').textContent = `十问 ${cov.coveredCount}/${cov.total}`;
+  $('aiFollowupProg').title = '已覆盖: ' + (covered.join('、') || '无') + '\n未覆盖: ' + (missed.join('、') || '无');
+
+  // 主追问 + 备选
+  let html = '<div style="margin-bottom:4px"><span style="color:#9b59b6">▶</span> <b style="color:#e8dfc8">' + escapeHtml(nq.text) + '</b></div>';
+  html += '<div style="font-size:10px;color:#8a7f66;margin-bottom:6px">' + escapeHtml(nq.dimension || '') + (nq.reason ? ' · ' + escapeHtml(nq.reason) : '') + '</div>';
+  if(data.alternatives && data.alternatives.length){
+    html += '<div style="font-size:11px;color:#9b93a8;border-top:1px dashed rgba(139,92,246,.15);padding-top:5px;margin-top:2px">备选：';
+    data.alternatives.forEach((a, i) => {
+      html += '<span class="cp-alt" data-i="' + i + '" style="cursor:pointer;color:#b8a6e8;text-decoration:underline dotted;margin-right:8px">' + escapeHtml(a.text.slice(0, 22)) + (a.text.length > 22 ? '…' : '') + '</span>';
+    });
+    html += '</div>';
+  }
+  $('aiFollowupText').innerHTML = html;
+
+  // 快捷回答选项（患者答法，点选回填转写+病历）
+  const opts = $('aiFollowupOpts');
+  opts.innerHTML = '';
+  (nq.quickReplies || []).forEach(reply => {
+    const chip = document.createElement('span');
+    chip.style.cssText = 'cursor:pointer;font-size:11px;padding:3px 10px;border-radius:12px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:#c9bce8';
+    chip.textContent = reply;
+    chip.onclick = () => copilotAnswer(nq.text, reply);
+    opts.appendChild(chip);
+  });
+  // 「已问过」按钮
+  const done = document.createElement('span');
+  done.style.cssText = 'cursor:pointer;font-size:11px;padding:3px 10px;border-radius:12px;background:rgba(80,80,80,.2);border:1px solid rgba(128,128,128,.3);color:#8a8a8a';
+  done.textContent = '✓ 已问过';
+  done.onclick = () => copilotMarkAsked(nq.text);
+  opts.appendChild(done);
+
+  // 备选点击 → 提升为主问
+  box.querySelectorAll('.cp-alt').forEach(el => {
+    el.onclick = () => {
+      const a = data.alternatives[+el.dataset.i];
+      if(!a) return;
+      App.copilot.asked.push(nq.text);
+      renderCopilot({ ...data, nextQuestion: a, alternatives: [nq, ...data.alternatives.filter(x => x !== a)] });
+    };
+  });
+}
+
+// 点选快捷回答：回填转写 + 病历 + 标记该问已答
+function copilotAnswer(qText, reply){
+  App.copilot.asked.push(qText);
+  const el = $('transcript');
+  const empty = el.querySelector('.empty'); if(empty) empty.remove();
+  const div = document.createElement('div');
+  div.className = 'final';
+  div.style.color = '#9b59b6';
+  div.textContent = '答: ' + reply;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  appendEmr('complaint', reply);
+  toast('已回填: ' + reply);
+  _copilotFetch();
+}
+
+// 标记已问过（患者口头已答，无需回填）
+function copilotMarkAsked(qText){
+  App.copilot.asked.push(qText);
+  _copilotFetch();
+}
+
 // HTML 转义
 function escapeHtml(s){
   return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
