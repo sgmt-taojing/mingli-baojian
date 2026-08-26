@@ -138,6 +138,7 @@ function renderSigned(list){
       '</div>';
       if(b.year)html+='<div class="card"><div class="card-title">生辰</div><div class="section">'+escapeHTML((b.name?b.name+' ':'')+b.year+'年'+b.month+'月'+b.day+'日 '+b.hour+'时 · '+(b.gender||''))+'</div></div>';
       if(r.annotation)html+='<div class="card"><div class="card-title">命理师批注</div><div class="section">'+escapeHTML(r.annotation)+'</div></div>';
+      if(r.labEvidence)html+='<div class="card"><div class="card-title">🧪 西医检验旁证（三方证据）</div><div class="section" style="white-space:pre-wrap;font-size:13px">'+escapeHTML(r.labEvidence)+'</div></div>';
       if(r.draft)html+='<div class="card"><div class="card-title">命理报告全文</div><div class="section">'+escapeHTML(r.draft)+'</div></div>';
     }
   });

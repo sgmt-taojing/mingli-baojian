@@ -125,6 +125,7 @@ textarea.tall{min-height:180px}
         </div>
         <div class="fld-label">AI 命理草案(只读参考)</div>
         <textarea class="tall" id="mlDraft" readonly style="opacity:.75" placeholder="点击「生成 AI 命理草案」"></textarea>
+        <div id="mlCross" style="display:none;font-size:11px;line-height:1.7;background:rgba(155,89,182,.08);border:1px solid rgba(155,89,182,.3);border-radius:6px;padding:6px 8px;margin-bottom:6px;white-space:pre-wrap"></div>
         <div class="fld-label">命理师批注(签名时生效)</div>
         <textarea id="mlAnnotation" placeholder="命理师专业补充:格局要点、与主诉互参、调候建议……"></textarea>
         <div class="btn-row">
@@ -142,6 +143,7 @@ textarea.tall{min-height:180px}
 
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var API_MINGLI=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8911':'';
 var $=function(id){return document.getElementById(id)};
 var token='',csrfToken='',roles=[],queue=[],curCase=null,mlDraftId=null;
 
@@ -236,15 +238,54 @@ $('btnMlDraft').addEventListener('click',function(){
   fetch(API+'/api/clinic/mingli/draft',{method:'POST',headers:hdr(),
     body:JSON.stringify({caseId:curCase.id,year:y,month:m,day:d,
       hour:($('bHour').value!==''?parseInt($('bHour').value):12),
-      gender:$('bGender').value,name:curCase.patientName})})
+      gender:$('bGender').value,name:curCase.patientName,labEvidence:curCase.labEvidence||''})})
   .then(function(r){return r.json()}).then(function(res){
     $('btnMlDraft').disabled=false;
     if(!res.ok){setSt('mlStatus','生成失败:'+(res.error||res.message||''),'err');return}
     mlDraftId=res.id;
     $('mlDraft').value=res.draft||'(空)';
     setSt('mlStatus','✅ 草案 #'+res.id+' 已生成,请审阅后批注签名','ok');
+    renderMlCross(y,m,d,($('bHour').value!==''?parseInt($('bHour').value):12));
   }).catch(function(e){$('btnMlDraft').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
 });
+
+// ── P2.8: 检验×命理互参(五行脏腑异常聚集 × 命盘旺衰) ──
+var ML_WX={'木':'肝胆(木)','火':'心/血脉(火)','土':'脾胃(土)','金':'肺(金)','水':'肾(水)'};
+function parseLabWuxing(text){
+  var tally={},re=/([木火土金水])\) ?(\d+)项/g,mm;
+  while((mm=re.exec(text||''))!==null){tally[mm[1]]=parseInt(mm[2])}
+  return tally;
+}
+function renderMlCross(y,m,d,h){
+  var box=$('mlCross');
+  var labTally=parseLabWuxing(curCase&&curCase.labEvidence);
+  if(!Object.keys(labTally).length||!API_MINGLI){box.style.display='none';return}
+  fetch(API_MINGLI+'/paipan?year='+y+'&month='+m+'&day='+d+'&hour='+h+'&module=bazi',{signal:AbortSignal.timeout(12000)})
+  .then(function(r){return r.json()}).then(function(p){
+    if(p.error)throw new Error(p.error);
+    var wMap={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
+    var zMap={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
+    var wx={};
+    Object.values(p.pillars||{}).forEach(function(pz){
+      if(wMap[pz[0]])wx[wMap[pz[0]]]=(wx[wMap[pz[0]]]||0)+1;
+      if(zMap[pz[1]])wx[zMap[pz[1]]]=(wx[zMap[pz[1]]]||0)+1;
+    });
+    var sorted=Object.keys(wx).map(function(k){return [k,wx[k]]}).sort(function(a,b){return b[1]-a[1]});
+    if(!sorted.length)return;
+    var strongest=sorted[0],lines=[];
+    Object.keys(labTally).forEach(function(w){
+      var n=labTally[w];
+      if(w===strongest[0])lines.push('⚠ 同向叠加: 检验聚集'+ML_WX[w]+'('+n+'项) × 命盘'+w+'最旺('+strongest[1]+') → 过旺为患,印证当前主要矛盾');
+      else if(wx[w]===undefined||wx[w]<=sorted[sorted.length-1][1])lines.push('⚑ 后天补位: 检验聚集'+ML_WX[w]+'('+n+'项) × 命盘'+w+'偏弱('+(wx[w]||0)+') → 先天弱项后天显症,宜重点调养');
+    });
+    if(!lines.length)lines.push('检验异常聚集与命盘旺衰不同向,互为补充,作综合调养参考');
+    box.innerHTML='<b style="color:#9b59b6">☯ 检验×命理互参(供批注参考)</b>\n'+esc(lines.join('\n'));
+    box.style.display='block';
+    if(!$('mlAnnotation').value.trim()){
+      $('mlAnnotation').value='【检验×命理互参】\n'+lines.join('\n')+'\n(以上为 AI 互参提示,请命理师审订后签名)';
+    }
+  }).catch(function(){box.style.display='none'});
+}
 
 // ── 命理师:签名 ──
 $('btnMlSign').addEventListener('click',function(){

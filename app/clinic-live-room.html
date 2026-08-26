@@ -1147,7 +1147,7 @@ async function toSignature(){
     if (y && m && d) {
       const r2 = await fetch(API_MEDICAL + '/api/clinic/mingli/draft', {
         method: 'POST', headers: hdr,
-        body: JSON.stringify({ caseId: Room.caseId || null, year: y, month: m, day: d, hour: h || 12, gender: $('bGender').value })
+        body: JSON.stringify({ caseId: Room.caseId || null, year: y, month: m, day: d, hour: h || 12, gender: $('bGender').value, labEvidence: labSignText() })
       }).then(r=>r.json());
       out.push(r2.ok ? '命理草案 #' + r2.id : '命理草案失败:' + (r2.error || r2.message || ''));
     }

@@ -1,5 +1,6 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+> 主会话: 2026-08-26 21:00 CST（**P2.8 检验×命理互参闭环**: mingli_annotation 加 lab_evidence 列, mingli/draft 接收存储, ml 公开报告带旁证; live-room toSignature 命理草案也附 labSignText(); review-studio 命理轨新增互参提示盒——从旁证文本解析五行聚集, 实时调排盘算命盘旺衰, 双维度交叉: 同向叠加(检验聚集×命盘最旺→印证主要矛盾)/后天补位(检验聚集×命盘偏弱→先天弱项后天显症)/不同向(综合调养参考), 互参提示自动预填批注框(命理师审订后签名); patient-report 命理报告展示旁证卡; 实测 case#18 土缺×检验聚集脾胃(土)→后天补位提示正确, ml 草案#6 签名报告带旁证）
 > 主会话: 2026-08-26 20:35 CST（**P2.7 检验旁证入签名链**: e_prescription/medical_cases 加 lab_evidence 加密列(幂等迁移, 修复误插 SQL 模板内的启动 bug); emr-session 白名单+emr-archive 新建/幂等更新均透传; review-queue 携带 labEvidence; live-room labSignText()(旁证结论+危急值+组合判读+衍生异常+逐项映射+复查建议+免责)随 toSignature 入处方草案; review-studio 病例卡一屏展示三方证据(四诊/命理/检验)且签名时自动带入; patient-report 公开报告展示旁证卡; 修复 sanitizeXSS 双重转义; 端到端实测(归档 case#18→队列可见→草案#7 测试医师签名→公开报告带旁证)）
 > 历史: 2026-08-26 20:30 CST（心跳：health-check 20:30 实探 exit 0 + 6 服务直探全绿（8900/8901/8911/8912/8913/8920 均 200）+ 8960=v9.0-7b 监听正常（/v1/models 200）；无新蒸馏入库（kb_formal=60,554 与 16:30 一致，99 条 tcm-agent-forward 已在 16:30 入账，staging pending 0，今日无 distill-*.py 新执行）；#5/#6 完结不变；v9.3 阈值触发制不变）
 
