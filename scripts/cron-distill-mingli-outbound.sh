@@ -22,6 +22,8 @@ def safe_str(v):
     return str(v)
 # R735-g8 修真：静态白名单 → 动态全量导出（源头新模块自动纳入次日同步）
 # 旧白名单仅 28 模块漏 96 模块；现 SQL NOT IN 排除内部模块，其余 formal 全量导出
+# R747 修真（2026-08-26）：出站改纯命理——tcm-agent 是医学知识唯一源头，
+# 命理宝鉴不再出口医学知识（断 tcm→mingli→tcm-aux 回流环路）
 EXCLUDE_MODULES = ('engine_compare', 'ai-prompt', 'mingli-cross-moved')
 EXPORT = "training-data/distill-outbound/mingli-pure-${DATE}.json"
 conn = sqlite3.connect("server/database/yidao.db")
@@ -29,7 +31,11 @@ conn.row_factory = sqlite3.Row
 ph = ','.join(['?'] * len(EXCLUDE_MODULES))
 rows = conn.execute(
     f"SELECT entry_id, module, title, content, keywords, trust_score FROM kb_formal "
-    f"WHERE status='formal' AND module NOT IN ({ph})", EXCLUDE_MODULES).fetchall()
+    f"WHERE status='formal' AND module NOT IN ({ph}) "
+    f"AND module NOT LIKE '%tcm%' AND module NOT LIKE '%shanghan%' AND module NOT LIKE '%nihaisha%' "
+    f"AND module NOT LIKE '%acupuncture%' AND module NOT LIKE '%shuhan%' AND module NOT LIKE '%shuihan%' "
+    f"AND module NOT LIKE '%jinkui%' AND module NOT LIKE '%wangzhen%' AND module NOT LIKE '%herb%' "
+    f"AND module NOT LIKE '%fangji%'", EXCLUDE_MODULES).fetchall()
 entries = []
 for r in rows:
     entries.append({
@@ -79,7 +85,9 @@ rows = conn.execute(
     f"SELECT entry_id, module, title, content, keywords, trust_score, status FROM kb_formal "
     f"WHERE status IN ({ph_s}) AND module NOT IN ({ph_m}) "
     f"AND module NOT LIKE '%tcm%' AND module NOT LIKE '%shanghan%' AND module NOT LIKE '%nihaisha%' "
-    f"AND module NOT LIKE '%acupuncture%' AND module NOT LIKE '%shuhan%' AND module NOT LIKE '%shuihan%'",
+    f"AND module NOT LIKE '%acupuncture%' AND module NOT LIKE '%shuhan%' AND module NOT LIKE '%shuihan%' "
+    f"AND module NOT LIKE '%jinkui%' AND module NOT LIKE '%wangzhen%' AND module NOT LIKE '%herb%' "
+    f"AND module NOT LIKE '%fangji%'",
     STATUSES + EXCLUDE_MODULES).fetchall()
 entries = []
 for r in rows:
