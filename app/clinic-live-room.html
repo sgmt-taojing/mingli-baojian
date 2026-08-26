@@ -241,6 +241,7 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
             <input type="number" id="bMonth" placeholder="月" min="1" max="12" value="6">
             <input type="number" id="bDay" placeholder="日" min="1" max="31" value="15">
             <input type="number" id="bHour" placeholder="时(0-23)" min="0" max="23" value="10">
+            <select id="bGender" style="width:58px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--paper)"><option>男</option><option>女</option></select>
           </div>
           <div style="display:flex;gap:6px;margin-bottom:10px">
             <button class="btn sm violet" onclick="runMingliAgent()">排盘分析</button>
@@ -250,6 +251,17 @@ body{background:var(--bg);color:var(--paper2);font-family:'Noto Serif SC',serif;
             <div class="placeholder">填出生信息后排盘，五行分析与体质倾向自动汇入病历</div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 实时研判(自动) -->
+    <div class="panel">
+      <div class="panel-head">
+        ⚡ 实时研判（随对话/采帧自动出具初步结果）
+        <span style="font-size:10px;color:var(--paper3)" id="laTime">待启动</span>
+      </div>
+      <div class="panel-body" id="laBody" style="font-size:12px">
+        <div class="placeholder">旁听与采帧进行中,AI 自动滚动出具初步结果（零操作,不打断交流）</div>
       </div>
     </div>
 
@@ -388,6 +400,8 @@ async function snapNow(){
     canvas.width = 480; canvas.height = 360;  // 降采样，减少传输
     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+    Room.lastFrame = dataUrl;                 // P2.5: 实时研判随发最新帧
+    Room.frameSeq = (Room.frameSeq || 0) + 1;
     const base64 = dataUrl.split(',')[1];
 
     // 舌诊 + 面诊并行（8913）
@@ -432,6 +446,7 @@ async function snapNow(){
     renderFrameChips(['采帧分析失败（不影响交流）']);
   } finally {
     _snapBusy = false;
+    scheduleLiveAssess();   // P2.5: 新望诊特征也驱动自动研判
   }
 }
 function renderFrameChips(chips){
@@ -519,6 +534,7 @@ function onFinalTranscript(text){
     runMedicalAgent(text);
   }
   emrSyncThrottled();
+  scheduleLiveAssess();   // P2.5: 对话静默 6s 后自动研判
 }
 function clearTranscript(){
   Room.transcriptLines = [];
@@ -773,6 +789,82 @@ function showVersionHistory(){
     .catch(() => toast('版本历史获取失败'));
 }
 
+// ═══ P2.5: 实时自动研判环(零操作, 对话/采帧驱动) ═══
+let _laTimer = null, _laLastAt = 0, _laLastLen = 0, _laBusy = false, _laLastFrameSent = 0;
+function scheduleLiveAssess(){
+  const len = (Room.emr.voiceLog || '').length + (Room.emr.examination || '').length;
+  if (len - _laLastLen < 8) return;              // 新内容不足不打扰
+  clearTimeout(_laTimer);
+  _laTimer = setTimeout(liveAssess, 6000);       // 静默 6s 触发
+}
+async function liveAssess(){
+  if (_laBusy) return;
+  const now = Date.now();
+  if (now - _laLastAt < 20000) {                 // 最小间隔 20s 防抖动
+    clearTimeout(_laTimer);
+    _laTimer = setTimeout(liveAssess, 20000 - (now - _laLastAt));
+    return;
+  }
+  const dialogue = Room.emr.voiceLog || Room.emr.complaint || '';
+  if (!dialogue && !Room.lastFrame) return;
+  _laBusy = true; _laLastAt = Date.now();
+  const y = +$('bYear').value, m = +$('bMonth').value, d = +$('bDay').value;
+  const body = { scene_type: 'clinic', dialogue: dialogue + '\n' + (Room.emr.examination || '') };
+  if (y && m && d) body.birth = { year: y, month: m, day: d, hour: (+$('bHour').value) || 12, gender: $('bGender').value };
+  if (Room.lastFrame && Room.frameSeq !== _laLastFrameSent) {
+    body.faceImage = Room.lastFrame;             // 仅新帧随发, 省带宽
+    _laLastFrameSent = Room.frameSeq;
+  }
+  $('laTime').textContent = '研判中…';
+  try {
+    const resp = await fetch(API_MEDICAL + '/api/doctor/multi-modal-assess', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-csrf-token': _csrfToken },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(25000)
+    });
+    const r = await resp.json();
+    if (!r.ok) throw new Error(r.error || 'assess failed');
+    _laLastLen = (Room.emr.voiceLog || '').length + (Room.emr.examination || '').length;
+    Room.aiDraft = r;
+    renderLiveAssess(r);
+  } catch (e) {
+    $('laTime').textContent = '本轮失败, 下轮自动重试';
+  } finally {
+    _laBusy = false;
+  }
+}
+function renderLiveAssess(r){
+  $('laTime').textContent = '更新于 ' + new Date().toLocaleTimeString();
+  const lv = r.risk_level || 'low';
+  const lvTxt = { low: '低风险', mid: '中风险', high: '高风险', critical: '危急' }[lv] || lv;
+  const lvCls = lv === 'low' ? 'approved' : lv === 'mid' ? 'modified' : 'rejected';
+  let html = '<div style="margin-bottom:6px"><span class="emr-status ' + lvCls + '">' + lvTxt + '</span></div>';
+  if (r.tcm_specific && r.tcm_specific.comprehensive) {
+    html += '<div style="color:#7fd4a8;margin-bottom:4px">证候方向:' + esc(r.tcm_specific.comprehensive) + '</div>';
+  }
+  (r.sections && r.sections.vital_alerts || []).forEach(a => {
+    html += '<div style="color:#f0b429">⚠ ' + esc(a.desc) + '</div>';
+  });
+  if (r.mingli && r.mingli.available) {
+    (r.mingli.cross_insights || []).forEach(ci => {
+      html += '<div style="color:#9f7aea;margin-top:3px">互参 · ' + esc(ci.insight || '') + '</div>';
+    });
+  }
+  if (r.missing && r.missing.length) {
+    html += '<div style="color:var(--paper3);margin-top:4px;font-size:11px">待补采集:' + esc(r.missing.join('、')) + '</div>';
+  }
+  $('laBody').innerHTML = html;
+  // AI 实时辨证同步 EMR(不覆盖医生已确认的复核结论)
+  if (Room.emr.reviewStatus === 'pending' && r.tcm_specific && r.tcm_specific.comprehensive
+      && r.tcm_specific.comprehensive.indexOf('不足以') < 0) {
+    Room.emr.syndrome = r.tcm_specific.comprehensive + '(AI 实时,待医生确认)';
+    setEmrField('fSyndrome', Room.emr.syndrome);
+  }
+  if (r.mingli && r.mingli.available && r.mingli.mingli_report && !Room.emr.mingli) {
+    Room.emr.mingli = r.mingli.mingli_report;
+    setEmrField('fMingli', Room.emr.mingli);
+  }
+}
+
 // ═══ P2: AI 汇总草案(实时环 → 一脑双轨定稿) ═══
 let _csrfToken = '';
 fetch(API_MEDICAL + '/api/csrf-token').then(r=>r.json()).then(d=>{ _csrfToken = d.csrfToken || ''; }).catch(()=>{});
@@ -782,7 +874,7 @@ async function aiSummarize(){
   if (!dialogue && !Room.emr.examination) { toast('先开旁听/采帧, 有原料再汇总'); return; }
   const y = +$('bYear').value, m = +$('bMonth').value, d = +$('bDay').value, h = +$('bHour').value;
   const body = { scene_type: 'clinic', dialogue: dialogue + '\n' + (Room.emr.examination||'') };
-  if (y && m && d) body.birth = { year: y, month: m, day: d, hour: h || 12, gender: '男' };
+  if (y && m && d) body.birth = { year: y, month: m, day: d, hour: h || 12, gender: $('bGender').value };
   $('aiSumBtn').disabled = true;
   $('aiDraftBox').style.display = 'block';
   $('aiDraftBox').innerHTML = '⏳ AI 汇总中(双轨融合+互参)…';
@@ -847,7 +939,7 @@ async function toSignature(){
     if (y && m && d) {
       const r2 = await fetch(API_MEDICAL + '/api/clinic/mingli/draft', {
         method: 'POST', headers: hdr,
-        body: JSON.stringify({ caseId: Room.caseId || null, year: y, month: m, day: d, hour: h || 12, gender: '男' })
+        body: JSON.stringify({ caseId: Room.caseId || null, year: y, month: m, day: d, hour: h || 12, gender: $('bGender').value })
       }).then(r=>r.json());
       out.push(r2.ok ? '命理草案 #' + r2.id : '命理草案失败:' + (r2.error || r2.message || ''));
     }

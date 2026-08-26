@@ -1,6 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+> 主会话: 2026-08-26 19:45 CST（**P2.5 实时自动研判环**: live-room 从手动按钮升级为零操作自动环——对话静默 6s 且间隔 ≥20s 自动打双轨融合, 新望诊帧随发; 常驻实时研判面板(风险徽标/证候方向/命理互参/待补项)滚动更新并同步 EMR 辨证(不覆盖医生复核); 生辰补性别; 浏览器实测两轮自动刷新(19:35:12→19:35:51, 互参随新句纳入舌红)）
 > 主会话: 2026-08-26 19:35 CST（**P2 实时问诊环+医学规范流转**: live-room 实时环(旁听转写/旁路采帧/KB实时比对)接通新签名链——AI 汇总草案(双轨融合)+一键转双师签名(处方/命理草案落库); 处方 dispense/archive 流转端点, review-studio 签名后可直接调剂/归档; 患者报告页显示流转状态; 摘除 error-interceptor(实时环与患者页登录被其静默破坏的存量 bug); 全链路浏览器实测(草案#5/处方#6 signed→dispensed)）
+> 历史: 2026-08-26 19:30 CST（心跳：health-check 19:30 实探 exit 0 + 6 服务直探全绿（8900/8901/8911/8912/8913/8920 均 200）+ 8960=v9.0-7b 监听正常 + 8941/8944 面相掌纹 svc health 200；无新蒸馏入库（kb_formal=60,554 sqlite 直查与 16:30 一致，staging pending 0，今日无 distill-*.py 新执行）；#5/#6 完结不变；v9.3 阈值触发制不变）
 > 主会话: 2026-08-26 19:11 CST（**僵尸 cron 二次清剿**：`baziqa-v92-t512-评估监控` 复活副本 56836464 仍在每小时空跑（17:45 退役的是 d7284f68，本只 ~18:12 复活/重建）——本轮实探四项全部早已完成：①/tmp/baziqa-v92-eval.log 不存在 + pgrep=0 + 8962 无监听 ✓ ②v9.2 结果 3/488=0.6% 早已十轮复核闭环、生产锚定 v9.0=53.9% ✓ ③fused-archive 源已清 + v9.1-7b 4.0G 已完整归档 data1 且无生产引用 ✓ ④memory/08-19 已记录 ✓；**本 cron 已真正 remove**（gateway 确认 ok）；#5/#6 完结不变，v9.3 阈值触发制不变）
 > 主会话: 2026-08-26 19:15 CST（**P1-6 患者报告闭环**: 公开端点 /api/public/signed-report(rx/ml, viewCode 防枚举+姓名脱敏+仅签名产物); patient-report.html 加免登录签名报告模式, 修 localStem 致命笔误+divination-hub.css 吃掉 .section 显示; 工作台签名后自动生成患者查看链接一键复制; server 清理 pyc 误提交; 全链路浏览器实测(正确码可见/错误码兜底)）
 > 主会话: 2026-08-26 18:55 CST（**P1 问诊台核心链路落地**: 双轨融合(诊疗+命理互参)进 multi-modal-assess; e_prescription/mingli_annotation 两表+六端点签名链路; consult-workbench 重构为一屏三步闭环(采集→AI双轨草案→双师签名→患者报告), SaaS 多诊所 ?clinic= 即配即用; review-studio 双师同页审核台; 修 cors 放行 x-csrf-token、review-queue 密文解密; 全链路浏览器实测通过(处方#3/批注#3)）
