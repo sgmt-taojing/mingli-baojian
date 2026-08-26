@@ -68,9 +68,46 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 .zw-form input,.zw-form select{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
 .zw-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
 
+/* ═══ P3 专业正形交互盘 ═══ */
+.zw-grid.pro{grid-template-columns:repeat(4,1fr);max-width:960px;gap:3px}
+.zw-gong.pro{min-height:148px;cursor:pointer;transition:box-shadow .15s,border-color .15s,opacity .15s;display:flex;flex-direction:column}
+.zw-gong.pro:hover{border-color:var(--gold)}
+.zw-gong.pro.dx-now{box-shadow:inset 0 0 0 1px rgba(99,179,237,.5)}
+.zw-gong.pro.ln-now{box-shadow:inset 0 0 0 1px rgba(239,68,68,.45)}
+.zw-gong.pro.dx-now.ln-now{box-shadow:inset 0 0 0 1px rgba(99,179,237,.5),inset 0 0 0 2px rgba(239,68,68,.3)}
+.zw-gong.pro.sf-on{border-color:var(--gold);background:rgba(201,168,76,.07);box-shadow:0 0 0 1px rgba(201,168,76,.35)}
+.zw-gong.pro.sf-off{opacity:.38}
+.zw-gong-head{display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.zw-gong-dx{margin-left:auto;font-size:8px;color:var(--blue)}
+.zw-gong-ln{font-size:8px;color:var(--red);padding:0 3px;border:1px solid rgba(239,68,68,.4);border-radius:2px}
+.zw-star i{font-style:normal;font-size:7px;vertical-align:super;margin-left:1px}
+.zw-star .zb.b-miao{color:#ffd700}.zw-star .zb.b-wang{color:#7fd4a8}.zw-star .zb.b-de{color:#5dade2}
+.zw-star .zb.b-li{color:#b794f6}.zw-star .zb.b-ping{color:#b8a88a}.zw-star .zb.b-bu{color:#e67e22}.zw-star .zb.b-xian{color:#ef4444}
+.zw-star .zs{font-size:7px;padding:0 2px;border-radius:2px;vertical-align:super}
+.zw-star .zs-禄{color:#10b981;border:1px solid rgba(16,185,129,.5)}
+.zw-star .zs-权{color:#c9a84c;border:1px solid rgba(201,168,76,.5)}
+.zw-star .zs-科{color:#63b3ed;border:1px solid rgba(99,179,237,.5)}
+.zw-star .zs-忌{color:#ef4444;border:1px solid rgba(239,68,68,.5)}
+.zw-gong-kong{font-size:8px;color:var(--paper3);font-style:italic}
+.zw-gong-foot{margin-top:auto;font-size:8px;color:var(--paper3);display:flex;justify-content:space-between;border-top:1px dashed rgba(255,255,255,.07);padding-top:2px}
+.zw-center{background:rgba(201,168,76,.04);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:11px;color:var(--paper2);line-height:1.9;overflow-y:auto}
+.zw-center .zc-t{color:var(--gold);font-size:13px;font-weight:600;letter-spacing:2px;text-align:center}
+.zw-layer{display:flex;gap:4px;justify-content:center;margin:6px 0;flex-wrap:wrap}
+.zw-layer button{font-size:10px;padding:3px 10px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--paper3);cursor:pointer}
+.zw-layer button.on{background:rgba(201,168,76,.15);color:var(--gold);border-color:var(--gold)}
+.zw-sh-legend{font-size:10px;text-align:center}
+.zw-sh-legend b{font-weight:600}
+.zw-b-legend{font-size:8px;color:var(--paper3);text-align:center;margin-top:4px}
+#zw-detail{max-width:960px;margin:8px auto 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--paper2);display:none}
+#zw-detail.on{display:block}
+#zw-detail .zd-t{color:var(--gold);font-weight:600;margin-bottom:6px}
+#zw-detail .zd-pal{margin-bottom:8px;line-height:1.7}
+#zw-detail .zd-pal b{color:var(--paper)}
 @media(max-width:768px){
-  .zw-grid{grid-template-columns:repeat(3,1fr);gap:3px}
+  .zw-grid:not(.pro){grid-template-columns:repeat(3,1fr);gap:3px}
+  .zw-grid.pro{gap:2px}
   .zw-gong{min-height:90px;padding:5px}
+  .zw-gong.pro{min-height:120px;padding:4px}
   .zw-gong-name{font-size:10px}
   .zw-star{font-size:8px}
   .zw-daxian-list{grid-template-columns:repeat(4,1fr)}
@@ -152,12 +189,12 @@ async function generateFullReport(mod){
     inputs.leapMonth = document.getElementById('zw-leap')?.checked || false;
   if(inputs.leapMonth===undefined) inputs.leapMonth = false;
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify({
         ...inputs,
         questions: [inputs.question||''].filter(Boolean),
@@ -206,8 +243,8 @@ async function doPaipan(){
   let rJson, rSvg;
   try {
     [rJson, rSvg] = await Promise.all([
-      fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload)}),
-      fetch(API_BASE+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload)})
+      fetch(API_BASE+'/api/paipan/ziwei',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload)}),
+      fetch(API_BASE+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload)})
     ]);
   } catch(e) {
     showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
@@ -234,6 +271,8 @@ function renderSvg(svg){
 }
 
 function renderFlow(flow, targetYear, currentAge){
+  window._zwFlow = flow || {};
+  buildPro();
   const old = document.getElementById('zw-flow-host');
   if(old) old.remove();
   if(!flow) return;
@@ -278,70 +317,171 @@ function switchZwCal(mode){
   event.target.style.color='var(--gold)';
 }
 
+// ═══ P3: 专业正形交互盘(地支方位·星曜亮度·三层四化·三方四正) ═══
+// 亮度表: iztro 开源紫微库 STARS_INFO(从寅起: 寅卯辰巳午未申酉戌亥子丑)
+var BRIGHT={
+ '紫微':['旺','旺','得','旺','庙','庙','旺','旺','得','旺','平','庙'],
+ '天机':['得','旺','利','平','庙','陷','得','旺','利','平','庙','陷'],
+ '太阳':['旺','庙','旺','旺','旺','得','得','陷','不','陷','陷','不'],
+ '武曲':['得','利','庙','平','旺','庙','得','利','庙','平','旺','庙'],
+ '天同':['利','平','平','庙','陷','不','旺','平','平','庙','旺','不'],
+ '廉贞':['庙','平','利','陷','平','利','庙','平','利','陷','平','利'],
+ '天府':['庙','得','庙','得','旺','庙','得','旺','庙','得','庙','庙'],
+ '太阴':['旺','陷','陷','陷','不','不','利','不','旺','庙','庙','庙'],
+ '贪狼':['平','利','庙','陷','旺','庙','平','利','庙','陷','旺','庙'],
+ '巨门':['庙','庙','陷','旺','旺','不','庙','庙','陷','旺','旺','不'],
+ '天相':['庙','陷','得','得','庙','得','庙','陷','得','得','庙','庙'],
+ '天梁':['庙','庙','庙','陷','庙','旺','陷','得','庙','陷','庙','旺'],
+ '七杀':['庙','旺','庙','平','旺','庙','庙','庙','庙','平','旺','庙'],
+ '破军':['得','陷','旺','平','庙','旺','得','陷','旺','平','庙','旺'],
+ '文昌':['陷','利','得','庙','陷','利','得','庙','陷','利','得','庙'],
+ '文曲':['平','旺','得','庙','陷','旺','得','庙','陷','旺','得','庙'],
+ '火星':['庙','利','陷','得','庙','利','陷','得','庙','利','陷','得'],
+ '铃星':['庙','利','陷','得','庙','利','陷','得','庙','利','陷','得'],
+ '擎羊':['','陷','庙','','陷','庙','','陷','庙','','陷','庙'],
+ '陀罗':['陷','','庙','陷','','庙','陷','','庙','陷','','庙']
+};
+var BC_CLS={'庙':'b-miao','旺':'b-wang','得':'b-de','利':'b-li','平':'b-ping','不':'b-bu','陷':'b-xian'};
+var ZW_POS={5:'1/1',6:'1/2',7:'1/3',8:'1/4',4:'2/1',9:'2/4',3:'3/1',10:'3/4',2:'4/1',1:'4/2',0:'4/3',11:'4/4'};
+var ZHI='子丑寅卯辰巳午未申酉戌亥';
+var _zwChart=null,_zwLayer='natal',_zwSel=-1;
+
+function zwSihuaMap(){
+  var sh=null;
+  if(_zwLayer==='natal')sh=_zwChart&&_zwChart.siHua;
+  else if(_zwLayer==='daxian')sh=window._zwFlow&&window._zwFlow.currentDaXian&&window._zwFlow.currentDaXian.siHua;
+  else if(_zwLayer==='liunian')sh=window._zwFlow&&window._zwFlow.liuNian&&window._zwFlow.liuNian.siHua;
+  var m={};
+  if(sh){if(sh.lu)m[sh.lu]='禄';if(sh.quan)m[sh.quan]='权';if(sh.ke)m[sh.ke]='科';if(sh.ji)m[sh.ji]='忌';}
+  return m;
+}
+function zwB(star,branch){var a=BRIGHT[star];if(!a)return '';return a[(branch+10)%12]||'';}
+function zwStar(star,branch,shMap,cls){
+  var b=zwB(star,branch),sh=shMap[star]||'';
+  var h='<span class="zw-star '+cls+'">'+star;
+  if(b)h+='<i class="zb '+BC_CLS[b]+'">'+b+'</i>';
+  if(sh)h+='<i class="zs zs-'+sh+'">'+sh+'</i>';
+  return h+'</span>';
+}
+function zwLayerBtn(id,label){
+  return '<button class="'+(_zwLayer===id?'on':'')+'" onclick="zwSetLayer(\''+id+'\')">'+label+'</button>';
+}
+function zwSetLayer(l){_zwLayer=l;buildPro();}
+function zwSelPalace(b){_zwSel=(_zwSel===b?-1:b);buildPro();}
+
 function renderChart(c){
+  _zwChart=c;
   const meta=document.getElementById('zw-meta');
   meta.innerHTML=`${c.yearGanZhi}年 · ${c.wuxingJu} · 命宫：${c.mingGong}<br>`+
     `<span>命主:${c.mingZhu||''}</span><span>身主:${c.shenZhu||''}</span>`+
     `<span>截空:${(c.jieKong||[]).join('、')}</span><span>旬空:${(c.xunKong||[]).join('、')}</span>`;
-  
-  // 四化
-  const sihua=document.createElement('div');
-  sihua.className='zw-sihua';
-  if(c.siHua){
-    sihua.innerHTML=`<span class="lu">化禄:${c.siHua.lu||''}</span><span class="quan">化权:${c.siHua.quan||''}</span><span class="ke">化科:${c.siHua.ke||''}</span><span class="ji">化忌:${c.siHua.ji||''}</span>`;
-  }
-  meta.appendChild(sihua);
+  buildPro();
+}
 
-  // 十二宫 4×3 网格
-  // 紫微命盘排列：命宫在中间偏左，按顺时针排列
-  // 标准布局：命兄夫子财疾迁奴官田福父
-  // 4列布局：[父母][福德][田宅][官禄]
-  //          [奴仆][命宫][兄弟][夫妻]
-  //          [子女][...][...][疾厄]
-  // 简化：按顺序 4×3 排列
+function buildPro(){
+  const c=_zwChart;if(!c)return;
+  const fl=window._zwFlow||{};
+  const shMap=zwSihuaMap();
   const grid=document.getElementById('zw-grid');
+  grid.className='zw-grid pro';
   grid.innerHTML='';
-  for(const p of c.palaces){
-    const div=document.createElement('div');
-    const cls=['zw-gong'];
-    if(p.isMingGong) cls.push('ming');
-    if(p.isShenGong) cls.push('shen');
-    div.className=cls.join(' ');
-    
-    let html='';
-    if(p.isMingGong) html+='<div class="zw-gong-tag ming">命</div>';
-    if(p.isShenGong) html+='<div class="zw-gong-tag shen">身</div>';
-    html+=`<div class="zw-gong-name">${p.name}</div>`;
-    html+=`<div class="zw-gong-gz">${p.ganZhi||''}</div>`;
-    html+='<div class="zw-stars">';
-    
-    if(p.mainStars) for(const s of p.mainStars) html+=`<span class="zw-star main">${s}</span>`;
-    if(p.auxStars) for(const s of p.auxStars) html+=`<span class="zw-star aux">${s}</span>`;
-    if(p.evilStars) for(const s of p.evilStars) html+=`<span class="zw-star evil">${s}</span>`;
-    if(p.otherStars) for(const s of p.otherStars) html+=`<span class="zw-star other">${s}</span>`;
-    if(p.changsheng) for(const s of p.changsheng) html+=`<span class="zw-star changsheng">${s}</span>`;
-    if(p.boshi) for(const s of p.boshi) html+=`<span class="zw-star boshi">${s}</span>`;
-    if(p.jiangqian) for(const s of p.jiangqian) html+=`<span class="zw-star jiangqian">${s}</span>`;
-    if(p.suijian) for(const s of p.suijian) html+=`<span class="zw-star suijian">${s}</span>`;
-    
-    html+='</div>';
-    div.innerHTML=html;
-    grid.appendChild(div);
-  }
+  const byBranch={};
+  c.palaces.forEach(p=>{byBranch[p.index]=p;});
 
-  // 大限
-  if(c.daXian && c.daXian.length>0){
-    const dx=document.getElementById('zw-daxian');
-    dx.style.display='block';
-    let html='<div class="zw-daxian-title">大限（十年运势）</div><div class="zw-daxian-list">';
-    for(const d of c.daXian){
-      const sh=d.siHua||{};
-      html+=`<div class="zw-daxian-item"><div class="zw-daxian-age">${d.startAge}-${d.endAge}岁</div><div class="zw-daxian-gz">${d.ganZhi}</div>`;
-      html+=`<div class="zw-daxian-sh"><span class="lu">禄:${sh.lu||''}</span> <span class="ji">忌:${sh.ji||''}</span></div></div>`;
+  // 十二宫(地支固定方位)
+  Object.keys(ZW_POS).forEach(function(bStr){
+    const b=+bStr,p=byBranch[b]||{index:b,name:'',ganZhi:ZHI[b],mainStars:[]};
+    const div=document.createElement('div');
+    div.className='zw-gong pro';
+    div.style.gridArea=ZW_POS[b];
+    if(p.isMingGong)div.classList.add('ming');
+    if(p.isShenGong)div.classList.add('shen');
+    const dxNow=fl.currentDaXian&&fl.currentDaXian.palaceIdx===b;
+    const lnNow=fl.liuNian&&ZHI[b]===fl.liuNian.zhi;
+    if(dxNow)div.classList.add('dx-now');
+    if(lnNow)div.classList.add('ln-now');
+    if(_zwSel>=0){
+      const grp=[_zwSel,(_zwSel+4)%12,(_zwSel+8)%12,(_zwSel+6)%12];
+      div.classList.add(grp.indexOf(b)>=0?'sf-on':'sf-off');
     }
+    let html='<div class="zw-gong-head"><span class="zw-gong-name">'+(p.name||'')+'</span>';
+    if(p.isMingGong)html+='<span class="zw-gong-tag ming">命</span>';
+    if(p.isShenGong)html+='<span class="zw-gong-tag shen">身</span>';
+    if(lnNow)html+='<span class="zw-gong-ln">流年</span>';
+    const dx=(c.daXian||[]).find(function(d){return d.palaceIdx===b;});
+    if(dx)html+='<span class="zw-gong-dx">'+dx.startAge+'-'+dx.endAge+'</span>';
+    html+='</div><div class="zw-stars">';
+    const mains=p.mainStars||[];
+    if(mains.length){
+      mains.forEach(function(s){html+=zwStar(s,b,shMap,'main')+' ';});
+    }else{
+      const opp=byBranch[(b+6)%12];
+      html+='<span class="zw-gong-kong">空宫·借对宫'+(opp&&(opp.mainStars||[]).join('')?'【'+(opp.mainStars||[]).join('')+'】':'')+'</span>';
+    }
+    (p.auxStars||[]).forEach(function(s){html+=zwStar(s,b,shMap,'aux')+' ';});
+    (p.evilStars||[]).forEach(function(s){html+=zwStar(s,b,shMap,'evil')+' ';});
+    (p.otherStars||[]).forEach(function(s){html+='<span class="zw-star other">'+s+'</span> ';});
+    (p.changsheng||[]).forEach(function(s){html+='<span class="zw-star changsheng">'+s+'</span> ';});
+    (p.boshi||[]).forEach(function(s){html+='<span class="zw-star boshi">'+s+'</span> ';});
+    (p.jiangqian||[]).forEach(function(s){html+='<span class="zw-star jiangqian">'+s+'</span> ';});
+    (p.suijian||[]).forEach(function(s){html+='<span class="zw-star suijian">'+s+'</span> ';});
     html+='</div>';
-    dx.innerHTML=html;
+    html+='<div class="zw-gong-foot"><span>'+(p.ganZhi||ZHI[b])+'</span><span>'+(dx?dx.ganZhi+' 大限':'')+'</span></div>';
+    div.innerHTML=html;
+    div.addEventListener('click',function(){zwSelPalace(b);});
+    grid.appendChild(div);
+  });
+
+  // 中央信息区
+  const ctr=document.createElement('div');
+  ctr.className='zw-center';
+  ctr.style.gridArea='2/2/4/4';
+  const dxC=fl.currentDaXian||{},ln=fl.liuNian||{};
+  const shTxt=Object.keys(shMap).length?
+    '化禄:<b style="color:#10b981">'+(shKey(shMap,'禄')||'—')+'</b> · 化权:<b style="color:#c9a84c">'+(shKey(shMap,'权')||'—')+'</b> · 化科:<b style="color:#63b3ed">'+(shKey(shMap,'科')||'—')+'</b> · 化忌:<b style="color:#ef4444">'+(shKey(shMap,'忌')||'—')+'</b>':'—';
+  ctr.innerHTML='<div class="zc-t">紫微斗数 · 专业盘</div>'+
+    '<div style="text-align:center">'+(c.yearGanZhi||'')+'年 · '+(c.wuxingJu||'')+'</div>'+
+    '<div style="text-align:center">命宫 '+(c.mingGong||'')+' · 命主 '+(c.mingZhu||'')+' · 身主 '+(c.shenZhu||'')+'</div>'+
+    '<div class="zw-layer">'+
+      zwLayerBtn('natal','本命四化')+
+      (dxC.siHua?zwLayerBtn('daxian','大限 '+(dxC.startAge||'')+'-'+(dxC.endAge||'')+'岁'):'')+
+      (ln.siHua?zwLayerBtn('liunian','流年 '+(ln.year||'')+' '+(ln.ganZhi||'')):'')+
+    '</div>'+
+    '<div class="zw-sh-legend">'+shTxt+'</div>'+
+    '<div class="zw-b-legend">亮度: <i class="zb b-miao">庙</i> <i class="zb b-wang">旺</i> <i class="zb b-de">得</i> <i class="zb b-li">利</i> <i class="zb b-ping">平</i> <i class="zb b-bu">不</i> <i class="zb b-xian">陷</i> · 点击宫位查看三方四正</div>';
+  grid.appendChild(ctr);
+  renderZwDetail();
+}
+function shKey(map,val){for(var k in map){if(map[k]===val)return k}return '';}
+
+// 三方四正详情
+function renderZwDetail(){
+  let host=document.getElementById('zw-detail');
+  if(!host){
+    host=document.createElement('div');host.id='zw-detail';
+    const grid=document.getElementById('zw-grid');
+    grid.parentNode.insertBefore(host,grid.nextSibling);
   }
+  const c=_zwChart;
+  if(_zwSel<0||!c){host.className='';host.innerHTML='';return;}
+  const b=_zwSel,byBranch={};
+  c.palaces.forEach(p=>{byBranch[p.index]=p;});
+  const shMap=zwSihuaMap();
+  const roles=[[b,'本宫'],[(b+6)%12,'对宫'],[(b+4)%12,'三合'],[(b+8)%12,'三合']];
+  let html='<div class="zd-t">三方四正 · '+ZHI[b]+'宫（'+(byBranch[b]?byBranch[b].name:'')+'）—— 再点一次取消</div>';
+  roles.forEach(function(rb){
+    const p=byBranch[rb[0]]||{name:'',ganZhi:ZHI[rb[0]],mainStars:[]};
+    html+='<div class="zd-pal"><b>'+rb[1]+' · '+(p.name||'')+'宫（'+(p.ganZhi||ZHI[rb[0]])+'）</b> ';
+    if(p.isMingGong)html+='<span class="zw-gong-tag ming">命</span> ';
+    if((p.mainStars||[]).length){
+      (p.mainStars||[]).forEach(function(s){html+=zwStar(s,rb[0],shMap,'main')+' ';});
+    }else html+='<span class="zw-gong-kong">空宫</span> ';
+    (p.auxStars||[]).forEach(function(s){html+=zwStar(s,rb[0],shMap,'aux')+' ';});
+    (p.evilStars||[]).forEach(function(s){html+=zwStar(s,rb[0],shMap,'evil')+' ';});
+    html+='</div>';
+  });
+  host.innerHTML=html;
+  host.className='on';
 }
 
 function renderInterpretation(i){
