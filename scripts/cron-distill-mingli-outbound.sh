@@ -54,7 +54,61 @@ PYEOF
 cp "$EXPORT" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json
 cp "$EXPORT" /Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json
 echo "  ✓ 推送到 SHF + TCM-aux" >> "$LOG_FILE"
+
+# ── R746 全量镜像导出（2026-08-26 家庭生活助手"全量采集命理知识"需求）──
+# 口径：status IN (formal/active/published/promoted/approved)，排除内部模块 + TCM 类模块
+# （TCM 语料由 tcm-agent 自己的 tcm-authoritative-full.json 全量镜像负责，避免双源重复）
+# 仅推送 SHF（家庭能体融合层 family-kb.json 的原料），不推 TCM-aux
+EXPORT_FULL="training-data/distill-outbound/mingli-full-${DATE}.json"
+python3 - <<PYEOF >> "$LOG_FILE" 2>&1
+import sqlite3, json
+from datetime import datetime
+from collections import Counter
+def safe_str(v):
+    if v is None: return ''
+    if isinstance(v, bytes): return v.decode('utf-8', errors='ignore')
+    return str(v)
+EXCLUDE_MODULES = ('engine_compare', 'ai-prompt', 'mingli-cross-moved')
+STATUSES = ('formal', 'active', 'published', 'promoted', 'approved')
+EXPORT_FULL = "training-data/distill-outbound/mingli-full-${DATE}.json"
+conn = sqlite3.connect("server/database/yidao.db")
+conn.row_factory = sqlite3.Row
+ph_m = ','.join(['?'] * len(EXCLUDE_MODULES))
+ph_s = ','.join(['?'] * len(STATUSES))
+rows = conn.execute(
+    f"SELECT entry_id, module, title, content, keywords, trust_score, status FROM kb_formal "
+    f"WHERE status IN ({ph_s}) AND module NOT IN ({ph_m}) "
+    f"AND module NOT LIKE '%tcm%' AND module NOT LIKE '%shanghan%' AND module NOT LIKE '%nihaisha%' "
+    f"AND module NOT LIKE '%acupuncture%' AND module NOT LIKE '%shuhan%' AND module NOT LIKE '%shuihan%'",
+    STATUSES + EXCLUDE_MODULES).fetchall()
+entries = []
+for r in rows:
+    content = safe_str(r['content']).strip()
+    title = safe_str(r['title']).strip()
+    if not title or len(content) < 30:
+        continue
+    entries.append({
+        'entry_id': safe_str(r['entry_id']),
+        'module': safe_str(r['module']),
+        'title': title,
+        'content': content,
+        'keywords': safe_str(r['keywords']),
+        'trust_score': r['trust_score'] or 0.8,
+        'status': safe_str(r['status']),
+        'source_project': 'mingli-baojian',
+        'distilled_at': datetime.now().isoformat(),
+    })
+modules = Counter(e['module'] for e in entries)
+with open(EXPORT_FULL, 'w', encoding='utf-8') as f:
+    json.dump(entries, f, ensure_ascii=False)
+print(f"全量镜像导出 {len(entries)} 条命理 KB（formal+active+published+promoted+approved）")
+for m, n in modules.most_common(10):
+    print(f"  {m}: {n}")
+PYEOF
+cp "$EXPORT_FULL" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-full.json
+echo "  ✓ 全量镜像推送到 SHF（mingli-full.json）" >> "$LOG_FILE"
 find training-data/distill-outbound -name "mingli-pure-*.json" -mtime +7 -delete
+find training-data/distill-outbound -name "mingli-full-*.json" -mtime +7 -delete
 echo "[$TS] === 完成 ===" >> "$LOG_FILE"
 # R104-W1.2: 更新蒸馏注册表
 python3 - <<'PYEOF'
