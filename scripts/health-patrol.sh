@@ -149,19 +149,33 @@ fi
 CRON_JOBS_JSON="/Users/tom/.openclaw-autoclaw/cron/jobs.json"
 if [ -f "$CRON_JOBS_JSON" ]; then
     BAD_CRON=$(python3 -c "
-import json
+import json, time
 try:
     data = json.load(open('$CRON_JOBS_JSON'))
     jobs = data.get('jobs', data)
+    now_ms = time.time() * 1000
+    FRESH_MS = 48 * 3600 * 1000  # R749 修真：48h 内有真实复跑失败的才算新鲜连败
+    stale = []
     for j in jobs:
         if not j.get('enabled', True):
             continue
-        errs = j.get('state', {}).get('consecutiveErrors', 0)
-        if errs >= 3:
+        st = j.get('state', {})
+        errs = st.get('consecutiveErrors', 0)
+        if errs < 3:
+            continue
+        last_ms = st.get('lastRunAtMs') or 0
+        if st.get('lastRunStatus') == 'error' and (now_ms - last_ms) <= FRESH_MS:
             print(f\"{j.get('name','?')} 连败{errs}次\")
+        else:
+            stale.append(f\"{j.get('name','?')} 连败{errs}次（陈旧·待复跑清零）\")
+    if stale:
+        print('STALE|' + '；'.join(stale), file=__import__('sys').stderr)
 except Exception:
     pass
-" 2>/dev/null)
+" 2>/tmp/patrol-stale-cron.txt)
+    if [ -s /tmp/patrol-stale-cron.txt ]; then
+        echo "[$TS] ℹ️ $(sed 's/^STALE|//' /tmp/patrol-stale-cron.txt)" >> "$LOG"
+    fi
     if [ -n "$BAD_CRON" ]; then
         while IFS= read -r line; do
             [ -n "$line" ] && ALERTS+=("cron 任务连败: $line")

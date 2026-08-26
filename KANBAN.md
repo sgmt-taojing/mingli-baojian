@@ -1,5 +1,6 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+> 交付: 2026-08-26 17:25 CST（**OneFrame 掌纹 v1.0 入库（平台 ai-vision-toolkit 出库）**：models/oneframe-palm-v1.0.onnx（md5 2ee31afd…1136）+ .report.json + vision-model-labels.json 第 20 条注册；hand-diag-svc(8944) MODELS 已增列并重启，/health 在册；端到端实测 3/3（生命线/感情线/川字纹 top1 全对，conf=1.0）；val top1=1.0 + 平台独立复核 40/40；标签集与 fortune-palm-lines 相同但**顺序不同**（字母序：智慧/感情/生命/断掌/川字），旧版并行保留 1 周期后退役；注：labels.json / hand-diag-svc.py 在 server 子模块内，**提交推送给板块主会话**）
 > 主会话: 2026-08-26 16:55 CST（**P0-1 密钥轮换全链路闭环**：新 g2claw key 已写入全部 6 处凭证（4 agent auth-profiles + main models.json + openclaw.json + runtime 层），旧 key 用户已吊销（直连 401），新 key 直连 200；AutoClaw 重启后 cron run 商用矩阵 KPI 巡检端到端 ok（12 服务在线/就绪度 92.8 分真实报告）；经验：gateway 配置走 config.patch（baseHash 乐观锁，写 runtime 层），agent 凭证在 agents/*/agent/auth-profiles.json，均需重启应用生效；10 个 402 切换 job 全部恢复在册）
 > 主会话: 2026-08-26 16:36 CST（**baziqa-v92-训练监控僵尸 cron 退役**：v9.2 已于 08-19 完结（3/488=0.6%<<v9.0 53.9%，十轮复核闭环），监控 cron c3ca36d6 每小时空跑且 /tmp/baziqa-v92-train.log 从未存在，已移除；#5/#6 完结不变；v9.3 走 V93-TRIGGER-SPEC 阈值触发制）
 > 主会话: 2026-08-26 16:30 CST（**16:00 后新蒸馏入库 361 条**：其中 99 条来自 tcm-agent-forward（trust≥0.9），kb_formal 60,193→60,554；staging pending 0，直达 kb_formal 无中间态；#5/#6 完结不变；v9.3 待用户触发）
