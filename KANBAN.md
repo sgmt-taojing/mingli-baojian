@@ -1,4 +1,14 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 14:00 — 白话解读引擎 + 报告层优化（双专项）
+- 专项一：paipan-baihua-engine.js 七模块白话构建器（总览/要素卡/未来3年预测/过往3年回测），端点 POST /api/paipan/:module/baihua 全模块实测通过；前端共享件 paipan-baihua-panel.js 接入 7 个排盘页（预测时间轴+验证按钮存 localStorage），浏览器实测奇门/八字两页通过
+- 专项二：报告层——seg0 白话总览置顶（延迟 unshift 防索引错位）、seg1 修「局局」bug+日干支去重、KB 标题级污染过滤（福利/到课/PAGE BREAK）、seg3 真实逐年走势替换模板空话、seg4 占位句替换白话要素卡、各段白话小结；奇门+八字报告回归通过
+- 提交：server b408e80 / main f6b6758
+## 2026-08-27 14:00 · OneFrame 舌色 v2.0 交付（平台侧登记，本仓未代 commit）
+- [x] **舌色 v2.0 模型入列 8942**：`oneframe-tcm-tongue-color-v2.0`（平台 AutoML AML-CLA-31A2D6）已投放 models/（md5=b1aeb33c…双侧核验一致）+ vision-model-labels.json 注册（类序与 v1.0 一致无需改映射）+ tongue-diag-svc MODELS 增列 + launchd 重启生效（health 9 模型）
+- [x] **端到端复测通过**：8942 `/classify` 真实舌象双模型对比（v2 淡红 0.722 vs v1 正常 0.566），v2 为真实域迭代版：300 真实舌象中位置信 0.561→0.665、红舌破零 21 张、合成域回归 0.9893 无退化
+- [ ] **并行灰度约定**：v1.0 保留 1 个周期后退役（届时从 MODELS 与 labels.json 移除 v1.0 条目）；v2 真实样本为色度学弱标注（无标准色卡标定），交付报告 oneframe-tcm-tongue-color-v2.0.report.json 已留痕
+- [ ] tcm-agent 双载体已同步同版（其服务未重启，留自验）
+
 ## 2026-08-27 13:30 · 六爻地支关系全集判定 + 拦截器冲突根治
 - [x] **六爻 getZhiRelation 重写为全集判定**：heartbeat 11:30 已确认相刑表本身无误（丑戌未三对全），本轮深挖发现真正缺陷是「单命中即返回」——一对地支冲合刑害可并存（丑未=六冲+持势之刑、巳申=六合+无恩之刑、寅巳=无恩之刑+相害），旧版静默吞掉其余关系；现主判按 六合>六冲>三合>相刑>相害>生克、次级关系以「兼xx」并入 desc；11 项单测全过 + 排盘/流年回归正常（server `6ebe915`）
 - [x] **拦截器冲突根治（不止 8 页，全站受益）**：扫描发现 54 页 `fetch().then(r=>r.json())` 与归一化对象冲突；改逐页打补丁为根修——①`normalizeResponse(res, body)` 定义与 `(body, status)` 调用参数错位，拦截后 `r.data` 恒为 HTTP 状态码数字（全站隐性 bug）；②拦截返回值升级为 Response 兼容对象（补 json()/text()/status/headers/clone + 旧壳业务字段平铺，54 页旧写法免改即用）；③normalizeResponse 新增旧壳 ok 布尔识别（`{ok:false}` 在 HTTP 200 下不再误判成功）。Node 沙箱 10 用例 + test-interceptor.html 浏览器实测 5 项全过；排盘页豁免路径回归正常（主仓 `e17a731`）
