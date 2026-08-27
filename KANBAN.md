@@ -1,4 +1,15 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 17:50 — 文字标签全面图片化（金字印章风格统一）
+- 新增 scripts/gen-title-images.py 通用生成器（宋体 Bold 描金渐变+朱红印章+透明底 @2x），一次产出 app/assets/titles/*.png ×76（首页 48 / 排盘中心 7 / 命理工具 6 / 问事网格 14 + 复用）
+- index.html：集中 MAP 映射 + DOM 替换（alt 保留原文，「全部」分区克隆后二次幂等替换）；零文字残留，100 张图全加载
+- paipan-center / divination-tools：13 处静态替换 + CSS；ask.html：TOOLS 网格模板改 img.nm-img
+- 浏览器截图验收：排盘中心 7 卡、问事 14 网格、首页信众区全图化；pro-gate 遮罩下透出金字图无冲突
+## 2026-08-27 17:45 — face-diag-svc 接入 OneFrame 唇色 v2.0（平台侧交付登记）
+- models/oneframe-tcm-lip-v2.0.onnx 到位（md5=ea30506628dc395ee952c3b3636202d1，与平台侧一致）；vision-model-labels.json 注册（labels 干裂脱屑/鲜红绛唇/淡白无华/青紫暗唇/红润有泽，task=lip-diag，input 320）
+- face-diag-svc(8941) MODELS 增列 oneframe-tcm-lip-v2.0 重启生效（health 10 模型）
+- 端到端实测：真实红润唇 v1 误判干裂脱屑 0.62 → v2 红润有泽 0.9907；真实暗紫唇 v1 误判干裂 0.97 → v2 青紫暗唇 0.9867
+- v2=合成950+GJ-Varna真实479色度学弱标重训，真实域弱标一致率 0.008→0.952；cracked 干裂零真实样本仍仅合成（平台留痕）；v1 并行灰度 1 周期后替代
+- 报告 models/oneframe-tcm-lip-v2.0.report.json；按约定 mingli 侧只登记不代 commit
 ## 2026-08-27 17:20 — 信众/患者分流 + 问事页生命周期三报告接入
 - 首页入口大厅：新增「信众 · 大众」角色胶囊（默认激活），命理向 13 卡（问事/一句话直达/AI助手/命理速览/人生规划/命格指数/流年报告/十年走势/青年规划/黄历/每日黄历/快速占卜/民俗中心）；「患者专区」纯化医疗 5 卡（综合问诊台 hero/症状自查/望诊采集/就医记录/患者门户），监控总览移出患者区（管理员区已有）
 - 问事页 ask.html 扩至 14 件工具：新增命格指数（birthYear+性别）、流年报告（全生辰）、十年走势（全生辰）；lifeplan/lifeindex 隐藏跳过按钮保证年龄必填
