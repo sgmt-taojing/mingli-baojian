@@ -31,7 +31,21 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 .qm-badge.fuyin{background:rgba(239,68,68,.15);color:var(--red)}
 .qm-badge.fanyin{background:rgba(99,179,237,.15);color:var(--blue)}
 
-.qm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:700px;margin:0 auto 16px}
+.qm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:700px;margin:0 auto 16px;position:relative}
+.qm-gong{cursor:pointer;transition:box-shadow .2s,transform .15s}
+.qm-gong:hover{box-shadow:0 0 0 1px var(--gold,#c9a84c),0 4px 14px rgba(201,168,76,.25);transform:translateY(-1px)}
+.qm-palace-pop{position:absolute;z-index:60;width:min(320px,86vw);background:var(--card,#141928);border:1px solid var(--gold,#c9a84c);border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.55);padding:12px 14px;font-size:12px;line-height:1.7;color:var(--paper,#e8dcc8);text-align:left;cursor:default}
+.qm-palace-pop .pp-title{color:var(--gold,#c9a84c);font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.qm-palace-pop .pp-close{background:none;border:none;color:var(--paper3,#8b7e6a);font-size:16px;cursor:pointer;padding:0 2px}
+.qm-palace-pop .pp-summary{font-size:12px;padding:6px 8px;border-radius:6px;margin-bottom:8px}
+.qm-palace-pop .pp-summary.good{background:rgba(78,201,176,.12);color:#4ec9b0}
+.qm-palace-pop .pp-summary.bad{background:rgba(239,68,68,.12);color:#ef4444}
+.qm-palace-pop .pp-summary.neutral{background:rgba(255,255,255,.05);color:var(--paper3,#8b7e6a)}
+.qm-palace-pop .pp-line{margin-bottom:6px;padding-left:8px;border-left:2px solid var(--border,#2a3450)}
+.qm-palace-pop .pp-line.good{border-color:#4ec9b0}
+.qm-palace-pop .pp-line.bad{border-color:#ef4444}
+.qm-palace-pop .pp-label{color:var(--gold,#c9a84c);font-size:11px;font-weight:600;margin-right:4px}
+.qm-palace-pop .pp-hint{margin-top:8px;font-size:10px;color:var(--paper3,#8b7e6a)}
 .qm-gong{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;min-height:120px;position:relative}
 .qm-gong.center{background:rgba(201,168,76,.05);border-color:var(--gold);border-style:dashed}
 .qm-gong.kong{opacity:.5}
@@ -197,6 +211,7 @@ async function doPaipan(){
   const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
   const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge,lang:_lang };
   if(question) body.question = question;
+  window._qmBody = body; // R-PALACE-TAP: 点宫解读复用同一排盘参数
   let r, rSvg;
   try {
     [r, rSvg] = await Promise.all([
@@ -263,6 +278,9 @@ function renderChart(c){
       html+=`<div style="font-size:10px;color:var(--gold);text-align:center;margin-top:4px">${palace.dipan||''}</div>`;
     }
     div.innerHTML=html;
+    div.dataset.palace=p;
+    div.title='点击查看该宫白话解读';
+    div.addEventListener('click',function(ev){ev.stopPropagation();showPalacePop(p,div)});
     grid.appendChild(div);
   }
 
@@ -283,6 +301,56 @@ function renderChart(c){
       item.innerHTML=`<div class="qm-geju-name ${g.type==='吉'?'ji':'xiong'}">${g.name} <span style="font-size:9px">[${g.type}]</span></div><div class="qm-geju-desc">${g.desc||''}</div>`;
       gjList.appendChild(item);
     }
+  }
+}
+
+/* ── R-PALACE-TAP: 点宫白话解读浮动弹层 ── */
+function escPal(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+let _ppEl=null,_ppPalace=null;
+function hidePalacePop(){if(_ppEl){_ppEl.remove();_ppEl=null;_ppPalace=null}}
+document.addEventListener('click',function(){hidePalacePop()});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape')hidePalacePop()});
+async function showPalacePop(p,cell){
+  if(_ppPalace===p){hidePalacePop();return}
+  hidePalacePop();_ppPalace=p;
+  const grid=document.getElementById('qm-grid');
+  const pop=document.createElement('div');pop.className='qm-palace-pop';_ppEl=pop;
+  pop.innerHTML='<div class="pp-title"><span>🔮 解读中…</span></div>';
+  pop.addEventListener('click',function(ev){ev.stopPropagation()});
+  grid.appendChild(pop);
+  // 定位：默认浮动在被点宫正上方（顶部行放不下则翻到下方）
+  const gw=grid.clientWidth;
+  const pw=Math.min(320,gw*0.86);
+  let left=cell.offsetLeft+cell.offsetWidth/2-pw/2;
+  left=Math.max(0,Math.min(left,gw-pw));
+  pop.style.left=left+'px';
+  function anchor(){
+    if(cell.offsetTop-8-pop.offsetHeight>=0){
+      pop.style.top='';pop.style.bottom=(grid.clientHeight-cell.offsetTop+8)+'px';
+    }else{
+      pop.style.bottom='';pop.style.top=(cell.offsetTop+cell.offsetHeight+8)+'px';
+    }
+  }
+  anchor();
+  const LV={good:'吉',bad:'凶',neutral:'平'};
+  try{
+    if(!window._qmBody)throw new Error('请先排盘');
+    const body=Object.assign({},window._qmBody,{palace:p});
+    const r=await fetch(API_BASE+'/api/paipan/qimen/baihua',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body)});
+    const res=await r.json();
+    const d=res&&res.data?res.data:res;
+    const pd=d&&d.palaceDetail;
+    if(!pd||!pd.ok)throw new Error((pd&&pd.error)||'解读生成失败');
+    pop.innerHTML='<div class="pp-title"><span>🔮 '+escPal(pd.title)+' <span style="font-size:10px;border:1px solid currentColor;border-radius:8px;padding:0 6px;color:'+(pd.level==='good'?'#4ec9b0':pd.level==='bad'?'#ef4444':'#8b7e6a')+'">'+(LV[pd.level]||'')+'</span></span><button class="pp-close" title="关闭">✕</button></div>'
+      +'<div class="pp-summary '+pd.level+'">'+escPal(pd.summary)+'</div>'
+      +pd.lines.map(function(l){return '<div class="pp-line '+l.level+'"><span class="pp-label">'+escPal(l.label)+'</span>'+escPal(l.text)+'</div>'}).join('')
+      +'<div class="pp-hint">点击其他宫位切换 · 点空白处或按 ESC 关闭</div>';
+    pop.querySelector('.pp-close').addEventListener('click',hidePalacePop);
+    anchor();
+  }catch(e){
+    pop.innerHTML='<div class="pp-title"><span>⚠️ '+escPal(e.message||'解读失败')+'</span><button class="pp-close">✕</button></div>';
+    pop.querySelector('.pp-close').addEventListener('click',hidePalacePop);
+    anchor();
   }
 }
 
