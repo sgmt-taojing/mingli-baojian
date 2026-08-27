@@ -1,4 +1,11 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 15:28 — 拼音搜索 + 方剂古籍原文 + 问诊台方剂选择器
+- 患者搜索：/api/clinic/patients 姓名支持中文子串/全拼/首字母(wbh→王病患)/编辑距离模糊(wangbinghua 差1字母可命中)，复用 search-intelligence pinyin-pro；实测五组关键词全过
+- 统一方剂搜索：formula-search-api.js 合并中医经典42方+全球五体系25方共67方索引；拼音全拼/首字母(bht→白虎汤)/别名/英文名/主治功用关键词，同分中医经典优先；端点 search/detail/stats 实测全过
+- 古籍补充：prescription-matcher 新增 CLASSICAL_TEXTS 28 首核心方原文条文（伤寒论8/金匮1/温病条辨6/局方8/小儿药证直诀3/医林改错2/济生方/内外伤辨惑论各1，均标篇目），matchFormulas 卡片自动挂 classical 字段
+- 前端：js/formula-picker.js 共享选择器接入问诊台审核区「修改后处方」上方——选中自动填「方名（出处）：组成」，详情卡含古籍原文；浏览器实测 bht→白虎汤→填入处方框→原文卡渲染 全通过
+- 医院级流程核查：建档→采集→AI草稿→双师审核→处方 draft/sign/dispense/archive 状态机后端本已齐备，本轮确认无缺口
+- 提交：server 8aa9302 / main 306110d
 ## 2026-08-27 15:10 — 民俗工具白话解读全量落地（九工具+老黄历页）
 - 引擎：minsu-baihua-engine.js 九构建器（黄历/择日/太岁/节气/手机号/姓名/流年/幸运/合婚），词典含建除十二神/十二值神黄黑道/24节气养生/合婚等级/五格吉凶；修 mobile 尾号0被||吞掉 bug
 - 服务端：九个 minsu 端点 + daily-almanac 挂载 result.baihua（daily-almanac 字段适配复用 huangli 构建器），全部 try/catch 不阻塞主流程，curl 实测十端点全过
