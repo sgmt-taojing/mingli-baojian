@@ -15,7 +15,10 @@ if [ ! -x "$NODE_BIN" ]; then
   exit 1
 fi
 
+# 修真 2026-08-28 02:00 心跳：LOG_FILE 原在 set -e 之后才定义，早失败分支写日志
+# 报「No such file or directory」连败 → 提前到最前，保证任何分支都能落日志
 LOG_FILE="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/cron-distill-kb-link.log"
+touch "$LOG_FILE"
 echo "[$(date '+%F %T')] 开始 distill-link 任务" >> "$LOG_FILE"
 
 cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian

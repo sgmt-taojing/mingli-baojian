@@ -83,7 +83,7 @@ input,select{background:#0d1117;border:1px solid var(--border);border-radius:6px
   </p>
 </div>
 
-<script>
+  <script>
 const API='http://127.0.0.1:8920';
 function fmt(b){try{const j=typeof b==='string'?JSON.parse(b):b;const d=j.lunar_date||`${j.year||'?'}-${j.month||'?'}-${j.day||'?'}`;return `${j.lunar?'农':'公'} ${d} ${j.hour||j.raw_time||''}`}catch(e){return '—'}}
 async function load(){
@@ -97,14 +97,35 @@ async function load(){
     const pct=Math.min(100,(d.total/10000*100)).toFixed(2);
     document.getElementById('goalbar').style.width=pct+'%';
     document.getElementById('goaltext').textContent=`完成 ${pct}%（${d.total}/10000）`;
-    const tb=document.getElementById('tbody');tb.innerHTML='';
+    const tb=document.getElementById('tbody');
+    while(tb.firstChild)tb.removeChild(tb.firstChild);
     (d.rows||[]).forEach(row=>{
       let facts=[];try{facts=Object.values(JSON.parse(row.facts_json||'{}')).flatMap(v=>Array.isArray(v)?v:[])}catch(e){}
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${row.name}</td><td>${row.source}</td><td>${fmt(row.birth_json)}</td><td>${facts.length||'—'}</td>
-      <td><span class="badge ${row.verify_status}">${{verified:'已验证',pending:'待验证',mismatch:'存疑',record_error:'记载疑'}[row.verify_status]||row.verify_status}</span></td>
-      <td>${row.verify_score?Math.round(row.verify_score*100)+'%':'—'}</td>
-      <td>${row.verify_status==='pending'&&facts.length?'<button class="btn" style="padding:4px 10px;font-size:12px" onclick="verifyOne(\''+row.person_id+'\')">校验</button>':'—'}</td>`;
+      const mkCell=(txt)=>{const td=document.createElement('td');td.textContent=txt==null||txt===''?'—':txt;return td};
+      const cells=[
+        mkCell(row.name),
+        mkCell(row.source),
+        mkCell(fmt(row.birth_json)),
+        mkCell(facts.length||'—'),
+      ];
+      const badgeTd=document.createElement('td');
+      const span=document.createElement('span');
+      span.className='badge '+String(row.verify_status||'');
+      span.textContent={verified:'已验证',pending:'待验证',mismatch:'存疑',record_error:'记载疑'}[row.verify_status]||row.verify_status||'—';
+      badgeTd.appendChild(span);cells.push(badgeTd);
+      cells.push(mkCell(row.verify_score?Math.round(row.verify_score*100)+'%':'—'));
+      if(row.verify_status==='pending'&&facts.length){
+        const actTd=document.createElement('td');
+        const btn=document.createElement('button');
+        btn.className='btn';btn.style.padding='4px 10px';btn.style.fontSize='12px';
+        btn.textContent='校验';
+        btn.addEventListener('click',()=>verifyOne(String(row.person_id||'')));
+        actTd.appendChild(btn);cells.push(actTd);
+      }else{
+        cells.push(mkCell('—'));
+      }
+      cells.forEach(td=>tr.appendChild(td));
       tb.appendChild(tr);
     });
   }catch(e){document.getElementById('msg').textContent='接口未就绪（/api/verification/corpus）'}
