@@ -1,4 +1,16 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 16:10 — 点读能力推广：六爻点爻 / 紫微点宫 / 风水点宫
+- 数据：新增 yijing-yaoci.js——《周易》64卦卦辞+384爻辞通行本原文+白话直解，卦名匹配器（全名/后缀双路，八纯卦与复合卦全覆盖，Node 实测 16 组卦名匹配全对、64卦均6爻）
+- 引擎：buildLiuyaoYao（爻位/阴阳当位/六亲/日辰旺衰/世应/六神/旬空/动变+本卦与变卦爻辞双层）、buildZiweiPalace（十二宫含义/主星庙旺陷/四化/辅煞曜/长生）、buildFengshuiPalace（运山向三星/当运生气退气/14组山向组合/旺山旺向）
+- 端点：baihua 新增 yao/palace 参数统一返回 tapDetail（qimen palaceDetail 保留兼容）
+- 前端：新增共享件 paipan-tap-pop.js（悬停上方/顶行下翻/吉绿凶红/ESC关闭/委托防重复绑定）；liuyao-chart 爻行、fengshui-chart 九宫、ziwei 十二宫全部可点；notify 缓存 _paipanBody 复用请求体
+- 浏览器实测：六爻点四爻（晋卦凶·爻辞「晋如鼫鼠」）、风水点震宫（凶·三碧山星）、紫微点命宫（吉·武曲化权）全通过；修复「命宫宫」文案
+- 提交：server fe8f148 / main ec10040
+## 2026-08-27 15:40 · OneFrame 舌苔 v2.0 交付（平台侧登记，本仓未代 commit）
+- [x] **舌苔 v2.0 模型入列 8942**：`oneframe-tcm-coating-v2.0`（平台 AutoML AML-CLA-617415）投放 models/（md5=e665bdc1…双侧核验）+ vision-model-labels.json 注册（类序同 v1.0）+ tongue-diag-svc MODELS 增列 + launchd 重启生效（health 10 模型）
+- [x] **端到端铁证**：真实正常舌 v1 误判「焦黑」0.44 → v2 正确「正常薄白」0.9999；黑毛舌 v2 置信 0.9998 vs v1 0.5458；真实域 259 张真值一致率 0.266→0.992；real-val 52 张（训练未见）0.231→0.981
+- [ ] **并行灰度约定**：舌色/舌苔 v1.0 各保留 1 个周期后退役（届时从 MODELS 与 labels.json 移除）；tcm-agent 双载体已同步同版（服务未重启留自验）
+
 ## 2026-08-27 15:28 — 拼音搜索 + 方剂古籍原文 + 问诊台方剂选择器
 - 患者搜索：/api/clinic/patients 姓名支持中文子串/全拼/首字母(wbh→王病患)/编辑距离模糊(wangbinghua 差1字母可命中)，复用 search-intelligence pinyin-pro；实测五组关键词全过
 - 统一方剂搜索：formula-search-api.js 合并中医经典42方+全球五体系25方共67方索引；拼音全拼/首字母(bht→白虎汤)/别名/英文名/主治功用关键词，同分中医经典优先；端点 search/detail/stats 实测全过
