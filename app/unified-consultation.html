@@ -310,6 +310,10 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
     </div>
     <div class="form-group">
       <label>修改后处方（可选）</label>
+      <div style="margin-bottom:6px">
+        <input type="text" id="formulaSearch" placeholder="📖 检索方剂：中文 / 拼音 / 首字母（如 bht→白虎汤），选中自动填入组成"
+          style="width:100%;padding:8px 10px;font-size:13px;background:rgba(255,255,255,.04);border:1px solid var(--border,rgba(201,168,76,.25));border-radius:6px;color:inherit">
+      </div>
       <textarea id="reviewPrescription" placeholder="例：原方 + 丹参 15g"></textarea>
     </div>
     <div class="review-btns">
@@ -851,6 +855,15 @@ setDot('emr', '');  // 占位
 // 已初始化完成
 </script>
 
+<script src="js/formula-picker.js"></script>
+<script>
+// R-FORMULA-SEARCH: 审核台处方区接入方剂检索（中文/拼音/首字母/模糊 + 古籍原文卡）
+document.addEventListener('DOMContentLoaded', function () {
+  var fi = document.getElementById('formulaSearch');
+  var rp = document.getElementById('reviewPrescription');
+  if (fi && rp && window.FormulaPicker) FormulaPicker.attach(fi, { target: rp });
+});
+</script>
 <script src="js/mobile-nav.js" defer></script>
 </body>
 </html>
