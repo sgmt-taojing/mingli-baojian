@@ -1,4 +1,21 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 21:15 — ✅ 机构服务中心 + 排盘行动方案引擎
+- 主仓 22ed1c4：新增 center-org（17 卡四组：入驻经营/门诊运营/设备物联/医技检验），首页加「机构」胶囊与入口卡；顺带修复 folk 分区 `</section>` 未闭合导致全部角色卡片被隐藏的历史 bug
+- server 97e54dd / 主仓 efedf46：新增 paipan-advice-engine.js，七模块（八字/紫微/奇门/六爻/六壬/梅花/风水）报告全部产出具体行动方案（五行补益/忌神规避/大运重点/化忌防范/体用定策/风水布置），buildBaihua 契约新增 actions[]
+- 前端面板渲染「🎯 行动方案·照着做」编号列表；norm-report-engine seg0 注入行动方案文本，大众报告拿来即用
+- 验收：七模块真实 API 全过（八字5/紫微3/奇门4/六爻2/六壬2/梅花2/风水5 条）；奇门页浏览器实测渲染正常
+## 2026-08-27 21:12 — hand-diag-svc 接入 OneFrame 掌纹 v2.0（平台侧交付登记）
+- models/oneframe-palm-v2.0.onnx 到位（md5=af836545713ec67fb47bffba404c1730，与平台侧一致）；vision-model-labels.json 注册（labels 智慧线平直/感情线细弯/生命线深长/断掌纹/川字纹，task=palm-lines，input 320）
+- hand-diag-svc(8944) MODELS 增列 oneframe-palm-v2.0 重启生效（health 11 模型）
+- 端到端实测：断掌例 v1 误判生命线深长 0.89 → v2 断掌纹 0.51（弱标边界如实呈现）；生命线例 v1/v2 均正确
+- v2=合成950+11kHands真实282线能量弱标重训，真实域弱标一致率 0.617→0.954，断掌召回 0→18/28；head/heart/三才纹不可测仍仅合成（平台留痕）；v1 并行灰度 1 周期后替代
+- 报告 models/oneframe-palm-v2.0.report.json；按约定 mingli 侧只登记不代 commit
+## 2026-08-27 21:10 — 🌙 日结（cron 21:00）
+- 健康检查实探：6 服务全绿（8900/8901/8911/8912/8913/8920 均 200）+ KB total=61,647 hi_trust=61,067（较 17:00 +681 系自动入库通道）
+- 今日全线丰收（均已在上方各条目详细留痕）：排盘五术内核真值修复 / SVG盘图v2 / 报告根治 / 白话引擎七模块 / 民俗九工具+改进建议 / 点读推广六爻紫微风水 / 五服务中心落地 / 卡标描金图化收口 / face-ocr 修真恢复 / OneFrame v2.0 ×6 模型（面色/舌色/舌苔/巩膜/指甲/面相三停/唇色）平台侧登记
+- 待办：face-ocr ONNX 面诊路径退役评估（8941-8944 已覆盖诊断）；patrol 3 项陈旧 cron 连败待复跑清零
+- 下一步动作：明日从「服务中心导航体验回归（五中心 × 主入口全链路走查）」开始
+
 ## 2026-08-27 21:05 — ✅ 全平台禁止文字卡片标识（描金图化收口）
 - 主仓 8826a5f：六门户 77 卡标（divination-almanac7/integrated7/folklore15/monitor22/naming11/practice15）静态替换为 cl-*.png
 - 五服务中心生成器改源头：gen-service-centers.py 直出 icon-name-img，78 卡全部描金 PNG，重跑验证 0 断图
@@ -828,3 +845,8 @@
 - **修真方法论闭环（17 次复核）**：修真失败 → 修真方法论升级 → 修真收敛
   - v9.3 候选配方已固化（iter=50 + lr=2e-6 + post-fuse local-q10 强制门）
   - 待用户触发 P1 任务修真流程后上 cron 全量评估
+
+## 2026-08-27 21:00 — 🔧 巡检 5 异常待修真（心跳登记 · 未排期）
+- health-patrol（22✓/5✗）：①tcm-synced-kb.json 污染 8 条（易道知识详情·bazi/huxing 等跨项目）②蒸馏边界异常 ③双向对齐 546 条待归位 ④中医 shf 缺口 1190 ⑤smart-home-family 64MB 大文件入库 + .gitignore 缺 *.db + 项目注册一致性未全绿
+- 判定：均为存量慢性问题非新增故障（今日描金/服务中心/OneFrame 交付链路正常）；①⑤ 可独立快速修真，②③④ 需跑 distill-source-audit / medical-align-check 出清单后分批处理
+- 下一步：建议明日白天排期，优先 ⑤（gitignore + rm --cached 一条命令级）→ ①（8 条清污）
