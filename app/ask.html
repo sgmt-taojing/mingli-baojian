@@ -150,6 +150,7 @@ const TOOLS = [
   { id:'liunian', ico:'📅', nm:'流年运势', ds:'今年运气 逐月走势', need:'birthYear' },
   { id:'hehun',   ico:'💑', nm:'合婚配对', ds:'两人缘分 婚配参考', need:'partner' },
   { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
+  { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'阶段定位 五年路径', need:'birthYear' },
   { id:'huangli', ico:'📖', nm:'黄历择日', ds:'今日宜忌 选好日子', need:'none' },
 ];
 const FACING_MAP = { '子':['子','午'],'午':['午','子'],'卯':['卯','酉'],'酉':['酉','卯'],'艮':['丑','未'],'坤':['未','丑'],'巽':['辰','戌'],'乾':['戌','辰'] };
@@ -191,8 +192,9 @@ $('questionNext').onclick = () => {
 function askBirthIfNeeded() {
   const need = state.tool.need;
   if (need === 'birth' || need === 'birthYear') {
-    bot(need === 'birth' ? '请告诉我您的出生信息（年月日必填，时辰不清楚可不选）：' : '请告诉我您的出生年份（看流年只需出生年，月日可不填更快速）：');
-    $('sexRow').classList.toggle('hidden', need !== 'birth');
+    bot(need === 'birth' ? '请告诉我您的出生信息（年月日必填，时辰不清楚可不选）：' : (state.tool.id === 'lifeplan' ? '请告诉我您的出生年份，并点选性别（用于定位人生阶段）：' : '请告诉我您的出生年份（看流年只需出生年，月日可不填更快速）：'));
+    $('sexRow').classList.toggle('hidden', need !== 'birth' && state.tool.id !== 'lifeplan');
+    $('skipBirth').style.display = state.tool.id === 'lifeplan' ? 'none' : '';
     $('calendarRow').classList.toggle('hidden', state.tool.id !== 'ziwei');
     $('askBirth').classList.remove('hidden');
   } else if (need === 'partner') {
@@ -319,6 +321,29 @@ async function fetchToolResult() {
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '查询失败');
     return { kind:'minsu', baihua: j.baihua, toolName:'合婚配对' };
+  }
+  // 人生规划：AI 报告端点（CSRF 白名单内），映射成白话卡结构复用渲染
+  if (t === 'lifeplan') {
+    const age = Math.max(1, now.getFullYear() - ((state.birth && state.birth.year) || (now.getFullYear() - 30)));
+    const r = await fetch(`${API}/api/ai/lifeplan-report`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+      body: JSON.stringify({ age, gender: state.sex, concerns: state.question ? [state.question.slice(0,30)] : [] }),
+      signal: AbortSignal.timeout(20000)
+    });
+    const j = await r.json();
+    const rep = j && j.data && j.data.report;
+    if (!rep) throw new Error((j && (j.message || j.error)) || '规划生成失败');
+    const b = {
+      overview: rep.summary,
+      cards: (rep.domains || []).map(d => ({
+        title: `${d.icon || ''} ${d.name} · ${d.score}分（${d.status}）`,
+        plain: d.advice || '',
+        level: d.score >= 80 ? 'good' : d.score < 60 ? 'bad' : 'neutral'
+      })),
+      forecast: (rep.next5Years || []).map(f => ({ period: `${age}岁起第${f.year - age}年`, plain: f.text, tone: 'neutral' })),
+      tips: (rep.actions || []).concat(rep.disclaimer ? [] : [])
+    };
+    return { kind:'paipan', baihua: b, toolName: `人生规划 · ${rep.stage}阶段` };
   }
   // 七盘走 baihua 端点
   const body = { question: state.question };
