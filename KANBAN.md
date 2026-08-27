@@ -1,4 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 21:05 — ✅ 全平台禁止文字卡片标识（描金图化收口）
+- 主仓 8826a5f：六门户 77 卡标（divination-almanac7/integrated7/folklore15/monitor22/naming11/practice15）静态替换为 cl-*.png
+- 五服务中心生成器改源头：gen-service-centers.py 直出 icon-name-img，78 卡全部描金 PNG，重跑验证 0 断图
+- 浏览器验收：center-yuanzhu 22/22、monitor-portal 22/22、practice-portal 15/15 图片加载成功；assets/titles 新增 155 PNG
+- 口径：卡片标识全图片化（含此前 index/ask/minsu-center/divination-tools/paipan-center）；组头与面板内 section 标题保留文字（非卡片标识）
 ## 2026-08-27 20:15 — ✅ 民俗工具按用途排序（三面同口径）
 - minsu-center 33a0fd6：15 卡按用途分五组（时·时光选择5 / 缘·人生大事4 / 数·号码姓名3 / 运·流年运势2 / 盘·排盘进阶1），组头单字徽章
 - ask.html 19 工具重排：问事起卦→命理排盘→运势走势→人生规划→婚恋家庭→风水→号码姓名→日历幸运
