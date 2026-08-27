@@ -104,12 +104,12 @@ async function generateFullReport(mod){
     if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
     if(inputs.leapMonth===undefined) inputs.leapMonth = false;
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify({
         ...inputs,
         questions: [inputs.question||''].filter(Boolean),
@@ -161,8 +161,8 @@ async function doPaipan(){
   let r, rSvg;
   try {
     [r, rSvg] = await Promise.all([
-      fetch(API_BASE+'/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
-      fetch(API_BASE+'/api/paipan/fengshui/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+      fetch(API_BASE+'/api/paipan/fengshui',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/fengshui/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
     ]);
   } catch(e) {
     showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
@@ -177,7 +177,9 @@ async function doPaipan(){
   if(data.interpretation) renderInterpretation(data.interpretation);
 }
 function renderChart(c){
-  document.getElementById('fs-meta').innerHTML=`${c.year}年 · ${c.yunName} · 坐${c.sittingMountain}向${c.facingMountain}<br>山星:${c.mountainStar} | 向星:${c.facingStar}`;
+  document.getElementById('fs-meta').innerHTML=`${c.year}年 · ${c.yunName} · 坐${c.sittingMountain}向${c.facingMountain}<br>`+
+    `山星:${c.mountainStar}${c.mountainShun?'顺飞':'逆飞'} | 向星:${c.facingStar}${c.facingShun?'顺飞':'逆飞'}`+
+    (c.jushi&&c.jushi.length?`<br><span style="color:var(--gold);font-weight:600">${c.jushi.map(j=>j.name).join(' · ')}</span>`:'');
   const grid=document.getElementById('fs-grid');
   grid.style.display='grid';
   const layout=[4,9,2,3,5,7,8,1,6];
@@ -189,12 +191,12 @@ function renderChart(c){
     const cls=['fs-gong'];
     if(p===5) cls.push('center');
     div.className=cls.join(' ');
-    let html=`<div class="fs-gong-name">${pal.name}宫</div><div class="fs-gong-dir">${pal.direction}</div>`;
+    let html=`<div class="fs-gong-name">${pal.name}宫${pal.isSit?'<span style="color:var(--jade);font-size:9px;margin-left:2px">坐</span>':''}${pal.isFace?'<span style="color:var(--gold);font-size:9px;margin-left:2px">向</span>':''}</div><div class="fs-gong-dir">${pal.direction}</div>`;
     if(p!==5){
       const jb=pal.auspicious==='吉'?'ji':'xiong';
       html+=`<div class="fs-row"><span class="fs-label">运</span><span class="fs-val yun">${pal.yunStar}<span class="fs-jixiong ${jb}">${pal.auspicious}</span></span></div>`;
-      html+=`<div class="fs-row"><span class="fs-label">山</span><span class="fs-val shan">${pal.mountainStar}</span></div>`;
-      html+=`<div class="fs-row"><span class="fs-label">向</span><span class="fs-val xiang">${pal.facingStar}</span></div>`;
+      html+=`<div class="fs-row"><span class="fs-label">山</span><span class="fs-val shan">${pal.mountainStar}${pal.mountainWuxing?`<span style="font-size:8px;color:var(--paper3)">${pal.mountainWuxing}</span>`:''}</span></div>`;
+      html+=`<div class="fs-row"><span class="fs-label">向</span><span class="fs-val xiang">${pal.facingStar}${pal.facingWuxing?`<span style="font-size:8px;color:var(--paper3)">${pal.facingWuxing}</span>`:''}</span></div>`;
     } else {
       html+=`<div class="fs-row"><span class="fs-label">运</span><span class="fs-val yun">${pal.yunStar}</span></div>`;
       html+=`<div class="fs-row"><span class="fs-label">山</span><span class="fs-val shan">${pal.mountainStar}</span></div>`;
@@ -210,6 +212,19 @@ function renderChart(c){
   if(c.taisui) ih+=`太岁：${c.taisui.zhi}（${c.taisui.direction}）<br>`;
   if(c.sansha) ih+=`三煞：${c.sansha.join('、')}<br>`;
   ih+='</div>';
+  if(c.jushi && c.jushi.length){
+    ih+=`<div class="fs-info-card"><h4>玄空格局</h4>`;
+    for(const j of c.jushi) ih+=`<span style="color:${j.type==='吉'?'var(--green)':j.type==='凶'?'var(--red)':'var(--gold)'}">${j.name}</span>：${j.desc}<br>`;
+    ih+='</div>';
+  }
+  if(c.bazhai && Object.keys(c.bazhai).length){
+    ih+=`<div class="fs-info-card"><h4>八宅（坐${c.sittingGua||''}）</h4>`;
+    for(const [k,v] of Object.entries(c.bazhai)){
+      const isJi=/生气|天医|延年|伏位/.test(v);
+      ih+=`<span style="color:${isJi?'var(--green)':'var(--red)'}">${v}</span> `;
+    }
+    ih+='</div>';
+  }
   ih+=`<div class="fs-info-card"><h4>九星吉凶</h4>`;
   ih+='1白·吉 2黑·凶 3碧·凶<br>4绿·吉 5黄·大凶 6白·吉<br>7赤·凶 8白·吉 9紫·吉';
   ih+='</div>';

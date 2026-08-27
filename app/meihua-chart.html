@@ -106,12 +106,12 @@ async function generateFullReport(mod){
     if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
     if(inputs.leapMonth===undefined) inputs.leapMonth = false;
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify({
         ...inputs,
         // 字段映射：前端字段名 → 后端期望字段名
@@ -167,8 +167,8 @@ async function doPaipan(){
   let r, rSvg;
   try {
     [r, rSvg] = await Promise.all([
-      fetch(API_BASE+'/api/paipan/meihua',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
-      fetch(API_BASE+'/api/paipan/meihua/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+      fetch(API_BASE+'/api/paipan/meihua',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/meihua/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
     ]);
   } catch(e) {
     showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
@@ -199,7 +199,10 @@ function renderChart(c){
     const cls=y.isDong?'mh-yao dong':'mh-yao';
     const line=y.yin?'— —':'———';
     const tag=y.isDong?'<span style="color:var(--red)">○动</span>':'';
-    const tiTag=(i===c.tiYong.dongYao)?'<span style="color:var(--gold)">用</span>':'<span style="color:var(--jade)">体</span>';
+    // 体用以卦分：动爻所在之卦为用，另一卦为体（旧版只标动爻为用，误导）
+    const yongIsLower = c.dongYao <= 2;
+    const inYong = yongIsLower ? i <= 2 : i >= 3;
+    const tiTag=inYong?'<span style="color:var(--gold)">用</span>':'<span style="color:var(--jade)">体</span>';
     html+=`<div class="${cls}"><div class="pos">${y.positionName}</div><div class="line">${line}</div><div class="wx">${y.isUpper?'上卦':'下卦'}</div><div class="tag">${tiTag} ${tag}</div></div>`;
   }
   html+='</div>';

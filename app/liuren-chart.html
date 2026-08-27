@@ -106,12 +106,12 @@ async function generateFullReport(mod){
     if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
     if(inputs.leapMonth===undefined) inputs.leapMonth = false;
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify({
         ...inputs,
         // 字段映射：前端字段名 → 后端期望字段名
@@ -164,8 +164,8 @@ async function doPaipan(){
   let r, rSvg;
   try {
     [r, rSvg] = await Promise.all([
-      fetch(API_BASE+'/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
-      fetch(API_BASE+'/api/paipan/liuren/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+      fetch(API_BASE+'/api/paipan/liuren',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/liuren/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
     ]);
   } catch(e) {
     showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
@@ -173,6 +173,7 @@ async function doPaipan(){
   }
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
+  window._lrChart=data.chart;
   const svg = await rSvg.text();
   renderChart(data.chart);
   renderSvg(svg);
@@ -180,31 +181,79 @@ async function doPaipan(){
   if(data.interpretation) renderInterpretation(data.interpretation);
 }
 function renderChart(c){
-  document.getElementById('lr-meta').innerHTML=`${c.dayGanZhi}日 ${c.hourZhi}时 | 月将:${c.monthJiang} | ${c.isDaytime?'昼':'夜'}占 | 贵人:${c.guiren}`+
+  document.getElementById('lr-meta').innerHTML=`${c.dayGanZhi}日 ${c.hourZhi}时 | 月将:${c.monthJiang}${c.monthJiangName?'('+c.monthJiangName+')':''} | ${c.isDaytime?'昼':'夜'}占 | 贵人:${c.guiren}${c.guirenShun===true?'顺布':c.guirenShun===false?'逆布':''}`+
     (c.isFuYin?' | 伏吟':'')+(c.isFanYin?' | 反吟':'');
   const ct=document.getElementById('lr-content');
   ct.style.display='block';
+
+  // —— 专业辅助：天盘支 → 天将 / 六亲 ——
+  const ZHI_WX={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+  const GAN_WX={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+  const SHENG={金:'水',水:'木',木:'火',火:'土',土:'金'}, KE={金:'木',木:'土',土:'水',水:'火',火:'金'};
+  const dayWx=GAN_WX[c.dayGanZhi[0]];
+  function liuqinOf(zhi){
+    const w=ZHI_WX[zhi]; if(!w||!dayWx) return '';
+    if(w===dayWx) return '兄弟';
+    if(SHENG[w]===dayWx) return '父母';
+    if(SHENG[dayWx]===w) return '子孙';
+    if(KE[w]===dayWx) return '官鬼';
+    return '妻财';
+  }
+  // 天盘支的天将 = 其所临地盘宫的天将
+  function tianjiangOf(tpZhi){
+    const pal=(c.palaces||[]).find(pp=>pp.tianpanZhi===tpZhi);
+    return pal ? (pal.tianjiang||'') : '';
+  }
+
   let html='';
-  // 四课
+  // 四课（上神带天将+六亲）
   html+='<div class="lr-section"><h3>四课</h3><div class="lr-ke">';
-  for(const k of c.siKe){html+=`<div class="lr-ke-item"><div class="top">${k.top}</div><div class="bottom">${k.bottom}</div><div style="font-size:8px;color:var(--paper3)">第${k.course}课</div></div>`;}
-  html+='</div></div>';
-  // 三传
-  html+='<div class="lr-section"><h3>三传（'+c.sanChuan.method+'）</h3><div class="lr-chuan">';
-  html+=`<div class="lr-chuan-item chu"><div class="label">初传</div><div class="zhi">${c.sanChuan.chu}</div></div>`;
-  html+=`<div class="lr-chuan-item zhong"><div class="label">中传</div><div class="zhi">${c.sanChuan.zhong}</div></div>`;
-  html+=`<div class="lr-chuan-item mo"><div class="label">末传</div><div class="zhi">${c.sanChuan.mo}</div></div>`;
-  html+='</div></div>';
-  // 天盘
-  html+='<div class="lr-section"><h3>天盘地盘</h3><div class="lr-pan">';
-  const layout=[5,8,2,4,0,6,9,1,3]; // 中艮坤巽中兑坎震离（简化）
-  const dirs=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  for(let i=0;i<12;i++){
-    const p=c.palaces[i];
-    if(!p) continue;
-    html+=`<div class="lr-pan-item"><div class="zhi">${p.zhi}</div><div class="tp">↑${p.tianpanZhi}</div><div class="tj">${p.tianjiang||''}</div></div>`;
+  const KE_NAME=['干阳(第一课)','干阴(第二课)','支阳(第三课)','支阴(第四课)'];
+  for(const k of c.siKe){
+    const tj=tianjiangOf(k.top), lq=liuqinOf(k.top);
+    html+=`<div class="lr-ke-item"><div style="font-size:8px;color:var(--blue)">${tj}</div>`+
+      `<div class="top">${k.top}<span style="font-size:9px;color:var(--jade);margin-left:2px">${lq}</span></div>`+
+      `<div class="bottom">${k.bottom}</div>`+
+      `<div style="font-size:8px;color:var(--paper3)">${KE_NAME[k.course-1]||'第'+k.course+'课'}</div></div>`;
   }
   html+='</div></div>';
+  // 三传（带天将+六亲）
+  html+='<div class="lr-section"><h3>三传（'+c.sanChuan.method+'）</h3><div class="lr-chuan">';
+  for(const [label,zhi,cls] of [['初传',c.sanChuan.chu,'chu'],['中传',c.sanChuan.zhong,'zhong'],['末传',c.sanChuan.mo,'mo']]){
+    html+=`<div class="lr-chuan-item ${cls}"><div class="label">${label}</div>`+
+      `<div style="font-size:9px;color:var(--blue)">${tianjiangOf(zhi)}</div>`+
+      `<div class="zhi">${zhi}</div>`+
+      `<div style="font-size:9px;color:var(--jade)">${liuqinOf(zhi)}</div></div>`;
+  }
+  html+='</div></div>';
+  // 式盘：地盘固定方位（上南下北左东右西），每宫 天盘支+天将
+  //  巳 午 未 申
+  //  辰       酉
+  //  卯       戌
+  //  寅 丑 子 亥
+  html+='<div class="lr-section"><h3>式盘（天盘覆地盘 · 点宫看详情）</h3>';
+  html+='<div id="lr-shipan" style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;max-width:460px;margin:0 auto">';
+  const POS={巳:[0,0],午:[0,1],未:[0,2],申:[0,3],辰:[1,0],酉:[1,3],卯:[2,0],戌:[2,3],寅:[3,0],丑:[3,1],子:[3,2],亥:[3,3]};
+  const cells={};
+  for(const pal of c.palaces||[]){
+    cells[pal.zhi]=pal;
+  }
+  for(let r=0;r<4;r++) for(let col=0;col<4;col++){
+    const zhi=Object.keys(POS).find(z=>POS[z][0]===r&&POS[z][1]===col);
+    if(!zhi){
+      if(r===1&&col===1) html+=`<div style="grid-row:2/4;grid-column:2/4;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(201,168,76,.05);border:1px solid var(--border);border-radius:4px;font-size:10px;color:var(--paper2);line-height:1.9">`+
+        `<div style="color:var(--gold);font-size:12px;font-weight:600">${c.dayGanZhi}日 ${c.hourZhi}时</div>`+
+        `<div>月将 ${c.monthJiang}${c.monthJiangName?'·'+c.monthJiangName:''}</div>`+
+        `<div>${c.isDaytime?'昼':'夜'}占 · 贵${c.guiren}</div></div>`;
+      continue;
+    }
+    const pal=cells[zhi]||{zhi,tianpanZhi:'',tianjiang:''};
+    html+=`<div class="lr-pan-item" onclick="lrPalaceDetail('${zhi}')" style="cursor:pointer" title="点击查看${zhi}宫详情">`+
+      `<div class="tj" style="color:var(--blue)">${pal.tianjiang||''}</div>`+
+      `<div class="tp" style="color:var(--jade);font-size:13px;font-weight:600">${pal.tianpanZhi||''}</div>`+
+      `<div class="zhi" style="color:var(--paper3);font-size:11px">${zhi}</div></div>`;
+  }
+  html+='</div><div id="lr-palace-detail" style="margin-top:8px;font-size:11px;color:var(--paper2);text-align:center;min-height:18px"></div></div>';
   // 神煞
   if(c.shensha && Object.keys(c.shensha).length>0){
     html+='<div class="lr-section"><h3>神煞</h3><div class="lr-shensha">';
@@ -212,6 +261,18 @@ function renderChart(c){
     html+='</div></div>';
   }
   ct.innerHTML=html;
+}
+
+// 式盘点宫详情：天地盘 + 天将 + 类神
+function lrPalaceDetail(zhi){
+  const c = window._lrChart; if(!c) return;
+  const pal=(c.palaces||[]).find(p=>p.zhi===zhi);
+  const el=document.getElementById('lr-palace-detail');
+  if(!pal||!el) return;
+  const cg=c.classGods||{};
+  const cls=Object.entries(cg).filter(([t,arr])=>(arr||[]).some(it=>it.zhi===pal.tianpanZhi)).map(([t])=>t).join('、');
+  el.innerHTML=`<span style="color:var(--gold)">地盘${pal.zhi}宫</span> · 天盘 <span style="color:var(--jade)">${pal.tianpanZhi}</span> · 天将 <span style="color:var(--blue)">${pal.tianjiang||'-'}</span>`+
+    (cls?` · 类神: ${cls}`:'')+` · 五行 ${({子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'})[pal.tianpanZhi]||''}`;
 }
 
 function renderSvg(svg){
@@ -228,30 +289,31 @@ function renderSvg(svg){
 function renderFlow(flow, targetYear, currentAge){
   const old = document.getElementById('lr-flow-host');
   if(old) old.remove();
-  if(!flow) return;
+  if(!flow || (!flow.liuNian && !flow.currentDaXian)) return;
   const ln = flow.liuNian || {};
-  const xx = flow.xiaoXian || {};
   const dx = flow.currentDaXian || {};
+  const sc = ln.annualSanChuan || {};
   const host = document.createElement('div');
   host.id = 'lr-flow-host';
   host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
   host.innerHTML = `
-    <div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:8px">🌊 ${targetYear} 流年 · 现年 ${currentAge} 岁</div>
+    <div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:8px">🌊 ${ln.targetYear||targetYear||''} 流年 · 现年 ${currentAge||''} 岁</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
       <div style="background:rgba(201,168,76,.08);padding:8px;border-radius:6px">
-        <div style="color:var(--gold,#c9a84c)">流年</div>
-        <div>${ln.ganZhi||''}（${ln.shengXiao||''}）</div>
-        <div style="color:var(--paper3);margin-top:2px">${ln.naYin||''}</div>
+        <div style="color:var(--gold,#c9a84c)">流年太岁</div>
+        <div>${ln.yearGanZhi||''}（太岁${ln.taiSui?ln.taiSui.zhi:''}）</div>
+        <div style="color:var(--paper3);margin-top:2px">${ln.taiSui?ln.taiSui.relation:''}</div>
+        <div style="color:var(--paper3)">岁破:${ln.suiPo?ln.suiPo.zhi:''}</div>
       </div>
       <div style="background:rgba(78,201,176,.08);padding:8px;border-radius:6px">
-        <div style="color:var(--jade,#4ec9b0)">小限</div>
-        <div>${xx.palaceName||''}宫</div>
-        <div style="color:var(--paper3);margin-top:2px">${xx.direction||''}</div>
+        <div style="color:var(--jade,#4ec9b0)">流年三传</div>
+        <div>${sc.method||''}</div>
+        <div style="color:var(--paper3);margin-top:2px">${sc.chu?('初'+sc.chu+' 中'+sc.zhong+' 末'+sc.mo):''}</div>
       </div>
       <div style="background:rgba(99,179,237,.08);padding:8px;border-radius:6px">
-        <div style="color:var(--blue,#63b3ed)">大限</div>
-        <div>${dx.startAge||''} - ${dx.endAge||''} 岁</div>
-        <div style="color:var(--paper3);margin-top:2px">${dx.ganZhi||''} · ${dx.palaceName||''}</div>
+        <div style="color:var(--blue,#63b3ed)">年运（${dx.decade||''}）</div>
+        <div>${dx.decadeZhi||''}（${dx.decadeWuxing||''}）</div>
+        <div style="color:var(--paper3);margin-top:2px">${dx.decadeRelation||''}</div>
       </div>
     </div>`;
   const content = document.getElementById('lr-content');

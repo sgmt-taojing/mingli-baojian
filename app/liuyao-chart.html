@@ -119,12 +119,12 @@ async function generateFullReport(mod){
     if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
     if(inputs.leapMonth===undefined) inputs.leapMonth = false;
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify({
         ...inputs,
         // 字段映射：前端字段名 → 后端期望字段名
@@ -181,8 +181,8 @@ async function doPaipan(){
   let r, rSvg;
   try {
     [r, rSvg] = await Promise.all([
-      fetch(API_BASE+'/api/paipan/liuyao',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
-      fetch(API_BASE+'/api/paipan/liuyao/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+      fetch(API_BASE+'/api/paipan/liuyao',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/liuyao/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
     ]);
   } catch(e) {
     showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
@@ -198,7 +198,8 @@ async function doPaipan(){
 }
 
 function renderChart(c){
-  document.getElementById('ly-meta').innerHTML=`日干支:${c.dayGanZhi} | 日五行:${c.dayWuxing}<br>`+
+  const xk = c.xunKong && c.xunKong.kong ? ` | 旬空:${c.xunKong.kong.split('').join('、')}` : '';
+  document.getElementById('ly-meta').innerHTML=`${c.gongName||''}(${c.gongWuxing||''}) · ${c.guaType||''} | 日干支:${c.dayGanZhi} | 日五行:${c.dayWuxing}${xk}<br>`+
     `<span>世爻:第${c.shiYao+1}爻</span><span>应爻:第${c.yingYao+1}爻</span>`;
 
   const chart=document.getElementById('ly-chart');
@@ -222,11 +223,15 @@ function renderChart(c){
     const line=y.yin?'— —':'———';
     const bian=y.bian?'<span class="ly-yao-bian">○变</span>':'';
     const sy=y.shiying?`<span class="ly-yao-sy">${y.shiying}</span>`:'';
-    html+=`<div class="ly-yao">`;
+    const kong=y.kong?'<span style="color:var(--red);font-size:9px;border:1px solid var(--red);border-radius:3px;padding:0 2px;margin-left:2px">空</span>':'';
+    // 伏神: 本爻下伏神（隐藏六亲）
+    const fs=(c.fushen||[]).find(f=>f.position===y.position);
+    const fsHtml=fs?`<div style="font-size:9px;color:var(--paper3)">伏${fs.liuqin}${fs.ganZhi}${fs.wuxing}</div>`:'';
+    html+=`<div class="ly-yao"${y.kong?' style="opacity:.55"':''}>`;
     html+=`<div class="ly-yao-pos">${y.positionName}</div>`;
     html+=`<div class="ly-yao-line">${line}</div>`;
-    html+=`<div class="ly-yao-gz">${y.ganZhi}</div>`;
-    html+=`<div class="ly-yao-wx">${y.wuxing}·${y.liuqin}</div>`;
+    html+=`<div class="ly-yao-gz">${y.ganZhi}${kong}</div>`;
+    html+=`<div class="ly-yao-wx">${y.wuxing}·${y.liuqin}${fsHtml}</div>`;
     html+=`<div class="ly-yao-lq">${y.liushen}</div>`;
     html+=`<div>${sy}${bian}</div>`;
     html+=`</div>`;
@@ -239,9 +244,16 @@ function renderChart(c){
   let infoHtml='';
   infoHtml+=`<div class="ly-info-card"><h4>本卦</h4>`;
   infoHtml+=`卦名：${c.guaName}<br>`;
+  infoHtml+=`卦宫：${c.gongName||''}（${c.gongWuxing||''}）· ${c.guaType||''}<br>`;
   infoHtml+=`上卦：${c.upper.name}${c.upper.symbol}（${c.upper.nature}）<br>`;
   infoHtml+=`下卦：${c.lower.name}${c.lower.symbol}（${c.lower.nature}）<br>`;
+  if(c.xunKong) infoHtml+=`旬空：${c.xunKong.xun||''}旬 ${c.xunKong.kong.split('').join('、')}空<br>`;
   infoHtml+=`</div>`;
+  if(c.fushen && c.fushen.length){
+    infoHtml+=`<div class="ly-info-card"><h4>伏神（本宫借六亲）</h4>`;
+    for(const f of c.fushen) infoHtml+=`${f.liuqin} ${f.ganZhi}${f.wuxing} 伏于第${f.position}爻${f.hideUnder}下<br>`;
+    infoHtml+=`</div>`;
+  }
   if(c.bianGua){
     infoHtml+=`<div class="ly-info-card"><h4>变卦</h4>`;
     infoHtml+=`卦名：${c.bianGua.name}<br>`;

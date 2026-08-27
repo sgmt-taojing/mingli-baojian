@@ -139,12 +139,12 @@ async function generateFullReport(mod){
     if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
     if(inputs.leapMonth===undefined) inputs.leapMonth = false;
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
     
     const r = await fetch(API_BASE+'/api/paipan/'+mod+'/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify({
         ...inputs,
         // 字段映射：前端字段名 → 后端期望字段名
@@ -200,8 +200,8 @@ async function doPaipan(){
   let r, rSvg;
   try {
     [r, rSvg] = await Promise.all([
-      fetch(API_BASE+'/api/paipan/qimen',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
-      fetch(API_BASE+'/api/paipan/qimen/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
+      fetch(API_BASE+'/api/paipan/qimen',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)}),
+      fetch(API_BASE+'/api/paipan/qimen/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body),signal:AbortSignal.timeout(20000)})
     ]);
   } catch(e) {
     showToast('排盘请求失败：' + (e && esc(e.message) || '网络异常') + '，请重试','err');
@@ -220,11 +220,13 @@ function renderChart(c){
   // meta
   const meta=document.getElementById('qm-meta');
   const yinYang=c.isYang?'<span class="qm-badge yang">阳遁</span>':'<span class="qm-badge yin">阴遁</span>';
-  const fuYin=c.isFuYin?'<span class="qm-badge fuyin">伏吟</span>':'';
-  const fanYin=c.isFanYin?'<span class="qm-badge fanyin">反吟</span>':'';
-  meta.innerHTML=`${c.ju} ${yinYang}${fuYin}${fanYin}<br>`+
-    `<span>时柱:${c.hourGanZhi}</span><span>旬首:${c.xunShou}</span><span>遁:${c.dun}</span><br>`+
-    `<span>值符:${c.zhiFuStar}</span><span>值使:${c.zhiShiDoor}</span><span>空亡:${c.kongWang.join('、')}</span>`+
+  const fuYin=c.isFuYin?'<span class="qm-badge fuyin">星伏吟</span>':'';
+  const fanYin=c.isFanYin?'<span class="qm-badge fanyin">星反吟</span>':'';
+  const mFu=c.menFuYin?'<span class="qm-badge fuyin">门伏吟</span>':'';
+  const mFan=c.menFanYin?'<span class="qm-badge fanyin">门反吟</span>':'';
+  meta.innerHTML=`${c.ju}${c.juYuan?'·'+c.juYuan:''} ${yinYang}${fuYin}${fanYin}${mFu}${mFan}<br>`+
+    `<span>节气:${c.jieqi||''}</span><span>日柱:${c.dayGanZhi}</span><span>时柱:${c.hourGanZhi}</span><span>旬首:${c.xunShou}</span><span>遁:${c.dun}</span><br>`+
+    `<span>值符:${c.zhiFuStar}落${c.zhiFuPalace}宫</span><span>值使:${c.zhiShiDoor}落${c.zhiShiPalace||''}宫</span><span>空亡:${c.kongWang.join('、')}</span>`+
     (c.maStar?`<span>马星:${c.maStar}宫</span>`:'');
 
   // grid: 九宫按后天八卦排列
@@ -249,7 +251,7 @@ function renderChart(c){
     if(p!==5){
       html+=`<div class="qm-row"><span class="qm-label">地</span><span class="qm-val dipan">${palace.dipan||'-'}</span></div>`;
       html+=`<div class="qm-row"><span class="qm-label">天</span><span class="qm-val tianpan">${palace.tianpan||'-'}</span></div>`;
-      html+=`<div class="qm-row"><span class="qm-label">星</span><span class="qm-val star">${palace.star||'-'}</span></div>`;
+      html+=`<div class="qm-row"><span class="qm-label">星</span><span class="qm-val star">${palace.star||'-'}${palace.diStar&&palace.diStar!==palace.star?`<span style="font-size:8px;color:var(--paper3)">(本${palace.diStar})</span>`:''}</span></div>`;
       html+=`<div class="qm-row"><span class="qm-label">门</span><span class="qm-val door">${palace.door||'-'}</span></div>`;
       html+=`<div class="qm-row"><span class="qm-label">神</span><span class="qm-val god">${palace.god||'-'}</span></div>`;
       if(palace.isKongWang) html+=`<div class="qm-val kong">空亡</div>`;
