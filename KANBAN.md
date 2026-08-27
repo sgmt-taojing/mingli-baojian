@@ -1,4 +1,17 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 18:25 — ✅ 问诊台医院全流程两拼图：叫号队列 + 医技开单（端到端验收通过）
+- server 5754ec7：clinic_queue/tech_order 两表 + 7 端点（checkin/queue/call/transition/tech-order/tech-orders/tech-order transition），状态机校验、加急优先、审计日志
+- 主仓 b8abf49：unified-consultation.html 新增叫号队列卡（三列态 8s 轮询）与医技开单卡（目录点选/执行/回填/作废/一键旁证）
+- 叫号自动带入开单患者与病历主诉；reported 单经 lab-evidence 分析后旁证（异常指标+五行佐证+中医提示）写入四诊区
+- 验收：curl 冒烟 7 端点全过；浏览器全链路（取号→叫号→就诊→完成 / 开单→执行→回填→旁证入病历）通过，截图验收
+## 2026-08-27 18:09 — ⚠️ face-ocr(:8913) DOWN：models/ 下 17 个 ONNX 软链悬空（心跳发现 · 待修真）
+- 心跳 health-check 报 face-ocr(:8913) DOWN（launchd 退出码 1）
+- /tmp/face-ocr.log 报 `FileNotFoundError: 'models/tcm-face-color-classifier.onnx'`
+- 真因：`models/` 下 17 个 `tcm-*.onnx / fortune-*.onnx` 系软链 → `../ai-vision-toolkit/models/xxx.onnx`，目标全部不在（ai-vision-toolkit 端只留 onnx/{classifier-helmet,mobilenet-*,resnet-fire,yolov8s-detect,unet-tongue-seg,classifier-helmet} 等通用模型，无 TCM/fortune 对应文件）
+- 影响：face-ocr-server.py 启动即崩（vision-onnx-integration.py init 循环 13 模型 stat() 失败），重启 N 次仍 DOWN；其他 svc（8941 face-diag / 8944 hand-diag）走自有 svc 而非此 svc，未受影响
+- 修真方向（主会话决策）：①从 ai-vision-toolkit 重建/找回对应模型 ②或改 face-ocr-server 走 OneFrame（已就位 oneframe-tcm-face/lip/tongue-color/coating/eye/nail v2.0+labels，8941/8942/8943/8944 已承担诊断；face-ocr 仅承担 OCR 不需 ONNX） ③或彻底退役 face-ocr-server 把端口 8913 释放
+- 待主会话排期（非本心跳修真）
+
 ## 2026-08-27 17:50 — 文字标签全面图片化（金字印章风格统一）
 - 新增 scripts/gen-title-images.py 通用生成器（宋体 Bold 描金渐变+朱红印章+透明底 @2x），一次产出 app/assets/titles/*.png ×76（首页 48 / 排盘中心 7 / 命理工具 6 / 问事网格 14 + 复用）
 - index.html：集中 MAP 映射 + DOM 替换（alt 保留原文，「全部」分区克隆后二次幂等替换）；零文字残留，100 张图全加载
