@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>拦截器兼容层自检 · 命理宝鉴</title>
+<style>body{background:#0a0e17;color:#e5e7eb;font:14px/1.8 monospace;padding:24px} .pass{color:#10b981} .fail{color:#ef4444}</style>
+</head>
+<body>
+<h3>error-interceptor Response 兼容层 · 真实环境自检</h3>
+<div id="out">运行中…</div>
+<script src="js/error-interceptor.js?v=20260827-compat"></script>
+<script>
+const API = 'http://127.0.0.1:8920';
+window.addEventListener('DOMContentLoaded', () => setTimeout(runTests, 300));
+async function runTests(){
+  const out = [];
+  const t = (name, cond) => out.push(`<div class="${cond ? 'pass' : 'fail'}">${cond ? '✓' : '✗'} ${name}</div>`);
+  try {
+    // 1. 真实端点：旧壳直取字段 + .json() 双通道
+    let r = await fetch(API + '/api/public/kb/stats');
+    const j1 = await r.json();
+    t('直取归一化 ok/code（' + r.ok + '/' + r.code + '）', r.ok === true && r.code === 0);
+    t('.json() 返回原始体（键:' + Object.keys(j1 || {}).slice(0, 4).join(',') + '）', j1 && typeof j1 === 'object');
+    // 2. 平铺业务字段可取（旧壳）
+    const spreadOk = Object.keys(j1 || {}).some(k => k in r && k !== 'ok' && k !== 'code');
+    t('业务字段平铺可取', spreadOk);
+    // 3. 豁免头 → 原生 Response
+    const raw = await fetch(API + '/api/public/kb/stats', { headers: { 'X-Skip-Interceptor': '1' } });
+    t('豁免头返回原生 Response', typeof raw.json === 'function' && raw.code === undefined && raw.constructor && raw.constructor.name === 'Response');
+    // 4. 失败业务码可见（限流/错误路径不静默）
+    const bad = await fetch(API + '/api/paipan/liuren/report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    t('业务失败 ok=false 且带 missing（code=' + bad.code + '）', bad.ok === false && (bad.code !== 0));
+  } catch (e) {
+    out.push('<div class="fail">✗ 异常: ' + (e && e.message) + '</div>');
+  }
+  document.getElementById('out').innerHTML = out.join('');
+}
+</script>
+</body>
+</html>

@@ -216,7 +216,7 @@
   //    - 旧壳: { success, data, error } 等
   //    - 如果都没，按 HTTP 状态推断
   // ─────────────────────────────────────────────────────────────
-  function normalizeResponse(res, body) {
+  function normalizeResponse(body, httpStatus) {
     if (body == null) return { code: ERROR_CODES.NETWORK_ERROR, message: t('error.504000', '空响应'), data: null };
     if (typeof body === 'object') {
       // 新壳
@@ -234,6 +234,15 @@
           code: body.success ? 0 : ERROR_CODES.SERVER_ERROR,
           message: body.error || (body.success ? t('success', 'ok') : t('failed', '操作失败')),
           data: body.data === undefined ? null : body.data
+        };
+      }
+      // 旧壳：ok 布尔字段（大量历史端点：{ok:true, chart:{...}} / {ok:false, error:'...'}）
+      if ('ok' in body && typeof body.ok === 'boolean') {
+        return {
+          code: body.ok ? 0 : (typeof body.code === 'number' ? body.code : ERROR_CODES.SERVER_ERROR),
+          message: body.message || body.error || (body.ok ? t('success', 'ok') : t('failed', '操作失败')),
+          data: body.data !== undefined ? body.data : body,
+          traceId: body.traceId || null
         };
       }
       // 兼容老 _v1 字段
@@ -332,7 +341,23 @@
               if (!resp.ok && n.code === 0) {
                 n.code = httpCodeToBiz(resp.status);
               }
-              return { ok: n.code === 0, code: n.code, message: n.message, data: n.data, traceId: n.traceId, httpStatus: resp.status, response: resp };
+              const normalized = { ok: n.code === 0, code: n.code, message: n.message, data: n.data, traceId: n.traceId, httpStatus: resp.status, response: resp };
+              // R-INT 兼容层：让返回值同时是「Response 兼容对象」——旧代码 .json()/.text()/.status 不再 TypeError，
+              // 旧壳业务字段（chart/pillars/...）直接平铺可取；归一化键（ok/code/message/data/httpStatus）优先。
+              const isPlainObj = body && typeof body === 'object' && !Array.isArray(body);
+              return Object.assign(
+                {},
+                isPlainObj ? body : {},
+                normalized,
+                {
+                  status: resp.status,
+                  statusText: resp.statusText,
+                  headers: resp.headers,
+                  json: () => Promise.resolve(body),
+                  text: () => Promise.resolve(typeof body === 'string' ? body : JSON.stringify(body)),
+                  clone: () => resp.clone(),
+                }
+              );
             }).catch((e) => {
               return { ok: false, code: ERROR_CODES.PARSE_ERROR, message: t('error.504003', 'JSON 解析失败'), data: null, httpStatus: resp.status, response: resp };
             });
