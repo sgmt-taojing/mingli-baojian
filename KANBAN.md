@@ -1,4 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 18:32 — ✅ face-ocr(:8913) 修真完成：悬空软链跳过 + stat 兜底，服务恢复 UP
+- server 6d36252：get_model_path 模糊匹配跳过 broken symlink；初始化 stat 加 OSError 兜底
+- 重启后 /health 200，13 个缺失模型降级为告警日志，OCR/PIL 启发式链路不受影响
+- 后续可选：从 ai-vision-toolkit 补齐 TCM 模型或正式退役 ONNX 面诊路径（OneFrame 已覆盖）
 ## 2026-08-27 18:25 — ✅ 问诊台医院全流程两拼图：叫号队列 + 医技开单（端到端验收通过）
 - server 5754ec7：clinic_queue/tech_order 两表 + 7 端点（checkin/queue/call/transition/tech-order/tech-orders/tech-order transition），状态机校验、加急优先、审计日志
 - 主仓 b8abf49：unified-consultation.html 新增叫号队列卡（三列态 8s 轮询）与医技开单卡（目录点选/执行/回填/作废/一键旁证）
