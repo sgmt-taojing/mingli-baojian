@@ -25,6 +25,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 .ms-card:hover{transform:translateY(-2px);border-color:var(--gold)}
 .ms-icon{font-size:36px;margin-bottom:8px;display:block}
 .ms-name{font-size:15px;color:var(--gold);font-weight:600;margin-bottom:4px}
+.ms-name-img{height:27px;width:auto;display:block;margin-bottom:6px}
 .ms-desc{font-size:11px;color:var(--paper3);line-height:1.6}
 .ms-api{font-size:9px;color:var(--jade);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);opacity:.7}
 .ms-card.ms-huangli{border-left:3px solid var(--gold)}
@@ -37,7 +38,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 .ms-card.ms-lucky{border-left:3px solid #f59e0b}
 .ms-footer{text-align:center;margin-top:24px;font-size:11px;color:var(--paper3)}
 .ms-footer a{color:var(--gold);text-decoration:none}
-@media(max-width:768px){.ms-grid{grid-template-columns:repeat(2,1fr);gap:8px}.ms-card{padding:14px}.ms-icon{font-size:28px}.ms-name{font-size:13px}.ms-desc{font-size:10px}}
+@media(max-width:768px){.ms-grid{grid-template-columns:repeat(2,1fr);gap:8px}.ms-card{padding:14px}.ms-icon{font-size:28px}.ms-name{font-size:13px}.ms-name-img{height:23px}.ms-desc{font-size:10px}}
 @media(max-width:360px){.ms-grid{grid-template-columns:1fr;gap:6px}.ms-card{padding:12px}.ms-icon{font-size:24px}.ms-header{padding:14px}.ms-title{font-size:18px}}
 @media print {
   .no-print{display:none!important}
@@ -80,73 +81,73 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <div class="ms-grid">
   <a class="ms-card ms-huangli" href="javascript:void(0)" onclick="showTool('huangli')">
     <span class="ms-icon">历</span>
-    <div class="ms-name">黄历查询</div>
+    <img class="ms-name-img" src="assets/minsu/title-huangli.png" alt="黄历查询">
     <div class="ms-desc">日干支 · 建除 · 宜忌 · 冲煞 · 值神 · 胎神</div>
     <div class="ms-api">GET /api/minsu/huangli</div>
   </a>
   <a class="ms-card ms-zeri" href="javascript:void(0)" onclick="showTool('zeri')">
     <span class="ms-icon">历</span>
-    <div class="ms-name">择日建议</div>
+    <img class="ms-name-img" src="assets/minsu/title-zeri.png" alt="择日建议">
     <div class="ms-desc">嫁娶 · 搬家 · 开业 · 动土 · 安葬 · 祭祀 · 出行</div>
     <div class="ms-api">GET /api/minsu/zeri</div>
   </a>
   <a class="ms-card ms-taisui" href="javascript:void(0)" onclick="showTool('taisui')">
     <span class="ms-icon">拜</span>
-    <div class="ms-name">太岁查询</div>
+    <img class="ms-name-img" src="assets/minsu/title-taisui.png" alt="太岁查询">
     <div class="ms-desc">本命太岁 · 冲刑害破 · 化解建议</div>
     <div class="ms-api">GET /api/minsu/taisui</div>
   </a>
   <a class="ms-card ms-jieqi" href="javascript:void(0)" onclick="showTool('jieqi')">
     <span class="ms-icon">草</span>
-    <div class="ms-name">24节气</div>
+    <img class="ms-name-img" src="assets/minsu/title-jieqi.png" alt="24节气">
     <div class="ms-desc">节气表 · 当前节气 · 节气养生</div>
     <div class="ms-api">GET /api/minsu/jieqi</div>
   </a>
   <a class="ms-card ms-mobile" href="javascript:void(0)" onclick="showTool('mobile')">
     <span class="ms-icon">机</span>
-    <div class="ms-name">手机号码</div>
+    <img class="ms-name-img" src="assets/minsu/title-mobile.png" alt="手机号码">
     <div class="ms-desc">尾数五行 · 81数理 · 组段分析 · 连号重号</div>
     <div class="ms-api">GET /api/minsu/mobile</div>
   </a>
   <a class="ms-card ms-xingming" href="rename.html">
     <span class="ms-icon">写</span>
-    <div class="ms-name">姓名学</div>
+    <img class="ms-name-img" src="assets/minsu/title-xingming.png" alt="姓名学">
     <div class="ms-desc">三才五格 · 笔画五行 · 81数理 · 相生相克</div>
     <div class="ms-api">GET /api/minsu/xingming</div>
   </a>
   <a class="ms-card ms-liunian" href="javascript:void(0)" onclick="showTool('liunian')">
     <span class="ms-icon">更</span>
-    <div class="ms-name">流年运程</div>
+    <img class="ms-name-img" src="assets/minsu/title-liunian.png" alt="流年运程">
     <div class="ms-desc">生肖关系 · 五行年运 · 12流月评分</div>
     <div class="ms-api">GET /api/minsu/liunian</div>
   </a>
   <a class="ms-card ms-lucky" href="javascript:void(0)" onclick="showTool('lucky')">
     <span class="ms-icon">🍀</span>
-    <div class="ms-name">幸运数色</div>
+    <img class="ms-name-img" src="assets/minsu/title-lucky.png" alt="幸运数色">
     <div class="ms-desc">幸运数字 · 幸运色 · 方位 · 季节</div>
     <div class="ms-api">GET /api/minsu/lucky</div>
   </a>
   <a class="ms-card" href="javascript:void(0)" onclick="showTool('hehun')" style="border-left:3px solid #f472b6">
     <span class="ms-icon">💕</span>
-    <div class="ms-name">合婚分析</div>
+    <img class="ms-name-img" src="assets/minsu/title-hehun.png" alt="合婚分析">
     <div class="ms-desc">生肖六盒六冲 · 五行生克 · 纳音 · 吕才合婚法</div>
     <div class="ms-api">GET /api/minsu/hehun</div>
   </a>
   <a class="ms-card" href="javascript:void(0)" onclick="showTool('family')" style="border-left:3px solid #34d399">
     <span class="ms-icon">👨‍👩‍👧</span>
-    <div class="ms-name">家庭排盘</div>
+    <img class="ms-name-img" src="assets/minsu/title-family.png" alt="家庭排盘">
     <div class="ms-desc">家庭成员五行 · 生肖关系 · 缺五行分析</div>
     <div class="ms-api">POST /api/minsu/family</div>
   </a>
   <a class="ms-card" href="javascript:void(0)" onclick="showTool('holidays')" style="border-left:3px solid #fbbf24">
     <span class="ms-icon">庆</span>
-    <div class="ms-name">节日查询</div>
+    <img class="ms-name-img" src="assets/minsu/title-holidays.png" alt="节日查询">
     <div class="ms-desc">法定假日 · 农历节日 · 道教佛诞 · 儒家纪念</div>
     <div class="ms-api">GET /api/minsu/holidays</div>
   </a>
   <a class="ms-card" href="paipan-center.html" style="border-left:3px solid var(--paper3)">
     <span class="ms-icon">🌀</span>
-    <div class="ms-name" style="color:var(--paper2)">排盘中心</div>
+    <img class="ms-name-img" src="assets/minsu/title-paipan.png" alt="排盘中心" style="opacity:.75">
     <div class="ms-desc">7模块古制排盘</div>
   </a>
 </div>
