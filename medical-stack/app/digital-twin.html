@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/digital-twin.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>数字孪生 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🔄</text></svg>">
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb;--purple-bg:#f5f0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:800px;margin:0 auto;padding:12px}
+.header{text-align:center;padding:20px;background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;border-radius:0 0 16px 16px;margin-bottom:12px}
+.header h1{font-size:20px;letter-spacing:2px}
+.header p{font-size:12px;opacity:.6}
+
+.card{background:var(--card);border-radius:12px;padding:16px;margin:12px 0;border:1px solid var(--border)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+
+/* Score ring */
+.score-ring{text-align:center;padding:16px}
+.score-circle{display:inline-block;width:120px;height:120px;border-radius:50%;border:8px solid var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:var(--primary);transition:.5s}
+.score-circle.grade-A{border-color:var(--green);color:var(--green)}
+.score-circle.grade-B{border-color:var(--blue);color:var(--blue)}
+.score-circle.grade-C{border-color:var(--gold);color:var(--gold)}
+.score-circle.grade-D{border-color:var(--accent);color:var(--accent)}
+.score-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;font-size:11px}
+.score-breakdown div{padding:4px;text-align:center;border-radius:4px;background:var(--bg)}
+
+/* Organ bars */
+.organ-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;margin:8px 0}
+.organ-item{background:var(--bg);border-radius:8px;padding:10px}
+.organ-item .organ-icon{font-size:28px}
+.organ-item .organ-name{font-size:12px;font-weight:600;margin:4px 0}
+.organ-bar{height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-top:4px}
+.organ-bar .fill{height:100%;border-radius:3px;transition:.5s}
+.fill.green{background:var(--green)} .fill.blue{background:var(--blue)} .fill.gold{background:var(--gold)} .fill.red{background:var(--accent)}
+
+/* Timeline */
+.timeline{position:relative;padding-left:20px}
+.timeline-item{position:relative;padding:8px 0;border-left:2px solid var(--border);padding-left:16px;margin-bottom:8px}
+.timeline-item::before{content:'';position:absolute;left:-6px;top:14px;width:10px;height:10px;border-radius:50%;background:var(--primary)}
+.timeline-item .ti-date{font-size:10px;color:var(--text3)}
+.timeline-item .ti-content{font-size:13px;margin-top:2px}
+
+/* Trend */
+.trend-badge{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.trend-improving{background:var(--green-bg);color:var(--green)}
+.trend-declining{background:var(--red-bg);color:var(--accent)}
+.trend-stable{background:var(--blue-bg);color:var(--blue)}
+
+/* Risks */
+.risk-item{padding:8px 12px;border-radius:8px;margin:4px 0;font-size:12px}
+.risk-high{background:var(--red-bg);border:1px solid #fca5a5}
+.risk-medium{background:var(--gold-bg);border:1px solid #fde68a}
+
+/* Constitution */
+.const-card{background:linear-gradient(135deg,var(--green-bg),#f0fff4);border:2px solid var(--green);border-radius:10px;padding:14px;text-align:center}
+.const-card .const-name{font-size:18px;font-weight:700;color:var(--primary)}
+
+/* Plan */
+.plan-section{margin:8px 0}
+.plan-section strong{display:block;margin-bottom:4px;color:var(--primary)}
+.plan-tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;margin:2px;background:var(--bg);border:1px solid var(--border)}
+
+/* Add record form */
+.input,select,textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit;margin-bottom:8px}
+.btn{display:inline-block;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999;animation:toastIn .3s}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/digital-twin.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">数字孪生</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>医生/患者</b></span><span class="std-tag">⚙️ 功能 <b>数字孪生·健康评分</b></span><span class="std-tag">💎 使用价值 <b>6维健康值+五脏评分+体质推断+养生方案</b></span></div>
+<div class="header"><h1>🔄 数字孪生健康档案</h1><p>时序关联 · 趋势分析 · 五脏评分 · 体质推断 · 养生推荐</p></div>
+
+<div class="container">
+  <!-- Record entry -->
+  <div class="card">
+    <h3>📝 添加就诊记录</h3>
+    <input  class="input" id="patient-id" placeholder="患者ID（留空自动生成）" aria-label="患者ID（留空自动生成）" data-validate="required|min=2">
+    <textarea class="input" id="complaint" placeholder="主诉/症状描述" style="min-height:50px"></textarea>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select class="input" id="tongue-color"><option value="">舌色(选填)</option><option>淡红</option><option>淡白</option><option>红</option><option>绛</option><option>紫暗</option></select>
+      <select class="input" id="face-complexion"><option value="">面色(选填)</option><option>明润</option><option>晦暗</option><option>潮红</option><option>苍白</option><option>萎黄</option><option>黧黑</option></select>
+    </div>
+    <button class="btn primary" onclick="addRecord()">📊 记录 + 分析</button>
+  </div>
+
+  <!-- Health Score -->
+  <div class="card" id="score-card" style="display:none">
+    <h3>📊 健康综合评分</h3>
+    <div class="score-ring" id="score-ring"></div>
+    <div class="score-breakdown" id="score-breakdown"></div>
+  </div>
+
+  <!-- Five Organs -->
+  <div class="card" id="organ-card" style="display:none">
+    <h3>🫁 五脏评分</h3>
+    <div class="organ-grid" id="organ-grid"></div>
+  </div>
+
+  <!-- Constitution -->
+  <div class="card" id="const-card" style="display:none">
+    <h3>🧬 体质推断</h3>
+    <div id="const-content"></div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">注: 体质推断基于舌象+面色+症状综合分析，建议由执业医师最终确认</div>
+  </div>
+
+  <!-- Trends -->
+  <div class="card" id="trends-card" style="display:none">
+    <h3>📈 时序趋势</h3>
+    <div id="trends-content"></div>
+    <div class="timeline" id="timeline"></div>
+  </div>
+
+  <!-- Risks -->
+  <div class="card" id="risks-card" style="display:none">
+    <h3>⚠️ 风险因素</h3>
+    <div id="risks-content"></div>
+  </div>
+
+  <!-- Health Plan -->
+  <div class="card" id="plan-card" style="display:none">
+    <h3>🌿 个性化养生方案</h3>
+    <div id="plan-content"></div>
+  </div>
+</div>
+
+<script>
+var currentPatientId = null;
+var currentModel = null;
+
+function addRecord() {
+  var pid = document.getElementById('patient-id').value.trim() || 'P' + Date.now().toString(36).toUpperCase();
+  document.getElementById('patient-id').value = pid;
+  currentPatientId = pid;
+
+  var record = {
+    chief_complaint: document.getElementById('complaint').value.trim() || '健康随访',
+    tongue: { manual_features: { color: document.getElementById('tongue-color').value } },
+    face: { manual_features: { complexion: document.getElementById('face-complexion').value } }
+  };
+
+  var result = TCM_DT.addRecord(pid, record);
+  currentModel = result.model;
+  renderAll(result.model);
+  TCM.toast('✅ 记录已添加 · 健康分: ' + result.model.health_score.total + '分 · ' + result.model.health_score.grade + '级');
+}
+
+function renderAll(model) {
+  // Show cards
+  ['score-card','organ-card','const-card','trends-card','risks-card','plan-card'].forEach(function(id) {
+    document.getElementById(id).style.display = 'block';
+  });
+
+  // Health Score
+  var hs = model.health_score;
+  document.getElementById('score-ring').innerHTML = 
+    '<div class="score-circle grade-' + hs.grade + '">' + hs.total + '<div style="font-size:10px;font-weight:400;opacity:.6">/100</div></div>';
+  
+  var bd = hs.breakdown;
+  document.getElementById('score-breakdown').innerHTML = 
+    '<div>面色<br><strong>' + bd.face + '</strong></div>' +
+    '<div>舌象<br><strong>' + bd.tongue + '</strong></div>' +
+    '<div>脉象<br><strong>' + bd.pulse + '</strong></div>' +
+    '<div>问诊<br><strong>' + bd.inquiry + '</strong></div>' +
+    '<div>穿戴<br><strong>' + bd.wearable + '</strong></div>' +
+    '<div>历史<br><strong>' + bd.trend + '</strong></div>';
+
+  // Organs
+  var organs = model.organ_scores;
+  var emoji = { heart: '❤️', liver: '🌿', spleen: '🍚', lung: '🫁', kidney: '💧' };
+  var html = '';
+  for (var k in organs) {
+    var o = organs[k];
+    var barColor = o.score >= 80 ? 'green' : o.score >= 60 ? 'blue' : o.score >= 40 ? 'gold' : 'red';
+    html += '<div class="organ-item"><div class="organ-icon">' + (emoji[k]||'') + '</div><div class="organ-name">' + o.label + '</div><div style="font-size:11px;color:var(--text3)">' + o.grade + '</div><div class="organ-bar"><div class="fill ' + barColor + '" style="width:' + o.score + '%"></div></div><div style="font-size:10px;color:var(--text3)">' + o.score + '</div></div>';
+  }
+  document.getElementById('organ-grid').innerHTML = html;
+
+  // Constitution
+  var con = model.constitution;
+  if (con) {
+    document.getElementById('const-content').innerHTML = 
+      '<div class="const-card"><div class="const-name">' + con.primary.name + '</div><div style="font-size:11px;color:var(--text3)">置信度: ' + con.primary.score + '分</div></div>' +
+      (con.secondary ? '<div style="font-size:12px;text-align:center;margin-top:4px">兼夹: ' + con.secondary.name + '(置信度' + con.secondary.score + ')</div>' : '');
+  }
+
+  // Trends
+  var t = model.trends;
+  if (t) {
+    var trendClass = t.trend === 'improving' ? 'trend-improving' : t.trend === 'declining' ? 'trend-declining' : 'trend-stable';
+    var trendLabel = t.trend === 'improving' ? '📈 改善中' : t.trend === 'declining' ? '📉 下降中' : '➡️ 稳定';
+    document.getElementById('trends-content').innerHTML = 
+      '<span class="trend-badge ' + trendClass.replace('trend-','') + '">' + trendLabel + ' · 变化: ' + (t.slope > 0 ? '+' : '') + t.slope + '分</span>' +
+      '<div style="font-size:11px;color:var(--text3);margin-top:4px">平均分: ' + t.average_score + ' · 数据点: ' + t.data_points + ' · 常见症状: ' + (t.frequent_symptoms || []).join(', ') + '</div>';
+
+    // Timeline
+    var tlHtml = '';
+    for (var i = model.timeline.length - 1; i >= 0; i--) {
+      var s = model.timeline[i];
+      tlHtml += '<div class="timeline-item"><div class="ti-date">' + new Date(s.timestamp).toLocaleDateString('zh-CN') + '</div><div class="ti-content">' + s.chief_complaint.substring(0, 50) + ' · <strong>' + (s.health_score ? s.health_score.total + '分/' + s.health_score.grade : '?') + '</strong></div></div>';
+    }
+    document.getElementById('timeline').innerHTML = tlHtml;
+  }
+
+  // Risks
+  var risks = model.risk_factors;
+  if (risks && risks.length) {
+    document.getElementById('risks-content').innerHTML = risks.map(function(r) {
+      return '<div class="risk-item risk-' + r.level + '"><strong>' + r.type + '</strong>: ' + r.detail + '<br><span style="font-size:10px;opacity:.8">💡 ' + r.suggestion + '</span></div>';
+    }).join('');
+  } else {
+    document.getElementById('risks-content').innerHTML = '<div style="text-align:center;padding:12px;color:var(--green)">✅ 当前无显著健康风险</div>';
+  }
+
+  // Plan
+  var plan = TCM_DT.generateHealthPlan(model);
+  if (plan) {
+    document.getElementById('plan-content').innerHTML =
+      '<div class="plan-section"><strong>🍽️ 饮食推荐</strong>' + plan.diet.map(function(d){return '<span class="plan-tag">'+d+'</span>';}).join('') + '</div>' +
+      '<div class="plan-section"><strong>🏃 运动建议</strong>' + plan.exercise.map(function(e){return '<span class="plan-tag">'+e+'</span>';}).join('') + '</div>' +
+      '<div class="plan-section"><strong>📍 推荐穴位</strong>' + plan.acupoints.map(function(a){return '<span class="plan-tag">'+a+'</span>';}).join('') + '</div>' +
+      '<div class="plan-section"><strong>🌙 生活建议</strong>' + plan.lifestyle.map(function(l){return '<span class="plan-tag">'+l+'</span>';}).join('') + '</div>' +
+      (plan.warnings.length ? '<div class="plan-section"><strong>⚠️ 注意事项</strong>' + plan.warnings.map(function(w){return '<div style="color:var(--accent);font-size:12px;margin:2px 0">'+w+'</div>';}).join('') + '</div>' : '') +
+      '<div style="font-size:10px;color:var(--text3);margin-top:8px">建议随访: ' + plan.followup_days + '天后</div>';
+  }
+
+  // 保存患者ID给其他页面用
+  localStorage.setItem('tcm_current_dt_patient', currentPatientId);
+}
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

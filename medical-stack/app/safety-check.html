@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/safety-check.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
+<title>用药安全检测 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#7f1d1d,#c0392b);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}.header .sub{font-size:11px;opacity:.7}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.label{font-size:11px;color:var(--text3);margin:6px 0 2px;display:block}
+.input,select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+textarea{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);min-height:80px;font-family:inherit}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.red{background:var(--accent);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.safety-card{border-radius:10px;padding:14px;margin:10px 0}
+.safety-card.pass{background:var(--green-bg);border:1px solid #86efac}
+.safety-card.fail{background:var(--red-bg);border:1px solid #fca5a5}
+.safety-card.warn{background:var(--gold-bg);border:1px solid #fde68a}
+.issue-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:12px}
+.issue-item .icon{font-size:16px;flex-shrink:0}
+.kb-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:600px){.kb-grid{grid-template-columns:1fr}}
+.kb-item{padding:8px;background:var(--bg);border-radius:6px;font-size:11px}
+.kb-item .kb-name{font-weight:600}.kb-item .kb-info{color:var(--text2);margin-top:2px}
+.quick-herb{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;background:var(--red-bg);color:var(--accent);margin:2px;cursor:pointer}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">用药安全检测</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>药师/医生</b></span>
+    <span class="std-tag">⚙️ 功能 <b>用药安全检测</b></span>
+    <span class="std-tag">💎 使用价值 <b>十八反·十九畏·剂量·妊娠·中西药交互全检</b></span>
+  </div>
+  <div class="header">
+    <h1>🧪 用药安全检测</h1>
+    <div class="sub">十八反 · 十九畏 · 剂量 · 妊娠禁忌 · 中西药交互 — 处方审核安全保障</div>
+  </div>
+
+  <div class="card">
+    <h3>① 处方检测（粘贴处方 / 每行: 药名 剂量）</h3>
+    <textarea class="input" id="herbs-input" placeholder="当归 9g&#10;黄芪 12g&#10;甘草 6g&#10;甘遂 3g&#10;附子 20g">当归 9g
+黄芪 12g
+甘草 6g
+甘遂 3g</textarea>
+    <div style="margin-top:6px;font-size:10px;color:var(--text3)">⚠️ 示例含甘草+甘遂(十八反) 用于演示</div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="checkSafety()">🔍 安全检测</button>
+      <button class="btn small" onclick="loadExample('safe')">示例: 安全处方</button>
+      <button class="btn small" onclick="loadExample('danger')">示例: 危险处方</button>
+    </div>
+  </div>
+
+  <div id="result"></div>
+
+  <!-- 知识库速查 -->
+  <div class="card">
+    <h3>📚 高危药物速查 <span style="font-size:10px;color:var(--text3)">点击查看禁忌详情</span></h3>
+    <div class="kb-grid" id="quick-lookup"></div>
+  </div>
+</div>
+
+<script>
+var HIGH_RISK_HERBS = ['附子','乌头','甘草','人参','细辛','麻黄','半夏','巴豆','马钱子','朱砂'];
+
+function loadExample(type) {
+  if (type === 'safe') document.getElementById('herbs-input').value = '当归 9g\n黄芪 12g\n白术 9g\n茯苓 9g\n甘草 6g\n陈皮 6g';
+  else document.getElementById('herbs-input').value = '甘草 9g\n甘遂 3g\n附子 25g\n人参 9g\n五灵脂 9g\n巴豆 1g\n细辛 5g';
+}
+
+function parseHerbs(text) {
+  var lines = text.split('\n').filter(Boolean);
+  return lines.map(function(line) {
+    var parts = line.trim().split(/\s+/);
+    return { name: parts[0] || '', dosage: parts[1] || '' };
+  }).filter(function(h) { return h.name; });
+}
+
+function checkSafety() {
+  var herbs = parseHerbs(document.getElementById('herbs-input').value);
+  if (!herbs.length) return toast('请输入处方内容');
+
+  document.getElementById('result').innerHTML = '<div class="safety-card pass"><span style="font-size:12px">⏳ 检测中...</span></div>';
+
+  var apiBase = (window.TCM && TCM.API_BASE) || '';
+  fetch(apiBase + '/api/tcm/safety-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ herbs: herbs, options: { include_pregnancy: true } })
+  }).then(function(r) { return r.json(); })
+    .then(function(d) { renderResult(d, herbs); })
+    .catch(function() { document.getElementById('result').innerHTML = '<div class="safety-card fail">❌ 检测服务不可用</div>'; });
+}
+
+function renderResult(d, herbs) {
+  var issues = d.total_issues || 0;
+  var html = '';
+  var cls = issues === 0 ? 'pass' : (d.ok ? 'warn' : 'fail');
+  var icon = issues === 0 ? '✅' : (d.ok ? '⚠️' : '🔴');
+
+  html += '<div class="safety-card ' + cls + '">';
+  html += '<h4>' + icon + ' 检测结果: ' + (issues === 0 ? '安全通过' : '发现 ' + issues + ' 个问题') + '</h4>';
+  html += '<div style="font-size:10px;color:var(--text3);margin-bottom:6px">处方: ' + herbs.map(function(h){ return h.name + (h.dosage||''); }).join('、') + '</div>';
+
+  if (d.errors.length) {
+    html += '<div style="margin-top:6px"><strong style="color:var(--accent)">🔴 严重错误（禁止用药）:</strong></div>';
+    d.errors.forEach(function(e) {
+      html += '<div class="issue-item"><span class="icon">🚫</span><div>' + e.type + ': <strong>' + e.main + (e.target ? ' + ' + e.target : '') + '</strong> — ' + e.reason + '</div></div>';
+    });
+  }
+  if (d.warnings.length) {
+    html += '<div style="margin-top:6px"><strong style="color:var(--gold)">🟡 警告（十九畏）:</strong></div>';
+    d.warnings.forEach(function(w) {
+      html += '<div class="issue-item"><span class="icon">⚠️</span><div>' + w.type + ': <strong>' + w.main + ' + ' + w.target + '</strong> — ' + w.reason + '</div></div>';
+    });
+  }
+  if (d.dose_warnings.length) {
+    html += '<div style="margin-top:6px"><strong style="color:var(--gold)">⚠️ 剂量超标:</strong></div>';
+    d.dose_warnings.forEach(function(dw) {
+      html += '<div class="issue-item"><span class="icon">📐</span><div><strong>' + dw.herb + '</strong> ' + dw.dose + ' > 上限 ' + dw.max + ' — ' + dw.reason + '</div></div>';
+    });
+  }
+  if (d.pregnancy_warnings.length) {
+    html += '<div style="margin-top:6px"><strong style="color:var(--gold)">🤰 妊娠慎用:</strong></div>';
+    d.pregnancy_warnings.forEach(function(pw) {
+      html += '<div class="issue-item"><span class="icon">🤰</span><div><strong>' + pw.herb + '</strong> — ' + pw.reason + '</div></div>';
+    });
+  }
+  html += '<div style="margin-top:8px;font-size:10px;color:var(--text3)">检测项: 十八反 ' + d.stats.bafan + ' · 十九畏 ' + d.stats.jiewei + ' · 剂量 ' + d.stats.dose + ' · 妊娠 ' + d.stats.pregnancy + '</div>';
+  html += '</div>';
+
+  document.getElementById('result').innerHTML = html;
+}
+
+// ═══ 高危药物速查 ═══
+function renderQuickLookup() {
+  var html = '';
+  HIGH_RISK_HERBS.forEach(function(name) {
+    html += '<div class="kb-item" onclick="quickLookup(\'' + name + '\')"><div class="kb-name">' + name + '</div><div class="kb-info">点击查看禁忌详情</div></div>';
+  });
+  document.getElementById('quick-lookup').innerHTML = html;
+}
+
+function quickLookup(name) {
+  var apiBase = (window.TCM && TCM.API_BASE) || '';
+  fetch(apiBase + '/api/tcm/safety-check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ herb: name })
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
+      var html = '<div class="safety-card warn"><h4>📋 ' + d.herb + ' 安全档案</h4>';
+      if (d.bafan.length) {
+        html += '<div style="margin-top:4px"><strong style="color:var(--accent)">🚫 十八反:</strong></div>';
+        d.bafan.forEach(function(b) { html += '<div style="font-size:11px;padding:2px 0">• 不可同用: ' + b.with + ' — ' + b.reason + '</div>'; });
+      }
+      if (d.jiewei.length) {
+        html += '<div style="margin-top:4px"><strong style="color:var(--gold)">⚠️ 十九畏:</strong></div>';
+        d.jiewei.forEach(function(j) { html += '<div style="font-size:11px;padding:2px 0">• 互畏: ' + j.with + ' — ' + j.reason + '</div>'; });
+      }
+      if (d.dose_limit) html += '<div style="margin-top:4px"><strong>📐 剂量上限:</strong> ' + d.dose_limit.max_dose + d.dose_limit.unit + ' — ' + d.dose_limit.reason + '</div>';
+      if (d.pregnancy) html += '<div style="margin-top:4px"><strong>🤰 妊娠:</strong> ' + d.pregnancy.reason + '</div>';
+      html += '</div>';
+      document.getElementById('quick-lookup').innerHTML = html + '<div style="margin-top:6px"><button class="btn small" onclick="renderQuickLookup()">← 返回列表</button></div>';
+    });
+}
+
+renderQuickLookup();
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>
+<script>
+// ═══ 十八反十九畏 增强KB ═══
+window.TCM_CONTRAINDICATIONS={
+  '十八反':{'甘草':['甘遂','大戟','海藻','芫花'],'乌头':['贝母','瓜蒌','半夏','白蔹','白及'],'藜芦':['人参','沙参','丹参','玄参','细辛','芍药']},
+  '十九畏':{'硫磺':'朴硝','水银':'砒霜','狼毒':'密陀僧','巴豆':'牵牛','丁香':'郁金','牙硝':'三棱','川乌':'犀角','人参':'五灵脂','官桂':'赤石脂'},
+  '妊娠禁忌':['斑蝥','水蛭','虻虫','麝香','三棱','莪术','巴豆','牵牛','芫花','大戟']
+};
+// [sanitized] [;,]/* [sanitized] */'✅ 十八反十九畏 KB已加载');
+</script>

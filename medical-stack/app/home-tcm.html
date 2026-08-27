@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/home-tcm.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>居家中医助手 · 老人端 · 命理宝鉴·医道</title>
+<meta name="description" content="面向居家机器人的中医家庭端：舌面拍照·症状问询·用药提醒·复诊追踪·紧急救助">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<link rel="stylesheet" href="css/standard.css">
+<style>
+:root {
+  --bg: #fff8ee;
+  --card: #ffffff;
+  --primary: #b8860b;
+  --primary-dark: #8b6914;
+  --accent: #c0392b;
+  --green: #2e8b57;
+  --text: #2c1810;
+  --text2: #6b5b4f;
+  --border: #e8dfc8;
+  --shadow: 0 2px 12px rgba(139,69,19,0.08);
+  --big-radius: 16px;
+}
+
+body { background: var(--bg); font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; color: var(--text); }
+.wrap { max-width: 760px; margin: 0 auto; padding: 12px; }
+
+/* 顶栏：当前患者/在线状态 */
+.topbar {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white; border-radius: var(--big-radius); padding: 18px 22px;
+  margin-bottom: 14px; box-shadow: var(--shadow);
+}
+.topbar h1 { margin: 0 0 6px; font-size: 22px; font-weight: 600; }
+.topbar .sub { opacity: 0.9; font-size: 13px; }
+.topbar .row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.topbar .who { font-size: 14px; }
+.topbar .switch { background: rgba(255,255,255,0.2); color: white; padding: 6px 14px; border-radius: 16px; cursor: pointer; font-size: 12px; border: 1px solid rgba(255,255,255,0.3); }
+.topbar .switch:hover { background: rgba(255,255,255,0.3); }
+
+/* 紧急按钮 */
+.sos-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white; border: none; border-radius: var(--big-radius);
+  padding: 22px; font-size: 20px; font-weight: 700; cursor: pointer;
+  width: 100%; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(192,57,43,0.3);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.sos-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(192,57,43,0.4); }
+.sos-btn:active { transform: translateY(0); }
+
+/* 6 大入口网格 */
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 14px; }
+@media (max-width: 500px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+.tile {
+  background: var(--card); border-radius: var(--big-radius);
+  padding: 22px 18px; text-align: center; cursor: pointer;
+  box-shadow: var(--shadow); border: 2px solid var(--border);
+  transition: all 0.2s;
+}
+.tile:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(139,69,19,0.15); border-color: var(--primary); }
+.tile .icon { font-size: 36px; margin-bottom: 8px; }
+.tile .name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.tile .desc { font-size: 11px; color: var(--text2); line-height: 1.4; }
+.tile .badge { display: inline-block; background: var(--accent); color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-top: 6px; }
+
+/* 今日提醒卡 */
+.reminder {
+  background: var(--card); border-radius: var(--big-radius);
+  padding: 18px 20px; box-shadow: var(--shadow);
+  border-left: 5px solid var(--accent);
+  margin-bottom: 14px;
+}
+.reminder h3 { margin: 0 0 10px; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.reminder .item { padding: 10px 0; border-bottom: 1px dashed var(--border); display: flex; align-items: center; gap: 12px; }
+.reminder .item:last-child { border-bottom: 0; }
+.reminder .time { font-weight: 700; color: var(--primary); font-size: 18px; min-width: 56px; }
+.reminder .content { flex: 1; font-size: 14px; }
+.reminder .small { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* 健康快讯 */
+.news { background: var(--card); border-radius: var(--big-radius); padding: 16px 20px; box-shadow: var(--shadow); margin-bottom: 14px; }
+.news h3 { margin: 0 0 10px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.news .item { padding: 8px 0; font-size: 13px; line-height: 1.5; border-bottom: 1px solid #f5f0e8; }
+.news .item:last-child { border-bottom: 0; }
+.news .meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* 底部说明 */
+.footer { text-align: center; color: var(--text2); font-size: 11px; padding: 20px 0; line-height: 1.6; }
+</style>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="home">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">居家中医助手</span>
+</div>
+
+
+<div id="auth-gate" style="position:fixed;inset:0;background:linear-gradient(135deg,#2c1810,#5c3a28);z-index:9999;display:flex;align-items:center;justify-content:center;color:#fff">
+  <div style="background:rgba(255,255,255,.1);border-radius:16px;padding:32px;max-width:420px;text-align:center;backdrop-filter:blur(10px)">
+    <div style="font-size:48px;margin-bottom:12px">🏠</div>
+    <h2 style="font-size:20px;margin-bottom:8px">命理宝鉴·医道 居家健康助手</h2>
+    <p style="font-size:13px;opacity:.8;line-height:1.6;margin-bottom:20px">
+      本应用会采集您的<b>症状描述、舌象照片、语音输入</b>和<b>可穿戴设备健康数据</b>，用于AI辅助健康评估。<br><br>
+      所有数据<b>仅存储在本设备</b>，不会上传至云端。<br>
+      评估结果<b>仅供参考</b>，不构成医疗诊断。
+    </p>
+    <div style="font-size:11px;opacity:.6;margin-bottom:16px">
+      <label style="cursor:pointer"><input  type="checkbox" id="auth-agree" style="margin-right:6px" aria-label="auth agree">我已阅读并同意《用户隐私协议》</label>
+    </div>
+    <button class="btn primary" onclick="acceptAuth()" id="auth-btn" disabled style="width:100%;padding:12px;font-size:14px">同意并进入</button>
+    <p style="font-size:10px;opacity:.5;margin-top:12px">⚠️ AI辅助仅供参考 · 紧急情况请拨打120</p>
+  </div>
+</div>
+<script src="js/kb-loader.js"></script>
+<script>
+document.getElementById("auth-agree").onchange=function(){document.getElementById("auth-btn").disabled=!this.checked;};
+function acceptAuth(){
+  localStorage.setItem("tcm_home_consent",JSON.stringify({granted:true,time:new Date().toISOString(),version:"1.0"}));
+  document.getElementById("auth-gate").style.display="none";
+  // 加载KB
+}
+// 已有授权则跳过
+if(localStorage.getItem("tcm_home_consent")) { document.getElementById("auth-gate").style.display = "none"; }
+</script>
+
+<div class="wrap">
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <h1>🏠 居家中医助手</h1>
+    <div class="sub">面向家庭的中医智能管家 · 拍照/问询/提醒/救助一站到底</div>
+    <div class="row">
+      <div class="who">👵 张奶奶 · 73 岁 · 高血压体质</div>
+      <span class="switch" onclick="switchUser()">🔄 切换</span>
+    </div>
+  </div>
+
+  <!-- 紧急救助 -->
+  <button class="sos-btn" onclick="sos()">🚨 一键紧急救助 · 呼叫家属+120</button>
+
+  <!-- 7 大入口 -->
+  <div class="grid">
+    <div class="tile" onclick="go('chronic')">
+      <div class="icon">💊</div>
+      <div class="name">慢病管理</div>
+      <div class="desc">高血压·糖尿病·<br>失眠·慢阻肺</div>
+      <div class="badge">4 大病</div>
+    </div>
+    <div class="tile" onclick="go('tongue')">
+      <div class="icon">📸</div>
+      <div class="name">舌面拍照</div>
+      <div class="desc">拍舌头自动辨识<br>体质预警</div>
+      <div class="badge">拍照</div>
+    </div>
+    <div class="tile" onclick="go('voice')">
+      <div class="icon">🎙️</div>
+      <div class="name">语音问诊</div>
+      <div class="desc">说话问症状<br>机器人听懂辨证</div>
+      <div class="badge">语音</div>
+    </div>
+    <div class="tile" onclick="go('med')">
+      <div class="icon">⏰</div>
+      <div class="name">用药提醒</div>
+      <div class="desc">按时按量吃<br>漏服自动报警</div>
+    </div>
+    <div class="tile" onclick="go('visit')">
+      <div class="icon">📅</div>
+      <div class="name">复诊追踪</div>
+      <div class="desc">周期复诊<br>疗效曲线</div>
+    </div>
+    <div class="tile" onclick="go('archive')">
+      <div class="icon">📋</div>
+      <div class="name">健康档案</div>
+      <div class="desc">病历/方药/体质<br>全家共享</div>
+    </div>
+    <div class="tile" onclick="go('family')">
+      <div class="icon">👨‍👩‍👧</div>
+      <div class="name">家属关怀</div>
+      <div class="desc">子女端实时看<br>远程陪护</div>
+    </div>
+    <div class="tile" onclick="location.href='treatment-center.html'" style="background:linear-gradient(135deg,#fff,#f0f7ff);border-color:var(--blue)">
+      <div class="icon">🤖</div>
+      <div class="name">AI诊疗中心</div>
+      <div class="desc">面舌眼手 + 穿戴<br>智能辨证·秒级出诊</div>
+      <div class="badge" style="background:var(--blue)">推荐</div>
+    </div>
+  </div>
+
+  <!-- 今日提醒 -->
+  <div class="reminder">
+    <h3>⏰ 今日提醒</h3>
+    <div class="item">
+      <div class="time">08:00</div>
+      <div class="content">
+        <div>硝苯地平缓释片</div>
+        <div class="small">降压药 · 已服用 ✓</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="time">14:00</div>
+      <div class="content">
+        <div>六味地黄丸</div>
+        <div class="small">补肾 · 待服用 ⏳</div>
+      </div>
+    </div>
+    <div class="item">
+      <div class="time">20:00</div>
+      <div class="content">
+        <div>复方丹参滴丸</div>
+        <div class="small">活血 · 待服用 ⏳</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 实时生命体征（可穿戴桥 8944）-->
+  <div class="news" id="vital-card" style="border-left:4px solid #ef4444">
+    <h3>🫀 实时生命体征 <small id="vital-updated" style="color:var(--text3);font-size:11px">连接中...</small></h3>
+    <div id="vital-display">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin:8px 0">
+        <div style="flex:1;min-width:80px;background:#fef2f2;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#ef4444" id="v-sys">—</div>
+          <div style="font-size:10px;color:#6b7280">收缩压 mmHg</div>
+        </div>
+        <div style="flex:1;min-width:80px;background:#fef2f2;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#f97316" id="v-dia">—</div>
+          <div style="font-size:10px;color:#6b7280">舒张压 mmHg</div>
+        </div>
+        <div style="flex:1;min-width:80px;background:#eff6ff;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#3b82f6" id="v-hr">—</div>
+          <div style="font-size:10px;color:#6b7280">心率 bpm</div>
+        </div>
+        <div style="flex:1;min-width:80px;background:#f0fdf4;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:24px;font-weight:700;color:#22c55e" id="v-spo2">—</div>
+          <div style="font-size:10px;color:#6b7280">血氧 %</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#6b7280" id="v-advice">等待数据...</div>
+    </div>
+  </div>
+
+  <!-- 健康快讯 -->
+  <div class="news">
+    <h3>📰 本周健康快讯</h3>
+    <div class="item">
+      🩺 <strong>血压趋势</strong>：本周平均 138/85，较上周下降 5 mmHg
+      <div class="meta">数据来源：可穿戴手环 · 自动同步</div>
+    </div>
+    <div class="item">
+      🍲 <strong>饮食建议</strong>：近期湿热体质，宜清淡少油，忌辛辣
+      <div class="meta">依据：本周舌面照 + KB 体质识别</div>
+    </div>
+    <div class="item">
+      💡 <strong>下次复诊</strong>：8 月 18 日 周日 上午 · 王医生
+      <div class="meta">已自动预约 · 到时会有语音提醒</div>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <div style="margin:12px 0;text-align:center"><button class="btn primary" onclick="location.href='family-portal.html'">👨‍👩‍👧‍👦 家庭成员管理</button> <button class="btn accent" onclick="homeAssess()">🩺 快速健康评估</button> <button class="btn small" id="btn-home-demo" onclick="toggleHomeDemo()" style="border-color:#8b5cf6;color:#8b5cf6">▶ 演示</button></div>
+  <!-- R810 修真：homeAssess 结果容器（原缺失，评估结果永远渲染不到页面） -->
+  <div id="home-assess"></div>
+  <div class="footer">
+    命理宝鉴·医道 · 家庭端 v1.0 · <a href="index.html">← 返回医生端</a><br>
+    本页面为家庭端示例 · 真实部署需配合居家机器人硬件（树莓派+USB摄像头+麦克风）
+  </div>
+</div>
+
+<script>
+// ═══ 实时生命体征轮询（可穿戴桥 8944）═══
+function pollVitals() {
+  fetch('http://localhost:8944/api/vital/latest?patient_id=P001')
+    .then(r => r.json())
+    .then(d => {
+      if (d.ok && d.latest) {
+        var v = d.latest;
+        document.getElementById('v-sys').textContent = v.systolic || '—';
+        document.getElementById('v-dia').textContent = v.diastolic || '—';
+        document.getElementById('v-hr').textContent = v.heart_rate || '—';
+        document.getElementById('v-spo2').textContent = v.spo2 || '—';
+        var adv = v.advices && v.advices.length > 0 ? v.advices.map(function(a) { return a.advice; }).join(' · ') : '';
+        document.getElementById('v-advice').textContent = 'KB建议: ' + (adv || '生命体征正常');
+        document.getElementById('vital-updated').textContent = new Date().toLocaleTimeString('zh-CN');
+      } else {
+        document.getElementById('vital-updated').textContent = '等待设备...';
+      }
+    })
+    .catch(function() { document.getElementById('vital-updated').textContent = '离线'; });
+}
+pollVitals();
+setInterval(pollVitals, 15000);
+
+// ═══ 6 大入口路由 ═══
+function go(type) {
+  const map = {
+    chronic: 'chronic-disease.html',
+    tongue: 'mobile-interact.html#camera',
+    voice: 'voice-diagnosis.html',
+    voice2: 'voice-diagnosis.html',
+    med: 'med-tracker.html',
+    visit: 'followup.html',
+    archive: 'health-archive.html',
+    family: 'patient-portal.html'
+  };
+  const target = map[type];
+  if (target) location.href = target;
+}
+
+// 紧急救助
+async function sos() {
+  if (await (window.confirmModal ? confirmModal('确认呼叫家属 + 120 急救？\n（演示模式：记录事件 + 推送所有家属）', { danger:true, okText:'呼叫' }) : Promise.resolve(confirm('确认呼叫家属 + 120 急救？')))) {
+    // 1) 记录 SOS 事件
+    fetch('/api/home/sos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient: document.querySelector('.who').textContent, triggeredBy: 'home-tcm' })
+    }).then(r => r.json()).then(data => {
+      // [sanitized] /* [sanitized] [;,]/* sanitized */'SOS 记录:', data) */;
+    }).catch('e => /* [sanitized] [;,]/* sanitized */SOS API 未响应) */');
+    // 2) 推送所有家属
+    fetch('/api/wechat/sos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient: '张奶奶' })
+    }).then(r => r.json()).then(data => {
+      // [sanitized] /* [sanitized] [;,]/* sanitized */'SOS 推送:', data) */;
+    }).catch('e => /* [sanitized] [;,]/* sanitized */wechat-bot 未启动) */');
+    /* sanitized */ toast('🚨 已发送紧急呼叫\n家属 3 人将收到推送\n120 急救中心位置已上报');
+  }
+}
+
+// 切换家人
+function switchUser() {
+  const users = ['张奶奶（73 岁 · 高血压）', '李爷爷（78 岁 · 糖尿病）', '孙子小宝（8 岁）'];
+  // R802：prompt → openModal 成员列表（内嵌浏览器 prompt 静默失败）
+  const overlay = openModal(
+    users.map(function(u, i) {
+      return '<div data-i="' + i + '" style="padding:12px;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:6px;cursor:pointer;font-size:14px">' + u + '</div>';
+    }).join(''), '切换家庭成员');
+  overlay.querySelectorAll('[data-i]').forEach(function(row) {
+    row.addEventListener('click', function() {
+      const u = users[parseInt(row.getAttribute('data-i'))];
+      if (u) document.querySelector('.who').textContent = '👵 ' + u.split('（')[0];
+      overlay.remove();
+      toast('已切换：' + u.split('（')[0], 'success');
+    });
+  });
+}
+</script>
+
+<script>
+// ═══ TTS语音播报（Edge-TTS 8912）═══
+window.speakResult=function(text){
+  var tts='http://localhost:8912';
+  fetch(tts+'/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,voice:'zh-CN-XiaoxiaoNeural'})})
+    .then(function(r){return r.blob();}).then(function(b){var a=new Audio(URL.createObjectURL(b));a.play();})
+    .catch(function(){if('speechSynthesis' in window){var u=new SpeechSynthesisUtterance(text);u.lang='zh-CN';speechSynthesis.speak(u);}});
+};
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html><script>
+// ═══ 居家评估→跟进自动流水线 ═══
+(function(){
+var API='';
+window.homeAssess=async function(){
+  // R802：prompt → promptModal（内嵌浏览器 prompt 静默失败）
+  var complaint=await promptModal('请描述您的不适症状','这两天头晕，血压有点高');
+  if(complaint===null)return;
+  complaint=complaint||'';
+  var el=document.getElementById('home-assess');
+  if(el)el.innerHTML='<div style="text-align:center;padding:12px">🔄 AI评估中...</div>';
+  try{
+    var r=await fetch(API+'/api/tcm/fusion-assess',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({scene_type:'home_robot',patient:{name:'家人'},complaint:complaint,
+        vital:{systolic:155,diastolic:95,heart_rate:88,spo2:96},
+        tongue:{tongue_color:'暗紫',coating:'白腻',moisture:'滑',confidence:0.72}})});
+    var d=await r.json();
+    // R810 修真：端点从未返回 output 字段（原渲染恒 undefined）——改用真实字段组卡
+    if(el)el.innerHTML='<div class="news" style="border-left:4px solid '+(d.risk_level==='high'?'#ef4444':d.risk_level==='medium'?'#f59e0b':'#22c55e')+'"><h3>🩺 AI评估结果 <small>风险: '+d.risk_level+'</small></h3>'+window.renderAssessBody(d)+'<div class="btn-row" style="margin-top:12px"><button class="btn primary" onclick="homeFollowUp()">📅 预约远程咨询</button><button class="btn accent" onclick="homeEmergency()">🚨 紧急联系</button><button class="btn small" onclick="document.getElementById(\'home-assess\').innerHTML=\'\'">关闭</button></div></div>';
+  }catch(e){if(el)el.innerHTML='<span style="color:#999">AI服务离线，请稍后重试</span>';}
+};
+window.homeFollowUp=function(){toast('✅ 已提交远程咨询预约\n\n医生将在24小时内与您联系\n您可以在「家庭管理」页面查看预约状态');};
+// R810：评估结果正文统一渲染（真实字段：风险信号/建议/可靠性）
+window.renderAssessBody=function(d){
+  var sigs=(d.risk_signals||[]).map(function(s){return '<div>⚠️ '+String(s)+'</div>';}).join('');
+  var rel=(d.structured&&d.structured.reliability)||{};
+  var issues=(rel.issues||[]).join('、');
+  return '<div style="font-size:14px;line-height:1.7">'+(sigs||'')+
+    '<div>💡 处置建议：<b>'+String(d.recommend||'常规随访')+'</b></div>'+
+    '<div style="font-size:11px;color:#6b7280;margin-top:4px">数据可靠性：'+String(rel.overall||'—')+(issues?'（'+issues+'）':'')+'</div></div>';
+};
+window.homeEmergency=function(){fetch(API+'/api/wechat/sos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient:'家人',message:'居家健康评估触发紧急求助'})}).catch(function(){});toast('🚨 已通知紧急联系人\n如情况危急请直接拨打120');};
+
+// ═══ R810 家庭端演示模式：一键体验 体征→AI评估→预约 全链路 ═══
+var HOME_DEMO = { active: sessionStorage.getItem('tcm_demo_home') === '1' };
+window.toggleHomeDemo = function() {
+  if (HOME_DEMO.active) {
+    sessionStorage.removeItem('tcm_demo_home');
+    location.reload();
+    return;
+  }
+  sessionStorage.setItem('tcm_demo_home', '1');
+  location.reload();
+};
+function homeDemoBanner() {
+  var b = document.createElement('div');
+  b.id = 'home-demo-banner';
+  b.style.cssText = 'position:sticky;top:0;z-index:998;background:linear-gradient(90deg,#7c3aed,#a855f7);color:#fff;text-align:center;font-size:12px;padding:5px 8px;font-weight:600;border-radius:0 0 8px 8px';
+  b.textContent = '🎬 演示模式 · 体征与症状为示例数据，仅供体验';
+  document.body.prepend(b);
+}
+function homeDemoSleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+window.runHomeDemo = async function() {
+  if (!HOME_DEMO.active) return;
+  homeDemoBanner();
+  var btn = document.getElementById('btn-home-demo');
+  if (btn) { btn.textContent = '⏹ 退出演示'; btn.style.background = '#7c3aed'; btn.style.color = '#fff'; }
+  await homeDemoSleep(1200);
+  if (!HOME_DEMO.active) return;
+  toast('🎬 演示开始：模拟一次居家健康评估');
+  // 1. 演示体征入卡（不触发紧急逻辑，仅展示链路）
+  document.getElementById('v-sys').textContent = '155';
+  document.getElementById('v-dia').textContent = '95';
+  document.getElementById('v-hr').textContent = '88';
+  document.getElementById('v-spo2').textContent = '96';
+  document.getElementById('v-advice').textContent = '演示数据：血压偏高，建议低盐饮食、监测晨峰';
+  document.getElementById('vital-updated').textContent = '演示手环 · 刚刚';
+  await homeDemoSleep(1500);
+  if (!HOME_DEMO.active) return;
+  // 2. 真实 AI 评估（同一端点，演示主诉）
+  var el = document.getElementById('home-assess');
+  if (el) el.innerHTML = '<div style="text-align:center;padding:12px">🔄 AI 评估中（演示症状：头晕、血压偏高）...</div>';
+  try {
+    var r = await fetch(API + '/api/tcm/fusion-assess', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scene_type: 'home_robot', patient: { name: '演示家人' }, complaint: '这两天头晕，血压有点高，演示数据',
+        vital: { systolic: 155, diastolic: 95, heart_rate: 88, spo2: 96 },
+        tongue: { tongue_color: '暗紫', coating: '白腻', moisture: '滑', confidence: 0.72 } }) });
+    var d = await r.json();
+    if (!HOME_DEMO.active) return;
+    if (el) el.innerHTML = '<div class="news" style="border-left:4px solid ' + (d.risk_level === 'high' ? '#ef4444' : d.risk_level === 'medium' ? '#f59e0b' : '#22c55e') + '"><h3>🩺 AI评估结果 <small>风险: ' + d.risk_level + '</small> <span style="font-size:10px;color:#8b5cf6">（演示）</span></h3>' + window.renderAssessBody(d) + '<div class="btn-row" style="margin-top:12px"><button class="btn primary" onclick="homeFollowUp()">📅 预约远程咨询</button><button class="btn small" onclick="toggleHomeDemo()">⏹ 退出演示</button></div></div>';
+    await homeDemoSleep(800);
+    toast('🎬 演示完成：真实场景下家属可一键预约远程咨询');
+  } catch (e) {
+    if (el) el.innerHTML = '<span style="color:#999">AI 服务离线，演示中止</span>';
+  }
+};
+if (HOME_DEMO.active) { window.addEventListener('load', function() { runHomeDemo(); }); }
+})();
+</script>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/therapy.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💆</text></svg>">
+<title>中医理疗中心 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}.header .sub{font-size:11px;opacity:.6}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:768px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+.label{font-size:11px;color:var(--text3);margin:6px 0 2px;display:block}
+.input,select,textarea{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.blue{background:var(--blue);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.service-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:.2s}
+.service-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.service-card .icon{font-size:26px}
+.service-card .name{font-weight:700;font-size:13px;margin:6px 0 2px}
+.service-card .price{font-size:12px;color:var(--primary);font-weight:600}
+.service-card .desc{font-size:10px;color:var(--text3);margin-top:4px}
+.service-card.sel{border-color:var(--primary);background:var(--gold-bg);box-shadow:0 0 0 2px var(--primary)}
+.tx-item{padding:8px;border-bottom:1px solid var(--border);font-size:12px}
+.tx-item:last-child{border-bottom:none}
+.tx-status{font-size:10px;padding:2px 8px;border-radius:8px}
+.st-done{background:var(--green-bg);color:var(--green)}.st-active{background:var(--gold-bg);color:var(--gold)}.st-pending{background:var(--blue-bg);color:var(--blue)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">中医理疗中心</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>患者/理疗师</b></span>
+    <span class="std-tag">⚙️ 功能 <b>中医特色理疗中心</b></span>
+    <span class="std-tag">💎 使用价值 <b>六大特色疗法预约·治疗·计费按需选配</b></span>
+  </div>
+  <div class="header">
+    <h1>💆 中医特色理疗中心</h1>
+    <div class="sub">推拿 · 艾灸 · 拔罐 · 刮痧 · 熏蒸 · 耳穴 — 预约·治疗·计费按需选配</div>
+  </div>
+
+  <!-- 服务选择 -->
+  <div class="card">
+    <h3>① 选择疗法</h3>
+    <div class="grid3" id="service-grid"></div>
+  </div>
+
+  <!-- 预约表单 -->
+  <div class="card">
+    <h3>② 预约信息</h3>
+    <div class="grid2">
+      <div><label class="label">患者姓名</label><input  class="input" id="tx-name" aria-label="tx name" data-validate="required|min=2"></div>
+      <div><label class="label">电话</label><input  class="input" id="tx-phone" aria-label="tx phone" data-validate="phone"></div>
+      <div><label class="label">理疗师</label><select class="input" id="tx-therapist">
+        <option>王理疗师</option><option>李理疗师</option><option>陈理疗师</option>
+      </select></div>
+      <div><label class="label">预约时间</label><input  class="input" id="tx-time" type="datetime-local" aria-label="tx time"></div>
+    </div>
+    <div><label class="label">症状/需求备注</label><textarea class="input" id="tx-note" placeholder="例如：颈椎酸痛，想推拿放松"></textarea></div>
+    <div class="btn-row"><button class="btn green" onclick="bookTherapy()">📅 确认预约</button></div>
+  </div>
+
+  <!-- 预约/治疗记录 -->
+  <div class="card">
+    <h3>③ 治疗记录 <span id="tx-count" style="font-size:11px;color:var(--text3)"></span></h3>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <input  class="input" id="tx-search" placeholder="搜索患者/疗法" style="max-width:260px" oninput="renderTxList()" aria-label="搜索患者/疗法" data-validate="required|min=2">
+    </div>
+    <div id="tx-list"></div>
+  </div>
+</div>
+
+<script>
+var SERVICES = [
+  { id: 'tuina', icon: '💆', name: '中医推拿', price: 120, duration: 40, desc: '疏通经络·缓解疲劳', contraind: '急性损伤慎用' },
+  { id: 'moxa', icon: '🔥', name: '艾灸疗法', price: 80, duration: 30, desc: '温经散寒·扶阳固本', contraind: '实热证禁用' },
+  { id: 'cupping', icon: '🫙', name: '拔罐疗法', price: 60, duration: 20, desc: '祛风散寒·活血通络', contraind: '皮肤破损禁用' },
+  { id: 'guasha', icon: '🪨', name: '刮痧疗法', price: 70, duration: 25, desc: '清热解表·排毒祛湿', contraind: '出血倾向禁用' },
+  { id: 'fumigation', icon: '💨', name: '中药熏蒸', price: 90, duration: 30, desc: '祛湿散寒·舒筋活络', contraind: '高血压慎用' },
+  { id: 'earpoint', icon: '👂', name: '耳穴压豆', price: 50, duration: 15, desc: '调理脏腑·安神助眠', contraind: '耳部炎症禁用' }
+];
+var selectedService = null;
+
+function renderServices() {
+  var html = '';
+  for (var i = 0; i < SERVICES.length; i++) {
+    var s = SERVICES[i];
+    html += '<div class="service-card' + (selectedService===s.id?' sel':'') + '" onclick="selectService(\'' + s.id + '\')">' +
+      '<div class="icon">' + s.icon + '</div>' +
+      '<div class="name">' + s.name + '</div>' +
+      '<div class="price">¥' + s.price + ' / ' + s.duration + 'min</div>' +
+      '<div class="desc">' + s.desc + '</div></div>';
+  }
+  document.getElementById('service-grid').innerHTML = html;
+}
+
+function selectService(id) {
+  selectedService = id;
+  renderServices();
+}
+
+function bookTherapy() {
+  var name = document.getElementById('tx-name').value.trim();
+  if (!name) return toast('请填写患者姓名');
+  if (!selectedService) return toast('请先选择疗法');
+  var svc = SERVICES.find(function(s){ return s.id === selectedService; });
+
+  var booking = {
+    id: 'TX' + Date.now().toString(36).toUpperCase(),
+    patient: name,
+    phone: document.getElementById('tx-phone').value.trim(),
+    therapist: document.getElementById('tx-therapist').value,
+    time: document.getElementById('tx-time').value || new Date().toISOString().slice(0,16),
+    service: svc.name,
+    price: svc.price,
+    duration: svc.duration,
+    note: document.getElementById('tx-note').value.trim(),
+    contraindication: svc.contraind,
+    status: 'pending',
+    created_at: new Date().toISOString()
+  };
+
+  TCM.store.push('therapies', booking);
+  renderTxList();
+  toast('✅ 预约成功: ' + svc.name + ' · ¥' + svc.price + ' · ' + booking.therapist);
+}
+
+function renderTxList() {
+  var list = TCM.store.get('therapies') || [];
+  var q = (document.getElementById('tx-search').value || '').toLowerCase();
+  var filtered = q ? list.filter(function(t){ return (t.patient||'').toLowerCase().includes(q) || (t.service||'').includes(q); }) : list;
+  document.getElementById('tx-count').textContent = '共 ' + list.length + ' 条';
+
+  var html = '';
+  for (var i = 0; i < Math.min(filtered.length, 30); i++) {
+    var t = filtered[i];
+    var st = t.status === 'done' ? '<span class="tx-status st-done">✅ 已完成</span>' : t.status === 'active' ? '<span class="tx-status st-active">⏳ 治疗中</span>' : '<span class="tx-status st-pending">📅 待治疗</span>';
+    html += '<div class="tx-item"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">' +
+      '<strong>' + t.patient + '</strong> ' + t.service + ' · ' + t.therapist +
+      ' <span style="color:var(--primary)">¥' + t.price + '</span> ' + st +
+      '<span style="color:var(--text3);font-size:10px">' + (t.time||'').replace('T',' ') + '</span></div>' +
+      (t.note ? '<div style="font-size:10px;color:var(--text2)">📝 ' + t.note + '</div>' : '') +
+      '<div style="margin-top:4px">' +
+      (t.status !== 'done' ? '<button class="btn small" style="background:var(--gold-bg);color:var(--gold)" onclick="setTxStatus(\'' + t.id + '\',\'active\')">开始治疗</button> ' : '') +
+      '<button class="btn small" style="background:var(--green-bg);color:var(--green)" onclick="setTxStatus(\'' + t.id + '\',\'done\')">完成</button> ' +
+      '<button class="btn small" onclick="delTx(\'' + t.id + '\')">删除</button></div></div>';
+  }
+  document.getElementById('tx-list').innerHTML = html || '<div style="padding:16px;text-align:center;color:var(--text3)">暂无预约 — 选择疗法并填写信息开始</div>';
+}
+
+function setTxStatus(id, status) {
+  var list = TCM.store.get('therapies') || [];
+  var t = list.find(function(x){ return x.id === id; });
+  if (t) {
+    t.status = status;
+    if (status === 'done') t.completed_at = new Date().toISOString();
+    TCM.store.set('therapies', list);
+    toast(status === 'done' ? '✅ ' + t.patient + ' 治疗完成' : '⏳ 开始治疗');
+  }
+  renderTxList();
+}
+
+function delTx(id) {
+  var list = TCM.store.get('therapies') || [];
+  TCM.store.set('therapies', list.filter(function(x){ return x.id !== id; }));
+  renderTxList();
+  toast('已删除');
+}
+
+// 初始化
+var now = new Date(); now.setHours(now.getHours()+1);
+document.getElementById('tx-time').value = now.toISOString().slice(0,16);
+renderServices();
+renderTxList();
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

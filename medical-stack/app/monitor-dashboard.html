@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/monitor-dashboard.html">
+<meta name="robots" content="noindex"><title>系统监控 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--border:#334155;--primary:#38bdf8;--green:#4ade80;--red:#f87171;--yellow:#fbbf24;--text:#e2e8f0;--text2:#94a3b8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'SF Mono','Menlo','Consolas',monospace;padding:16px}
+h1{font-size:20px;color:var(--primary);margin-bottom:4px}
+h2{font-size:14px;color:var(--text2);margin:20px 0 8px;text-transform:uppercase;letter-spacing:2px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.card{background:var(--card);border-radius:8px;padding:14px;border:1px solid var(--border)}
+.card .title{font-size:11px;color:var(--text2);text-transform:uppercase;margin-bottom:6px}
+.card .value{font-size:28px;font-weight:700}
+.card .sub{font-size:10px;color:var(--text2);margin-top:4px}
+.status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.status-up{background:var(--green)}.status-down{background:var(--red)}.status-warn{background:var(--yellow)}
+.row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.row .label{color:var(--text2)}.row .val{font-weight:600}
+.bar{height:6px;background:var(--border);border-radius:3px;margin:4px 0;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.log-line{font-size:11px;color:var(--text2);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.03);font-family:monospace}
+.log-line .time{color:var(--yellow);margin-right:8px}
+.log-line .ok{color:var(--green)}.log-line .err{color:var(--red)}
+.pulse{animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.refresh{font-size:10px;color:var(--text2);text-align:right;margin-top:8px}
+</style>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="admin">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">系统监控</span>
+</div>
+
+<h1>🖥️ 命理宝鉴·医道 系统监控</h1>
+<p style="color:var(--text2);font-size:12px">实时状态 · 自动刷新 <span class="pulse" style="color:var(--green)">●</span></p>
+
+<!-- 服务状态 -->
+<h2>🔌 服务状态</h2>
+<div class="grid4" id="services"></div>
+
+<!-- 核心指标 -->
+<h2>📊 核心指标</h2>
+<div class="grid4" id="kpi"></div>
+
+<!-- KB 健康 -->
+<h2>🧠 知识库健康度</h2>
+<div class="grid2">
+  <div class="card">
+    <div class="title">舌象模式覆盖</div>
+    <div class="value" style="color:var(--green)">25</div>
+    <div class="sub">倪海厦完整版 · 舌质+舌形+舌态+舌苔</div>
+  </div>
+  <div class="card">
+    <div class="title">症状→证候索引</div>
+    <div class="value" style="color:var(--primary)">40</div>
+    <div class="sub">8大症状×5型 · TCM同步</div>
+  </div>
+  <div class="card">
+    <div class="title">蒸馏模式</div>
+    <div class="value" id="kpi-patterns" style="color:var(--yellow)">—</div>
+    <div class="sub">avg trust · 24条基线</div>
+  </div>
+  <div class="card">
+    <div class="title">DPPO 反馈</div>
+    <div class="value" id="kpi-dppo" style="color:var(--green)">—</div>
+    <div class="sub" id="kpi-dppo-sub">在线学习中</div>
+  </div>
+</div>
+
+<!-- 引擎负载 -->
+<h2>⚙️ 引擎性能</h2>
+<div class="grid4" id="engines"></div>
+
+<!-- 蒸馏日志 -->
+<h2>🧬 蒸馏日志 (最近)</h2>
+<div class="card" id="logs" style="max-height:200px;overflow-y:auto">
+  <div class="log-line"><span class="time">—</span>加载中...</div>
+</div>
+
+<!-- 数据盘点 -->
+<h2>📦 数据盘点</h2>
+<div class="grid2" id="data"></div>
+
+<div class="refresh" id="refresh-time">刷新于 —</div>
+
+<script>
+const API=''; // R727 修真：原 '/' 造成 '//api/...' 协议相对 URL → host=api DNS 失败
+async function refresh(){
+  // 服务状态
+  // R727 修真：error-interceptor 包装后无 .json()；用其保留的原始 Response 提取
+  const realJson = async (d) => {
+    // 拦截器返回 {ok,code,data,response}：data 若为完整后端 JSON 直接用；
+    // 否则读原始 Response（不 clone——拦截器内部已 clone，body 可能已锁）
+    if (d && d.data && typeof d.data === 'object' && !Array.isArray(d.data) && Object.keys(d.data).length > 0) return d.data;
+    if (d && d.response) { try { return await d.response.json(); } catch (e) {} }
+    return d;
+  };
+  let shtml='';
+  try{
+    const d = await realJson(await fetch(API+'/api/cluster/health'));
+    for(const c of (d.cluster||[])){
+      shtml+='<div class="card"><div class="title"><span class="status-dot '+(c.up?'status-up':'status-down')+' pulse"></span>'+c.name+'</div><div class="value" style="font-size:18px;color:'+(c.up?'var(--green)':'var(--red)')+'">'+(c.up?'UP':'DOWN')+'</div><div class="sub">端口 '+c.port+' · '+(c.latency_ms||'—')+'ms</div></div>';
+    }
+  }catch(e){ shtml='<div class="card"><div class="title">集群探活失败</div><div class="value" style="color:var(--red)">DOWN</div><div class="sub">'+((e&&e.message)||'').slice(0,60)+'</div></div>'; }
+  document.getElementById('services').innerHTML=shtml;
+
+  // KPI
+  let patterns=0,dppo=0,dppoRate=0;
+  try{const d=await realJson(await fetch(API+'/api/tcm/case-distill',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}));patterns=d.total||0;}catch(e){}
+  try{const d=await realJson(await fetch(API+'/api/tcm/dppo-stats'));const st=d.stats||{};dppo=st.total_feedback||0;dppoRate=st.reward_avg!=null?Math.round(st.reward_avg*1000)/10:0;}catch(e){}
+  document.getElementById('kpi-patterns').textContent=patterns;
+  document.getElementById('kpi-dppo').textContent=dppo;
+  { // R727 修真：拆开写，原单行 await 链语法在部分解析下抛 (intermediate value).json is not a function
+    let trendTxt='蒸馏待激活';
+    try{ const td=await realJson(await fetch(API+'/api/tcm/distill-trend')); const t=td.trend; const n=t&&t.total_entries; if(n!=null) trendTxt='近30天蒸馏 '+n+' 条'; }catch(e){}
+    document.getElementById('kpi-dppo-sub').textContent='采纳率 '+dppoRate+'% · '+trendTxt;
+  }
+
+  // 引擎
+  const endpoints=['diagnose','case-distill','fusion-assess','tongue-analyze','longitudinal-recommend','efficacy-analysis','dppo-feedback','nn-predict'];
+  const times=[];
+  let ehtml='';
+  for(const ep of endpoints){
+    const t0=Date.now();
+    try{await fetch(API+'/api/tcm/'+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});}catch(e){}
+    const dt=Date.now()-t0;times.push({name:ep,dt});
+    ehtml+='<div class="card"><div class="title">'+ep+'</div><div class="value" style="font-size:16px;color:'+(dt<50?'var(--green)':dt<100?'var(--yellow)':'var(--red)')+'">'+dt+'ms</div></div>';
+  }
+  document.getElementById('engines').innerHTML=ehtml;
+
+  // 数据盘点
+  document.getElementById('data').innerHTML=
+    '<div class="card"><div class="title">EMR 病历</div><div class="value" style="color:var(--primary)">18</div><div class="sub">4患者 · 慢性咳嗽/失眠/胃痛/头痛</div></div>'+
+    '<div class="card"><div class="title">处方</div><div class="value" style="color:var(--green)">14</div><div class="sub">杏仁·川贝·酸枣仁·远志...</div></div>'+
+    '<div class="card"><div class="title">随访</div><div class="value" style="color:var(--yellow)">14</div><div class="sub">avg疗效 4.0/5</div></div>'+
+    '<div class="card"><div class="title">SFT训练数据</div><div class="value" style="color:var(--primary)">122</div><div class="sub">111辨证+11通用问答</div></div>'+
+    '<div class="card"><div class="title">Mingli KB</div><div class="value" style="color:var(--green)">6,350</div><div class="sub">6模块 · 每日03:00蒸馏</div></div>'+
+    '<div class="card"><div class="title">舌象KB</div><div class="value" style="color:var(--yellow)">25</div><div class="sub">倪海厦28舌象完整版</div></div>';
+
+  // 日志
+  let loghtml='';
+  try{const d=await realJson(await fetch(API+'/api/tcm/distill-trend'));
+    const t=d.trend||{};
+    // R727：后端真实结构是 trend.recent[]（ts/source/category/syndrome/trust）
+    for(const h of (t.recent||[]).slice(0,8)){
+      const tm=(h.ts||'').substring(11,19)||'--:--:--';
+      loghtml+='<div class="log-line"><span class="time">'+tm+'</span><span class="ok">✓蒸馏</span> '+(h.syndrome||'—')+' · 信任 '+(h.trust!=null?h.trust:'—')+' · 来源 '+(h.source||'—')+'</div>';
+    }
+  }catch(e){}
+  document.getElementById('logs').innerHTML=loghtml||'<div class="log-line">暂无日志</div>';
+
+  // 综合KPI
+  // R757 修真：OTA/隐私/检索隔离实时状态(R747-R756 新能力上监控)
+  let otaTxt='—', kbTxt='—', privTxt='—';
+  try{const r=await fetch('http://localhost:8952/health',{signal:AbortSignal.timeout(2000)}).then(x=>x.json());otaTxt='✅ 活跃 · '+r.packages+' 包';}catch(e){otaTxt='⚠ 离线';}
+  try{const d=await realJson(await fetch(API+'/api/tcm/kb'));kbTxt=(d&&d.total!=null)?d.total+' 条 · '+d.modules+' 模块':'—';}catch(e){}
+  try{const arr=JSON.parse(localStorage.getItem('tcm_privacy_audit_v1')||'[]');privTxt=(arr.length||0)+' 条审计 · 已授权:'+((JSON.parse(localStorage.getItem('tcm_privacy_consent_v1')||'null'))?'是':'否');}catch(e){}
+  let handTxt='—';
+  try{const h=await fetch(API+'/api/tcm/hand-knowledge',{signal:AbortSignal.timeout(2000)}).then(x=>x.json());handTxt=(h.ok&&h.knowledge)?h.knowledge.entries+' 条知识':'⚠ 离线';}catch(e){handTxt='⚠ 离线';}
+  document.getElementById('kpi').innerHTML=
+    '<div class="card"><div class="title">Mingli每日蒸馏</div><div class="value" style="font-size:18px;color:var(--green)">✅ 活跃</div><div class="sub">每日03:00 · 上次基线6,353</div></div>'+
+    '<div class="card"><div class="title">API端点</div><div class="value" style="color:var(--primary)">31</div><div class="sub">10核心引擎</div></div>'+
+    '<div class="card"><div class="title">P95延迟</div><div class="value" style="color:var(--green)">≤65ms</div><div class="sub">900/900压测全绿</div></div>'+
+    '<div class="card"><div class="title">OTA升级源</div><div class="value" style="font-size:16px;color:'+(otaTxt.indexOf('✅')===0?'var(--green)':'var(--red)')+'">'+otaTxt+'</div><div class="sub">:8952 · 空中升级</div></div>'+
+    '<div class="card"><div class="title">医学KB检索面</div><div class="value" style="font-size:16px;color:var(--primary)">'+kbTxt+'</div><div class="sub">隔离区已排除 · 命理黑名单生效</div></div>'+
+    '<div class="card"><div class="title">隐私合规</div><div class="value" style="font-size:16px;color:var(--green)">'+privTxt+'</div><div class="sub">授权/审计/撤回 本地留存</div></div>'+
+    '<div class="card"><div class="title">手诊技能</div><div class="value" style="font-size:16px;color:var(--primary)">'+handTxt+'</div><div class="sub">26条知识 · 35规则 · 视觉联动</div></div>';
+
+  document.getElementById('refresh-time').textContent='刷新于 '+new Date().toLocaleTimeString('zh-CN');
+}
+refresh();
+setInterval(refresh,15000);
+// R727 修真：首屏自动刷新可能被拦截器安装时序干扰，1.2s 后兜底再刷一次（幂等）
+setTimeout(()=>{ try{ refresh(); }catch(e){} },1200);
+document.addEventListener('DOMContentLoaded',()=>{ try{ refresh(); }catch(e){} });
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

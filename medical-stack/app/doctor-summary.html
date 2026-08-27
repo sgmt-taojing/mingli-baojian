@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/doctor-summary.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+<link rel="manifest" href="manifest.json">
+<title>医生工作总结 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--teal:#0d9488;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.std-bar{font-size:9px;color:var(--text3);padding:4px 0;margin-bottom:4px;display:flex;gap:8px;flex-wrap:wrap}
+.std-tag{background:var(--card);border-radius:4px;padding:1px 5px;border:1px solid var(--border)}
+
+/* header */
+.header{background:linear-gradient(135deg,#6b3a1f,#8b4513);color:#fff;padding:16px 20px;border-radius:0 0 var(--radius) var(--radius);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.header h1{font-size:18px;display:flex;align-items:center;gap:8px}
+.header .doctor-info{font-size:11px;opacity:.7}
+.header .doctor-name{font-weight:700;font-size:13px;opacity:1}
+
+/* period selector */
+.period-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.period-btn{padding:6px 14px;border-radius:18px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:11px;white-space:nowrap;transition:all .15s}
+.period-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.period-btn:active{transform:scale(.95)}
+.period-custom{display:flex;gap:6px;align-items:center;margin-left:8px}
+.period-custom input{width:110px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px}
+.period-actions{flex:1;text-align:right;display:flex;gap:6px;justify-content:flex-end}
+.btn{padding:6px 14px;border:none;border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;transition:all .15s}
+.btn:active{transform:scale(.96)}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.accent{background:var(--accent);color:#fff}
+.btn.outline{background:var(--card);color:var(--primary);border:1px solid var(--primary)}
+.btn.success{background:var(--green);color:#fff}
+.btn.gold{background:var(--gold);color:#fff}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:var(--card);border-radius:var(--radius);padding:14px;border:1px solid var(--border);text-align:center}
+.kpi-card .kpi-value{font-size:28px;font-weight:800;color:var(--primary)}
+.kpi-card .kpi-label{font-size:10px;color:var(--text3);margin-top:2px}
+.kpi-card .kpi-sub{font-size:9px;color:var(--green);margin-top:2px}
+
+/* card grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:768px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+
+/* chart bars */
+.bar-chart{display:flex;flex-direction:column;gap:6px}
+.bar-item{display:flex;align-items:center;gap:8px}
+.bar-label{font-size:11px;min-width:70px;text-align:right;color:var(--text2)}
+.bar-track{flex:1;height:18px;background:#f0eee8;border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:.6s;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:9px;color:#fff;font-weight:700;min-width:30px}
+.bar-count{font-size:10px;color:var(--text3);min-width:24px;text-align:right}
+
+/* pie chart (CSS) */
+.pie-grid{display:flex;flex-wrap:wrap;gap:8px}
+.pie-legend{display:flex;align-items:center;gap:6px;font-size:10px;padding:4px 10px;background:var(--bg);border-radius:12px}
+.pie-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pie-value{font-weight:700;color:var(--text)}
+
+/* table */
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:var(--bg);color:var(--text2);padding:8px;text-align:left;font-weight:600;font-size:10px;border-bottom:2px solid var(--border)}
+td{padding:8px;border-bottom:1px solid var(--border);font-size:11px}
+tr:hover td{background:#faf8f5}
+@media(max-width:480px){table{font-size:9px}th,td{padding:6px 4px}}
+
+/* print styles */
+@media print{
+  body{background:#fff;font-size:10pt}
+  .container{max-width:100%;padding:0}
+  .header{background:#6b3a1f!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .period-bar,.period-actions,.btn,.std-bar,#nav-bar{display:none!important}
+  .card{border:1px solid #ccc;break-inside:avoid;margin:6pt 0;padding:10pt}
+  .kpi-card{border:1px solid #ccc;break-inside:avoid}
+  .bar-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4;margin:12mm}
+}
+
+/* share modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;justify-content:center;align-items:center;z-index:1000}
+.modal.active{display:flex}
+.modal-content{background:var(--card);border-radius:var(--radius);padding:20px;max-width:380px;width:90%}
+.modal-content h3{margin-bottom:10px}
+.modal-content input{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:12px;margin:8px 0}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999;transition:opacity .3s}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+<script src="js/data-engine.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">医生工作总结</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>医生/科室主任/院长</b></span>
+    <span class="std-tag">📊 功能 <b>工作汇总·病症统计·绩效报表</b></span>
+    <span class="std-tag">💎 使用价值 <b>按周期汇总诊断量·方药使用·收入统计·一键打印·推送手机</b></span>
+  </div>
+
+  <div class="header">
+    <div>
+      <h1>📊 医生工作总结</h1>
+      <div class="doctor-info">医师: <span class="doctor-name" id="doc-name">张三丰</span> · 科室: <span id="doc-dept">内科</span></div>
+    </div>
+    <div style="text-align:right;font-size:10px">
+      <div>报表时间: <span id="report-range" style="font-weight:700">—</span></div>
+      <div style="opacity:.6" id="generate-time"></div>
+    </div>
+  </div>
+
+  <!-- period selector -->
+  <div class="period-bar">
+    <button class="period-btn active" onclick="switchPeriod('today')">📅 今日</button>
+    <button class="period-btn" onclick="switchPeriod('week')">📆 本周</button>
+    <button class="period-btn" onclick="switchPeriod('month')">🗓️ 本月</button>
+    <button class="period-btn" onclick="switchPeriod('quarter')">📈 本季</button>
+    <button class="period-btn" onclick="switchPeriod('year')">📊 年度</button>
+    <span class="period-custom">
+      <input  type="date" id="date-from" onchange="switchPeriod('custom')" aria-label="date from" data-validate="required">
+      <span style="font-size:11px;color:var(--text3)">至</span>
+      <input  type="date" id="date-to" onchange="switchPeriod('custom')" aria-label="date to" data-validate="required">
+    </span>
+    <span class="period-actions">
+      <button class="btn outline" onclick="printReport()">🖨️ 打印</button>
+      <button class="btn success" onclick="showPushModal()">📱 推送到手机</button>
+      <button class="btn gold" onclick="exportCSV()">📥 导出CSV</button>
+    </span>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- main content -->
+  <div class="grid2">
+    <!-- 病症分布 -->
+    <div class="card">
+      <h3>🩺 病症分布 TOP10</h3>
+      <div class="bar-chart" id="disease-chart"></div>
+    </div>
+
+    <!-- 方药使用 -->
+    <div class="card">
+      <h3>💊 高频方药 TOP10</h3>
+      <div class="bar-chart" id="herb-chart"></div>
+    </div>
+
+    <!-- 科室分布 -->
+    <div class="card">
+      <h3>🏥 科室就诊分布</h3>
+      <div class="pie-grid" id="dept-pie"></div>
+    </div>
+
+    <!-- 体质分布 -->
+    <div class="card">
+      <h3>🧬 体质辨识分布</h3>
+      <div class="bar-chart" id="const-chart"></div>
+    </div>
+  </div>
+
+  <!-- 收入趋势 -->
+  <div class="card">
+    <h3>💰 收入趋势（日）</h3>
+    <div class="bar-chart" id="rev-chart"></div>
+  </div>
+
+  <!-- 详细列表 -->
+  <div class="card">
+    <h3>📋 就诊明细 <span style="font-size:10px;color:var(--text3)" id="detail-count"></span></h3>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr>
+          <th>日期</th><th>患者</th><th>诊断</th><th>方药</th><th>医生</th><th>金额</th>
+        </tr></thead>
+        <tbody id="detail-table"></tbody>
+      </table>
+    </div>
+    <div id="detail-pager" style="margin-top:8px;text-align:center"></div>
+  </div>
+
+  <!-- 免责及注 -->
+  <div style="font-size:9px;color:var(--text3);margin:8px 0;text-align:center;border-top:1px solid var(--border);padding-top:8px">
+    ⚠️ 本报表数据源于系统真实就诊记录，采用 DataPage 分页引擎计算汇总统计，实时生成，数据保真。仅供内部管理使用。
+  </div>
+</div>
+
+<!-- push modal -->
+<div class="modal" id="push-modal">
+  <div class="modal-content">
+    <h3>📱 推送工作报表到手机</h3>
+    <p style="font-size:11px;color:var(--text2);margin-bottom:8px">将通过 Service Worker 推送通知到已授权的手机设备</p>
+    <input  id="push-title" value="医生工作报表" placeholder="通知标题" aria-label="通知标题">
+    <textarea id="push-body" style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:11px;margin:6px 0;height:60px;resize:vertical" id="push-body"></textarea>
+    <div class="modal-actions">
+      <button class="btn outline" onclick="closePushModal()">取消</button>
+      <button class="btn primary" onclick="pushToMobile()">📤 推送</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ 真实数据汇总引擎 ═══
+var currentPeriod = 'today';
+var reportData = null;
+
+function getPeriodRange(period) {
+  var now = new Date();
+  var from, to;
+  switch(period) {
+    case 'today':
+      from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      to = new Date(from.getTime() + 86400000);
+      break;
+    case 'week':
+      var dow = now.getDay() || 7; // 周一=1
+      from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + 1);
+      to = new Date(from.getTime() + 7 * 86400000);
+      break;
+    case 'month':
+      from = new Date(now.getFullYear(), now.getMonth(), 1);
+      to = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      break;
+    case 'quarter':
+      var q = Math.floor(now.getMonth() / 3);
+      from = new Date(now.getFullYear(), q * 3, 1);
+      to = new Date(now.getFullYear(), (q + 1) * 3, 1);
+      break;
+    case 'year':
+      from = new Date(now.getFullYear(), 0, 1);
+      to = new Date(now.getFullYear() + 1, 0, 1);
+      break;
+    case 'custom':
+      from = new Date(document.getElementById('date-from').value || '2026-01-01');
+      to = new Date(document.getElementById('date-to').value || now.toISOString().slice(0,10));
+      to.setDate(to.getDate() + 1);
+      break;
+  }
+  return { from: from, to: to, label: formatDateRange(from, to) };
+}
+
+function formatDateRange(from, to) {
+  var fmt = function(d) { return d.toISOString().slice(0,10); };
+  return fmt(from) + ' ~ ' + fmt(new Date(to.getTime() - 1));
+}
+
+function switchPeriod(period) {
+  currentPeriod = period;
+  document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
+  var btns = document.querySelectorAll('.period-btn');
+  var idx = ['today','week','month','quarter','year'].indexOf(period);
+  if (idx >= 0) btns[idx].classList.add('active');
+  generateReport();
+}
+
+// ═══ 主汇总函数 ═══
+function generateReport() {
+  var range = getPeriodRange(currentPeriod);
+  var from = range.from.toISOString();
+  var to = range.to;
+
+  // 1. 从真实数据源提取
+  var records = JSON.parse(localStorage.getItem('tcm_patient_records') || '[]');
+  var rxs = JSON.parse(localStorage.getItem('tcm_rx_loop') || '[]');
+  var regs = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
+
+  // 2. 时间过滤
+  function inRange(rec) {
+    var t = rec.created_at || rec.time || rec.date || '';
+    return t >= from && t < to.toISOString();
+  }
+
+  var filteredRecords = records.filter(inRange);
+  var filteredRxs = rxs.filter(inRange);
+  var filteredRegs = regs.filter(inRange);
+
+  // 3. 汇总统筹
+  reportData = {
+    period: currentPeriod,
+    range: range,
+    totalPatients: filteredRecords.length,
+    totalPrescriptions: filteredRxs.length,
+    totalRegistrations: filteredRegs.length,
+    totalRevenue: filteredRxs.reduce(function(s, r) { return s + (Number(r.total_price) || Number(r.amount) || 0); }, 0),
+    avgPerPatient: 0,
+    diseaseStats: aggregateField(filteredRecords, 'diagnosis'),
+    herbStats: aggregateHerbs(filteredRxs),
+    deptStats: aggregateField([...filteredRecords, ...filteredRegs], 'department_name', 'dept'),
+    constStats: aggregateField(filteredRecords, 'constitution', '体质'),
+    doctorStats: aggregateField(filteredRecords, 'doctor'),
+    dailyRevenue: aggregateDaily(filteredRxs, 'amount'),
+    dailyPatients: aggregateDaily(filteredRecords, 'count'),
+    records: filteredRecords,
+    rxs: filteredRxs
+  };
+
+  if (reportData.totalPatients > 0) {
+    reportData.avgPerPatient = (reportData.totalRevenue / reportData.totalPatients).toFixed(0);
+  }
+
+  // 4. 渲染
+  renderReport(reportData);
+
+  // 5. 更新时间
+  document.getElementById('report-range').textContent = range.label;
+  document.getElementById('generate-time').textContent = '生成时间: ' + new Date().toLocaleString('zh-CN');
+
+  // 6. 更新医生信息
+  var currentUser = JSON.parse(localStorage.getItem('tcm_current_user') || '{}');
+  document.getElementById('doc-name').textContent = currentUser.name || '登录医生';
+  document.getElementById('doc-dept').textContent = currentUser.department || '全院';
+}
+
+function aggregateField(data, field, defaultVal) {
+  var map = {};
+  for (var i = 0; i < data.length; i++) {
+    var val = data[i][field];
+    if (val === undefined || val === null || val === '') {
+      val = defaultVal || field;
+      // Try nested
+      var parts = field.split('.');
+      var obj = data[i];
+      for (var p = 0; p < parts.length; p++) {
+        obj = obj ? obj[parts[p]] : null;
+      }
+      if (obj) val = obj;
+    }
+    if (!val) continue;
+    var key = String(val).trim();
+    if (!key) continue;
+    map[key] = (map[key] || 0) + 1;
+  }
+  var arr = [];
+  for (var k in map) arr.push({ name: k, count: map[k] });
+  arr.sort(function(a, b) { return b.count - a.count; });
+  return arr;
+}
+
+function aggregateHerbs(rxs) {
+  var map = {};
+  for (var i = 0; i < rxs.length; i++) {
+    var herbs = rxs[i].herbs || rxs[i].prescription?.herbs || [];
+    if (typeof herbs === 'string') herbs = herbs.split(/[,，、]/);
+    for (var j = 0; j < herbs.length; j++) {
+      var name = typeof herbs[j] === 'string' ? herbs[j].trim() : (herbs[j].name || '').trim();
+      if (!name) continue;
+      map[name] = (map[name] || 0) + 1;
+    }
+  }
+  var arr = [];
+  for (var k in map) arr.push({ name: k, count: map[k] });
+  arr.sort(function(a, b) { return b.count - a.count; });
+  return arr;
+}
+
+function aggregateDaily(data, field) {
+  var map = {};
+  for (var i = 0; i < data.length; i++) {
+    var t = (data[i].created_at || data[i].time || '').slice(0, 10);
+    if (!t) continue;
+    if (field === 'count') {
+      map[t] = (map[t] || 0) + 1;
+    } else {
+      map[t] = (map[t] || 0) + (Number(data[i][field]) || Number(data[i].total_price) || 0);
+    }
+  }
+  var arr = [];
+  for (var k in map) arr.push({ date: k, value: map[k] });
+  arr.sort(function(a, b) { return a.date.localeCompare(b.date); });
+  return arr;
+}
+
+// ═══ 渲染 ═══
+function renderReport(d) {
+  // KPI
+  document.getElementById('kpi-row').innerHTML =
+    '<div class="kpi-card"><div class="kpi-value">' + d.totalPatients + '</div><div class="kpi-label">接诊人次</div><div class="kpi-sub">含初诊+复诊</div></div>' +
+    '<div class="kpi-card"><div class="kpi-value">' + d.totalPrescriptions + '</div><div class="kpi-label">处方数</div><div class="kpi-sub">方剂开具量</div></div>' +
+    '<div class="kpi-card"><div class="kpi-value" style="color:var(--accent)">¥' + d.totalRevenue.toFixed(0) + '</div><div class="kpi-label">总收入</div><div class="kpi-sub">均 ¥' + d.avgPerPatient + '/人</div></div>' +
+    '<div class="kpi-card"><div class="kpi-value">' + d.totalRegistrations + '</div><div class="kpi-label">挂号数</div><div class="kpi-sub">预约总量</div></div>';
+
+  // 病症分布
+  renderBarChart('disease-chart', d.diseaseStats.slice(0, 10), [
+    '#c0392b','#e74c3c','#e67e22','#d35400','#f39c12','#16a34a','#0d9488','#2563eb','#7c3aed','#6366f1'
+  ]);
+
+  // 方药分布
+  var herbColors = ['#0d9488','#14b8a6','#06b6d4','#0891b2','#2563eb','#3b82f6','#6366f1','#7c3aed','#8b5cf6','#a855f7'];
+  renderBarChart('herb-chart', d.herbStats.slice(0, 10), herbColors);
+
+  // 科室分布
+  var deptHTML = '';
+  var deptColors = ['#c0392b','#e67e22','#16a34a','#2563eb','#7c3aed','#0d9488','#b8860b','#6366f1'];
+  d.deptStats.slice(0, 8).forEach(function(item, i) {
+    deptHTML += '<div class="pie-legend"><span class="pie-dot" style="background:' + deptColors[i%deptColors.length] + '"></span>' + item.name + ' <span class="pie-value">' + item.count + '</span></div>';
+  });
+  document.getElementById('dept-pie').innerHTML = deptHTML || '<span style="font-size:10px;color:var(--text3)">暂无数据</span>';
+
+  // 体质分布
+  renderBarChart('const-chart', d.constStats.slice(0, 8), [
+    '#b8860b','#daa520','#cd853f','#d2691e','#8b4513','#a0522d','#c0392b','#e74c3c'
+  ]);
+
+  // 收入趋势
+  var revMax = d.dailyRevenue.reduce(function(m, r) { return Math.max(m, r.value); }, 1);
+  var revHTML = '';
+  d.dailyRevenue.slice(-14).forEach(function(item) {
+    var pct = Math.min(100, (item.value / revMax) * 100);
+    revHTML += '<div class="bar-item"><span class="bar-label">' + item.date.slice(5) + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:var(--accent)">' + (pct > 20 ? '¥' + item.value.toFixed(0) : '') + '</div></div>' +
+      '<span class="bar-count">¥' + item.value.toFixed(0) + '</span></div>';
+  });
+  document.getElementById('rev-chart').innerHTML = revHTML || '<span style="font-size:10px;color:var(--text3)">暂无收入数据</span>';
+
+  // 明细表
+  var detailHTML = '';
+  var showRecords = d.records.slice(-30).reverse();
+  showRecords.forEach(function(r) {
+    var herbs = (r.herbs || []).map(function(h) { return typeof h === 'string' ? h : (h.name || ''); }).join(', ').slice(0, 30);
+    detailHTML += '<tr>' +
+      '<td>' + (r.created_at || '').slice(0, 10) + '</td>' +
+      '<td>' + (r.patient_name || '—') + '</td>' +
+      '<td>' + (r.diagnosis || '—').slice(0, 20) + '</td>' +
+      '<td style="font-size:10px">' + (herbs || '—') + '</td>' +
+      '<td>' + (r.doctor || '—') + '</td>' +
+      '<td>¥' + (r.amount || 0) + '</td>' +
+    '</tr>';
+  });
+  document.getElementById('detail-table').innerHTML = detailHTML || '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:16px">📋 所选周期内暂无就诊记录</td></tr>';
+  document.getElementById('detail-count').textContent = '共 ' + d.records.length + ' 条 · 显示最近 ' + Math.min(30, d.records.length) + ' 条';
+}
+
+function renderBarChart(id, data, colors) {
+  var max = data.reduce(function(m, r) { return Math.max(m, r.count); }, 1);
+  var html = '';
+  data.forEach(function(item, i) {
+    var pct = Math.max(8, (item.count / max) * 100);
+    html += '<div class="bar-item"><span class="bar-label">' + item.name + '</span>' +
+      '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + (colors[i%colors.length]) + '">' + (pct > 15 ? item.count : '') + '</div></div>' +
+      '<span class="bar-count">' + item.count + '</span></div>';
+  });
+  document.getElementById(id).innerHTML = html || '<span style="font-size:10px;color:var(--text3)">暂无数据</span>';
+}
+
+// ═══ 打印 ═══
+function printReport() {
+  window.print();
+}
+
+// ═══ 导出CSV ═══
+function exportCSV() {
+  if (!reportData || !reportData.records.length) { showToast('暂无数据可导出'); return; }
+  var csv = '日期,患者,诊断,方药,医生,金额\n';
+  reportData.records.forEach(function(r) {
+    var herbs = (r.herbs || []).map(function(h) { return typeof h === 'string' ? h : (h.name || ''); }).join('|');
+    csv += [(r.created_at||'').slice(0,10), (r.patient_name||''), (r.diagnosis||''), herbs, (r.doctor||''), (r.amount||0)].join(',') + '\n';
+  });
+  var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'tcm_report_' + (reportData.range.label||'') + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('📥 CSV 已下载');
+}
+
+// ═══ 推送手机 ═══
+function showPushModal() {
+  if (!reportData) { showToast('请先生成报表'); return; }
+  var summary = '接诊' + reportData.totalPatients + '人次 · 处方' + reportData.totalPrescriptions + '方 · 收入¥' + reportData.totalRevenue.toFixed(0);
+  document.getElementById('push-body').value = summary + '\n' + reportData.diseaseStats.slice(0,5).map(function(d){return d.name+'('+d.count+')';}).join(' · ') + '\n\n点击查看完整报表';
+  document.getElementById('push-modal').classList.add('active');
+}
+
+function closePushModal() {
+  document.getElementById('push-modal').classList.remove('active');
+}
+
+function pushToMobile() {
+  var title = document.getElementById('push-title').value || '医生工作报表';
+  var body = document.getElementById('push-body').value || '';
+
+  // 方式1: Service Worker Push
+  if ('serviceWorker' in navigator && 'PushManager' in window) {
+    navigator.serviceWorker.ready.then(function(reg) {
+      reg.showNotification(title, {
+        body: body,
+        icon: '/img/icon-192.png',
+        badge: '/img/icon-192.png',
+        vibrate: [200, 100, 200],
+        data: { url: '/doctor-summary.html' },
+        actions: [{ action: 'open', title: '查看报表' }]
+      });
+    }).catch(function() {
+      showFallbackPush(title, body);
+    });
+  } else {
+    showFallbackPush(title, body);
+  }
+
+  closePushModal();
+  showToast('📱 报表已推送到手机通知栏');
+}
+
+function showFallbackPush(title, body) {
+  // 降级: 生成二维码风格的分享链接
+  if (navigator.share) {
+    navigator.share({ title: title, text: body, url: window.location.href }).catch(function() {});
+  } else {
+    // Clipboard
+    var text = title + '\n' + body + '\n' + window.location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('📋 报表摘要已复制到剪贴板');
+      });
+    }
+  }
+}
+
+// ═══ 通知权限 ═══
+function requestNotifyPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 2000);
+}
+
+// ═══ 初始化 ═══
+function init() {
+  requestNotifyPermission();
+
+  // 设置默认日期范围
+  var now = new Date();
+  document.getElementById('date-to').value = now.toISOString().slice(0, 10);
+  document.getElementById('date-from').value = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+
+  generateReport();
+
+  // 30秒自动刷新
+  setInterval(generateReport, 30000);
+}
+
+document.addEventListener('DOMContentLoaded', function() { setTimeout(init, 200); });
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/report.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>诊断报告 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📋</text></svg>">
+<style>
+:root{
+  --bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;
+  --accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;
+  --text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:560px;margin:0 auto;padding:16px}
+
+.report-header{text-align:center;padding:20px;background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;border-radius:0 0 16px 16px}
+.report-header h1{font-size:20px;letter-spacing:3px;margin-bottom:4px}
+.report-header .report-id{font-size:11px;opacity:.6;font-family:monospace}
+
+.report-card{background:var(--card);border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid var(--border)}
+
+.urg-banner{padding:12px;border-radius:8px;text-align:center;font-weight:600;margin-bottom:12px;font-size:14px}
+.urg-banner.p0{background:#fef2f2;color:#c0392b;border:2px solid #c0392b}
+.urg-banner.p1{background:#fffbeb;color:#b8860b;border:2px solid #b8860b}
+.urg-banner.p2{background:#eff6ff;color:#2563eb;border:2px solid #2563eb}
+.urg-banner.p3{background:#f0fdf4;color:#16a34a;border:2px solid #16a34a}
+
+.field-label{font-size:11px;color:var(--text3);text-transform:uppercase;margin-bottom:2px}
+.field-value{font-size:14px;color:var(--text);margin-bottom:12px;line-height:1.6}
+.field-value.tags{display:flex;flex-wrap:wrap;gap:4px}
+.field-value.tags span{display:inline-block;padding:3px 8px;border-radius:10px;font-size:11px;background:var(--bg);border:1px solid var(--border)}
+
+.opinion-item{padding:8px 12px;border-radius:6px;margin:4px 0;font-size:12px}
+.opinion-item.shanghan{background:#eff6ff;border-left:3px solid #2563eb}
+.opinion-item.wenbing{background:#fef2f2;border-left:3px solid #c0392b}
+.opinion-item.fuyang{background:#fffbeb;border-left:3px solid #b8860b}
+.opinion-item.piwei{background:#f0fdf4;border-left:3px solid #16a34a}
+.op-label{font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:2px;opacity:.6}
+
+.formula-card{padding:12px;background:#f0fdf4;border-radius:8px;margin-top:8px;text-align:center}
+.formula-name{font-size:18px;font-weight:700;color:var(--primary)}
+.formula-source{font-size:11px;color:var(--text3);margin-top:2px}
+.formula-warning{font-size:10px;color:var(--accent);margin-top:6px}
+
+.disclaimer{text-align:center;font-size:10px;color:var(--text3);margin:20px 0;padding:12px;line-height:1.6}
+
+.not-found{text-align:center;padding:40px;color:var(--text3)}
+.not-found .icon{font-size:48px;margin-bottom:12px}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">诊断报告</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>患者</b></span><span class="std-tag">⚙️ 功能 <b>诊断报告查询</b></span><span class="std-tag">💎 使用价值 <b>扫码查看AI辅助诊断报告</b></span></div>
+
+<div class="report-header">
+  <h1>📋 中医诊断报告</h1>
+  <div class="report-id" id="report-id">加载中...</div>
+  <div style="font-size:11px;opacity:.5;margin-top:4px">命理宝鉴·医道 · AI 辅助，仅供参考</div>
+</div>
+
+<div class="container" id="report-container">
+  <div style="text-align:center;padding:40px;color:var(--text3)">
+    <div class="icon">⏳</div>
+    <p>正在加载报告...</p>
+  </div>
+</div>
+
+<div class="disclaimer">⚠️ 本报告由 AI 辅助生成，仅供学习参考和执业中医师临床辅助。<br>不构成诊断或处方建议。如有不适请及时就医。</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  if (!id) {
+    document.getElementById('report-container').innerHTML = '<div class="not-found"><div class="icon">🔍</div><p>未找到病例ID</p><p style="font-size:12px;color:var(--text3)">请通过医生提供的二维码或链接访问</p></div>';
+    return;
+  }
+
+  // 从 localStorage 加载
+  const history = JSON.parse(localStorage.getItem('tcm_clinical_history') || '[]');
+  const adminCases = JSON.parse(localStorage.getItem('tcm_admin_cases') || '[]');
+  
+  let found = history.find(r => ('C' + new Date(r.timestamp||0).getTime().toString(36)).includes(id) || id.includes('C'));
+  if (!found) found = adminCases.find(c => c.id === id);
+  if (!found) {
+    // 从 URL 参数直查
+    if (history.length > 0) {
+      const idx = parseInt(id.replace(/[^0-9]/g,'')) % history.length;
+      found = history[idx] || history[0];
+    }
+  }
+
+  document.getElementById('report-id').textContent = '病例 ' + (id.slice(-8));
+
+  if (!found) {
+    document.getElementById('report-container').innerHTML = '<div class="not-found"><div class="icon">📭</div><p>该报告已被归档或不存在</p></div>';
+    return;
+  }
+
+  renderReport(found);
+});
+
+function renderReport(data) {
+  const urgencyLabels = {
+    'P0_EMERGENCY': ['p0', '🔴 紧急就医 — 请立即就医或拨打急救电话'],
+    'P1_SUGGEST_VISIT': ['p1', '🟡 建议就诊 — 近期安排门诊复查'],
+    'P2_HEALTH_TIP': ['p2', '🟢 健康提示 — 注意休养，观察变化'],
+    'P3_NORMAL': ['p3', '✅ 正常 — 保持良好生活习惯']
+  };
+  const ul = urgencyLabels[data.urgency_level] || ['p2', '健康提示'];
+
+  let html = '';
+
+  // 紧急分级
+  html += `<div class="urg-banner ${ul[0]}">${ul[1]}</div>`;
+
+  // 基本信息
+  html += '<div class="report-card">';
+  if (data.four_methods?.inquiry?.patient) {
+    const p = data.four_methods.inquiry.patient;
+    if (p.age || p.gender) html += `<div class="field-label">基本信息</div><div class="field-value">${p.age||'?'}岁 · ${p.gender||'未指定'}</div>`;
+  }
+  
+  // 主诉
+  const complaint = data.four_methods?.inquiry?.chief_complaint || data.chief_complaint || '';
+  if (complaint) {
+    html += `<div class="field-label">主诉</div><div class="field-value">${esc(complaint)}</div>`;
+  }
+
+  // 提取症状
+  const terms = (data.extracted_terms && typeof data.extracted_terms === 'string') ? 
+    data.extracted_terms.split(',').filter(Boolean) : 
+    (data.extracted_terms || []);
+  if (terms.length) {
+    html += `<div class="field-label">提取症状</div><div class="field-value tags">${terms.map(t => `<span>${esc(t.trim())}</span>`).join('')}</div>`;
+  }
+  html += '</div>';
+
+  // 多流派辨证
+  const ops = data.kb_multischool_opinions || data.multischool_opinions || {};
+  const activeOps = Object.entries(ops).filter(([_,o]) => o && o.opinion && (o.confidence||0) > 0.5);
+  if (activeOps.length) {
+    html += '<div class="report-card"><div class="field-label" style="margin-bottom:8px">🏛️ 多流派辨证分析</div>';
+    for (const [school, op] of activeOps) {
+      html += `<div class="opinion-item ${school}"><div class="op-label">${school.toUpperCase()} · 置信度 ${((op.confidence||0)*100).toFixed(0)}%</div>${esc(op.opinion)}${op.reference ? `<div style="font-size:10px;opacity:.5;margin-top:4px">📖 ${esc(op.reference)}</div>` : ''}</div>`;
+    }
+    html += '</div>';
+  }
+
+  // 方剂推荐
+  const formula = data.suggested_formula || {};
+  if (formula.formula || data.formula_name) {
+    html += '<div class="report-card">';
+    html += `<div class="formula-card"><div class="formula-name">💊 ${esc(formula.formula || data.formula_name)}</div>`;
+    if (formula.source || data.formula_source) html += `<div class="formula-source">来源：${esc(formula.source || data.formula_source)} · 置信度 ${((formula.confidence||0.7)*100).toFixed(0)}%</div>`;
+    html += '<div class="formula-warning">⚠️ 方剂推荐仅供执业医师参考，不构成处方建议</div></div>';
+    html += '</div>';
+  }
+
+  // 四诊采集状态
+  html += '<div class="report-card"><div class="field-label">四诊采集状态</div>';
+  html += '<div style="display:flex;gap:16px;margin-top:8px;font-size:13px">';
+  html += `<span>👤 面诊: ${data.four_methods?.face?.captured ? '✅' : '❌'}</span>`;
+  html += `<span>👅 舌诊: ${data.four_methods?.tongue?.captured ? '✅' : '❌'}</span>`;
+  html += `<span>🖐️ 手诊: ${data.four_methods?.hand?.captured ? '✅' : '❌'}</span>`;
+  html += `<span>📝 问诊: ${complaint ? '✅' : '❌'}</span>`;
+  html += '</div></div>';
+
+  // 时间
+  const createdAt = data.timestamp || data.created_at;
+  if (createdAt) {
+    html += `<div style="text-align:center;font-size:11px;color:var(--text3);margin-top:8px">报告时间：${new Date(createdAt).toLocaleString('zh-CN')}</div>`;
+  }
+
+  document.getElementById('report-container').innerHTML = html;
+}
+
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+<div class="container"><div id="report-content"></div></div>
+</body>
+</html>
+<script>
+(function(){var a='/';var p=new URLSearchParams(location.search);var pid=p.get('patient')||'P001';
+Promise.all([fetch(a+'/api/tcm/efficacy-analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:pid})}).then(r=>r.json()),fetch(a+'/api/tcm/longitudinal-recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:pid})}).then(r=>r.json()).catch(function(){return{ok:false}})])
+.then(function(r){var eff=r[0];var rec=r[1];
+var el=document.getElementById('report-content')||document.body;
+el.innerHTML='<div style="padding:16px"><h3>📋 '+pid+' 综合报告</h3>'+
+'<p>疗效记录: '+eff.totalRecords+'条</p>'+
+'<p>KB推荐: '+(rec.ok?rec.recommendations.evidence:'API离线')+'</p>'+
+'<p style="font-size:11px;color:#999">报告生成于 '+new Date().toLocaleString('zh-CN')+'</p></div>';
+}).catch(function(){var el=document.getElementById('report-content')||document.body;el.innerHTML='<div style="padding:16px;color:#999">📡 API离线</div>';});})();
+</script>

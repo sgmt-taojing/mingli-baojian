@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/voice-diagnosis.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>语音问诊 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
+<link rel="stylesheet" href="css/standard.css">
+<style>
+:root { --bg:#fff8ee; --card:#fff; --primary:#b8860b; --accent:#c0392b; --green:#2e8b57; --blue:#2980b9; --text:#2c1810; --text2:#6b5b4f; --border:#e8dfc8; }
+body { background: var(--bg); font-family: 'PingFang SC', sans-serif; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+.header { background: linear-gradient(135deg, var(--primary), #8b6914); color: white; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+.header h1 { margin: 0 0 6px; font-size: 22px; }
+.header p { margin: 0; opacity: 0.9; font-size: 13px; }
+
+.mic-zone { background: var(--card); border-radius: 16px; padding: 32px 24px; text-align: center; box-shadow: var(--shadow, 0 2px 8px rgba(0,0,0,0.06)); margin-bottom: 16px; }
+.mic-btn { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary); background: var(--card); color: var(--primary); font-size: 48px; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; justify-content: center; }
+.mic-btn.recording { background: var(--accent); color: white; border-color: var(--accent); animation: pulse 1.2s infinite; }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+.mic-hint { margin-top: 14px; color: var(--text2); font-size: 14px; }
+
+.transcript-box { background: var(--card); border-radius: 12px; padding: 16px 20px; min-height: 60px; margin-bottom: 12px; font-size: 16px; line-height: 1.6; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.transcript-box.empty { color: var(--text2); font-style: italic; }
+.transcript-box .symptoms { margin-top: 8px; }
+.transcript-box .symptom-tag { display: inline-block; background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; margin: 3px 5px 3px 0; font-size: 13px; }
+
+.diagnose-result { background: linear-gradient(135deg, #fff8e7, #fffef5); border-radius: 12px; padding: 18px 22px; margin-bottom: 16px; border-left: 4px solid var(--green); }
+.diagnose-result h3 { margin: 0 0 10px; color: var(--green); font-size: 18px; }
+.diagnose-result .syndrome { font-size: 24px; font-weight: 700; color: var(--primary); margin: 8px 0; }
+.diagnose-result .formula { background: var(--card); padding: 12px; border-radius: 8px; margin-top: 10px; font-family: monospace; }
+.diagnose-result .formula .herb { display: inline-block; padding: 3px 8px; margin: 3px; background: #f5efd8; border-radius: 6px; font-size: 14px; }
+
+.kb-evidence { background: #fffbf0; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; border-left: 4px solid var(--primary); font-size: 13px; }
+.kb-evidence strong { color: var(--primary); }
+
+.btn-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.btn { padding: 12px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; flex: 1; }
+.btn.primary { background: var(--primary); color: white; }
+.btn.outline { background: var(--card); color: var(--primary); border: 1px solid var(--border); }
+
+.history { background: var(--card); border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.history h3 { margin: 0 0 12px; font-size: 16px; color: var(--primary); }
+.history-item { padding: 10px 0; border-bottom: 1px solid #f5f0e8; font-size: 14px; }
+.history-item:last-child { border-bottom: 0; }
+.history-item .ts { font-size: 11px; color: var(--text2); }
+.history-item .txt { margin-top: 4px; }
+
+.disclaimer { background: #fdf2e9; border-radius: 8px; padding: 10px 14px; margin-top: 16px; font-size: 12px; color: var(--text2); }
+</style>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">语音问诊</span>
+</div>
+
+<div class="wrap">
+  <div class="header">
+    <h1>🎙️ 语音问诊</h1>
+    <p>说话即可 · KB 立刻辨证 · 老人也能用</p>
+  </div>
+
+  <!-- 麦克风区 -->
+  <div class="mic-zone">
+    <button class="mic-btn" id="mic-btn" onclick="toggleRecord()">🎤</button>
+    <div class="mic-hint" id="mic-hint">按住说话，说「最近胃不舒服，吃完饭就胀」</div>
+  </div>
+
+  <!-- 识别文本 -->
+  <div class="transcript-box empty" id="transcript">语音识别结果将显示在这里...</div>
+
+  <!-- 辨证结果 -->
+  <div id="result-area"></div>
+
+  <!-- 按钮行 -->
+  <div class="btn-row">
+    <button class="btn outline" onclick="clearAll()">🔄 清空</button>
+    <button class="btn primary" onclick="saveToHistory()">💾 保存到记录</button>
+  </div>
+
+  <!-- 历史 -->
+  <div class="history">
+    <h3>📋 本次会话（最近 5 条）</h3>
+    <div id="history-list"></div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 本页面基于自有 KB 蒸馏结果辅助辨证，<strong>不能替代医生诊断</strong>。仅供家庭参考，重要病情请到院就诊。
+  </div>
+</div>
+
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script>
+let recognition = null;
+let isRecording = false;
+let sessionHistory = [];
+let finalTranscript = '';
+
+// ═══ 初始化语音识别 ═══
+function initRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    document.getElementById('mic-hint').textContent = '❌ 浏览器不支持语音识别，请用 Chrome / Edge';
+    return false;
+  }
+  recognition = new SR();
+  recognition.lang = 'zh-CN';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.onstart = () => {
+    isRecording = true;
+    document.getElementById('mic-btn').classList.add('recording');
+    document.getElementById('mic-hint').textContent = '🎙️ 正在聆听...说完后再次点击停止';
+  };
+  recognition.onend = () => {
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+    document.getElementById('mic-hint').textContent = '✓ 识别完成，点麦克风再说一次';
+  };
+  recognition.onerror = e => {
+    isRecording = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+    document.getElementById('mic-hint').textContent = '❌ 识别失败：' + e.error + '（按麦克风重试）';
+  };
+  recognition.onresult = e => {
+    let interim = '';
+    finalTranscript = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const tr = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalTranscript += tr;
+      else interim += tr;
+    }
+    const display = finalTranscript + (interim ? ' ' + interim : '');
+    const tb = document.getElementById('transcript');
+    tb.textContent = display;
+    tb.classList.remove('empty');
+    // 自动触发辨证（停顿 1s）
+    if (finalTranscript) autoDiagnose(display);
+  };
+  return true;
+}
+
+function toggleRecord() {
+  if (!recognition) {
+    if (!initRecognition()) return;
+  }
+  if (isRecording) {
+    recognition.stop();
+  } else {
+    finalTranscript = '';
+    try { recognition.start(); } catch (e) { recognition.stop(); setTimeout(() => recognition.start(), 250); }
+  }
+}
+
+// ═══ 辨证 ═══
+async function autoDiagnose(text) {
+  if (!text.trim()) return;
+  // 1) 提取症状关键词
+  const symptoms = extractSymptoms(text);
+  if (symptoms.length === 0) return;
+
+  // 2) 调 TCM API 辨证
+  const resultEl = document.getElementById('result-area');
+  resultEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">🔍 KB 辨证中...</div>';
+  try {
+    const r = await fetch('/api/tcm/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ symptoms, age: 73, gender: 'female' })
+    });
+    const data = await r.json();
+    renderResult(data, symptoms, text);
+    // 3) 并行调 case-distill 看 KB 证据
+    fetch('/api/tcm/case-distill', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ options: { minOccurrences: 1 } })
+    }).then(r => r.json()).then(kb => {
+      const matched = (kb.patterns || []).filter(p =>
+        symptoms.some(s => (p.top_symptoms || []).includes(s) || (p.syndrome || '').includes(s))
+      );
+      if (matched.length > 0) {
+        const top = matched[0];
+        const ev = document.createElement('div');
+        ev.className = 'kb-evidence';
+        ev.innerHTML = `📚 <strong>KB 蒸馏证据</strong>：${top.syndrome} (grade ${top.grade} · trust ${(top.confidence || 0).toFixed(3)} · ${top.evidence_patients}患者/${top.evidence_occurrences}次 验证 · avg疗效 ${(top.avg_effect || 0).toFixed(2)} · TOP药 ${(top.top_herbs || []).slice(0,4).join('/')})`;
+        resultEl.appendChild(ev);
+      }
+    }).catch(e => {});
+  } catch (e) {
+    resultEl.innerHTML = '<div style="color:var(--accent);padding:14px">❌ 辨证失败：' + esc(e.message) + '</div>';
+  }
+}
+
+function extractSymptoms(text) {
+  const KW = ['胃胀','胃痛','胃酸','反酸','烧心','腹胀','腹痛','腹泻','便秘','食欲不振','恶心','呕吐','咳嗽','咳痰','气短','胸闷','心悸','失眠','多梦','头痛','头晕','耳鸣','腰痛','关节痛','乏力','疲倦','口苦','口干','口黏','咽干','咽痛','发热','怕冷','手脚凉','出汗','盗汗','浮肿','月经不调','痛经','白带','尿频','尿急','尿痛','便溏','小便黄','皮肤瘙痒','湿疹','荨麻疹'];
+  const found = [];
+  for (const kw of KW) if (text.includes(kw)) found.push(kw);
+  return found;
+}
+
+function renderResult(data, symptoms, rawText) {
+  const resultEl = document.getElementById('result-area');
+  const syndromes = data.diagnoses || data.results || data.syndromes || [];
+  const formulas = data.formulas || data.recommendations || [];
+  if (syndromes.length === 0) {
+    resultEl.innerHTML = `<div class="diagnose-result"><h3>⚠️ 暂未匹配到证型</h3><p>症状：${symptoms.join('、')}</p><p style="color:var(--text2);font-size:13px;margin-top:8px">建议就医或继续描述</p></div>`;
+    return;
+  }
+  const top = syndromes[0];
+  const matchedFormula = formulas[0];
+  resultEl.innerHTML = `
+    <div class="diagnose-result">
+      <h3>✅ 辨证结果</h3>
+      <div class="syndrome">${top.syndrome || top.name || '未命名证型'}</div>
+      <div>置信度：<strong>${((top.confidence || top.score || 0) * 100).toFixed(1)}%</strong> · 匹配度：${((top.match || 0) * 100).toFixed(0)}%</div>
+      <div style="margin-top:8px">症状：${symptoms.map(s => `<span class="symptom-tag">${s}</span>`).join('')}</div>
+      ${matchedFormula ? `
+      <div class="formula">
+        <div style="font-size:13px;color:var(--text2);margin-bottom:6px">📋 推荐方剂：${matchedFormula.name || ''}</div>
+        ${(matchedFormula.herbs || []).map(h => `<span class="herb">${h.name || h} ${h.dose || ''}</span>`).join('')}
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function saveToHistory() {
+  const text = document.getElementById('transcript').textContent;
+  if (!text || text === '语音识别结果将显示在这里...') return toast('⚠️ 请先录入语音');
+  sessionHistory.unshift({ ts: new Date().toLocaleString('zh-CN'), text });
+  if (sessionHistory.length > 5) sessionHistory = sessionHistory.slice(0, 5);
+  renderHistory();
+  toast('⚠️ 已保存到本次会话');
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (sessionHistory.length === 0) {
+    list.innerHTML = '<div style="color:var(--text2);text-align:center;padding:14px">还没有记录</div>';
+    return;
+  }
+  list.innerHTML = sessionHistory.map(h => `
+    <div class="history-item">
+      <div class="ts">${h.ts}</div>
+      <div class="txt">${h.text.substring(0, 100)}</div>
+    </div>
+  `).join('');
+}
+
+function clearAll() {
+  document.getElementById('transcript').textContent = '语音识别结果将显示在这里...';
+  document.getElementById('transcript').classList.add('empty');
+  document.getElementById('result-area').innerHTML = '';
+  finalTranscript = '';
+}
+
+renderHistory();
+initRecognition();
+
+// toast 提示函数（页面级，独立于 nav.js TCM.toast）
+if (!document.getElementById('tcm-toast-style')) {
+  var st = document.createElement('style');
+  st.id = 'tcm-toast-style';
+  st.textContent = '@keyframes tcmToastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+  document.head.appendChild(st);
+}
+
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

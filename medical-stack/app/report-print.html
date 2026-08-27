@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><title>TCM诊断报告</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/report-print.html">
+<style>@media print{@page{size:A4;margin:15mm}body{font-size:12pt}}
+body{font-family:'PingFang SC',sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#333}
+h1{text-align:center;font-size:20pt;border-bottom:2px solid #8b4513;padding-bottom:8px}
+h2{font-size:14pt;color:#8b4513;margin-top:16px}
+.section{margin:12px 0;padding:8px;border-left:3px solid #8b4513}
+.label{font-size:10pt;color:#888;text-transform:uppercase}
+.value{font-size:13pt;font-weight:600}
+.sig{text-align:right;margin-top:24px;font-size:10pt;color:#888}
+.disc{font-size:9pt;color:#888;margin-top:16px;text-align:center}
+@media print{.no-print{display:none}}
+</style>
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">TCM诊断报告</span>
+</div>
+
+<h1>🏥 命理宝鉴·医道 中医诊断报告</h1>
+<div id="report"></div>
+<div class="sig">报告生成: <span id="time"></span></div>
+<div class="disc">⚠️ 本报告由AI辅助生成，仅供执业医师参考。最终诊断以医师面诊为准。</div>
+<div class="no-print" style="text-align:center;margin-top:20px">
+  <button onclick="window.print()" style="padding:10px 24px;font-size:14px;border-radius:8px;background:#8b4513;color:#fff;border:none;cursor:pointer">🖨️ 打印报告</button>
+</div>
+<script>
+var p=new URLSearchParams(location.search);var pid=p.get('patient')||'P001';var name=p.get('name')||'患者';
+document.getElementById('time').textContent=new Date().toLocaleString('zh-CN');
+fetch('/api/tcm/efficacy-analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:pid})})
+.then(r=>r.json()).then(d=>{
+  var h='<div class="section"><div class="label">患者</div><div class="value">'+name+' ('+pid+')</div></div>';
+  h+='<div class="section"><div class="label">疗效记录</div><div class="value">共 '+d.totalRecords+' 条随访记录</div></div>';
+  document.getElementById('report').innerHTML=h;
+}).catch(function(){document.getElementById('report').innerHTML='<p>API离线 · 请重试</p>';});
+fetch('/api/tcm/longitudinal-recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:pid})})
+.then(r=>r.json()).then(d=>{
+  if(d.ok&&d.recommendations.evidence){
+    var el=document.createElement('div');el.className='section';
+    el.innerHTML='<div class="label">KB循证推荐</div><div class="value">'+d.recommendations.evidence+'</div>';
+    document.getElementById('report').appendChild(el);
+  }
+}).catch(function(){});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body></html>

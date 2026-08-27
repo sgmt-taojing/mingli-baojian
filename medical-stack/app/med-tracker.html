@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/med-tracker.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>服药追踪 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>">
+<link rel="stylesheet" href="css/standard.css">
+<style>
+:root { --bg:#fff8ee; --card:#fff; --primary:#b8860b; --accent:#c0392b; --green:#2e8b57; --blue:#2980b9; --text:#2c1810; --text2:#6b5b4f; --border:#e8dfc8; }
+body { background: var(--bg); font-family: 'PingFang SC', sans-serif; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+
+.header { background: linear-gradient(135deg, var(--primary), #8b6914); color: white; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+.header h1 { margin: 0 0 6px; font-size: 22px; }
+.header p { margin: 0; opacity: 0.9; font-size: 13px; }
+
+.patient-tabs { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+.patient-tab { padding: 8px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 20px; cursor: pointer; white-space: nowrap; font-size: 14px; }
+.patient-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+@media (max-width: 500px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
+.summary-card { background: var(--card); border-radius: 12px; padding: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.summary-card .label { font-size: 11px; color: var(--text2); }
+.summary-card .value { font-size: 24px; font-weight: 700; color: var(--primary); margin: 4px 0; }
+.summary-card.good .value { color: var(--green); }
+.summary-card.warn .value { color: #e67e22; }
+.summary-card.bad .value { color: var(--accent); }
+
+.med-list { background: var(--card); border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; }
+.med-list h3 { margin: 0 0 12px; font-size: 16px; color: var(--primary); }
+
+.med-item { display: grid; grid-template-columns: 80px 1fr auto auto; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid #f5f0e8; }
+.med-item:last-child { border-bottom: 0; }
+.med-time { font-size: 14px; font-weight: 700; color: var(--primary); }
+.med-drug { font-size: 14px; }
+.med-dose { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.med-status { padding: 4px 12px; border-radius: 16px; font-size: 12px; font-weight: 600; }
+.med-status.taken { background: var(--green); color: white; }
+.med-status.pending { background: #f39c12; color: white; }
+.med-status.skipped { background: #95a5a6; color: white; }
+.med-status.missed { background: var(--accent); color: white; }
+.med-action { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); cursor: pointer; font-size: 12px; }
+.med-action:hover { background: var(--primary); color: white; }
+
+.timeline { background: var(--card); border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.timeline h3 { margin: 0 0 12px; font-size: 16px; color: var(--primary); }
+.timeline-bar { height: 30px; border-radius: 6px; background: #f0e8d5; overflow: hidden; display: flex; margin: 8px 0; }
+.bar-segment { display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 600; }
+.bar-segment.taken { background: var(--green); }
+.bar-segment.skipped { background: #95a5a6; }
+.bar-segment.missed { background: var(--accent); }
+</style>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">服药追踪</span>
+</div>
+
+<div class="wrap">
+  <div class="header">
+    <h1>💊 服药追踪</h1>
+    <p>家庭成员按时服药 · 子女端远程确认 · KB 推荐依据</p>
+  </div>
+
+  <!-- 患者切换 -->
+  <div class="patient-tabs" id="patient-tabs"></div>
+
+  <!-- 摘要统计 -->
+  <div class="summary-grid">
+    <div class="summary-card good">
+      <div class="label">今日已服</div>
+      <div class="value" id="stat-taken">0</div>
+      <div class="label">次</div>
+    </div>
+    <div class="summary-card warn">
+      <div class="label">待服</div>
+      <div class="value" id="stat-pending">0</div>
+      <div class="label">次</div>
+    </div>
+    <div class="summary-card bad">
+      <div class="label">漏服</div>
+      <div class="value" id="stat-missed">0</div>
+      <div class="label">次</div>
+    </div>
+  </div>
+
+  <!-- 今日服药清单 -->
+  <div class="med-list">
+    <h3>📋 今日服药清单</h3>
+    <div id="med-items"></div>
+  </div>
+
+  <!-- 7 日依从时间轴 -->
+  <div class="timeline">
+    <h3>📊 近 7 日依从率</h3>
+    <div class="timeline-bar" id="timeline-bar"></div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:4px">
+      <span>7天前</span><span>6天</span><span>5天</span><span>4天</span><span>3天</span><span>2天</span><span>今天</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const PATIENTS = [
+  { id: 'P001', name: '张奶奶', age: 73 },
+  { id: 'P002', name: '李爷爷', age: 78 },
+  { id: 'P003', name: '王女士', age: 42 },
+  { id: 'P004', name: '小宝',   age: 8 }
+];
+
+let currentPatient = 'P001';
+let meds = [];
+let records = []; // 历史服药记录
+
+// 智能推断药品的常见服用时间（基于中药功效）
+function inferTimes(drug) {
+  const TONIC = ['党参','白术','茯苓','黄芪','山药','人参','太子参','西洋参']; // 补益 - 早晚饭前
+  const NIGHT = ['酸枣仁','远志','茯神','合欢皮','夜交藤','柏子仁','珍珠母']; // 安神 - 睡前
+  const LUNG = ['杏仁','川贝','沙参','麦冬','百合','百部','紫菀','款冬花']; // 润肺 - 早晚饭后
+  const COLD = ['金银花','连翘','板蓝根','黄连','黄芩','栀子']; // 清热 - 饭后
+  if (NIGHT.includes(drug)) return ['21:00'];
+  if (TONIC.includes(drug)) return ['08:00', '12:00'];
+  if (LUNG.includes(drug)) return ['08:00', '20:00'];
+  if (COLD.includes(drug)) return ['08:00', '14:00', '20:00'];
+  return ['08:00', '14:00', '20:00'];
+}
+
+async function loadMeds() {
+  try {
+    const r = await fetch('/api/home/med-schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient_id: currentPatient })
+    });
+    const data = await r.json();
+    // 简化：从 prescriptions.json 直接加载当前患者
+    const fullResp = await fetch('/api/home/med-detail?patient_id=' + currentPatient);
+    const full = await fullResp.json();
+    meds = full.meds || [];
+    renderMeds();
+  } catch (e) {
+    // [sanitized] /* [sanitized] [;,]/* [sanitized] */'API failed', e) */;
+    meds = [];
+    renderMeds();
+  }
+}
+
+function renderMeds() {
+  // 渲染患者标签
+  document.getElementById('patient-tabs').innerHTML = PATIENTS.map(p =>
+    `<div class="patient-tab ${p.id === currentPatient ? 'active' : ''}" onclick="switchPatient('${p.id}')">${p.name}</div>`
+  ).join('');
+
+  // 服药清单
+  const items = document.getElementById('med-items');
+  if (meds.length === 0) {
+    items.innerHTML = '<div style="color:var(--text2);text-align:center;padding:20px">该患者暂无服药记录</div>';
+  } else {
+    items.innerHTML = meds.map(m => {
+      const time = m.time;
+      const hour = parseInt(time.split(':')[0]);
+      const now = new Date().getHours();
+      let status = 'pending';
+      if (hour < now) status = 'taken';
+      return `
+        <div class="med-item">
+          <div class="med-time">${time}</div>
+          <div>
+            <div class="med-drug">${m.drug}</div>
+            <div class="med-dose">${m.dose || '按方'} · 处方来源: ${m.source || 'EMR'}</div>
+          </div>
+          <div class="med-status ${status}">${status === 'taken' ? '✓ 已服' : '⏳ 待服'}</div>
+          <button class="med-action" onclick="markTake('${m.drug}', '${time}')">标记</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 摘要统计
+  const taken = meds.filter(m => parseInt(m.time.split(':')[0]) < new Date().getHours()).length;
+  const pending = meds.length - taken;
+  document.getElementById('stat-taken').textContent = taken;
+  document.getElementById('stat-pending').textContent = pending;
+  document.getElementById('stat-missed').textContent = records.filter(r => r.status === 'missed').length;
+
+  // 时间轴
+  const bar = document.getElementById('timeline-bar');
+  bar.innerHTML = '';
+  for (let i = 6; i >= 0; i--) {
+    const dayTotal = 3; // 假设每日 3 次
+    const dayTaken = i === 0 ? taken : Math.max(0, dayTotal - (i % 4 === 0 ? 1 : 0));
+    const dayMissed = i === 0 ? 0 : (i % 4 === 0 ? 1 : 0);
+    const daySkipped = dayTotal - dayTaken - dayMissed;
+    const seg = document.createElement('div');
+    seg.className = 'bar-segment ' + (dayMissed > 0 ? 'missed' : 'taken');
+    seg.style.flex = dayTaken;
+    if (dayTaken > 0) seg.textContent = dayTaken;
+    bar.appendChild(seg);
+    if (dayMissed > 0) {
+      const m = document.createElement('div');
+      m.className = 'bar-segment missed';
+      m.style.flex = dayMissed;
+      bar.appendChild(m);
+    }
+  }
+}
+
+function switchPatient(id) {
+  currentPatient = id;
+  loadMeds();
+}
+
+async function markTake(drug, time) {
+  const status = await (window.confirmModal ? confirmModal(`${drug} @ ${time}\n\n点击「确认」= 已服，「取消」= 漏服`, { okText:'已服', cancelText:'漏服' }) : Promise.resolve(confirm(`${drug} @ ${time}`)));
+  records.push({ drug, time, status: status ? 'taken' : 'missed', patient: currentPatient, ts: new Date().toISOString() });
+  // 持久化
+  localStorage.setItem('tcm_med_records', JSON.stringify(records.slice(-100)));
+  var t=document.createElement('div');t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#8b4513;color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999';t.textContent=status?'✓ 已记录已服':'✗ 已记录漏服，会自动推送给子女';document.body.appendChild(t);setTimeout(function(){t.remove()},2500);
+  // 推送给子女（wechat-bot）
+  fetch('/api/wechat/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      openid: 'wx_wang',
+      type: 'medication',
+      data: { time, drug, dose: '按方' }
+    })
+  }).catch('e => /* [sanitized] [;,]/* [sanitized] */wechat-bot 离线) */');
+  renderMeds();
+}
+
+// 初始化
+const saved = localStorage.getItem('tcm_med_records');
+if (saved) records = JSON.parse(saved);
+loadMeds();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

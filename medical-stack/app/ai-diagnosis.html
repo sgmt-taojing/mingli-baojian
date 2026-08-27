@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/ai-diagnosis.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+<title>AI 问诊台 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb;--purple-bg:#f5f0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:10px}
+
+/* page-header-bar (R762 统一模板) */
+.page-header-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(139,69,19,.06)}
+.page-header-bar[data-theme="tcm"]{border-bottom-color:#b8860b}
+.phb-back{font-size:22px;color:var(--text2);text-decoration:none;padding:0 8px}
+.phb-back:hover{color:var(--primary)}
+.phb-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0}
+.page-header-bar[data-theme="tcm"] .phb-dot{background:#b8860b}
+.phb-title{font-size:15px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Flow steps */
+.flow-bar{display:flex;align-items:center;gap:4px;padding:8px 16px;background:var(--card);border-bottom:1px solid var(--border);font-size:11px;overflow-x:auto}
+.flow-step{padding:4px 10px;border-radius:12px;background:#f1f5f9;color:var(--text3);white-space:nowrap;transition:.2s}
+.flow-step.active{background:var(--tcm,#0f766e);color:#fff}
+.flow-arrow{color:var(--text3);font-size:10px}
+
+/* Workbench: 3-column */
+.workbench{display:grid;grid-template-columns:240px 1fr 1fr;gap:8px;padding:8px;min-height:calc(100vh - 120px)}
+@media(max-width:1024px){.workbench{grid-template-columns:1fr;}}
+
+/* Panel */
+.panel{background:var(--card);border-radius:10px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;flex-direction:column;overflow:hidden}
+.panel-h{padding:8px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+.panel-h .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.panel-h .badge{font-size:10px;padding:1px 6px;border-radius:8px;background:#f1f5f9;color:var(--text3);margin-left:auto}
+.panel-body{padding:10px 12px;flex:1;overflow-y:auto;font-size:13px}
+
+/* Inputs */
+.input,select,textarea{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg);color:var(--text);font-family:inherit}
+textarea{resize:vertical;min-height:36px}
+.label{font-size:11px;color:var(--text3);margin:6px 0 2px;display:block}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:4px;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;white-space:nowrap}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.gold{background:var(--gold);color:#fff}
+.btn.accent{background:var(--accent);color:#fff}
+.btn.small{padding:4px 8px;font-size:10px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+
+/* Video container */
+.video-wrap{position:relative;background:#000;border-radius:8px;overflow:hidden;aspect-ratio:4/3}
+.video-wrap video{width:100%;height:100%;object-fit:cover}
+.video-wrap .overlay{position:absolute;inset:0;pointer-events:none}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:rgba(20,184,166,.5);animation:scan 2s linear infinite}
+@keyframes scan{0%{top:0}100%{top:100%}}
+.video-placeholder{display:flex;align-items:center;justify-content:center;height:100%;color:#fff;font-size:13px;background:#1a1008}
+
+/* Transcript */
+.transcript{font-size:12px;line-height:1.7;max-height:180px;overflow-y:auto;padding:8px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.transcript .role-doctor{color:var(--primary)}
+.transcript .role-patient{color:var(--blue)}
+.transcript .role-ai{color:var(--green);font-style:italic}
+.transcript .turn{margin:3px 0;padding:3px 6px;border-radius:4px}
+.transcript .turn.doctor{background:var(--gold-bg)}
+.transcript .turn.patient{background:var(--blue-bg)}
+.transcript .turn.ai{background:var(--green-bg)}
+
+/* AI card */
+.ai-card{border-radius:8px;padding:10px;border:1px solid #93c5fd;background:var(--blue-bg)}
+.ai-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;background:var(--blue);color:#fff;margin-bottom:4px}
+.ai-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px dashed #bfdbfe}
+.ai-conf{font-size:10px;color:var(--blue)}
+.kb-ref{font-size:10px;color:var(--text3);margin-top:4px;background:#fff;padding:4px 6px;border-radius:4px;border:1px solid #e2e8f0}
+
+/* Medical record draft */
+.record-section{margin:6px 0;padding:6px 8px;background:var(--bg);border-radius:6px;border:1px solid var(--border)}
+.record-section .rs-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:3px}
+.record-section .rs-content{font-size:11px;color:var(--text);line-height:1.6}
+.record-section[contenteditable="true"]{outline:2px solid var(--gold);cursor:text}
+
+/* Status pill */
+.status-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600}
+.status-pill.live{background:var(--red-bg);color:var(--accent);animation:pulse 1.5s infinite}
+.status-pill.idle{background:var(--bg);color:var(--text3);border:1px solid var(--border)}
+.status-pill.done{background:var(--green-bg);color:var(--green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* Query bar */
+.query-bar{display:flex;gap:6px;padding:8px 16px;background:var(--card);border-top:1px solid var(--border);font-size:11px;flex-wrap:wrap}
+.query-bar input,.query-bar select{padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px}
+
+/* Chip */
+.chip{padding:4px 8px;border-radius:12px;font-size:10px;background:var(--bg);border:1px solid var(--border);cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--primary)}
+.chip.sel{background:var(--primary);color:#fff;border-color:var(--primary)}
+.chip-grid{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:8px 20px;border-radius:16px;font-size:12px;z-index:999;opacity:0;transition:opacity .3s}
+.toast.show{opacity:1}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:12px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:16px}
+.modal h3{font-size:15px;color:var(--primary);margin-bottom:10px}
+
+/* Collapsible */
+.collapse-toggle{font-size:10px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid var(--border);background:var(--bg)}
+.collapse-toggle:hover{color:var(--primary)}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js" defer></script>
+<script src="js/rx-loop.js" defer></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</head>
+<body>
+
+<!-- page-header-bar R762 统一模板 -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">AI 问诊台</span>
+  <span class="status-pill idle" id="inquiry-status">⏸ 待采集</span>
+</div>
+
+<!-- Flow steps -->
+<div class="flow-bar">
+  <div class="flow-step active" data-step="1">① 患者</div><div class="flow-arrow">→</div>
+  <div class="flow-step" data-step="2">② 采集</div><div class="flow-arrow">→</div>
+  <div class="flow-step" data-step="3">③ AI 辨证</div><div class="flow-arrow">→</div>
+  <div class="flow-step" data-step="4">④ 病历</div><div class="flow-arrow">→</div>
+  <div class="flow-step" data-step="5">⑤ 存盘</div>
+</div>
+
+<!-- Workbench: 左(患者+采集) 中(音视频+转写) 右(AI+病历) -->
+<div class="workbench">
+
+  <!-- ═══ LEFT: Patient + Quick Capture ═══ -->
+  <div class="col-left" style="display:flex;flex-direction:column;gap:8px">
+    <!-- Patient -->
+    <div class="panel">
+      <div class="panel-h"><span class="dot" style="background:var(--primary)"></span>患者档案</div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div><label class="label">姓名 *</label><input class="input" id="p-name" placeholder="患者姓名" data-validate="required|min=2|max=20" maxlength="20"></div>
+          <div><label class="label">年龄</label><input class="input" id="p-age" type="number" placeholder="岁" min="0" max="150" data-validate="range=0-150"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+          <div><label class="label">性别</label><select class="input" id="p-gender" data-validate="required"><option>男</option><option>女</option></select></div>
+          <div><label class="label">主诉</label><input class="input" id="p-complaint" placeholder="主要不适" data-validate="max=50" maxlength="50"></div>
+        </div>
+        <div style="margin-top:6px;font-size:10px;color:var(--text3)">💡 候诊队列一键带入</div>
+        <div id="queue-shortcuts" style="margin-top:4px"></div>
+      </div>
+    </div>
+
+    <!-- Quick Capture (collapsible) -->
+    <div class="panel" style="flex:0 0 auto">
+      <div class="panel-h" style="cursor:pointer" onclick="togglePanel('quick-panel')">
+        <span class="dot" style="background:var(--blue)"></span>快速采集<span class="badge">点选</span>
+        <span class="collapse-toggle" id="quick-toggle">收起</span>
+      </div>
+      <div class="panel-body" id="quick-panel">
+        <div id="quick-capture"></div>
+        <div style="margin-top:6px;font-size:10px;color:var(--text3)">已选: 症状 <b id="cnt-s">0</b> · 舌象 <b id="cnt-t">0</b> · 脉象 <b id="cnt-p">0</b>
+          <button class="btn small" style="margin-left:6px" onclick="clearSelection()">清空</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NLP input (compact) -->
+    <div class="panel" style="flex:0 0 auto">
+      <div class="panel-h"><span class="dot" style="background:var(--green)"></span>语音转写 / 文字输入</div>
+      <div class="panel-body">
+        <textarea class="input" id="nl-input" rows="2" data-validate="max=500" maxlength="500" placeholder="医生口述或打字：患者最近一周睡不着，白天头晕没力气..."></textarea>
+        <div class="btn-row">
+          <button class="btn blue small" onclick="extractNLP()">🎙️ 提取症状</button>
+          <button class="btn small" onclick="document.getElementById('nl-input').value=''">清空</button>
+        </div>
+        <div id="nl-result" style="margin-top:4px;font-size:10px;color:var(--text3)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CENTER: Video/Audio + Transcript ═══ -->
+  <div class="col-center" style="display:flex;flex-direction:column;gap:8px">
+    <!-- Video + controls -->
+    <div class="panel" style="flex:0 0 auto">
+      <div class="panel-h">
+        <span class="dot" style="background:var(--accent)"></span>音视频采集
+        <span class="badge" id="capture-badge">摄像头待启动</span>
+      </div>
+      <div class="panel-body" style="padding:8px">
+        <div class="video-wrap" id="video-container">
+          <video id="inquiry-video" autoplay playsinline muted></video>
+          <div class="overlay" id="video-overlay">
+            <div class="video-placeholder" id="video-placeholder">📷 点击「启动采集」开始问诊</div>
+            <div class="scan-line" id="scan-line" style="display:none"></div>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn primary" id="btn-start" onclick="startCapture()">▶ 启动采集</button>
+          <button class="btn accent" id="btn-stop" onclick="stopCapture()" disabled>⏹ 停止</button>
+          <button class="btn blue" id="btn-pause" onclick="togglePause()" disabled>⏸ 暂停</button>
+          <button class="btn small" onclick="captureSnapshot()">📸 快照</button>
+        </div>
+        <div style="margin-top:6px;font-size:10px;color:var(--text3)" id="capture-info">采集节流: 1s/帧 · 本地优先存储</div>
+      </div>
+    </div>
+
+    <!-- Live transcript -->
+    <div class="panel" style="flex:1;min-height:200px">
+      <div class="panel-h">
+        <span class="dot" style="background:var(--green)"></span>实时转写
+        <span class="badge" id="transcript-badge">等待中</span>
+      </div>
+      <div class="panel-body">
+        <div class="transcript" id="transcript-box">
+          <div style="color:var(--text3);font-size:11px;text-align:center;padding:20px">问诊开始后，医患对话将实时转写显示</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ RIGHT: AI Diagnosis + Medical Record ═══ -->
+  <div class="col-right" style="display:flex;flex-direction:column;gap:8px">
+    <!-- AI real-time diagnosis -->
+    <div class="panel" style="flex:1;min-height:280px">
+      <div class="panel-h">
+        <span class="dot" style="background:var(--blue)"></span>AI 实时辨证
+        <span class="badge" id="ai-badge">待启动</span>
+      </div>
+      <div class="panel-body">
+        <div id="ai-result">
+          <div style="color:var(--text3);font-size:11px;text-align:center;padding:20px">
+            启动采集后，AI 将实时分析音视频流，出具辨证建议
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auto medical record -->
+    <div class="panel" style="flex:1;min-height:240px">
+      <div class="panel-h">
+        <span class="dot" style="background:var(--gold)"></span>病历草稿
+        <span class="badge" id="record-badge">AI 生成中</span>
+        <button class="btn small" onclick="exportRecord()" style="margin-left:auto">📋 导出</button>
+      </div>
+      <div class="panel-body" id="record-draft">
+        <div class="record-section" id="rs-chief">
+          <div class="rs-title">主诉</div>
+          <div class="rs-content" id="rs-chief-text">—</div>
+        </div>
+        <div class="record-section" id="rs-hpi">
+          <div class="rs-title">现病史</div>
+          <div class="rs-content" id="rs-hpi-text">—</div>
+        </div>
+        <div class="record-section" id="rs-four">
+          <div class="rs-title">四诊摘要</div>
+          <div class="rs-content" id="rs-four-text">—</div>
+        </div>
+        <div class="record-section" id="rs-syn">
+          <div class="rs-title">辨证</div>
+          <div class="rs-content" id="rs-syn-text">—</div>
+        </div>
+        <div class="record-section" id="rs-treat">
+          <div class="rs-title">治法</div>
+          <div class="rs-content" id="rs-treat-text">—</div>
+        </div>
+        <div class="record-section" id="rs-rx">
+          <div class="rs-title">处方</div>
+          <div class="rs-content" id="rs-rx-text">—</div>
+        </div>
+        <div style="margin-top:6px;font-size:10px;color:var(--text3)">💡 点击病历区块可直接编辑修改</div>
+      </div>
+    </div>
+
+    <!-- Review + Confirm -->
+    <div class="panel" style="flex:0 0 auto">
+      <div class="panel-h"><span class="dot" style="background:var(--green)"></span>复核定稿</div>
+      <div class="panel-body">
+        <div class="btn-row">
+          <button class="btn green" id="btn-confirm" onclick="confirmCase(true)" disabled>✅ 采纳 AI 版本</button>
+          <button class="btn gold" id="btn-edit-confirm" onclick="confirmCase(false)" disabled>✏️ 修改后定稿</button>
+          <button class="btn small" onclick="openQuery()">🔍 历史查询</button>
+        </div>
+        <div id="confirm-msg" style="margin-top:6px;font-size:11px;color:var(--text3)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Bottom: Query bar ═══ -->
+<div class="query-bar" id="query-bar">
+  <span style="font-weight:600;color:var(--text2)">🔍 快速查询</span>
+  <input type="text" id="q-name" placeholder="患者姓名" style="width:120px" data-validate="max=20" maxlength="20">
+  <input type="date" id="q-date" style="width:140px">
+  <select id="q-syndrome" style="width:120px"><option value="">全部证型</option></select>
+  <button class="btn small" onclick="queryCases()">查询</button>
+  <button class="btn small" onclick="clearQuery()">清空</button>
+  <span style="margin-left:auto;font-size:10px;color:var(--text3)" id="q-count">共 0 条</span>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Confirm modal -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3>📋 确认定稿</h3>
+    <div id="confirm-modal-body"></div>
+    <div class="btn-row" style="margin-top:12px;justify-content:flex-end">
+      <button class="btn small" onclick="closeModal('confirm-modal')">取消</button>
+      <button class="btn green" onclick="submitConfirm()">确认存盘</button>
+    </div>
+  </div>
+</div>
+
+<!-- Query modal -->
+<div class="modal-overlay" id="query-modal">
+  <div class="modal" style="max-width:800px">
+    <h3>🔍 历史问诊记录</h3>
+    <div id="query-results"></div>
+    <div class="btn-row" style="margin-top:12px;justify-content:flex-end">
+      <button class="btn small" onclick="closeModal('query-modal')">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// AI 问诊台 —— 实时音视频采集 + 流式 AI 辨证 + 病历草稿
+// R762 重构：功能极简、AI 实时、医生复核后启用
+// ═══════════════════════════════════════════════════════
+
+// ─── State ───
+var state = {
+  capturing: false,      // 采集进行中
+  paused: false,         // 暂停采集
+  stream: null,          // MediaStream
+  mediaRecorder: null,   // MediaRecorder
+  frameTimer: null,      // 节流帧上传 timer
+  sseConn: null,         // EventSource
+  transcript: [],        // 转写记录 [{role, text, time}]
+  aiEvents: [],          // AI 流式输出片段
+  medicalRecord: { chief:'', hpi:'', four:'', syndrome:'', treatment:'', formula:'' },
+  aiResult: null,        // 最终 AI 辨证结果
+  confirmMode: null,     // 'ai' | 'edit'
+  caseId: null,          // 已存盘病例 ID（confirm 后）
+  sessionId: null,       // 采集会话 ID（startCapture 起，帧上传用；R764：避免每帧 caseId 漂移）
+  lastPatient: null,     // 上一位患者姓名（R764：换人重置 AI 状态，防串诊）
+  submitting: false      // 存盘锁（R764：防双击重复提交）
+};
+
+// R764：统一转义（全局 escape-html.js 优先，缺脚本时兑底；声明在前，供全部函数使用）
+var escFn = (typeof escapeHtml === 'function') ? escapeHtml : function(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+};
+
+// ─── Quick capture data ───
+var CAPTURE_GROUPS = [
+  { title: '😴 睡眠', items: ['失眠','多梦','易醒','嗜睡','入睡困难'] },
+  { title: '😵 头面', items: ['头痛','头晕','耳鸣','目赤','口苦','口干','口臭'] },
+  { title: '🍚 消化', items: ['食欲不振','腹胀','胃痛','恶心','嗳气','反酸'] },
+  { title: '💧 二便', items: ['便秘','便溏','腹泻','小便黄','尿频','夜尿多'] },
+  { title: '🔥 寒热', items: ['畏寒','怕热','发热','五心烦热','盗汗','自汗'] },
+  { title: '💪 全身', items: ['乏力','疲倦','气短','心悸','胸闷','腰酸','关节痛'] },
+  { title: '😢 情绪', items: ['烦躁易怒','情绪抑郁','焦虑','善太息'] },
+  { title: '🌸 妇科', items: ['月经不调','痛经','经量少','经色暗','白带异常'] }
+];
+var TONGUE_ITEMS = ['舌淡红','舌淡白','舌红','舌绛','舌紫暗','苔薄白','苔白腻','苔黄腻','苔黄燥','苔少','有齿痕','有瘀斑'];
+var PULSE_ITEMS = ['脉浮','脉沉','脉数','脉缓','脉弦','脉滑','脉细','脉涩','脉弱','脉紧','脉濡','脉结代'];
+var selectedSymptoms = [];
+var selectedTongue = [];
+var selectedPulse = [];
+
+// ─── Init ───
+document.addEventListener('DOMContentLoaded', function() {
+  renderCapture();
+  renderQueueShortcuts();
+  loadQueryOptions();
+  // Make record sections editable on click
+  document.querySelectorAll('.record-section').forEach(function(sec) {
+    sec.addEventListener('click', function() {
+      if (!this.dataset.editing) {
+        this.dataset.editing = '1';
+        this.querySelector('.rs-content').contentEditable = 'true';
+        this.querySelector('.rs-content').focus();
+      }
+    });
+    sec.addEventListener('blur', function() {
+      this.dataset.editing = '';
+      this.querySelector('.rs-content').contentEditable = 'false';
+    });
+  });
+});
+
+// ═══ Quick Capture ═══
+function renderCapture() {
+  var html = '';
+  for (var g = 0; g < CAPTURE_GROUPS.length; g++) {
+    var grp = CAPTURE_GROUPS[g];
+    html += '<div style="font-size:10px;font-weight:700;color:var(--text2);margin:6px 0 2px">' + grp.title + '</div><div class="chip-grid">';
+    for (var i = 0; i < grp.items.length; i++) {
+      var it = grp.items[i];
+      html += '<span class="chip' + (selectedSymptoms.indexOf(it)>=0?' sel':'') + '" onclick="toggleChip(\'symptom\',\'' + it + '\')">' + it + '</span>';
+    }
+    html += '</div>';
+  }
+  html += '<div style="font-size:10px;font-weight:700;color:var(--text2);margin:6px 0 2px">👅 舌象</div><div class="chip-grid">';
+  for (var t = 0; t < TONGUE_ITEMS.length; t++) {
+    html += '<span class="chip' + (selectedTongue.indexOf(TONGUE_ITEMS[t])>=0?' sel':'') + '" onclick="toggleChip(\'tongue\',\'' + TONGUE_ITEMS[t] + '\')">' + TONGUE_ITEMS[t] + '</span>';
+  }
+  html += '</div><div style="font-size:10px;font-weight:700;color:var(--text2);margin:6px 0 2px">🫀 脉象</div><div class="chip-grid">';
+  for (var p = 0; p < PULSE_ITEMS.length; p++) {
+    html += '<span class="chip' + (selectedPulse.indexOf(PULSE_ITEMS[p])>=0?' sel':'') + '" onclick="toggleChip(\'pulse\',\'' + PULSE_ITEMS[p] + '\')">' + PULSE_ITEMS[p] + '</span>';
+  }
+  html += '</div>';
+  document.getElementById('quick-capture').innerHTML = html;
+  document.getElementById('cnt-s').textContent = selectedSymptoms.length;
+  document.getElementById('cnt-t').textContent = selectedTongue.length;
+  document.getElementById('cnt-p').textContent = selectedPulse.length;
+}
+
+function toggleChip(type, val) {
+  var arr = type==='symptom'?selectedSymptoms : type==='tongue'?selectedTongue : selectedPulse;
+  var idx = arr.indexOf(val);
+  if (idx >= 0) arr.splice(idx, 1); else arr.push(val);
+  renderCapture();
+}
+
+function clearSelection() {
+  selectedSymptoms = []; selectedTongue = []; selectedPulse = [];
+  renderCapture();
+}
+
+function togglePanel(id) {
+  var el = document.getElementById(id);
+  var tog = document.getElementById('quick-toggle');
+  if (el.style.display === 'none') {
+    el.style.display = ''; tog.textContent = '收起';
+  } else {
+    el.style.display = 'none'; tog.textContent = '展开';
+  }
+}
+
+// ═══ Queue shortcuts ═══
+function renderQueueShortcuts() {
+  try {
+    var regs = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
+    var waiting = regs.filter(r => r.status !== 'done' && r.status !== 'cancelled').slice(0, 5);
+    if (!waiting.length) return;
+    var html = '';
+    for (var i = 0; i < waiting.length; i++) {
+      html += '<button class="btn small" style="margin:2px" onclick="loadFromQueue(\'' + waiting[i].id + '\')">' + waiting[i].name + ' · ' + (waiting[i].complaint||'').slice(0,10) + '</button>';
+    }
+    document.getElementById('queue-shortcuts').innerHTML = html;
+  } catch(e) {}
+}
+
+function loadFromQueue(id) {
+  try {
+    var regs = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
+    var r = regs.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('p-name').value = r.name;
+    document.getElementById('p-age').value = r.age || '';
+    document.getElementById('p-gender').value = r.gender || '男';
+    if (r.complaint) {
+      document.getElementById('p-complaint').value = r.complaint;
+      document.getElementById('nl-input').value = r.complaint;
+      extractNLP();
+    }
+    toast('已带入患者 ' + r.name);
+  } catch(e) {}
+}
+
+// ═══ NLP extraction ═══
+var NLP_RULES = [
+  [/失眠|睡不着|入睡难|多梦|易醒|早醒/, '失眠'], [/多梦/, '多梦'],
+  [/头痛|偏头痛|头胀/, '头痛'], [/头晕|眩晕|头昏/, '头晕'], [/耳鸣|耳聋/, '耳鸣'],
+  [/口苦|苦口/, '口苦'], [/口干|口渴|咽干/, '口干'], [/口臭/, '口臭'],
+  [/食欲不振|胃口差|纳差|不想吃/, '食欲不振'], [/腹胀|肚子胀/, '腹胀'], [/胃痛|胃脘痛|胃疼/, '胃痛'],
+  [/恶心|想吐/, '恶心'], [/嗳气|打嗝/, '嗳气'], [/反酸|烧心/, '反酸'],
+  [/便秘|大便干|排便难/, '便秘'], [/便溏|大便稀|拉肚子|腹泻/, '便溏'], [/腹泻/, '腹泻'],
+  [/小便黄|尿黄/, '小便黄'], [/尿频/, '尿频'], [/夜尿/, '夜尿多'],
+  [/怕冷|畏寒|恶寒/, '畏寒'], [/怕热/, '怕热'], [/发热|发烧/, '发热'],
+  [/五心烦热|手脚心热/, '五心烦热'], [/盗汗|晚上出汗/, '盗汗'], [/自汗|白天出汗/, '自汗'],
+  [/乏力|没力气|疲劳|疲倦/, '乏力'], [/气短|喘不上气/, '气短'], [/心悸|心慌/, '心悸'],
+  [/胸闷|胸口堵/, '胸闷'], [/腰酸|腰痛|腰疼/, '腰酸'], [/关节痛|关节疼/, '关节痛'],
+  [/烦躁|易怒|爱发脾气/, '烦躁易怒'], [/抑郁|情绪低/, '情绪抑郁'], [/焦虑|紧张/, '焦虑'],
+  [/月经不调|月经乱/, '月经不调'], [/痛经/, '痛经'], [/经量少|月经少/, '经量少'],
+  [/舌淡|舌头淡/, '舌淡白'], [/舌红|舌头红/, '舌红'], [/苔黄|黄苔/, '苔黄腻'], [/苔白|白苔/, '苔白腻'], [/舌紫|紫暗/, '舌紫暗']
+];
+
+function extractNLP() {
+  var text = document.getElementById('nl-input').value.trim();
+  if (!text) return toast('请输入描述');
+  var found = [];
+  for (var i = 0; i < NLP_RULES.length; i++) {
+    if (NLP_RULES[i][0].test(text) && found.indexOf(NLP_RULES[i][1]) < 0) found.push(NLP_RULES[i][1]);
+  }
+  if (found.length) {
+    var added = 0;
+    for (var j = 0; j < found.length; j++) {
+      if (selectedSymptoms.indexOf(found[j]) < 0) { selectedSymptoms.push(found[j]); added++; }
+    }
+    renderCapture();
+    document.getElementById('nl-result').innerHTML = '✅ 提取 ' + added + ' 个症状: <strong>' + found.join('、') + '</strong>';
+  } else {
+    document.getElementById('nl-result').innerHTML = '⚠️ 未识别明确症状词';
+  }
+}
+
+// ═══ Capture: WebRTC + throttled frame upload + SSE ═══
+async function startCapture() {
+  try {
+    var name = document.getElementById('p-name').value.trim();
+    if (!name) return toast('请先填写患者姓名');
+
+    // R764：换患者重置上一位的 AI 状态（防止把 A 的辨证存给 B）
+    if (state.lastPatient && state.lastPatient !== name) {
+      state.aiResult = null;
+      state.aiEvents = [];
+      state.transcript = [];
+      state.caseId = null;
+      state.medicalRecord = { chief:'', hpi:'', four:'', syndrome:'', treatment:'', formula:'' };
+      document.getElementById('btn-confirm').disabled = true;
+      document.getElementById('btn-edit-confirm').disabled = true;
+      document.getElementById('ai-result').innerHTML = '<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px">已切换患者，等待新一轮辨证</div>';
+      document.getElementById('transcript-box').innerHTML = '<div style="color:var(--text3);font-size:11px;text-align:center;padding:20px">问诊开始后，医患对话将实时转写显示</div>';
+      document.getElementById('transcript-badge').textContent = '等待中';
+      document.getElementById('record-badge').textContent = 'AI 生成中';
+      ['chief','hpi','four','syn','treat','rx'].forEach(function(k) {
+        var el = document.getElementById('rs-' + k + '-text');
+        if (el) el.textContent = '—';
+      });
+      toast('已切换患者：' + name + '（AI 状态已重置）');
+    }
+    state.lastPatient = name;
+    // R764：采集会话 ID（帧上传共用，避免每帧漂移）
+    if (!state.sessionId) state.sessionId = 'live-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+
+    // WebRTC
+    var stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    state.stream = stream;
+    state.capturing = true;
+    state.paused = false;
+    var video = document.getElementById('inquiry-video');
+    video.srcObject = stream;
+    document.getElementById('video-placeholder').style.display = 'none';
+    document.getElementById('scan-line').style.display = 'block';
+    document.getElementById('btn-start').disabled = true;
+    document.getElementById('btn-stop').disabled = false;
+    document.getElementById('btn-pause').disabled = false;
+    document.getElementById('capture-badge').textContent = '🔴 采集中';
+    document.getElementById('capture-badge').style.background = 'var(--red-bg)';
+    document.getElementById('capture-badge').style.color = 'var(--accent)';
+    setStatus('live', '🔴 采集中');
+    setFlowStep(2);
+
+    // Throttled frame upload (1s)
+    state.frameTimer = setInterval(function() {
+      if (!state.paused && video.readyState >= 2) {
+        uploadFrame(video);
+      }
+    }, 1000);
+
+    // SSE: AI real-time diagnosis
+    connectSSE();
+
+    toast('采集已启动');
+  } catch(e) {
+    toast('摄像头/麦克风启动失败: ' + e.message);
+  }
+}
+
+function stopCapture() {
+  state.capturing = false;
+  state.paused = false; // R764：复位暂停态，防下次启动按钮文案错乱
+  if (state.stream) {
+    state.stream.getTracks().forEach(function(t) { t.stop(); });
+    state.stream = null;
+  }
+  if (state.frameTimer) { clearInterval(state.frameTimer); state.frameTimer = null; }
+  if (state.sseConn) { state.sseConn.close(); state.sseConn = null; }
+  document.getElementById('inquiry-video').srcObject = null;
+  document.getElementById('video-placeholder').style.display = 'flex';
+  document.getElementById('scan-line').style.display = 'none';
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-stop').disabled = true;
+  document.getElementById('btn-pause').disabled = true;
+  document.getElementById('btn-pause').textContent = '⏸ 暂停'; // R764：复位文案
+  document.getElementById('capture-badge').textContent = '摄像头待启动';
+  document.getElementById('capture-badge').style.background = '';
+  document.getElementById('capture-badge').style.color = '';
+  setStatus('done', '✅ 采集完成');
+  // R764：只在 AI 已出结果时才推进到病历步，否则停在采集步
+  setFlowStep(state.aiResult ? 4 : 2);
+  toast('采集已停止');
+}
+
+function togglePause() {
+  state.paused = !state.paused;
+  var btn = document.getElementById('btn-pause');
+  if (state.paused) {
+    btn.textContent = '▶ 继续';
+    setStatus('idle', '⏸ 已暂停');
+  } else {
+    btn.textContent = '⏸ 暂停';
+    setStatus('live', '🔴 采集中');
+  }
+}
+
+async function uploadFrame(video) {
+  try {
+    if (!video || video.readyState < 2) return;
+    var canvas = document.createElement('canvas');
+    canvas.width = 320; canvas.height = 240;
+    canvas.getContext('2d').drawImage(video, 0, 0, 320, 240);
+    var blob = await new Promise(function(resolve) {
+      canvas.toBlob(resolve, 'image/jpeg', 0.7);
+    });
+    if (!blob) return;
+    // R763 自检修真：后端改 express.raw 接收，帧即焚（仅计数元数据，不落盘原始帧）
+    // R764 修真：帧上传统一携带 sessionId（confirm 前 caseId 为空会导致服务端每帧生成新 id，帧计数碎片化）
+    var apiBase = (window.TCM && TCM.API_BASE) || '';
+    var cid = state.caseId || state.sessionId;
+    var q = cid ? ('?caseId=' + encodeURIComponent(cid)) : '';
+    fetch(apiBase + '/api/tcm/inquiry-frame' + q, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: blob
+    }).catch(function() {});
+  } catch(e) { /* 静默：帧上传失败不中断问诊 */ }
+}
+
+function captureSnapshot() {
+  var video = document.getElementById('inquiry-video');
+  if (!video.srcObject) return toast('请先启动采集');
+  var canvas = document.createElement('canvas');
+  canvas.width = 640; canvas.height = 480;
+  canvas.getContext('2d').drawImage(video, 0, 0, 640, 480);
+  var link = document.createElement('a');
+  link.download = 'snapshot-' + Date.now() + '.jpg';
+  link.href = canvas.toDataURL('image/jpeg', 0.9);
+  link.click();
+  toast('快照已保存');
+}
+
+// ═══ SSE: Real-time AI diagnosis ═══
+function connectSSE() {
+  try {
+    var apiBase = (window.TCM && TCM.API_BASE) || '';
+    var url = apiBase + '/api/tcm/ai-stream?caseId=' + encodeURIComponent(state.caseId || '') + '&symptoms=' + encodeURIComponent(selectedSymptoms.join('、'));
+    var es = new EventSource(url);
+    state.sseConn = es;
+    es.onopen = function() {
+      document.getElementById('ai-badge').textContent = '🟢 实时连接';
+      document.getElementById('ai-badge').style.background = 'var(--green-bg)';
+      document.getElementById('ai-badge').style.color = 'var(--green)';
+    };
+    es.onmessage = function(evt) {
+      try {
+        var data = JSON.parse(evt.data);
+        handleAIStreamEvent(data);
+      } catch(e) { /* ignore non-JSON */ }
+    };
+    es.onerror = function() {
+      // R763 自检修真：服务端发完 final 会 res.end()，这里必须主动关，否则 EventSource 无限重连
+      es.close();
+      state.sseConn = null;
+      if (!state.aiResult) {
+        document.getElementById('ai-badge').textContent = '⚠️ 连接中断';
+        document.getElementById('ai-badge').style.background = 'var(--gold-bg)';
+        document.getElementById('ai-badge').style.color = 'var(--gold)';
+        // 兜底：本地规则辨证
+        runLocalDiagnosis();
+      }
+    };
+  } catch(e) {
+    runLocalDiagnosis();
+  }
+}
+
+function handleAIStreamEvent(data) {
+  // Stream types: 'transcript' | 'diagnosis' | 'record_update' | 'final'
+  if (data.type === 'transcript') {
+    addTranscript(data.role, data.text);
+  } else if (data.type === 'diagnosis') {
+    appendAIResult(data);
+  } else if (data.type === 'record_update') {
+    updateMedicalRecord(data.record);
+  } else if (data.type === 'final') {
+    state.aiResult = data;
+    // final 后服务端会关流：主动断开，避免 EventSource 自动重连
+    if (state.sseConn) { state.sseConn.close(); state.sseConn = null; }
+    document.getElementById('btn-confirm').disabled = false;
+    document.getElementById('btn-edit-confirm').disabled = false;
+    setFlowStep(4);
+    setStatus('done', '✅ 辨证完成');
+    toast('AI 辨证完成，请医生复核');
+  } else if (data.type === 'error') {
+    if (state.sseConn) { state.sseConn.close(); state.sseConn = null; }
+    runLocalDiagnosis();
+  }
+}
+
+function addTranscript(role, text) {
+  var time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  state.transcript.push({ role: role, text: text, time: time });
+  var box = document.getElementById('transcript-box');
+  var cls = role === 'doctor' ? 'doctor' : role === 'patient' ? 'patient' : 'ai';
+  var label = role === 'doctor' ? '医' : role === 'patient' ? '患' : 'AI';
+  // R763 自检修真：DocumentFragment 替代 innerHTML +=（避免全量重排）
+  var div = document.createElement('div');
+  div.className = 'turn ' + cls;
+  var b = document.createElement('b'); b.textContent = label;
+  div.appendChild(b);
+  div.appendChild(document.createTextNode(' [' + time + '] ' + text));
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  document.getElementById('transcript-badge').textContent = state.transcript.length + ' 条';
+}
+
+function appendAIResult(data) {
+  state.aiEvents.push(data);
+  var f = data.suggested_formula || {};
+  var ops = data.kb_multischool_opinions || {};
+  var syndrome = f.matched_syndrome || ops.primary_syndrome || '待辨';
+  var formula = f.formula || '';
+  var conf = f.confidence ? Math.round(f.confidence * 100) + '%' : '—';
+  var urgency = data.urgency_level || '';
+  var urgencyCN = { P1_EMERGENCY:'🔴 紧急', P2_HEALTH_TIP:'🟡 建议就诊', P3_ROUTINE:'🟢 常规' }[urgency] || urgency;
+
+  // R764 修真：服务端字段全部转义后再入 innerHTML（XSS 规范：AI 输出不可信）
+  var html = '<div class="ai-card">' +
+    '<span class="ai-badge">🤖 AI 实时辨证</span>' +
+    '<div class="ai-row"><span>辨证</span><strong>' + escFn(syndrome) + '</strong></div>' +
+    '<div class="ai-row"><span>推荐方剂</span><strong>' + escFn(formula || '—') + '</strong></div>' +
+    '<div class="ai-row"><span>置信度</span><span class="ai-conf">' + escFn(conf) + '</span></div>' +
+    '<div class="ai-row"><span>紧急度</span><span>' + escFn(urgencyCN) + '</span></div>' +
+    (ops.treatment ? '<div class="ai-row"><span>治则</span><span>' + escFn(ops.treatment) + '</span></div>' : '') +
+    '</div>';
+
+  if (data.kb_refs) {
+    html += '<div class="kb-ref">📚 ' + escFn(data.kb_refs) + '</div>';
+  }
+
+  document.getElementById('ai-result').innerHTML = html;
+  document.getElementById('ai-badge').textContent = '🟢 辨证中';
+  setFlowStep(3);
+
+  // Update medical record draft
+  updateMedicalRecord({
+    syndrome: syndrome,
+    treatment: ops.treatment || '',
+    formula: formula,
+    confidence: conf,
+    chief: document.getElementById('p-complaint').value || syndrome,
+    hpi: state.transcript.map(function(t) { return t.role + ': ' + t.text; }).join('；'),
+    four: '症状: ' + selectedSymptoms.join('、') + ' | 舌象: ' + (selectedTongue.join('、')||'未选') + ' | 脉象: ' + (selectedPulse.join('、')||'未选')
+  });
+}
+
+function updateMedicalRecord(rec) {
+  if (rec.chief) document.getElementById('rs-chief-text').textContent = rec.chief;
+  if (rec.hpi) document.getElementById('rs-hpi-text').textContent = rec.hpi;
+  if (rec.four) document.getElementById('rs-four-text').textContent = rec.four;
+  if (rec.syndrome) document.getElementById('rs-syn-text').textContent = rec.syndrome;
+  if (rec.treatment) document.getElementById('rs-treat-text').textContent = rec.treatment;
+  if (rec.formula) document.getElementById('rs-rx-text').textContent = rec.formula;
+  state.medicalRecord = rec;
+  document.getElementById('record-badge').textContent = '🟢 已生成';
+}
+
+// ═══ Local fallback diagnosis (offline) ═══
+function runLocalDiagnosis() {
+  var s = selectedSymptoms.join('、');
+  var syndrome = '', formula = '', treatment = '', confidence = 0.6;
+  if (/失眠|多梦|心悸|乏力/.test(s)) { syndrome='心脾两虚'; formula='归脾汤'; treatment='补益心脾，养血安神'; confidence=0.85; }
+  else if (/口苦|口干|小便黄|烦躁/.test(s)) { syndrome='肝胆湿热'; formula='龙胆泻肝汤'; treatment='清泻肝胆湿热'; confidence=0.88; }
+  else if (/畏寒|腰酸|夜尿/.test(s)) { syndrome='肾阳虚'; formula='金匮肾气丸'; treatment='温补肾阳'; confidence=0.86; }
+  else if (/头痛|头晕|烦躁/.test(s)) { syndrome='肝阳上亢'; formula='天麻钩藤饮'; treatment='平肝潜阳'; confidence=0.84; }
+  else if (/食欲不振|腹胀|便溏|乏力/.test(s)) { syndrome='脾胃气虚'; formula='四君子汤'; treatment='健脾益气'; confidence=0.83; }
+  else if (/便秘|口干/.test(s)) { syndrome='阴虚肠燥'; formula='增液汤'; treatment='滋阴润燥'; confidence=0.78; }
+  else { syndrome='待辨'; formula='请医生辨证'; treatment='随证治之'; confidence=0.5; }
+
+  var localResult = {
+    suggested_formula: { matched_syndrome: syndrome, formula: formula, confidence: confidence },
+    kb_multischool_opinions: { primary_syndrome: syndrome, treatment: treatment },
+    urgency_level: 'P3_ROUTINE',
+    source: 'local'
+  };
+  appendAIResult(localResult);
+  // R764：本地兜底也设 aiResult（否则「采纳 AI 版本」永远无据可依、换人重置判断失真）
+  state.aiResult = localResult;
+  // R764：兜底路径认领 lastPatient（SSE 失败可发生在未采集场景，此时换人重置同样要生效）
+  var cn = document.getElementById('p-name') && document.getElementById('p-name').value.trim();
+  if (cn) state.lastPatient = cn;
+  document.getElementById('btn-confirm').disabled = false;
+  document.getElementById('btn-edit-confirm').disabled = false;
+  setFlowStep(3);
+  toast('⚠️ 后端不可用，已用本地模型');
+}
+
+// ═══ Confirm / Save ═══
+function confirmCase(mode) {
+  state.confirmMode = mode;
+  var modal = document.getElementById('confirm-modal');
+  var body = document.getElementById('confirm-modal-body');
+
+  // R763 自检修真：采纳 AI 版本 = 用 AI 原始输出回填病历区块（拾回医生误编辑）；修改版 = 用当前区块
+  if (mode && state.aiResult) {
+    var f = state.aiResult.suggested_formula || {};
+    var ops = state.aiResult.kb_multischool_opinions || {};
+    var rec = state.medicalRecord || {};
+    if (rec.chief) document.getElementById('rs-chief-text').textContent = rec.chief;
+    if (rec.hpi) document.getElementById('rs-hpi-text').textContent = rec.hpi;
+    if (rec.four) document.getElementById('rs-four-text').textContent = rec.four;
+    document.getElementById('rs-syn-text').textContent = f.matched_syndrome || ops.primary_syndrome || '待辨';
+    document.getElementById('rs-treat-text').textContent = ops.treatment || '';
+    document.getElementById('rs-rx-text').textContent = f.formula || '';
+  }
+
+  // Read current record (may have been edited)
+  var record = {
+    chief: document.getElementById('rs-chief-text').textContent,
+    hpi: document.getElementById('rs-hpi-text').textContent,
+    four: document.getElementById('rs-four-text').textContent,
+    syndrome: document.getElementById('rs-syn-text').textContent,
+    treatment: document.getElementById('rs-treat-text').textContent,
+    formula: document.getElementById('rs-rx-text').textContent
+  };
+
+  var html = '<div style="font-size:12px;margin-bottom:8px">' +
+    (mode ? '<b>采纳 AI 版本定稿</b>' : '<b>以修改版定稿</b>（以下为当前病历内容）') +
+    '</div>' +
+    '<table style="width:100%;font-size:12px;border-collapse:collapse">' +
+    '<tr><td style="padding:4px;color:var(--text3);width:80px">主诉</td><td style="padding:4px">' + escFn(record.chief) + '</td></tr>' +
+    '<tr><td style="padding:4px;color:var(--text3)">现病史</td><td style="padding:4px">' + escFn(record.hpi) + '</td></tr>' +
+    '<tr><td style="padding:4px;color:var(--text3)">四诊</td><td style="padding:4px">' + escFn(record.four) + '</td></tr>' +
+    '<tr><td style="padding:4px;color:var(--text3)">辨证</td><td style="padding:4px;font-weight:600">' + escFn(record.syndrome) + '</td></tr>' +
+    '<tr><td style="padding:4px;color:var(--text3)">治法</td><td style="padding:4px">' + escFn(record.treatment) + '</td></tr>' +
+    '<tr><td style="padding:4px;color:var(--text3)">处方</td><td style="padding:4px">' + escFn(record.formula) + '</td></tr>' +
+    '</table>';
+
+  body.innerHTML = html;
+  modal.classList.add('show');
+  document.getElementById('confirm-msg').textContent = mode ? '将按 AI 原始输出存盘' : '将按当前编辑内容存盘';
+}
+
+function submitConfirm() {
+  // R764：存盘锁——防双击/重复提交（fetch 未返回期间第二次调用直接拦截）
+  if (state.submitting) return;
+  state.submitting = true;
+
+  var record = {
+    chief: document.getElementById('rs-chief-text').textContent,
+    hpi: document.getElementById('rs-hpi-text').textContent,
+    four: document.getElementById('rs-four-text').textContent,
+    syndrome: document.getElementById('rs-syn-text').textContent,
+    treatment: document.getElementById('rs-treat-text').textContent,
+    formula: document.getElementById('rs-rx-text').textContent,
+    patient: {
+      name: document.getElementById('p-name').value,
+      age: document.getElementById('p-age').value,
+      gender: document.getElementById('p-gender').value
+    },
+    symptoms: selectedSymptoms,
+    tongue: selectedTongue,
+    pulse: selectedPulse,
+    aiVersion: state.aiResult || null,
+    confirmMode: state.confirmMode
+  };
+
+  var finishOk = function(caseId, offline) {
+    state.caseId = caseId;
+    closeModal('confirm-modal');
+    toast(offline ? '⚠️ 离线存盘（本地）#' + caseId : '✅ 病例已存盘 #' + caseId);
+    document.getElementById('btn-confirm').disabled = true;
+    document.getElementById('btn-edit-confirm').disabled = true;
+    setFlowStep(5);
+    setStatus('done', offline ? '⚠️ 离线存盘' : '✅ 已存盘');
+    state.submitting = false;
+  };
+  var finishLocal = function() {
+    // R764：离线/失败统一落本地兜底（绝不丢病历）
+    var caseId = 'local-' + Date.now();
+    try {
+      var cases = JSON.parse(localStorage.getItem('tcm_cases') || '[]');
+      record.id = caseId;
+      record.createdAt = new Date().toISOString();
+      record.localOnly = true;
+      cases.unshift(record);
+      localStorage.setItem('tcm_cases', JSON.stringify(cases));
+    } catch(e) {}
+    finishOk(caseId, true);
+  };
+
+  var apiBase = (window.TCM && TCM.API_BASE) || '';
+  fetch(apiBase + '/api/tcm/case-confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(record)
+  }).then(function(resp) { return resp.json(); })
+    .then(function(data) {
+      // R764：拦截器包装后网络失败不 reject 而返回 wrapped{ok:false}——必须显式判业务 ok
+      if (data && data.ok && data.caseId) {
+        finishOk(data.caseId, false);
+      } else {
+        toast('存盘失败: ' + ((data && data.error) || '服务不可用，已转本地保存'));
+        finishLocal();
+      }
+    })
+    .catch(function() {
+      finishLocal();
+    });
+}
+
+// ═══ Export record ═══
+function exportRecord() {
+  var record = {
+    chief: document.getElementById('rs-chief-text').textContent,
+    hpi: document.getElementById('rs-hpi-text').textContent,
+    four: document.getElementById('rs-four-text').textContent,
+    syndrome: document.getElementById('rs-syn-text').textContent,
+    treatment: document.getElementById('rs-treat-text').textContent,
+    formula: document.getElementById('rs-rx-text').textContent,
+    patient: {
+      name: document.getElementById('p-name').value,
+      age: document.getElementById('p-age').value,
+      gender: document.getElementById('p-gender').value
+    }
+  };
+  var blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json' });
+  var link = document.createElement('a');
+  link.download = 'case-' + (record.patient.name || 'unknown') + '-' + Date.now() + '.json';
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  toast('病历已导出');
+}
+
+// ═══ Query history ═══
+function openQuery() {
+  document.getElementById('query-modal').classList.add('show');
+  queryCases();
+}
+
+function queryCases() {
+  // R764：姓名不做 toLowerCase——服务端是 SHA(name) 精确匹配，预小写化会让哈希永远对不上
+  var name = document.getElementById('q-name').value.trim();
+  var date = document.getElementById('q-date').value;
+  var syndrome = document.getElementById('q-syndrome').value;
+  var apiBase = (window.TCM && TCM.API_BASE) || '';
+  var url = apiBase + '/api/tcm/cases?name=' + encodeURIComponent(name) + '&date=' + encodeURIComponent(date) + '&syndrome=' + encodeURIComponent(syndrome);
+
+  fetch(url).then(function(r) { return r.json(); })
+    .then(function(data) {
+      // R764：拦截器包装后网络失败不 reject 而返回 wrapped{ok:false}——必须显式判业务 ok
+      if (data && data.ok && Array.isArray(data.cases)) {
+        renderQueryResults(data.cases);
+      } else {
+        renderQueryResults(localQueryFallback(name, syndrome));
+      }
+    })
+    .catch(function() {
+      renderQueryResults(localQueryFallback(name, syndrome));
+    });
+}
+
+// R764：本地兜底查询（离线/服务不可用时仍可查 localStorage 病历）
+function localQueryFallback(name, syndrome) {
+  try {
+    var cases = JSON.parse(localStorage.getItem('tcm_cases') || '[]');
+    return cases.filter(function(c) {
+      if (name && !(c.patient && c.patient.name && c.patient.name.indexOf(name) >= 0)) return false;
+      if (syndrome && c.syndrome !== syndrome) return false;
+      return true;
+    });
+  } catch(e) { return []; }
+}
+
+function renderQueryResults(cases) {
+  var el = document.getElementById('query-results');
+  if (!cases || !cases.length) {
+    el.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px">暂无记录</div>';
+    document.getElementById('q-count').textContent = '共 0 条';
+    return;
+  }
+  var html = '<table style="width:100%;font-size:11px;border-collapse:collapse">' +
+    '<tr style="background:var(--bg)"><th style="padding:6px;text-align:left">日期</th><th>患者</th><th>辨证</th><th>方剂</th><th>置信度</th></tr>';
+  for (var i = 0; i < cases.length; i++) {
+    var c = cases[i];
+    // R764：字段对齐——服务端返回 timestamp/name_hash（脱敏），本地兜底是 createdAt/patient.name
+    var dateStr = c.timestamp || c.createdAt || '';
+    var patientLabel = (c.patient && c.patient.name) ? c.patient.name : (c.localOnly ? '（本地）' : '已脱敏');
+    var conf = c.aiVersion && c.aiVersion.suggested_formula && c.aiVersion.suggested_formula.confidence;
+    html += '<tr style="border-bottom:1px solid var(--border)">' +
+      '<td style="padding:5px">' + escFn(dateStr ? dateStr.slice(0,10) : '—') + '</td>' +
+      '<td style="padding:5px">' + escFn(patientLabel) + '</td>' +
+      '<td style="padding:5px">' + escFn(c.syndrome || '—') + '</td>' +
+      '<td style="padding:5px">' + escFn(c.formula || '—') + '</td>' +
+      '<td style="padding:5px">' + (conf ? escFn(String(Math.round(conf * 100) + '%')) : '—') + '</td>' +
+      '</tr>';
+  }
+  html += '</table>';
+  el.innerHTML = html;
+  document.getElementById('q-count').textContent = '共 ' + cases.length + ' 条';
+}
+
+function clearQuery() {
+  document.getElementById('q-name').value = '';
+  document.getElementById('q-date').value = '';
+  document.getElementById('q-syndrome').value = '';
+  renderQueryResults([]);
+}
+
+function loadQueryOptions() {
+  // Load unique syndromes from existing cases for dropdown
+  try {
+    var cases = JSON.parse(localStorage.getItem('tcm_cases') || '[]');
+    var syndromes = [];
+    cases.forEach(function(c) {
+      if (c.syndrome && syndromes.indexOf(c.syndrome) < 0) syndromes.push(c.syndrome);
+    });
+    var sel = document.getElementById('q-syndrome');
+    syndromes.forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      sel.appendChild(opt);
+    });
+  } catch(e) {}
+}
+
+// ═══ Status & Flow helpers ═══
+function setStatus(type, text) {
+  var el = document.getElementById('inquiry-status');
+  el.className = 'status-pill ' + type;
+  el.textContent = text;
+}
+
+function setFlowStep(n) {
+  var steps = document.querySelectorAll('.flow-step');
+  steps.forEach(function(s, i) {
+    if (i < n) s.classList.add('active');
+    else s.classList.remove('active');
+  });
+}
+
+// ═══ Modal ═══
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+// ═══ Toast ═══
+function toast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+</script>
+</body>
+</html>

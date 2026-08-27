@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/family-portal.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>家庭成员管理 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍👩‍👧</text></svg>">
+<link rel="stylesheet" href="css/standard.css">
+<style>
+:root { --bg:#fff8ee; --card:#fff; --primary:#b8860b; --accent:#c0392b; --green:#2e8b57; --blue:#2980b9; --text:#2c1810; --text2:#6b5b4f; --border:#e8dfc8; }
+body { background: var(--bg); font-family: 'PingFang SC', sans-serif; }
+.wrap { max-width: 880px; margin: 0 auto; padding: 16px; }
+
+.header { background: linear-gradient(135deg, var(--primary), #8b6914); color: white; border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+.header h1 { margin: 0 0 6px; font-size: 22px; }
+.header p { margin: 0; opacity: 0.9; font-size: 13px; }
+
+.family-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.member-card { background: var(--card); border-radius: 12px; padding: 16px 18px; box-shadow: 0 2px 8px rgba(139,69,19,0.08); cursor: pointer; border-left: 4px solid var(--primary); }
+.member-card.active { border-left-color: var(--accent); background: #fff8e7; }
+.member-card .row { display: flex; align-items: center; gap: 12px; }
+.member-card .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.member-card .name { font-size: 16px; font-weight: 600; }
+.member-card .role { font-size: 11px; color: var(--text2); }
+.member-card .status { margin-top: 8px; font-size: 12px; padding: 4px 8px; border-radius: 8px; display: inline-block; }
+.member-card .status.ok { background: var(--green); color: white; }
+.member-card .status.warn { background: #e67e22; color: white; }
+.member-card .status.alert { background: var(--accent); color: white; }
+
+.detail-card { background: var(--card); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.detail-card h2 { margin: 0 0 14px; font-size: 18px; color: var(--primary); }
+.detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+.field { background: #faf6ed; border-radius: 8px; padding: 10px 14px; }
+.field .label { font-size: 11px; color: var(--text2); text-transform: uppercase; }
+.field .value { font-size: 16px; font-weight: 600; margin-top: 4px; }
+
+.action-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.btn { padding: 10px 18px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.btn.primary { background: var(--primary); color: white; }
+.btn.sos { background: var(--accent); color: white; }
+.btn.outline { background: var(--card); color: var(--primary); border: 1px solid var(--border); }
+
+.push-log { background: var(--card); border-radius: 12px; padding: 18px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.push-log h2 { margin: 0 0 12px; font-size: 16px; color: var(--primary); }
+.push-item { padding: 10px 0; border-bottom: 1px solid #f5f0e8; display: grid; grid-template-columns: 80px 80px 1fr auto; gap: 10px; align-items: center; font-size: 13px; }
+.push-item:last-child { border-bottom: 0; }
+.push-item .type { padding: 3px 8px; border-radius: 6px; background: var(--primary); color: white; font-size: 10px; text-align: center; }
+.push-item .type.sos { background: var(--accent); }
+.push-item .ts { color: var(--text2); font-size: 11px; }
+</style>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="home">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">家庭成员管理</span>
+</div>
+
+<div class="wrap">
+  <div class="header">
+    <h1>👨‍👩‍👧 家庭成员管理</h1>
+    <p>一人管理全家 · 老人端/子女端/医生端 三端协同 · 微信推送实时同步</p>
+  </div>
+
+  <!-- 家庭成员卡片网格 -->
+  <div class="family-grid" id="family-grid"></div>
+
+  <!-- 当前选中成员的详情 -->
+  <div class="detail-card" id="detail-card" style="display:none">
+    <h2 id="detail-title">—</h2>
+    <div class="detail-grid" id="detail-grid"></div>
+    <div class="action-row">
+      <button class="btn primary" onclick="openConsult()">🩺 在线问诊</button>
+      <button class="btn sos" onclick="triggerSOS()">🚨 一键 SOS</button>
+      <button class="btn outline" onclick="pushMedication()">💊 推用药提醒</button>
+      <button class="btn outline" onclick="pushWeeklyReport()">📊 推周报</button>
+      <button class="btn outline" onclick="openHealthArchive()">📋 健康档案</button>
+    </div>
+  </div>
+
+  <!-- 推送历史 -->
+  <div class="push-log">
+    <h2>📨 推送历史（最近 20 条）</h2>
+    <div id="push-list"></div>
+  </div>
+</div>
+
+<script>
+// ═══ 真实家庭成员数据（演示用，生产从 /api/tcm/patient-list 加载）═══
+const FAMILY = [
+  { id: 'p001', name: '张奶奶', role: '母亲', age: 73, avatar: '👵', constitution: '气虚+阴虚', chronicDiseases: ['高血压', '失眠'], openid: 'wx_zhang', status: 'ok', statusText: '状态正常' },
+  { id: 'p002', name: '李爷爷', role: '父亲', age: 78, avatar: '👴', constitution: '阳虚+痰湿', chronicDiseases: ['糖尿病', '关节炎'], openid: 'wx_li', status: 'warn', statusText: '本周血糖偏高' },
+  { id: 'p003', name: '王女士', role: '女儿', age: 42, avatar: '👩', constitution: '平和', chronicDiseases: [], openid: 'wx_wang', status: 'ok', statusText: '健康' },
+  { id: 'p004', name: '小宝', role: '孙子', age: 8, avatar: '👦', constitution: '脾虚', chronicDiseases: ['易感冒'], openid: 'wx_xbao', status: 'ok', statusText: '活泼健康' }
+];
+
+let currentMember = null;
+
+// 渲染家庭网格
+function renderFamily() {
+  const grid = document.getElementById('family-grid');
+  grid.innerHTML = FAMILY.map(m => `
+    <div class="member-card ${currentMember && currentMember.id === m.id ? 'active' : ''}" onclick="selectMember('${m.id}')">
+      <div class="row">
+        <div class="avatar">${m.avatar}</div>
+        <div>
+          <div class="name">${m.name}</div>
+          <div class="role">${m.role} · ${m.age}岁</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text2)">体质: ${m.constitution}</div>
+      <div style="margin-top:4px;font-size:11px;color:var(--text2)">慢病: ${m.chronicDiseases.join('、') || '无'}</div>
+      <span class="status ${m.status}">${m.statusText}</span>
+    </div>
+  `).join('');
+}
+
+// 选中成员
+function selectMember(id) {
+  currentMember = FAMILY.find(m => m.id === id);
+  if (!currentMember) return;
+  const detail = document.getElementById('detail-card');
+  detail.style.display = 'block';
+  document.getElementById('detail-title').textContent = `${currentMember.avatar} ${currentMember.name}（${currentMember.role}）`;
+  document.getElementById('detail-grid').innerHTML = `
+    <div class="field"><div class="label">姓名</div><div class="value">${currentMember.name}</div></div>
+    <div class="field"><div class="label">年龄</div><div class="value">${currentMember.age} 岁</div></div>
+    <div class="field"><div class="label">体质</div><div class="value">${currentMember.constitution}</div></div>
+    <div class="field"><div class="label">慢病</div><div class="value">${currentMember.chronicDiseases.join('、') || '无'}</div></div>
+    <div class="field"><div class="label">微信</div><div class="value">${currentMember.openid}</div></div>
+    <div class="field"><div class="label">状态</div><div class="value">${currentMember.statusText}</div></div>
+  `;
+  renderFamily();
+  detail.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ═══ 推送操作 ═══
+async function triggerSOS() {
+  if (!currentMember) return /* [sanitized] toast('⚠️ 请先选择家庭成员') */;
+  if (!await (window.confirmModal ? confirmModal(`🚨 确认对 ${currentMember.name} 触发 SOS？\n将向所有家属推送紧急通知`, { danger:true, okText:'触发 SOS' }) : Promise.resolve(confirm(`确认触发 SOS？`)))) return;
+  // 同时调用：本地 SOS 记录 + wechat-bot 推送
+  try {
+    const r = await fetch('/api/home/sos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient: currentMember.name, triggeredBy: 'family-portal' })
+    });
+    const data = await r.json();
+    if (data.ok) {
+      toast('🚨 SOS 已记录（事件 #' + data.total + '）\n本地推送通道已就绪（wechat-bot 8945 监听）');
+    }
+  } catch (e) {
+    toast('SOS 记录失败: ' + e.message);
+  }
+  // 推 wechat-bot
+  try {
+    await fetch('/api/wechat/sos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        patient: currentMember.name,
+        family: FAMILY.filter(m => m.id !== currentMember.id).map(m => ({ name: m.name, openid: m.openid }))
+      })
+    });
+  } catch (e) { /* [sanitized] */ }
+  loadPushHistory();
+}
+
+async function pushMedication() {
+  if (!currentMember) return;
+  loadPushHistory();
+}
+
+async function pushWeeklyReport() {
+  if (!currentMember) return;
+  loadPushHistory();
+}
+
+function openHealthArchive() {
+  if (!currentMember) return;
+  location.href = 'health-archive.html?patient=' + currentMember.id;
+}
+
+// ═══ 家庭在线问诊（互联网医院模式：提交 → 医生审核 → 出方案）═══
+function openConsult() {
+  if (!currentMember) return;
+  location.href = 'family-consult.html?patient=' + currentMember.id;
+}
+
+// ═══ 推送历史 ═══
+async function loadPushHistory() {
+  const list = document.getElementById('push-list');
+  // R757 修真：加载态提示
+  list.innerHTML = '<div style="color:var(--text2);text-align:center;padding:20px">加载中…</div>';
+  try {
+    const r = await fetch('/api/wechat/history');
+    const data = await r.json();
+    if (!data.history || data.history.length === 0) {
+      list.innerHTML = '<div style="color:var(--text2);text-align:center;padding:20px">暂无推送记录<br><small>试试点上面的「💊 推用药提醒」</small></div>';
+      return;
+    }
+    list.innerHTML = data.history.slice(-20).reverse().map(h => `
+      <div class="push-item">
+        <span class="type ${h.type === 'sos' ? 'sos' : ''}">${h.type}</span>
+        <span class="ts">${new Date(h.ts).toLocaleTimeString('zh-CN')}</span>
+        <span>${h.content.substring(0, 60)}${h.content.length > 60 ? '...' : ''}</span>
+        <span style="color:var(--text2);font-size:11px">→ ${h.target}</span>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('push-list').innerHTML = '<div style="color:var(--text2);text-align:center;padding:20px">wechat-bot 未启动<br><small>运行 node server/wechat-bot.js 启动推送服务</small></div>';
+  }
+}
+
+// 启动
+renderFamily();
+loadPushHistory();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

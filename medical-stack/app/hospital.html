@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/hospital.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
+<title>医院门户 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.hero{background:linear-gradient(135deg,#1a1008 0%,#4a2810 50%,#7a4a1f 100%);color:#fff;border-radius:0 0 20px 20px;padding:40px 20px;text-align:center;margin-bottom:14px}
+.hero h1{font-size:28px;letter-spacing:6px;margin-bottom:10px}
+.hero p{font-size:13px;opacity:.7;line-height:1.8}
+.hero .badge{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 14px;font-size:11px;margin:3px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:768px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
+.doc-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.doc-card .avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6b3a1f,#8b5e34);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 8px}
+.doc-card .name{font-weight:700;font-size:13px}
+.doc-card .dept{font-size:10px;color:var(--text3);margin:2px 0 6px}
+.doc-card .spec{font-size:10px;color:var(--primary);background:var(--gold-bg);border-radius:8px;padding:2px 8px;display:inline-block}
+.stat-line{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border);font-size:12px}
+.visit-time{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:8px;margin:6px 0;font-size:12px}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;text-decoration:none}
+.btn.primary{background:var(--primary);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.blue{background:var(--blue);color:#fff}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.quick-entry{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;margin:6px 0;cursor:pointer;font-size:12px;background:var(--card);text-decoration:none;color:var(--text);transition:.15s}
+.quick-entry:hover{border-color:var(--primary);transform:translateX(2px)}
+.quick-entry .icon{font-size:20px}
+.footer{text-align:center;padding:20px;font-size:11px;color:var(--text3)}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">医院门户</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>公众/患者</b></span>
+    <span class="std-tag">⚙️ 功能 <b>医院门户</b></span>
+    <span class="std-tag">💎 使用价值 <b>医生团队/出诊安排/平台实况一站了解，快速进入服务</b></span>
+  </div>
+  <div class="hero">
+    <h1>🏥 杏林中医馆</h1>
+    <p>传承千年中医智慧 · 融合现代 AI 科技<br>让每一位患者享受专业、温暖、高效的诊疗服务</p>
+    <div style="margin-top:12px">
+      <span class="badge">🌿 纯中医诊疗</span>
+      <span class="badge">🤖 AI 辅助诊疗</span>
+      <span class="badge">🌿 治未病中心</span>
+      <span class="badge">📹 远程会诊</span>
+    </div>
+  </div>
+
+  <!-- 快速入口 -->
+  <div class="card">
+    <h3>⚡ 快速入口</h3>
+    <div class="grid3">
+      <a class="quick-entry" href="patient-portal.html"><span class="icon">📅</span>在线挂号</a>
+      <a class="quick-entry" href="doctors.html"><span class="icon">👨‍⚕️</span>医生团队</a>
+      <a class="quick-entry" href="disease-kb.html"><span class="icon">📚</span>病种知识库</a>
+      <a class="quick-entry" href="ai-diagnosis.html"><span class="icon">🤖</span>AI 快速辨证</a>
+      <a class="quick-entry" href="therapy.html"><span class="icon">💆</span>理疗预约</a>
+      <a class="quick-entry" href="wellness.html"><span class="icon">🌿</span>治未病体检</a>
+      <a class="quick-entry" href="telemedicine.html"><span class="icon">📹</span>远程会诊</a>
+      <a class="quick-entry" href="health-archive.html"><span class="icon">📁</span>健康档案</a>
+    </div>
+  </div>
+
+  <!-- 医生团队（R814：真实在册医生，替代假科室卡） -->
+  <div class="card">
+    <h3>👨‍⚕️ 医生团队 <span style="font-size:11px;color:var(--text3);font-weight:400">点击看擅长与真实口碑</span></h3>
+    <div class="grid3" id="doc-grid-h">加载中…</div>
+  </div>
+
+  <!-- 出诊信息 -->
+  <div class="card">
+    <h3>🕐 今日出诊</h3>
+    <div id="visit-list">加载中…</div>
+    <div class="btn-row"><a class="btn primary" href="patient-portal.html">📅 预约挂号</a></div>
+  </div>
+
+  <!-- 平台实况（R814：真实运行数据，替代假概况） -->
+  <div class="card">
+    <h3>📊 平台实况</h3>
+    <div class="grid4" id="live-stats">
+      <div style="text-align:center;padding:10px;color:var(--text3);font-size:11px;grid-column:1/-1">加载中…</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>🏥 杏林中医馆 · 本系统为 命理宝鉴·医道 演示实例 · 内容仅供学习参考</p>
+    <p style="margin-top:6px">© 2026 杏林中医馆</p>
+  </div>
+</div>
+
+<script>
+// R814：医院门户全真化——医生/出诊/统计全部来自 API
+var SLOT_TXT = { am: '上午 08:30-12:00', pm: '下午 14:00-17:30' };
+
+function loadPortal() {
+  fetch('/api/doctors').then(function(r){ return r.json(); }).then(function(d) {
+    var docs = d.doctors || [];
+    // 医生卡片
+    document.getElementById('doc-grid-h').innerHTML = docs.map(function(p) {
+      var st = p.stats || {};
+      return '<a class="doc-card" style="text-decoration:none;color:var(--text);display:block" href="doctors.html?doctor=' + p.doctor_id + '">' +
+        '<div class="avatar">' + (p.avatar || '👨‍⚕️') + '</div>' +
+        '<div class="name">' + p.name + '</div>' +
+        '<div class="dept">' + p.title + ' · 从业 ' + p.years + ' 年</div>' +
+        '<span class="spec">' + p.specialty_name + '</span>' +
+        '<div style="font-size:10px;color:var(--text3);margin-top:6px">接诊 ' + (st.rx_count || 0) +
+        (st.rating_avg != null ? ' · ★' + st.rating_avg : '') + '</div>' +
+      '</a>';
+    }).join('') || '<div style="color:var(--text3)">暂无在册医生</div>';
+    // 今日出诊（按档案 schedule）
+    var wd = String(new Date().getDay());
+    var vhtml = '';
+    docs.forEach(function(p) {
+      var slots = (p.schedule && p.schedule[wd]) || [];
+      if (!slots.length) return;
+      vhtml += '<div class="visit-time"><span><strong>' + p.name + '</strong> · ' + p.specialty_name + '</span><span>' +
+        slots.map(function(s){ return SLOT_TXT[s]; }).join(' / ') + '</span>' +
+        (p.today_waiting ? '<span style="font-size:10px;padding:2px 10px;border-radius:10px;background:var(--gold-bg);color:var(--gold)">候诊 ' + p.today_waiting + '</span>'
+                         : '<span style="font-size:10px;padding:2px 10px;border-radius:10px;background:var(--green-bg);color:var(--green)">● 可挂号</span>') + '</div>';
+    });
+    document.getElementById('visit-list').innerHTML = vhtml || '<div style="color:var(--text3);font-size:12px;padding:8px">今日暂无出诊安排</div>';
+    // 实况：医生数 + 评价均分
+    var rated = docs.filter(function(p){ return p.stats && p.stats.rating_avg != null; });
+    var avgAll = rated.length ? (rated.reduce(function(s,p){ return s + p.stats.rating_avg; }, 0) / rated.length).toFixed(1) : '—';
+    var totalRx = docs.reduce(function(s,p){ return s + ((p.stats && p.stats.rx_count) || 0); }, 0);
+    window.__portalDocs = { count: docs.length, avgAll: avgAll, totalRx: totalRx };
+    renderLiveStats();
+  }).catch(function() {
+    document.getElementById('doc-grid-h').innerHTML = '<div style="color:var(--text3)">📡 服务离线</div>';
+    document.getElementById('visit-list').textContent = '服务离线';
+  });
+}
+
+function renderLiveStats() {
+  var base = window.__portalDocs || { count: 0, avgAll: '—', totalRx: 0 };
+  fetch('/api/tcm/dppo-stats').then(function(r){ return r.json(); }).then(function(d) {
+    document.getElementById('live-stats').innerHTML =
+      statCell(base.count, '在册医生') +
+      statCell(base.totalRx, '累计接诊处方') +
+      statCell(d.total || 0, '今日接诊人次') +
+      statCell(base.avgAll, '患者评价均分');
+  }).catch(function() {
+    document.getElementById('live-stats').innerHTML =
+      statCell(base.count, '在册医生') +
+      statCell(base.totalRx, '累计接诊处方') +
+      statCell('—', '今日接诊人次') +
+      statCell(base.avgAll, '患者评价均分');
+  });
+}
+
+function statCell(v, l) {
+  return '<div class="stat-line" style="flex-direction:column;align-items:center;border:none;padding:10px">' +
+    '<div style="font-size:26px;font-weight:800;color:var(--primary)">' + v + '</div>' +
+    '<div style="font-size:10px;color:var(--text3)">' + l + '</div></div>';
+}
+
+loadPortal();
+setInterval(loadPortal, 60000);
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

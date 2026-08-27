@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/chronic-care.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>慢病管理 · 中医智能体</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/mobile.css">
+
+<style>
+:root{--tcm:#b8860b;--tcm-bg:rgba(184,134,11,.06);--ok:#2e8b57;--warn:#d97706;--crit:#dc2626;--border:#e5e7eb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:#f9fafb;color:#1f2937;line-height:1.6}
+.page-header-bar{background:linear-gradient(135deg,var(--tcm),#8b6914);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;gap:12px}
+.page-header-bar .dot{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.8}
+.page-header-bar h1{font-size:17px;font-weight:600;flex:1}
+.page-header-bar a{color:#fff;text-decoration:none;font-size:14px;opacity:.9;padding:4px 10px;border:1px solid rgba(255,255,255,.3);border-radius:6px}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+.hero{background:linear-gradient(135deg,rgba(184,134,11,.1),rgba(46,139,87,.1));border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;text-align:center}
+.hero h2{font-size:20px;color:var(--tcm);margin-bottom:8px}
+.hero p{font-size:14px;color:#6b7280}
+
+.disease-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.disease-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;cursor:pointer;transition:.2s}
+.disease-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);transform:translateY(-2px)}
+.disease-card .icon{font-size:28px;margin-bottom:8px}
+.disease-card h3{font-size:15px;color:var(--tcm);margin-bottom:6px}
+.disease-card .desc{font-size:13px;color:#6b7280;margin-bottom:10px;line-height:1.5}
+.disease-card .tags{display:flex;gap:6px;flex-wrap:wrap}
+.disease-card .tag{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--tcm-bg);color:var(--tcm)}
+
+.assess-panel{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-top:20px}
+.assess-panel h3{font-size:16px;color:var(--tcm);margin-bottom:14px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;font-weight:500;color:#4b5563;margin-bottom:4px}
+.form-group input,.form-group select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:#fff}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--tcm)}
+.btn-primary{width:100%;padding:12px;background:var(--tcm);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:500;cursor:pointer;margin-top:8px}
+.btn-primary:hover{opacity:.9}
+.result-box{background:#f9fafb;border:1px solid var(--border);border-radius:8px;padding:16px;margin-top:16px;display:none}
+.result-box.show{display:block}
+.result-box h4{font-size:14px;color:var(--tcm);margin-bottom:10px}
+.risk-high{color:var(--crit);font-weight:600}
+.risk-mid{color:var(--warn);font-weight:600}
+.risk-low{color:var(--ok);font-weight:600}
+
+.warning-banner{background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#92400e}
+.warning-banner strong{margin-right:6px}
+
+@media(max-width:360px){
+  .disease-grid{grid-template-columns:1fr}
+  .hero{padding:16px}
+}
+</style>
+</head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+<div class="page-header-bar">
+  <span class="dot"></span>
+  <h1>慢病管理</h1>
+  <a href="/treatment-center.html">返回</a>
+</div>
+
+<div class="container">
+  <div class="warning-banner">
+    <strong>⚠️ 重要提醒</strong>慢病评估仅供参考，不构成医学诊断，重要事项请遵医嘱。
+  </div>
+
+  <div class="hero">
+    <h2>慢病风险评估</h2>
+    <p>基于最新指南的中医综合慢病评估 · 4 大类慢性病 · 四诊数据融合 · TCM 个性化建议</p>
+  </div>
+
+  <div class="disease-grid">
+    <div class="disease-card" onclick="selectDisease('htn')">
+      <div class="icon">🫀</div>
+      <h3>高血压</h3>
+      <p class="desc">中医辨证（肝阳上亢/痰湿壅盛/阴虚阳亢/阴阳两虚）+ 血压分级 +  lifestyle 建议</p>
+      <div class="tags"><span class="tag">肝阳上亢</span><span class="tag">痰湿</span><span class="tag">阴虚</span></div>
+    </div>
+    <div class="disease-card" onclick="selectDisease('dm')">
+      <div class="icon">🩸</div>
+      <h3>糖尿病</h3>
+      <p class="desc">中医辨证（上消/中消/下消/阴阳两虚）+ 血糖管理 + 饮食运动指导</p>
+      <div class="tags"><span class="tag">上消</span><span class="tag">中消</span><span class="tag">下消</span></div>
+    </div>
+    <div class="disease-card" onclick="selectDisease('ins')">
+      <div class="icon">🫁</div>
+      <h3>慢阻肺</h3>
+      <p class="desc">COPD 综合评估（肺脾气虚/肺肾两虚/痰瘀阻肺）+ 肺功能分期 + 康复指导</p>
+      <div class="tags"><span class="tag">肺虚</span><span class="tag">肾虚</span><span class="tag">痰瘀</span></div>
+    </div>
+    <div class="disease-card" onclick="selectDisease('copd')">
+      <div class="icon">❤️</div>
+      <h3>冠心病</h3>
+      <p class="desc">胸痹心痛辨证（心血瘀阻/痰浊内阻/心气不足/心肾阳虚）+ 心血管风险分层</p>
+      <div class="tags"><span class="tag">心血瘀阻</span><span class="tag">痰浊</span><span class="tag">心气虚</span></div>
+    </div>
+  </div>
+
+  <div class="assess-panel" id="assess-panel" style="display:none">
+    <h3 id="disease-title">风险评估</h3>
+    <form id="chronic-form" onsubmit="submitAssess(event)">
+      <div class="form-group">
+        <label>症状描述（主诉）</label>
+        <input  type="text" id="symptom" placeholder="如：头痛头晕3年，血压波动" required aria-label="如：头痛头晕3年，血压波动" data-validate="required">
+      </div>
+      <div class="form-group">
+        <label>舌象特征</label>
+        <select id="tongue">
+          <option value="">请选择</option>
+          <option>舌淡红苔白</option>
+          <option>舌红少苔</option>
+          <option>舌暗紫有瘀斑</option>
+          <option>舌胖大齿痕苔白腻</option>
+          <option>舌红苔黄腻</option>
+          <option>舌淡苔薄</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>脉象特征</label>
+        <select id="pulse">
+          <option value="">请选择</option>
+          <option>弦脉</option>
+          <option>细脉</option>
+          <option>滑脉</option>
+          <option>沉脉</option>
+          <option>弱脉</option>
+          <option>涩脉</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>年龄</label>
+        <input  type="number" id="age" placeholder="请输入年龄" min="1" max="120" aria-label="请输入年龄" data-validate="required|number">
+      </div>
+      <button type="submit" class="btn-primary">评估风险</button>
+    </form>
+    <div class="result-box" id="result-box">
+      <h4>评估结果</h4>
+      <div id="result-content"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentDisease = null;
+function selectDisease(type) {
+  var titles = {htn:'高血压风险评估', dm:'糖尿病风险评估', ins:'慢阻肺风险评估', copd:'冠心病风险评估'};
+  var endpoints = {htn:'/api/chronic/htn/assess', dm:'/api/chronic/dm/assess', ins:'/api/chronic/ins/assess', copd:'/api/chronic/copd/assess'};
+  currentDisease = {type:type, endpoint:endpoints[type], title:titles[type]};
+  document.getElementById('disease-title').textContent = currentDisease.title;
+  document.getElementById('assess-panel').style.display = 'block';
+  document.getElementById('assess-panel').scrollIntoView({behavior:'smooth'});
+}
+
+async function submitAssess(e) {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  e.preventDefault();
+  if (!currentDisease) return;
+  var symptom = document.getElementById('symptom').value;
+  var tongue = document.getElementById('tongue').value;
+  var pulse = document.getElementById('pulse').value;
+  var age = parseInt(document.getElementById('age').value) || 0;
+  var payload = {symptom:symptom, tongue_features:tongue || undefined, pulse_features:pulse || undefined, age:age || undefined};
+  try {
+    var res = await fetch(currentDisease.endpoint, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    }).then(r=>r.json());
+    var box = document.getElementById('result-box');
+    var content = document.getElementById('result-content');
+    box.classList.add('show');
+    if (res.ok) {
+      var riskClass = res.urgency_level==='high'?'risk-high':res.urgency_level==='medium'?'risk-mid':'risk-low';
+      var riskLabel = {high:'高风险',medium:'中风险',low:'低风险'}[res.urgency_level||'medium'];
+      var syndromeText = (res.syndrome||res.primary_syndrome||'');
+      var adviceText = (res.tcm_advice||res.recommendations||'暂无建议');
+      content.innerHTML = ''
+        + '<p>风险等级: <span class="' + riskClass + '">' + riskLabel + '</span></p>'
+        + (syndromeText?'<p style="margin-top:8px">辨证: ' + syndromeText + '</p>':'')
+        + '<p style="margin-top:8px;font-size:13px;color:#6b7280">TCM建议: ' + adviceText + '</p>'
+        + '<p style="margin-top:8px;font-size:12px;color:#9ca3af">仅供学习参考，重要事项请遵医嘱</p>';
+    } else {
+      content.innerHTML = '<p style="color:var(--crit)">评估失败: ' + (res.error||'') + '</p>';
+    }
+  } catch(e) {
+    console.error('[sanitized]', e);
+    var box = document.getElementById('result-box');
+    box.classList.add('show');
+    document.getElementById('result-content').innerHTML = '<p style="color:var(--crit)">网络错误</p>';
+  }
+}
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

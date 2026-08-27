@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/doctors.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍⚕️</text></svg>">
+<title>医生团队 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:768px){.doc-grid{grid-template-columns:1fr}}
+.doc-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.15s}
+.doc-card:hover{border-color:var(--primary);box-shadow:0 2px 10px rgba(107,58,31,.12)}
+.doc-card .avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#6b3a1f,#8b5e34);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:8px}
+.doc-card .name{font-weight:700;font-size:15px}
+.doc-card .title{font-size:11px;color:var(--gold);margin:2px 0}
+.doc-card .spec{font-size:11px;color:var(--primary);background:var(--gold-bg);border-radius:8px;padding:2px 8px;display:inline-block;margin:4px 0}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.tag{font-size:10px;background:var(--blue-bg);color:var(--blue);border-radius:6px;padding:2px 6px}
+.stats-line{display:flex;gap:10px;font-size:11px;color:var(--text2);margin-top:8px;flex-wrap:wrap}
+.stars{color:var(--gold);font-size:12px}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;text-decoration:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.outline{border:1px solid var(--border);background:var(--bg);color:var(--text)}
+.review-item{border-bottom:1px dashed var(--border);padding:8px 0;font-size:12px}
+.review-item .meta{font-size:10px;color:var(--text3);margin-top:2px}
+.review-item .tag{font-size:9px}
+.outcome-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+@media(max-width:768px){.outcome-grid{grid-template-columns:repeat(2,1fr)}}
+.oc{background:var(--bg);border-radius:8px;padding:10px;text-align:center}
+.oc .v{font-size:18px;font-weight:700;color:var(--primary)}
+.oc .l{font-size:10px;color:var(--text3);margin-top:2px}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: #b8860b; flex-shrink: 0; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<body>
+
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">医生团队</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>患者/家属</b></span>
+    <span class="std-tag">⚙️ 功能 <b>医生介绍·挂号·评价</b></span>
+    <span class="std-tag">💎 使用价值 <b>选对医生 · 看真实疗效与口碑</b></span>
+  </div>
+
+  <div class="card">
+    <h3>👨‍⚕️ 在册医生 <span style="font-size:11px;color:var(--text3);font-weight:400">点击卡片看详情与评价</span></h3>
+    <div class="doc-grid" id="doc-grid">加载中…</div>
+  </div>
+
+  <div class="card" id="doc-detail" style="display:none">
+    <h3 id="dd-title">医生详情</h3>
+    <div id="dd-body"></div>
+  </div>
+</div>
+
+<div style="font-size:10px;color:var(--text3);margin-top:8px;text-align:center">⚠️ 本系统内容仅供学习参考，用药请遵医嘱。</div>
+
+<script>
+var DOCTORS = [];
+
+function stars(avg, count) {
+  if (avg == null) return '<span style="color:var(--text3);font-size:11px">暂无评价</span>';
+  var full = Math.round(avg);
+  var s = '';
+  for (var i = 0; i < 5; i++) s += i < full ? '★' : '☆';
+  return '<span class="stars">' + s + '</span> <span style="font-size:11px;color:var(--text2)">' + avg + '（' + count + ' 条）</span>';
+}
+
+function loadDoctors() {
+  fetch('/api/doctors').then(function(r){ return r.json(); }).then(function(d) {
+    DOCTORS = d.doctors || [];
+    renderGrid();
+  }).catch(function() {
+    document.getElementById('doc-grid').innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">📡 服务离线，医生信息暂不可用</div>';
+  });
+}
+
+function renderGrid() {
+  var el = document.getElementById('doc-grid');
+  if (!DOCTORS.length) { el.innerHTML = '<div style="color:var(--text3);padding:20px">暂无在册医生</div>'; return; }
+  el.innerHTML = DOCTORS.map(function(p) {
+    var st = p.stats || {};
+    return '<div class="doc-card" onclick="showDetail(\'' + p.doctor_id + '\')">' +
+      '<div class="avatar">' + (p.avatar || '👨‍⚕️') + '</div>' +
+      '<div class="name">' + p.name + ' <span style="font-size:11px;font-weight:400;color:var(--text3)">' + p.title + '</span></div>' +
+      '<div><span class="spec">' + p.specialty_name + '</span> <span style="font-size:11px;color:var(--text3)">从业 ' + p.years + ' 年</span></div>' +
+      '<div class="tags">' + (p.good_at || []).slice(0, 4).map(function(g){ return '<span class="tag">' + g + '</span>'; }).join('') + '</div>' +
+      '<div>' + stars(st.rating_avg, st.review_count) + '</div>' +
+      '<div class="stats-line">' +
+        '<span>📋 接诊 ' + (st.rx_count || 0) + '</span>' +
+        '<span>💰 挂号 ¥' + p.fee + '</span>' +
+        (p.today_waiting ? '<span style="color:var(--accent)">⏳ 候诊 ' + p.today_waiting + '</span>' : '<span style="color:var(--green)">● 可挂</span>') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function showDetail(id) {
+  var card = document.getElementById('doc-detail');
+  card.style.display = '';
+  card.scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('dd-body').innerHTML = '加载中…';
+  fetch('/api/doctor/' + encodeURIComponent(id)).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { document.getElementById('dd-body').innerHTML = '加载失败'; return; }
+    var p = d.doctor, st = d.stats || {}, oc = st.outcome || {};
+    document.getElementById('dd-title').textContent = (p.avatar || '') + ' ' + p.name + ' · ' + p.specialty_name + ' · ' + p.title;
+    var html = '<div style="font-size:13px;line-height:1.9;color:var(--text2)">' + (p.bio || '') + '</div>' +
+      '<div class="tags" style="margin:8px 0">' + (p.good_at || []).map(function(g){ return '<span class="tag">擅长 ' + g + '</span>'; }).join('') + '</div>' +
+      '<div style="margin:6px 0">' + stars(st.rating_avg, st.review_count) + '</div>' +
+      '<div class="outcome-grid">' +
+        '<div class="oc"><div class="v">' + (st.rx_count || 0) + '</div><div class="l">累计接诊处方</div></div>' +
+        '<div class="oc"><div class="v">' + (oc.followed || 0) + '</div><div class="l">随访完成</div></div>' +
+        '<div class="oc"><div class="v">' + (oc.effective_rate != null ? oc.effective_rate + '%' : '—') + '</div><div class="l">随访有效率</div></div>' +
+        '<div class="oc"><div class="v">' + (oc.avg_score != null ? oc.avg_score : '—') + '</div><div class="l">平均恢复评分</div></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:8px;margin:10px 0">' +
+        '<a class="btn primary" href="patient-portal.html?doctor=' + p.doctor_id + '">📅 立即挂号</a>' +
+        '<a class="btn outline" href="disease-kb.html">📚 病种知识库</a>' +
+      '</div>' +
+      '<h3 style="margin-top:10px">💬 患者评价</h3>';
+    if (!d.reviews.length) {
+      html += '<div style="font-size:12px;color:var(--text3);padding:10px 0">暂无评价 — 就诊后可在患者门户评价</div>';
+    } else {
+      html += d.reviews.map(function(v) {
+        var s = '';
+        for (var i = 0; i < 5; i++) s += i < v.rating ? '★' : '☆';
+        return '<div class="review-item">' +
+          '<span class="stars">' + s + '</span> <b>' + v.patient_name + '</b> ' +
+          (v.tags || []).map(function(t){ return '<span class="tag">' + t + '</span>'; }).join(' ') +
+          (v.comment ? '<div style="margin-top:3px">' + v.comment + '</div>' : '') +
+          '<div class="meta">' + (v.created_at || '').slice(0, 10) + '</div>' +
+        '</div>';
+      }).join('');
+    }
+    document.getElementById('dd-body').innerHTML = html;
+  }).catch(function() {
+    document.getElementById('dd-body').innerHTML = '📡 服务离线';
+  });
+}
+
+loadDoctors();
+// URL 参数直接打开详情
+(function() {
+  var m = location.search.match(/[?&]doctor=([A-Z0-9]+)/i);
+  if (m) showDetail(m[1]);
+})();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

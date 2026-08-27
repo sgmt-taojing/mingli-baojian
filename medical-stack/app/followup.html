@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/followup.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+<meta name="robots" content="noindex">
+<title>随访管理 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--green:#16a34a;--blue:#2563eb;--accent:#c0392b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;display:flex;justify-content:space-between}
+.header h1{font-size:18px}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.stat{background:var(--card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border)}
+.stat .v{font-size:24px;font-weight:700;color:var(--primary)}
+.stat .l{font-size:10px;color:var(--text3)}
+.card{background:var(--card);border-radius:10px;padding:16px;margin:12px 0;border:1px solid var(--border)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+.followup-item{display:flex;align-items:center;gap:12px;padding:10px;border-bottom:1px solid var(--border);font-size:13px}
+.followup-item .info{flex:1}
+.followup-item .badge{font-size:10px;padding:3px 8px;border-radius:10px}
+.badge.today{background:#fef2f2;color:var(--accent)}
+.badge.tomorrow{background:#fffbeb;color:#b8860b}
+.badge.done{background:#f0fdf4;color:var(--green)}
+.badge.overdue{background:#f5f0ff;color:#7c3aed}
+.template-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.template-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px}
+.template-item:hover{border-color:var(--primary)}
+.btn{display:inline-block;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+<script src="js/data-engine.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">随访管理</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>医生</b></span><span class="std-tag">⚙️ 功能 <b>随访管理</b></span><span class="std-tag">💎 使用价值 <b>4类模板+逾期检测+消息发送</b></span></div>
+<div class="header"><h1>📞 随访管理</h1><a href="admin.html" style="color:rgba(255,255,255,.6);font-size:11px;text-decoration:none">← 返回</a></div>
+<div class="container">
+  <div class="stats">
+    <div class="stat"><div class="v" id="s-today">0</div><div class="l">今日待随访</div></div>
+    <div class="stat"><div class="v" id="s-week">0</div><div class="l">本周待随访</div></div>
+    <div class="stat"><div class="v" id="s-overdue">0</div><div class="l">逾期未访</div></div>
+    <div class="stat"><div class="v" id="s-done">0</div><div class="l">本周已完成</div></div>
+  </div>
+
+  <div class="card">
+    <h3>📋 随访模板</h3>
+    <div class="template-grid">
+      <div class="template-item" onclick="sendFollowup('initial')">
+        <strong>🏥 初次就诊后随访</strong><br>
+        <span style="font-size:10px;color:var(--text3)">就诊后3天 · 询问服药反应/症状变化</span>
+      </div>
+      <div class="template-item" onclick="sendFollowup('chronic')">
+        <strong>🔄 慢性病随访</strong><br>
+        <span style="font-size:10px;color:var(--text3)">每2周 · 评估疗效/调整方案</span>
+      </div>
+      <div class="template-item" onclick="sendFollowup('post_rx')">
+        <strong>💊 用药后随访</strong><br>
+        <span style="font-size:10px;color:var(--text3)">服药7天 · 询问效果/不良反应</span>
+      </div>
+      <div class="template-item" onclick="sendFollowup('health')">
+        <strong>🩺 健康管理随访</strong><br>
+        <span style="font-size:10px;color:var(--text3)">每月 · 体质评估/生活指导</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📞 今日随访列表</h3>
+    <div id="followup-list" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card">
+    <h3>✅ 最近完成的随访</h3>
+    <div id="completed-list"></div>
+  </div>
+</div>
+<script>
+const templates = {
+  initial: { title: '初次就诊随访', msg: '您好，我是您的随访医生。上次就诊后服药情况如何？症状有改善吗？有没有不舒服的反应？方便的话请回复一下，我好帮您调整。' },
+  chronic: { title: '慢性病随访', msg: '您好，定期随访时间到了。最近身体感觉怎么样？是否按时服药？饮食睡眠有没有变化？请简单说明一下，谢谢。' },
+  post_rx: { title: '用药后随访', msg: '您好，您服用中药已有7天。请问感觉效果如何？有没有出现胃不舒服、腹泻、过敏等反应？有任何不适请随时告知。' },
+  health: { title: '健康管理随访', msg: '您好，本月健康随访。最近睡眠胃口如何？精神状态怎么样？舌苔有什么变化？方便的话拍张舌苔照片给我看看。' }
+};
+
+// R812：随访改走真 API（/api/followup/list），假种子数组全部移除
+var fuList = [];
+var fuStats = { pending: 0, overdue: 0, completed: 0 };
+
+function loadFollowups() {
+  fetch('/api/followup/list?limit=200').then(function(r){ return r.json(); }).then(function(d) {
+    fuList = d.list || [];
+    fuStats = d.stats || fuStats;
+    render();
+  }).catch(function() {
+    // 离线降级：读本地缓存
+    fuList = JSON.parse(localStorage.getItem('tcm_followups_active') || '[]');
+    render();
+  });
+}
+
+function fuTypeLabel(t) {
+  return { initial:'初次就诊', chronic:'慢性病', post_rx:'用药后', health:'健康管理', 'family-consult':'家庭问诊' }[t] || t || '随访';
+}
+
+function render() {
+  var today = new Date().toISOString().slice(0,10);
+  var now = Date.now();
+  var weekLater = now + 7*86400000;
+  var pending = fuList.filter(function(f){ return f.status==='pending'; });
+  document.getElementById('s-today').textContent = pending.filter(function(f){ return f.due_at && f.due_at.slice(0,10)<=today; }).length;
+  document.getElementById('s-week').textContent = pending.filter(function(f){ return f.due_at && new Date(f.due_at).getTime()<=weekLater; }).length;
+  document.getElementById('s-overdue').textContent = fuStats.overdue != null ? fuStats.overdue : pending.filter(function(f){ return f.due_at && new Date(f.due_at).getTime()<now; }).length;
+  document.getElementById('s-done').textContent = fuStats.completed != null ? fuStats.completed : fuList.filter(function(f){ return f.status==='completed'; }).length;
+
+  var listEl = document.getElementById('followup-list');
+  if (!pending.length) {
+    listEl.innerHTML = '<div style="text-align:center;color:var(--text3);padding:16px">📞 暂无待随访 — 问诊签发后自动生成随访计划</div>';
+  } else {
+    listEl.innerHTML = pending.map(function(f){
+      var overdue = f.due_at && new Date(f.due_at).getTime() < now;
+      var dueDay = f.due_at ? f.due_at.slice(0,10) : '—';
+      var pname = String(f.patient_name||'').replace(/'/g,'');
+      var psyn = String(f.syndrome||'').replace(/'/g,'');
+      var pfx = String(f.formula||'').replace(/'/g,'');
+      return '<div class="followup-item">'+
+        '<span style="font-size:20px">📞</span>'+
+        '<div class="info"><strong>'+esc(f.patient_name||'—')+'</strong> · '+esc(f.syndrome||'')+(f.formula?' · '+esc(f.formula):'')+'<br>'+
+        '<span style="font-size:10px;color:var(--text3)">'+fuTypeLabel(f.source||f.type)+' · 应访 '+dueDay+'</span></div>'+
+        '<span class="badge '+(overdue?'overdue':'today')+'">'+(overdue?'⚠️逾期':dueDay===today?'📌今天':'待随访')+'</span>'+
+        '<button class="btn green small" onclick="sendFollowup(\'post_rx\',\''+pname+'\',\''+psyn+'\',\''+pfx+'\')">随访</button>'+
+        '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="completeFU(\''+f.id+'\')">✓</button>'+
+      '</div>';
+    }).join('');
+  }
+
+  var done = fuList.filter(function(f){ return f.status==='completed'; });
+  document.getElementById('completed-list').innerHTML = done.length ? done.slice(0,20).map(function(c){
+    return '<div class="followup-item">'+
+      '<span style="font-size:20px">✅</span>'+
+      '<div class="info"><strong>'+esc(c.patient_name||'—')+'</strong> · '+esc(c.formula||c.syndrome||'')+'<br><span style="font-size:10px;color:var(--text2)">'+esc(c.feedback||c.advice||'随访完成')+'</span></div>'+
+      '<span class="badge done">'+(c.completed_at||'').slice(0,10)+'</span>'+
+    '</div>';
+  }).join('') : '<div style="text-align:center;color:var(--text3);padding:16px">暂无已完成随访</div>';
+}
+
+// R816：优先取服务端 AI 个性化话术（证型+方剂规则引擎），失败回退静态模板；发送前可编辑
+function sendFollowup(type, patient, syndrome, formula) {
+  var t = templates[type];
+  var name = patient || '';
+  var fallback = t ? '【'+t.title+'】'+(name?' '+name+'，':'')+t.msg : '您好，本次随访想了解您的恢复情况。请简单回复。';
+  var done = function(msg) {
+    var log = JSON.parse(localStorage.getItem('tcm_followup_log')||'[]');
+    log.unshift({ time: new Date().toISOString(), type: type, patient: name, message: msg, status: 'sent' });
+    localStorage.setItem('tcm_followup_log', JSON.stringify(log.slice(0,100)));
+    toast('✅ 随访消息已发送给 ' + (name||'患者'));
+  };
+  if (!syndrome && !formula) { previewFU(fallback, done); return; }
+  fetch('/api/followup/message', {method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ type:type, patient_name:name, syndrome:syndrome||'', formula:formula||'' })})
+    .then(function(r){ return r.json(); }).then(function(d) {
+      previewFU(d.ok && d.message ? d.message : fallback, done, d.matched);
+    }).catch(function(){ previewFU(fallback, done); });
+}
+
+function previewFU(msg, done, matched) {
+  var tag = matched && (matched.formula_note || matched.syndrome_care)
+    ? '<div style="font-size:10px;color:var(--green)">🤖 AI 话术 · 已按证型/方剂个性化</div>'
+    : '<div style="font-size:10px;color:var(--text3)">📝 通用话术</div>';
+  var overlay = openModal(
+    '<div style="display:grid;gap:8px;min-width:300px">' + tag +
+    '<textarea id="__fu_msg" rows="5" style="padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;line-height:1.8">'+esc(msg)+'</textarea>' +
+    '<button class="btn primary" id="__fu_send" style="padding:10px;border:none;border-radius:6px;background:var(--primary,#6b3a1f);color:#fff;cursor:pointer">📤 确认发送</button></div>',
+    '随访话术预览');
+  overlay.querySelector('#__fu_send').addEventListener('click', function() {
+    var m = overlay.querySelector('#__fu_msg').value.trim();
+    if (!m) { toast('话术不能为空', 'warn'); return; }
+    done(m); overlay.remove();
+  });
+}
+
+// R812：完成随访走真 API（服务端新增 /api/followup/complete）
+function completeFU(id) {
+  fetch('/api/followup/complete', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:id})})
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (d.ok) { toast('✅ 随访完成'); loadFollowups(); }
+      else toast('操作失败：'+(d.error||''), 'warn');
+    }).catch(function(){ toast('网络错误', 'warn'); });
+}
+
+// R812：新增随访走真 API /api/followup/create（原仅写 localStorage 镜像）
+function addFollowup() {
+  var overlay = openModal(
+    '<div style="display:grid;gap:8px;min-width:280px">' +
+    '<input id="__fu_name" class="input" placeholder="患者姓名 *" style="padding:8px;border:1px solid #d1d5db;border-radius:6px">' +
+    '<input id="__fu_diag" class="input" placeholder="中医诊断 *（如 心脾两虚）" style="padding:8px;border:1px solid #d1d5db;border-radius:6px">' +
+    '<input id="__fu_formula" class="input" placeholder="方剂 *（如 归脾汤）" style="padding:8px;border:1px solid #d1d5db;border-radius:6px">' +
+    '<select id="__fu_days" style="padding:8px;border:1px solid #d1d5db;border-radius:6px">' +
+    '<option value="3">3 天后随访</option><option value="7" selected>7 天后随访</option>' +
+    '<option value="14">14 天后随访</option><option value="30">30 天后随访</option></select>' +
+    '<button class="btn primary" id="__fu_ok" style="padding:10px;border:none;border-radius:6px;background:var(--primary,#6b3a1f);color:#fff;cursor:pointer">✅ 确认新增</button></div>',
+    '新增随访');
+  overlay.querySelector('#__fu_ok').addEventListener('click', function() {
+    var name = overlay.querySelector('#__fu_name').value.trim();
+    var diagnosis = overlay.querySelector('#__fu_diag').value.trim();
+    var formula = overlay.querySelector('#__fu_formula').value.trim();
+    var days = parseInt(overlay.querySelector('#__fu_days').value, 10) || 7;
+    if (!name || !diagnosis || !formula) { toast('姓名/诊断/方剂必填', 'warn'); return; }
+    fetch('/api/followup/create', {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ patient_name:name, syndrome:diagnosis, formula:formula, days:days })})
+      .then(function(r){ return r.json(); }).then(function(d) {
+        if (d.ok) { overlay.remove(); toast('✅ 随访已新增'); loadFollowups(); }
+        else toast('新增失败：'+(d.error||''), 'warn');
+      }).catch(function(){ toast('网络错误', 'warn'); });
+  });
+}
+
+// R812：搜索 = fuList 客户端过滤（原 searchFU 只搜假数组）
+function searchFU(q) {
+  if (!q) { render(); return; }
+  var now = Date.now();
+  var filtered = fuList.filter(function(f){
+    return (f.patient_name||'').indexOf(q) >= 0 ||
+           (f.syndrome||'').indexOf(q) >= 0 ||
+           (f.formula||'').indexOf(q) >= 0;
+  });
+  document.getElementById('followup-list').innerHTML = filtered.length ? filtered.map(function(f){
+    var overdue = f.status==='pending' && f.due_at && new Date(f.due_at).getTime() < now;
+    return '<div class="followup-item">'+
+      '<span style="font-size:20px">🔍</span>'+
+      '<div class="info"><strong>'+esc(f.patient_name||'—')+'</strong> · '+esc(f.syndrome||'')+(f.formula?' · '+esc(f.formula):'')+'<br>'+
+      '<span style="font-size:10px;color:var(--text3)">'+fuTypeLabel(f.source||f.type)+' · 应访 '+(f.due_at||'').slice(0,10)+'</span></div>'+
+      '<span class="badge '+(f.status==='completed'?'done':overdue?'overdue':'today')+'">'+(f.status==='completed'?'已完成':overdue?'⚠️逾期':'待随访')+'</span>'+
+    '</div>';
+  }).join('') : '<div style="text-align:center;color:var(--text3);padding:16px">未找到匹配随访</div>';
+}
+
+// 初始化：真 API 加载，每分钟刷新
+loadFollowups();
+setInterval(loadFollowups, 60000);
+
+// ═══ 工具栏 UI 注入 ═══
+(function(){
+  var card = document.querySelectorAll('.card')[1];
+  if (!card) return;
+  var bar = document.createElement('div');
+  bar.style.cssText = 'display:flex;gap:8px;margin:8px 0;flex-wrap:wrap';
+  bar.innerHTML = '<input  type="text" id="fu-search" placeholder="🔍 搜索患者/诊断/方剂" style="flex:1;min-width:140px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text)" aria-label="🔍 搜索患者/诊断/方剂" data-validate="required|min=2">'+
+                  '<button class="btn primary" onclick="addFollowup()">➕ 新增</button>'+
+                  '<button class="btn" onclick="searchFU(document.getElementById(\'fu-search\').value)">🔍 搜索</button>';
+  card.insertBefore(bar, card.firstChild.nextSibling);
+})();
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<div id="followup-result" style="margin:8px;text-align:center;color:var(--text2)"></div>
+<script>
+(function(){var api='/';window.submitFollowup=function(pid,effect,notes){fetch(api+'/api/tcm/efficacy-analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:pid,days:90})}).then(r=>r.json()).then(d=>{var el=document.getElementById('followup-result');if(el)el.innerHTML='✅ 已提交 · '+d.totalRecords+'条记录';}).catch(function(e){var el=document.getElementById('followup-result');if(el)el.innerHTML='📡 API离线 · 本地已保存';});};})();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

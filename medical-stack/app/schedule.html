@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/schedule.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+<meta name="robots" content="noindex">
+<title>排班管理 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--green:#16a34a;--blue:#2563eb;--accent:#c0392b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:18px}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.calendar-nav{display:flex;align-items:center;gap:12px;margin:12px 0;justify-content:center}
+.calendar-nav button{padding:8px 16px;border:1px solid var(--border);border-radius:6px;background:var(--card);cursor:pointer;font-size:13px}
+.calendar-nav .title{font-size:18px;font-weight:600;color:var(--primary);min-width:160px;text-align:center}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.calendar-cell{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;min-height:100px;font-size:12px;cursor:pointer;transition:.1s}
+.calendar-cell:hover{background:#faf8f5;border-color:var(--primary)}
+.calendar-cell.weekend{background:#faf8f5}
+.calendar-cell.today{border:2px solid var(--primary);box-shadow:0 0 0 3px rgba(107,58,31,.1)}
+.calendar-cell .day{font-weight:600;margin-bottom:4px}
+.calendar-cell .shift{font-size:10px;padding:2px 4px;border-radius:3px;margin:1px 0}
+.shift.am{background:var(--blue-bg);color:var(--blue)}
+.shift.pm{background:#fffbeb;color:#b8860b}
+.shift.night{background:#f5f0ff;color:#7c3aed}
+.calendar-cell .no-shift{font-size:10px;color:var(--text3)}
+.doctor-list{font-size:13px;margin-top:8px;color:var(--text2)}
+.doctor-list div{padding:2px 0}
+.card{background:var(--card);border-radius:10px;padding:16px;margin:12px 0;border:1px solid var(--border)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">排班管理</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>管理员</b></span><span class="std-tag">⚙️ 功能 <b>排班管理</b></span><span class="std-tag">💎 使用价值 <b>月历视图上午/下午/夜班排班</b></span></div>
+<div class="header"><h1>📅 排班管理</h1><a href="admin.html" style="color:rgba(255,255,255,.6);font-size:11px;text-decoration:none">← 返回</a></div>
+<div class="container">
+  <div class="calendar-nav">
+    <button onclick="changeMonth(-1)">←</button>
+    <span class="title" id="month-title"></span>
+    <button onclick="changeMonth(1)">→</button>
+    <button onclick="goToday()">今天</button>
+  </div>
+  <div class="calendar-grid" id="calendar"></div>
+
+  <div class="card">
+    <h3>👨‍⚕️ 医生排班</h3>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="shift am" style="border:none;padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer" onclick="addShift('am')">+ 上午班</button>
+      <button class="shift pm" style="border:none;padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer" onclick="addShift('pm')">+ 下午班</button>
+      <button style="border:1px solid var(--border);padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer;background:var(--card)" onclick="addShift('night')">+ 夜班</button>
+    </div>
+    <div id="shift-form" style="display:none;margin-top:8px">
+      <select id="shift-doctor" style="padding:6px;border:1px solid var(--border);border-radius:4px;margin-right:8px">
+        <option value="">加载医生中…</option>
+      </select>
+      <input  type="date" id="shift-date" style="padding:6px;border:1px solid var(--border);border-radius:4px;margin-right:8px" aria-label="shift date" data-validate="required">
+      <button onclick="saveShift()" style="padding:6px 16px;background:var(--green);color:#fff;border:none;border-radius:4px;cursor:pointer">保存</button>
+      <button onclick="cancelShift()" style="padding:6px 16px;background:var(--bg);border:1px solid var(--border);border-radius:4px;cursor:pointer;margin-left:4px">取消</button>
+    </div>
+  </div>
+</div>
+<script>
+// R815：排班接真——医生来自 /api/doctors，自定义班次持久化到服务端 /api/schedule
+let currentYear, currentMonth;
+let shifts = [];       // 服务端自定义班次
+let recurring = {};    // 医生档案周固定出诊 doctor_id → {name, specialty_name, schedule}
+let DOCS = [];         // /api/doctors 列表
+
+function init() {
+  const now = new Date();
+  currentYear = now.getFullYear();
+  currentMonth = now.getMonth();
+  loadAll();
+}
+
+function loadAll() {
+  fetch('/api/doctors').then(function(r){ return r.json(); }).then(function(d) {
+    DOCS = d.doctors || [];
+    var sel = document.getElementById('shift-doctor');
+    sel.innerHTML = DOCS.map(function(p){
+      return '<option value="' + p.doctor_id + '">' + p.name + '（' + p.specialty_name + '）</option>';
+    }).join('');
+    return fetch('/api/schedule');
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    shifts = d.shifts || [];
+    recurring = d.recurring || {};
+    render();
+  }).catch(function() {
+    toast('📡 服务离线，排班不可用', 'warn');
+    render();
+  });
+}
+
+function changeMonth(d) { currentMonth += d; if(currentMonth>11){currentMonth=0;currentYear++} if(currentMonth<0){currentMonth=11;currentYear--} render(); }
+function goToday() { const n=new Date(); currentYear=n.getFullYear(); currentMonth=n.getMonth(); render(); }
+
+// 某天的全部班次 = 周固定出诊 + 自定义班次
+function dayShifts(dateStr, weekday) {
+  var list = [];
+  Object.keys(recurring).forEach(function(did) {
+    var r = recurring[did];
+    (r.schedule[String(weekday)] || []).forEach(function(slot) {
+      list.push({ doctor: r.name, type: slot, fixed: true });
+    });
+  });
+  shifts.filter(function(s){ return s.date === dateStr; }).forEach(function(s) {
+    list.push({ doctor: s.doctor_name || s.doctor_id, type: s.type, fixed: false });
+  });
+  return list;
+}
+
+function render() {
+  document.getElementById('month-title').textContent = currentYear + '年' + (currentMonth+1) + '月';
+
+  const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth+1, 0).getDate();
+  const today = new Date().toDateString();
+
+  let html = '';
+  const dayNames = ['日','一','二','三','四','五','六'];
+  for (const d of dayNames) html += '<div style="text-align:center;font-weight:600;padding:4px;font-size:11px;color:var(--text3)">' + d + '</div>';
+
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = currentYear + '-' + String(currentMonth+1).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    const dateObj = new Date(currentYear, currentMonth, day);
+    const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+    const isToday = dateObj.toDateString() === today;
+    const list = dayShifts(dateStr, dateObj.getDay());
+
+    html += '<div class="calendar-cell' + (isWeekend?' weekend':'') + (isToday?' today':'') + '" onclick="selectDate(\'' + dateStr + '\')">' +
+      '<div class="day">' + day + '</div>';
+    if (list.length) {
+      for (const sh of list) {
+        html += '<div class="shift ' + sh.type + '">' + (sh.type==='am'?'☀️':sh.type==='pm'?'🌤️':'🌙') + ' ' + sh.doctor + (sh.fixed?'':' *') + '</div>';
+      }
+    } else {
+      html += '<div class="no-shift">休息</div>';
+    }
+    html += '</div>';
+  }
+
+  document.getElementById('calendar').innerHTML = html;
+}
+
+let selectedDate = null, selectedShiftType = null;
+
+function selectDate(date) { selectedDate = date; document.getElementById('shift-date').value = date; }
+
+function addShift(type) {
+  if (!DOCS.length) return toast('医生列表未加载，请稍候', 'warn');
+  selectedShiftType = type;
+  document.getElementById('shift-form').style.display = 'block';
+  if (!selectedDate) selectedDate = new Date().toISOString().slice(0,10);
+  document.getElementById('shift-date').value = selectedDate;
+}
+
+function saveShift() {
+  const doctorId = document.getElementById('shift-doctor').value;
+  const date = document.getElementById('shift-date').value;
+  if (!doctorId) return toast('请选择医生');
+  if (!date) return toast('请选择日期');
+
+  // R815：真持久化到服务端（冲突由服务端 409 判定）
+  fetch('/api/schedule/shift', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ doctor_id: doctorId, date: date, type: selectedShiftType || 'am' })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { toast(d.error || '保存失败', 'warn'); return; }
+    shifts.push(d.shift);
+    document.getElementById('shift-form').style.display = 'none';
+    render();
+    toast('✅ 排班已保存');
+  }).catch(function(){ toast('网络错误', 'warn'); });
+}
+
+function cancelShift() { document.getElementById('shift-form').style.display = 'none'; }
+init();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

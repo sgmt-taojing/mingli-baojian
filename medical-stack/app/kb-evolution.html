@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/kb-evolution.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KB 进化仪表盘 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+<link rel="stylesheet" href="css/standard.css">
+<style>
+body { background: #f5f1e8; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+.hero {
+  background: linear-gradient(135deg, #1a2530 0%, #2c3e50 100%);
+  color: white; border-radius: 12px; padding: 24px 28px; margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(44,62,80,0.18);
+}
+.hero h1 { margin: 0 0 8px; font-size: 24px; font-weight: 600; }
+.hero p { margin: 0; opacity: 0.85; font-size: 13px; }
+.live-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: #4ade80; margin-right: 6px; animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+@media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: white; border-radius: 10px; padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 4px solid #2c3e50;
+}
+.kpi .label { font-size: 11px; color: #6b7280; text-transform: uppercase; margin-bottom: 6px; }
+.kpi .value { font-size: 28px; font-weight: 700; color: #1f2937; line-height: 1.1; }
+.kpi .delta { font-size: 11px; margin-top: 4px; }
+.kpi .delta.up { color: #16a34a; }
+.kpi .delta.down { color: #dc2626; }
+.kpi.gold { border-left-color: #d97706; }
+.kpi.diamond { border-left-color: #0891b2; }
+.kpi.crystal { border-left-color: #7c3aed; }
+
+.card {
+  background: white; border-radius: 10px; padding: 18px 22px; margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.card h3 { margin: 0 0 12px; font-size: 16px; color: #1f2937; }
+.card .sub { color: #6b7280; font-size: 12px; margin-bottom: 14px; }
+
+.flow-diagram {
+  display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: center; gap: 12px; padding: 20px 0;
+}
+.flow-node {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 2px solid #cbd5e1; border-radius: 10px;
+  padding: 14px 12px; text-align: center;
+}
+.flow-node.icon { font-size: 24px; }
+.flow-node .name { font-size: 12px; font-weight: 600; margin: 6px 0 2px; }
+.flow-node .count { font-size: 20px; font-weight: 700; color: #1f2937; }
+.flow-arrow { font-size: 20px; color: #94a3b8; text-align: center; }
+
+.bar-chart { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: grid; grid-template-columns: 80px 1fr 50px; align-items: center; gap: 10px; font-size: 12px; }
+.bar-label { color: #6b7280; }
+.bar-track { background: #f1f5f9; border-radius: 4px; height: 14px; position: relative; overflow: hidden; }
+.bar-fill { height: 100%; background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%); border-radius: 4px; transition: width 0.6s; }
+.bar-fill.gold { background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%); }
+.bar-fill.crystal { background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%); }
+.bar-value { font-weight: 700; text-align: right; color: #1f2937; }
+
+.feed-list { max-height: 360px; overflow-y: auto; }
+.feed-item {
+  display: grid; grid-template-columns: 32px 1fr auto;
+  gap: 10px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; align-items: center;
+}
+.feed-icon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #dbeafe; color: #1e40af; font-size: 14px;
+}
+.feed-icon.distill { background: #f3e8ff; color: 6b21a8; }
+.feed-icon.feedback { background: #dcfce7; color: #166534; }
+.feed-icon.inject { background: #fed7aa; color: #c2410c; }
+.feed-text { font-size: 12px; line-height: 1.5; }
+.feed-text strong { color: #1f2937; }
+.feed-time { font-size: 10px; color: #9ca3af; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.btn-refresh {
+  background: white; color: #2c3e50; border: 1px solid #2c3e50;
+  padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer;
+}
+.btn-refresh:hover { background: #2c3e50; color: white; }
+
+.tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+.tag.gold { background: #fef3c7; color: #92400e; }
+.tag.silver { background: #f3f4f6; color: #4b5563; }
+.tag.bronze { background: #fed7aa; color: #9a3412; }
+.tag.diamond { background: #cffafe; color: #155e75; }
+.tag.crystal { background: #ede9fe; color: #5b21b6; }
+
+.health-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.health-dot.green { background: #16a34a; }
+.health-dot.yellow { background: #eab308; }
+.health-dot.red { background: #dc2626; }
+</style>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="kb">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">KB 进化仪表盘</span>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>🧬 KB 进化仪表盘 <span style="float:right;font-size:13px;opacity:0.85">面向 居家机器人 · KB 中枢 进化</span></h1>
+    <p><span class="live-dot"></span>实时观察 命理宝鉴·医道 知识库的成长 · 反馈注入 · 跨患者模式蒸馏</p>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button id="btn-distill" class="btn-refresh" style="background:#d97706;color:white;border:none" onclick="triggerDistill()">
+        🔬 手动蒸馏（扫描 EMR+处方+随访）
+      </button>
+      <button class="btn-refresh" onclick="loadAll()">🔃 刷新</button>
+      <span id="distill-status" style="font-size:12px;opacity:0.85;margin-left:8px"></span>
+    </div>
+  </div>
+
+  <!-- 4 个核心 KPI -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">KB 总条目</div>
+      <div class="value" id="kpi-total">—</div>
+      <div class="delta up" id="kpi-total-delta">+0 今日</div>
+    </div>
+    <div class="kpi gold">
+      <div class="label">🥇 Gold 高信任条目</div>
+      <div class="value" id="kpi-gold">—</div>
+      <div class="delta up" id="kpi-gold-delta">0%</div>
+    </div>
+    <div class="kpi crystal">
+      <div class="label">💎 跨患者模式</div>
+      <div class="value" id="kpi-patterns">—</div>
+      <div class="delta up" id="kpi-patterns-delta">+0 本周</div>
+    </div>
+    <div class="kpi diamond">
+      <div class="label">📊 平均 trust_score</div>
+      <div class="value" id="kpi-trust">—</div>
+      <div class="delta up" id="kpi-trust-delta">↑ 持续提升</div>
+    </div>
+    <div class="kpi dppo">
+      <div class="label">🤖 AI 采纳率</div>
+      <div class="value" id="dppo-stats">⏳ 加载中...</div>
+      <div class="delta up">DPPO 在线学习中</div>
+    </div>
+  </div>
+
+  <!-- 闭环流向图 -->
+  <div class="card">
+    <h3>🔄 知识进化闭环 <span style="float:right"><button class="btn-refresh" onclick="loadAll()">🔃 刷新</button></span></h3>
+    <p class="sub">KB 北极星：非专家用户通过 KB 输出最专业且闭环的事情。下方四步是闭环核心</p>
+    <div class="flow-diagram">
+      <div class="flow-node">
+        <div style="font-size:32px">📥</div>
+        <div class="name">采集</div>
+        <div class="count" id="flow-source">—</div>
+        <div style="font-size:10px;color:#6b7280">跨患者数据源</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div style="font-size:32px">🧠</div>
+        <div class="name">蒸馏</div>
+        <div class="count" id="flow-distill">—</div>
+        <div style="font-size:10px;color:#6b7280">长程模式</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div style="font-size:32px">💉</div>
+        <div class="name">注入</div>
+        <div class="count" id="flow-inject">—</div>
+        <div style="font-size:10px;color:#6b7280">写入 KB</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <div style="font-size:32px">✅</div>
+        <div class="name">验证</div>
+        <div class="count" id="flow-verify">—</div>
+        <div style="font-size:10px;color:#6b7280">闭环命中率</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DPPO 信任调整趋势 -->
+  <div class="card">
+    <h3>🎯 DPPO 信任调整趋势 <span class="delta up" style="font-size:12px">医生采纳/修正 → 实时调 trust</span></h3>
+    <div id="trust-trend-list" style="min-height:60px">加载中...</div>
+  </div>
+
+  <div class="grid-2">
+    <!-- 信任等级分布 -->
+    <div class="card">
+      <h3>🏆 KB 信任等级分布</h3>
+      <p class="sub">按 trust_score 区间统计条目数 · 等级越高代表蒸馏/复用次数越多</p>
+      <div class="bar-chart" id="grade-chart">
+        <div class="bar-row"><span class="bar-label">🥇 Gold</span><div class="bar-track"><div class="bar-fill gold" style="width:0%"></div></div><span class="bar-value" id="grade-gold-count">—</span></div>
+        <div class="bar-row"><span class="bar-label">🥈 Silver</span><div class="bar-track"><div class="bar-fill" style="width:0%"></div></div><span class="bar-value" id="grade-silver-count">—</span></div>
+        <div class="bar-row"><span class="bar-label">🥉 Bronze</span><div class="bar-track"><div class="bar-fill" style="width:0%;background:linear-gradient(90deg,#9a3412 0%,#ea580c 100%)"></div></div><span class="bar-value" id="grade-bronze-count">—</span></div>
+        <div class="bar-row"><span class="bar-label">💎 Diamond</span><div class="bar-track"><div class="bar-fill crystal" style="width:0%"></div></div><span class="bar-value" id="grade-diamond-count">—</span></div>
+        <div class="bar-row"><span class="bar-label">🔮 Crystal</span><div class="bar-track"><div class="bar-fill crystal" style="width:0%"></div></div><span class="bar-value" id="grade-crystal-count">—</span></div>
+      </div>
+    </div>
+
+    <!-- 多源证据累积器 -->
+    <div class="card">
+      <h3>🧬 多源证据分布 <span style="float:right;font-size:11px;color:#6b7280">≥2 源共识即高置信</span></h3>
+      <p class="sub">同一证型被 EMR + 处方 + 随访 多源相互验证的证据强度</p>
+      <div class="bar-chart" id="multisource-chart">
+        <div class="bar-row"><span class="bar-label">📜 EMR 佐证</span><div class="bar-track"><div class="bar-fill" id="ms-emr" style="width:0%;background:linear-gradient(90deg,#0ea5e9 0%,#38bdf8 100%)"></div></div><span class="bar-value" id="ms-emr-count">—</span></div>
+        <div class="bar-row"><span class="bar-label">💊 处方佐证</span><div class="bar-track"><div class="bar-fill" id="ms-rx" style="width:0%;background:linear-gradient(90deg,#16a34a 0%,#4ade80 100%)"></div></div><span class="bar-value" id="ms-rx-count">—</span></div>
+        <div class="bar-row"><span class="bar-label">📅 随访佐证</span><div class="bar-track"><div class="bar-fill" id="ms-fu" style="width:0%;background:linear-gradient(90deg,#a855f7 0%,#c084fc 100%)"></div></div><span class="bar-value" id="ms-fu-count">—</span></div>
+        <div class="bar-row"><span class="bar-label">🔁 多源交集</span><div class="bar-track"><div class="bar-fill" id="ms-int" style="width:0%;background:linear-gradient(90deg,#f59e0b 0%,#fbbf24 100%)"></div></div><span class="bar-value" id="ms-int-count">—</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:10px;background:linear-gradient(90deg,#fef3c7 0%,#fff 100%);border-radius:6px;margin-top:10px">
+        <span>🎯 共识证型总数</span>
+        <strong id="ms-total">—</strong>
+      </div>
+    </div>
+
+    <!-- 健康指标 -->
+    <div class="card">
+      <h3>💚 KB 健康指标</h3>
+      <p class="sub">实时监控 KB 命中表现 · 闭环质量</p>
+      <div style="display:grid;gap:10px">
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:6px">
+          <span><span class="health-dot green"></span>直答命中率（≥0.7）</span>
+          <strong id="health-direct">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:6px">
+          <span><span class="health-dot yellow"></span>润色率（0.4-0.7）</span>
+          <strong id="health-polish">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:6px">
+          <span><span class="health-dot red"></span>兜底率（<0.4）</span>
+          <strong id="health-fallback">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:6px">
+          <span><span class="health-dot green"></span>API P95 响应</span>
+          <strong id="health-p95">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:6px">
+          <span><span class="health-dot green"></span>模块覆盖</span>
+          <strong id="health-modules">—</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px;background:#f9fafb;border-radius:6px">
+          <span><span class="health-dot green"></span>并发吞吐</span>
+          <strong id="health-rps">—</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 进化事件流 -->
+  <div class="card">
+    <h3>📡 实时进化事件流</h3>
+    <p class="sub">最近 20 条 KB 变更：蒸馏、注入、反馈闭环 · 让进化看得见</p>
+    <div class="feed-list" id="feed-list">
+      <div style="text-align:center;padding:30px;color:#9ca3af">⏳ 加载中…</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;color:#9ca3af;font-size:11px;margin:20px 0">
+    ⏱ <span id="last-refresh">—</span> · 数据源：localStorage + KB FTS5 + 长程画像引擎 + API 压测
+  </div>
+</div>
+
+<script src="js/kb-evolution-page.js"></script>
+<script>
+/* R800：统搜知识库直达（kb-evolution.html?q=关键词）→ 浮动结果面板 */
+(function(){
+  var q = new URLSearchParams(location.search).get('q');
+  if (!q) return;
+  var panel = document.createElement('div');
+  panel.id = 'kb-q-panel';
+  panel.style.cssText = 'position:fixed;right:16px;top:70px;width:min(420px,92vw);max-height:70vh;overflow-y:auto;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;padding:10px';
+  panel.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+    '<b style="font-size:13px">📚 知识库检索：' + q.replace(/</g,'&lt;') + '</b>' +
+    '<span style="cursor:pointer;color:#9ca3af;font-size:16px" onclick="this.closest(\'#kb-q-panel\').remove()">×</span></div>' +
+    '<div id="kb-q-list" style="font-size:12px;color:#6b7280">🔄 检索中…</div>';
+  document.body.appendChild(panel);
+  fetch('/api/tcm/kb/search?q=' + encodeURIComponent(q) + '&limit=10').then(function(r){ return r.json(); }).then(function(d){
+    var list = document.getElementById('kb-q-list');
+    if (!list) return;
+    var rs = d.results || [];
+    if (!rs.length) { list.innerHTML = '未找到相关条目'; return; }
+    list.innerHTML = rs.map(function(it){
+      return '<div style="border-top:1px dotted #e5e7eb;padding:6px 0">' +
+        '<div style="font-weight:600;color:#1f2937">' + String(it.title||'').replace(/</g,'&lt;') + '</div>' +
+        '<div style="color:#6b7280;margin-top:2px">' + String(it.content||'').slice(0,120).replace(/</g,'&lt;') + '…</div>' +
+        '<div style="font-size:10px;color:#9ca3af;margin-top:2px">' + (it.module||'') + '</div></div>';
+    }).join('');
+  }).catch(function(){ var list = document.getElementById('kb-q-list'); if (list) list.innerHTML = '检索服务不可用'; });
+})();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

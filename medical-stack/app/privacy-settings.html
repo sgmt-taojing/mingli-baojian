@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>隐私设置 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f0e8;--card:#fff;--primary:#8b4513;--accent:#c0392b;--text:#2c1810;--text2:#6b5b4f;--text3:#9b8b7f;--green:#27ae60;--blue:#2980b9;--border:#d4c9b8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:720px;margin:0 auto;padding:16px}
+.header{background:linear-gradient(135deg,#2c1810,#5c3a28);color:#fff;border-radius:0 0 16px 16px;padding:24px 16px;text-align:center}
+.header h1{font-size:20px;margin-bottom:6px}
+.header p{font-size:12px;opacity:.75}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin:14px 0}
+.card h2{font-size:15px;margin-bottom:12px;color:var(--primary)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--border);font-size:13px}
+.row:last-child{border-bottom:none}
+.row .label{color:var(--text2)}
+.row .value{font-weight:600}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px}
+.badge.granted{background:#edf7f0;color:var(--green);border:1px solid #b8e0c4}
+.badge.none{background:#f3f4f6;color:var(--text3);border:1px solid #e5e7eb}
+.btn{display:inline-block;padding:10px 18px;border-radius:8px;border:none;font-size:13px;cursor:pointer;font-weight:600}
+.btn-danger{background:var(--accent);color:#fff}
+.btn-danger:hover{opacity:.85}
+.btn-ghost{background:#f3f4f6;color:var(--text2)}
+.log-box{background:#faf7f2;border:1px solid var(--border);border-radius:8px;padding:10px;max-height:220px;overflow-y:auto;font-size:11px;color:var(--text2);line-height:1.7}
+.log-item{padding:4px 0;border-bottom:1px dashed #e8e0d5}
+.log-item:last-child{border-bottom:none}
+.note{font-size:11px;color:var(--text3);margin-top:10px;line-height:1.6}
+.muted{font-size:12px;color:var(--text3)}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+<div class="header">
+  <h1>🔐 隐私设置</h1>
+  <p>视觉采集授权 · 数据留存 · 操作审计</p>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <h2>📷 视觉采集授权</h2>
+    <div class="row">
+      <span class="label">当前状态</span>
+      <span class="value"><span class="badge none" id="consent-badge">检测中…</span></span>
+    </div>
+    <div class="row">
+      <span class="label">授权范围</span>
+      <span class="value" id="consent-scope">—</span>
+    </div>
+    <div class="row">
+      <span class="label">授权有效期</span>
+      <span class="value" id="consent-expiry">—</span>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn btn-danger" id="btn-revoke">一键撤回授权并删除数据</button>
+      <button class="btn btn-ghost" id="btn-refresh">刷新</button>
+    </div>
+    <div class="note">撤回后将立即停止一切摄像头采集，并删除本机全部生物特征数据与照片存档。依据《个人信息保护法》您有权随时撤回同意。</div>
+  </div>
+
+  <div class="card">
+    <h2>💾 数据留存</h2>
+    <div class="row">
+      <span class="label">结论留存</span>
+      <span class="value">30 天自动过期</span>
+    </div>
+    <div class="row">
+      <span class="label">原图缓存</span>
+      <span class="value">10 分钟滚动清除</span>
+    </div>
+    <div class="row">
+      <span class="label">照片存档</span>
+      <span class="value" id="photo-count">—</span>
+    </div>
+    <div class="row">
+      <span class="label">审计日志</span>
+      <span class="value" id="audit-count">—</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📋 敏感操作审计（本机留存，最近 200 条）</h2>
+    <div class="log-box" id="audit-log">加载中…</div>
+  </div>
+
+  <div class="card">
+    <h2>🛰 空中升级状态</h2>
+    <div class="row">
+      <span class="label">私有核心</span>
+      <span class="value" id="ota-private">—</span>
+    </div>
+    <div class="row">
+      <span class="label">已装升级包</span>
+      <span class="value" id="ota-versions">—</span>
+    </div>
+    <div class="row">
+      <span class="label">升级历史</span>
+      <span class="value" id="ota-history">—</span>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn" id="btn-ota-check" style="background:var(--blue);color:#fff;flex:1">🔍 检查更新</button>
+      <button class="btn btn-ghost" id="btn-ota-apply" style="flex:1" disabled>⬇ 应用更新</button>
+    </div>
+    <div class="note" id="ota-msg">点击"检查更新"连接升级源（:8952）</div>
+  </div>
+
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/nav.js" defer></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/ota-upgrader.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  function refresh() {
+    // 1. 同意状态
+    var badge = document.getElementById('consent-badge');
+    var scope = document.getElementById('consent-scope');
+    var expiry = document.getElementById('consent-expiry');
+    var c = null;
+    if (window.PrivacyConsent) c = PrivacyConsent.readConsent();
+    if (c && c.granted) {
+      badge.textContent = '已授权';
+      badge.className = 'badge granted';
+      scope.textContent = (c.purposes || []).join('、') || '中医辅助辨证';
+      expiry.textContent = c.expiry ? new Date(c.expiry).toLocaleDateString('zh-CN') : '—';
+    } else {
+      badge.textContent = '未授权';
+      badge.className = 'badge none';
+      scope.textContent = '—';
+      expiry.textContent = '—';
+    }
+
+    // 2. 数据留存
+    var photos = [];
+    try { photos = JSON.parse(localStorage.getItem('tcm_tongue_photos') || '[]'); } catch (_) {}
+    document.getElementById('photo-count').textContent = photos.length + ' 张';
+
+    // 3. 审计日志
+    var audit = [];
+    try { audit = JSON.parse(localStorage.getItem('tcm_privacy_audit_v1') || '[]'); } catch (_) {}
+    document.getElementById('audit-count').textContent = audit.length + ' 条';
+    var logBox = document.getElementById('audit-log');
+    logBox.innerHTML = audit.length
+      ? audit.slice(0, 30).map(function (a) {
+          var d = new Date(a.ts).toLocaleString('zh-CN', { hour12: false });
+          return '<div class="log-item">' + esc(d) + ' · <b>' + esc(a.action) + '</b>' + (a.detail ? ' · ' + esc(JSON.stringify(a.detail).slice(0, 60)) : '') + '</div>';
+        }).join('')
+      : '暂无审计记录（进行视觉采集后自动产生）';
+
+    // 4. OTA 状态
+    if (window.OtaUpgrader) {
+      var st = OtaUpgrader.status();
+      document.getElementById('ota-private').textContent = (st.privateCore && st.privateCore.kb) || '—';
+      var vs = st.versions || {};
+      var names = Object.keys(vs).filter(function (k) { return k !== '_lastApplied'; });
+      document.getElementById('ota-versions').textContent = names.length ? names.map(function (n) { return n + '@' + vs[n]; }).join('、') : '无';
+      document.getElementById('ota-history').textContent = (st.history || []).length + ' 次';
+    }
+  }
+
+  // 撤回
+  document.getElementById('btn-revoke').addEventListener('click', async function () {
+    if (!window.PrivacyConsent) return;
+    if (await (window.confirmModal ? confirmModal('确定撤回视觉采集授权？将立即删除本机全部生物特征数据与照片存档。', { danger:true, okText:'撤回授权' }) : Promise.resolve(confirm('确定撤回视觉采集授权？')))) {
+      PrivacyConsent.revoke();
+      toast('已撤回授权并清除数据', 'success');
+      refresh();
+    }
+  });
+
+  document.getElementById('btn-refresh').addEventListener('click', refresh);
+
+  // ── R751: OTA 检查更新 + 应用 ──
+  var _otaPending = null;
+  var otaMsg = document.getElementById('ota-msg');
+  var btnCheck = document.getElementById('btn-ota-check');
+  var btnApply = document.getElementById('btn-ota-apply');
+
+  function setOtaMsg(t, isErr) {
+    otaMsg.textContent = t;
+    otaMsg.style.color = isErr ? '#c0392b' : '#6b5b4f';
+  }
+
+  btnCheck.addEventListener('click', function () {
+    if (!window.OtaUpgrader) { setOtaMsg('OTA 模块未加载', true); return; }
+    btnCheck.disabled = true; btnCheck.textContent = '检查中…';
+    OtaUpgrader.check('http://localhost:8952/manifest.json').then(function (r) {
+      btnCheck.disabled = false; btnCheck.textContent = '🔍 检查更新';
+      if (r.available && r.package) {
+        _otaPending = r.package;
+        btnApply.disabled = false;
+        setOtaMsg('发现新版本: ' + r.package.name + '@' + r.package.version + ' (' + r.package.type + ')，可应用');
+      } else {
+        _otaPending = null;
+        btnApply.disabled = true;
+        setOtaMsg(r.error ? ('检查失败: ' + r.error) : '已是最新版本');
+      }
+    }).catch(function (e) {
+      btnCheck.disabled = false; btnCheck.textContent = '🔍 检查更新';
+      setOtaMsg('检查异常: ' + (e.message || e), true);
+    });
+  });
+
+  btnApply.addEventListener('click', async function () {
+    if (!_otaPending) return;
+    if (!await (window.confirmModal ? confirmModal('应用升级包 ' + _otaPending.name + '@' + _otaPending.version + '？') : Promise.resolve(confirm('应用升级包？')))) return;
+    btnApply.disabled = true; btnApply.textContent = '应用中…';
+    OtaUpgrader.apply(_otaPending).then(function (r) {
+      btnApply.disabled = false; btnApply.textContent = '⬇ 应用更新';
+      if (r.ok) {
+        setOtaMsg('✅ 已升级到 ' + r.version + (r.applied && r.applied.entriesAdded ? '（新增 ' + r.applied.entriesAdded + ' 条知识）' : ''));
+        refresh();
+      } else {
+        setOtaMsg('应用失败: ' + (r.error || '') + '（已自动回滚）', true);
+      }
+    });
+  });
+
+  refresh();
+})();
+</script>
+<script src="js/ai-assistant.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>线上会诊室 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>👥</text></svg>">
+<style>
+:root{--bg:#f5f0e8;--card:#fff;--border:#d4c9b8;--primary:#8b4513;--green:#27ae60;--text:#2c1810;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;max-width:880px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0}
+h1{font-size:18px;color:var(--primary)} h2{font-size:14px;color:var(--primary);margin-bottom:8px}
+.snap-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px dotted var(--border)}
+.member{display:inline-block;background:#e0f2fe;color:#075985;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px}
+.note{display:flex;gap:8px;padding:8px 0;border-bottom:1px dotted var(--border);font-size:12px}
+.note .dr{flex-shrink:0;font-weight:700;color:var(--primary);min-width:70px}
+.note .time{color:var(--text3);font-size:10px;margin-left:auto;flex-shrink:0}
+.input-row{display:flex;gap:8px;margin-top:12px}
+input,textarea{padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg);color:var(--text)}
+button{padding:8px 16px;border:none;border-radius:6px;background:var(--primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.live{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.foot{text-align:center;font-size:10px;color:var(--text3);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>👥 线上会诊室 <span id="room-tag" style="font-size:11px;color:var(--text3)"></span></h1>
+  <div style="font-size:11px;color:var(--text2);margin-top:4px"><span class="live"></span> 3 秒轮询同步 · 留言实时共享</div>
+  <div id="members" style="margin-top:6px"></div>
+</div>
+
+<div class="card" id="snapshot-card">
+  <h2>📋 病历快照（宿主医生提交）</h2>
+  <div id="snapshot">加载中...</div>
+</div>
+
+<div class="card">
+  <h2>💬 会诊讨论</h2>
+  <div id="notes"></div>
+  <div class="input-row">
+    <input id="dr-name" placeholder="您的署名（如：王医师）" style="width:160px">
+    <input id="note-input" placeholder="发表会诊意见..." style="flex:1" onkeydown="if(event.key==='Enter')postNote()">
+    <button onclick="postNote()">发送</button>
+  </div>
+</div>
+
+<div class="foot">⚠️ 会诊意见仅供执业医师参考 · 最终诊断与处方以接诊医师签发为准</div>
+
+<script>
+const room = new URLSearchParams(location.search).get('room') || '';
+document.getElementById('room-tag').textContent = room ? '房间号 ' + room : '';
+if (!room) document.getElementById('snapshot').textContent = '缺少 room 参数';
+
+const savedDr = localStorage.getItem('tcm_consult_dr') || new URLSearchParams(location.search).get('dr') || '';
+if (savedDr) document.getElementById('dr-name').value = savedDr;
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+async function api(path, opts){
+  const r = await fetch(path, opts);
+  return r.json();
+}
+
+async function join(){
+  const dr = document.getElementById('dr-name').value.trim();
+  if (dr) {
+    localStorage.setItem('tcm_consult_dr', dr);
+    await api('/api/consult/' + room + '/join', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({doctor:dr}) });
+  }
+}
+
+async function refresh(){
+  if (!room) return;
+  try {
+    const d = await api('/api/consult/' + room);
+    if (!d.ok) { document.getElementById('snapshot').textContent = d.error || '会诊室不存在'; return; }
+    // 成员
+    document.getElementById('members').innerHTML = '在线医师：' + d.members.map(m=>'<span class="member">⚕ '+esc(m.doctor)+'</span>').join('');
+    // 快照
+    const s = d.snapshot || {};
+    let h = '';
+    if (s.patient) h += '<div class="snap-row"><span>患者</span><b>' + esc(s.patient.name||'—') + ' ' + esc(s.patient.age||'') + '岁 ' + esc(s.patient.gender||'') + '</b></div>';
+    if (s.complaint) h += '<div class="snap-row"><span>主诉</span><b>' + esc(String(s.complaint).slice(0,60)) + '</b></div>';
+    if (s.four) for (const [k,v] of Object.entries(s.four)) h += '<div class="snap-row"><span>【' + esc(k) + '】</span><b>' + esc(String(v).slice(0,50)) + '</b></div>';
+    h += '<div class="snap-row"><span>辨证 / 方剂</span><b>' + esc(s.syndrome||'—') + ' / ' + esc(s.formula||'—') + '</b></div>';
+    if (s.herbs && s.herbs.length) h += '<div class="snap-row"><span>药材</span><b>' + s.herbs.map(x=>esc(x.name)+' '+esc(x.dosage||'')).join('、') + '</b></div>';
+    if (s.host) h += '<div class="snap-row"><span>宿主医师</span><b>' + esc(d.host) + '</b></div>';
+    document.getElementById('snapshot').innerHTML = h || '（无快照）';
+    // 留言
+    document.getElementById('notes').innerHTML = d.notes.map(n =>
+      '<div class="note"><span class="dr">⚕ ' + esc(n.doctor) + '</span><span>' + esc(n.text) + '</span><span class="time">' + String(n.ts).slice(5,16).replace('T',' ') + '</span></div>'
+    ).join('') || '<div style="font-size:11px;color:var(--text3)">暂无讨论</div>';
+  } catch(e) {}
+}
+
+async function postNote(){
+  // R802：本页未引 common.js，补本地 toast（alert 内嵌环境静默失败）
+  const toast = window.toast || function(m){
+    const t = document.createElement('div');
+    t.style.cssText = 'position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:99999;background:#ef4444;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px';
+    t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+  };
+  const dr = document.getElementById('dr-name').value.trim();
+  const text = document.getElementById('note-input').value.trim();
+  if (!dr) return toast('请先填写署名');
+  if (!text) return;
+  localStorage.setItem('tcm_consult_dr', dr);
+  const d = await api('/api/consult/' + room + '/note', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({doctor:dr, text}) });
+  if (d.ok) { document.getElementById('note-input').value = ''; refresh(); }
+  else toast(d.error || '发送失败');
+}
+
+document.getElementById('dr-name').addEventListener('change', join);
+join().then(refresh);
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/health-archive.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📁</text></svg>">
+<title>健康档案 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}.header .sub{font-size:11px;opacity:.6}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}}
+.label{font-size:11px;color:var(--text3);margin:6px 0 2px;display:block}
+.input,select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.timeline{border-left:2px solid var(--border);margin-left:8px;padding-left:16px}
+.tl-item{position:relative;padding:10px 0;border-bottom:1px solid var(--border)}
+.tl-item::before{content:'';position:absolute;left:-21px;top:16px;width:10px;height:10px;border-radius:50%;background:var(--primary)}
+.tl-item.report::before{background:var(--blue)}
+.tl-item.rx::before{background:var(--green)}
+.tl-item.visit::before{background:var(--gold)}
+.tl-date{font-size:10px;color:var(--text3)}
+.tl-tag{font-size:10px;padding:1px 8px;border-radius:8px;margin-left:6px}
+.tag-report{background:var(--blue-bg);color:var(--blue)}.tag-rx{background:var(--green-bg);color:var(--green)}.tag-visit{background:var(--gold-bg);color:var(--gold)}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:600px){.metric-grid{grid-template-columns:repeat(2,1fr)}}
+.metric{background:var(--bg);border-radius:8px;padding:10px;text-align:center}
+.metric .v{font-size:18px;font-weight:700;color:var(--primary)}
+.metric .l{font-size:10px;color:var(--text3);margin-top:2px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">健康档案</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>患者/医生</b></span>
+    <span class="std-tag">⚙️ 功能 <b>个人健康档案</b></span>
+    <span class="std-tag">💎 使用价值 <b>病历·处方·体检·随访全记录时间线</b></span>
+  </div>
+  <div class="header">
+    <h1>📁 个人健康档案</h1>
+    <div class="sub">病历 · 处方 · 体检 · 随访 — 全生命周期健康时间线</div>
+  </div>
+
+  <!-- 档案摘要 -->
+  <div class="card">
+    <h3>👤 档案摘要</h3>
+    <div class="metric-grid">
+      <div class="metric"><div class="v" id="m-visits">0</div><div class="l">就诊次数</div></div>
+      <div class="metric"><div class="v" id="m-rx">0</div><div class="l">处方数</div></div>
+      <div class="metric"><div class="v" id="m-reports">0</div><div class="l">体检报告</div></div>
+      <div class="metric"><div class="v" id="m-score">—</div><div class="l">最新健康指数</div></div>
+    </div>
+  </div>
+
+  <!-- 全记录时间线 -->
+  <div class="card">
+    <h3>💊 用药档案</h3>
+    <div id="archive-content" style="font-size:12px;color:var(--text3)">加载中…</div>
+  </div>
+
+  <div class="card">
+    <h3>📜 健康时间线</h3>
+    <div class="timeline" id="timeline"></div>
+  </div>
+</div>
+
+<script>
+// ═══ 汇总所有数据源 ═══
+function collectAll() {
+  var items = [];
+  try {
+    // 病历
+    (JSON.parse(localStorage.getItem('tcm_emr') || '[]')).forEach(function(r) {
+      items.push({ time: r.created_at || r.date, type: 'visit', tag: '就诊', title: '门诊病历 · ' + (r.name||''), detail: (r.tcm_syndrome||r.tcm_disease||'') + ' — ' + (r.complaint||'').slice(0,30) });
+    });
+  } catch(e) {}
+  try {
+    // 处方
+    (JSON.parse(localStorage.getItem('tcm_prescriptions') || '[]')).forEach(function(r) {
+      items.push({ time: r.created_at, type: 'rx', tag: '处方', title: '中药处方 · ' + (r.patient_name||''), detail: (r.diagnosis||'') + ' — ' + (r.herbs||[]).map(function(h){return h.name;}).join('、').slice(0,40) });
+    });
+  } catch(e) {}
+  try {
+    // 体检
+    (JSON.parse(localStorage.getItem('tcm_wellness') || '[]')).forEach(function(r) {
+      items.push({ time: r.time, type: 'report', tag: '体检', title: '治未病体检 · 健康指数 ' + r.score, detail: '体质判定: ' + r.constitution });
+    });
+  } catch(e) {}
+  try {
+    // 临床
+    (JSON.parse(localStorage.getItem('tcm_clinical_history') || '[]')).forEach(function(r) {
+      items.push({ time: r.timestamp, type: 'visit', tag: '四诊', title: '四诊采集分析', detail: (r.urgency_level || '') + (r.suggested_formula ? ' — ' + r.suggested_formula.formula : '') });
+    });
+  } catch(e) {}
+  try {
+    // 随访
+    (JSON.parse(localStorage.getItem('tcm_followup_log') || '[]')).forEach(function(r) {
+      items.push({ time: r.time, type: 'report', tag: '随访', title: '随访 · ' + (r.patient||''), detail: (r.message||'').slice(0,30) });
+    });
+  } catch(e) {}
+  items.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
+  return items;
+}
+
+function renderAll() {
+  var items = collectAll();
+  document.getElementById('m-visits').textContent = items.filter(function(i){ return i.type === 'visit'; }).length;
+  document.getElementById('m-rx').textContent = items.filter(function(i){ return i.type === 'rx'; }).length;
+  document.getElementById('m-reports').textContent = items.filter(function(i){ return i.type === 'report'; }).length;
+
+  // 最新健康指数
+  try {
+    var w = JSON.parse(localStorage.getItem('tcm_wellness') || '[]');
+    if (w.length) document.getElementById('m-score').textContent = w[0].score;
+  } catch(e) {}
+
+  var html = '';
+  for (var i = 0; i < Math.min(items.length, 40); i++) {
+    var it = items[i];
+    var tagCls = it.type === 'report' ? 'tag-report' : it.type === 'rx' ? 'tag-rx' : 'tag-visit';
+    html += '<div class="tl-item ' + it.type + '">' +
+      '<div class="tl-date">' + new Date(it.time).toLocaleString('zh-CN') + '<span class="tl-tag ' + tagCls + '">' + it.tag + '</span></div>' +
+      '<div style="font-weight:600;font-size:13px;margin-top:2px">' + it.title + '</div>' +
+      '<div style="font-size:11px;color:var(--text2)">' + it.detail + '</div></div>';
+  }
+  document.getElementById('timeline').innerHTML = html || '<div style="padding:16px;color:var(--text3);font-size:12px">暂无健康记录 — 就诊/处方/体检后将自动汇集</div>';
+}
+
+renderAll();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>
+<script>
+(function(){var a='/';function load(){var p=new URLSearchParams(location.search).get('patient')||'P001';fetch(a+'/api/home/med-detail?patient_id='+p).then(r=>r.json()).then(d=>{var el=document.getElementById('archive-content')||document.body;if(d.meds){el.innerHTML='<div style="padding:12px"><h3>📋 '+p+' 健康档案</h3>'+d.meds.slice(0,10).map(function(m){return'<div style="padding:6px;border-bottom:1px solid #eee;font-size:13px"><strong>'+m.drug+'</strong> · '+m.time+' · '+m.dosage+'</div>';}).join('')+'<div style="font-size:11px;color:var(--text2);padding:8px">共 '+d.meds.length+' 条记录 · 来源: API</div></div>';}}).catch(function(){var el=document.getElementById('archive-content')||document.body;el.innerHTML='<span style="color:#999">📡 API离线</span>';});}window.addEventListener('DOMContentLoaded',load);})();
+</script>

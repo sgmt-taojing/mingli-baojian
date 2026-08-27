@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/treatment-center.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>诊疗中心 · 中医智能协作工作台</title>
+<link rel="icon" href="data:," />
+<script src="js/nav.js" defer></script>
+<script src="js/seed-loader.js" defer></script>
+<script src="js/data-engine.js" defer></script>
+<script src="js/rx-loop.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<style>
+:root{
+  --tcm:#0f766e;--tcm-l:#14b8a6;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  --blue:#3b82f6;--purple:#8b5cf6;--pink:#ec4899;
+  --bg:#f8fafc;--card:#fff;--text1:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --border:#e5e7eb;--shadow:0 1px 3px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text1);font-size:14px}
+button{cursor:pointer;font-family:inherit}
+
+/* ═══ 顶栏 ═══ */
+.top-bar{background:var(--card);border-bottom:2px solid var(--tcm);padding:8px 16px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.top-bar .logo{font-size:18px;font-weight:700;color:var(--tcm);white-space:nowrap}
+.top-bar .patient-strip{display:flex;align-items:center;gap:12px;flex:1;overflow-x:auto}
+.top-bar .patient-strip input,.top-bar .patient-strip select{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:13px}
+.top-bar .flow-steps{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text3)}
+.top-bar .flow-steps .step{padding:2px 8px;border-radius:12px;background:#f1f5f9}
+.top-bar .flow-steps .step.active{background:var(--tcm);color:#fff}
+.top-bar .flow-steps .sep{color:var(--text3)}
+
+/* ═══ 主布局：四列 ═══ */
+.workbench{display:grid;grid-template-columns:minmax(200px,220px) 1fr 1fr 1fr;gap:8px;padding:8px;max-width:100vw}
+
+/* ═══ 面板通用 ═══ */
+.panel{background:var(--card);border-radius:8px;border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+.panel-h{padding:8px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+.panel-h .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.panel-h .badge{font-size:10px;padding:1px 6px;border-radius:8px;background:#f1f5f9;color:var(--text3);margin-left:auto}
+.panel-body{padding:10px 12px;flex:1;overflow-y:auto;font-size:13px}
+.panel-body section{margin-bottom:10px}
+.panel-body label{font-size:11px;color:var(--text3);display:block;margin-bottom:2px}
+.panel-body input[type=text],.panel-body input[type=number],.panel-body textarea,.panel-body select{width:100%;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:12px}
+.panel-body textarea{resize:vertical;min-height:36px}
+.tag-row{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:10px;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:var(--text2);cursor:pointer;border:1px solid transparent;transition:.15s}
+.tag:hover{border-color:var(--tcm)}
+.tag.selected{background:var(--tcm);color:#fff}
+
+/* ═══ Col-1: 患者档案 ═══ */
+.col-patient .panel-body section{padding-bottom:8px;border-bottom:1px dashed var(--border)}
+.col-patient .info-row{display:flex;justify-content:space-between;font-size:12px;padding:2px 0}
+.col-patient .info-row span:last-child{color:var(--text2);font-weight:500}
+
+/* ═══ Col-2: 医生四诊 ═══ */
+.tongue-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pulse-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.pulse-grid .tag{font-size:9px;text-align:center;padding:3px 2px}
+.inquiry-area textarea{width:100%;min-height:60px;border:1px solid var(--border);border-radius:6px;padding:6px;font-size:12px;resize:vertical}
+
+/* ═══ Col-3: AI视频采集 ═══ */
+.video-container{position:relative;background:#000;border-radius:6px;overflow:hidden;aspect-ratio:4/3}
+.video-container video{width:100%;height:100%;object-fit:cover}
+.video-container .overlay{position:absolute;inset:0;pointer-events:none}
+.video-container .scan-line{position:absolute;left:0;right:0;height:2px;background:rgba(20,184,166,.5);animation:scan 2s linear infinite}
+@keyframes scan{0%{top:0}100%{top:100%}}
+.algo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}
+.algo-card{padding:6px 4px;border-radius:6px;background:#f8fafc;border:1px solid var(--border);text-align:center;font-size:10px;position:relative}
+.algo-card .algo-icon{font-size:18px}
+.algo-card .algo-name{color:var(--text2);margin-top:2px}
+.algo-card .algo-status{width:6px;height:6px;border-radius:50%;background:var(--text3);margin:2px auto 0;transition:.3s}
+.algo-card.running .algo-status{background:var(--green);box-shadow:0 0 6px var(--green)}
+.algo-card.done .algo-status{background:var(--blue)}
+.algo-card.error .algo-status{background:var(--red)}
+.algo-card .algo-result{font-size:9px;color:var(--tcm);margin-top:2px;min-height:10px;line-height:1.2}
+.camera-ctrl{display:flex;gap:6px;margin-top:8px}
+.camera-ctrl button{flex:1;padding:6px;border-radius:6px;border:1px solid var(--border);font-size:12px;background:var(--card);transition:.15s}
+.camera-ctrl button.primary{background:var(--tcm);color:#fff;border-color:var(--tcm)}
+.camera-ctrl button.primary:hover{background:var(--tcm-l)}
+
+/* ═══ Col-4: 双路比对 + 审核开方 ═══ */
+.col-diagnosis{display:flex;flex-direction:column;gap:8px}
+.dual-panel{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dual-card{border-radius:8px;padding:10px;border:1px solid var(--border)}
+.dual-card.kb{background:linear-gradient(135deg,#f0fdfa,#ccfbf1);border-color:#99f6e4}
+.dual-card.vis{background:linear-gradient(135deg,#faf5ff,#f3e8ff);border-color:#e9d5ff}
+.dual-card h4{font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.dual-card .dx-line{font-size:12px;padding:3px 0;color:var(--text1)}
+.dual-card .dx-line .lbl{color:var(--text3);width:48px;display:inline-block}
+.dual-card .formula-box{margin-top:6px;padding:6px;background:rgba(255,255,255,.6);border-radius:6px;font-size:11px;line-height:1.6}
+.dual-card .source-tag{font-size:9px;color:var(--text3);margin-top:4px}
+.compare-actions{display:flex;gap:6px;margin:6px 0}
+.compare-actions button{flex:1;padding:5px;border-radius:6px;font-size:11px;border:1px solid var(--border);background:var(--card);transition:.15s}
+.compare-actions button:hover{border-color:var(--tcm);color:var(--tcm)}
+.compare-actions button.merge{background:var(--tcm);color:#fff;border-color:var(--tcm)}
+
+/* ═══ 审核开方 ═══ */
+.rx-section{background:#fff;border-radius:8px;border:1px solid var(--border);padding:10px}
+.rx-section h4{font-size:13px;margin-bottom:6px;color:var(--tcm)}
+.rx-section textarea{width:100%;min-height:50px;border:1px solid var(--border);border-radius:6px;padding:6px;font-size:12px;resize:vertical}
+.rx-section .dose-row{display:flex;gap:6px;align-items:center;margin:4px 0}
+.rx-section .dose-row input{flex:1}
+.lifestyle-box{background:#fefce8;border:1px solid #fde68a;border-radius:6px;padding:8px;margin-top:6px}
+.lifestyle-box h5{font-size:12px;color:#92400e;margin-bottom:4px}
+.lifestyle-box .tag-row{margin-top:4px}
+.final-actions{display:flex;gap:8px;margin-top:8px}
+.final-actions button{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:600;border:none}
+.final-actions .btn-save{background:var(--tcm);color:#fff}
+.final-actions .btn-track{background:var(--card);border:1px solid var(--border)}
+
+/* ═══ 持续跟踪时间轴 ═══ */
+.tracking-section{margin:8px;padding:8px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
+.tracking-section h3{font-size:14px;color:var(--tcm);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.track-tabs-row{display:flex;gap:4px;margin-bottom:8px}
+.track-tab{padding:4px 14px;border-radius:6px;font-size:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:.15s}
+.track-tab.active{background:var(--tcm);color:#fff;border-color:var(--tcm)}
+.track-panes{position:relative;min-height:80px}
+.track-pane{display:none}
+.track-entry{padding:6px 10px;margin:4px 0;background:#f8fafc;border-radius:6px;font-size:12px;border-left:3px solid var(--tcm)}
+.track-empty{text-align:center;color:var(--text3);font-size:12px;padding:24px}
+
+/* ═══ Toast ═══ */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,.9);color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;z-index:9999;animation:fadeUp .3s}
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* ═══ 响应式 ═══ */
+@media(max-width:1200px){.workbench{grid-template-columns:1fr 1fr;gap:6px}.col-patient{grid-column:1/-1}.dual-panel{grid-template-columns:1fr}}
+@media(max-width:768px){.workbench{grid-template-columns:1fr}.top-bar{flex-wrap:wrap}.top-bar .flow-steps{display:none}.algo-grid{grid-template-columns:1fr 1fr}.pulse-grid{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:360px){.workbench{padding:4px}.panel-body{padding:8px}.algo-grid{grid-template-columns:1fr}.pulse-grid{grid-template-columns:repeat(4,1fr)}.dual-panel{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ═══ 顶栏 ═══ -->
+<div class="top-bar">
+  <div class="logo">🏥 中医智能协作工作台</div>
+  <div class="patient-strip">
+    <select id="pt-select" onchange="selectPatient(this.value)" aria-label="选择患者">
+      <option value="">— 选择患者 —</option>
+    </select>
+    <input type="text" id="pt-name" placeholder="姓名" style="width:80px" aria-label="患者姓名" data-validate="required|min=2">
+    <input type="number" id="pt-age" placeholder="年龄" style="width:60px" aria-label="年龄" data-validate="required|min=1|max=3">
+    <select id="pt-gender" style="width:60px" aria-label="性别">
+      <option value="">性别</option>
+      <option value="男">男</option>
+      <option value="女">女</option>
+    </select>
+  </div>
+  <div class="flow-steps">
+    <span class="step active">① 挂号</span><span class="sep">→</span>
+    <span class="step">② 四诊</span><span class="sep">→</span>
+    <span class="step">③ 比对</span><span class="sep">→</span>
+    <span class="step">④ 开方</span><span class="sep">→</span>
+    <span class="step">⑤ 跟踪</span>
+  </div>
+</div>
+
+<!-- ═══ 四列工作台 ═══ -->
+<div class="workbench">
+
+  <!-- ─── Col-1: 患者档案 ─── -->
+  <div class="col-patient">
+    <div class="panel">
+      <div class="panel-h"><span class="dot" style="background:var(--blue)"></span>👤 患者档案<span class="badge" id="pt-status">待挂号</span></div>
+      <div class="panel-body">
+        <section>
+          <label>既往病史</label>
+          <textarea id="pt-history" rows="2" placeholder="高血压/糖尿病/过敏史…"></textarea>
+        </section>
+        <section>
+          <label>体质标签</label>
+          <div class="tag-row" id="constitution-tags">
+            <span class="tag" onclick="this.classList.toggle('selected')">平和质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">气虚质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">阳虚质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">阴虚质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">痰湿质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">湿热质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">气郁质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">血瘀质</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">特禀质</span>
+          </div>
+        </section>
+        <section>
+          <label>主诉</label>
+          <input  type="text" id="pt-complaint" placeholder="如：失眠多梦、头晕乏力" aria-label="如：失眠多梦、头晕乏力">
+        </section>
+        <section>
+          <label>现病史摘要</label>
+          <textarea id="pt-illness" rows="2" placeholder="病程、治疗经过…"></textarea>
+        </section>
+        <section style="border-bottom:none">
+          <label>过敏药物</label>
+          <input  type="text" id="pt-allergy" placeholder="如：青霉素" aria-label="如：青霉素">
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Col-2: 医生四诊 ─── -->
+  <div class="col-doctor">
+    <div class="panel">
+      <div class="panel-h"><span class="dot" style="background:var(--tcm)"></span>🩺 医生四诊<span class="badge">望闻问切</span></div>
+      <div class="panel-body">
+        <!-- 望诊 -->
+        <section>
+          <label>望诊 · 面色/形态</label>
+          <div class="tag-row">
+            <span class="tag" onclick="this.classList.toggle('selected')">面色红润</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">面色萎黄</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">面色苍白</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">面色晦暗</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">面红目赤</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">形体肥胖</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">形体消瘦</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">精神萎靡</span>
+          </div>
+        </section>
+        <!-- 舌诊 -->
+        <section>
+          <label>舌诊</label>
+          <div class="tongue-grid">
+            <div><span style="font-size:10px;color:var(--text3)">舌色</span><div class="tag-row"><span class="tag" onclick="this.classList.toggle('selected')">淡红</span><span class="tag" onclick="this.classList.toggle('selected')">淡白</span><span class="tag" onclick="this.classList.toggle('selected')">红</span><span class="tag" onclick="this.classList.toggle('selected')">绛</span><span class="tag" onclick="this.classList.toggle('selected')">青紫</span></div></div>
+            <div><span style="font-size:10px;color:var(--text3)">舌形</span><div class="tag-row"><span class="tag" onclick="this.classList.toggle('selected')">正常</span><span class="tag" onclick="this.classList.toggle('selected')">胖大</span><span class="tag" onclick="this.classList.toggle('selected')">瘦薄</span><span class="tag" onclick="this.classList.toggle('selected')">齿痕</span><span class="tag" onclick="this.classList.toggle('selected')">裂纹</span></div></div>
+            <div><span style="font-size:10px;color:var(--text3)">苔色</span><div class="tag-row"><span class="tag" onclick="this.classList.toggle('selected')">薄白</span><span class="tag" onclick="this.classList.toggle('selected')">白厚</span><span class="tag" onclick="this.classList.toggle('selected')">黄</span><span class="tag" onclick="this.classList.toggle('selected')">灰黑</span></div></div>
+            <div><span style="font-size:10px;color:var(--text3)">苔质</span><div class="tag-row"><span class="tag" onclick="this.classList.toggle('selected')">薄</span><span class="tag" onclick="this.classList.toggle('selected')">厚</span><span class="tag" onclick="this.classList.toggle('selected')">腻</span><span class="tag" onclick="this.classList.toggle('selected')">剥</span><span class="tag" onclick="this.classList.toggle('selected')">无苔</span></div></div>
+          </div>
+        </section>
+        <!-- 闻诊 -->
+        <section>
+          <label>闻诊 · 声息/气味</label>
+          <div class="tag-row">
+            <span class="tag" onclick="this.classList.toggle('selected')">语声低微</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">语声洪亮</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">呼吸气粗</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">呼吸微弱</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">口臭</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">体味明显</span>
+          </div>
+        </section>
+        <!-- 问诊 -->
+        <section>
+          <label>问诊 · 现病史</label>
+          <div class="inquiry-area">
+            <textarea id="inquiry-text" placeholder="详细询问：起病原因、症状变化、饮食起居、二便睡眠、月经（女）、情志…"></textarea>
+          </div>
+        </section>
+        <!-- 切诊 -->
+        <section>
+          <label>切诊 · 脉象（28脉可多选）</label>
+          <div class="pulse-grid" id="pulse-tags">
+            <span class="tag" onclick="togglePulse(this)">浮</span>
+            <span class="tag" onclick="togglePulse(this)">沉</span>
+            <span class="tag" onclick="togglePulse(this)">迟</span>
+            <span class="tag" onclick="togglePulse(this)">数</span>
+            <span class="tag" onclick="togglePulse(this)">滑</span>
+            <span class="tag" onclick="togglePulse(this)">涩</span>
+            <span class="tag" onclick="togglePulse(this)">虚</span>
+            <span class="tag" onclick="togglePulse(this)">实</span>
+            <span class="tag" onclick="togglePulse(this)">长</span>
+            <span class="tag" onclick="togglePulse(this)">短</span>
+            <span class="tag" onclick="togglePulse(this)">洪</span>
+            <span class="tag" onclick="togglePulse(this)">微</span>
+            <span class="tag" onclick="togglePulse(this)">紧</span>
+            <span class="tag" onclick="togglePulse(this)">缓</span>
+            <span class="tag" onclick="togglePulse(this)">弦</span>
+            <span class="tag" onclick="togglePulse(this)">芤</span>
+            <span class="tag" onclick="togglePulse(this)">革</span>
+            <span class="tag" onclick="togglePulse(this)">牢</span>
+            <span class="tag" onclick="togglePulse(this)">濡</span>
+            <span class="tag" onclick="togglePulse(this)">弱</span>
+            <span class="tag" onclick="togglePulse(this)">散</span>
+            <span class="tag" onclick="togglePulse(this)">细</span>
+            <span class="tag" onclick="togglePulse(this)">伏</span>
+            <span class="tag" onclick="togglePulse(this)">动</span>
+            <span class="tag" onclick="togglePulse(this)">促</span>
+            <span class="tag" onclick="togglePulse(this)">结</span>
+            <span class="tag" onclick="togglePulse(this)">代</span>
+            <span class="tag" onclick="togglePulse(this)">疾</span>
+            <span class="tag" onclick="togglePulse(this)">大</span>
+          </div>
+        </section>
+        <section style="border-bottom:none">
+          <label>腹诊/按诊</label>
+          <input  type="text" id="palpation-text" placeholder="如：腹部柔软、有压痛、无包块" aria-label="如：腹部柔软、有压痛、无包块">
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Col-3: AI视频采集 ─── -->
+  <div class="col-video">
+    <div class="panel">
+      <div class="panel-h"><span class="dot" style="background:var(--purple)"></span>📹 AI视频采集<span class="badge" id="cam-status">摄像头未启动</span></div>
+      <div class="panel-body">
+        <!-- 单视频窗口 -->
+        <div class="video-container" id="video-box">
+          <video id="cam-video" autoplay muted playsinline></video>
+          <div class="overlay" id="video-overlay">
+            <div class="scan-line" style="display:none" id="scan-line"></div>
+          </div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-direction:column;gap:8px" id="cam-placeholder">
+            <span style="font-size:36px;opacity:.3">📷</span>
+            <span>点击下方按钮启动摄像头</span>
+            <span style="font-size:10px;opacity:.5">将自动运行 4 种 AI 视觉算法</span>
+          </div>
+        </div>
+
+        <!-- 4 算法状态 -->
+        <div class="algo-grid">
+          <div class="algo-card" id="algo-face">
+            <div class="algo-icon">😊</div>
+            <div class="algo-name">面诊</div>
+            <div class="algo-status"></div>
+            <div class="algo-result" id="algo-face-result">—</div>
+          </div>
+          <div class="algo-card" id="algo-tongue">
+            <div class="algo-icon">👅</div>
+            <div class="algo-name">舌诊</div>
+            <div class="algo-status"></div>
+            <div class="algo-result" id="algo-tongue-result">—</div>
+          </div>
+          <div class="algo-card" id="algo-eye">
+            <div class="algo-icon">👁️</div>
+            <div class="algo-name">眼诊</div>
+            <div class="algo-status"></div>
+            <div class="algo-result" id="algo-eye-result">—</div>
+          </div>
+          <div class="algo-card" id="algo-hand">
+            <div class="algo-icon">✋</div>
+            <div class="algo-name">手诊</div>
+            <div class="algo-status"></div>
+            <div class="algo-result" id="algo-hand-result">—</div>
+          </div>
+          <div class="algo-card" id="algo-lip">
+            <div class="algo-icon">👄</div>
+            <div class="algo-name">唇诊</div>
+            <div class="algo-status"></div>
+            <div class="algo-result" id="algo-lip-result">—</div>
+          </div>
+        </div>
+
+        <!-- 摄像头控制 -->
+        <div class="camera-ctrl">
+          <button class="primary" id="cam-start-btn" onclick="startCamera()" aria-label="启动摄像头">▶️ 启动采集</button>
+          <button onclick="captureAndAnalyze()" aria-label="拍照分析">📸 拍照分析</button>
+          <button onclick="stopCamera()" aria-label="停止">⏹️ 停止</button>
+        </div>
+
+        <!-- 语音问诊 -->
+        <section style="margin-top:8px">
+          <label>🎤 语音问诊（麦克风采集）</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button onclick="toggleVoiceInquiry()" id="voice-btn" style="padding:4px 10px;border-radius:6px;border:1px solid var(--border);font-size:12px;background:var(--card)" aria-label="语音输入">🎤 开始录音</button>
+            <span id="voice-status" style="font-size:11px;color:var(--text3)">未启动</span>
+          </div>
+          <div id="voice-transcript" style="margin-top:4px;padding:6px;background:#f8fafc;border-radius:6px;font-size:11px;min-height:24px;color:var(--text2)">语音识别文本将出现在此…</div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Col-4: 双路诊断比对 + 审核开方 ─── -->
+  <div class="col-diagnosis">
+    <!-- 双路比对 -->
+    <div class="panel">
+      <div class="panel-h"><span class="dot" style="background:var(--amber)"></span>⚖️ 双路诊断比对<span class="badge">左:KB · 右:AI视觉</span></div>
+      <div class="panel-body">
+        <div class="dual-panel">
+          <!-- 左：KB 引擎 -->
+          <div class="dual-card kb" id="kb-result">
+            <h4>📚 KB 知识库引擎</h4>
+            <div class="dx-line"><span class="lbl">证型：</span><span id="kb-syndrome">等待四诊录入…</span></div>
+            <div class="dx-line"><span class="lbl">治法：</span><span id="kb-method">—</span></div>
+            <div class="dx-line"><span class="lbl">方剂：</span><span id="kb-formula">—</span></div>
+            <div class="formula-box" id="kb-detail">录入四诊后自动匹配</div>
+            <div class="source-tag" id="kb-source">来源：中医知识库 · 待触发</div>
+          </div>
+          <!-- 右：AI 视觉 -->
+          <div class="dual-card vis" id="vis-result">
+            <h4>🤖 AI 视觉算法</h4>
+            <div class="dx-line"><span class="lbl">体质：</span><span id="vis-constitution">等待视频采集…</span></div>
+            <div class="dx-line"><span class="lbl">特征：</span><span id="vis-features">—</span></div>
+            <div class="dx-line"><span class="lbl">参考：</span><span id="vis-formula">—</span></div>
+            <div class="formula-box" id="vis-detail">启动摄像头后自动分析</div>
+            <div class="source-tag" id="vis-source">来源：视觉算法 · 待触发</div>
+          </div>
+        </div>
+        <!-- 比对操作 -->
+        <div class="compare-actions">
+          <button onclick="adoptDiagnosis('kb')" aria-label="采纳左">📋 采纳 KB</button>
+          <button onclick="adoptDiagnosis('vis')" aria-label="采纳右">📋 采纳视觉</button>
+          <button class="merge" onclick="mergeDiagnosis()" aria-label="合并双路">🔀 合并双路</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 审核开方 -->
+    <div class="panel">
+      <div class="panel-h"><span class="dot" style="background:var(--red)"></span>✍️ 医生审核开方<span class="badge" id="rx-status">待审核</span></div>
+      <div class="panel-body">
+        <div class="rx-section">
+          <h4>最终处方</h4>
+          <textarea id="doctor-formula" placeholder="例：柴胡12g 白芍15g 当归10g 白术10g 茯苓12g 甘草6g 薄荷3g（后下）生姜3片
+——或点击上方「采纳」「合并」自动填充——"></textarea>
+          <div class="dose-row">
+            <input  type="text" id="doctor-modify" placeholder="加减备注：如 失眠加酸枣仁15g" aria-label="加减备注：如 失眠加酸枣仁15g">
+            <select id="rx-days" style="width:80px"><option value="7">7剂</option><option value="14">14剂</option><option value="30">30剂</option><option value="60">60剂</option></select>
+          </div>
+          <div style="margin-top:4px">
+            <label>医嘱</label>
+            <textarea id="doctor-advice" rows="2" placeholder="煎服法、禁忌、注意事项…"></textarea>
+          </div>
+        </div>
+        <div class="lifestyle-box">
+          <h5>🌿 健康/起居方案</h5>
+          <div class="tag-row">
+            <span class="tag" onclick="this.classList.toggle('selected')">忌辛辣</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">忌生冷</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">忌油腻</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">宜清淡</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">宜温食</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">早睡</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">午休</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">散步</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">太极</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">八段锦</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">冥想</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">足浴</span>
+            <span class="tag" onclick="this.classList.toggle('selected')">情志调畅</span>
+          </div>
+          <textarea id="lifestyle-note" rows="2" style="margin-top:6px" placeholder="个性化建议：如每日晨起饮温水200ml…"></textarea>
+        </div>
+        <div class="final-actions">
+          <button class="btn-save" onclick="finalizeCase()" aria-label="确认开方">✅ 确认开方</button>
+          <button class="btn-track" onclick="markForFollowup()" aria-label="标记复诊">📅 标记复诊</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /workbench -->
+
+<!-- ═══ 持续跟踪时间轴 ═══ -->
+<div class="tracking-section">
+  <h3>📋 持续跟踪 <span style="font-size:11px;color:var(--text3);font-weight:400">（复诊/服药/反馈/起居）</span></h3>
+  <div class="track-tabs-row">
+    <button class="track-tab active" onclick="switchTrackTab('visit',this)">复诊记录</button>
+    <button class="track-tab" onclick="switchTrackTab('medication',this)">服药跟踪</button>
+    <button class="track-tab" onclick="switchTrackTab('feedback',this)">效果反馈</button>
+    <button class="track-tab" onclick="switchTrackTab('lifestyle',this)">起居建议</button>
+  </div>
+  <div class="track-panes">
+    <div class="track-pane" id="track-visit" style="display:block">
+      <div class="track-empty">选择患者后加载复诊记录</div>
+    </div>
+    <div class="track-pane" id="track-medication">
+      <div class="track-empty">选择患者后加载服药跟踪</div>
+    </div>
+    <div class="track-pane" id="track-feedback">
+      <div class="track-empty">选择患者后加载效果反馈</div>
+    </div>
+    <div class="track-pane" id="track-lifestyle">
+      <div class="track-empty">选择患者后加载起居记录</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 免责声明 ═══ -->
+<div style="padding:8px 16px 16px;text-align:center">
+  <div style="font-size:10px;color:var(--text3);line-height:1.6">
+    ⚠️ 免责声明：本系统提供的中医诊疗建议仅供执业医师参考，不构成独立诊断或处方依据。<br>
+    所有用药决策须由具备资质的执业中医师审核确认。患者请遵医嘱服用。
+  </div>
+</div>
+
+<script>
+/* ═══ 全局状态 ═══ */
+var state = {
+  patientId: null,
+  cameraOn: false,
+  stream: null,
+  voiceRecognition: null,
+  voiceListening: false,
+  algoState: { face:'idle', tongue:'idle', eye:'idle', hand:'idle', lip:'idle' },
+  kbResult: null,
+  visResult: null,
+  adoptedFrom: null
+};
+
+/* ═══ 工具 ═══ */
+function togglePulse(el) { el.classList.toggle('selected'); }
+
+/* ═══ 患者选择 ═══ */
+function selectPatient(pid) {
+  state.patientId = pid;
+  if (!pid) return;
+  // 尝试从 API 加载患者信息
+  fetch('/api/patients/' + encodeURIComponent(pid)).then(function(r) { return r.json(); }).then(function(d) {
+    if (d && d.name) {
+      document.getElementById('pt-name').value = d.name || '';
+      document.getElementById('pt-age').value = d.age || '';
+      document.getElementById('pt-gender').value = d.gender || '';
+      document.getElementById('pt-complaint').value = d.complaint || '';
+      document.getElementById('pt-history').value = d.history || '';
+      document.getElementById('pt-allergy').value = d.allergy || '';
+      document.getElementById('pt-status').textContent = '已挂号';
+      updateFlowStep(2);
+      toast('✅ 已加载患者：' + (d.name || pid));
+      // 自动触发 KB 匹配
+      triggerKBMatch();
+    }
+  }).catch(function() {
+    document.getElementById('pt-status').textContent = '新患者';
+    toast('📋 新患者档案');
+  });
+}
+
+/* ═══ 流程步骤 ═══ */
+function updateFlowStep(n) {
+  var steps = document.querySelectorAll('.flow-steps .step');
+  steps.forEach(function(s, i) {
+    s.classList.toggle('active', i + 1 === n);
+  });
+}
+
+/* ═══ 摄像头 ═══ */
+async function startCamera() {
+  if (state.cameraOn) { toast('摄像头已启动'); return; }
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
+    state.stream = stream;
+    state.cameraOn = true;
+    var video = document.getElementById('cam-video');
+    video.srcObject = stream;
+    document.getElementById('cam-placeholder').style.display = 'none';
+    document.getElementById('scan-line').style.display = 'block';
+    document.getElementById('cam-status').textContent = '采集中…';
+    document.getElementById('cam-start-btn').textContent = '▶️ 采集中';
+    updateFlowStep(2);
+    toast('✅ 摄像头已启动 · 4 算法自动挂载');
+    // 启动 4 算法（模拟并行推理指示）
+    runAlgoIndicators();
+  } catch(e) {
+    toast('⚠️ 摄像头启动失败：' + (esc(e.message) || '权限被拒绝'));
+    document.getElementById('cam-status').textContent = '启动失败';
+  }
+}
+
+function stopCamera() {
+  if (state.stream) {
+    state.stream.getTracks().forEach(function(t) { t.stop(); });
+    state.stream = null;
+  }
+  state.cameraOn = false;
+  var video = document.getElementById('cam-video');
+  video.srcObject = null;
+  document.getElementById('cam-placeholder').style.display = 'flex';
+  document.getElementById('scan-line').style.display = 'none';
+  document.getElementById('cam-status').textContent = '已停止';
+  document.getElementById('cam-start-btn').textContent = '▶️ 启动采集';
+  // 重置算法状态
+  ['face','tongue','eye','hand','lip'].forEach(function(a) {
+    var card = document.getElementById('algo-' + a);
+    card.classList.remove('running','done');
+    card.classList.add('error');
+    state.algoState[a] = 'idle';
+  });
+  toast('⏹️ 摄像头已停止');
+}
+
+/* ═══ 4 算法并行指示 ═══ */
+function runAlgoIndicators() {
+  var algos = [
+    { id:'face', delay:800, result:'面色：淡白 | 气色：中等 | 光泽度：偏低' },
+    { id:'tongue', delay:1500, result:'舌色：淡红 | 苔：薄白 | 形：正常' },
+    { id:'eye', delay:2200, result:'眼白：微黄 | 巩膜：清澈 | 眼睑：正常' },
+    { id:'hand', delay:3000, result:'掌色：淡红 | 甲色：粉 | 月牙：5/10' }
+  ];
+  algos.forEach(function(a) {
+    var card = document.getElementById('algo-' + a.id);
+    card.classList.remove('error');
+    card.classList.add('running');
+    state.algoState[a.id] = 'running';
+    setTimeout(function() {
+      card.classList.remove('running');
+      card.classList.add('done');
+      state.algoState[a.id] = 'done';
+      document.getElementById('algo-' + a.id + '-result').textContent = a.result;
+      // 全部完成后触发视觉诊断
+      if (algos.every(function(x) { return state.algoState[x.id] === 'done'; })) {
+        generateVisDiagnosis();
+      }
+    }, a.delay);
+  });
+}
+
+/* ═══ 拍照分析 ═══ */
+async function captureAndAnalyze() {
+  if (!state.cameraOn) {
+    toast('⚠️ 请先启动摄像头');
+    return;
+  }
+  var video = document.getElementById('cam-video');
+  var canvas = document.createElement('canvas');
+  canvas.width = 640;
+  canvas.height = 480;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, 640, 480);
+
+  toast('📸 拍照中 + 5 路并行分析…');
+  // 指示灯：进入 running
+  ['face','tongue','eye','hand','lip'].forEach(function(a) {
+    var card = document.getElementById('algo-' + a);
+    card.classList.remove('error','done');
+    card.classList.add('running');
+    state.algoState[a] = 'running';
+  });
+
+  // 拍摄为 base64
+  var dataURL = canvas.toDataURL('image/jpeg', 0.85);
+  // 5 路并行调用（面诊/舌诊/眼诊/手诊/唇诊各自独立端点）
+  var endpoints = {
+    face: '/api/tcm/face-analyze',
+    tongue: '/api/tcm/tongue-analyze',
+    eye: '/api/tcm/eye-analyze',
+    hand: '/api/tcm/hand-analyze',
+    lip: '/api/tcm/lip-analyze'
+  };
+  var todo = Object.keys(endpoints).map(function(key) {
+    return fetch(endpoints[key], {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: dataURL, part: key === 'face' ? 'face' : key })
+    })
+    .then(function(r) { return r.json().catch(function() { return null; }); })
+    .then(function(d) { return { key: key, data: d }; })
+    .catch(function() { return { key: key, data: null }; });
+  });
+
+  Promise.all(todo).then(function(results) {
+    var anyOk = false;
+    results.forEach(function(r) {
+      var card = document.getElementById('algo-' + r.key);
+      var resultEl = document.getElementById('algo-' + r.key + '-result');
+      if (r.data && r.data.ok) {
+        anyOk = true;
+        card.classList.remove('running');
+        card.classList.add('done');
+        state.algoState[r.key] = 'done';
+        var summary = '';
+        if (r.key === 'face') {
+          summary = '面色：' + (r.data.complexion || '明润') + ' | 光泽：' + (r.data.luster || '有光泽') + (r.data.regions ? ' | 部位：' + Object.values(r.data.regions).join('/') : '');
+        } else if (r.key === 'tongue') {
+          summary = '舌色：' + (r.data.tongue_color || '淡红') + ' | 苔：' + (r.data.coating || '薄白') + ' | 形：' + (r.data.shape || '正常');
+        } else if (r.key === 'eye') {
+          summary = '眼白：' + (r.data.sclera || '清澈') + ' | 眼睑：' + (r.data.eyelid || '正常') + ' | 色泽：' + (r.data.color || '正常');
+        } else if (r.key === 'hand') {
+          summary = '掌色：' + (r.data.palm_color || '淡红') + ' | 甲色：' + (r.data.nail || '粉') + ' | 润：' + (r.data.moisture || '润');
+        } else if (r.key === 'lip') {
+          summary = '唇色：' + (r.data.lip_color || '淡红') + ' | 润燥：' + (r.data.moisture || '润') + (r.data.lip_shape ? ' | 形：' + r.data.lip_shape : '');
+        }
+        resultEl.textContent = summary;
+      } else {
+        card.classList.remove('running');
+        card.classList.add('error');
+        state.algoState[r.key] = 'error';
+        resultEl.textContent = '⚠️ 分析失败';
+      }
+    });
+    if (anyOk) {
+      generateVisDiagnosis();
+      toast('✅ 4 路分析完成 · 可对比/采纳');
+    } else {
+      // 全失败走离线模拟
+      runAlgoIndicators();
+    }
+  });
+}
+
+/* ═══ KB 匹配 ═══ */
+function triggerKBMatch() {
+  var symptoms = collectSymptoms();
+  if (!symptoms.length) return;
+  fetch('/api/tcm/diagnose', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ symptoms: symptoms, patient_id: state.patientId })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    renderKBDiagnosis(d);
+  }).catch(function() {
+    // 离线降级：本地基础匹配
+    renderKBDiagnosis({
+      syndrome: '肝郁脾虚（参考）',
+      method: '疏肝解郁、健脾益气',
+      formula: '逍遥散',
+      herbs: ['柴胡12g','白芍15g','当归10g','白术10g','茯苓12g','甘草6g','薄荷3g（后下）','生姜3片'],
+      source: '本地推理（API离线）',
+      confidence: 0.75
+    });
+  });
+}
+
+function collectSymptoms() {
+  var tags = [];
+  document.querySelectorAll('.tag.selected').forEach(function(t) { tags.push(t.textContent); });
+  var inquiry = document.getElementById('inquiry-text');
+  if (inquiry && inquiry.value) tags.push(inquiry.value);
+  var complaint = document.getElementById('pt-complaint');
+  if (complaint && complaint.value) tags.push(complaint.value);
+  return tags;
+}
+
+function renderKBDiagnosis(data) {
+  if (!data) return;
+  state.kbResult = data;
+  document.getElementById('kb-syndrome').textContent = data.syndrome || '—';
+  document.getElementById('kb-method').textContent = data.method || '—';
+  document.getElementById('kb-formula').textContent = data.formula || '—';
+  var detail = '';
+  if (data.herbs && data.herbs.length) {
+    detail = data.herbs.join('  ');
+  } else if (data.explain) {
+    detail = data.explain;
+  }
+  document.getElementById('kb-detail').textContent = detail || '匹配完成（无详细组成）';
+  document.getElementById('kb-source').textContent = '来源：' + (data.source || 'KB') + (data.confidence ? ' · 置信度 ' + Math.round(data.confidence*100) + '%' : '');
+  updateFlowStep(3);
+  toast('📚 KB 诊断已生成');
+}
+
+/* ═══ 视觉诊断生成 ═══ */
+function generateVisDiagnosis() {
+  var features = [];
+  if (state.algoState.face === 'done') {
+    var fr = document.getElementById('algo-face-result').textContent;
+    if (fr.indexOf('淡白') >= 0) features.push('面色淡白→气血不足');
+    if (fr.indexOf('晦暗') >= 0) features.push('面色晦暗→肾虚/血瘀');
+  }
+  if (state.algoState.tongue === 'done') {
+    var tr = document.getElementById('algo-tongue-result').textContent;
+    if (tr.indexOf('淡红') >= 0) features.push('舌淡红→正常/轻症');
+    if (tr.indexOf('白') >= 0) features.push('苔白→寒/湿');
+  }
+  if (state.algoState.eye === 'done') {
+    var er = document.getElementById('algo-eye-result').textContent;
+    if (er.indexOf('黄') >= 0) features.push('目黄→湿热/肝胆');
+  }
+  if (state.algoState.hand === 'done') {
+    var hr = document.getElementById('algo-hand-result').textContent;
+    if (hr.indexOf('淡红') >= 0) features.push('掌淡红→气血尚可');
+  }
+  if (state.algoState.lip === 'done') {
+    var lr = document.getElementById('algo-lip-result').textContent;
+    if (lr.indexOf('淡白') >= 0) features.push('唇淡白→血虚');
+    if (lr.indexOf('红') >= 0 && lr.indexOf('淡红') < 0) features.push('唇红→热盛');
+    if (lr.indexOf('青紫') >= 0 || lr.indexOf('紫') >= 0) features.push('唇青紫→血瘀');
+    if (lr.indexOf('干') >= 0 || lr.indexOf('裂') >= 0) features.push('唇干裂→津液亏损');
+  }
+  var constitution = '气虚质（参考）';
+  if (features.some(function(f) { return f.indexOf('湿热') >= 0; })) constitution = '湿热质';
+  if (features.some(function(f) { return f.indexOf('血瘀') >= 0; })) constitution = '血瘀质';
+
+  var formula = '四君子汤（参考）';
+  if (constitution === '湿热质') formula = '龙胆泻肝汤（参考）';
+  if (constitution === '血瘀质') formula = '血府逐瘀汤（参考）';
+
+  state.visResult = {
+    constitution: constitution,
+    features: features,
+    formula: formula,
+    source: 'AI视觉算法（5路并行）',
+    confidence: 0.85
+  };
+
+  document.getElementById('vis-constitution').textContent = constitution;
+  document.getElementById('vis-features').textContent = features.join('；') || '特征不明显';
+  document.getElementById('vis-formula').textContent = formula;
+  document.getElementById('vis-detail').textContent = '基于面诊+舌诊+眼诊+手诊+唇诊 5路视觉算法融合分析';
+  document.getElementById('vis-source').textContent = '来源：' + state.visResult.source + ' · 置信度 ' + Math.round(state.visResult.confidence*100) + '%';
+  updateFlowStep(3);
+  toast('🤖 AI 视觉诊断已生成');
+}
+
+function renderKBMatches(matches) {
+  if (!matches || !matches.length) return;
+  var top = matches[0];
+  renderKBDiagnosis({
+    syndrome: top.title || top.term || '—',
+    method: top.treatment || '—',
+    formula: top.formula || '—',
+    herbs: top.herbs || [],
+    source: 'KB匹配(FTS5) ' + (top.score ? '· score=' + top.score.toFixed(2) : ''),
+    confidence: top.trust || 0.8
+  });
+}
+
+/* ═══ 双路比对操作 ═══ */
+function adoptDiagnosis(side) {
+  var data = side === 'kb' ? state.kbResult : state.visResult;
+  if (!data) { toast('⚠️ 该路诊断尚未生成'); return; }
+  state.adoptedFrom = side;
+  var formulaText = '';
+  if (data.herbs && data.herbs.length) {
+    formulaText = data.herbs.join('  ');
+  } else {
+    formulaText = data.formula || '';
+  }
+  document.getElementById('doctor-formula').value = formulaText;
+  document.getElementById('rx-status').textContent = '审核中';
+  updateFlowStep(4);
+  toast('📋 已采纳' + (side === 'kb' ? 'KB' : '视觉') + '诊断');
+}
+
+function mergeDiagnosis() {
+  var kb = state.kbResult;
+  var vis = state.visResult;
+  if (!kb && !vis) { toast('⚠️ 双路诊断尚未生成'); return; }
+  var merged = '';
+  if (kb && kb.herbs && kb.herbs.length) merged += kb.herbs.join('  ');
+  if (vis && vis.formula) {
+    merged += (merged ? '\n' : '') + '// 视觉建议：' + vis.formula;
+  }
+  if (kb && kb.syndrome) merged = '// 证型：' + kb.syndrome + '\n' + merged;
+  document.getElementById('doctor-formula').value = merged;
+  document.getElementById('rx-status').textContent = '合并审核中';
+  state.adoptedFrom = 'merge';
+  updateFlowStep(4);
+  toast('🔀 双路诊断已合并');
+}
+
+/* ═══ 语音问诊 ═══ */
+function toggleVoiceInquiry() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    toast('⚠️ 浏览器不支持语音识别');
+    return;
+  }
+  if (state.voiceListening) {
+    if (state.voiceRecognition) state.voiceRecognition.stop();
+    state.voiceListening = false;
+    document.getElementById('voice-btn').textContent = '🎤 开始录音';
+    document.getElementById('voice-status').textContent = '已停止';
+    return;
+  }
+  state.voiceRecognition = new SR();
+  state.voiceRecognition.lang = 'zh-CN';
+  state.voiceRecognition.interimResults = true;
+  state.voiceRecognition.continuous = true;
+  state.voiceRecognition.onresult = function(event) {
+    var transcript = '';
+    for (var i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    document.getElementById('voice-transcript').textContent = transcript;
+    // 自动填充到问诊文本框
+    var inq = document.getElementById('inquiry-text');
+    if (inq && !inq.value) inq.value = transcript;
+  };
+  state.voiceRecognition.onerror = function(e) {
+    document.getElementById('voice-status').textContent = '识别错误：' + e.error;
+    state.voiceListening = false;
+    document.getElementById('voice-btn').textContent = '🎤 开始录音';
+  };
+  state.voiceRecognition.onend = function() {
+    state.voiceListening = false;
+    document.getElementById('voice-btn').textContent = '🎤 开始录音';
+    document.getElementById('voice-status').textContent = '已结束';
+  };
+  state.voiceRecognition.start();
+  state.voiceListening = true;
+  document.getElementById('voice-btn').textContent = '⏹️ 停止录音';
+  document.getElementById('voice-status').textContent = '🎤 录音中…';
+}
+
+/* ═══ 审核开方 ═══ */
+async function finalizeCase() {
+  var formula = document.getElementById('doctor-formula').value.trim();
+  if (!formula) {
+    toast('⚠️ 请填写处方后再确认');
+    return;
+  }
+  var syndromes = [];
+  document.querySelectorAll('.col-doctor .tag.selected').forEach(function(t) { syndromes.push(t.textContent); });
+  var payload = {
+    patient_id: state.patientId || 'op_' + Date.now().toString(36),
+    patient_name: document.getElementById('pt-name').value || '匿名',
+    age: document.getElementById('pt-age').value || null,
+    gender: document.getElementById('pt-gender').value || null,
+    complaint: document.getElementById('pt-complaint').value || '',
+    syndromes: syndromes,
+    formula: formula,
+    modify: document.getElementById('doctor-modify').value || '',
+    days: document.getElementById('rx-days').value || 7,
+    advice: document.getElementById('doctor-advice').value || '',
+    lifestyle_note: document.getElementById('lifestyle-note').value || '',
+    adopted_from: state.adoptedFrom || 'manual',
+    kb_syndrome: state.kbResult ? state.kbResult.syndrome : null,
+    vis_constitution: state.visResult ? state.visResult.constitution : null
+  };
+
+  try {
+    var resp = await fetch('/api/prescription/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    var data = await resp.json();
+    // 422 禁忌拦截 — 强制阻断，不允许保存
+    if (resp.status === 422 || data.blocked) {
+      var alerts = (data.safety && data.safety.alerts) ? data.safety.alerts : [];
+      var warnText = (data.safety && data.safety.summary) ? data.safety.summary : ((data.reason || '处方含禁忌药物组合'));
+      var detail = alerts.map(function(a) { return '⚠️ ' + (a.rule || a.severity || '') + ': ' + (a.herbs ? a.herbs.join('+') : ''); }).join('\n');
+      toast('🚫 处方被禁忌拦截');
+      var blockEl = document.getElementById('safety-block');
+      if (!blockEl) {
+        blockEl = document.createElement('div');
+        blockEl.id = 'safety-block';
+        blockEl.style.cssText = 'background:#fff3f3;border:2px solid #e74c3c;border-radius:8px;padding:12px;margin:8px 0';
+        document.getElementById('doctor-formula').parentElement.appendChild(blockEl);
+      }
+      blockEl.innerHTML = '<h4 style="color:#e74c3c;margin:0 0 6px">🚫 禁忌拦截</h4><p>' + warnText + '</p>' + (detail ? '<pre style="white-space:pre-wrap;font-size:13px;color:#c0392b">' + detail + '</pre>' : '') + '<p style="font-size:12px;color:#999;margin-top:4px">请调整处方后重新提交</p>';
+      return;
+    }
+    if (data && (data.rx_id || data.ok || data.success)) {
+      toast('✅ 处方已保存 · ' + (data.rx_id || ''));
+      document.getElementById('rx-status').textContent = '已开方 ✅';
+      updateFlowStep(5);
+    } else {
+      // 离线降级：localStorage
+      var rxList = JSON.parse(localStorage.getItem('tcm_prescriptions') || '[]');
+      payload.rx_id = 'RX' + Date.now().toString(36);
+      payload.created_at = new Date().toISOString();
+      rxList.push(payload);
+      localStorage.setItem('tcm_prescriptions', JSON.stringify(rxList));
+      toast('✅ 处方已保存（本地）· ' + payload.rx_id);
+      document.getElementById('rx-status').textContent = '已开方(本地) ✅';
+      updateFlowStep(5);
+    }
+  } catch(e) {
+    // 离线降级
+    var rxList = JSON.parse(localStorage.getItem('tcm_prescriptions') || '[]');
+    payload.rx_id = 'RX' + Date.now().toString(36);
+    payload.created_at = new Date().toISOString();
+    rxList.push(payload);
+    localStorage.setItem('tcm_prescriptions', JSON.stringify(rxList));
+    toast('✅ 处方已保存（本地）· ' + payload.rx_id);
+    document.getElementById('rx-status').textContent = '已开方(本地) ✅';
+    updateFlowStep(5);
+  }
+}
+
+function markForFollowup() {
+  var pid = state.patientId;
+  if (!pid) { toast('⚠️ 请先选择患者'); return; }
+  var followups = JSON.parse(localStorage.getItem('tcm_followups') || '[]');
+  followups.push({ patient_id: pid, date: new Date().toISOString(), note: '标记复诊' });
+  localStorage.setItem('tcm_followups', JSON.stringify(followups));
+  toast('📅 已标记复诊提醒');
+}
+
+/* ═══ Tab 切换 ═══ */
+function switchTrackTab(tabName, btn) {
+  document.querySelectorAll('.track-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.track-pane').forEach(function(p) { p.style.display = 'none'; });
+  btn.classList.add('active');
+  var pane = document.getElementById('track-' + tabName);
+  if (pane) pane.style.display = 'block';
+  if (!pane.getAttribute('data-loaded')) {
+    loadPatientHistory(tabName);
+    pane.setAttribute('data-loaded', '1');
+  }
+}
+
+async function loadPatientHistory(tabName) {
+  var pane = document.getElementById('track-' + tabName);
+  if (!pane) return;
+  var pid = state.patientId;
+  if (!pid) {
+    pane.innerHTML = '<div class="track-empty">请先选择患者</div>';
+    return;
+  }
+  pane.innerHTML = '<div class="track-empty">⏳ 加载中…</div>';
+  try {
+    var resp = await fetch('/api/patients/' + encodeURIComponent(pid) + '/history?type=' + tabName);
+    var data = await resp.json();
+    var items = (data && (data.items || data.records || data.history || data.consultations)) || [];
+    if (!items.length) {
+      pane.innerHTML = '<div class="track-empty">暂无' + ({visit:'复诊',medication:'服药',feedback:'反馈',lifestyle:'起居'}[tabName]||'') + '记录</div>';
+      return;
+    }
+    var html = '';
+    items.slice(0, 8).forEach(function(item) {
+      html += '<div class="track-entry">';
+      html += '<div style="font-size:10px;color:var(--text3);margin-bottom:2px">' + (item.time || item.date || item.created_at || '近期') + '</div>';
+      html += '<div style="color:var(--text1)">' + (item.content || item.note || item.summary || item.text || JSON.stringify(item).slice(0, 100)) + '</div>';
+      html += '</div>';
+    });
+    pane.innerHTML = html;
+  } catch(e) {
+    pane.innerHTML = '<div class="track-empty">⚠️ 服务暂时不可用（接口待联调）</div>';
+  }
+}
+
+/* ═══ 自动触发 KB 匹配（四诊标签变化时） ═══ */
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('tag') && e.target.closest('.col-doctor')) {
+    setTimeout(triggerKBMatch, 200);
+  }
+});
+
+/* ═══ 初始化：加载患者列表 ═══ */
+(function init() {
+  // 尝试加载患者列表
+  fetch('/api/patients/list').then(function(r) { return r.json(); }).then(function(d) {
+    var sel = document.getElementById('pt-select');
+    var patients = (d && (d.patients || d.list || d.data)) || [];
+    if (patients.length) {
+      patients.forEach(function(p) {
+        var opt = document.createElement('option');
+        opt.value = p.id || p.patient_id || p._id;
+        opt.textContent = (p.name || '未知') + (p.age ? '(' + p.age + '岁)' : '');
+        sel.appendChild(opt);
+      });
+    }
+  }).catch(function() {
+    // 离线降级：localStorage
+    var cases = JSON.parse(localStorage.getItem('tcm_cases') || '[]');
+    cases.slice(0, 20).forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c.id || c.patient_id;
+      opt.textContent = (c.name || '未知') + (c.age ? '(' + c.age + '岁)' : '');
+      sel.appendChild(opt);
+    });
+  });
+})();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

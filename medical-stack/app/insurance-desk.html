@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>医保人脸核验窗口 · 命理宝鉴·医道</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1020;color:#e8eefc;font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:24px 16px;max-width:720px;margin:0 auto;line-height:1.7}
+h1{font-size:22px;color:#e8c87a;text-align:center;letter-spacing:2px;margin-bottom:4px}
+.sub{text-align:center;color:#7a8aab;font-size:13px;margin-bottom:20px}
+.panel{background:#101a2e;border:1px solid rgba(120,160,255,.2);border-radius:14px;padding:20px;margin-bottom:16px}
+.panel h3{color:#e8c87a;margin-bottom:12px;font-size:15px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:#7a8aab;margin-bottom:4px}
+.field input,.field select{width:100%;padding:11px;border-radius:8px;border:1px solid rgba(120,160,255,.3);background:#0b1020;color:#e8eefc;font-size:14px}
+.btn{display:block;width:100%;padding:12px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+.btn.gold{background:#e8c87a;color:#0b1020}
+.btn.ghost{background:transparent;border:1px solid #e8c87a;color:#e8c87a}
+#result{margin-top:12px;padding:12px;border-radius:10px;font-size:13px;display:none}
+#result.ok{background:rgba(61,220,151,.1);border:1px solid rgba(61,220,151,.3)}
+#result.err{background:rgba(255,93,115,.1);border:1px solid rgba(255,93,115,.3)}
+#result.warn{background:rgba(255,200,87,.1);border:1px solid rgba(255,200,87,.3)}
+.muted{color:#5a6a90;font-size:11px;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+th{text-align:left;padding:6px 8px;border-bottom:1px solid rgba(120,160,255,.15);color:#7a8aab;font-size:11px}
+td{padding:6px 8px;border-bottom:1px solid rgba(120,160,255,.08)}
+</style>
+</head>
+<body>
+<h1>🏥 医保人脸核验窗口</h1>
+<div class="sub">医保局系统人脸核对 · 医疗身份确认 · 全程脱敏审计</div>
+
+<div class="panel">
+  <h3>📷 现场核验</h3>
+  <div class="field"><label>参保人姓名（选填——留空自动全库识别）</label><input id="p-name" placeholder="留空则自动识别人脸对应参保人"></div>
+  <div class="field"><label>现场照片</label><input type="file" id="face-file" accept="image/*" onchange="onFile(this)"></div>
+  <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+    <button class="btn gold" style="flex:1" onclick="doCheck()">🩺 人脸核对</button>
+    <label style="font-size:12px;color:#7a8aab;display:flex;align-items:center;gap:4px;white-space:nowrap">
+      <input type="checkbox" id="auto-continue" checked> 连续核验
+    </label>
+  </div>
+  <div id="result"></div>
+  <div class="muted">核对结果与审计记录自动上报（traceId 可追溯），照片不落日志</div>
+</div>
+
+<div class="panel">
+  <h3>🧾 最近核验审计</h3>
+  <button class="btn ghost" onclick="loadAudit()">刷新审计记录</button>
+  <div id="audit"></div>
+</div>
+
+<script>
+var API = 'http://127.0.0.1:8972';
+var PHOTO = null;
+function onFile(input){
+  var f = input.files[0]; if(!f) return;
+  var r = new FileReader();
+  r.onload = function(e){ PHOTO = e.target.result; };
+  r.readAsDataURL(f);
+}
+function show(msg, cls){
+  var d = document.getElementById('result');
+  d.style.display = 'block'; d.className = cls;
+  d.textContent = msg;
+}
+function doCheck(){
+  if(!PHOTO){ show('请先选择现场照片', 'err'); return; }
+  var name = document.getElementById('p-name').value.trim();
+  show('⏳ 核验中…', 'warn');
+  var body2 = {photo_base64: PHOTO, operator: '医保窗口', channel: 'insurance-window'};
+  if (name) body2.patient_id = 'P-' + name;  // 有姓名：1:1 核对；无姓名：1:N 全库识别
+  fetch(API + '/api/insurance/face-check', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body2)})
+    .then(function(r){return r.json()}).then(function(d){
+      if(d.code === 'MATCH'){
+        show('✅ 人脸核对一致（相似度 ' + d.similarity + '）\n参保人：' + d.patient_id + ' · traceId：' + d.traceId, 'ok');
+        if(d.explain){ show('✅ ' + d.explain.text + '\n下一步：' + (d.explain.next||[]).join(' → ') + '\ntraceId：' + d.traceId, 'ok'); }
+        if(document.getElementById('auto-continue').checked){
+          setTimeout(function(){ PHOTO = null; document.getElementById('face-file').value=''; document.getElementById('p-name').value=''; document.getElementById('result').style.display='none'; }, 2500);
+        }
+      } else {
+        show('⚠️ ' + (d.message || '核验未通过') + '\n参保人：' + (d.patient_id||'') + ' · traceId：' + (d.traceId||''), d.code === 'NOT_REGISTERED' ? 'warn' : 'err');
+        if(d.explain){ show('⚠️ ' + d.explain.text + '\n下一步：' + (d.explain.next||[]).join(' → ') + '\ntraceId：' + (d.traceId||''), d.code === 'NOT_REGISTERED' ? 'warn' : 'err'); }
+      }
+    }).catch(function(){ show('核验服务不可用', 'err'); });
+}
+function loadAudit(){
+  fetch(API + '/api/insurance/audit?limit=10').then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){ document.getElementById('audit').innerHTML = '<div class="muted">审计不可用</div>'; return; }
+    var h = '<table><tr><th>traceId</th><th>结果</th><th>参保人</th><th>相似度</th><th>时间</th></tr>';
+    (d.records||[]).forEach(function(r){
+      h += '<tr><td>' + r.traceId + '</td><td>' + (r.code==='MATCH'?'✅':'⚠️') + r.code + '</td><td>' + r.patient_id + '</td><td>' + (r.similarity ?? '-') + '</td><td>' + (r.ts||'').slice(5,19) + '</td></tr>';
+    });
+    h += '</table>';
+    document.getElementById('audit').innerHTML = h;
+  }).catch(function(){ document.getElementById('audit').innerHTML = '<div class="muted">审计不可用</div>'; });
+}
+loadAudit();
+</script>
+<script src="js/nav.js" defer></script>
+<script src="js/ai-assistant.js"></script>
+</body>
+</html>

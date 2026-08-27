@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/finance.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+<title>运营财务 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}.header .sub{font-size:11px;opacity:.6}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border-radius:10px;padding:12px;border:1px solid var(--border);text-align:center}
+.stat .v{font-size:20px;font-weight:700;color:var(--primary)}
+.stat .l{font-size:10px;color:var(--text3);margin-top:2px}
+.stat .trend{font-size:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:768px){.grid2{grid-template-columns:1fr}}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:110px;padding:4px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center}
+.bar{width:100%;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#b8860b,#8b5e34);min-height:2px}
+.bar.blue{background:linear-gradient(180deg,#60a5fa,#2563eb)}
+.bar.green{background:linear-gradient(180deg,#4ade80,#16a34a)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--text3);font-weight:600;font-size:10px}
+.btn{display:inline-block;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+<script src="js/data-engine.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">运营财务</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>管理员/院长</b></span>
+    <span class="std-tag">⚙️ 功能 <b>运营财务报表</b></span>
+    <span class="std-tag">💎 使用价值 <b>营收·成本·利润·客单价·趋势分析</b></span>
+  </div>
+  <div class="header">
+    <h1>💰 运营财务报表</h1>
+    <div class="sub">收入 · 成本 · 利润 · 客单 · 科室占比 · 趋势</div>
+  </div>
+
+  <!-- KPI -->
+  <div class="stats-row" id="kpi-row"></div>
+
+  <!-- 趋势（纯中医诊所无科室维度，R813c 移除科室占比伪图） -->
+  <div class="card">
+    <h3>📈 近 7 日营收</h3>
+    <div class="bar-chart" id="rev-chart"></div>
+  </div>
+
+  <!-- R813：医生业绩 + 支付方式占比 -->
+  <div class="grid2">
+    <div class="card">
+      <h3>👨‍⚕️ 医生业绩</h3>
+      <div class="bar-chart" id="doctor-chart"></div>
+    </div>
+    <div class="card">
+      <h3>💳 支付方式占比</h3>
+      <div class="bar-chart" id="pay-chart"></div>
+    </div>
+  </div>
+
+  <!-- 收入明细 -->
+  <div class="card">
+    <h3>🧾 收入流水 <button class="btn small" style="float:right" onclick="exportFin()">📥 导出</button></h3>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:6px">累计 <b id="fin-total">—</b> · 今日 <b id="fin-today">—</b></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>时间</th><th>类型</th><th>患者</th><th>医生</th><th>金额</th><th>支付方式</th></tr></thead>
+        <tbody id="fin-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// R813：财务接服务端真报表 /api/finance/summary（处方签发即计价→结算→报表闭环）
+// 离线降级保留 R812 的 rx_loop 本地通道
+function loadFinsLocal() {
+  var rxs = [];
+  try { rxs = JSON.parse(localStorage.getItem('tcm_rx_loop') || '[]'); } catch(e) {}
+  return rxs.filter(function(r){ return r.status==='paid'||r.status==='dispensed'||r.status==='completed'; }).map(function(r){
+    return {
+      time: r.paid_at || r.created_at || '',
+      type: '中药处方',
+      patient: r.patient || r.patient_name || '—',
+      amount: Number(r.total_price || r.amount) || 0,
+      pay: r.pay || r.pay_method || '—',
+      doctor: r.doctor || '—'
+    };
+  }).sort(function(a,b){ return String(b.time).localeCompare(String(a.time)); });
+}
+
+var fins = [];
+var finDays = null;      // 服务端聚合的近 7 日（null = 本地兜底按 fins 自算）
+var finByDoctor = null;  // 服务端 by_doctor（null = 本地自算）
+var finByPay = null;     // 服务端 by_pay
+
+function loadFinance() {
+  fetch('/api/finance/summary').then(function(r){ return r.json(); }).then(function(d) {
+    if (!d || !d.ok) throw new Error('bad response');
+    fins = d.transactions || [];
+    finDays = d.days || null;
+    finByDoctor = d.by_doctor || null;
+    finByPay = d.by_pay || null;
+    renderAll();
+  }).catch(function() {
+    fins = loadFinsLocal();
+    finDays = null;
+    finByDoctor = null;
+    finByPay = null;
+    renderAll();
+  });
+}
+
+function fmt(n) { return '¥' + Math.round(n).toLocaleString(); }
+
+// R813：通用柱状图渲染（医生业绩/支付方式占比共用）
+function renderBarChart(id, map, colors) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var keys = Object.keys(map);
+  if (!keys.length) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:30px 0;text-align:center;width:100%">暂无数据</div>';
+    return;
+  }
+  var maxV = Math.max.apply(null, keys.map(function(k){ return map[k]; })) || 1;
+  var html = '';
+  for (var i = 0; i < keys.length; i++) {
+    html += '<div class="bar-col"><div class="bar ' + colors[i%colors.length] + '" style="height:' + (map[keys[i]]/maxV*100) + 'px"></div>' +
+      '<div style="font-size:9px;margin-top:2px">' + keys[i] + '</div>' +
+      '<div style="font-size:8px;color:var(--text3)">' + Math.round(map[keys[i]]) + '</div></div>';
+  }
+  el.innerHTML = html;
+}
+
+function renderAll() {
+  // KPI
+  var total = fins.reduce(function(s, f){ return s + f.amount; }, 0);
+  var rx = fins.filter(function(f){ return f.type === '中药处方'; }).reduce(function(s, f){ return s + f.amount; }, 0);
+  var therapy = fins.filter(function(f){ return f.type === '针灸' || f.type === '理疗'; }).reduce(function(s, f){ return s + f.amount; }, 0);
+  var avg = fins.length ? total / fins.length : 0;
+  document.getElementById('kpi-row').innerHTML =
+    '<div class="stat"><div class="v">' + fmt(total) + '</div><div class="l">总收入</div></div>' +
+    '<div class="stat"><div class="v" style="color:var(--blue)">' + fmt(rx) + '</div><div class="l">处方收入</div></div>' +
+    '<div class="stat"><div class="v" style="color:var(--purple)">' + fmt(therapy) + '</div><div class="l">理疗收入</div></div>' +
+    '<div class="stat"><div class="v" style="color:var(--green)">' + fmt(avg) + '</div><div class="l">客单价</div></div>';
+
+  // R811 的累计/今日 KPI 位改由真数据驱动
+  var todayKey = new Date().toISOString().slice(0,10);
+  var todayTotal = fins.filter(function(f){ return (f.time||'').slice(0,10)===todayKey; }).reduce(function(s,f){ return s+f.amount; }, 0);
+  var elFT = document.getElementById('fin-total'); if (elFT) elFT.textContent = fmt(total);
+  var elFY = document.getElementById('fin-today'); if (elFY) elFY.textContent = fmt(todayTotal);
+
+  // 近 7 日营收（R813：优先用服务端聚合 finDays；离线时按本地流水自算）
+  var revs = [0,0,0,0,0,0,0];
+  var dayLabels = [];
+  if (finDays && finDays.length === 7) {
+    for (var fd = 0; fd < 7; fd++) { revs[fd] = finDays[fd].amount; dayLabels.push(finDays[fd].weekday); }
+  } else {
+    var weekDays = ['日','一','二','三','四','五','六'];
+    for (var d = 6; d >= 0; d--) {
+      var dt = new Date(Date.now() - d*86400000);
+      dayLabels.push('周' + weekDays[dt.getDay()]);
+      var key = dt.toISOString().slice(0,10);
+      fins.forEach(function(f){ if ((f.time||'').slice(0,10)===key) revs[6-d] += f.amount; });
+    }
+  }
+  var html = '';
+  var maxR = Math.max.apply(null, revs) || 1;
+  for (var i = 0; i < 7; i++) {
+    html += '<div class="bar-col"><div class="bar" style="height:' + (revs[i]/maxR*100) + 'px"></div>' +
+      '<div style="font-size:9px;margin-top:2px">' + dayLabels[i] + '</div>' +
+      '<div style="font-size:8px;color:var(--text3)">' + Math.round(revs[i]) + '</div></div>';
+  }
+  document.getElementById('rev-chart').innerHTML = html;
+
+  // R813：医生业绩 + 支付方式占比（服务端聚合直给，离线按本地流水自算）
+  var docMap = {};
+  if (finByDoctor) { docMap = finByDoctor; }
+  else { fins.forEach(function(f){ var k = f.doctor || '—'; docMap[k] = (docMap[k]||0) + f.amount; }); }
+  renderBarChart('doctor-chart', docMap, ['', 'blue', 'green', 'blue', 'green']);
+  var payMap = {};
+  if (finByPay) { payMap = finByPay; }
+  else { fins.forEach(function(f){ payMap[f.pay] = (payMap[f.pay]||0) + f.amount; }); }
+  renderBarChart('pay-chart', payMap, ['green', 'blue', '', 'blue', 'green']);
+
+  // 流水（纯中医诊所无科室维度，列改为医生）
+  var html2 = '';
+  for (var k = 0; k < fins.length; k++) {
+    var f = fins[k];
+    html2 += '<tr><td>' + new Date(f.time).toLocaleDateString('zh-CN') + ' ' + new Date(f.time).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}) + '</td>' +
+      '<td>' + f.type + '</td><td>' + f.patient + '</td><td>' + (f.doctor || '—') + '</td>' +
+      '<td style="color:var(--primary);font-weight:600">' + fmt(f.amount) + '</td><td>' + f.pay + '</td></tr>';
+  }
+  document.getElementById('fin-table').innerHTML = html2 || '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">💰 暂无流水 — 处方收费完成后自动生成</td></tr>';
+}
+
+function exportFin() {
+  var lines = ['时间,类型,患者,医生,金额,支付方式'];
+  fins.forEach(function(f){ lines.push([new Date(f.time).toLocaleString('zh-CN'), f.type, f.patient, f.doctor || '—', f.amount, f.pay].join(',')); });
+  var blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '财务流水-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('📥 财务流水已导出');
+}
+
+loadFinance();
+// R813：30 秒自动刷新（处方结算后财务页自动更新）
+setInterval(loadFinance, 30000);
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

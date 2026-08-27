@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/clinical.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>四诊采集 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🔬</text></svg>">
+<style>
+:root{
+  --bg:#f8f5f0;--card:#fff;--border:#ddd6c8;--primary:#7b3f00;--accent:#c0392b;
+  --green:#27ae60;--gold:#b8860b;--jade:#2e8b57;
+  --text:#2c1810;--text2:#6b5b4f;--text3:#9b8b7f;
+  --red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+
+/* Header */
+.page-header{background:linear-gradient(135deg,#2c1810,#5c3a28);color:#fff;padding:20px;text-align:center}
+.page-header h1{font-size:22px;letter-spacing:3px;margin-bottom:4px}
+.page-header p{font-size:13px;opacity:.8}
+.page-header a{color:rgba(255,255,255,.7);font-size:12px;text-decoration:none}
+
+.container{max-width:800px;margin:0 auto;padding:12px}
+
+/* Steps */
+.steps{display:flex;justify-content:center;gap:6px;margin:16px 0;flex-wrap:wrap}
+.step{padding:8px 16px;border-radius:20px;font-size:12px;font-weight:500;background:var(--card);border:1px solid var(--border);color:var(--text2)}
+.step.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.step.done{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* Panel */
+.panel{display:none;animation:fadeIn .3s}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Cards */
+.card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.05);border:1px solid var(--border)}
+.card h3{font-size:16px;color:var(--primary);margin-bottom:12px}
+.card p{font-size:13px;color:var(--text2);line-height:1.7}
+
+/* Camera zone */
+.camera-zone{position:relative;width:100%;max-width:360px;margin:0 auto 12px;border-radius:12px;overflow:hidden;background:#1a1a1a;aspect-ratio:4/3}
+.camera-zone video,.camera-zone canvas{width:100%;height:100%;object-fit:cover;display:block}
+.camera-zone .guide-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:2px dashed rgba(255,255,255,.4);border-radius:50%;width:60%;aspect-ratio:1;pointer-events:none}
+.camera-zone .guide-text{position:absolute;bottom:8px;left:0;right:0;text-align:center;color:#fff;font-size:11px;opacity:.7}
+
+/* Buttons */
+.btn{display:inline-block;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:.2s}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.primary:hover{opacity:.9}
+.btn.secondary{background:var(--bg);color:var(--primary);border:1px solid var(--border)}
+.btn.accent{background:var(--accent);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:6px 14px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* QC results */
+.qc-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+@media(max-width:480px){.qc-grid{grid-template-columns:1fr}}
+.qc-item{padding:6px 10px;border-radius:6px;font-size:12px;display:flex;align-items:center;gap:6px}
+.qc-item.pass{background:var(--green-bg);color:var(--green)}
+.qc-item.fail{background:var(--red-bg);color:var(--accent)}
+.qc-icon{font-size:14px}
+
+/* Results */
+.result-block{background:var(--card);border-radius:10px;padding:14px;margin-top:8px;border:1px solid var(--border)}
+.result-block h4{font-size:14px;color:var(--primary);margin-bottom:8px}
+.result-block .feature-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.feature-tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;background:var(--bg);border:1px solid var(--border);color:var(--text2)}
+.feature-tag.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+.feature-tag.abnormal{background:var(--red-bg);color:var(--accent);border-color:var(--accent)}
+
+/* Textarea */
+.tcm-input,.tcm-textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.tcm-textarea{min-height:80px;resize:vertical}
+.tcm-label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block;font-weight:500}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:480px){.input-row{grid-template-columns:1fr}}
+
+/* Disclaimers */
+.disclaimer{text-align:center;padding:20px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);margin-top:20px}
+
+/* Report */
+.report-section{border-left:3px solid var(--primary);padding:8px 12px;margin:8px 0;background:var(--bg);border-radius:0 8px 8px 0}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999;animation:toastIn .3s}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">四诊采集</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>医生</b></span><span class="std-tag">⚙️ 功能 <b>四诊采集·智能分析</b></span><span class="std-tag">💎 使用价值 <b>望闻切三诊结构化采集，AI辨证参考</b></span></div>
+
+<div class="page-header">
+  <h1>🔬 四诊采集</h1>
+  <p>面诊 · 舌诊 · 手诊 · 问诊 — 中医临床标准化采集</p>
+  <a href="index.html">← 返回首页</a>
+</div>
+
+<div class="container">
+  <!-- Steps -->
+  <div class="steps" id="step-bar">
+    <div class="step active" data-step="1">① 问诊</div>
+    <div class="step" data-step="2">② 面诊</div>
+    <div class="step" data-step="3">③ 舌诊</div>
+    <div class="step" data-step="4">④ 手诊</div>
+    <div class="step" data-step="5">⑤ 综合报告</div>
+  </div>
+
+  <!-- ═══ Panel 1: 问诊 ═══ -->
+  <div class="panel active" id="panel-inquiry">
+    <div class="card">
+      <h3>📝 主诉</h3>
+      <p>请详细描述主要症状和持续时间</p>
+      <textarea class="tcm-textarea" id="main-complaint" placeholder="例如：最近两周睡眠不好，入睡困难，通常要躺1-2小时才能睡着，睡着了也多梦，早上起来感觉很累，白天精神不好..."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>📋 补充信息</h3>
+      <div class="input-row">
+        <div><label class="tcm-label">年龄</label><input  class="tcm-input" id="age" type="number" min="0" max="120" aria-label="age" data-validate="number"></div>
+        <div><label class="tcm-label">性别</label><select class="tcm-input" id="gender"><option value="">请选择</option><option value="男">男</option><option value="女">女</option></select></div>
+      </div>
+      <div class="input-row">
+        <div><label class="tcm-label">寒热</label><select class="tcm-input" id="chills-fever"><option value="">正常</option><option value="恶寒">怕冷</option><option value="发热">发烧</option><option value="恶寒发热">又冷又热</option><option value="寒热往来">时冷时热</option></select></div>
+        <div><label class="tcm-label">出汗</label><select class="tcm-input" id="sweating"><option value="">正常</option><option value="自汗">自汗(白天出汗)</option><option value="盗汗">盗汗(睡觉出汗)</option><option value="无汗">无汗</option></select></div>
+      </div>
+      <div class="input-row">
+        <div><label class="tcm-label">食欲</label><select class="tcm-input" id="appetite"><option value="">正常</option><option value="减退">食欲减退</option><option value="亢进">吃很多</option><option value="厌食">不想吃</option></select></div>
+        <div><label class="tcm-label">口味</label><select class="tcm-input" id="taste"><option value="">正常</option><option value="口苦">口苦</option><option value="口淡">口淡无味</option><option value="口甜">口甜</option><option value="口酸">口酸</option></select></div>
+      </div>
+      <div class="input-row">
+        <div><label class="tcm-label">大便</label><select class="tcm-input" id="bowel"><option value="">正常</option><option value="便秘">便秘</option><option value="便溏">便溏</option><option value="腹泻">腹泻</option></select></div>
+        <div><label class="tcm-label">小便</label><select class="tcm-input" id="urine"><option value="">正常</option><option value="清长">清长</option><option value="短赤">短赤</option><option value="频数">频繁</option></select></div>
+      </div>
+      <div class="input-row">
+        <div><label class="tcm-label">睡眠</label><select class="tcm-input" id="sleep"><option value="">正常</option><option value="失眠">失眠</option><option value="多梦">多梦</option><option value="易醒">易醒</option><option value="嗜睡">嗜睡</option></select></div>
+        <div><label class="tcm-label">每日睡眠</label><input  class="tcm-input" id="sleep-hours" type="number" min="0" max="24" placeholder="小时" aria-label="小时" data-validate="number"></div>
+      </div>
+      <div class="input-row" id="female-row" style="display:none">
+        <div><label class="tcm-label">月经周期(天)</label><input  class="tcm-input" id="menstrual-cycle" type="number" min="0" aria-label="menstrual cycle" data-validate="number"></div>
+        <div><label class="tcm-label">月经情况</label><select class="tcm-input" id="menstrual-flow"><option value="">正常</option><option value="量多">量多</option><option value="量少">量少</option><option value="痛经">痛经</option></select></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" onclick="nextStep('face')">下一步：面诊 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Panel 2: 面诊 ═══ -->
+  <div class="panel" id="panel-face">
+    <div class="card">
+      <h3>👤 面诊采集</h3>
+      <p>请正对镜头，光线均匀，摘掉眼镜和口罩</p>
+      <div class="camera-zone">
+        <video id="face-camera" autoplay playsinline></video>
+        <div class="guide-overlay"></div>
+        <div class="guide-text">请将面部放在框内</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="captureFace()" id="btn-face-capture">📸 拍摄面诊</button>
+        <button class="btn secondary small" onclick="stopCamera('face')">关闭摄像头</button>
+      </div>
+      <canvas id="face-canvas" style="display:none"></canvas>
+      <div id="face-qc"></div>
+      <div id="face-result"></div>
+    </div>
+
+    <div class="card" id="face-manual" style="display:none">
+      <h3>📝 手动补充面诊特征</h3>
+      <label class="tcm-label">面色</label>
+      <div class="feature-row" id="face-complexion">
+        <span class="feature-tag" data-val="明润">明润</span>
+        <span class="feature-tag" data-val="晦暗">晦暗</span>
+        <span class="feature-tag" data-val="潮红">潮红</span>
+        <span class="feature-tag" data-val="苍白">苍白</span>
+        <span class="feature-tag" data-val="萎黄">萎黄</span>
+        <span class="feature-tag" data-val="黧黑">黧黑</span>
+      </div>
+      <label class="tcm-label" style="margin-top:8px">光泽</label>
+      <div class="feature-row" id="face-brightness">
+        <span class="feature-tag" data-val="有光泽">有光泽</span>
+        <span class="feature-tag" data-val="无光泽">无光泽</span>
+        <span class="feature-tag" data-val="油光">油光</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary" onclick="prevStep('inquiry')">← 上一步</button>
+      <button class="btn primary" onclick="nextStep('tongue')">下一步：舌诊 →</button>
+    </div>
+  </div>
+
+  <!-- ═══ Panel 3: 舌诊 ═══ -->
+  <div class="panel" id="panel-tongue">
+    <div class="card">
+      <h3>👅 舌诊采集</h3>
+      <p>自然伸舌，请保持3秒钟。光线要好，不要开美颜。</p>
+      <div class="camera-zone">
+        <video id="tongue-camera" autoplay playsinline></video>
+        <div class="guide-overlay" style="width:40%"></div>
+        <div class="guide-text">请将舌头放在框内</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="captureTongue()" id="btn-tongue-capture">📸 拍摄舌诊</button>
+        <button class="btn secondary small" onclick="stopCamera('tongue')">关闭摄像头</button>
+      </div>
+      <canvas id="tongue-canvas" style="display:none"></canvas>
+      <div id="tongue-qc"></div>
+      <div id="tongue-result"></div>
+    </div>
+
+    <div class="card" id="tongue-manual" style="display:none">
+      <h3>📝 手动补充舌象特征</h3>
+      <label class="tcm-label">舌色</label>
+      <div class="feature-row" id="tongue-color">
+        <span class="feature-tag" data-val="淡红">淡红</span>
+        <span class="feature-tag" data-val="淡白">淡白</span>
+        <span class="feature-tag" data-val="红">红</span>
+        <span class="feature-tag" data-val="绛">绛</span>
+        <span class="feature-tag" data-val="紫暗">紫暗</span>
+      </div>
+      <label class="tcm-label" style="margin-top:8px">苔色</label>
+      <div class="feature-row" id="coating-color">
+        <span class="feature-tag" data-val="白">白</span>
+        <span class="feature-tag" data-val="黄">黄</span>
+        <span class="feature-tag" data-val="灰">灰</span>
+        <span class="feature-tag" data-val="黑">黑</span>
+      </div>
+      <label class="tcm-label" style="margin-top:8px">苔质</label>
+      <div class="feature-row" id="coating-texture">
+        <span class="feature-tag" data-val="薄">薄</span>
+        <span class="feature-tag" data-val="厚">厚</span>
+        <span class="feature-tag" data-val="腻">腻</span>
+        <span class="feature-tag" data-val="剥">剥</span>
+      </div>
+      <label class="tcm-label" style="margin-top:8px">舌体</label>
+      <div class="feature-row" id="tongue-shape">
+        <span class="feature-tag" data-val="正常">正常</span>
+        <span class="feature-tag" data-val="胖大">胖大</span>
+        <span class="feature-tag" data-val="瘦薄">瘦薄</span>
+        <span class="feature-tag" data-val="齿痕">齿痕</span>
+        <span class="feature-tag" data-val="裂纹">裂纹</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary" onclick="prevStep('face')">← 上一步</button>
+      <button class="btn primary" onclick="nextStep('hand')">下一步：手诊 →</button>
+    </div>
+  </div>
+
+  <!-- ═══ Panel 4: 手诊 ═══ -->
+  <div class="panel" id="panel-hand">
+    <div class="card">
+      <h3>🖐️ 手诊采集</h3>
+      <p>请将手掌平放在镜头前，保持静止</p>
+      <div class="camera-zone">
+        <video id="hand-camera" autoplay playsinline></video>
+        <div class="guide-overlay" style="width:70%;aspect-ratio:4/3;border-radius:20%"></div>
+        <div class="guide-text">请将手掌放在框内</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="captureHand()" id="btn-hand-capture">📸 拍摄手诊</button>
+        <button class="btn secondary small" onclick="stopCamera('hand')">关闭摄像头</button>
+      </div>
+      <canvas id="hand-canvas" style="display:none"></canvas>
+      <div id="hand-qc"></div>
+      <div id="hand-result"></div>
+    </div>
+
+    <div class="card" id="hand-manual" style="display:none">
+      <h3>📝 手动补充手诊特征</h3>
+      <label class="tcm-label">手掌颜色</label>
+      <div class="feature-row" id="palm-color">
+        <span class="feature-tag" data-val="淡红">淡红</span>
+        <span class="feature-tag" data-val="潮红">潮红</span>
+        <span class="feature-tag" data-val="苍白">苍白</span>
+        <span class="feature-tag" data-val="紫暗">紫暗</span>
+      </div>
+      <label class="tcm-label" style="margin-top:8px">指甲颜色</label>
+      <div class="feature-row" id="nail-color">
+        <span class="feature-tag" data-val="淡红">淡红</span>
+        <span class="feature-tag" data-val="苍白">苍白</span>
+        <span class="feature-tag" data-val="青紫">青紫</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn secondary" onclick="prevStep('tongue')">← 上一步</button>
+      <button class="btn green" onclick="generateReport()">✅ 生成综合报告</button>
+    </div>
+  </div>
+
+  <!-- ═══ Panel 5: 综合报告 ═══ -->
+  <div class="panel" id="panel-report">
+    <div class="card">
+      <h3>📋 四诊综合报告</h3>
+      <div id="final-report">正在生成...</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn secondary" onclick="resetAll()">🔄 重新采集</button>
+      <button class="btn primary" onclick="saveReport()">💾 保存病例</button>
+      <button class="btn accent" onclick="window.print()">🖨️ 打印</button>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 本系统由 AI 辅助，仅供执业中医师临床参考。不构成独立诊断或处方建议。
+  </div>
+</div>
+
+<script>
+// ═══ 命理宝鉴·医道 四诊采集 v2.0 — 真实 API 驱动的无缝 AI 采集 ═══
+const API = '/';
+const state = { inquiry: null, face: null, tongue: null, hand: null, captures: {} };
+let currentStep = 1;
+let faceStream = null, tongueStream = null, handStream = null;
+
+// ═══ 步骤导航 ═══
+function showStep(n) {
+  currentStep = n;
+  document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+  document.getElementById('panel-' + ['inquiry','face','tongue','hand','report'][n-1]).style.display = 'block';
+  document.querySelectorAll('.step').forEach((s, i) => { s.classList.remove('active', 'done'); if (i < n-1) s.classList.add('done'); if (i === n-1) s.classList.add('active'); });
+  if (n === 2) startCamera('face');
+  if (n === 3) startCamera('tongue');
+  if (n === 4) startCamera('hand');
+}
+
+function nextStep(to) { if (to) showStep(['inquiry','face','tongue','hand','report'].indexOf(to)+1); else showStep(currentStep+1); }
+function prevStep(to) { if (to) showStep(['inquiry','face','tongue','hand','report'].indexOf(to)+1); else showStep(currentStep-1); }
+
+// ═══ 摄像头 ═══
+async function startCamera(part) {
+  const video = document.getElementById(part + '-camera');
+  if (!video) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } } });
+    video.srcObject = stream;
+    video.play();
+    if (part === 'face') faceStream = stream;
+    else if (part === 'tongue') tongueStream = stream;
+    else if (part === 'hand') handStream = stream;
+  } catch (e) {
+    document.getElementById(part + '-manual').style.display = 'block';
+    toast('⚠️ 摄像头不可用，请手动标注 ' + part);
+  }
+}
+
+function stopCamera(part) {
+  const video = document.getElementById(part + '-camera');
+  if (video && video.srcObject) {
+    video.srcObject.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+  }
+  document.getElementById(part + '-manual').style.display = 'block';
+}
+
+// ═══ 真实图像质量检测（真实检测）═══
+function realQC(canvas) {
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imgData.data;
+  let brightSum = 0, n = 0, brightMin = 255, brightMax = 0;
+  const step = Math.max(1, Math.floor(data.length / (4 * 5000)));
+  for (let i = 0; i < data.length; i += step * 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    const gray = 0.299*r + 0.587*g + 0.114*b;
+    brightSum += gray; n++;
+    if (gray < brightMin) brightMin = gray;
+    if (gray > brightMax) brightMax = gray;
+  }
+  const avgBright = brightSum / n;
+  const contrast = brightMax - brightMin;
+  return [
+    { name: '亮度', pass: avgBright > 40 && avgBright < 230, detail: Math.round(avgBright) + '/255' },
+    { name: '对比度', pass: contrast > 30, detail: Math.round(contrast) },
+    { name: '分辨率', pass: canvas.width >= 320, detail: canvas.width + '×' + canvas.height },
+    { name: '曝光', pass: avgBright > 60, detail: avgBright > 200 ? '偏亮' : avgBright < 80 ? '偏暗' : '正常' }
+  ];
+}
+
+// ═══ 采集核心（真实 API 驱动）═══
+function captureFace() { capture('face', '面诊', true); }
+function captureTongue() { capture('tongue', '舌诊', true); }
+function captureHand() { capture('hand', '手诊', false); }
+
+async function capture(part, label, callAI) {
+  const video = document.getElementById(part + '-camera');
+  const canvas = document.getElementById(part + '-canvas');
+  if (!video || !video.srcObject) {
+    document.getElementById(part + '-manual').style.display = 'block';
+    toast('⚠️ 请先开启摄像头或手动标注');
+    return;
+  }
+  
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+  // 真实 QC
+  const qcResults = realQC(canvas);
+  const allPass = qcResults.every(q => q.pass);
+  
+  let qcHtml = '<div class="qc-grid">';
+  for (const qc of qcResults) {
+    qcHtml += '<div class="qc-item ' + (q.pass ? 'pass' : 'fail') + '"><span class="qc-icon">' + (q.pass ? '✅' : '❌') + '</span>' + q.name + '<br><small>' + q.detail + '</small></div>';
+  }
+  qcHtml += '</div>';
+  document.getElementById(part + '-qc').innerHTML = qcHtml;
+
+  const btn = document.getElementById('btn-' + part + '-capture');
+  if (btn) { btn.disabled = true; btn.textContent = allPass ? '✅ 已采集' : '⚠️ 需重拍'; }
+
+  state[part] = { captured: true, timestamp: new Date().toISOString(), image: dataUrl, quality: qcResults };
+
+  // 如果不清晰，提示用固定摄像头重采
+  if (!allPass) {
+    document.getElementById(part + '-result').innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:10px;margin-top:8px">⚠️ <strong>图像质量不达标</strong>，建议用<strong>固定摄像头</strong>重新采集（当前:' + qcResults.filter(q=>!q.pass).map(q=>q.name).join('、') + '不合格）<br><button class="btn secondary" onclick="retake(\''+part+'\',\''+label+'\','+callAI+')" style="margin-top:6px">🔄 用固定摄像头重采</button></div>';
+    return;
+  }
+
+  // 真实 AI 分析
+  if (callAI && dataUrl) {
+    document.getElementById(part + '-result').innerHTML = '<div style="padding:10px;color:var(--text2)">🔬 AI 分析中...</div>';
+    try {
+      const r = await fetch(API + '/api/tcm/tongue-analyze', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl, part: part })
+      });
+      const d = await r.json();
+      if (d.ok) {
+        state[part].aiAnalysis = d;
+        document.getElementById(part + '-result').innerHTML = 
+          '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-top:8px">' +
+          '🤖 <strong>AI ' + label + '分析</strong>: ' + d.tongue_color + ' · ' + d.coating + ' · ' + d.moisture +
+          '<br>📚 KB: ' + (d.kb_match?.syndrome || '待匹配') + ' · ' + (d.kb_match?.formula || '—') +
+          '<br>💡 ' + (d.advice || '') + ' <span style="opacity:.6">(置信 ' + Math.round(d.confidence*100) + '%)</span>' +
+          '</div>';
+        toast('✅ AI ' + label + '完成 · ' + d.kb_match?.syndrome || '');
+      } else {
+        document.getElementById(part + '-result').innerHTML = '<div style="color:var(--text2);padding:10px">AI 引擎离线，已保存本地特征</div>';
+      }
+    } catch (e) {
+      document.getElementById(part + '-result').innerHTML = '<div style="color:var(--text2);padding:10px">📡 AI 服务不可达 · 本地特征已保存</div>';
+    }
+  } else {
+    document.getElementById(part + '-manual').style.display = 'block';
+  }
+  
+  toast('✅ ' + label + '采集完成' + (allPass ? '' : ' · 建议重拍'));
+}
+
+function retake(part, label, callAI) {
+  const btn = document.getElementById('btn-' + part + '-capture');
+  if (btn) { btn.disabled = false; btn.textContent = '📸 拍摄' + label; }
+  document.getElementById(part + '-qc').innerHTML = '';
+  document.getElementById(part + '-result').innerHTML = '';
+  state[part] = null;
+  startCamera(part);
+}
+
+// ═══ 问诊采集（语音 + 文本）═══
+function collectInquiry() {
+  const complaint = document.getElementById('main-complaint').value.trim();
+  const age = document.getElementById('age').value;
+  const gender = document.getElementById('gender').value;
+  return { chief_complaint: complaint, patient: { age, gender }, timestamp: new Date().toISOString() };
+}
+
+document.getElementById('gender').addEventListener('change', function() {
+  state.inquiry = collectInquiry();
+});
+
+// ═══ 综合报告生成（真实 API + KB 蒸馏）═══
+async function generateReport() {
+  if (!state.inquiry) state.inquiry = collectInquiry();
+  if (!state.inquiry.chief_complaint) { toast('⚠️ 请先填写主诉'); showStep(1); return; }
+
+  // 采集手动标注
+  ['face','tongue','hand'].forEach(part => {
+    if (!state[part] || !state[part].captured) {
+      const manual = document.getElementById(part + '-manual');
+      if (manual && manual.style.display !== 'none') {
+        const features = {};
+        manual.querySelectorAll('.feature-row').forEach(row => {
+          const sel = row.querySelector('.feature-tag.selected');
+          if (sel) features[row.id.replace(part+'-','')] = sel.dataset.val;
+        });
+        state[part] = { manual_features: features, type: 'manual' };
+      }
+    }
+  });
+
+  showStep(5);
+  document.getElementById('final-report').innerHTML = '<div style="padding:20px;text-align:center">🔄 AI 辨证中，正在比对知识库...</div>';
+
+  // 提取症状
+  const complaint = state.inquiry.chief_complaint || '';
+  const symptoms = extractTerms(complaint);
+  const tongueFeatures = state.tongue?.aiAnalysis || null;
+  const faceFeatures = state.face?.aiAnalysis || null;
+
+  try {
+    // 并行：AI 辨证 + KB 蒸馏证据 + 案例蒸馏
+    const [diagR, kbR, caseR] = await Promise.all([
+      fetch(API + '/api/tcm/diagnose', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms, age: state.inquiry.patient?.age, gender: state.inquiry.patient?.gender, tongue: tongueFeatures, face: faceFeatures })
+      }).then(r => r.json()),
+      fetch(API + '/api/tcm/longitudinal-recommend', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symptoms, constitution: tongueFeatures?.tongue_color || '' })
+      }).then(r => r.json()).catch(() => ({ ok: false })),
+      fetch(API + '/api/tcm/case-distill', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      }).then(r => r.json()).catch(() => ({ ok: false }))
+    ]);
+
+    const diagData = diagR.data || diagR;
+    const formula = diagData.suggested_formula || {};
+    const ops = diagData.kb_multischool_opinions || {};
+
+    // KB 推荐
+    let kbHTML = '';
+    if (kbR.ok && kbR.recommendations?.matchedCount > 0) {
+      const rec = kbR.recommendations;
+      kbHTML = '<div class="report-section" style="background:#fefce8;border:1px solid #fde68a"><strong>📚 KB 循证推荐</strong>: ' +
+        rec.matchedCount + ' 个模式匹配 · 证据等级: ' + rec.evidenceLevel +
+        '<br>TOP药材: ' + (rec.topHerbs || []).join('、') +
+        '<br>' + (rec.evidence || '') + '</div>';
+    }
+
+    // 案例蒸馏证据
+    let distillHTML = '';
+    if (caseR.ok && caseR.patterns) {
+      const matched = caseR.patterns.filter(p => formula.matched_syndrome && p.syndrome && p.syndrome.includes(formula.matched_syndrome));
+      if (matched.length > 0) {
+        const top = matched[0];
+        distillHTML = '<div class="report-section" style="background:#f0fdf4"><strong>🧬 KB 蒸馏证据</strong>: ' +
+          top.syndrome + ' (grade ' + top.grade + ' · trust ' + (top.confidence||0).toFixed(2) +
+          ' · ' + top.evidence_patients + '患者/' + top.evidence_occurrences + '次验证 · avg疗效' + (top.avg_effect||0).toFixed(1) + ')</div>';
+      }
+    }
+
+    // 四诊状态
+    const parts = [];
+    if (state.face?.captured) parts.push('面诊✅');
+    if (state.tongue?.captured) parts.push('舌诊✅');
+    if (state.hand?.captured) parts.push('手诊✅');
+    if (symptoms.length > 0) parts.push('症状' + symptoms.length + '项');
+
+    let html = '';
+    html += '<div class="report-section"><strong>采集状态</strong>: ' + (parts.join(' · ') || '仅问诊') + '</div>';
+    html += '<div class="report-section"><strong>提取症状</strong>: ' + (symptoms.join('、') || '未识别') + '</div>';
+    html += '<div class="report-section"><strong>紧急分级</strong>: ' + (diagData.urgency_level || 'P2_HEALTH_TIP') + '</div>';
+    html += '<div class="report-section"><strong>AI 辨证</strong>: ' + (formula.matched_syndrome || '待定') + 
+      ' · ' + (formula.formula || '—') + ' · 置信 ' + Math.round((formula.confidence || 0) * 100) + '%</div>';
+
+    // 多学派意见
+    if (ops && Object.keys(ops).length > 0) {
+      html += '<div class="report-section"><strong>多学派参考</strong>:<br>';
+      for (const [school, o] of Object.entries(ops)) {
+        if (o.opinion) html += '· <em>' + school + '</em>: ' + o.opinion + ' (' + o.reference + ')<br>';
+      }
+      html += '</div>';
+    }
+
+    html += kbHTML + distillHTML;
+    html += '<div class="report-section" style="opacity:.7;font-size:12px">⚠️ 本报告由AI辅助生成，仅供执业中医师参考。重要诊断请以面诊为准。</div>';
+
+    document.getElementById('final-report').innerHTML = html;
+    document.querySelectorAll('.step').forEach(s => s.classList.add('done'));
+    document.querySelector('.step:last-child').classList.add('active');
+    toast('✅ 综合报告生成完成 · AI辨证+KB循证');
+
+  } catch (e) {
+    document.getElementById('final-report').innerHTML = 
+      '<div style="background:#fef2f2;padding:15px;border-radius:8px">' +
+      '⚠️ <strong>AI 服务不可达</strong><br>已保存本地采集数据。请检查网络连接后重试。<br>' +
+      '<button class="btn primary" onclick="generateReport()" style="margin-top:8px">🔄 重试</button></div>';
+  }
+}
+
+// ═══ 保存病例 ═══
+function saveReport() {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  const report = {
+    timestamp: new Date().toISOString(),
+    inquiry: state.inquiry,
+    face: state.face,
+    tongue: state.tongue,
+    hand: state.hand,
+    final_report: document.getElementById('final-report').textContent.substring(0, 500)
+  };
+  const key = 'tcm_clinical_records';
+  const records = JSON.parse(localStorage.getItem(key) || '[]');
+  records.unshift(report);
+  localStorage.setItem(key, JSON.stringify(records.slice(0, 200)));
+  toast('💾 病例已保存（共 ' + records.length + ' 条）');
+}
+
+function resetAll() {
+  state.inquiry = null; state.face = null; state.tongue = null; state.hand = null;
+  document.getElementById('main-complaint').value = '';
+  document.querySelectorAll('.qc-grid, [id$="-result"]').forEach(el => el.innerHTML = '');
+  document.querySelectorAll('[id$="-manual"]').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.btn[id$="-capture"]').forEach(el => { el.disabled = false; el.textContent = el.textContent.replace(/✅|⚠️/, '📸'); });
+  showStep(1);
+  toast('🔄 已重置');
+}
+
+// ═══ 工具函数 ═══
+function extractTerms(text) {
+  const patterns = [
+    [/失眠|睡不着|入睡困难|多梦/, '失眠'], [/头痛|头晕|头眩/, '头痛'],
+    [/发热|发烧|体温高/, '发热'], [/咳嗽|咳/, '咳嗽'], [/恶心|呕吐|想吐/, '恶心'],
+    [/腹泻|拉肚子/, '腹泻'], [/便秘|大便干/, '便秘'], [/胸闷|心慌|心悸|心跳/, '心悸'],
+    [/腰酸|腰痛/, '腰痛'], [/怕冷|恶寒|畏寒/, '畏寒'], [/口苦/, '口苦'],
+    [/乏力|疲劳|没劲/, '乏力'], [/月经|痛经/, '月经不调'], [/没胃口|纳差/, '纳差'],
+    [/腹胀|胃痛|胃胀/, '胃痛'], [/口干|口渴/, '口干'], [/盗汗|夜间出汗/, '盗汗'],
+    [/耳鸣|耳聋/, '耳鸣'], [/烦躁|易怒|心烦/, '烦躁']
+  ];
+  return patterns.filter(p => p[0].test(text || '')).map(p => p[1]);
+}
+
+// ═══ 初始化 ═══
+showStep(1);
+
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:12px;text-align:center;border-top:1px solid var(--border);padding-top:8px">⚠️ 免责声明：本系统提供的中医诊疗建议仅供执业医师参考，不构成独立诊断或处方依据。所有用药决策须由具备资质的执业中医师审核确认。患者请遵医嘱服用。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

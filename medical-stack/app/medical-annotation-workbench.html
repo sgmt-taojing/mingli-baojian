@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>命理师核对工作台 · 命理宝鉴</title>
+<style>
+  :root { --ink:#2b2620; --gold:#b8860b; --bg:#faf7f0; --card:#fff; --line:#e8e0d0; --red:#b3402a; --green:#2f7d4f; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"Songti SC","STSong",serif; background:var(--bg); color:var(--ink); padding:24px; max-width:960px; margin:0 auto; }
+  header { display:flex; justify-content:space-between; align-items:baseline; border-bottom:2px solid var(--gold); padding-bottom:12px; margin-bottom:16px; }
+  h1 { font-size:22px; letter-spacing:2px; }
+  .stats { font-size:13px; color:#7a6f5c; }
+  .stats b { color:var(--red); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:16px; margin-bottom:14px; }
+  .meta { font-size:12px; color:#8a7f6a; margin-bottom:8px; display:flex; gap:14px; flex-wrap:wrap; }
+  .overdue { color:var(--red); font-weight:bold; }
+  .content { font-size:15px; line-height:1.8; margin:10px 0; white-space:pre-wrap; }
+  .disclaimer { display:inline-block; font-size:12px; color:var(--gold); border:1px dashed var(--gold); border-radius:4px; padding:2px 8px; margin-bottom:10px; }
+  .watermark { display:inline-block; font-size:12px; color:var(--red); border:1px solid var(--red); border-radius:4px; padding:2px 8px; margin-left:8px; }
+  .actions { margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  input { font-family:inherit; font-size:13px; padding:6px 10px; border:1px solid var(--line); border-radius:4px; }
+  button { font-family:inherit; font-size:13px; padding:6px 16px; border:none; border-radius:4px; cursor:pointer; }
+  .approve { background:var(--green); color:#fff; }
+  .reject { background:var(--red); color:#fff; }
+  .empty { text-align:center; color:#8a7f6a; padding:60px 0; font-size:15px; }
+  #toast { position:fixed; top:16px; right:16px; background:var(--ink); color:#fff; padding:10px 18px; border-radius:6px; font-size:13px; display:none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>命理师核对工作台</h1>
+  <div class="stats" id="stats">加载中…</div>
+</header>
+<div id="queue"></div>
+<div id="toast"></div>
+<script>
+const API = 'http://127.0.0.1:8974';
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2600);
+}
+
+async function load() {
+  const r = await fetch(API + '/api/annotation-queue').then(x => x.json());
+  document.getElementById('stats').innerHTML =
+    `待核对 <b>${r.backlog}</b> 条 ｜ 超 ${r.sla_hours}h SLA <b>${r.overdue}</b> 条 ｜ 已通过 ${r.stats.approved} ｜ 已驳回 ${r.stats.rejected}`;
+  const q = document.getElementById('queue');
+  if (!r.queue.length) { q.innerHTML = '<div class="empty">队列已清空，无待核对批注</div>'; return; }
+  q.innerHTML = r.queue.map(a => `
+    <div class="card">
+      <div class="meta">
+        <span>病历 ${a.emr_id}</span>
+        <span>${a.type === 'ai' ? 'AI 批注' : '命理师批注'} · ${a.author}</span>
+        <span>${a.created_at.replace('T',' ').slice(0,19)}</span>
+        <span class="${a.overdue ? 'overdue' : ''}">已等待 ${a.age_hours}h${a.overdue ? '（超 SLA）' : ''}</span>
+      </div>
+      <span class="disclaimer">${a.disclaimer}</span>${a.watermark ? `<span class="watermark">${a.watermark}</span>` : ''}
+      <div class="content">${a.content.replace(/</g,'&lt;')}</div>
+      <div class="actions">
+        <input id="rev-${a.id}" placeholder="核对人（命理师）姓名" size="16">
+        <button class="approve" onclick="decide('${a.id}','approve')">核对通过</button>
+        <input id="reason-${a.id}" placeholder="驳回原因" size="20">
+        <button class="reject" onclick="decide('${a.id}','reject')">驳回</button>
+      </div>
+    </div>`).join('');
+}
+
+async function decide(aid, action) {
+  const reviewer = document.getElementById('rev-' + aid).value.trim();
+  if (!reviewer) return toast('请填写核对人姓名');
+  const body = { reviewer };
+  if (action === 'reject') {
+    const reason = document.getElementById('reason-' + aid).value.trim();
+    if (!reason) return toast('驳回必须填写原因');
+    body.reason = reason;
+  }
+  const r = await fetch(`${API}/api/annotations/${aid}/${action}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  }).then(x => x.json());
+  if (r.ok) { toast(action === 'approve' ? '已核对通过' : '已驳回'); load(); }
+  else toast('失败：' + (r.error || '未知错误'));
+}
+
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>

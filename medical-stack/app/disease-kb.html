@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/disease-kb.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+<title>病种知识库 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.kb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:768px){.kb-grid{grid-template-columns:1fr}}
+.kb-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.kb-card .syn{font-size:15px;font-weight:700;color:var(--primary)}
+.kb-card .num{font-size:22px;font-weight:800;color:var(--accent)}
+.kb-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px dashed var(--border)}
+.tag{display:inline-block;font-size:10px;background:var(--blue-bg);color:var(--blue);border-radius:6px;padding:2px 6px;margin:2px}
+.tag.formula{background:var(--gold-bg);color:var(--primary)}
+.eff{font-weight:700}
+.eff.good{color:var(--green)}.eff.mid{color:var(--gold)}.eff.na{color:var(--text3)}
+.search-bar{display:flex;gap:8px;margin-bottom:8px}
+.input{flex:1;min-width:150px;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:12px}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: #7c3aed; flex-shrink: 0; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<body>
+
+<div class="page-header-bar" data-theme="kb">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">病种知识库</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>医生/患者</b></span>
+    <span class="std-tag">⚙️ 功能 <b>真实病例沉淀的病种经验库</b></span>
+    <span class="std-tag">💎 使用价值 <b>什么证型用什么方 · 疗效如何 · 一目了然</b></span>
+  </div>
+
+  <div class="card">
+    <h3>📚 按证型沉淀的临床经验 <span id="kb-total" style="font-size:11px;color:var(--text3);font-weight:400"></span></h3>
+    <div class="search-bar">
+      <input class="input" id="kb-search" type="text" placeholder="🔍 搜索证型/方剂/药材（支持首字母）" aria-label="搜索证型">
+    </div>
+    <div class="kb-grid" id="kb-grid">加载中…</div>
+  </div>
+
+  <div style="font-size:11px;color:var(--text3);text-align:center;line-height:1.8">
+    数据来自本机构真实签发处方与随访反馈，随诊疗持续生长 · 供后续诊疗参考，不构成独立诊断依据
+  </div>
+</div>
+
+<script>
+var KB = [];
+
+function effClass(rate) {
+  if (rate == null) return 'na';
+  return rate >= 70 ? 'good' : 'mid';
+}
+
+function renderKB(list) {
+  var el = document.getElementById('kb-grid');
+  if (!list.length) { el.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">未找到匹配证型</div>'; return; }
+  el.innerHTML = list.map(function(g) {
+    var formulas = g.top_formulas.length
+      ? g.top_formulas.map(function(f){ return '<span class="tag formula">📜 ' + f.name + ' ×' + f.count + '</span>'; }).join('')
+      : '<span style="font-size:11px;color:var(--text3)">方剂待沉淀</span>';
+    var herbs = (g.top_herbs || []).slice(0, 4).map(function(h){ return '<span class="tag">🌿 ' + h.name + '</span>'; }).join('');
+    return '<div class="kb-card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline">' +
+        '<span class="syn">' + g.syndrome + '</span>' +
+        '<span><span class="num">' + g.cases + '</span> <span style="font-size:10px;color:var(--text3)">例</span></span>' +
+      '</div>' +
+      '<div style="margin:6px 0">' + formulas + '</div>' +
+      (herbs ? '<div style="margin-bottom:6px">' + herbs + '</div>' : '') +
+      '<div class="kb-row"><span>随访完成</span><span>' + g.followed + ' 例</span></div>' +
+      '<div class="kb-row"><span>随访有效率</span><span class="eff ' + effClass(g.effective_rate) + '">' + (g.effective_rate != null ? g.effective_rate + '%' : '待随访') + '</span></div>' +
+      '<div class="kb-row"><span>平均恢复评分</span><span>' + (g.avg_score != null ? g.avg_score + ' / 10' : '—') + '</span></div>' +
+      '<div class="kb-row" style="border:none"><span>接诊医生</span><span>' + (g.doctors.length ? g.doctors.join('、') : '—') + '</span></div>' +
+    '</div>';
+  }).join('');
+}
+
+function loadKB() {
+  fetch('/api/disease-kb').then(function(r){ return r.json(); }).then(function(d) {
+    KB = d.kb || [];
+    document.getElementById('kb-total').textContent = '（' + (d.total || 0) + ' 个证型 · 持续生长）';
+    renderKB(KB);
+  }).catch(function() {
+    document.getElementById('kb-grid').innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">📡 服务离线</div>';
+  });
+}
+
+// 首字母搜索：转拼音首字母简表（常见中医字）+ 直接包含匹配
+var PY = {'脾':'p','胃':'w','气':'q','虚':'x','血':'x','心':'x','肝':'g','郁':'y','湿':'s','热':'r','寒':'h','火':'h','阳':'y','阴':'y','痰':'t','瘀':'y','风':'f','滞':'z','结':'j','亏':'k','衰':'s','不':'b','足':'z','两':'l','困':'k','阻':'z','上':'s','炎':'y','亢':'k','脾':'p','肾':'s','肺':'f','胆':'d','肠':'c'};
+function pyInit(s) {
+  var r = '';
+  for (var i = 0; i < s.length; i++) r += PY[s[i]] || s[i];
+  return r.toLowerCase();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var si = document.getElementById('kb-search');
+  var deb;
+  si.addEventListener('input', function() {
+    clearTimeout(deb);
+    deb = setTimeout(function() {
+      var q = si.value.trim().toLowerCase();
+      if (!q) { renderKB(KB); return; }
+      renderKB(KB.filter(function(g) {
+        if (g.syndrome.toLowerCase().indexOf(q) >= 0) return true;
+        if (pyInit(g.syndrome).indexOf(q) >= 0) return true;
+        return g.top_formulas.some(function(f){ return f.name.toLowerCase().indexOf(q) >= 0; }) ||
+               (g.top_herbs || []).some(function(h){ return h.name.indexOf(q) >= 0; });
+      }));
+    }, 250);
+  });
+});
+
+loadKB();
+setInterval(loadKB, 60000);
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

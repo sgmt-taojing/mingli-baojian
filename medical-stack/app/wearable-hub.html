@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/wearable-hub.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>可穿戴设备中心 · 中医智能体</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/mobile.css">
+
+<style>
+:root{--tcm:#b8860b;--tcm-bg:rgba(184,134,11,.06);--ok:#2e8b57;--warn:#d97706;--crit:#dc2626;--border:#e5e7eb;--home:#2e8b57}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:#f9fafb;color:#1f2937;line-height:1.6}
+.page-header-bar{background:linear-gradient(135deg,var(--home),#1f6b47);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;gap:12px}
+.page-header-bar .dot{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.8}
+.page-header-bar h1{font-size:17px;font-weight:600;flex:1}
+.page-header-bar a{color:#fff;text-decoration:none;font-size:14px;opacity:.9;padding:4px 10px;border:1px solid rgba(255,255,255,.3);border-radius:6px}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+
+.hero{background:linear-gradient(135deg,rgba(46,139,87,.1),rgba(184,134,11,.1));border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px;text-align:center}
+.hero h2{font-size:20px;color:var(--home);margin-bottom:8px}
+.hero p{font-size:14px;color:#6b7280}
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.metric-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.metric-card .metric-icon{font-size:24px;margin-bottom:4px}
+.metric-card .metric-value{font-size:24px;font-weight:700;color:#1f2937}
+.metric-card .metric-unit{font-size:12px;color:#9ca3af}
+.metric-card .metric-label{font-size:13px;color:#6b7280;margin-top:2px}
+.metric-card .metric-time{font-size:11px;color:#d1d5db;margin-top:4px}
+.metric-card.normal .metric-value{color:var(--ok)}
+.metric-card.warning .metric-value{color:var(--warn)}
+.metric-card.critical .metric-value{color:var(--crit)}
+
+.device-list{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden}
+.device-list-title{background:var(--tcm-bg);padding:12px 16px;font-weight:600;color:var(--home);font-size:15px;border-bottom:1px solid var(--border)}
+.device-item{padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:12px}
+.device-item:last-child{border-bottom:none}
+.device-icon{width:40px;height:40px;border-radius:8px;background:var(--tcm-bg);display:flex;align-items:center;justify-content:center;font-size:20px}
+.device-info{flex:1}
+.device-name{font-size:14px;font-weight:500}
+.device-status{font-size:12px;color:#6b7280}
+.device-status.online{color:var(--ok)}
+.device-status.offline{color:#9ca3af}
+.device-time{font-size:11px;color:#d1d5db}
+
+.upload-section{background:#fff;border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px}
+.upload-section h3{font-size:15px;color:var(--home);margin-bottom:12px}
+.upload-section textarea{width:100%;min-height:100px;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:monospace;resize:vertical}
+.upload-section .hint{font-size:12px;color:#9ca3af;margin-top:4px}
+.btn-upload{margin-top:10px;padding:10px 20px;background:var(--home);color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+.btn-upload:hover{opacity:.9}
+
+.empty-state{text-align:center;padding:40px 20px;color:#9ca3af}
+.empty-state .icon{font-size:48px;margin-bottom:8px;opacity:.3}
+
+@media(max-width:360px){
+  .metric-grid{grid-template-columns:1fr 1fr}
+  .hero{padding:16px}
+}
+</style>
+</head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+<div class="page-header-bar">
+  <span class="dot"></span>
+  <h1>可穿戴设备中心</h1>
+  <a href="/treatment-center.html">返回</a>
+</div>
+
+<div class="container">
+  <div class="hero">
+    <h2>健康数据实时监控</h2>
+    <p>智能手表 / 手环 / 血压计 / 血糖仪 数据自动同步 · TCM 健康趋势分析</p>
+  </div>
+
+  <div id="metrics-area">
+    <div class="empty-state">
+      <div class="icon">⌚</div>
+      <p>暂无设备数据，请先上传或连接设备</p>
+    </div>
+  </div>
+
+  <div class="device-list">
+    <div class="device-list-title">已连接设备</div>
+    <div class="device-item">
+      <div class="device-icon">⌚</div>
+      <div class="device-info">
+        <div class="device-name">Apple Watch / 华为手环</div>
+        <div class="device-status offline">未连接</div>
+      </div>
+    </div>
+    <div class="device-item">
+      <div class="device-icon">🩺</div>
+      <div class="device-info">
+        <div class="device-name">蓝牙血压计</div>
+        <div class="device-status offline">未连接</div>
+      </div>
+    </div>
+    <div class="device-item">
+      <div class="device-icon">🩸</div>
+      <div class="device-info">
+        <div class="device-name">蓝牙血糖仪</div>
+        <div class="device-status offline">未连接</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="upload-section">
+    <h3>手动上传健康数据（JSON）</h3>
+    <textarea id="upload-data" placeholder='{"heart_rate":72,"systolic":120,"diastolic":80,"blood_glucose":5.5,"steps":8000,"spo2":98,"body_temp":36.5}'></textarea>
+    <div class="hint">支持字段：heart_rate, systolic, diastolic, blood_glucose, steps, spo2, body_temp, sleep_hours, weight</div>
+    <button class="btn-upload" onclick="uploadData()">上传并分析</button>
+  </div>
+
+  <div id="analysis-result"></div>
+</div>
+
+<script>
+var metricsOrder = [
+  {key:'heart_rate',label:'心率',icon:'❤️',unit:'bpm',normal:[60,100]},
+  {key:'systolic',label:'收缩压',icon:'🩺',unit:'mmHg',normal:[90,140]},
+  {key:'diastolic',label:'舒张压',icon:'🩺',unit:'mmHg',normal:[60,90]},
+  {key:'blood_glucose',label:'血糖',icon:'🩸',unit:'mmol/L',normal:[3.9,6.1]},
+  {key:'spo2',label:'血氧',icon:'🫁',unit:'%',normal:[95,100]},
+  {key:'body_temp',label:'体温',icon:'🌡️',unit:'°C',normal:[36.1,37.3]},
+  {key:'steps',label:'步数',icon:'👟',unit:'步',normal:[4000,null]},
+  {key:'sleep_hours',label:'睡眠',icon:'😴',unit:'h',normal:[6,9]}
+];
+
+var lastData = null;
+
+function renderMetrics(data) {
+  var area = document.getElementById('metrics-area');
+  if (!data) {
+    area.innerHTML = '<div class="empty-state"><div class="icon">⌚</div><p>暂无设备数据</p></div>';
+    return;
+  }
+  var cards = metricsOrder.filter(function(m) { return data[m.key] !== undefined; }).map(function(m) {
+    var v = data[m.key];
+    var cls = 'normal';
+    if (m.normal[0] !== null && v < m.normal[0]) cls = 'warning';
+    if (m.normal[1] !== null && v > m.normal[1]) cls = 'critical';
+    if (m.key === 'steps') { cls = v < 4000 ? 'warning' : 'normal'; }
+    return '<div class="metric-card ' + cls + '">'
+      + '<div class="metric-icon">' + m.icon + '</div>'
+      + '<div class="metric-value">' + v + '</div>'
+      + '<div class="metric-unit">' + m.unit + '</div>'
+      + '<div class="metric-label">' + m.label + '</div>'
+      + '<div class="metric-time">' + (new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})) + '</div>'
+      + '</div>';
+  });
+  area.innerHTML = '<div class="metric-grid">' + cards.join('') + '</div>';
+}
+
+async function uploadData() {
+  var text = document.getElementById('upload-data').value.trim();
+  if (!text) { toast('请输入数据'); return; }
+  try {
+    var data = JSON.parse(text);
+    lastData = data;
+    renderMetrics(data);
+    var res = await fetch('/api/tcm/wearable-ingest', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    }).then(r=>r.json());
+    var resultDiv = document.getElementById('analysis-result');
+    if (res.ok) {
+      var analysis = res.analysis || res.summary || '数据已记录';
+      resultDiv.innerHTML = '<div class="upload-section"><h3>TCM 健康分析</h3><p style="font-size:14px;color:#374151">' + (typeof analysis === 'string' ? analysis : JSON.stringify(analysis, null, 2)) + '</p><p style="font-size:12px;color:#9ca3af;margin-top:8px">仅供学习参考，重要事项请遵医嘱</p></div>';
+    } else {
+      resultDiv.innerHTML = '<div class="upload-section"><p style="color:var(--warn)">数据已保存，分析暂不可用</p></div>';
+    }
+    toast('数据上传成功');
+  } catch(e) {
+    toast('JSON 格式错误');
+  }
+}
+
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

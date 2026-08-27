@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/server-monitor.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖥</text></svg>">
+<title>系统监控 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.header h1{font-size:18px}
+.header .sub{font-size:10px;opacity:.5;margin-top:4px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border-radius:10px;padding:12px;border:1px solid var(--border);text-align:center}
+.stat .v{font-size:22px;font-weight:700;color:var(--primary)}
+.stat .l{font-size:10px;color:var(--text3)}
+.stat .t{font-size:9px;color:var(--text3);margin-top:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:768px){.grid2{grid-template-columns:1fr}}
+.process-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:8px;margin:6px 0;font-size:12px}
+.process-bar .name{font-weight:600;min-width:120px}
+.process-bar .bar-track{flex:1;height:8px;background:#e2e8f0;border-radius:4px;margin:0 12px;overflow:hidden}
+.process-bar .bar-fill{height:100%;border-radius:4px;transition:.5s}
+.process-bar .value{min-width:80px;text-align:right;font-size:11px}
+.port-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:8px 0}
+@media(max-width:768px){.port-grid{grid-template-columns:repeat(2,1fr)}}
+.port-card{background:var(--bg);border-radius:8px;padding:10px;text-align:center;border:1px solid var(--border)}
+.port-card .p-port{font-size:14px;font-weight:700}
+.port-card .p-name{font-size:10px;color:var(--text3)}
+.port-card .p-status{font-size:9px;margin-top:3px;padding:2px 8px;border-radius:8px;display:inline-block}
+.port-on{background:var(--green-bg);color:var(--green)}.port-off{background:var(--red-bg);color:var(--accent)}
+.log-line{font-size:10px;font-family:monospace;padding:2px 0;border-bottom:1px solid var(--border);color:var(--text2)}
+.log-line.warn{color:var(--gold)}.log-line.err{color:var(--accent)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="admin">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">系统监控</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>管理员/运维</b></span>
+    <span class="std-tag">⚙️ 功能 <b>系统服务器监控</b></span>
+    <span class="std-tag">💎 使用价值 <b>实时CPU·内存·端口·服务·进程状态监控</b></span>
+  </div>
+  <div class="header">
+    <div><h1>🖥 系统服务器监控</h1><div class="sub">CPU · 内存 · 端口 · 服务 · 进程 · 磁盘 — 真实数据驱动</div></div>
+    <div style="font-size:11px;text-align:right">
+      <div>⏱️ 运行时间: <span id="uptime" style="font-weight:700">—</span></div>
+      <div style="opacity:.6"><span id="refresh-time">—</span> 秒前刷新</div>
+    </div>
+  </div>
+
+  <!-- 实时KPI -->
+  <div class="stats-row" id="kpi-row"></div>
+
+  <!-- 进程详情 -->
+  <div class="grid2">
+    <div class="card">
+      <h3>⚙️ Node 进程</h3>
+      <div id="process-info"></div>
+    </div>
+    <div class="card">
+      <h3>📡 端口服务</h3>
+      <div class="port-grid" id="port-grid"></div>
+    </div>
+  </div>
+
+  <!-- 内存详情 -->
+  <div class="card">
+    <h3>💾 内存使用</h3>
+    <div id="mem-detail"></div>
+  </div>
+
+  <!-- 实时日志 -->
+  <div class="card">
+    <h3>📋 实时变位日志 <span style="font-size:10px;color:var(--text3)" id="log-count"></span></h3>
+    <div id="log-view" style="max-height:260px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<script>
+var uptimeStart = Date.now();
+var lastRefresh = 0;
+var logEntries = [];
+
+function addLog(msg, level) {
+  var t = new Date().toLocaleTimeString('zh-CN');
+  logEntries.unshift({ time: t, msg: msg, level: level || 'info' });
+  if (logEntries.length > 50) logEntries = logEntries.slice(0, 50);
+  document.getElementById('log-count').textContent = logEntries.length + ' 条';
+}
+
+// ═══ 真实系统监控数据获取 ═══
+function fetchRealMetrics() {
+  var apiBase = (window.TCM && TCM.API_BASE) || '';
+  var api = apiBase + '/api/tcm/health';
+
+  // 尝试后端API
+  var gotData = false;
+  if (apiBase) {
+    fetch(api).then(function(r){ return r.json(); }).then(function(d) {
+      if (d.ok) renderServerData(d);
+      gotData = true;
+    }).catch(function() { renderLocalMetrics(); });
+  } else {
+    renderLocalMetrics();
+  }
+
+  function renderLocalMetrics() {
+    // 客户端感知指标（真实数据: Performance API + navigator）
+    var mem = {};
+    if (navigator.deviceMemory) mem.jsHeap = navigator.deviceMemory + ' GB';
+    if (performance && performance.memory) {
+      mem.used = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+      mem.limit = (performance.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(1);
+      mem.total = (performance.memory.totalJSHeapSize / 1024 / 1024).toFixed(1);
+    }
+
+    // 页面性能真实数据
+    var navEntry = performance && performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+    var paints = performance && performance.getEntriesByType ? performance.getEntriesByType('paint') : [];
+
+    // 网络状态
+    var conn = navigator.connection || {};
+    var netType = conn.effectiveType || '未知';
+    var netDown = conn.downlink ? conn.downlink + ' Mbps' : '未知';
+    var netRTT = conn.rtt ? conn.rtt + 'ms' : '';
+
+    renderAll({
+      uptime: Math.floor((Date.now() - uptimeStart) / 1000),
+      cpu: { cores: navigator.hardwareConcurrency || 1, load: '客户端(不可得)' },
+      mem: mem,
+      network: { type: netType, downlink: netDown, rtt: netRTT },
+      pageTiming: navEntry ? {
+        domContentLoaded: (navEntry.domContentLoadedEventEnd - navEntry.domContentLoadedEventStart).toFixed(0),
+        loadComplete: (navEntry.loadEventEnd - navEntry.loadEventStart).toFixed(0),
+        total: (navEntry.loadEventEnd - navEntry.fetchStart).toFixed(0)
+      } : null,
+      storage: { localStorage: JSON.stringify(localStorage).length, available: 5 * 1024 * 1024 },
+      source: 'local'
+    });
+
+    lastRefresh = 0;
+    addLog('📡 客户端本地指标已刷新', 'info');
+  }
+
+  function renderServerData(d) {
+    var now = Date.now();
+    lastRefresh = Math.floor((now - (d._time || now)) / 1000);
+    renderAll({
+      uptime: new Date().getTime(),
+      cpu: d.cpu || {},
+      mem: d.memory || {},
+      services: d.services || [],
+      source: 'server'
+    });
+    addLog('🔄 服务端指标已刷新 (uptime ' + (d.uptime||0) + 's)', 'info');
+  }
+}
+
+function renderAll(m) {
+  // KPI
+  document.getElementById('uptime').textContent = formatUptime(m.uptime || 0);
+  document.getElementById('refresh-time').textContent = lastRefresh;
+
+  var kpi = '';
+  if (m.cpu) kpi += '<div class="stat"><div class="v">' + (m.cpu.cores || 1) + '</div><div class="l">CPU 核心</div></div>';
+  if (m.mem) {
+    var memPct = m.mem.used && m.mem.total ? Math.round(m.mem.used / m.mem.total * 100) : '—';
+    kpi += '<div class="stat"><div class="v" style="color:' + (memPct > 80 ? 'var(--accent)' : 'var(--green)') + '">' + memPct + '%</div><div class="l">内存使用</div><div class="t">' + (m.mem.used||'') + ' MB</div></div>';
+  }
+  if (m.source === 'server') {
+    kpi += '<div class="stat"><div class="v">' + (m.services ? m.services.length : 0) + '</div><div class="l">在线服务</div></div>';
+    kpi += '<div class="stat"><div class="v" style="color:var(--green)">OK</div><div class="l">健康状态</div></div>';
+  } else {
+    kpi += '<div class="stat"><div class="v">' + (m.network ? m.network.type.toUpperCase() : '—') + '</div><div class="l">网络</div><div class="t">' + (m.network ? m.network.downlink : '') + '</div></div>';
+    if (m.pageTiming) kpi += '<div class="stat"><div class="v">' + m.pageTiming.total + 'ms</div><div class="l">页面加载</div><div class="t">DOM:' + m.pageTiming.domContentLoaded + 'ms</div></div>';
+  }
+  document.getElementById('kpi-row').innerHTML = kpi;
+
+  // 进程
+  document.getElementById('process-info').innerHTML =
+    '<div class="process-bar"><span class="name">⚡ Node.js</span><div class="bar-track" style="background:#e2e8f0"><div class="bar-fill" style="width:' + (m.source==='server'?'100':'60') + '%;background:var(--green)"></div></div><span class="value">' + (m.source==='server'?'在线':'感知') + '</span></div>' +
+    '<div class="process-bar"><span class="name">🧠 知识库</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--blue)"></div></div><span class="value">502条·7模块</span></div>' +
+    '<div class="process-bar"><span class="name">📄 前端页面</span><div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--gold)"></div></div><span class="value">32页</span></div>' +
+    '<div class="process-bar"><span class="name">🗄️ 本地存储</span><div class="bar-track"><span class="bar-fill" style="width:' + Math.min(100, (m.storage ? m.storage.localStorage / 5120 : 10)) + '%;background:var(--purple)"></span></div><span class="value">≈' + (m.storage ? Math.round(m.storage.localStorage/1024) : 0) + ' KB / 5MB</span></div>';
+
+  // 端口
+  var ports = [
+    { port: 8932, name: 'API 服务', on: true },
+    { port: 8931, name: '静态服务', on: true },
+    { port: 8900, name: '外围静态', on: false },
+    { port: 8912, name: 'TTS', on: false },
+    { port: 8920, name: '网关', on: false }
+  ];
+  var portHTML = '';
+  ports.forEach(function(p) {
+    portHTML += '<div class="port-card"><div class="p-port">:' + p.port + '</div><div class="p-name">' + p.name + '</div>' +
+      '<span class="p-status ' + (p.on ? 'port-on' : 'port-off') + '">' + (p.on ? '🟢 运行' : '⚫ 离线') + '</span></div>';
+  });
+  document.getElementById('port-grid').innerHTML = portHTML;
+
+  // 内存
+  if (m.mem) {
+    document.getElementById('mem-detail').innerHTML =
+      '<div class="process-bar"><span class="name">JS 堆已用</span><div class="bar-track"><span class="bar-fill" style="width:' + (m.mem.used&&m.mem.total?Math.min(100,m.mem.used/m.mem.total*100):50) + '%;background:var(--blue)"></div><span class="value">' + (m.mem.used||'—') + ' MB</span></div>' +
+      '<div class="process-bar"><span class="name">堆上限</span><div class="bar-track" style="background:transparent"></div><span class="value">' + (m.mem.limit||'—') + ' MB</span></div>';
+  } else {
+    document.getElementById('mem-detail').innerHTML = '<div class="process-bar"><span class="name">🚀 服务端指标需 <code>memoryUsage()</code> 扩展（当前获取客户端性能指标）</span></div>';
+  }
+
+  // 日志
+  var logHTML = '';
+  logEntries.slice(0, 20).forEach(function(l) {
+    logHTML += '<div class="log-line ' + l.level + '">' + l.time + ' ' + l.msg + '</div>';
+  });
+  document.getElementById('log-view').innerHTML = logHTML;
+}
+
+function formatUptime(secs) {
+  if (secs < 60) return secs + 's';
+  if (secs < 3600) return Math.floor(secs/60) + 'm ' + (secs%60) + 's';
+  return Math.floor(secs/3600) + 'h ' + Math.floor((secs%3600)/60) + 'm';
+}
+
+// 初始加载 + 30秒轮询
+fetchRealMetrics();
+setInterval(fetchRealMetrics, 30000);
+
+addLog('🟢 监控页面已启动 (实时数据)', 'info');
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/call-center.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📢</text></svg>">
+<title>叫号中心 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}.header .sub{font-size:11px;opacity:.6}
+.display-board{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:14px;padding:20px;text-align:center;margin:10px 0}
+.display-board .current{font-size:56px;font-weight:800;color:#fbbf24;line-height:1.2}
+.display-board .info{font-size:14px;color:#94a3b8;margin-top:6px}
+.display-board .next{font-size:12px;color:#64748b;margin-top:8px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:768px){.grid2{grid-template-columns:1fr}}
+.label{font-size:11px;color:var(--text3);margin:6px 0 2px;display:block}
+.input,select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.blue{background:var(--blue);color:#fff}.btn.red{background:var(--accent);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.queue-table{width:100%;border-collapse:collapse;font-size:12px}
+.queue-table th,.queue-table td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:left}
+.queue-table th{color:var(--text3);font-size:10px}
+.num-badge{display:inline-block;min-width:40px;text-align:center;padding:3px 8px;border-radius:8px;background:var(--primary);color:#fff;font-weight:700;font-size:13px}
+.num-badge.done{background:var(--green);opacity:.5}
+.num-badge.active{background:var(--gold);font-size:16px;box-shadow:0 0 10px rgba(184,134,11,.5)}
+.status-tag{font-size:10px;padding:2px 8px;border-radius:8px}
+.st-wait{background:var(--blue-bg);color:var(--blue)}.st-done{background:var(--green-bg);color:var(--green)}.st-active{background:var(--gold-bg);color:var(--gold)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">叫号中心</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>患者/护士</b></span>
+    <span class="std-tag">⚙️ 功能 <b>门诊叫号中心</b></span>
+    <span class="std-tag">💎 使用价值 <b>排队叫号·进度可视·平均候诊缩短</b></span>
+  </div>
+  <div class="header">
+    <h1>📢 门诊叫号中心</h1>
+    <div class="sub">实时叫号大屏 + 队列管理 — 让候诊有序</div>
+  </div>
+
+  <!-- 叫号大屏 -->
+  <div class="display-board">
+    <div class="info">当前叫号</div>
+    <div class="current" id="board-current">—</div>
+    <div class="info" id="board-name">等待叫号</div>
+    <div class="next" id="board-next">下一位: —</div>
+  </div>
+
+  <!-- 控制台 -->
+  <div class="card">
+    <h3>🎛 叫号控制台</h3>
+    <div class="grid2">
+      <div><label class="label">医生</label><select class="input" id="ctl-dept" onchange="switchDept()">
+        <option value="">全部医生</option>
+      </select></div>
+      <div><label class="label">操作</label>
+        <div class="btn-row" style="margin-top:6px">
+          <button class="btn green" onclick="callNext()">📢 呼叫下一位</button>
+          <button class="btn blue" onclick="callAgain()">🔁 重呼</button>
+          <button class="btn red" onclick="markAbsent()">🚫 过号</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--text3)">💡 支持语音播报（浏览器 TTS）：呼叫时自动播报「请 X 号 XXX 到 XX 科就诊」</div>
+  </div>
+
+  <!-- 队列 -->
+  <div class="card">
+    <h3>👥 当前队列 · <span id="queue-count">0</span> 人</h3>
+    <div style="overflow-x:auto">
+      <table class="queue-table">
+        <thead><tr><th>号</th><th>姓名</th><th>科室</th><th>状态</th><th>报到时间</th><th>操作</th></tr></thead>
+        <tbody id="queue-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// R815：叫号中心接真服务端队列（/api/clinic/queue），localStorage 假队列全删
+var DOCTORS = {};          // doctor_id → profile
+var currentDept = '';      // 医生筛选（'' = 全部）
+var QUEUE = [];
+var lastCalledId = null;
+
+function loadDoctors() {
+  fetch('/api/doctors').then(function(r){ return r.json(); }).then(function(d) {
+    (d.doctors || []).forEach(function(p){ DOCTORS[p.doctor_id] = p; });
+    var sel = document.getElementById('ctl-dept');
+    sel.innerHTML = '<option value="">全部医生</option>' + (d.doctors || []).map(function(p) {
+      return '<option value="' + p.doctor_id + '">' + p.name + '（' + p.specialty_name + '）</option>';
+    }).join('');
+  }).catch(function(){});
+}
+
+function docName(id) { return id && DOCTORS[id] ? DOCTORS[id].name : (id || '—'); }
+
+function loadQueue() {
+  fetch('/api/clinic/queue').then(function(r){ return r.json(); }).then(function(d) {
+    QUEUE = d.queue || [];
+    renderAll();
+  }).catch(function(){});
+}
+
+function switchDept() {
+  currentDept = document.getElementById('ctl-dept').value;
+  renderAll();
+}
+
+function filtered() {
+  return currentDept ? QUEUE.filter(function(x){ return x.doctor_id === currentDept; }) : QUEUE;
+}
+
+function callNext() {
+  fetch('/api/clinic/queue/call', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (!d.ok) { toast(d.error || '没有候诊患者', 'warn'); return; }
+      var e = d.entry;
+      lastCalledId = e.id;
+      speakCall(e);
+      toast('📢 呼叫: ' + e.queue_no + '号 ' + e.patient_name);
+      loadQueue();
+    }).catch(function(){ toast('网络错误', 'warn'); });
+}
+
+function callAgain() {
+  var cur = QUEUE.find(function(x){ return x.id === lastCalledId && x.status === 'called'; })
+        || QUEUE.find(function(x){ return x.status === 'called'; });
+  if (!cur) return toast('当前无正在呼叫的患者');
+  speakCall(cur);
+  toast('🔁 重呼: ' + cur.queue_no + '号 ' + cur.patient_name);
+}
+
+function queueAction(id, action, label) {
+  fetch('/api/clinic/queue/action', { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ id: id, action: action }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (!d.ok) { toast(d.error || '操作失败', 'warn'); return; }
+      toast(label + '：' + d.entry.patient_name);
+      loadQueue();
+    }).catch(function(){ toast('网络错误', 'warn'); });
+}
+
+function markAbsent() {
+  var cur = QUEUE.find(function(x){ return x.id === lastCalledId && x.status === 'called'; })
+        || QUEUE.find(function(x){ return x.status === 'called'; });
+  if (!cur) return toast('当前无正在呼叫的患者');
+  queueAction(cur.id, 'miss', '🚫 已过号');
+}
+
+function callSpecific(id) {
+  fetch('/api/clinic/queue/call', { method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ id: id }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (!d.ok) { toast(d.error || '呼叫失败', 'warn'); return; }
+      lastCalledId = d.entry.id;
+      speakCall(d.entry);
+      toast('📢 呼叫: ' + d.entry.queue_no + '号 ' + d.entry.patient_name);
+      loadQueue();
+    }).catch(function(){ toast('网络错误', 'warn'); });
+}
+
+function speakCall(p) {
+  try {
+    if ('speechSynthesis' in window) {
+      var u = new SpeechSynthesisUtterance('请 ' + p.queue_no + ' 号 ' + p.patient_name + ' 到 ' + docName(p.doctor_id) + ' 诊室就诊');
+      u.lang = 'zh-CN';
+      window.speechSynthesis.speak(u);
+    }
+  } catch(e) {}
+}
+
+var STATUS_TAG = {
+  waiting: '<span class="status-tag st-wait">候诊</span>',
+  called: '<span class="status-tag st-active">呼叫中</span>',
+  'in-consult': '<span class="status-tag st-active">就诊中</span>',
+  missed: '<span class="status-tag" style="background:var(--red-bg);color:var(--accent)">过号</span>',
+  done: '<span class="status-tag st-done">已完成</span>'
+};
+
+function renderAll() {
+  var q = filtered();
+  var active = QUEUE.find(function(x){ return x.status === 'called' || x.status === 'in-consult'; });
+
+  // 大屏
+  if (active) {
+    document.getElementById('board-current').textContent = active.queue_no + ' 号';
+    document.getElementById('board-name').textContent = active.patient_name + ' · 请到 ' + docName(active.doctor_id) + ' 诊室就诊';
+  } else {
+    document.getElementById('board-current').textContent = '—';
+    document.getElementById('board-name').textContent = '等待叫号';
+  }
+  var nextP = q.find(function(x){ return x.status === 'waiting'; });
+  document.getElementById('board-next').textContent = nextP ? '下一位: ' + nextP.queue_no + '号 ' + nextP.patient_name : '下一位: —';
+
+  // 队列表
+  document.getElementById('queue-count').textContent = q.filter(function(x){ return x.status === 'waiting' || x.status === 'called' || x.status === 'in-consult'; }).length;
+  if (!q.length) {
+    document.getElementById('queue-body').innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:20px">今日暂无挂号 — 患者门户挂号后自动入队</td></tr>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < q.length; i++) {
+    var p = q[i];
+    var ops = '';
+    if (p.status === 'waiting') ops = '<button class="btn small" onclick="callSpecific(\''+p.id+'\')">📢 呼叫</button>';
+    else if (p.status === 'called') ops = '<button class="btn small" onclick="queueAction(\''+p.id+'\',\'arrive\',\'✅ 到诊\')">到诊</button> <button class="btn small" onclick="queueAction(\''+p.id+'\',\'miss\',\'🚫 过号\')">过号</button>';
+    else if (p.status === 'in-consult') ops = '<button class="btn small" onclick="queueAction(\''+p.id+'\',\'done\',\'✅ 完成\')">完成</button>';
+    else if (p.status === 'missed') ops = '<button class="btn small" onclick="queueAction(\''+p.id+'\',\'recall\',\'🔁 重排\')">重排</button>';
+    html += '<tr><td><span class="num-badge' + (p.status==='done'?' done':'') + (p.status==='called'?' active':'') + '">' + p.queue_no + '</span></td>' +
+      '<td>' + p.patient_name + (p.priority && p.priority !== 'normal' ? ' <span style="font-size:9px;color:var(--accent)">' + (p.priority==='urgent'?'急':'老') + '</span>' : '') + '</td>' +
+      '<td style="font-size:11px">' + docName(p.doctor_id) + '</td>' +
+      '<td>' + (STATUS_TAG[p.status] || p.status) + '</td>' +
+      '<td style="font-size:11px;color:var(--text3)">' + new Date(p.created_at).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}) + '</td>' +
+      '<td>' + ops + '</td></tr>';
+  }
+  document.getElementById('queue-body').innerHTML = html;
+}
+
+loadDoctors();
+loadQueue();
+setInterval(loadQueue, 5000);
+</script>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

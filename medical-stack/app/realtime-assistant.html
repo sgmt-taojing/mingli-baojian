@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>实时智能助手 · 语音×知识库×视觉零延迟</title>
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/realtime-assistant.html">
+<style>
+:root{
+  --bg:#0c0f14; --panel:#12161d; --panel2:#181e28; --line:#262d38;
+  --ink:#e8eef5; --ink2:#8b96a5; --gold:#3f9d6e; --gold2:#5ec98f;
+  --green:#4ade80; --amber:#fbbf24; --red:#f87171; --blue:#60a5fa;
+  --green-bg:rgba(74,222,128,.1); --amber-bg:rgba(251,191,36,.1);
+  --red-bg:rgba(248,113,113,.1); --blue-bg:rgba(96,165,250,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 18px;background:linear-gradient(135deg,#1a1f28,#11151c);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+header .brand{font-size:18px;letter-spacing:2px;color:var(--gold2)}
+header .brand small{font-size:11px;color:var(--ink2);letter-spacing:0;margin-left:8px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:3px 10px;border-radius:16px;border:1px solid var(--line);font-size:11px;color:var(--ink2);background:var(--panel)}
+.chip b{color:var(--ink)}
+.chip.gold{border-color:rgba(201,168,76,.45);color:var(--gold2);background:rgba(201,168,76,.08)}
+.chip.green{border-color:rgba(74,222,128,.45);color:var(--green);background:var(--green-bg)}
+.chip.red{border-color:rgba(248,113,113,.45);color:var(--red);background:var(--red-bg)}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{padding:8px 20px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink2);cursor:pointer;font-size:13px}
+.tab.active{background:rgba(201,168,76,.12);border-color:var(--gold);color:var(--gold2)}
+.pane{display:none}
+.pane.active{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.card h2{font-size:15px;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);display:inline-block}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.micbtn{width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);background:rgba(201,168,76,.08);color:var(--gold2);font-size:24px;cursor:pointer;flex-shrink:0;transition:all .2s}
+.micbtn:hover{border-color:var(--gold2);transform:scale(1.04)}
+.micbtn.recording{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(248,113,113,.5)}70%{box-shadow:0 0 0 14px rgba(248,113,113,0)}100%{box-shadow:0 0 0 0 rgba(248,113,113,0)}}
+.vbar{flex:1;min-width:120px;height:8px;border-radius:4px;background:var(--panel2);overflow:hidden}
+.vbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .12s}
+.transcript{min-height:80px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:10px;font-size:13px}
+.transcript .interim{color:var(--gold)}
+.transcript .final{color:var(--ink)}
+.transcript .hint{color:var(--ink2);text-align:center;padding:20px 0}
+.textinput{display:flex;gap:8px;margin-top:10px}
+.textinput input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--ink);font-size:13px;outline:none}
+.textinput input:focus{border-color:var(--gold)}
+.textinput button{background:var(--gold);border:none;border-radius:8px;color:#191303;font-weight:600;padding:0 18px;cursor:pointer}
+.textinput button:hover{background:var(--gold2)}
+.kblist{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
+.kbcard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--panel2);animation:fadein .25s}
+@keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.kbcard .row1{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.kbcard .title{font-size:13px;font-weight:600}
+.kbcard .tier{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap}
+.tier.direct{background:var(--green-bg);color:var(--green)}
+.tier.summary{background:var(--amber-bg);color:var(--amber)}
+.tier.ai{background:var(--red-bg);color:var(--red)}
+.kbcard .meta{font-size:11px;color:var(--ink2);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+.kbcard .content{font-size:12px;color:var(--ink2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.answer{background:var(--panel2);border:1px solid rgba(201,168,76,.3);border-radius:8px;padding:12px;font-size:13px;min-height:60px;white-space:pre-wrap}
+.answer .src{display:inline-block;font-size:11px;color:var(--gold2);border:1px solid rgba(201,168,76,.4);border-radius:10px;padding:1px 8px;margin-bottom:6px}
+.empty{color:var(--ink2);font-size:12px;text-align:center;padding:20px 8px;border:1px dashed var(--line);border-radius:8px}
+.video-box{position:relative;border-radius:8px;overflow:hidden;background:#000;aspect-ratio:16/9}
+.video-box video{width:100%;height:100%;object-fit:cover;display:block}
+.video-box .st{position:absolute;left:8px;bottom:8px;background:rgba(12,15,20,.8);color:var(--ink);font-size:11px;padding:3px 10px;border-radius:12px}
+.mode-row{display:flex;gap:8px;margin:10px 0}
+.mode-btn{padding:6px 16px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--ink2);cursor:pointer;font-size:12px}
+.mode-btn.active{border-color:var(--gold);color:var(--gold2);background:rgba(201,168,76,.1)}
+.feats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.feat{font-size:11px;padding:3px 10px;border-radius:12px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(96,165,250,.3)}
+.vmatch{font-size:12px;padding:6px 10px;border-radius:6px;background:var(--green-bg);color:var(--green);border:1px solid rgba(74,222,128,.3);margin-top:6px}
+.err{color:var(--red);font-size:12px;background:var(--red-bg);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:8px 10px;margin-top:10px;display:none}
+.err.show{display:block}
+.note{font-size:11px;color:var(--ink2);margin-top:10px;line-height:1.7}
+.note code{color:var(--blue)}
+footer{color:var(--ink2);font-size:11px;text-align:center;padding:16px 0}
+</style>
+</head>
+<body>
+<div class="page-header-bar" data-theme="home">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">实时助手</span>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="brand">TCM 智能体 · 实时智能助手<small>语音 × 知识库 × 视觉 · 零延迟</small><a href="index.html" style="margin-left:12px;color:inherit;font-size:12px;opacity:.75;text-decoration:none">← 返回首页</a></div>
+    <div class="chips">
+      <span class="chip">状态：<b id="stateLabel">待命</b></span>
+      <span class="chip">KB <b id="kbLat">–</b></span>
+      <span class="chip gold" id="kbHitChip">KB 直答 0 次</span>
+      <span class="chip" id="modeChip">语音:Web Speech</span>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" id="tabVoice" type="button">🗣 实时语音问询</button>
+    <button class="tab" id="tabVision" type="button">📷 实时视觉诊察</button>
+  </div>
+
+  <!-- ═══════ 语音问询 ═══════ -->
+  <div class="pane active" id="paneVoice">
+    <div class="card">
+      <h2><span class="dot"></span>实时收音 <small style="font-size:11px;color:var(--ink2)">Web Speech API · 边说边查知识库</small></h2>
+      <div class="row">
+        <button id="micBtn" class="micbtn" aria-label="开始语音输入">🎙</button>
+        <div class="vbar" aria-hidden="true"><i id="volBar"></i></div>
+      </div>
+      <div class="row" style="margin-top:10px;gap:14px">
+        <label style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="autoSubmit" checked> 说完自动识别
+        </label>
+        <label style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="autoRelisten" checked> 答完继续听
+        </label>
+        <label style="font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px">语言
+          <select id="langSel" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 8px;font-size:12px">
+            <option value="zh-CN" selected>普通话</option>
+            <option value="zh-TW">粤语/繁体</option>
+            <option value="en-US">English</option>
+          </select>
+        </label>
+      </div>
+      <div class="transcript" id="transcript"><div class="hint">点击麦克风或<b>按住空格</b>说话——您还没说完，知识库已在同步检索</div></div>
+      <div class="textinput">
+        <input id="textInput" type="text" placeholder="或直接输入问题（例如：帮我查一下…）" aria-label="问题输入">
+        <button id="sendBtn" type="button">提问</button>
+      </div>
+      <div class="err" id="voiceErr"></div>
+      <div class="note">💡 三级分级：命中分 ≥0.7 → <b style="color:var(--green)">KB 直答</b>（即时朗读）；0.4~0.7 → KB 摘要；&lt;0.4 → 引导补充信息。检索命中后可直接朗读，无需等待 AI。</div>
+    </div>
+    <div class="card">
+      <h2><span class="dot"></span>知识库实时互通 <small style="font-size:11px;color:var(--ink2)">FTS5 全文检索 · 命中即答</small></h2>
+      <div class="kblist" id="kbList"><div class="empty">实时检索结果将在此流出</div></div>
+    </div>
+    <div class="card">
+      <h2><span class="dot"></span>答复 <small style="font-size:11px;color:var(--ink2)">KB 直答优先</small></h2>
+      <div class="answer" id="answerBox"><span class="src" style="display:none"></span><span style="color:var(--ink2)">提问后，知识库直答或综合答复会显示在这里</span></div>
+    </div>
+  </div>
+
+  <!-- ═══════ 视觉诊察 ═══════ -->
+  <div class="pane" id="paneVision">
+    <div class="card">
+      <h2><span class="dot"></span>实时视觉诊察 <small style="font-size:11px;color:var(--ink2)">抽帧 → 识别 → KB 匹配 · 与语音同一零延迟规则</small></h2>
+      <div class="video-box">
+        <video id="cam" autoplay playsinline muted></video>
+        <span class="st" id="visState">未启动</span>
+      </div>
+      <div class="mode-row" id="modeRow">
+        <button class="mode-btn active" data-mode="face" type="button">面诊</button>
+        <button class="mode-btn" data-mode="tongue" type="button">舌诊</button>
+        <button class="mode-btn" data-mode="eye" type="button">眼诊</button>
+        <button class="mode-btn" data-mode="hand" type="button">手诊</button>
+        <button class="mode-btn" data-mode="lip" type="button">唇诊</button>
+      </div>
+      <div class="row">
+        <button id="visStart" class="tab active" style="flex:1;text-align:center" type="button">▶ 开始实时识别</button>
+        <button id="visStop" class="tab" style="flex:1;text-align:center" type="button">■ 停止</button>
+      </div>
+      <div class="feats" id="visFeats"></div>
+      <div id="visMatches"></div>
+      <div class="err" id="visErr"></div>
+      <div class="note">📷 实时采集 → 实时识别 → 实时知识库匹配 → 无等待反馈。识别服务不可用时会明确提示并自动暂停，绝不静默失败。</div>
+    </div>
+  </div>
+
+  <footer>TCM 智能体 · Realtime Engine v2.1 · 提示词：prompts/mingli-medical.md · 共享引擎源：projects/_shared/realtime-interaction/</footer>
+</div>
+
+<script src="js/realtime/realtime-voice.js"></script>
+<script src="js/realtime/realtime-kb.js"></script>
+<script src="js/realtime/realtime-vision.js"></script>
+<script src="js/realtime/realtime-engine.js"></script>
+<script>
+(function(){
+'use strict';
+var API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+var TTS_API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8912' : '';
+var VISION_API = 'http://127.0.0.1:8913/api/camera/upload';
+
+var $ = function(id){ return document.getElementById(id); };
+var els = {
+  micBtn:$('micBtn'), volBar:$('volBar'), transcript:$('transcript'), textInput:$('textInput'),
+  sendBtn:$('sendBtn'), kbList:$('kbList'), answerBox:$('answerBox'), voiceErr:$('voiceErr'),
+  stateLabel:$('stateLabel'), kbLat:$('kbLat'), kbHitChip:$('kbHitChip'), modeChip:$('modeChip'),
+  tabVoice:$('tabVoice'), tabVision:$('tabVision'), paneVoice:$('paneVoice'), paneVision:$('paneVision'),
+  cam:$('cam'), visStart:$('visStart'), visStop:$('visStop'), visState:$('visState'),
+  visFeats:$('visFeats'), visMatches:$('visMatches'), visErr:$('visErr'), modeRow:$('modeRow'),
+  autoSubmit:$('autoSubmit'), autoRelisten:$('autoRelisten'), langSel:$('langSel')
+};
+var directCount = 0, currentMode = 'face', speaking = false, listenAfterAnswer = true;
+
+function speak(text){
+  if (!TTS_API || !text) return;
+  try {
+    stopSpeak();
+    speaking = true;
+    els.stateLabel.textContent = '正在答复…';
+    var a = new Audio(TTS_API + '/tts?text=' + encodeURIComponent(text.substring(0, 300)) + '&voice=female');
+    window.__rtAudio = a;
+    a.onended = function(){ speaking = false; els.stateLabel.textContent = '待命'; maybeRelisten(); };
+    a.onerror = function(){ speaking = false; els.stateLabel.textContent = '待命'; maybeRelisten(); };
+    a.play().catch(function(){ speaking = false; els.stateLabel.textContent = '待命'; });
+  } catch(e){ /* TTS 失败不影响回答 */ }
+}
+function stopSpeak(){
+  speaking = false;
+  try { if (window.__rtAudio) { window.__rtAudio.pause(); window.__rtAudio = null; } } catch(e){ /* ignore */ }
+}
+function maybeRelisten(){
+  // turn-taking：答完继续听（主流语音助手连续对话模式）
+  if (listenAfterAnswer && voice.isSupported() && !voice.isListening()) {
+    setTimeout(function(){ voice.start(); }, 400);
+  }
+}
+
+/* ═════════ 语音引擎（VAD 自动提交 + PTT + 打断就绪） ═════════ */
+var voice = new RealtimeVoice({
+  continuous: true, interimResults: true, volumeMeter: true, autoRestart: true,
+  autoSubmitMs: 900,          // 停顿 0.9s 视为说完（主流语音助手模式）
+  emitFinalOnStop: true,      // PTT 松开即提交
+  onState: function(s){
+    var listening = (s === 'listening' || s === 'starting');
+    els.micBtn.classList.toggle('recording', listening);
+    els.micBtn.textContent = listening ? '⏺' : '🎙';
+    els.micBtn.setAttribute('aria-label', listening ? '停止语音输入' : '开始语音输入');
+  },
+  onVolume: function(v){ els.volBar.style.width = Math.max(4, v) + '%'; },
+  onError: function(err){
+    if (!err || !err.message) return;
+    els.voiceErr.textContent = err.message;
+    els.voiceErr.classList.add('show');
+    setTimeout(function(){ els.voiceErr.classList.remove('show'); }, 6000);
+  }
+});
+if (!voice.isSupported()) {
+  els.modeChip.textContent = '语音:粘贴降级';
+  els.modeChip.style.color = 'var(--amber)';
+}
+
+function renderTranscript(interim, accum){
+  var f = esc(accum || ''), i = esc(interim || '');
+  els.transcript.innerHTML = (f ? '<div class="final">' + f + '</div>' : '') +
+    (i ? '<div class="interim">' + i + '</div>' : '') +
+    (!f && !i ? '<div class="hint">点击麦克风开始说话——您还没说完，知识库已在同步检索</div>' : '');
+}
+
+/* ═════════ KB 引擎（实时互通） ═════════ */
+var kb = new RealtimeKB({
+  apiBase: API + '/api/public/kb/realtime-search',
+  maxResults: 5,
+  onResult: function(r){ renderKb(r); },
+  onStatus: function(st){
+    if (typeof st.latencyMs === 'number') els.kbLat.textContent = st.latencyMs + 'ms';
+    if (st.error && !kb._fbTried) { kb._fbTried = true; kb._opts.apiBase = 'http://127.0.0.1:8920/api/public/kb/realtime-search'; els.kbLat.textContent = '共享KB'; }
+  }
+});
+
+function renderKb(r){
+  if (!r || !r.items || !r.items.length) return;
+  var tierClass = { direct:'direct', summary:'summary', ai:'ai' }[r.tier] || 'ai';
+  var tierLabel = { direct:'KB 直答', summary:'KB 摘要', ai:'AI 兜底' }[r.tier] || '';
+  if (r.tier === 'direct') { directCount++; els.kbHitChip.textContent = 'KB 直答 ' + directCount + ' 次'; }
+  var html = r.items.slice(0, 4).map(function(it, idx){
+    return '<div class="kbcard"><div class="row1"><span class="title">' + esc(it.title || '知识条目') + '</span>' +
+      '<span class="tier ' + tierClass + '">' + (idx === 0 ? tierLabel : '') + '</span></div>' +
+      '<div class="meta"><span>来源:KB' + (it.module ? '·' + esc(it.module) : '') + '</span><span>' + r.latencyMs + 'ms</span>' +
+      (r.cacheHit ? '<span>缓存</span>' : '') + '<span>命中分 ' + Math.round((r.score || 0) * 100) + '%</span></div>' +
+      '<div class="content">' + esc((it.content || '').substring(0, 160)) + '</div></div>';
+  }).join('');
+  els.kbList.innerHTML = html;
+  // KB 直答 → 立即给出答复并朗读（无需等 AI）
+  if (r.tier === 'direct' && r.items[0]) {
+    var item = r.items[0];
+    var answer = '【依据典籍 · ' + esc(item.title || '') + '】\n' + (item.content || '').substring(0, 400);
+    els.answerBox.innerHTML = '<span class="src">来源:KB · 命中分 ' + Math.round((r.score || 0) * 100) + '%</span>' + esc(answer);
+    speak('根据知识库：' + (item.title || '') + '。' + (item.content || '').substring(0, 120));
+  }
+}
+
+/* ═════════ 视觉引擎 ═════════ */
+var vision = new RealtimeVision({
+  videoEl: els.cam, endpoint: VISION_API, intervalMs: 800, mode: 'face',
+  onResult: function(r){
+    els.visState.textContent = '实时识别中 · ' + r.latencyMs + 'ms';
+    if (r.features && r.features.length) {
+      els.visFeats.innerHTML = r.features.slice(0, 8).map(function(f){ return '<span class="feat">' + esc(f) + '</span>'; }).join('');
+    }
+    if (r.matches && r.matches.length) {
+      els.visMatches.innerHTML = r.matches.slice(0, 4).map(function(m){
+        return '<div class="vmatch">📖 ' + esc(m.title || m.entry_id || '知识条目') + ' — ' + esc((m.snippet || m.content || '').substring(0, 60)) + '</div>';
+      }).join('');
+    }
+    // R749 修真：结论实时推送桌面 HUD（隐私最小化——仅特征/证型，无图像）
+    if (window.DesktopHUD && r.features && r.features.length) {
+      var first = r.features[0] || '';
+      DesktopHUD.push({
+        source: vision._opts.mode || 'face',
+        syndrome: first,
+        detail: (r.matches && r.matches[0] ? r.matches[0].title : '') || '',
+        confidence: r.confidence || null,
+        urgency: 'P3_ROUTINE'
+      });
+    }
+    // R760 缺口补齐：手诊视觉结果接规则引擎（结构化辨证——证候+科室+建议）
+    if ((vision._opts.mode === 'hand') && r.features && r.features.length) {
+      var _handText = r.features.join('、');
+      fetch(API + '/api/tcm/hand-diagnosis', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: _handText })
+      }).then(function(resp){ return resp.json(); }).then(function(hd){
+        if (hd && hd.ok && hd.matched && hd.matched.length) {
+          var hdHtml = hd.matched.map(function(m){
+            return '<div class="vmatch" style="border-left:3px solid #2563eb">🖐 <b>' + esc(m.syndrome) + '</b>（' + esc(m.dept) + '）<br><span style="font-size:11px;color:var(--text2)">' + esc(m.advice) + '</span></div>';
+          }).join('');
+          els.visMatches.innerHTML = hdHtml + (els.visMatches.innerHTML || '');
+          // HUD 推送结构化证候(多个时取第一个)
+          if (window.DesktopHUD) {
+            DesktopHUD.push({
+              source: 'hand',
+              syndrome: hd.matched[0].syndrome,
+              detail: hd.matched[0].advice,
+              confidence: null,
+              urgency: 'P3_ROUTINE'
+            });
+          }
+        }
+      }).catch(function(){});
+    }
+  },
+  onStatus: function(st){ els.visState.textContent = st.detail || st.status; },
+  onError: function(e){
+    els.visErr.textContent = e.message;
+    els.visErr.classList.add('show');
+    setTimeout(function(){ els.visErr.classList.remove('show'); }, 8000);
+  }
+});
+
+/* ═════════ 编排 ═════════ */
+var engine = new RealtimeEngine({
+  voice: voice, kb: kb, vision: vision, kbDirectSpeak: false, // 朗读由本页 speak 统一处理
+  onEvent: function(type, p){
+    if (type === 'statechange') {
+      els.stateLabel.textContent = p.label;
+      // 三态反馈：聆听金 / 思考蓝 / 说话绿 / 待命灰
+      var dot = document.querySelector('.card h2 .dot');
+      if (dot) {
+        dot.style.background = p.state === 'listening' ? 'var(--amber)' : (p.state === 'searching' ? 'var(--blue)' : (p.state === 'answering' ? 'var(--green)' : 'var(--gold)'));
+        dot.style.boxShadow = p.state === 'listening' ? '0 0 8px var(--amber)' : 'none';
+      }
+    }
+    else if (type === 'interim') {
+      renderTranscript(p.text, p.accum);
+      // barge-in：用户再次开口 → 立即打断朗读（主流语音助手标配）
+      if (speaking) stopSpeak();
+    }
+    else if (type === 'final') { renderTranscript('', p.accum); }
+    else if (type === 'voice_error' && p && p.code === 'unsupported') {
+      els.voiceErr.textContent = p.message; els.voiceErr.classList.add('show');
+    }
+  }
+});
+
+/* ═════════ 交互绑定（点击 + PTT 空格 + 开关 + 语言） ═════════ */
+els.micBtn.addEventListener('click', function(){ voice.toggle(); });
+
+// PTT：按住空格说话，松开提交（对讲机式，主流对讲/语音输入模式）
+var pttActive = false;
+document.addEventListener('keydown', function(e){
+  if (e.code !== 'Space' || e.repeat) return;
+  var tag = (document.activeElement && document.activeElement.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return; // 输入框内不劫持空格
+  e.preventDefault();
+  pttActive = true;
+  if (!voice.isListening()) voice.start();
+});
+document.addEventListener('keyup', function(e){
+  if (e.code !== 'Space' || !pttActive) return;
+  e.preventDefault();
+  pttActive = false;
+  if (voice.isListening()) voice.stop(); // emitFinalOnStop → 自动提交
+});
+
+// 开关：说完自动识别 / 答完继续听
+els.autoSubmit.addEventListener('change', function(){ voice._opts.autoSubmitMs = els.autoSubmit.checked ? 900 : 0; });
+els.autoRelisten.addEventListener('change', function(){ listenAfterAnswer = els.autoRelisten.checked; });
+
+// 语言切换：重建识别器
+els.langSel.addEventListener('change', function(){
+  voice._opts.lang = els.langSel.value;
+  var wasListening = voice.isListening();
+  if (wasListening) voice.stop();
+  voice._createRecognition();
+  if (wasListening) voice.start();
+});
+
+function ask(text){
+  text = (text || '').trim();
+  if (!text) return;
+  voice.feedText(text);
+  renderTranscript('', text);
+  kb.search(text, { force: true });
+  els.answerBox.innerHTML = '<span style="color:var(--ink2)">正在查阅典籍…（KB 命中即直答）</span>';
+}
+els.sendBtn.addEventListener('click', function(){ ask(els.textInput.value); els.textInput.value = ''; });
+els.textInput.addEventListener('keydown', function(e){ if (e.key === 'Enter') els.sendBtn.click(); });
+
+// Tab 切换
+els.tabVoice.addEventListener('click', function(){
+  els.tabVoice.classList.add('active'); if (els.tabVision) els.tabVision.classList.remove('active');
+  els.paneVoice.classList.add('active'); if (els.paneVision) els.paneVision.classList.remove('active');
+});
+if (els.tabVision && VISION_API) {
+  els.tabVision.addEventListener('click', function(){
+    els.tabVision.classList.add('active'); els.tabVoice.classList.remove('active');
+    els.paneVision.classList.add('active'); els.paneVoice.classList.remove('active');
+  });
+} else if (els.tabVision) {
+  els.tabVision.style.display = 'none';   // 视觉未接入：隐藏 Tab，避免装饰性无响应按钮
+  if (els.paneVision) els.paneVision.style.display = 'none';
+}
+if (els.visStart && VISION_API) {
+  els.visStart.addEventListener('click', function(){
+    // R749 修真：隐私同意前置——无同意记录则弹横幅，拒绝则不启动摄像头
+    if (window.PrivacyConsent) {
+      var gate = null;
+      PrivacyConsent.consentGate('realtime-assistant').then(function(g){
+        if (!g.ok) {
+          PrivacyConsent.showConsentBanner(function(dec){
+            if (dec && dec.ok) {
+              vision._opts.mode = currentMode;
+              vision.start();
+              DesktopHUD.mount();
+              DesktopHUD.setStatus('listening');
+            } else {
+              els.visState.textContent = '已拒绝视觉授权 · 仅语音/问诊可用';
+            }
+          });
+          return;
+        }
+        vision._opts.mode = currentMode;
+        vision.start();
+        DesktopHUD.mount();
+        DesktopHUD.setStatus('listening');
+      });
+      return;
+    }
+    vision._opts.mode = currentMode;
+    if (vision.getStatus() === 'scanning') vision.stop();
+    else vision.start();
+  });
+  els.visStop.addEventListener('click', function(){
+    vision.stop();
+    if (window.DesktopHUD) DesktopHUD.setStatus('idle');
+  });
+  els.modeRow.addEventListener('click', function(e){
+    var btn = e.target.closest('.mode-btn');
+    if (!btn) return;
+    currentMode = btn.getAttribute('data-mode');
+    els.modeRow.querySelectorAll('.mode-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    vision._opts.mode = currentMode;
+  });
+}
+
+})();
+</script>
+  <script src="js/nav.js" defer></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ai-assistant.js"></script>
+</body>
+</html>

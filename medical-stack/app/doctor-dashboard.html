@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+    '<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/doctor-dashboard.html">' +
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>医生工作台 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🩺</text></svg>">
+<style>
+:root{
+  --bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;
+  --accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;
+  --text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;
+  --red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+
+/* Top bar */
+.topbar{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.topbar h1{font-size:16px;letter-spacing:2px}
+.topbar .user-info{font-size:12px;opacity:.8}
+.topbar .btn-exit{color:rgba(255,255,255,.6);cursor:pointer;font-size:12px;text-decoration:none;padding:4px 10px;border-radius:4px;border:1px solid rgba(255,255,255,.2)}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 44px)}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.sidebar{background:var(--card);border-right:1px solid var(--border);padding:12px}
+.sidebar .nav-item{display:block;padding:10px 12px;border-radius:6px;font-size:13px;color:var(--text2);text-decoration:none;margin-bottom:2px;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.sidebar .nav-item:hover,.sidebar .nav-item.active{background:var(--primary);color:#fff}
+.sidebar .nav-divider{border-top:1px solid var(--border);margin:8px 0}
+.main{padding:12px;overflow-y:auto}
+
+/* Cards */
+.card{background:var(--card);border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+.card-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:900px){.card-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.card-row{grid-template-columns:1fr}}
+
+.stat-mini{background:var(--bg);border-radius:8px;padding:10px;text-align:center}
+.stat-mini .val{font-size:22px;font-weight:700;color:var(--primary)}
+.stat-mini .lbl{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* Patient queue */
+.patient-item{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border);cursor:pointer;transition:.1s}
+.patient-item:hover{background:var(--bg)}
+.patient-item.current{background:var(--blue-bg);border-left:3px solid var(--blue)}
+.patient-item .queue-num{font-size:18px;font-weight:700;color:var(--primary);width:36px;text-align:center}
+.patient-item .info{flex:1}
+.patient-item .name{font-size:14px;font-weight:600}
+.patient-item .meta{font-size:11px;color:var(--text3)}
+.patient-item .status-badge{font-size:10px;padding:3px 8px;border-radius:10px}
+.status-waiting{background:var(--blue-bg);color:var(--blue)}
+.status-diagnosing{background:var(--gold-bg);color:var(--gold)}
+.status-done{background:var(--green-bg);color:var(--green)}
+
+/* Workflow steps */
+.workflow{display:flex;gap:4px;margin:12px 0;flex-wrap:wrap}
+.workflow .wf-step{flex:1;padding:10px;text-align:center;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg);min-width:80px}
+.workflow .wf-step.done{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.workflow .wf-step.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.workflow .wf-step.current{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);border-style:dashed}
+
+/* Forms */
+.input,select,textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+textarea{min-height:60px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}}
+.label{font-size:11px;color:var(--text3);margin-bottom:2px;display:block}
+
+/* Buttons */
+.btn{display:inline-block;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.secondary{background:var(--bg);color:var(--primary);border:1px solid var(--border)}
+.btn.green{background:var(--green);color:#fff}
+.btn.accent{background:var(--accent);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+
+/* AI suggestion box */
+.ai-box{background:linear-gradient(135deg,#eff6ff,#f0f9ff);border:1px solid #93c5fd;border-radius:8px;padding:12px}
+.ai-box .ai-label{font-size:10px;color:var(--blue);font-weight:700;margin-bottom:4px}
+.ai-box .ai-content{font-size:12px;color:var(--text);line-height:1.5}
+
+/* Prescription herbs */
+.herb-row{display:flex;gap:6px;align-items:center;margin-bottom:4px}
+.herb-row input{flex:1;min-width:0}
+.herb-row input.herb-name{flex:2}
+.herb-row input.herb-dose{flex:1;max-width:70px}
+
+/* Wearable status */
+.wearable-device{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px;margin:2px}
+.wearable-device.online{background:var(--green-bg);color:var(--green)}
+.wearable-device.offline{background:var(--red-bg);color:var(--accent)}
+
+/* Hidden panels */
+.panel{display:none}
+.panel.active{display:block}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:12px;max-width:700px;width:95%;max-height:85vh;overflow-y:auto;padding:20px}
+.modal h3{font-size:16px;color:var(--primary);margin-bottom:12px}
+.modal .close-btn{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999;animation:toastIn .3s}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/rx-loop.js" defer></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">医生工作台</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>医生</b></span><span class="std-tag">⚙️ 功能 <b>医生工作台·6步诊疗</b></span><span class="std-tag">💎 使用价值 <b>候诊→望闻问切→AI辅助→处方全流程</b></span></div>
+
+<div class="topbar">
+  <h1>🩺 中医诊疗系统</h1>
+  <div>
+    <span class="user-info" id="user-info">未登录</span>
+    <a class="btn-exit" href="login.html" onclick="logout()">退出</a>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div style="padding:8px;font-size:11px;color:var(--text3);text-transform:uppercase">导航</div>
+    <button class="nav-item active" onclick="showPanel('queue')">👥 候诊队列</button>
+    <button class="nav-item" onclick="showPanel('diagnosis')">🔬 诊断中</button>
+    <div class="nav-divider"></div>
+    <button class="nav-item" onclick="showPanel('prescription')">💊 处方管理</button>
+    <button class="nav-item" onclick="showPanel('records')">📋 历史病例</button>
+    <!-- R762 移除冗余 family-consult 入口 -->
+
+    <div class="nav-divider"></div>
+    <div style="padding:8px;font-size:11px;color:var(--text3);text-transform:uppercase">设备</div>
+    <div id="wearable-list" style="padding:4px 8px;font-size:11px">加载中...</div>
+    <div class="nav-divider"></div>
+    <a class="nav-item" href="clinical.html" target="_blank">🔬 四诊采集 →</a>
+    <a class="nav-item" href="admin.html" target="_blank">📊 管理后台 →</a>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <!-- Panel: Queue -->
+    <div class="panel active" id="panel-queue">
+      <div class="card-row">
+        <div class="stat-mini"><div class="val" id="q-waiting">0</div><div class="lbl">等待中</div></div>
+        <div class="stat-mini"><div class="val" id="q-today">0</div><div class="lbl">今日接诊</div></div>
+        <div class="stat-mini"><div class="val" id="q-total">0</div><div class="lbl">本月累计</div></div>
+      </div>
+      <div class="card">
+        <h3>👥 候诊队列</h3>
+        <div id="queue-list">暂无候诊患者</div>
+      </div>
+
+      <!-- R811：家庭问诊审核恢复（R762 迁出后无家可归，R802 修好的审方面板从未能打开） -->
+      <div id="overdue-banner" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:8px;padding:8px 10px;font-size:12px;margin-bottom:8px"></div>
+      <div class="card">
+        <h3>🩺 家庭问诊审核</h3>
+        <div id="followup-stats" style="margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <select class="input" id="fc-filter" onchange="loadFamilyConsults()" style="width:auto">
+            <option value="pending_review">待审核</option>
+            <option value="all">全部</option>
+          </select>
+          <button class="btn small secondary" onclick="loadFamilyConsults()">🔄 刷新</button>
+          <button class="btn small secondary" onclick="pushOverdueFollowups()">📋 推送逾期随访</button>
+        </div>
+        <div id="family-consult-list">加载中…</div>
+      </div>
+    </div>
+
+    <!-- Panel: Diagnosis -->
+    <div class="panel" id="panel-diagnosis">
+      <div class="workflow" id="diagnosis-workflow"></div>
+      <div class="card" id="diagnosis-content"></div>
+    </div>
+
+    <!-- Panel: Prescription -->
+    <div class="panel" id="panel-prescription">
+      <div class="card">
+        <h3>💊 处方管理</h3>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <select class="input" id="rx-filter" onchange="renderPrescriptions()" style="width:auto">
+            <option value="all">全部</option>
+            <option value="pending_review">待审核</option>
+            <option value="verified">已审核</option>
+            <option value="dispensed">已发药</option>
+            <option value="completed">已完成</option>
+          </select>
+          <button class="btn secondary small" onclick="loadPrescriptions()">🔄 刷新</button>
+          <button class="btn small secondary" onclick="printPrescription()">🖨️ 打印</button>
+        </div>
+        <div id="prescription-list">暂无处方</div>
+      </div>
+    </div>
+
+    <!-- Panel: Records -->
+    <div class="panel" id="panel-records">
+      <div class="card">
+        <h3>📋 历史病例</h3>
+        <input  class="input" placeholder="搜索患者姓名/主诉/诊断..." oninput="renderRecords()" id="record-search" style="margin-bottom:8px" aria-label="搜索患者姓名/主诉/诊断..." data-validate="required|min=2">
+        <div id="records-list">暂无记录</div>
+      </div>
+    </div>
+
+    <!-- R762 修真：家庭问诊审核迁移到 family-portal.html（按场景分流, 不在医生工作台重复） -->
+  </div>
+</div>
+
+<!-- Modal: Start diagnosis -->
+<div class="modal-overlay" id="diagnosis-modal">
+  <div class="modal" id="diagnosis-modal-content"></div>
+</div>
+
+<script>
+// ═══ 全局状态 ═══
+const state = {
+  user: null,
+  currentPatient: null,
+  currentDiagnosis: null,
+  queue: [],
+  wearableDevices: []
+};
+
+// ═══ 初始化 ═══
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('tcm_user');
+  if (saved) {
+    state.user = JSON.parse(saved);
+    document.getElementById('user-info').textContent = 
+      `👨‍⚕️ ${state.user.name}（${state.user.roleName}）· ${state.user.specialtyName||''}`;
+  } else {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  generateQueue();
+  loadWearableDevices();
+  showPanel('queue');
+  if (window.loadFamilyConsults) loadFamilyConsults();   // R811：家庭问诊审核卡初始化
+  setInterval(generateQueue, 30000);
+});
+
+// ═══ 候诊队列 ═══
+function generateQueue() {
+  // ═══ 真实数据优先：患者自助挂号的记录 ═══
+  const registrations = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
+  const liveRegs = registrations.filter(r => r.status !== 'done' && r.status !== 'cancelled');
+
+  if (liveRegs.length > 0) {
+    // 用真实挂号数据生成候诊队列
+    state.queue = liveRegs.map((r, i) => ({
+      id: r.id || 'P'+(2000+i),
+      name: r.name,
+      age: r.age || 30,
+      gender: r.gender || '男',
+      queue_num: r.queue_num || (i+1),
+      chief_complaint: r.complaint || '',
+      department: r.department_name || '',
+      doctor: r.doctor || '',
+      status: 'waiting',
+      registered_at: r.time || new Date().toISOString()
+    }));
+  } else {
+    // 无真实挂号时用演示数据
+    const names = ['王小明','李建国','张三妹','赵四海','钱美丽','孙老者','周阿姨','吴大叔','郑女士','冯先生'];
+    const complaints = [
+      '失眠多梦，头晕乏力2周','咳嗽咳痰，胸闷1周','胃痛腹胀，食欲不振3天',
+      '月经不调，痛经','关节疼痛，屈伸不利','反复感冒，免疫力下降',
+      '腰膝酸软，畏寒','头痛如针刺，血压偏高','便秘，口苦口干','皮肤瘙痒'
+    ];
+
+    state.queue = names.map((n,i) => ({
+      id: 'P'+(2000+i),
+      name: n,
+      age: 25 + ((i*7) % 55),
+      gender: i%2 ? '女' : '男',
+      queue_num: i+1,
+      chief_complaint: complaints[i],
+      status: 'waiting',
+      registered_at: new Date(Date.now() - (i+1)*600000).toISOString()
+    }));
+  }
+
+  // Stats
+  document.getElementById('q-waiting').textContent = state.queue.filter(q => q.status==='waiting').length;
+  document.getElementById('q-today').textContent = 3;
+  document.getElementById('q-total').textContent = 47;
+
+  // Render
+  let html = '';
+  for (const p of state.queue) {
+    html += `<div class="patient-item ${p.id===state.currentPatient?.id?'current':''}" onclick="startDiagnosis('${p.id}')">
+      <div class="queue-num">${p.queue_num}</div>
+      <div class="info">
+        <div class="name">${p.name} · ${p.age}岁 · ${p.gender}</div>
+        <div class="meta">${p.chief_complaint}</div>
+      </div>
+      <span class="status-badge status-waiting">候诊</span>
+    </div>`;
+  }
+  document.getElementById('queue-list').innerHTML = html || '暂无候诊患者';
+}
+
+// ═══ 开始诊断 ═══
+function startDiagnosis(patientId) {
+  const p = state.queue.find(q => q.id === patientId);
+  if (!p) return;
+  state.currentPatient = p;
+  p.status = 'diagnosing';
+  state.currentDiagnosis = createEmptyDiagnosis(p);
+  
+  // 同步更新挂号状态为诊断中
+  const regs = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
+  const reg = regs.find(r => r.id === patientId);
+  if (reg) { reg.status = 'diagnosing'; localStorage.setItem('tcm_registrations', JSON.stringify(regs)); }
+  
+  showPanel('diagnosis');
+  renderDiagnosisWorkflow(0);
+  renderQueue();
+}
+
+function createEmptyDiagnosis(patient) {
+  return {
+    patient,
+    complaint: patient.chief_complaint || '',
+    inquiry: {},
+    tongue: null,
+    face: null,
+    hand: null,
+    wearable: null,
+    ai_suggestions: null,
+    diagnosis: '',
+    syndrome: '',
+    treatment: '',
+    prescription: null,
+    step: 0
+  };
+}
+
+// ═══ 诊断工作流（6步） ═══
+const WORKFLOW_STEPS = ['望诊', '闻诊', '问诊', '切诊', 'AI辅助', '处方'];
+
+function renderDiagnosisWorkflow(currentStep) {
+  let html = '';
+  for (let i = 0; i < WORKFLOW_STEPS.length; i++) {
+    let cls = '';
+    if (i < currentStep) cls = 'done';
+    else if (i === currentStep) cls = 'active';
+    html += `<div class="wf-step ${cls}" onclick="navigateStep(${i})">${i+1}. ${WORKFLOW_STEPS[i]}</div>`;
+  }
+  document.getElementById('diagnosis-workflow').innerHTML = html;
+
+  const d = state.currentDiagnosis;
+  if (!d) return;
+
+  const p = d.patient;
+  let content = '';
+  
+  if (currentStep === 0) { // 望诊
+    content = `
+      <h3>👁️ 望诊 — ${p.name} · ${p.age}岁 · ${p.gender}</h3>
+      <div class="card-row">
+        <div class="stat-mini" onclick="openWearable('tongue')" style="cursor:pointer">
+          <div style="font-size:28px">👅</div><div class="lbl">舌诊仪采集</div>
+          <div style="font-size:10px;color:var(--green)">设备在线</div>
+        </div>
+        <div class="stat-mini" onclick="openWearable('face')" style="cursor:pointer">
+          <div style="font-size:28px">👤</div><div class="lbl">面诊仪采集</div>
+          <div style="font-size:10px;color:var(--green)">设备在线</div>
+        </div>
+        <div class="stat-mini" onclick="openClinicalPage()" style="cursor:pointer">
+          <div style="font-size:28px">🖐️</div><div class="lbl">手动四诊采集</div>
+          <div style="font-size:10px;color:var(--text3)">打开采集页</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding:8px;background:#faf8f5;border-radius:6px;font-size:11px;color:var(--text2)">
+        📸 <strong>快速上传</strong>：
+        <input  type="file" accept="image/*" capture="environment" onchange="quickUploadTongue(this)" style="display:none" id="tongue-upload" aria-label="tongue upload">
+        <button class="btn small secondary" onclick="document.getElementById('tongue-upload').click()">👅 拍舌头</button>
+        <input  type="file" accept="image/*" onchange="quickUploadFace(this)" style="display:none" id="face-upload" aria-label="face upload">
+        <button class="btn small secondary" onclick="document.getElementById('face-upload').click()">👤 拍面部</button>
+        <input  type="file" accept="image/*" onchange="quickUploadHand(this)" style="display:none" id="hand-upload" aria-label="hand upload">
+        <button class="btn small secondary" onclick="document.getElementById('hand-upload').click()">🖐️ 拍手掌</button>
+      </div>
+      <div style="margin-top:12px">
+        <label class="label">舌象观察</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          ${renderTags(['淡红','淡白','红','绛','紫暗'], 'tongue-color')}
+        </div>
+        <label class="label">苔象观察</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          ${renderTags(['薄白','白腻','黄腻','黄燥','少苔','剥苔'], 'coating')}
+        </div>
+        <label class="label">面色观察</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${renderTags(['明润','晦暗','潮红','苍白','萎黄','黧黑'], 'complexion')}
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="navigateStep(1)">下一步：闻诊 →</button>
+      </div>`;
+  } else if (currentStep === 1) { // 闻诊
+    content = `
+      <h3>👂 闻诊</h3>
+      <div class="form-row">
+        <div><label class="label">声音</label><select class="input" id="voice-quality"><option value="">正常</option><option value="洪亮">洪亮</option><option value="低微">低微</option><option value="嘶哑">嘶哑</option></select></div>
+        <div><label class="label">呼吸</label><select class="input" id="breath"><option value="">正常</option><option value="气促">气促</option><option value="短气">短气</option><option value="喘粗">喘粗</option></select></div>
+      </div>
+      <div class="form-row">
+        <div><label class="label">咳嗽</label><select class="input" id="cough"><option value="">无</option><option value="干咳">干咳</option><option value="咳痰">咳痰</option><option value="阵咳">阵咳</option></select></div>
+        <div><label class="label">体味</label><input  class="input" placeholder="正常/异常描述" aria-label="正常/异常描述"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="navigateStep(0)">← 上一步</button>
+        <button class="btn primary" onclick="navigateStep(2)">下一步：问诊 →</button>
+      </div>`;
+  } else if (currentStep === 2) { // 问诊
+    content = `
+      <h3>📝 问诊</h3>
+      <textarea class="input" id="inquiry-text" placeholder="主诉、现病史、既往史...">${d.complaint}</textarea>
+      <div class="form-row" style="margin-top:8px">
+        <div><label class="label">寒热</label><select class="input" id="chills-fever"><option value="">正常</option><option>恶寒</option><option>发热</option><option>恶寒发热</option><option>寒热往来</option></select></div>
+        <div><label class="label">出汗</label><select class="input" id="sweat"><option value="">正常</option><option>自汗</option><option>盗汗</option><option>无汗</option></select></div>
+      </div>
+      <div class="form-row">
+        <div><label class="label">饮食</label><select class="input" id="appetite"><option value="">正常</option><option>食欲减退</option><option>多食易饥</option><option>厌食</option></select></div>
+        <div><label class="label">口味</label><select class="input" id="taste"><option value="">正常</option><option>口苦</option><option>口淡</option><option>口甜</option><option>口黏</option></select></div>
+      </div>
+      <div class="form-row">
+        <div><label class="label">大便</label><select class="input" id="bowel"><option value="">正常</option><option>便秘</option><option>便溏</option><option>腹泻</option></select></div>
+        <div><label class="label">小便</label><select class="input" id="urine"><option value="">正常</option><option>清长</option><option>短赤</option><option>频数</option></select></div>
+      </div>
+      <div class="form-row">
+        <div><label class="label">睡眠</label><select class="input" id="sleep"><option value="">正常</option><option>失眠</option><option>多梦</option><option>易醒</option><option>嗜睡</option></select></div>
+        <div><label class="label">情绪</label><select class="input" id="emotion"><option value="">正常</option><option>烦躁</option><option>抑郁</option><option>焦虑</option></select></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="navigateStep(1)">← 上一步</button>
+        <button class="btn primary" onclick="navigateStep(3)">下一步：切诊 →</button>
+      </div>`;
+  } else if (currentStep === 3) { // 切诊
+    content = `
+      <h3>🤚 切诊（脉诊 + 触诊）</h3>
+      <div class="stat-mini" onclick="openWearable('pulse')" style="cursor:pointer;margin-bottom:12px">
+        <div style="font-size:28px">⌚</div><div class="lbl">脉诊手环采集</div>
+        <div style="font-size:10px;color:var(--green)">设备在线 · 电池85%</div>
+      </div>
+      <div class="form-row">
+        <div><label class="label">脉位</label><select class="input" id="pulse-depth"><option value="中">中（正常）</option><option value="浮">浮</option><option value="沉">沉</option></select></div>
+        <div><label class="label">脉数</label><select class="input" id="pulse-speed"><option value="中">中（正常）</option><option value="数">数（快）</option><option value="迟">迟（慢）</option></select></div>
+      </div>
+      <div class="form-row">
+        <div><label class="label">脉力</label><select class="input" id="pulse-strength"><option value="中">中（正常）</option><option value="有力">有力</option><option value="无力">无力</option></select></div>
+        <div><label class="label">脉形</label><select class="input" id="pulse-shape"><option value="">正常</option><option value="弦">弦</option><option value="滑">滑</option><option value="涩">涩</option><option value="细">细</option><option value="洪">洪</option></select></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="navigateStep(2)">← 上一步</button>
+        <button class="btn primary" onclick="navigateStep(4)">下一步：AI辅助 →</button>
+      </div>`;
+  } else if (currentStep === 4) { // AI辅助
+    const suggestions = generateAISuggestions(d);
+    d.ai_suggestions = suggestions;
+    content = `
+      <h3>🤖 AI 辅助诊断</h3>
+      <div class="ai-box">
+        <div class="ai-label">命理宝鉴·医道 · 多流派辨证参考</div>
+        <div class="ai-content">${suggestions.analysis}</div>
+      </div>
+      <div style="margin-top:8px">
+        <div class="ai-box" style="background:linear-gradient(135deg,#f0fdf4,#f0fff4);border-color:#86efac">
+          <div class="ai-label" style="color:var(--green)">💊 方剂参考</div>
+          <div class="ai-content">${suggestions.formula_suggestion}</div>
+        </div>
+      </div>
+      ${suggestions.contraindications.length ? `
+      <div class="ai-box" style="background:linear-gradient(135deg,#fef2f2,#fff5f5);border-color:#fca5a5;margin-top:8px">
+        <div class="ai-label" style="color:var(--accent)">⚠️ 禁忌提示</div>
+        <div class="ai-content">${suggestions.contraindications.join('<br>')}</div>
+      </div>` : ''}
+      <label class="label" style="margin-top:12px">诊断（证型）</label>
+      <input  class="input" id="final-diagnosis" value="${suggestions.suggested_diagnosis}" placeholder="如：心脾两虚证" aria-label="如：心脾两虚证">
+      <label class="label" style="margin-top:8px">治则</label>
+      <input  class="input" id="final-treatment" value="${suggestions.suggested_treatment}" placeholder="如：补益心脾，养血安神" aria-label="如：补益心脾，养血安神">
+      <div class="btn-row">
+        <button class="btn secondary" onclick="navigateStep(3)">← 上一步</button>
+        <button class="btn green" onclick="navigateStep(5)">开具处方 →</button>
+      </div>`;
+  } else if (currentStep === 5) { // 处方
+    content = renderPrescriptionForm(d);
+  }
+
+  document.getElementById('diagnosis-content').innerHTML = content;
+}
+
+function renderTags(options, field) {
+  return options.map(o => 
+    `<span class="feature-tag" data-val="${o}" data-field="${field}" onclick="toggleTag(this)" style="display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;background:var(--bg);border:1px solid var(--border);cursor:pointer;transition:.2s">${o}</span>`
+  ).join('');
+}
+
+// 安全函数：标签点击切换选中状态（兼容直接 onclick 调用）
+function toggleTag(el) {
+  if (!el) return;
+  el.classList.toggle('selected');
+  el.style.background = el.classList.contains('selected') ? 'var(--primary)' : 'var(--bg)';
+  el.style.color = el.classList.contains('selected') ? '#fff' : 'var(--text)';
+  el.style.borderColor = el.classList.contains('selected') ? 'var(--primary)' : 'var(--border)';
+  // 收集选中值到当前诊断
+  if (state.currentDiagnosis && el.dataset.field) {
+    var vals = Array.from(document.querySelectorAll('.feature-tag.selected[data-field="' + el.dataset.field + '"]')).map(t => t.dataset.val);
+    state.currentDiagnosis[el.dataset.field] = vals;
+  }
+}
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('feature-tag')) {
+    e.target.classList.toggle('selected');
+    e.target.style.background = e.target.classList.contains('selected') ? 'var(--primary)' : 'var(--bg)';
+    e.target.style.color = e.target.classList.contains('selected') ? '#fff' : 'var(--text)';
+    e.target.style.borderColor = e.target.classList.contains('selected') ? 'var(--primary)' : 'var(--border)';
+  }
+});
+
+function generateAISuggestions(d) {
+  const complaint = d.complaint || '';
+  const patterns = [
+    { match: /失眠|多梦|睡不着/, diagnosis: '心脾两虚', treatment: '补益心脾，养血安神', formula: '归脾汤', contra: ['忌生冷油腻', '注意调节情绪'] },
+    { match: /咳嗽|咳痰|胸闷/, diagnosis: '风寒束肺', treatment: '疏风散寒，宣肺止咳', formula: '止嗽散', contra: ['忌辛辣刺激', '注意保暖'] },
+    { match: /胃痛|腹胀|食欲不振/, diagnosis: '脾胃虚弱', treatment: '健脾和胃，理气消胀', formula: '香砂六君子汤', contra: ['忌暴饮暴食', '少食多餐'] },
+    { match: /月经|痛经/, diagnosis: '肝郁气滞', treatment: '疏肝解郁，调经止痛', formula: '逍遥散', contra: ['经期忌寒凉', '注意情绪管理'] },
+    { match: /关节|疼痛|屈伸/, diagnosis: '风寒湿痹', treatment: '祛风散寒，除湿通络', formula: '独活寄生汤', contra: ['注意关节保暖', '避免潮湿环境'] },
+    { match: /头痛|头晕/, diagnosis: '肝阳上亢', treatment: '平肝潜阳，清热安神', formula: '天麻钩藤饮', contra: ['忌烟酒', '控制血压'] },
+    { match: /感冒|发热|怕冷/, diagnosis: '风寒表证', treatment: '辛温解表，宣肺散寒', formula: '桂枝汤', contra: ['服后覆被取微汗', '忌食生冷'] },
+    { match: /乏力|疲劳|没精神/, diagnosis: '气血两虚', treatment: '益气养血，扶正固本', formula: '八珍汤', contra: ['注意休息', '适当运动'] },
+  ];
+
+  for (const p of patterns) {
+    if (p.match.test(complaint)) {
+      return {
+        analysis: `<strong>主证：${p.diagnosis}</strong><br>从四诊合参分析：${complaint.replace(/。/,'，')}。结合舌脉表现，综合八纲辨证，属<strong>${p.diagnosis}</strong>范畴。<br><br>
+<strong>多流派参考：</strong><br>
+· 伤寒派：六经辨证中属相应经证<br>
+· 温病派：需辨卫气营血层次<br>
+· 扶阳派：注意阳气盛衰<br>
+· 脾胃派：脾胃为后天之本，调护为先`,
+        formula_suggestion: `推荐方剂：<strong>${p.formula}</strong><br>出自经典医籍，为${p.diagnosis}常用方。<br>建议由医师根据具体脉证加减调整。`,
+        contraindications: p.contra || [],
+        suggested_diagnosis: p.diagnosis,
+        suggested_treatment: p.treatment
+      };
+    }
+  }
+
+  return {
+    analysis: '<strong>需进一步四诊合参</strong><br>当前症状信息不足以明确证型，建议补充舌脉等信息后再行辨证。',
+    formula_suggestion: '建议四诊合参后由执业医师辨证处方，不推荐盲目用药。',
+    contraindications: ['信息不足，不宜仓促处方'],
+    suggested_diagnosis: '',
+    suggested_treatment: ''
+  };
+}
+
+function renderPrescriptionForm(d) {
+  const s = d.ai_suggestions || {};
+  const templates = [
+    { name: '桂枝汤', herbs: [{name:'桂枝',dosage:'9g'},{name:'芍药',dosage:'9g'},{name:'甘草',dosage:'6g',note:'炙'},{name:'生姜',dosage:'9g'},{name:'大枣',dosage:'12枚'}] },
+    { name: '小柴胡汤', herbs: [{name:'柴胡',dosage:'24g'},{name:'黄芩',dosage:'9g'},{name:'人参',dosage:'9g'},{name:'半夏',dosage:'9g'},{name:'甘草',dosage:'9g'},{name:'生姜',dosage:'9g'},{name:'大枣',dosage:'12枚'}] },
+    { name: '归脾汤', herbs: [{name:'白术',dosage:'9g'},{name:'当归',dosage:'9g'},{name:'茯苓',dosage:'9g'},{name:'黄芪',dosage:'12g'},{name:'龙眼肉',dosage:'9g'},{name:'酸枣仁',dosage:'12g'},{name:'人参',dosage:'6g'},{name:'甘草',dosage:'6g'}] },
+    { name: '逍遥散', herbs: [{name:'柴胡',dosage:'9g'},{name:'当归',dosage:'9g'},{name:'白芍',dosage:'9g'},{name:'白术',dosage:'9g'},{name:'茯苓',dosage:'9g'},{name:'甘草',dosage:'6g'}] }
+  ];
+
+  let herbHtml = templates.map(t => `<button class="btn small secondary" onclick="applyTemplate('${t.name}')">📋 ${t.name}</button>`).join(' ');
+
+  let html = `<h3>💊 开具处方 — ${d.patient.name}</h3>
+    <div class="ai-box">
+      <div class="ai-label">AI 辅助诊断</div>
+      <div class="ai-content">诊断：${s.suggested_diagnosis || '未确定'}<br>治则：${s.suggested_treatment || '未确定'}</div>
+    </div>
+    <div style="margin-top:8px"><label class="label">方剂模板</label><div class="btn-row">${herbHtml}</div></div>
+    <label class="label" style="margin-top:8px">中药组成</label>
+    <div id="herb-list">
+      <div class="herb-row"><input  class="input herb-name" placeholder="药名" aria-label="药名"><input  class="input herb-dose" placeholder="剂量" aria-label="剂量"><button class="btn small accent" onclick="removeHerb(this)">✕</button></div>
+    </div>
+    <button class="btn small secondary" onclick="addHerb()">+ 添加</button>
+    <div style="margin-top:12px">
+      <label class="label">煎服方法</label>
+      <select class="input" id="decoction-method">
+        <option value="hospital_decoct">🏥 医院代煎</option>
+        <option value="self_decoct">🏠 自行煎药</option>
+      </select>
+    </div>
+    <div style="margin-top:8px">
+      <label class="label">取药方式</label>
+      <select class="input" id="delivery-method" onchange="toggleAddress()">
+        <option value="self_pickup">🏥 医院自取</option>
+        <option value="mail">📦 快递邮寄</option>
+      </select>
+    </div>
+    <div id="address-row" style="display:none;margin-top:8px">
+      <label class="label">邮寄地址</label>
+      <input  class="input" id="delivery-address" placeholder="详细地址+收件人+电话" aria-label="详细地址+收件人+电话" data-validate="phone">
+    </div>
+    <label class="label" style="margin-top:8px">医嘱备注</label>
+    <textarea class="input" id="prescription-notes" placeholder="服药方法、饮食禁忌、复诊建议...">${s.contraindications?.join('；')||''}</textarea>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn secondary" onclick="navigateStep(4)">← 返回</button>
+      <button class="btn green" onclick="submitPrescription()">✅ 提交处方</button>
+    </div>`;
+  return html;
+}
+
+function applyTemplate(name) {
+  const templates = {
+    '桂枝汤': ['桂枝|9g','芍药|9g','甘草|6g','生姜|9g','大枣|12枚'],
+    '小柴胡汤': ['柴胡|24g','黄芩|9g','人参|9g','半夏|9g','甘草|9g','生姜|9g','大枣|12枚'],
+    '归脾汤': ['白术|9g','当归|9g','茯苓|9g','黄芪|12g','龙眼肉|9g','酸枣仁|12g','人参|6g','甘草|6g'],
+    '逍遥散': ['柴胡|9g','当归|9g','白芍|9g','白术|9g','茯苓|9g','甘草|6g']
+  };
+  const herbs = templates[name] || [];
+  const container = document.getElementById('herb-list');
+  container.innerHTML = herbs.map(h => {
+    const [name, dose] = h.split('|');
+    return `<div class="herb-row"><input  class="input herb-name" value="${name}" aria-label="field"><input  class="input herb-dose" value="${dose}" aria-label="field"><button class="btn small accent" onclick="removeHerb(this)">✕</button></div>`;
+  }).join('');
+}
+
+function addHerb() {
+  const div = document.createElement('div');
+  div.className = 'herb-row';
+  div.innerHTML = '<input  class="input herb-name" placeholder="药名" aria-label="药名"><input  class="input herb-dose" placeholder="剂量" aria-label="剂量"><button class="btn small accent" onclick="removeHerb(this)">✕</button>';
+  document.getElementById('herb-list').appendChild(div);
+}
+
+function removeHerb(btn) { btn.closest('.herb-row').remove(); }
+
+function toggleAddress() {
+  document.getElementById('address-row').style.display = 
+    document.getElementById('delivery-method').value === 'mail' ? '' : 'none';
+}
+
+// ═══ 提交处方 ═══
+function submitPrescription() {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  var herbs = [];
+  document.querySelectorAll('.herb-row').forEach(function(row) {
+    var inputs = row.querySelectorAll('input');
+    if (inputs[0].value.trim()) herbs.push({ name: inputs[0].value.trim(), dosage: inputs[1].value.trim() || '9g' });
+  });
+  if (!herbs.length) return TCM.toast('请添加至少一味中药');
+
+  var rx = TCM_RX.create({
+    patient_name: state.currentPatient.name,
+    patient_id: state.currentPatient.id,
+    patient_age: state.currentPatient.age,
+    patient_gender: state.currentPatient.gender,
+    doctor_name: state.user.name,
+    doctor_id: state.user.id,
+    diagnosis: document.getElementById('final-diagnosis')?.value || '',
+    treatment: document.getElementById('final-treatment')?.value || '',
+    herbs: herbs,
+    decoction_method: document.getElementById('decoction-method')?.value || 'self_decoct',
+    delivery_method: document.getElementById('delivery-method')?.value || 'self_pickup',
+    delivery_address: document.getElementById('delivery-address')?.value || '',
+    notes: document.getElementById('prescription-notes')?.value || ''
+  });
+
+  // 自动更新患者记录
+  TCM.store.push('patient_records', {
+    patient_id: rx.patient_id, patient_name: rx.patient_name,
+    doctor: rx.doctor_name, diagnosis: rx.diagnosis,
+    herbs: rx.herbs, created_at: rx.created_at, prescription_id: rx.id
+  });
+
+  state.currentPatient.status = 'done';
+  // 同步挂号状态为已完成
+  const regs = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
+  const reg = regs.find(r => r.id === state.currentPatient.id);
+  if (reg) { reg.status = 'done'; localStorage.setItem('tcm_registrations', JSON.stringify(regs)); }
+  TCM.toast('✅ 处方 ' + rx.id.slice(-6) + ' 已提交，待药师审核 · ¥' + rx.total_price.total);
+  
+  // 更新药房列表（如在同一浏览器）
+  showPanel('prescription');
+  loadPrescriptions();
+  setTimeout(function() { renderQueue(); }, 500);
+}
+
+function updatePatientRecord(prescription) {
+  const records = JSON.parse(localStorage.getItem('tcm_patient_records') || '[]');
+  records.unshift({
+    patient_id: prescription.patient?.id,
+    patient_name: prescription.patient?.name,
+    doctor: prescription.doctor?.name,
+    diagnosis: prescription.diagnosis,
+    herbs: prescription.herbs,
+    created_at: prescription.created_at,
+    status: 'pending_review'
+  });
+  localStorage.setItem('tcm_patient_records', JSON.stringify(records));
+}
+
+// ═══ 处方管理 ═══
+function loadPrescriptions() {
+  const list = JSON.parse(localStorage.getItem('tcm_prescriptions') || '[]');
+  const filter = document.getElementById('rx-filter')?.value || 'all';
+  renderPrescriptions(list, filter);
+}
+
+function renderPrescriptions() {
+  const list = JSON.parse(localStorage.getItem('tcm_prescriptions') || '[]');
+  const filter = document.getElementById('rx-filter')?.value || 'all';
+  const filtered = filter === 'all' ? list : list.filter(p => p.status === filter);
+
+  const statusLabels = { pending_review: '⏳待审核', verified: '✅已审核', dispensed: '💊已发药', completed: '✔️完成' };
+
+  let html = '';
+  if (!filtered.length) { html = '<div style="padding:20px;text-align:center;color:var(--text3)">暂无处方</div>'; }
+  else {
+    for (const p of filtered) {
+      html += `<div style="padding:10px;border-bottom:1px solid var(--border);font-size:12px">
+        <div style="font-weight:600">${p.id} · ${p.patient?.name} · ${p.diagnosis}</div>
+        <div style="color:var(--text3)">${p.herbs?.map(h=>h.name+h.dosage).join('、')||''}</div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span>${statusLabels[p.status]||p.status} · ${p.doctor?.name}</span>
+          <span style="color:var(--text3)">${new Date(p.created_at).toLocaleString('zh-CN')}</span>
+        </div>
+      </div>`;
+    }
+  }
+  document.getElementById('prescription-list').innerHTML = html;
+}
+
+// ═══ 历史病例 ═══
+function renderRecords() {
+  const records = JSON.parse(localStorage.getItem('tcm_patient_records') || '[]');
+  const q = (document.getElementById('record-search')?.value || '').toLowerCase();
+  const filtered = q ? records.filter(r => 
+    (r.patient_name||'').toLowerCase().includes(q) || 
+    (r.diagnosis||'').toLowerCase().includes(q)
+  ) : records;
+
+  let html = '';
+  for (const r of filtered.slice(0, 50)) {
+    html += `<div style="padding:8px;border-bottom:1px solid var(--border);font-size:12px;cursor:pointer" onclick="viewRecord('${r.patient_id}')">
+      <strong>${r.patient_name}</strong> · ${r.diagnosis} · <span style="color:var(--text3)">${new Date(r.created_at).toLocaleDateString('zh-CN')}</span>
+      <div style="color:var(--text2)">💊 ${r.herbs?.map(h=>h.name).join('、')||''} · 👨‍⚕️ ${r.doctor}</div>
+    </div>`;
+  }
+  document.getElementById('records-list').innerHTML = html || '<div style="padding:20px;text-align:center;color:var(--text3)">暂无历史病例</div>';
+}
+
+// ═══ 查看患者历史病例详情 ═══
+function viewRecord(patientId) {
+  if (!patientId) return TCM.toast('无患者记录');
+  const records = JSON.parse(localStorage.getItem('tcm_patient_records') || '[]');
+  const list = records.filter(r => r.patient_id === patientId || r.patient_name === patientId);
+  if (!list.length) return TCM.toast('该患者暂无病历');
+
+  const p = list[0];
+  let html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:16px">' +
+    '<div style="background:#fff;border-radius:12px;padding:20px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto">' +
+    '<h3 style="margin-bottom:12px">📋 ' + p.patient_name + ' 病历</h3>';
+  list.slice(0, 5).forEach(function(r, idx) {
+    html += '<div style="padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px">' +
+      '<div style="font-size:10px;color:var(--text3)">#' + (idx+1) + ' · ' + new Date(r.created_at).toLocaleString('zh-CN') + '</div>' +
+      '<div style="font-weight:600;margin:4px 0">诊断: ' + (r.diagnosis || '—') + '</div>' +
+      '<div style="font-size:12px">💊 ' + (r.herbs || []).map(function(h){ return h.name + (h.dosage||''); }).join('、') + '</div>' +
+      '<div style="font-size:11px;color:var(--text2);margin-top:4px">👨‍⚕️ ' + (r.doctor||'—') + '</div>' +
+      '</div>';
+  });
+  html += '<div style="text-align:center;margin-top:10px"><button class="btn small primary" onclick="this.parentElement.parentElement.remove()">关闭</button></div>' +
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+// ═══ 穿戴设备 ═══
+// 快捷上传：舌/面/手拍照后自动保存到当前诊断
+function quickUploadTongue(input) {
+  var f = input && input.files && input.files[0];
+  if (!f) return;
+  if (state.currentDiagnosis) state.currentDiagnosis.tongue = { file: f.name, time: new Date().toISOString() };
+  TCM.toast('👅 舌象照片已采集: ' + f.name + ' · 可继续下一步');
+}
+function quickUploadFace(input) {
+  var f = input && input.files && input.files[0];
+  if (!f) return;
+  if (state.currentDiagnosis) state.currentDiagnosis.face = { file: f.name, time: new Date().toISOString() };
+  TCM.toast('👤 面部照片已采集: ' + f.name);
+}
+function quickUploadHand(input) {
+  var f = input && input.files && input.files[0];
+  if (!f) return;
+  if (state.currentDiagnosis) state.currentDiagnosis.hand = { file: f.name, time: new Date().toISOString() };
+  TCM.toast('🖐️ 手掌照片已采集: ' + f.name);
+}
+
+function loadWearableDevices() {
+  state.wearableDevices = [
+    { id: 'TCM-TONGUE-001', name: '舌诊仪 #1', type: 'tongue_camera', status: 'online' },
+    { id: 'TCM-FACE-001', name: '面诊仪 #1', type: 'face_camera', status: 'online' },
+    { id: 'TCM-PULSE-001', name: '脉诊手环 #1', type: 'pulse_wristband', status: 'online' }
+  ];
+  const html = state.wearableDevices.map(d => 
+    `<span class="wearable-device ${d.status}">${d.status==='online'?'🟢':'🔴'} ${d.name}</span>`
+  ).join('<br>');
+  document.getElementById('wearable-list').innerHTML = html;
+}
+
+function openWearable(type) {
+  toast(`📡 正在连接${type==='tongue'?'舌诊仪':type==='face'?'面诊仪':'脉诊手环'}... 请将设备对准患者`);
+}
+
+function openClinicalPage() {
+  const p = state.currentPatient;
+  if (p) {
+    const params = new URLSearchParams({name:p.name,age:p.age,gender:p.gender,complaint:p.chief_complaint});
+    window.open('clinical.html#' + params.toString(), '_blank');
+  } else {
+    window.open('clinical.html', '_blank');
+  }
+}
+
+// ═══ UI ═══
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (name === 'prescription') loadPrescriptions();
+  if (name === 'records') renderRecords();
+  // R762 移除 family-consult 分支
+}
+
+// ═══ 家庭问诊审核（互联网医院模式）═══
+async function loadFamilyConsults() {
+  const box = document.getElementById('family-consult-list');
+  if (!box) return;
+  const filter = (document.getElementById('fc-filter') || {}).value || 'pending_review';
+  box.innerHTML = '<div style="color:var(--text3);padding:12px">加载中…</div>';
+  if (window.loadFollowupStats) loadFollowupStats();
+  try {
+    const qs = filter === 'all' ? 'limit=100' : 'status=' + filter + '&limit=100';
+    const r = await fetch('/api/family/consults?' + qs);
+    const d = await r.json().catch(() => null);
+    const list = (d && d.ok && d.consults) ? d.consults : [];
+    // 统计卡片
+    const all = await fetch('/api/family/consults?limit=200').then(r => r.json()).catch(() => ({consults: []}));
+    const allList = (all && all.consults) || [];
+    const setNum = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+    setNum('fc-pending', allList.filter(c => c.status === 'pending_review').length);
+    setNum('fc-approved', allList.filter(c => c.status === 'approved' || c.status === 'revised').length);
+    setNum('fc-total', allList.length);
+    if (list.length === 0) {
+      box.innerHTML = '<div style="color:var(--text3);padding:20px;text-align:center">暂无' + (filter === 'all' ? '' : '待审核') + '问诊记录</div>';
+      return;
+    }
+    window.__consultMap = {};
+    list.forEach(c => { window.__consultMap[c.consult_id] = c; });
+    box.innerHTML = list.map(c => {
+      const t = (c.created_at || '').replace('T', ' ').slice(5, 16);
+      const pill = { pending_review: '<span style="color:#b8860b">待审核</span>', approved: '<span style="color:#2e8b57">已出方案</span>', revised: '<span style="color:#2980b9">已修订</span>', rejected: '<span style="color:#c0392b">已驳回</span>' }[c.status] || c.status;
+      const ai = (c.ai_suggestion && c.ai_suggestion.syndrome) ? '<div style="font-size:12px;color:#2980b9;margin:4px 0">🤖 AI 初判：' + c.ai_suggestion.syndrome + (c.ai_suggestion.confidence ? '（' + Math.round(c.ai_suggestion.confidence * 100) + '%）' : '') + (c.ai_suggestion.formula ? ' · ' + c.ai_suggestion.formula : '') + '</div>' : '';
+      const rx = (c.review) ? '<div style="font-size:12px;color:#2e8b57;margin:4px 0">🧑‍⚕️ ' + (c.review.syndrome || '—') + ' · ' + (c.review.formula || '—') + '（' + c.review.doctor_name + '）</div>' : '';
+      const actions = (c.status === 'pending_review')
+        ? '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">' +
+          '<button class="btn small primary" onclick="openReviewPanel(\'' + c.consult_id + '\',\'approve\',window.__consultMap[\'' + c.consult_id + '\'])">✅ 通过</button>' +
+          '<button class="btn small secondary" onclick="openReviewPanel(\'' + c.consult_id + '\',\'revise\',window.__consultMap[\'' + c.consult_id + '\'])">✏️ 修订</button>' +
+          '<button class="btn small danger" onclick="openReviewPanel(\'' + c.consult_id + '\',\'reject\',window.__consultMap[\'' + c.consult_id + '\'])">❌ 驳回</button>' +
+          '</div>'
+        : ((c.status === 'approved' || c.status === 'revised')
+          ? '<div style="margin-top:8px"><button class="btn small secondary" onclick="exportFamilyReport(\'' + c.consult_id + '\')">🖨 导出方案</button></div>'
+          : '');
+      return '<div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><b>' + (c.patient_name || c.patient_id) + '</b> ' + pill + '</div>' +
+        '<div style="font-size:13px;color:var(--text2)">' + (c.complaint || (c.symptoms || []).join('、')) + '</div>' +
+        ai + rx +
+        '<div style="font-size:11px;color:var(--text3)">' + c.consult_id + ' · ' + t + '</div>' +
+        actions + '</div>';
+    }).join('');
+  } catch (e) {
+    box.innerHTML = '<div style="color:var(--text3);padding:12px">加载失败：' + (e.message || '网络异常') + '</div>';
+  }
+}
+
+function fcAction(consult_id, action, extra) {
+  const doctor = (state.user && (state.user.name || state.user.username)) || '医生';
+  const body = Object.assign({ consult_id, action, doctor_name: doctor }, extra || {});
+  return fetch('/api/family/consult/verify', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+  }).then(r => r.json()).then(d => {
+    if (d.ok) { toast('✅ ' + (d.flow_step || d.message || '已处理')); loadFamilyConsults(); }
+    else toast('❌ ' + (d.error || '操作失败'));
+  }).catch(() => toast('❌ 网络异常'));
+}
+// R735-g10 修真：inline 审核面板（符合医生工作规范：AI 初稿回显→修改→校验→二次确认）
+window.__consultCache = {};
+window.openReviewPanel = function(id, mode, consult) {
+  window.__consultCache = { id: id, mode: mode, consult: consult || {} };
+  const ai = (consult && consult.ai_suggestion) || {};
+  const cur = (consult && consult.review) || {};
+  const isApprove = mode === 'approve';
+  const title = isApprove ? '✅ 通过审核（AI 初稿确认）' : (mode === 'revise' ? '✏️ 修订方案' : '❌ 驳回');
+  const sy = (cur.syndrome || ai.syndrome || '').toString().replace(/^辨证[·:：]?/, '');
+  const fm = (cur.formula || ai.formula || '').toString();
+  const ad = (cur.advice || ai.advice || ai.lifestyle || '注意休息，清淡饮食').toString();
+  const panel = document.createElement('div');
+  panel.id = 'review-panel';
+  panel.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:999;display:flex;align-items:center;justify-content:center';
+  panel.innerHTML =
+    '<div style="background:#fff;color:#1f2d3d;border-radius:16px;padding:22px 26px;width:min(560px,92vw);max-height:88vh;overflow:auto;box-shadow:0 12px 40px rgba(0,0,0,.4)">' +
+    '<div style="font-size:17px;font-weight:700;margin-bottom:4px">' + title + '</div>' +
+    '<div style="font-size:12px;color:#8492a6;margin-bottom:14px">主诉：' + ((consult && consult.complaint) || '-') + ' · ' + ((consult && consult.patient_id) || '') + '</div>' +
+    '<label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">证型（AI 初判：' + (ai.syndrome || '无') + '）</label>' +
+    '<input id="rp-syndrome" style="width:100%;padding:9px 12px;border:1.5px solid #dcdfe6;border-radius:8px;font-size:14px;margin-bottom:12px;box-sizing:border-box" value="' + sy + '">' +
+    '<label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">处方</label>' +
+    '<div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">' +
+    '<select id="rp-template" style="padding:6px 10px;border-radius:8px;border:1.5px solid #dcdfe6;font-size:12.5px;background:#fff"><option value="">常用方模板…</option>' +
+    '<option value="四物汤：当归 川芎 白芍 熟地黄">四物汤（血虚）</option><option value="四君子汤：人参 白术 茯苓 甘草">四君子汤（气虚）</option>' +
+    '<option value="六味地黄丸：熟地黄 山茱萸 山药 泽泻 牡丹皮 茯苓">六味地黄丸（阴虚）</option><option value="逍遥散：柴胡 当归 白芍 白术 茯苓 甘草 薄荷 生姜">逍遥散（肝郁）</option>' +
+    '<option value="归脾汤：白术 当归 茯苓 黄芪 龙眼肉 远志 酸枣仁 木香 甘草 人参">归脾汤（心脾两虚）</option>' +
+    '<option value="二陈汤：半夏 陈皮 茯苓 甘草">二陈汤（痰湿）</option>' +
+    '</select><span style="font-size:11px;color:#8492a6;align-self:center">选模板自动填入，可再修改</span></div>' +
+    '<textarea id="rp-formula" rows="2" style="width:100%;padding:9px 12px;border:1.5px solid #dcdfe6;border-radius:8px;font-size:13.5px;margin-bottom:8px;box-sizing:border-box;resize:vertical">' + fm + '</textarea>' +
+    '<div id="rp-check" style="font-size:12px;min-height:18px;margin-bottom:10px"></div>' +
+    '<label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">医嘱/生活建议</label>' +
+    '<textarea id="rp-advice" rows="2" style="width:100%;padding:9px 12px;border:1.5px solid #dcdfe6;border-radius:8px;font-size:13.5px;margin-bottom:14px;box-sizing:border-box;resize:vertical">' + ad + '</textarea>' +
+    (mode === 'reject' ? '<label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px">驳回原因（将通知家庭成员）</label>' +
+      '<textarea id="rp-notes" rows="2" style="width:100%;padding:9px 12px;border:1.5px solid #dcdfe6;border-radius:8px;font-size:13.5px;margin-bottom:14px;box-sizing:border-box">信息不足，请补充舌象照片</textarea>' : '') +
+    '<div style="display:flex;gap:10px;justify-content:flex-end">' +
+    '<button onclick="document.getElementById(\'review-panel\').remove()" style="padding:9px 18px;border-radius:9px;border:1px solid #dcdfe6;background:#fff;font-size:13.5px;cursor:pointer">取消</button>' +
+    '<button onclick="window.__submitReview()" style="padding:9px 22px;border-radius:9px;border:none;background:' + (isApprove ? '#2e8b57' : (mode === 'revise' ? '#2980b9' : '#c0392b')) + ';color:#fff;font-size:13.5px;font-weight:700;cursor:pointer">' + (isApprove ? '确认通过' : (mode === 'revise' ? '确认修订' : '确认驳回')) + '</button></div></div>';
+  document.body.appendChild(panel);
+  // 模板选择
+  document.getElementById('rp-template').addEventListener('change', function(e){
+    if(e.target.value){ document.getElementById('rp-formula').value = e.target.value; window.__checkHerbs(); }
+  });
+  document.getElementById('rp-formula').addEventListener('input', window.__checkHerbs);
+  window.__checkHerbs();
+};
+// 十八反十九畏前端轻量提示（后端为最终防线）
+window.__checkHerbs = function() {
+  const box = document.getElementById('rp-check');
+  if (!box) return;
+  const v = (document.getElementById('rp-formula') || {}).value || '';
+  const pairs = [
+    ['藜芦', '细辛', '十八反：藜芦反细辛'], ['藜芦', '白芍', '十八反：藜芦反白芍'], ['乌头', '半夏', '十八反：乌头反半夏'],
+    ['乌头', '贝母', '十八反：乌头反贝母'], ['甘草', '甘遂', '十八反：甘草反甘遂'], ['甘草', '海藻', '十八反：甘草反海藻'],
+    ['甘草', '大戟', '十八反：甘草反大戟'], ['甘草', '芫花', '十八反：甘草反芫花'], ['藜芦', '人参', '十八反：藜芦反人参'],
+    ['乌头', '白蔹', '十八反：乌头反白蔹'], ['硫黄', '朴硝', '十九畏：硫黄畏朴硝'], ['水银', '砒霜', '十九畏：水银畏砒霜'],
+    ['狼毒', '密陀僧', '十九畏：狼毒畏密陀僧'], ['巴豆', '牵牛', '十九畏：巴豆畏牵牛'], ['丁香', '郁金', '十九畏：丁香畏郁金'],
+    ['川乌', '犀角', '十九畏：川乌畏犀角'], ['牙硝', '三棱', '十九畏：牙硝畏三棱'], ['官桂', '石脂', '十九畏：官桂畏石脂'],
+    ['人参', '五灵脂', '十九畏：人参畏五灵脂'],
+  ];
+  const warns = pairs.filter(function(p){ return v.indexOf(p[0]) >= 0 && v.indexOf(p[1]) >= 0; });
+  box.innerHTML = warns.length
+    ? '<span style="color:#c0392b;font-weight:700">⚠️ ' + warns.map(function(w){return w[2]}).join('；') + '</span>'
+    : '<span style="color:#2e8b57">✓ 未检出十八反/十九畏冲突</span>';
+};
+window.__submitReview = async function() {
+  // R802：alert→toast、confirm→confirmModal（内嵌环境原生对话框静默失败，审批流被无声阻断）
+  const c = window.__consultCache;
+  const get = function(id){ return (document.getElementById(id) || {}).value || ''; };
+  if (c.mode === 'approve') {
+    const formula = get('rp-formula').trim();
+    if (!formula) { toast('处方不能为空', 'warn'); return; }
+    if (!await confirmModal('确认通过该方案并下发？通过后家庭成员可查看。')) return;
+    fcAction(c.id, 'approve', { syndrome: get('rp-syndrome').trim(), formula: formula, advice: get('rp-advice').trim() });
+  } else if (c.mode === 'revise') {
+    const formula = get('rp-formula').trim();
+    if (!formula) { toast('修订处方不能为空', 'warn'); return; }
+    if (!await confirmModal('确认修订并下发新方案？')) return;
+    fcAction(c.id, 'revise', { syndrome: get('rp-syndrome').trim(), formula: formula, advice: get('rp-advice').trim() });
+  } else {
+    const notes = get('rp-notes').trim();
+    if (!notes) { toast('请填写驳回原因', 'warn'); return; }
+    if (!await confirmModal('确认驳回？驳回后将通知家庭成员。', { danger: true, okText: '驳回' })) return;
+    fcAction(c.id, 'reject', { notes: notes });
+  }
+  document.getElementById('review-panel').remove();
+};
+
+// 随访效果看板（医生端）
+window.loadFollowupStats = async function() {
+  const box = document.getElementById('followup-stats');
+  if (!box) return;
+  try {
+    const r = await fetch('/api/family/followups?limit=200');
+    const d = await r.json().catch(() => null);
+    const list = (d && d.ok && d.followups) || [];
+    const completed = list.filter(f => f.status === 'completed');
+    const improved = completed.filter(f => f.effect === 'improved').length;
+    const stable = completed.filter(f => f.effect === 'stable').length;
+    const worsened = completed.filter(f => f.effect === 'worsened').length;
+    const needRevisit = list.filter(f => f.needs_revisit || (f.status === 'completed' && f.effect === 'worsened'));
+    const rate = completed.length ? Math.round(improved / completed.length * 100) : 0;
+    box.innerHTML =
+      '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">' +
+      '<div class="stat-mini"><div class="val" style="color:#2e8b57">' + improved + '</div><div class="lbl">改善</div></div>' +
+      '<div class="stat-mini"><div class="val" style="color:#b8860b">' + stable + '</div><div class="lbl">平稳</div></div>' +
+      '<div class="stat-mini"><div class="val" style="color:#c0392b">' + worsened + '</div><div class="lbl">加重</div></div>' +
+      '<div class="stat-mini"><div class="val">' + rate + '%</div><div class="lbl">改善率</div></div>' +
+      '</div>' +
+      (needRevisit.length ? '<div style="background:#fdecea;border:1px solid #f5c6c0;border-radius:8px;padding:8px 12px;font-size:13px;color:#c0392b;margin-bottom:10px">⚠️ 需复诊 ' + needRevisit.length + ' 人：' +
+        needRevisit.slice(0, 3).map(f => f.patient_name || f.patient_id).join('、') + (needRevisit.length > 3 ? ' 等' : '') + '（随访反馈症状加重/无效，建议尽快复诊调方）</div>' : '') +
+      (completed.length === 0 ? '<div style="color:var(--text3);font-size:13px;padding:4px 0">暂无随访反馈数据</div>' : '');
+  } catch (e) {
+    box.innerHTML = '';
+  }
+};
+window.pushOverdueFollowups = async function() {
+  const banner = document.getElementById('overdue-banner');
+  try {
+    const r = await fetch('/api/family/followups/overdue');
+    const d = await r.json().catch(() => null);
+    const count = (d && d.ok && d.overdue) ? d.overdue.length : 0;
+    if (count === 0) {
+      if (banner) { banner.style.display = 'block'; banner.innerHTML = '✅ 无逾期随访，全部按时';
+        setTimeout(() => { banner.style.display = 'none'; }, 3000); }
+      return;
+    }
+    if (!await confirmModal('有 ' + count + ' 条逾期随访，确认推送提醒到家庭端？')) return;
+    const pr = await fetch('/api/family/followups/push-overdue', { method: 'POST' });
+    const pd = await pr.json().catch(() => null);
+    toast((pd && pd.ok) ? ('📋 ' + (pd.message || '推送完成')) : '❌ 推送失败');
+    if (banner) { banner.style.display = 'none'; }
+  } catch (e) {
+    toast('❌ 网络异常');
+  }
+};
+
+// 医生端导出家庭问诊方案（打印友好窗口）
+window.exportFamilyReport = function(consultId) {
+  fetch('/api/family/consults?limit=200')
+    .then(r => r.json().catch(() => null))
+    .then(d => {
+      const list = (d && d.ok && d.consults) || [];
+      const c = list.find(x => x.consult_id === consultId);
+      if (!c || !c.review) { toast('该记录无审核方案'); return; }
+      const win = window.open('', '_blank', 'width=500,height=700');
+      if (!win) { toast('浏览器拦截弹窗，请允许'); return; }
+      const doc = win.document;
+      doc.open('text/html');
+      const herbsHtml = String(c.review.formula || '').split(/[+、,，;；\s]+/).filter(Boolean)
+        .map(h => '<li>' + h + '</li>').join('');
+      doc.write('<html><head><meta charset="utf-8"><title>中医问诊方案</title>' +
+        '<style>body{font-family:serif;padding:24px;max-width:480px;margin:0 auto;color:#2c1810} ' +
+        'h1{text-align:center;font-size:20px;border-bottom:2px solid #b8860b;padding-bottom:8px} ' +
+        '.line{border-bottom:1px dashed #999;margin:10px 0} ' +
+        'table{width:100%;border-collapse:collapse;font-size:14px} ' +
+        'td{padding:6px 4px;vertical-align:top} td:first-child{width:80px;color:#6b5b4f} ' +
+        '.stamp{text-align:right;color:#b8860b;font-size:13px;margin-top:16px} ' +
+        '.footer{font-size:10px;color:#999;margin-top:20px;border-top:1px solid #e8dfc8;padding-top:8px;text-align:center}</style></head><body>' +
+        '<h1>中医问诊方案单</h1>' +
+        '<table>' +
+        '<tr><td>问诊编号</td><td>' + c.consult_id + '</td></tr>' +
+        '<tr><td>患者</td><td>' + (c.patient_name || c.patient_id) + '</td></tr>' +
+        '<tr><td>主诉</td><td>' + (c.complaint || (c.symptoms || []).join('、')) + '</td></tr>' +
+        '<tr><td>AI 初判</td><td>' + ((c.ai_suggestion && c.ai_suggestion.syndrome) || '—') + '</td></tr>' +
+        '<tr><td>审核医生</td><td>' + c.review.doctor_name + '</td></tr>' +
+        '<tr><td>审核时间</td><td>' + (c.review.reviewed_at || '').replace('T',' ').slice(0,16) + '</td></tr>' +
+        '</table><div class="line"></div>' +
+        '<p style="font-size:15px;font-weight:bold">辨证：' + (c.review.syndrome || '—') + '</p>' +
+        '<p style="font-size:15px;font-weight:bold">处方：' + (c.review.formula || '—') + '</p>' +
+        (herbsHtml ? '<ul>' + herbsHtml + '</ul>' : '') +
+        '<p style="font-size:14px;white-space:pre-wrap">医嘱：' + (c.review.advice || '—') + '</p>' +
+        '<div class="stamp">执业中医师：' + c.review.doctor_name + '</div>' +
+        '<div class="footer">⚠️ 本方案由 命理宝鉴·医道 辅助生成，经执业中医师审核，仅供家庭健康参考，不构成诊疗依据。如症状加重请及时就医。</div>' +
+        '</body></html>');
+      doc.close();
+      setTimeout(() => win.print(), 300);
+    })
+    .catch(() => toast('导出失败'));
+};
+
+function navigateStep(n) {
+  state.currentDiagnosis.step = n;
+  renderDiagnosisWorkflow(n);
+}
+
+function printPrescription() {
+  const list = JSON.parse(localStorage.getItem('tcm_prescriptions') || '[]');
+  if (!list.length) return toast('无处方可打印');
+  const p = list[0];
+  const win = window.open('', '_blank', 'width=400,height=600');
+  var d = win.document;
+  d.open('text/html');
+  var html = '<html><head><meta charset=utf-8><title>处方</title><style>body{font-size:16px;padding:20px;font-family:serif} .line{border-bottom:1px dashed #000;margin:8px 0} .stamp{text-align:right;color:red;font-size:14px}</style>' +
+    '<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/doctor-dashboard.html">' +
+    '<link rel="stylesheet" href="css/mobile.css"></head><body>' +
+    '<h2 style="text-align:center">中医处方笺</h2><div class="line"></div>' +
+    '<p>患者：' + (p.patient_name || '') + '</p>' +
+    '<p>诊断：' + (p.diagnosis || '') + '</p><div class="line"></div>' +
+    '<p>处方：' + (p.herbs || []).map(function(h){return h.name+' '+h.dosage;}).join('、') + '</p>' +
+    '<p>医嘱：' + (p.notes || '') + '</p><div class="line"></div>' +
+    '<p>医师：' + (p.doctor_name || '') + ' · ' + new Date(p.created_at).toLocaleString('zh-CN') + '</p>' +
+    '<div class="stamp">药师审核签章区域</div>' +
+    '<div style="font-size:10px;color:var(--text3);margin-top:12px;text-align:center;border-top:1px solid var(--border);padding-top:8px">⚠️ 免责声明：本系统提供</div>' +
+    '的中医诊疗建议仅供执业医师参考,不构成独立诊断或处方依据。所有用药决策须由具备资质的执业中医师审核确认。患者请遵医嘱服用。</div>' +
+    '</body></html>';
+  d.documentElement.innerHTML = html;
+  d.close();
+  win.print();
+}
+
+function logout() {
+  localStorage.removeItem('tcm_user');
+  localStorage.removeItem('tcm_token');
+  window.location.href = 'login.html';
+}
+
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+</body>
+</html>

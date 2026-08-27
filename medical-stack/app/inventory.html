@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/inventory.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
+<title>药房库存 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}.header .sub{font-size:11px;opacity:.6}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border-radius:10px;padding:12px;border:1px solid var(--border);text-align:center}
+.stat .v{font-size:22px;font-weight:700;color:var(--primary)}
+.stat .l{font-size:10px;color:var(--text3);margin-top:2px}
+.label{font-size:11px;color:var(--text3);margin:6px 0 2px;display:block}
+.input,select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.red{background:var(--accent);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--text3);font-weight:600;font-size:10px}
+.low{color:var(--accent);font-weight:700}
+.ok{color:var(--green)}
+.alert-banner{background:var(--red-bg);border:1px solid #fca5a5;border-left:4px solid var(--accent);border-radius:8px;padding:10px 14px;margin:8px 0;font-size:12px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">药房库存</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>药师/管理员</b></span>
+    <span class="std-tag">⚙️ 功能 <b>智能药房库存</b></span>
+    <span class="std-tag">💎 使用价值 <b>库存预警·出入库·盘点·保质期管理</b></span>
+  </div>
+  <div class="header">
+    <h1>📦 智能药房库存</h1>
+    <div class="sub">中药库存全生命周期：预警 · 入库 · 出库 · 盘点 · 保质期</div>
+  </div>
+
+  <!-- 预警横幅 -->
+  <div id="alert-banner"></div>
+
+  <!-- 统计 -->
+  <div class="stats-row" id="stats-row"></div>
+
+  <!-- R816: AI 补货建议（按近30天处方真实消耗速率预测） -->
+  <div class="card" id="inv-advice-card" style="display:none">
+    <h3>🤖 AI 补货建议 <span style="font-size:10px;color:var(--text3);font-weight:normal">按近 30 天处方消耗速率 · 补到 60 天用量</span></h3>
+    <div id="inv-advice" style="font-size:12px;line-height:2"></div>
+  </div>
+
+  <!-- 入库/出库 -->
+  <div class="card">
+    <h3>⚡ 出入库操作</h3>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:8px;align-items:end">
+      <div><label class="label">药品</label><select class="input" id="inv-drug"></select></div>
+      <div><label class="label">操作</label><select class="input" id="inv-op"><option value="in">入库</option><option value="out">出库</option></select></div>
+      <div><label class="label">数量(g)</label><input  class="input" id="inv-qty" type="number" value="100" aria-label="inv qty" data-validate="number"></div>
+      <div><label class="label">单价(元/500g)</label><input  class="input" id="inv-price" value="0" aria-label="inv price"></div>
+      <div><label class="label">批次/来源</label><input  class="input" id="inv-batch" placeholder="批次号" aria-label="批次号"></div>
+    </div>
+    <div class="btn-row"><button class="btn primary" onclick="doStockOp()">✅ 确认操作</button></div>
+    <div id="stock-log" style="margin-top:10px;max-height:140px;overflow-y:auto;font-size:11px"></div>
+  </div>
+
+  <!-- 库存表 -->
+  <div class="card">
+    <h3>📋 库存明细 <button class="btn small" style="float:right" onclick="exportInv()">📥 导出</button></h3>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>药品</th><th>分类</th><th>库存(g)</th><th>预警线</th><th>状态</th><th>单价</th><th>保质期</th><th>操作</th></tr></thead>
+        <tbody id="inv-table"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// R815：库存接真——/api/inventory 服务端单一数据源，入出库走 /api/inventory/op
+var INV = [];
+var LOG = [];
+
+function loadInv() {
+  fetch('/api/inventory').then(function(r){ return r.json(); }).then(function(d) {
+    INV = d.list || [];
+    LOG = d.log || [];
+    renderAll();
+  }).catch(function() {
+    document.getElementById('inv-table').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">📡 服务离线</td></tr>';
+  });
+  loadAdvice();
+}
+
+// R816: AI 补货建议
+function loadAdvice() {
+  fetch('/api/inventory/advice').then(function(r){ return r.json(); }).then(function(d) {
+    var card = document.getElementById('inv-advice-card');
+    var box = document.getElementById('inv-advice');
+    if (!d.ok || !d.advice || !d.advice.length) { card.style.display = 'none'; return; }
+    var icon = { '紧急': '🔴', '尽快': '🟠', '常规': '🟡' };
+    box.innerHTML = d.advice.map(function(a) {
+      var days = a.days_left != null ? '预计可用 <strong>' + a.days_left + ' 天</strong>' : '近期无消耗但已低于预警线';
+      return '<div>' + (icon[a.urgency] || '⚪') + ' <strong>' + a.name + '</strong>（' + a.urgency + '）：库存 ' + a.stock + a.unit + ' · 近30天消耗 ' + a.consumed_30d + 'g · ' + days +
+        (a.restock_qty ? ' · 建议补货 <strong style="color:var(--green)">' + a.restock_qty + 'g</strong> <button class="btn small" onclick="fillRestock(\'' + a.name + '\',' + a.restock_qty + ')">一键填入</button>' : '') + '</div>';
+    }).join('');
+    card.style.display = '';
+  }).catch(function() { document.getElementById('inv-advice-card').style.display = 'none'; });
+}
+
+function fillRestock(name, qty) {
+  document.getElementById('inv-drug').value = name;
+  document.getElementById('inv-op').value = 'in';
+  document.getElementById('inv-qty').value = qty;
+  document.getElementById('inv-batch').focus();
+}
+
+function renderAll() {
+  var inv = INV;
+  var log = LOG;
+
+  // 预警
+  var low = inv.filter(function(d){ return d.stock < d.min_stock; });
+  var expSoon = inv.filter(function(d){ return d.expiry && new Date(d.expiry) < new Date(Date.now() + 120*86400000); });
+  var banner = '';
+  if (low.length) banner += '<div class="alert-banner">🔴 <strong>' + low.length + ' 种药品库存不足</strong>: ' + low.map(function(d){ return d.name + '(' + d.stock + 'g)'; }).join('、') + '</div>';
+  if (expSoon.length) banner += '<div class="alert-banner" style="border-color:var(--gold);background:var(--gold-bg)">🟡 <strong>' + expSoon.length + ' 种药品临期</strong>(4个月内): ' + expSoon.map(function(d){ return d.name + '(' + (d.expiry||'').slice(0,7) + ')'; }).join('、') + '</div>';
+  document.getElementById('alert-banner').innerHTML = banner;
+
+  // 统计（单价为元/g，库存价值 = 库存×单价）
+  var totalValue = inv.reduce(function(s, d){ return s + d.stock * (d.price || 0); }, 0);
+  document.getElementById('stats-row').innerHTML =
+    '<div class="stat"><div class="v">' + inv.length + '</div><div class="l">药品品种</div></div>' +
+    '<div class="stat"><div class="v">' + inv.reduce(function(s,d){return s+d.stock;},0) + 'g</div><div class="l">总库存</div></div>' +
+    '<div class="stat"><div class="v" style="color:var(--accent)">' + low.length + '</div><div class="l">库存预警</div></div>' +
+    '<div class="stat"><div class="v" style="color:var(--green)">¥' + Math.round(totalValue) + '</div><div class="l">库存价值</div></div>';
+
+  // 药品下拉
+  var opts = '';
+  for (var i = 0; i < inv.length; i++) opts += '<option value="' + inv[i].name + '">' + inv[i].name + '</option>';
+  document.getElementById('inv-drug').innerHTML = opts;
+
+  // 库存表
+  var html = '';
+  for (var j = 0; j < inv.length; j++) {
+    var d = inv[j];
+    var st = d.stock < d.min_stock ? '<span class="low">🔴 不足</span>' : d.stock < d.min_stock * 1.5 ? '<span style="color:var(--gold)">🟡 偏低</span>' : '<span class="ok">✅ 充足</span>';
+    html += '<tr><td><strong>' + d.name + '</strong></td><td>' + (d.category_cn || d.category || '—') + '</td><td>' + d.stock + '</td><td>' + d.min_stock + '</td><td>' + st + '</td><td>¥' + ((d.price || 0) * 500).toFixed(0) + '/500g</td><td>' + (d.expiry || '—').slice(0,7) + '</td>' +
+      '<td><button class="btn small" onclick="quickIn(\'' + d.name + '\')">+入库</button> <button class="btn small" onclick="quickOut(\'' + d.name + '\')">-出库</button></td></tr>';
+  }
+  document.getElementById('inv-table').innerHTML = html || '<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:20px">暂无库存数据</td></tr>';
+
+  // 流水
+  document.getElementById('stock-log').innerHTML = log.slice(0, 15).map(function(l) {
+    return '<div>' + (l.time||'').slice(5,16).replace('T',' ') + ' · <strong>' + (l.op==='in'?'入库':'出库') + '</strong> ' + l.drug + ' ' + l.qty + 'g' + (l.batch ? ' · ' + l.batch : '') + '</div>';
+  }).join('') || '<div style="color:var(--text3)">暂无流水</div>';
+}
+
+function doStockOp() {
+  var drug = document.getElementById('inv-drug').value;
+  var op = document.getElementById('inv-op').value;
+  var qty = parseFloat(document.getElementById('inv-qty').value) || 0;
+  var price500 = parseFloat(document.getElementById('inv-price').value) || 0;
+  var batch = document.getElementById('inv-batch').value.trim() || 'B' + Date.now().toString(36).toUpperCase();
+  if (!drug || qty <= 0) return toast('请选择药品并填写数量');
+
+  // R815：真持久化到服务端（不足由服务端 409 判定）
+  fetch('/api/inventory/op', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: drug, op: op, qty: qty, price: price500 > 0 ? price500 / 500 : undefined, batch: batch })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { toast(d.error || '操作失败', 'warn'); return; }
+    loadInv();
+    toast((op==='in'?'📥 入库':'📤 出库') + ' ' + drug + ' ' + qty + 'g 成功' + (d.low ? '（⚠️ 已低于预警线）' : ''));
+  }).catch(function(){ toast('网络错误', 'warn'); });
+}
+
+function quickIn(name) {
+  document.getElementById('inv-drug').value = name;
+  document.getElementById('inv-op').value = 'in';
+  document.getElementById('inv-qty').value = 500;
+  doStockOp();
+}
+
+function quickOut(name) {
+  document.getElementById('inv-drug').value = name;
+  document.getElementById('inv-op').value = 'out';
+  document.getElementById('inv-qty').value = 100;
+  doStockOp();
+}
+
+function exportInv() {
+  var lines = ['药品,分类,库存(g),预警线,单价(元/500g),保质期'];
+  INV.forEach(function(d){ lines.push([d.name, d.category_cn || d.category || '', d.stock, d.min_stock, ((d.price||0)*500).toFixed(0), (d.expiry||'').slice(0,7)].join(',')); });
+  var blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '库存-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('📥 库存已导出 CSV');
+}
+
+loadInv();
+setInterval(loadInv, 30000);
+</script>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

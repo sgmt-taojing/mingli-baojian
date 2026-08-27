@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/recommend.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+<title>精准推荐 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1000px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}
+.header .sub{font-size:11px;opacity:.6}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:768px){.grid2,.grid3{grid-template-columns:1fr}}
+.label{font-size:11px;color:var(--text3);margin:6px 0 2px;display:block}
+.input,select,textarea{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip-grid{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}
+.chip{padding:5px 10px;border-radius:14px;font-size:11px;background:var(--bg);border:1px solid var(--border);cursor:pointer;transition:.15s}
+.chip:hover{border-color:var(--blue);background:var(--blue-bg)}
+.chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.rec-card{border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border);border-left:4px solid var(--blue);background:var(--card)}
+.rec-card.gold{border-left-color:var(--gold)}
+.rec-card.green{border-left-color:var(--green)}
+.rec-card.purple{border-left-color:var(--purple)}
+.rec-card h4{font-size:13px;color:var(--primary);margin-bottom:6px}
+.rec-item{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px}
+.rec-item:last-child{border-bottom:none}
+.rec-score{font-size:10px;color:var(--blue);font-weight:600}
+.rec-score.gold{color:var(--gold)}
+.rec-reason{font-size:10px;color:var(--text3)}
+.rec-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.rec-tag{padding:2px 8px;border-radius:10px;font-size:10px;background:var(--blue-bg);color:var(--blue)}
+.rec-tag.green{background:var(--green-bg);color:var(--green)}
+.rec-tag.gold{background:var(--gold-bg);color:var(--gold)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">精准推荐</span>
+</div>
+
+<div class="container">
+  <div class="std-bar">
+    <span class="std-tag">👥 使用对象 <b>医生/患者/管理员</b></span>
+    <span class="std-tag">⚙️ 功能 <b>精准推荐中心</b></span>
+    <span class="std-tag">💎 使用价值 <b>基于症状/体质的方剂·养生·穴位·科室·知识五维推荐</b></span>
+  </div>
+
+  <div class="header">
+    <h1>🎯 精准推荐中心</h1>
+    <div class="sub">输入症状/体质 → 五维推荐：方剂 · 养生 · 穴位 · 科室 · 知识</div>
+  </div>
+
+  <div class="card">
+    <h3>① 输入症状（点选或输入）</h3>
+    <div class="chip-grid" id="symptom-chips"></div>
+    <div style="margin-top:8px"><label class="label">或手动输入（逗号分隔）</label>
+    <textarea class="input" id="manual-input" placeholder="例如：失眠,多梦,心悸,乏力"></textarea></div>
+    <div class="grid3" style="margin-top:8px">
+      <div><label class="label">体质（可选）</label><select class="input" id="constitution">
+        <option value="">自动推断</option>
+        <option>气虚质</option><option>阳虚质</option><option>阴虚质</option><option>痰湿质</option>
+        <option>湿热质</option><option>血瘀质</option><option>气郁质</option><option>平和质</option><option>特禀质</option>
+        <option>阳虚痰湿</option><option>阴虚湿热</option><option>气虚血瘀</option><option>肝郁脾虚</option>
+        <option>心脾两虚质</option><option>气阴两虚质</option><option>痰瘀互结</option><option>湿热夹瘀</option>
+        <option>阳虚血瘀</option><option>阴虚血瘀</option><option>脾肾阳虚</option><option>肝肾阴虚</option>
+      </select></div>
+      <div><label class="label">主诉</label><input  class="input" id="complaint" placeholder="例如：失眠2周" aria-label="例如：失眠2周"></div>
+      <div><label class="label">推荐策略</label><select class="input" id="strategy">
+        <option value="balanced">⚖️ 综合均衡</option>
+        <option value="match">🎯 按匹配度</option>
+        <option value="confidence">📈 按置信度</option>
+        <option value="urgency">🚨 按紧急度</option>
+      </select></div>
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <label style="font-size:11px;color:var(--text3)">结果数量 <input  type="number" id="limit" value="10" min="1" max="30" style="width:60px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:12px" aria-label="limit" data-validate="number"></label>
+      <button class="btn primary" onclick="runRecommend()">🎯 精准推荐</button>
+      <button class="btn small" onclick="toggleAllSymptoms()">全选症状</button>
+      <span style="font-size:10px;color:var(--text3)" id="strategy-desc">综合均衡: 匹配度×0.5 + 置信度×0.3 + 紧急度×0.2</span>
+    </div>
+  </div>
+
+  <div id="rec-result"></div>
+</div>
+
+<script>
+// ═══ 症状点选库 ═══
+var SYMPTOM_POOL = ['失眠','多梦','健忘','头痛','头晕','耳鸣','目赤','口苦','口干','食欲不振','腹胀','胃痛','恶心','便秘','便溏','腹泻','小便黄','尿频','夜尿多','畏寒','发热','五心烦热','盗汗','自汗','乏力','气短','心悸','胸闷','腰酸','关节痛','肢体麻木','烦躁易怒','情绪抑郁','月经不调','痛经','带下','皮肤瘙痒','湿疹','皮疹','痤疮','咳嗽','咳痰','咽痛','鼻塞','水肿','遗精'];
+var selected = [];
+
+function renderChips() {
+  var html = '';
+  for (var i = 0; i < SYMPTOM_POOL.length; i++) {
+    var s = SYMPTOM_POOL[i];
+    html += '<span class="chip' + (selected.indexOf(s)>=0?' sel':'') + '" onclick="toggle(\'' + s + '\')">' + s + '</span>';
+  }
+  document.getElementById('symptom-chips').innerHTML = html;
+}
+function toggle(s) {
+  var idx = selected.indexOf(s);
+  if (idx >= 0) selected.splice(idx, 1); else selected.push(s);
+  renderChips();
+}
+
+function runRecommend() {
+  // 合并点选 + 手动输入
+  var manual = document.getElementById('manual-input').value.split(/[,，、\s]+/).filter(Boolean);
+  var symptoms = selected.concat(manual);
+  symptoms = [...new Set(symptoms)];
+  if (!symptoms.length) return toast('请点选或输入至少一个症状');
+
+  var payload = {
+    symptoms: symptoms,
+    complaint: document.getElementById('complaint').value.trim(),
+    constitution: document.getElementById('constitution').value,
+    strategy: document.getElementById('strategy').value,
+    limit: parseInt(document.getElementById('limit').value) || 10
+  };
+
+  var loading = '<div class="rec-card" style="text-align:center;color:var(--text3);font-size:12px">⏳ 精准推荐计算中...</div>';
+  document.getElementById('rec-result').innerHTML = loading;
+
+  var apiBase = (window.TCM && TCM.API_BASE) || '';
+  fetch(apiBase + '/api/tcm/recommend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.ok) renderResult(d, payload);
+      else document.getElementById('rec-result').innerHTML = '<div class="rec-card" style="color:var(--accent)">❌ ' + (d.error||'服务异常') + '</div>';
+    })
+    .catch(function() {
+      document.getElementById('rec-result').innerHTML = '<div class="rec-card" style="color:var(--accent)">❌ 后端不可用，请确认服务已启动</div>';
+    });
+}
+
+function renderResult(d, payload) {
+  var html = '';
+
+  // 策略信息
+  html += '<div class="rec-card" style="border-left-color:var(--primary);background:var(--gold-bg)">' +
+    '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:11px">' +
+    '<span>⚙️ 策略: <strong>' + (d.strategy_name||'') + '</strong> <span style="color:var(--text3)">' + (d.strategy_desc||'') + '</span></span>' +
+    '<span style="color:var(--text3)">知识库: 方证 ' + d.stats.formula_kb_size + ' · 体质 ' + d.stats.constitution_kb_size + ' · 穴位 ' + d.stats.acupoint_kb_size + ' · 科室 ' + d.stats.dept_kb_size + '</span></div></div>';
+
+  // 1. 方剂推荐（全量）
+  html += '<div class="rec-card">';
+  html += '<h4>💊 方剂推荐 <span style="font-size:10px;color:var(--text3)">' + d.formula_total + '/' + d.stats.formula_candidates + ' 候选 · 策略排序</span></h4>';
+  if (d.formulas.length) {
+    d.formulas.forEach(function(f, i) {
+      html += '<div class="rec-item">' +
+        '<div><strong>' + (i+1) + '. ' + f.formula + '</strong> <span style="color:var(--text2)">(' + f.syndrome + ' · ' + f.source + ')</span>' +
+        '<div class="rec-reason">' + f.herbs + '</div></div>' +
+        '<span class="rec-score' + (f.score>0.88?' gold':'') + '">' + Math.round(f.score*100) + '%</span></div>';
+    });
+  } else {
+    html += '<div class="rec-reason">暂无高匹配方剂，建议医生辨证</div>';
+  }
+  html += '</div>';
+
+  // 2. 养生方案
+  if (d.health_plan) {
+    html += '<div class="rec-card green">';
+    html += '<h4>🥗 养生方案 · ' + d.health_plan.type + '</h4>';
+    html += '<div class="rec-item"><span>🥬 饮食</span><span>' + d.health_plan.diet.join('·') + '</span></div>';
+    html += '<div class="rec-item"><span>🏃 运动</span><span>' + d.health_plan.exercise + '</span></div>';
+    html += '<div class="rec-item"><span>📍 穴位</span><span>' + d.health_plan.acupoints.join('·') + '</span></div>';
+    html += '<div class="rec-item"><span>🌙 生活</span><span>' + d.health_plan.life + '</span></div>';
+    html += '</div>';
+  }
+
+  // 3. 穴位推荐
+  if (d.acupoints.length) {
+    html += '<div class="rec-card purple">';
+    html += '<h4>📍 穴位推荐</h4>';
+    html += '<div class="rec-tags">' + d.acupoints.map(function(a){ return '<span class="rec-tag">' + a + '</span>'; }).join('') + '</div><div style="font-size:10px;color:var(--text3);margin-top:4px">共 ' + d.acupoint_total + ' 穴</div>';
+    html += '</div>';
+  }
+
+  // 4. 科室推荐
+  if (d.departments.length) {
+    html += '<div class="rec-card">';
+    html += '<h4>🏥 就诊科室推荐</h4>';
+    html += '<div class="rec-tags">' + d.departments.map(function(x){ return '<span class="rec-tag green">' + x + '</span>'; }).join('') + '</div>';
+    html += '</div>';
+  }
+
+  // 5. 知识推荐
+  html += '<div class="rec-card gold">';
+  html += '<h4>📚 知识库相关模块</h4>';
+  html += '<div class="rec-tags">' + d.knowledge.map(function(k){ return '<span class="rec-tag gold">' + k.module + ' · ' + k.keywords.join('、') + '</span>'; }).join('') + '</div>';
+  html += '<div style="margin-top:8px;font-size:10px;color:var(--text3)">⚠️ 推荐仅供医生参考，处方需医生审核</div>';
+  html += '</div>';
+
+  document.getElementById('rec-result').innerHTML = html;
+}
+
+function toggleAllSymptoms() {
+  if (selected.length === SYMPTOM_POOL.length) { selected = []; }
+  else { selected = SYMPTOM_POOL.slice(); }
+  renderChips();
+}
+
+document.getElementById('strategy').addEventListener('change', function() {
+  var descs = {
+    balanced: '综合均衡: 匹配度×0.5 + 置信度×0.3 + 紧急度×0.2',
+    match: '按匹配度: 优先症状命中数最多的方证',
+    confidence: '按置信度: 优先知识库置信度最高的方证',
+    urgency: '按紧急度: 优先最紧急(最危险)的方证'
+  };
+  document.getElementById('strategy-desc').textContent = descs[this.value] || '';
+});
+
+renderChips();
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script>window.TCM_RECOMMEND_KB=function(s){return fetch("/api/tcm/longitudinal-recommend",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({symptoms:s})}).then(r=>r.json());};</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

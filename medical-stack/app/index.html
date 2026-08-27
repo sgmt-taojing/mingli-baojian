@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/index.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>命理宝鉴·医道 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🏥</text></svg>">
+<style>
+:root{
+  --bg:#f5f0e8;--card:#fff;--border:#d4c9b8;--primary:#8b4513;--accent:#c0392b;
+  --green:#27ae60;--blue:#2980b9;--gold:#b8860b;--jade:#2e8b57;
+  --text:#2c1810;--text2:#6b5b4f;--text3:#9b8b7f;
+  --red-bg:#fdf0ed;--red-border:#e8b4b0;--green-bg:#edf7f0;--blue-bg:#edf2f7;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:16px}
+
+/* Header */
+.tcm-header{text-align:center;padding:32px 16px 20px;background:linear-gradient(135deg,#2c1810,#5c3a28);color:#fff;border-radius:0 0 16px 16px}
+.tcm-header h1{font-size:28px;font-weight:700;margin-bottom:8px;letter-spacing:4px}
+.tcm-header p{font-size:14px;opacity:.8}
+.tcm-badge{display:inline-block;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:12px;font-size:11px;margin:4px}
+
+/* Tabs */
+.tcm-tabs{display:flex;gap:2px;margin:16px 0;background:var(--card);border-radius:12px;padding:4px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tcm-tab{flex:1;text-align:center;padding:10px 8px;border-radius:8px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text2);font-weight:500;transition:.2s}
+.tcm-tab.active{background:var(--primary);color:#fff;box-shadow:0 2px 6px rgba(139,69,19,.3)}
+
+/* Panels */
+.tcm-panel{display:none;animation:fadeIn .3s}
+.tcm-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Cards */
+.tcm-card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--border)}
+.tcm-card h3{font-size:16px;color:var(--primary);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid rgba(139,69,19,.1)}
+.tcm-card p{font-size:13px;color:var(--text2);line-height:1.7}
+
+/* Input groups */
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:480px){.input-row{grid-template-columns:1fr}}
+.tcm-input,.tcm-textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text)}
+.tcm-input:focus,.tcm-textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(139,69,19,.1)}
+.tcm-textarea{min-height:80px;resize:vertical;font-family:inherit}
+.tcm-label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block;font-weight:500}
+
+/* Buttons */
+.tcm-btn{display:inline-block;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:.2s}
+.tcm-btn.primary{background:var(--primary);color:#fff}
+.tcm-btn.primary:hover{opacity:.9;transform:translateY(-1px)}
+.tcm-btn.secondary{background:var(--bg);color:var(--primary);border:1px solid var(--border)}
+.tcm-btn.accent{background:var(--accent);color:#fff}
+.tcm-btn.small{padding:6px 14px;font-size:12px}
+.tcm-btn:disabled{opacity:.5;cursor:not-allowed}
+.tcm-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+
+/* Results */
+.result-box{background:var(--card);border-radius:12px;padding:16px;margin-top:12px;border:1px solid var(--border)}
+.result-box.loading{opacity:.6}
+.result-title{font-size:15px;font-weight:600;color:var(--primary);margin-bottom:8px}
+.result-meta{font-size:12px;color:var(--text3);margin-bottom:12px}
+.opinion-item{padding:10px 12px;border-radius:8px;margin-bottom:6px;font-size:13px;line-height:1.6}
+.opinion-item.shanghan{background:var(--blue-bg);border-left:3px solid var(--blue)}
+.opinion-item.wenbing{background:var(--red-bg);border-left:3px solid var(--accent)}
+.opinion-item.fuyang{background:#fff8e7;border-left:3px solid var(--gold)}
+.opinion-item.piwei{background:var(--green-bg);border-left:3px solid var(--green)}
+.opinion-item.jingfang{background:#f5f0ff;border-left:3px solid #7c3aed}
+.opinion-label{font-size:11px;font-weight:700;text-transform:uppercase;margin-bottom:4px;opacity:.7}
+.opinion-text{color:var(--text)}
+
+.urgency-badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600}
+.urgency-p0{background:var(--accent);color:#fff}
+.urgency-p1{background:var(--gold);color:#fff}
+.urgency-p2{background:var(--blue);color:#fff}
+.urgency-p3{background:var(--green);color:#fff}
+
+.formula-card{background:var(--green-bg);border-radius:8px;padding:12px;margin-top:8px}
+.formula-card .f-name{font-size:15px;font-weight:700;color:var(--primary)}
+.formula-card .f-source{font-size:11px;color:var(--text3)}
+.formula-card .f-hint{font-size:12px;color:var(--accent);margin-top:6px}
+
+.warning-box{padding:10px 14px;border-radius:8px;font-size:12px;margin-top:8px}
+.warning-box.CRITICAL{background:var(--red-bg);border:1px solid var(--red-border);color:var(--accent)}
+.warning-box.WARNING{background:#fff8e7;border:1px solid #e8d8a0;color:var(--gold)}
+
+/* Quick cards */
+.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+@media(max-width:480px){.quick-grid{grid-template-columns:repeat(2,1fr)}}
+.quick-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:.2s}
+.quick-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.quick-card .qc-icon{font-size:32px;margin-bottom:6px}
+.quick-card .qc-name{font-size:13px;font-weight:600;color:var(--text)}
+.quick-card .qc-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* Disclaimer */
+.disclaimer{text-align:center;padding:16px;font-size:11px;color:var(--text3);margin-top:24px;border-top:1px solid var(--border)}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999;animation:toastIn .3s}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* KB search */
+.kb-result-item{padding:10px;border-bottom:1px solid var(--border);cursor:pointer;transition:.1s}
+.kb-result-item:hover{background:var(--bg)}
+.kb-result-item .kb-title{font-size:14px;font-weight:600;color:var(--primary)}
+.kb-result-item .kb-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.kb-result-item .kb-snippet{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5}
+.highlight{background:#fff3b0;padding:1px 2px;border-radius:2px}
+
+/* History */
+.history-item{padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;cursor:pointer}
+.history-item:hover{color:var(--primary)}
+.history-item .hi-time{color:var(--text3);font-size:10px}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/i18n.js"></script>
+<script src="js/kb-loader.js"></script>
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js" defer></script>
+<script src="js/ai-voice-assistant.js" defer></script>
+<script src="js/crud-engine.js" defer></script>
+<script src="js/realtime-engine.js" defer></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js" defer></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js" defer></script>
+<script src="js/ai-assistant.js" defer></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">命理宝鉴·医道</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>全部角色</b></span><span class="std-tag">⚙️ 功能 <b>命理宝鉴·医道·辨证论治</b></span><span class="std-tag">💎 使用价值 <b>知识检索+AI辨证+穴位方剂一站查询</b></span></div>
+
+<div class="tcm-header">
+  <h1>🏥 命理宝鉴·医道</h1>
+  <p>命理宝鉴·医道 · 多流派辨证 · 方证对应 · 针灸穴位</p>
+  <div style="margin-top:8px">
+    <span class="tcm-badge">伤寒论</span>
+    <span class="tcm-badge">金匮要略</span>
+    <span class="tcm-badge">温病条辨</span>
+    <span class="tcm-badge">脾胃论</span>
+    <span class="tcm-badge">神农本草</span>
+  </div>
+  <div style="margin-top:14px;padding:10px 16px;background:linear-gradient(90deg,rgba(212,165,116,0.25),rgba(212,165,116,0.05));border:1px solid rgba(255,215,150,0.35);border-radius:10px;font-size:12px;line-height:1.7;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center">
+    <span style="background:#d4a574;color:#2c1810;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700">真实开发中</span>
+    <span>面向 <strong>居家机器人</strong>：打造 KB 中枢 · 多端协同（医生端 + 家庭端 + 机器人端）</span>
+    <a href="home-tcm.html" style="background:#d4a574;color:#2c1810;padding:4px 12px;border-radius:10px;text-decoration:none;font-weight:600;font-size:11px">查看家庭端 →</a>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- R762 修真：场景入口极简化——按使用场景分流, 不按端口分流, 减少用户选择负担 -->
+<div style="margin:12px 0 14px">
+  <a href="treatment-center.html" style="display:block;padding:14px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;border-radius:12px;text-decoration:none;text-align:center;font-weight:700;font-size:14px;box-shadow:0 4px 14px rgba(192,57,43,.2)">🤖 我要看病 → AI 诊疗中心</a>
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <a href="home-tcm.html" style="flex:1;padding:10px;background:#2e8b57;color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:12px">🏠 居家养生</a>
+    <a href="clinic-desk.html" style="flex:1;padding:10px;background:#8b4513;color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:12px">🏥 医生工作台</a>
+  </div>
+</div>
+
+  <!-- Tabs -->
+  <!-- R762 修真：Tab 顺序按使用频率重排, 历史记录移末尾, 穴位并入知识检索模块 -->
+  <div class="tcm-tabs">
+    <button class="tcm-tab active" data-tab="diagnose">🔍 辨证</button>
+    <button class="tcm-tab" data-tab="kb">📚 知识</button>
+    <button class="tcm-tab" data-tab="history">📋 记录</button>
+  </div>
+
+  <!-- ═══ 辨证论治 Panel ═══ -->
+  <div class="tcm-panel active" id="panel-diagnose">
+    <div class="tcm-card">
+      <h3>问诊</h3>
+      <p>请描述您的主要症状，越详细越好（支持自然语言）</p>
+      <label class="tcm-label">主诉</label>
+      <textarea class="tcm-textarea" id="chief-complaint" placeholder="例如：最近一周总是失眠，入睡困难，睡着了也多梦，白天没精神，有时候还会头痛，胃口也不太好..."></textarea>
+      <div class="input-row" style="margin-top:8px">
+        <div><label class="tcm-label">年龄</label><input  class="tcm-input" id="age" type="number" min="0" max="120" placeholder="可选" aria-label="可选" data-validate="number"></div>
+        <div><label class="tcm-label">性别</label><select class="tcm-input" id="gender"><option value="">未指定</option><option value="男">男</option><option value="女">女</option></select></div>
+      </div>
+      <div class="tcm-btns">
+        <button class="tcm-btn primary" onclick="runDiagnosis()" id="btn-diagnose">🔍 开始辨证</button>
+        <button class="tcm-btn secondary small" onclick="clearComplaint()">清空</button>
+      </div>
+    </div>
+
+    <!-- 快捷症状 -->
+    <div class="quick-grid">
+      <div class="quick-card" onclick="setComplaint('最近总是失眠，入睡困难')"><div class="qc-icon">😴</div><div class="qc-name">失眠</div><div class="qc-desc">入睡困难/多梦</div></div>
+      <div class="quick-card" onclick="setComplaint('头痛，有时头晕，怕冷')"><div class="qc-icon">🤕</div><div class="qc-name">头痛</div><div class="qc-desc">头痛/头晕/怕冷</div></div>
+      <div class="quick-card" onclick="setComplaint('胃不舒服，腹胀，没胃口')"><div class="qc-icon">🤢</div><div class="qc-name">胃不适</div><div class="qc-desc">腹胀/纳差/恶心</div></div>
+      <div class="quick-card" onclick="setComplaint('咳嗽有痰，胸闷气短')"><div class="qc-icon">😷</div><div class="qc-name">咳嗽</div><div class="qc-desc">咳嗽/胸闷/气短</div></div>
+      <div class="quick-card" onclick="setComplaint('老是感觉疲劳乏力，没精神')"><div class="qc-icon">😮‍💨</div><div class="qc-name">乏力</div><div class="qc-desc">疲劳/没精神</div></div>
+      <div class="quick-card" onclick="setComplaint('腰酸背痛，怕冷，手脚凉')"><div class="qc-icon">🧊</div><div class="qc-name">畏寒</div><div class="qc-desc">怕冷/腰酸/手脚凉</div></div>
+    </div>
+
+    <!-- 诊断结果 -->
+    <div id="diagnosis-result"></div>
+  </div>
+
+  <!-- ═══ 知识检索 Panel ═══ -->
+  <div class="tcm-panel" id="panel-kb">
+    <div class="tcm-card">
+      <h3>知识库搜索</h3>
+      <div class="input-row">
+        <input  class="tcm-input" id="kb-search" placeholder="搜索方剂、穴位、症状、药物..." onkeydown="if(event.key==='Enter')searchKB()" aria-label="搜索方剂、穴位、症状、药物...">
+        <select class="tcm-input" id="kb-module">
+          <option value="">全部模块</option>
+          <option value="nihaisha">倪海厦全集</option>
+          <option value="tcm">中医基础</option>
+          <option value="tcm-diagnosis">中医诊断</option>
+          <option value="tcm-fangji">中医方剂</option>
+          <option value="shanghan-lun">伤寒论</option>
+        </select>
+      </div>
+      <div class="tcm-btns">
+        <button class="tcm-btn primary" onclick="searchKB()">🔍 搜索</button>
+      </div>
+      <div id="kb-status" style="font-size:11px;color:var(--text3);margin-top:6px"></div>
+      <div id="kb-results" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- R762 移除穴位查询 panel：并入知识检索模块(穴位是知识子集) -->
+  <!-- ═══ 问诊记录 Panel ═══ -->
+  <div class="tcm-panel" id="panel-history">
+    <div class="tcm-card">
+      <h3>问诊记录</h3>
+      <p>最近诊断记录（本地存储，不联网）</p>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 本系统由 AI 驱动，仅供学习参考和执业中医师临床辅助。不构成诊断或处方建议。<br>
+    如有不适请及时就医，切勿自行用药。
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// 全局状态
+// ═══════════════════════════════════════
+const API_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8972' : '';
+const KB_SYNCED = null; // 动态加载
+let kbData = null;
+
+// ═══════════════════════════════════════
+// Tab切换
+// ═══════════════════════════════════════
+document.querySelectorAll('.tcm-tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tcm-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const panelId = 'panel-' + tab.dataset.tab;
+    document.querySelectorAll('.tcm-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(panelId).classList.add('active');
+    if (tab.dataset.tab === 'history') renderHistory();
+  };
+});
+
+// ═══════════════════════════════════════
+// 辨证论治
+// ═══════════════════════════════════════
+function setComplaint(text) {
+  document.getElementById('chief-complaint').value = text;
+}
+
+function clearComplaint() {
+  document.getElementById('chief-complaint').value = '';
+  document.getElementById('diagnosis-result').innerHTML = '';
+}
+
+async function runDiagnosis() {
+  const complaint = document.getElementById('chief-complaint').value.trim();
+  if (!complaint) return toast('请描述您的症状');
+
+  const btn = document.getElementById('btn-diagnose');
+  btn.disabled = true; btn.textContent = '⏳ 辨证中...';
+
+  const resultDiv = document.getElementById('diagnosis-result');
+  resultDiv.innerHTML = '<div class="result-box loading">正在分析，请稍候...</div>';
+
+  try {
+    const apiUrl = API_BASE ? API_BASE + '/api/tcm/diagnose' : '/api/tcm/diagnose';
+    const resp = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        inquiry: {
+          chief_complaint: complaint,
+          extracted_tcm_terms: extractTerms(complaint),
+          structured: extractStructured(complaint)
+        },
+        patient_id: 'web-' + Date.now()
+      })
+    });
+    
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.ok) {
+        renderDiagnosis(data, complaint);
+        saveToHistory(data, complaint);
+      } else {
+        // 离线：本地分析
+        const local = localDiagnosis(complaint);
+        renderLocalDiagnosis(local);
+        saveToHistory(local, complaint);
+      }
+    } else {
+      const local = localDiagnosis(complaint);
+      renderLocalDiagnosis(local);
+      saveToHistory(local, complaint);
+    }
+  } catch (e) {
+    /* [sanitized] */
+    const local = localDiagnosis(complaint);
+    renderLocalDiagnosis(local);
+    saveToHistory(local, complaint);
+  }
+
+  btn.disabled = false; btn.textContent = '🔍 开始辨证';
+}
+
+function extractTerms(text) {
+  const patterns = [
+    [/失眠|睡不着|入睡困难|多梦/, '失眠'],
+    [/头痛|头晕|头部/, '头痛'],
+    [/发热|发烧/, '发热'],
+    [/咳嗽|咳痰/, '咳嗽'],
+    [/恶心|呕吐|想吐/, '恶心'],
+    [/腹泻|拉肚子|便溏/, '腹泻'],
+    [/便秘|大便干/, '便秘'],
+    [/胸闷|心慌|心悸/, '心悸'],
+    [/腰酸|腰痛/, '腰痛'],
+    [/怕冷|恶寒|畏寒/, '畏寒'],
+    [/口苦|口干|口渴/, '口苦'],
+    [/乏力|疲劳|没精神/, '乏力'],
+    [/月经|痛经/, '月经'],
+    [/没胃口|不想吃|食欲/, '纳差'],
+    [/腹胀|腹痛|胃痛/, '腹胀'],
+  ];
+  return patterns.filter(p => p[0].test(text)).map(p => p[1]);
+}
+
+function extractStructured(text) {
+  const s = {};
+  if (/怕冷|恶寒|手脚凉/.test(text)) s.chills_fever = '恶寒';
+  if (/发热|发烧/.test(text)) s.chills_fever = s.chills_fever ? '恶寒发热' : '发热';
+  if (/失眠|睡不着/.test(text)) s.sleep = { quality: '失眠', hours_per_night: null };
+  if (/口苦/.test(text)) s.appetite_digestion = { taste: '口苦' };
+  if (/没胃口|不想吃/.test(text)) s.appetite_digestion = { ...(s.appetite_digestion||{}), appetite: '减退' };
+  return s;
+}
+
+// ─── 本地辨证（离线可用）───
+function localDiagnosis(complaint) {
+  const terms = extractTerms(complaint);
+  const s = extractStructured(complaint);
+
+  const patterns = [
+    { key: '失眠', syndrome: '心脾两虚', shanghan: '思虑过度，心脾受损', wenbing: '阴血暗耗，虚火上扰', fuyang: '阳气浮越，不能入阴', piwei: '脾胃虚弱，气血生化不足', formula: '归脾汤', source: '济生方', urgency: 'P2' },
+    { key: '头痛', syndrome: '肝阳上亢', shanghan: '太阳病，头痛发热', wenbing: '风热上扰清窍', fuyang: '阳虚寒凝，不通则痛', piwei: '清阳不升，浊阴不降', formula: '天麻钩藤饮', source: '杂病证治新义', urgency: 'P2' },
+    { key: '咳嗽', syndrome: '风寒束肺', shanghan: '太阳病，麻黄汤证', wenbing: '风温袭肺，桑菊饮证', fuyang: '阳虚感寒，当温散', piwei: '土不生金，培土生金', formula: '止嗽散', source: '医学心悟', urgency: 'P2' },
+    { key: '纳差', syndrome: '脾胃虚弱', shanghan: '太阴病，腹满而吐', wenbing: '湿热困脾', fuyang: '火不生土', piwei: '脾胃气虚，运化无权', formula: '香砂六君子汤', source: '时方歌括', urgency: 'P2' },
+    { key: '乏力', syndrome: '气血两虚', shanghan: '少阴病，脉微细', wenbing: '热伤气阴', fuyang: '阳气不足', piwei: '脾虚不能生血', formula: '八珍汤', source: '瑞竹堂经验方', urgency: 'P2' },
+    { key: '畏寒', syndrome: '阳虚寒盛', shanghan: '少阴病，四逆汤证', wenbing: '阳微阴盛', fuyang: '阳气衰微，急当温补', piwei: '中阳不足', formula: '金匮肾气丸', source: '金匮要略', urgency: 'P1' },
+    { key: '心悸', syndrome: '心气不足', shanghan: '伤寒脉结代', wenbing: '热扰心神', fuyang: '心阳不振', piwei: '气血不足，心失所养', formula: '炙甘草汤', source: '伤寒论', urgency: 'P1' },
+    { key: '月经', syndrome: '肝郁血虚', shanghan: '妇人杂病', wenbing: '血热妄行', fuyang: '宫寒血瘀', piwei: '脾不统血', formula: '逍遥散', source: '太平惠民和剂局方', urgency: 'P2' },
+    { key: '腹泻', syndrome: '脾虚湿盛', shanghan: '太阴病，自利益甚', wenbing: '湿热下注', fuyang: '脾肾阳虚', piwei: '脾虚不运', formula: '参苓白术散', source: '太平惠民和剂局方', urgency: 'P2' },
+    { key: '腰痛', syndrome: '肾虚腰痛', shanghan: '少阴病', wenbing: '湿热腰痛', fuyang: '肾阳虚', piwei: '脾肾两虚', formula: '独活寄生汤', source: '备急千金要方', urgency: 'P2' },
+  ];
+
+  // 找最佳匹配
+  let best = null;
+  for (const p of patterns) {
+    if (complaint.includes(p.key) || terms.includes(p.key)) {
+      best = p; break;
+    }
+  }
+  if (!best) {
+    best = { key: '综合', syndrome: '需四诊合参', shanghan: '请补充更多症状信息', wenbing: '舌脉不详，建议面诊', fuyang: '阳气状态需观察', piwei: '脾胃为后天之本', formula: null, urgency: 'P2' };
+  }
+
+  // P0紧急检查
+  if (/剧烈胸痛|呼吸困难|意识不清|大出血|中风|偏瘫/.test(complaint)) {
+    best.urgency = 'P0';
+  }
+
+  return {
+    ok: true,
+    data: {
+      urgency_level: best.urgency,
+      urgency: { P0_EMERGENCY: { label: '紧急就医' }, P1_SUGGEST_VISIT: { label: '建议就诊' }, P2_HEALTH_TIP: { label: '健康提示' } }[best.urgency === 'P0' ? 'P0_EMERGENCY' : best.urgency === 'P1' ? 'P1_SUGGEST_VISIT' : 'P2_HEALTH_TIP'],
+      kb_multischool_opinions: {
+        shanghan: { opinion: best.shanghan, reference: '《伤寒论》', confidence: 0.82 },
+        wenbing: { opinion: best.wenbing, reference: '《温病条辨》', confidence: 0.75 },
+        fuyang: { opinion: best.fuyang, reference: '《医理真传》', confidence: 0.78 },
+        piwei: { opinion: best.piwei, reference: '《脾胃论》', confidence: 0.85 },
+        jingfang: { opinion: best.syndrome + '，以方证对应为核', reference: '经方辨证', confidence: 0.70 }
+      },
+      suggested_formula: best.formula ? { formula: best.formula, source: best.source, confidence: 0.78, matched_syndrome: best.syndrome } : { formula: null, note: '请面诊后由执业医师处方' },
+      four_methods: { inquiry: { chief_complaint: complaint } }
+    },
+    warnings: null
+  };
+}
+
+function renderDiagnosis(data, complaint) {
+  const d = data.data;
+  const opinions = d.kb_multischool_opinions;
+  const urgency = d.urgency;
+  const formula = d.suggested_formula;
+  const warnings = data.warnings;
+
+  let html = '<div class="result-box">';
+  html += '<div class="result-title">📋 诊断分析报告</div>';
+  html += '<div class="result-meta">主诉: ' + esc(complaint) + '</div>';
+
+  // 紧急级别
+  if (urgency) {
+    const levelClass = d.urgency_level === 'P0_EMERGENCY' ? 'urgency-p0' : d.urgency_level === 'P1_SUGGEST_VISIT' ? 'urgency-p1' : d.urgency_level === 'P2_HEALTH_TIP' ? 'urgency-p2' : 'urgency-p3';
+    html += '<div style="margin-bottom:12px"><span class="urgency-badge ' + levelClass + '">' + (urgency.label || '') + '</span></div>';
+  }
+
+  // 多流派观点
+  html += '<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px">🏛️ 多流派辨证</div>';
+  for (const [school, op] of Object.entries(opinions)) {
+    if (!op || !op.opinion || op.confidence < 0.5) continue;
+    html += '<div class="opinion-item ' + school + '">' +
+      '<div class="opinion-label">' + school.toUpperCase() + ' · 置信度 ' + (op.confidence*100).toFixed(0) + '%</div>' +
+      '<div class="opinion-text">' + esc(op.opinion) + '</div>' +
+      (op.reference ? '<div style="font-size:11px;opacity:.6;margin-top:4px">📖 ' + esc(op.reference) + '</div>' : '') +
+      '</div>';
+  }
+
+  // 方剂推荐
+  if (formula && formula.formula) {
+    html += '<div class="formula-card">' +
+      '<div class="f-name">💊 ' + esc(formula.formula) + '</div>' +
+      '<div class="f-source">来源: ' + esc(formula.source) + ' · 置信度 ' + ((formula.confidence||0)*100).toFixed(0) + '%</div>' +
+      (formula.matched_syndrome ? '<div class="f-source">证型: ' + esc(formula.matched_syndrome) + '</div>' : '') +
+      '<div class="f-hint">⚠️ 方剂推荐仅供执业医师参考，不构成处方建议</div>' +
+      '</div>';
+  } else if (formula && formula.note) {
+    html += '<div style="padding:12px;color:var(--text2);font-size:13px">📝 ' + esc(formula.note) + '</div>';
+  }
+
+  // 警告
+  if (warnings && warnings.length) {
+    for (const w of warnings) {
+      html += '<div class="warning-box ' + w.level + '">⚠️ ' + esc(w.detail) + '</div>';
+    }
+  }
+
+  html += '</div>';
+  document.getElementById('diagnosis-result').innerHTML = html;
+}
+
+function renderLocalDiagnosis(local) {
+  renderDiagnosis(local, local.data.four_methods.inquiry.chief_complaint);
+  toast('使用本地知识库分析（离线模式）');
+}
+
+// ═══════════════════════════════════════
+// 知识检索
+// ═══════════════════════════════════════
+async function searchKB() {
+  const q = document.getElementById('kb-search').value.trim();
+  const mod = document.getElementById('kb-module').value;
+  if (!q) return toast('请输入搜索关键词');
+
+  // R757 修真：服务端检索（不再客户端拉 85MB 全量遍历，<100ms 线性索引）
+  // 注意: 走同源相对路径(8931 代理到 8932)——apiBase(127.0.0.1:8972)跨源会被 CORS 拦截
+  let results = [];
+  let j = null;
+  try {
+    const resp = await fetch('/api/tcm/kb/search?q=' + encodeURIComponent(q) + '&limit=20');
+    if (resp.ok) {
+      j = await resp.json();
+      results = (j.results || []).map(r => ({
+        title: r.title || '',
+        module: r.module || '',
+        snippet: (r.content || '').substring(0, 120).replace(q, '<span class="highlight">' + q + '</span>'),
+        confidence: r.confidence || 0.75
+      }));
+    }
+    var kbStatus = document.getElementById('kb-status');
+    if (kbStatus) {
+      kbStatus.textContent = '✅ 知识库在线 · ' + (j && j.total_hits != null ? '命中 ' + j.total_hits + ' 条' : '');
+      kbStatus.style.color = 'var(--green)';
+    }
+  } catch (e) {
+    document.getElementById('kb-results').innerHTML = '<div style="padding:16px;color:var(--text3)">知识库服务不可用</div>';
+    return;
+  }
+  if (mod) results = results.filter(r => r.module === mod || r.module.includes(mod));
+  const top = results.slice(0, 20);
+
+  let html = '<div style="font-size:13px;color:var(--text2);margin-bottom:8px">找到 ' + results.length + ' 条结果</div>';
+  for (const r of top) {
+    html += '<div class="kb-result-item">' +
+      '<div class="kb-title">' + esc(r.title) + '</div>' +
+      '<div class="kb-meta">模块: ' + esc(r.module) + ' · 置信度: ' + (r.confidence*100).toFixed(0) + '%</div>' +
+      '<div class="kb-snippet">' + r.snippet + '</div>' +
+      '</div>';
+  }
+  if (!results.length) html += '<div style="padding:16px;color:var(--text3);text-align:center">未找到匹配结果</div>';
+
+  document.getElementById('kb-results').innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// 问诊记录
+// ═══════════════════════════════════════
+function saveToHistory(data, complaint) {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  const history = JSON.parse(localStorage.getItem('tcm_history') || '[]');
+  history.unshift({
+    time: new Date().toISOString(),
+    complaint: complaint,
+    urgency: data.data?.urgency_level || 'P2',
+    syndrome: data.data?.kb_multischool_opinions?.piwei?.opinion || '',
+    formula: data.data?.suggested_formula?.formula || ''
+  });
+  if (history.length > 50) history.pop();
+  localStorage.setItem('tcm_history', JSON.stringify(history));
+}
+
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('tcm_history') || '[]');
+  if (!history.length) {
+    document.getElementById('history-list').innerHTML = '<div style="padding:16px;color:var(--text3);text-align:center">暂无问诊记录</div>';
+    return;
+  }
+  
+  let html = '';
+  for (const h of history) {
+    const dt = new Date(h.time);
+    const timeStr = dt.toLocaleDateString('zh-CN') + ' ' + dt.toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'});
+    html += '<div class="history-item">' +
+      '<div class="hi-time">' + timeStr + ' · ' + h.urgency + '</div>' +
+      '<div>' + esc(h.complaint.substring(0, 60)) + (h.complaint.length > 60 ? '...' : '') + '</div>' +
+      (h.formula ? '<div style="color:var(--green);font-size:11px">💊 ' + esc(h.formula) + '</div>' : '') +
+      '</div>';
+  }
+  document.getElementById('history-list').innerHTML = html;
+}
+
+// ═══════════════════════════════════════
+// 工具函数
+// ═══════════════════════════════════════
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

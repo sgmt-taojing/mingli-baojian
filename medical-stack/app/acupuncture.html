@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/acupuncture.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+<meta name="robots" content="noindex">
+<title>针灸治疗 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--green:#16a34a;--blue:#2563eb;--accent:#c0392b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}}
+.input,select,textarea{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+.label{font-size:11px;color:var(--text3);margin-bottom:2px;display:block}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px;border:1px solid var(--border);background:var(--bg)}
+.acupoint-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+@media(max-width:480px){.acupoint-grid{grid-template-columns:repeat(2,1fr)}}
+.acupoint-chip{padding:8px;border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:11px;transition:.1s}
+.acupoint-chip:hover{background:var(--bg);border-color:var(--primary)}
+.acupoint-chip.selected{background:var(--primary);color:#fff;border-color:var(--primary)}
+.acupoint-chip .pt-name{font-weight:600}
+.acupoint-chip .pt-info{font-size:9px;opacity:.7;margin-top:2px}
+.treatment-item{padding:8px;border-bottom:1px solid var(--border);font-size:12px;cursor:pointer}
+.treatment-item:hover{background:var(--bg)}
+.treatment-item .t-date{font-size:10px;color:var(--text3)}
+.treatment-item .t-pts{color:var(--primary);font-weight:600}
+.meridian-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.meridian-tab{padding:4px 10px;border-radius:10px;border:1px solid var(--border);font-size:11px;cursor:pointer;background:var(--card)}
+.meridian-tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.selected-pts{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0}
+.selected-pt{padding:4px 10px;border-radius:10px;font-size:11px;background:var(--blue-bg);color:var(--blue);cursor:pointer;display:flex;align-items:center;gap:4px}
+.selected-pt .remove{font-weight:700;cursor:pointer;opacity:.5}
+.selected-pt .remove:hover{opacity:1}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">针灸治疗</span>
+</div>
+
+<div class="container">
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>针灸医生</b></span><span class="std-tag">⚙️ 功能 <b>针灸治疗记录</b></span><span class="std-tag">💎 使用价值 <b>12经络穴位点选，刺法灸法留针记录</b></span></div>
+  <div class="card"><h1 style="font-size:18px;text-align:center;letter-spacing:3px;color:var(--primary)">📍 针灸治疗记录</h1></div>
+
+  <!-- 新建治疗记录 -->
+  <div class="card">
+    <h3>📝 新建治疗</h3>
+    <div class="form-row">
+      <div><label class="label">患者姓名</label><input  class="input" id="acu-patient" aria-label="acu patient" data-validate="required|min=2"></div>
+      <div><label class="label">治疗日期</label><input  class="input" id="acu-date" type="date" aria-label="acu date" data-validate="required"></div>
+    </div>
+    <div class="form-row">
+      <div><label class="label">诊断(证型)</label><input  class="input" id="acu-diagnosis" aria-label="acu diagnosis"></div>
+      <div><label class="label">治则</label><input  class="input" id="acu-treatment" aria-label="acu treatment"></div>
+    </div>
+    <label class="label">所选穴位</label>
+    <div class="selected-pts" id="acu-selected"></div>
+
+    <!-- 经络Tab -->
+    <div class="meridian-tabs" id="meridian-tabs"></div>
+    <div class="acupoint-grid" id="acupoint-grid"></div>
+
+    <!-- API 搜索框：穴位名/适应症/经脉三向检索 -->
+    <div style="margin-top:8px;display:grid;grid-template-columns:1fr auto;gap:6px">
+      <input  class="input" id="acu-search" placeholder="🔍 搜穴位/适应症/经脉（如 头痛、足三里、肺经）" aria-label="🔍 搜穴位/适应症/经脉（如 头痛、足三里、肺经）">
+      <button class="btn primary" onclick="searchAcupoints()">搜索</button>
+    </div>
+    <div id="acu-search-result" style="margin-top:8px"></div>
+
+    <div class="form-row" style="margin-top:8px">
+      <div><label class="label">刺法</label><select class="input" id="acu-method"><option>毫针刺</option><option>电针</option><option>温针灸</option><option>三棱针</option><option>皮肤针</option><option>穴位注射</option></select></div>
+      <div><label class="label">留针时间(分钟)</label><input  class="input" id="acu-duration" type="number" value="30" aria-label="acu duration" data-validate="number"></div>
+    </div>
+    <div class="form-row">
+      <div><label class="label">灸法</label><select class="input" id="acu-moxa"><option>无艾灸</option><option>艾条灸</option><option>艾炷灸</option><option>温灸器</option><option>隔姜灸</option></select></div>
+      <div><label class="label">补泻手法</label><select class="input" id="acu-manip"><option>平补平泻</option><option>提插补泻</option><option>捻转补泻</option><option>呼吸补泻</option></select></div>
+    </div>
+    <label class="label">治疗反应/备注</label>
+    <textarea class="input" id="acu-note" placeholder="针刺反应、患者感受、特殊事项"></textarea>
+    <div style="margin-top:8px">
+      <button class="btn green" onclick="saveTreatment()">✅ 保存治疗记录</button>
+    </div>
+  </div>
+
+  <!-- 治疗记录列表 -->
+  <div class="card">
+    <h3>📚 治疗记录 · <span id="acu-count">0</span> 次</h3>
+    <div id="acu-list"></div>
+  </div>
+</div>
+
+<script>
+var allPoints = {
+  '肺经(LU)': [{n:'中府',l:'胸前壁外上方',i:'咳嗽,气喘'},{n:'尺泽',l:'肘横纹中',i:'咳嗽,肘臂痛'},{n:'列缺',l:'腕横纹上1.5寸',i:'头痛,咳嗽'},{n:'太渊',l:'腕横纹桡侧',i:'咳喘,腕痛'},{n:'少商',l:'拇指桡侧',i:'咽喉肿痛'}],
+  '心经(HT)': [{n:'神门',l:'腕横纹尺侧',i:'失眠,心悸'},{n:'少海',l:'肘横纹内侧',i:'心痛,肘痛'}],
+  '心包(PC)': [{n:'内关',l:'腕横纹上2寸',i:'心悸,胸闷,恶心'},{n:'劳宫',l:'掌心',i:'口疮,心痛'}],
+  '脾经(SP)': [{n:'三阴交',l:'内踝上3寸',i:'月经不调,失眠'},{n:'阴陵泉',l:'膝内侧',i:'水肿,膝痛'}],
+  '胃经(ST)': [{n:'足三里',l:'膝下3寸',i:'胃痛,强壮'},{n:'天枢',l:'脐旁2寸',i:'腹痛,便秘'}],
+  '肝经(LR)': [{n:'太冲',l:'足背第1-2跖骨间',i:'头痛,眩晕,月经不调'},{n:'期门',l:'乳头下第6肋',i:'胁痛'}],
+  '肾经(KI)': [{n:'涌泉',l:'足底前1/3',i:'头痛,失眠'},{n:'太溪',l:'内踝后',i:'耳鸣,腰痛'}],
+  '胆经(GB)': [{n:'风池',l:'枕骨下',i:'头痛,感冒'},{n:'阳陵泉',l:'腓骨小头前下',i:'胁痛,膝痛'}],
+  '膀胱(UB)': [{n:'大杼',l:'T1棘突下旁开1.5寸',i:'颈项强痛'},{n:'肺俞',l:'T3旁开1.5寸',i:'咳嗽'},{n:'肾俞',l:'L2旁开1.5寸',i:'腰痛,耳鸣'}],
+  '任脉(CV)': [{n:'关元',l:'脐下3寸',i:'遗尿,虚弱'},{n:'气海',l:'脐下1.5寸',i:'虚弱,腹痛'},{n:'中脘',l:'脐上4寸',i:'胃痛,呕吐'}],
+  '督脉(GV)': [{n:'百会',l:'头顶正中',i:'头痛,失眠'},{n:'大椎',l:'C7棘突下',i:'发热,项强'},{n:'命门',l:'L2棘突下',i:'腰痛'}],
+  '奇穴': [{n:'四神聪',l:'百会前后左右各1寸',i:'头痛,失眠'},{n:'印堂',l:'两眉中点',i:'鼻塞,失眠'},{n:'太阳',l:'眉梢后1寸',i:'头痛'},{n:'安眠',l:'风池与翳风之间',i:'失眠'}]
+};
+
+var selected = [];
+var currentMeridian = '肺经(LU)';
+
+function renderMeridianTabs() {
+  var tabs = '';
+  for (var m in allPoints) {
+    tabs += '<div class="meridian-tab' + (m===currentMeridian?' active':'') + '" onclick="selectMeridian(\'' + m + '\')">' + m + '</div>';
+  }
+  document.getElementById('meridian-tabs').innerHTML = tabs;
+}
+
+function selectMeridian(m) {
+  currentMeridian = m;
+  renderMeridianTabs();
+  renderAcupoints();
+}
+
+function renderAcupoints() {
+  var pts = allPoints[currentMeridian] || [];
+  var html = '';
+  for (var i = 0; i < pts.length; i++) {
+    var p = pts[i];
+    var isSel = selected.some(function(s) { return s.name === p.n; });
+    html += '<div class="acupoint-chip' + (isSel?' selected':'') + '" onclick="togglePoint(\'' + p.n + '\', \'' + p.l + '\', \'' + p.i + '\')">' +
+      '<div class="pt-name">📍 ' + p.n + '</div>' +
+      '<div class="pt-info">' + p.l + ' · ' + p.i + '</div></div>';
+  }
+  document.getElementById('acupoint-grid').innerHTML = html;
+}
+
+function togglePoint(name, location, indications) {
+  var idx = selected.findIndex(function(s) { return s.name === name; });
+  if (idx >= 0) selected.splice(idx, 1);
+  else selected.push({ name: name, location: location, indications: indications });
+  renderAcupoints();
+  renderSelected();
+}
+
+function renderSelected() {
+  var html = '';
+  for (var i = 0; i < selected.length; i++) {
+    html += '<div class="selected-pt">📍 ' + selected[i].name + '<span class="remove" onclick="removePt(' + i + ')">✕</span></div>';
+  }
+  document.getElementById('acu-selected').innerHTML = html || '<span style="font-size:11px;color:var(--text3)">请点击上方穴位添加</span>';
+}
+
+function removePt(i) { selected.splice(i,1); renderAcupoints(); renderSelected(); }
+
+function saveTreatment() {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  var patient = document.getElementById('acu-patient').value.trim();
+  if (!patient) return toast('请填写患者姓名');
+  if (!selected.length) return toast('请选择治疗的穴位');
+
+  var treatment = {
+    id: 'ACU' + Date.now().toString(36).toUpperCase(),
+    patient: patient,
+    date: document.getElementById('acu-date').value || new Date().toISOString().slice(0,10),
+    diagnosis: document.getElementById('acu-diagnosis').value.trim(),
+    treatment_principle: document.getElementById('acu-treatment').value.trim(),
+    points: selected.map(function(p) { return p.name; }),
+    method: document.getElementById('acu-method').value,
+    duration: document.getElementById('acu-duration').value,
+    moxibustion: document.getElementById('acu-moxa').value,
+    manipulation: document.getElementById('acu-manip').value,
+    note: document.getElementById('acu-note').value.trim(),
+    created_at: new Date().toISOString()
+  };
+
+  TCM.store.push('acupuncture', treatment);
+  selected = [];
+  renderSelected();
+  renderAcupoints();
+  renderList();
+  toast('✅ 治疗记录已保存 · ' + treatment.points.length + ' 穴');
+}
+
+function renderList() {
+  var list = TCM.store.get('acupuncture') || [];
+  document.getElementById('acu-count').textContent = list.length;
+
+  var html = '';
+  for (var i = 0; i < Math.min(list.length, 30); i++) {
+    var t = list[i];
+    html += '<div class="treatment-item" onclick="viewTreatment(\'' + t.id + '\')">' +
+      '<strong>' + t.patient + '</strong> · ' + (t.diagnosis||'') + 
+      ' <span class="t-pts">📍' + (t.points||[]).join(',') + '</span>' +
+      '<div class="t-date">' + t.date + ' · ' + t.method + ' · ' + t.duration + '分钟 · ' + t.id.slice(-6) + '</div></div>';
+  }
+  document.getElementById('acu-list').innerHTML = html || '<div style="padding:14px;text-align:center;color:var(--text3)">暂无治疗记录</div>';
+}
+
+function viewTreatment(id) {
+  var list = TCM.store.get('acupuncture') || [];
+  var t = list.find(function(r) { return r.id === id; });
+  if (!t) return;
+  document.getElementById('acu-patient').value = t.patient;
+  document.getElementById('acu-date').value = t.date;
+  document.getElementById('acu-diagnosis').value = t.diagnosis||'';
+  document.getElementById('acu-treatment').value = t.treatment_principle||'';
+  document.getElementById('acu-method').value = t.method||'';
+  document.getElementById('acu-duration').value = t.duration||'30';
+  document.getElementById('acu-moxa').value = t.moxibustion||'';
+  document.getElementById('acu-manip').value = t.manipulation||'';
+  document.getElementById('acu-note').value = t.note||'';
+  selected = (t.points||[]).map(function(p) { return { name: p, location: '', indications: '' }; });
+  renderSelected();
+  renderAcupoints();
+}
+
+// 调 API 穴位搜索（穴位名 / 适应症 / 经脉 三向检索）
+async function searchAcupoints() {
+  var q = (document.getElementById('acu-search').value || '').trim();
+  if (!q) return toast('请输入搜索关键词');
+  try {
+    var res = await fetch('/api/tcm/acupoint/search?q=' + encodeURIComponent(q));
+    var data = await res.json();
+    var box = document.getElementById('acu-search-result');
+    var pts = data.points || data.data || [];   // R800 修真：端点返回 data 字段（原读 data.points 永远空）
+    if (!data.count && !pts.length) { box.innerHTML = '<div style="font-size:11px;color:var(--text3);padding:6px">未匹配到穴位</div>'; return; }
+    var html = '<div style="font-size:11px;color:var(--text3);margin-bottom:4px">匹配 ' + pts.length + ' 个穴位：</div>';
+    pts.forEach(function(p) {
+      var ind = (p.indications||[]).join('、');
+      var mer = p.meridian ? ' · ' + p.meridian : '';
+      html += '<div class="acupoint-chip" onclick="togglePoint(\'' + p.name + '\', \'' + (p.location||'') + '\', \'' + ind + '\')" style="display:inline-block;margin:2px 4px 2px 0">' +
+        '<div class="pt-name">📍 ' + p.name + '</div>' +
+        '<div class="pt-info">' + (p.location||'') + mer + '<br>主治：' + ind + '</div></div>';
+    });
+    box.innerHTML = html;
+  } catch (e) {
+    toast('搜索失败：' + e.message);
+  }
+}
+
+// 回车触发搜索
+document.getElementById('acu-search').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') searchAcupoints();
+});
+
+document.getElementById('acu-date').value = new Date().toISOString().slice(0,10);
+renderMeridianTabs();
+renderAcupoints();
+renderList();
+document.getElementById('acu-count').textContent = (TCM.store.get('acupuncture')||[]).length;
+// R800：统搜直达（acupuncture.html?q=穴名/症状）→ 自动检索定位
+try {
+  var _q0 = new URLSearchParams(location.search).get('q');
+  if (_q0) {
+    document.getElementById('acu-search').value = _q0;
+    searchAcupoints();
+    document.getElementById('acu-search-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+} catch(e) {}
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<!-- ═══ 实时事件流 ═══ -->
+<div id="rt-panel" style="margin:8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:11px;font-family:monospace;max-height:120px;overflow-y:auto">
+  <div style="color:#999;text-align:center">📡 实时事件监听中…</div>
+</div>
+<script>
+setTimeout(function(){
+  if (window.TCM && window.TCM.realtime) {
+    var evts = [];
+    window.TCM.realtime.on("*", function(p, m) {
+      var ts = new Date(m.ts).toISOString().slice(11,19);
+      evts.push("[" + ts + "] " + m.type + (p.module ? " " + p.module : "") + (p.id ? " #" + p.id.slice(-6) : ""));
+      if (evts.length > 10) evts = evts.slice(-10);
+      var el = document.getElementById("rt-panel");
+      if (el) el.innerHTML = evts.slice().reverse().map(function(e){return "&lt;div style='padding:2px 0;border-bottom:1px dashed #eee'&gt;"+e+"&lt;/div&gt;";}).join("");
+    });
+  }
+}, 300);
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/flows.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+<meta name="robots" content="noindex">
+<title>流程图中心 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb;--purple-bg:#f5f0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.header{text-align:center;padding:20px;background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;border-radius:0 0 16px 16px;margin-bottom:12px}
+.header h1{font-size:20px;letter-spacing:2px}
+.header p{font-size:12px;opacity:.6}
+
+/* 流程导航网格 */
+.master-flow{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:14px;margin:12px 0}
+.mf-title{font-size:13px;font-weight:700;color:var(--primary);margin-bottom:10px}
+.mf-steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.mf-step{flex:1;min-width:90px;text-align:center;padding:8px 6px;border-radius:8px;background:var(--bg);border:1px solid var(--border);position:relative;cursor:pointer;transition:.2s}
+.mf-step:hover{transform:translateY(-2px);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.mf-step .mf-num{font-size:16px}
+.mf-step .mf-name{font-size:10px;font-weight:600;margin-top:2px}
+.mf-step .mf-count{font-size:9px;color:var(--text3);margin-top:2px}
+.mf-step.done{background:var(--green-bg);border-color:#86efac}
+.mf-step.active{background:var(--gold-bg);border-color:#fde68a}
+.mf-step.waiting{background:var(--red-bg);border-color:#fca5a5}
+.mf-arrow{display:flex;align-items:center;color:var(--text3);font-size:12px;flex-shrink:0}
+
+.flow-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+@media(max-width:768px){.flow-grid{grid-template-columns:1fr}}
+.flow-card{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;transition:.2s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.flow-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.08)}
+.flow-card .card-header{padding:12px 16px;color:#fff;font-weight:700;font-size:14px}
+.flow-card .card-body{padding:12px 16px}
+.flow-card .card-header.h1{background:linear-gradient(135deg,#6b3a1f,#8b4513)}.flow-card .card-header.h2{background:linear-gradient(135deg,#1a5276,#2980b9)}.flow-card .card-header.h3{background:linear-gradient(135deg,#145a32,#27ae60)}.flow-card .card-header.h4{background:linear-gradient(135deg,#7d3c98,#a569bd)}.flow-card .card-header.h5{background:linear-gradient(135deg,#b8860b,#d4a017)}.flow-card .card-header.h6{background:linear-gradient(135deg,#c0392b,#e74c3c)}
+.flow-step{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:var(--text2)}
+.flow-step .step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.flow-step .step-arrow{margin:0 4px;color:var(--text3);font-size:10px}
+.step-blue{background:var(--blue)}.step-green{background:var(--green)}.step-gold{background:var(--gold)}.step-purple{background:var(--purple)}.step-red{background:var(--accent)}
+.flow-link{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;margin:2px;text-decoration:none;background:var(--bg);border:1px solid var(--border);color:var(--primary)}
+.flow-link:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">流程图中心</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>全部角色</b></span><span class="std-tag">⚙️ 功能 <b>流程图中心·主流程状态</b></span><span class="std-tag">💎 使用价值 <b>一眼看懂全业务流，实时掌握各环节待办</b></span></div>
+<div class="header">
+  <h1>🔀 流程图中心</h1>
+  <p>一眼看懂系统操作流程 · 点击跳转对应功能页</p>
+</div>
+<div class="container">
+  <!-- 主流程驱动横条：8环节实时状态 -->
+  <div class="master-flow" id="master-flow">
+    <div class="mf-title">⚡ 主业务流程</div>
+    <div class="mf-steps" id="mf-steps"></div>
+  </div>
+
+  <div class="flow-grid">
+    <!-- 1. 诊疗闭环 -->
+    <div class="flow-card" onclick="window.open('patient-portal.html','_blank')">
+      <div class="card-header h1">🏥 患者就诊全流程</div>
+      <div class="card-body">
+        <div class="flow-step"><span class="step-num step-blue">1</span>挂号选科<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-blue">2</span>候诊排队<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">3</span>望闻问切<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">4</span>AI辅助辨证<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">5</span>开具处方<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">6</span>药师审核<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-purple">7</span>缴费<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-purple">8</span>取药/邮寄</div>
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">
+          <a class="flow-link" href="patient-portal.html" onclick="event.stopPropagation()">👤 挂号</a>
+          <a class="flow-link" href="doctor-dashboard.html" onclick="event.stopPropagation()">🩺 诊断</a>
+          <a class="flow-link" href="pharmacy.html" onclick="event.stopPropagation()">💊 药房</a>
+          <a class="flow-link" href="payment.html" onclick="event.stopPropagation()">💳 缴费</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 医生工作 -->
+    <div class="flow-card" onclick="window.open('doctor-dashboard.html','_blank')">
+      <div class="card-header h2">🩺 医生诊疗6步</div>
+      <div class="card-body">
+        <div class="flow-step"><span class="step-num step-blue">1</span>叫号接诊<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-blue">2</span>👁️望诊(面/舌)<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">3</span>👂闻诊(声/咳)<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">4</span>📝问诊(十问)<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">5</span>🤚切诊(脉)<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-purple">6</span>🤖AI辅助→处方</div>
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">
+          <a class="flow-link" href="clinical.html" onclick="event.stopPropagation()">🔬 四诊采集</a>
+          <a class="flow-link" href="index.html" onclick="event.stopPropagation()">🔍 AI辨证</a>
+          <a class="flow-link" href="emr.html" onclick="event.stopPropagation()">📋 电子病历</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 药房流程 -->
+    <div class="flow-card" onclick="window.open('pharmacy.html','_blank')">
+      <div class="card-header h3">💊 药房管理流程</div>
+      <div class="card-body">
+        <div class="flow-step"><span class="step-num step-blue">1</span>接收处方<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">2</span>审核配伍<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">3</span>十八反十九畏检测<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">4</span>调配中药<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">5</span>代煎/自煎<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-purple">6</span>自取/邮寄</div>
+        <div style="margin-top:8px">
+          <a class="flow-link" href="pharmacy.html" onclick="event.stopPropagation()">💊 药房管理</a>
+          <a class="flow-link" href="payment.html" onclick="event.stopPropagation()">💳 支付</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 穿戴设备 -->
+    <div class="flow-card" onclick="window.open('wearable-monitor.html','_blank')">
+      <div class="card-header h4">⌚ 穿戴设备工作流</div>
+      <div class="card-body">
+        <div class="flow-step"><span class="step-num step-blue">1</span>设备开机配对<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-blue">2</span>距离传感器触发<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">3</span>光线自适应补光<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">4</span>陀螺仪防抖矫正<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">5</span>自动采集面/舌/脉<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-purple">6</span>数据→AI辨证</div>
+        <div style="margin-top:8px">
+          <a class="flow-link" href="wearable-monitor.html" onclick="event.stopPropagation()">⌚ 设备监控</a>
+          <a class="flow-link" href="clinical.html" onclick="event.stopPropagation()">🔬 四诊采集</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 数字孪生 -->
+    <div class="flow-card" onclick="window.open('digital-twin.html','_blank')">
+      <div class="card-header h5">🔄 数字孪生流程</div>
+      <div class="card-body">
+        <div class="flow-step"><span class="step-num step-blue">1</span>录入就诊记录<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">2</span>健康综合评分<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">3</span>五脏分区评分<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">4</span>体质推断<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">5</span>时序趋势分析<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-purple">6</span>风险预警+养生方案</div>
+        <div style="margin-top:8px">
+          <a class="flow-link" href="digital-twin.html" onclick="event.stopPropagation()">🔄 数字孪生</a>
+          <a class="flow-link" href="followup.html" onclick="event.stopPropagation()">📞 随访</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. 管理流程 -->
+    <div class="flow-card" onclick="window.open('admin.html','_blank')">
+      <div class="card-header h6">📊 管理监控流程</div>
+      <div class="card-body">
+        <div class="flow-step"><span class="step-num step-blue">1</span>数据看板<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-blue">2</span>排班管理<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">3</span>患者索引查询<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-green">4</span>医生绩效统计<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-gold">5</span>监控预警<span class="step-arrow">→</span></div>
+        <div class="flow-step"><span class="step-num step-red">6</span>设备监控</div>
+        <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">
+          <a class="flow-link" href="dashboard.html" onclick="event.stopPropagation()">📈 看板</a>
+          <a class="flow-link" href="admin.html" onclick="event.stopPropagation()">📊 管理</a>
+          <a class="flow-link" href="schedule.html" onclick="event.stopPropagation()">📅 排班</a>
+          <a class="flow-link" href="wearable-monitor.html" onclick="event.stopPropagation()">⌚ 设备</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// ═══ 主流程驱动横条：实时业务状态 ═══
+function renderMasterFlow() {
+  try {
+    var regs = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
+    var rxs = JSON.parse(localStorage.getItem('tcm_prescriptions') || '[]');
+    var recs = JSON.parse(localStorage.getItem('tcm_patient_records') || '[]');
+    
+    var steps = [
+      { icon: '📋', name: '挂号', count: regs.filter(r=>r.status!=='done').length + ' 候诊', href: 'patient-portal.html' },
+      { icon: '🩺', name: '诊断', count: regs.filter(r=>r.status==='diagnosing').length + ' 进行中', href: 'doctor-dashboard.html' },
+      { icon: '📝', name: '病历', count: recs.length + ' 份', href: 'emr.html' },
+      { icon: '💊', name: '处方', count: rxs.filter(r=>r.status==='pending_review').length + ' 待审', href: 'doctor-dashboard.html' },
+      { icon: '🔍', name: '审核', count: rxs.filter(r=>r.status==='verified').length + ' 待付', href: 'pharmacy.html' },
+      { icon: '💳', name: '支付', count: rxs.filter(r=>r.status==='paid').length + ' 待配', href: 'payment.html' },
+      { icon: '💊', name: '调配', count: rxs.filter(r=>r.status==='dispensed'||r.status==='ready').length + ' 进行中', href: 'pharmacy.html' },
+      { icon: '✅', name: '完成', count: rxs.filter(r=>r.status==='completed').length + ' 单', href: 'monitor.html' }
+    ];
+    
+    var html = '';
+    for (var i = 0; i < steps.length; i++) {
+      var s = steps[i];
+      var cls = 'waiting';
+      var n = parseInt(s.count) || 0;
+      if (s.name === '完成' && n > 0) cls = 'done';
+      else if (n > 0) cls = (s.name === '挂号' || s.name === '诊断' || s.name === '调配') ? 'active' : (s.name === '处方' ? 'active' : 'waiting');
+      if (s.name === '挂号' && n > 0) cls = 'active';
+      if (s.name === '完成' && n === 0) cls = 'waiting';
+      html += '<div class="mf-step ' + cls + '" onclick="window.open(\'' + s.href + '\',\'_blank\')">' +
+        '<div class="mf-num">' + s.icon + '</div>' +
+        '<div class="mf-name">' + s.name + '</div>' +
+        '<div class="mf-count">' + s.count + '</div></div>';
+      if (i < steps.length - 1) html += '<div class="mf-arrow">›</div>';
+    }
+    document.getElementById('mf-steps').innerHTML = html;
+  } catch(e) {
+    document.getElementById('mf-steps').innerHTML = '<div style="font-size:11px;color:var(--text3)">暂无业务数据</div>';
+  }
+}
+renderMasterFlow();
+setInterval(renderMasterFlow, 10000);
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

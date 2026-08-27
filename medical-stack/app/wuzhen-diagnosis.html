@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="description" content="五诊联动 · 面诊/舌诊/眼诊/唇诊/手诊 视频采集 - AI 辨证 - KB 闭环">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/wuzhen-diagnosis.html">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩺</text></svg>">
+<title>五诊联动 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#356859;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a3a2a,#356859);color:#fff;padding:14px 16px;border-radius:0 0 12px 12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:18px}.header .sub{font-size:10px;opacity:.7}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.tab{padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);cursor:pointer;font-size:13px;background:var(--card);color:var(--text);transition:all .2s}
+.tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tab .badge{font-size:10px;opacity:.8;margin-left:4px}
+.video-wrap{position:relative;background:#000;border-radius:10px;overflow:hidden;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center}
+#cam{width:100%;height:100%;object-fit:cover}
+#canvas{display:none}
+.cam-overlay{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.6);color:#fff;padding:3px 8px;border-radius:5px;font-size:11px}
+.btn{display:inline-block;padding:9px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn.primary{background:var(--primary);color:#fff}.btn.primary:hover{opacity:.9}
+.btn.green{background:var(--green);color:#fff}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.gold{background:var(--gold);color:#fff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.flex{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.result{white-space:pre-wrap;font-size:13px;line-height:1.7;background:#faf8f4;border-radius:8px;padding:12px;border:1px solid var(--border);max-height:360px;overflow:auto}
+.result .empty{color:var(--text3);text-align:center;padding:20px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin:10px 0}
+.metric{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center}
+.metric .v{font-size:18px;font-weight:700;color:var(--primary)}
+.metric .k{font-size:10px;color:var(--text2);margin-top:2px}
+.kb-card{border-left:4px solid var(--gold);padding:10px;background:var(--card);border-radius:0 8px 8px 0;margin-top:8px}
+.kb-card h4{font-size:13px;color:var(--gold);margin-bottom:6px}
+.kb-card p{font-size:12px;color:var(--text2);line-height:1.6}
+.chip{display:inline-block;background:#eef3f0;border-radius:12px;padding:3px 10px;font-size:11px;margin:2px;color:var(--primary)}
+.state-pill{display:inline-block;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:600}
+.state-idle{background:#eee;color:#888}
+.state-scanning{background:#e0f2fe;color:#0369a1}
+.state-camera_error{background:#fee2e2;color:#b91c1c}
+.state-service_error{background:#fee2e2;color:#b91c1c}
+.state-paused{background:#fef3c7;color:#92400e}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:999;display:none;max-width:90vw}
+.guide{font-size:12px;color:var(--text2);line-height:1.8;background:#f7f4ee;padding:10px 12px;border-radius:8px;border:1px dashed var(--border)}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">舌诊辨证</span>
+</div>
+
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>🩺 五诊联动 · AI 辨证</h1>
+      <div class="sub">面诊 · 舌诊 · 眼诊 · 唇诊 · 手诊 — 视频采集 → AI识别 → KB辨证闭环</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span class="state-pill state-idle" id="state">待机</span>
+      <a href="index.html" style="color:#fff;text-decoration:none;font-size:12px;background:rgba(255,255,255,.15);padding:6px 12px;border-radius:14px">← 返回首页</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-mode="face">👤 面诊 <span class="badge">五脏五色</span></div>
+      <div class="tab" data-mode="tongue">👅 舌诊 <span class="badge">寒热虚实</span></div>
+      <div class="tab" data-mode="eye">👁️ 眼诊 <span class="badge">五轮学说</span></div>
+      <div class="tab" data-mode="lip">💋 唇诊 <span class="badge">气血津液</span></div>
+      <div class="tab" data-mode="hand">✋ 手诊 <span class="badge">掌纹甲色</span></div>
+    </div>
+
+    <div class="video-wrap">
+      <video id="cam" autoplay playsinline></video>
+      <canvas id="canvas"></canvas>
+      <div class="cam-overlay" id="camHint">未启动</div>
+    </div>
+
+    <div class="flex" style="margin-top:12px">
+      <button class="btn primary" id="btnStart">▶ 启动摄像头</button>
+      <button class="btn gold" id="btnCapture">📸 单帧抓拍</button>
+      <button class="btn blue" id="btnUpload" disabled>⬆ 上传图片</button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none">
+      <button class="btn" id="btnReset">🔄 重置</button>
+    </div>
+
+    <div class="guide" id="guide">
+      <strong>拍摄指引</strong>：请置入自然光、无反光遮挡的画面对准镜头。面诊需正面平视；舌诊需完整露舌；眼诊需睁眼直视；唇诊需正面闭嘴；手诊需手掌摊开自然光。
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 实时指标</h3>
+    <div class="metrics" id="metrics">
+      <div class="metric"><div class="v" id="mTotal">0</div><div class="k">累计识别</div></div>
+      <div class="metric"><div class="v" id="mHits">0</div><div class="k">KB命中</div></div>
+      <div class="metric"><div class="v" id="mLatency">—</div><div class="k">平均延迟 ms</div></div>
+      <div class="metric"><div class="v" id="mConf">—</div><div class="k">置信度</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔍 识别结果 & KB 辨证</h3>
+    <div class="result" id="result"><div class="empty">等待采集… 选择诊断部位后点「启动摄像头」</div></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* 五诊模式配置：端点 + 标签 + 展示名 */
+var MODES = {
+  face:  { label: '面诊', endpoint: '/api/tcm/face-analyze', resultKey: 'face_features', kbKey: 'kb_match', color: '#356859' },
+  tongue:{ label: '舌诊', endpoint: '/api/tcm/tongue-analyze', resultKey: 'tongue_features', kbKey: 'kb_match', color: '#c0392b' },
+  eye:   { label: '眼诊', endpoint: '/api/tcm/eye-analyze', resultKey: 'eye_features', kbKey: 'kb_match', color: '#2563eb' },
+  lip:   { label: '唇诊', endpoint: '/api/tcm/lip-analyze', resultKey: 'lip_features', kbKey: 'kb_match', color: '#b8860b' },
+  hand:  { label: '手诊', endpoint: '/api/tcm/hand-analyze', resultKey: 'hand_features', kbKey: 'kb_match', color: '#7c3aed' }
+};
+
+var apiBase = 'http://127.0.0.1:8972';
+var currentMode = 'face';
+var stream = null;
+var canvas = document.getElementById('canvas');
+var video = document.getElementById('cam');
+var stats = { total: 0, hits: 0, latencySum: 0, latencyN: 0 };
+
+var els = {
+  state: document.getElementById('state'),
+  camHint: document.getElementById('camHint'),
+  guide: document.getElementById('guide'),
+  result: document.getElementById('result'),
+  metrics: document.getElementById('metrics'),
+  mTotal: document.getElementById('mTotal'),
+  mHits: document.getElementById('mHits'),
+  mLatency: document.getElementById('mLatency'),
+  mConf: document.getElementById('mConf'),
+  btnStart: document.getElementById('btnStart'),
+  btnCapture: document.getElementById('btnCapture'),
+  btnUpload: document.getElementById('btnUpload'),
+  btnReset: document.getElementById('btnReset'),
+  fileInput: document.getElementById('fileInput')
+};
+
+function setState(s, label) {
+  els.state.className = 'state-pill state-' + s;
+  els.state.textContent = label || s;
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.classList.toggle('active', tab.dataset.mode === mode);
+  });
+  var m = MODES[mode];
+  els.camHint.textContent = m.label + ' · 待机';
+  els.mConf.textContent = '—';
+}
+
+/* AJAX POST（自动带 CSRF token，端点不存在时兜底） */
+function getCsrf() {
+  return fetch(apiBase + '/api/csrf-token')
+    .then(function(r){ return r.json(); })
+    .then(function(d){ return d && d.csrfToken; })
+    .catch(function(){ return ''; });
+}
+
+function postAnalyze(mode, imageData) {
+  var m = MODES[mode];
+  var t0 = performance.now();
+  return getCsrf().then(function(token){
+    return fetch(apiBase + m.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+      body: JSON.stringify(mode === 'eye' ? { image: imageData, eye_side: 'both' }
+                           : mode === 'tongue' ? { image: imageData, part: 'tongue' }
+                           : { image: imageData })
+    });
+  }).then(function(r){ return r.json(); }).then(function(data){
+    var latency = Math.round(performance.now() - t0);
+    stats.total++; stats.latencySum += latency; stats.latencyN++;
+    if (data && data.kb_match && data.kb_match.syndrome) stats.hits++;
+    renderResult(mode, data, latency);
+    return data;
+  }).catch(function(e){
+    toast('识别失败：' + (e.message || e));
+    throw e;
+  });
+}
+
+function renderResult(mode, data, latency) {
+  var m = MODES[mode];
+  var features = data && (data[m.resultKey] || data);
+  var kb = data && data.kb_match;
+  var conf = (features && features.confidence) || (data && data.confidence) || '—';
+
+  var html = '<div style="margin-bottom:8px"><span class="chip">' + m.label + '</span>';
+  html += '<span class="chip">延迟 ' + latency + 'ms</span>';
+  if (conf !== undefined && conf !== null) html += '<span class="chip">置信度 ' + (typeof conf === 'number' ? (conf*100).toFixed(0)+'%' : conf) + '</span></div>';
+
+  if (kb) {
+    html += '<div class="kb-card"><h4>📚 KB 辨证</h4>';
+    html += '<p><strong>证型：</strong>' + (kb.syndrome || '待辨证') + '</p>';
+    html += '<p><strong>方剂：</strong>' + (kb.formula || '—') + '</p>';
+    if (kb.herbs && kb.herbs.length) html += '<p><strong>药材：</strong>' + kb.herbs.join('、') + '</p>';
+    html += '<p><strong>建议：</strong>' + (kb.advice || '') + '</p>';
+    if (kb.confidence) html += '<p><strong>置信度：</strong>' + (kb.confidence*100).toFixed(0) + '%</p>';
+    html += '</div>';
+  }
+
+  if (features) {
+    var printable = {};
+    Object.keys(features).forEach(function(k){
+      if (k === 'notes' && !features[k]) return;
+      if (k === 'confidence') return;
+      printable[k] = features[k];
+    });
+    html += '<div style="margin-top:10px;font-size:12px;color:var(--text2)"><details><summary>原始特征（JSON）</summary><pre style="font-size:11px;overflow:auto">' + JSON.stringify(printable, null, 2) + '</pre></details></div>';
+  }
+  if (data && data.disclaimer) html += '<div style="margin-top:8px;font-size:11px;color:var(--text3)">' + data.disclaimer + '</div>';
+
+  els.result.innerHTML = html;
+  els.mTotal.textContent = stats.total;
+  els.mHits.textContent = stats.hits;
+  els.mLatency.textContent = stats.latencyN ? Math.round(stats.latencySum / stats.latencyN) : '—';
+  els.mConf.textContent = conf === '—' ? '—' : (typeof conf === 'number' ? (conf*100).toFixed(0)+'%' : conf);
+  els.camHint.textContent = m.label + ' · 已完成';
+
+  // R753 修真：识别结论推桌面 HUD（五诊+证型+方剂实时显示）
+  if (window.DesktopHUD) {
+    DesktopHUD.push({
+      source: mode,
+      syndrome: (kb && kb.syndrome) || (features && features.syndrome) || (m.label + '分析'),
+      confidence: (kb && kb.confidence) || (typeof conf === 'number' ? conf : null),
+      detail: (kb && kb.formula) ? ('方剂: ' + kb.formula) : '',
+      urgency: 'P3_ROUTINE'
+    });
+  }
+  if (window.PrivacyConsent) PrivacyConsent.auditLog('wuzhen_analyze', { mode: mode, latency: latency });
+}
+
+/* 摄像头取流 */
+function startCam() {
+  if (stream) { stopCam(); }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } })
+    .then(function(s){
+      stream = s; video.srcObject = s;
+      setState('scanning', '采集中');
+      els.camHint.textContent = MODES[currentMode].label + ' · 识别中';
+      setTimeout(function(){ els.btnCapture.disabled = false; }, 300);
+      tickFrame();
+    })
+    .catch(function(e){
+      setState('camera_error', '摄像头不可用');
+      toast('摄像头启动失败：' + (e.message || e) + '（可用「上传图片」代替）');
+    });
+}
+
+function stopCam() {
+  if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; }
+}
+
+function tickFrame() {
+  if (!stream) return;
+  var ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+  postAnalyze(currentMode, dataUrl)
+    .catch(function(){})
+    .then(function(){ setTimeout(tickFrame, 2000); });
+}
+
+function captureOnce() {
+  var ctx = canvas.getContext('2d');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+  postAnalyze(currentMode, dataUrl).catch(function(){});
+}
+
+/* 事件绑定 */
+document.getElementById('tabs').addEventListener('click', function(e){
+  var tab = e.target.closest('.tab');
+  if (tab) setMode(tab.dataset.mode);
+});
+function safeBind(el, evt, fn){ if (el) el.addEventListener(evt, fn); else console.warn('missing element for', evt); }
+safeBind(els.btnStart, 'click', function(){
+    // R753 修真：隐私同意前置——无同意弹横幅, 拒绝不启动摄像头
+    if (window.PrivacyConsent) {
+      PrivacyConsent.consentGate('wuzhen-diagnosis').then(function(g){
+        if (!g.ok) {
+          PrivacyConsent.showConsentBanner(function(dec){
+            if (dec && dec.ok) { startCam(); DesktopHUD.mount(); }
+            else toast('已拒绝视觉授权', 'warn');
+          });
+          return;
+        }
+        startCam();
+        DesktopHUD.mount();
+      });
+      return;
+    }
+    startCam();
+  });
+safeBind(els.btnCapture, 'click', function(){ if (stream) captureOnce(); else toast('请先启动摄像头'); });
+safeBind(els.btnUpload, 'click', function(){ if (els.fileInput) els.fileInput.click(); });
+safeBind(els.fileInput, 'change', function(){
+  var file = els.fileInput.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){ postAnalyze(currentMode, e.target.result).catch(function(){}); };
+  reader.readAsDataURL(file);
+});
+safeBind(els.btnReset, 'click', function(){
+  stopCam(); stats = { total:0, hits:0, latencySum:0, latencyN:0 };
+  els.mTotal.textContent='0'; els.mHits.textContent='0'; els.mLatency.textContent='—'; els.mConf.textContent='—';
+  els.result.innerHTML = '<div class="empty">已重置，重新选择部位采集</div>';
+  setState('idle', '待机');
+  els.camHint.textContent = MODES[currentMode].label + ' · 待机';
+});
+
+window.addEventListener('beforeunload', function(){ stopCam(); });
+</script>
+  <script src="js/nav.js" defer></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ai-assistant.js"></script>
+</body>
+</html>

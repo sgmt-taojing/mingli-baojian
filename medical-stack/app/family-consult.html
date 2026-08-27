@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>家庭问诊 · 命理宝鉴·医道</title>
+<style>
+:root { --bg:#fff8ee; --card:#fff; --primary:#b8860b; --accent:#c0392b; --green:#2e8b57; --blue:#2980b9; --text:#2c1810; --text2:#6b5b4f; --border:#e8dfc8; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.back-btn { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 14px; color: var(--text); }
+.back-btn:hover { background: #f5efe0; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text); flex: 1; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+.card { background: var(--card); border-radius: 12px; padding: 18px 20px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.card h2 { font-size: 17px; color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.card h3 { font-size: 14px; color: var(--text); margin: 10px 0 6px; }
+.sub { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+select, textarea, input[type=text] { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: #fff; color: var(--text); }
+textarea { min-height: 70px; resize: vertical; }
+select:focus, textarea:focus, input:focus { outline: 2px solid rgba(184,134,11,0.3); border-color: var(--primary); }
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border); background: #fff; cursor: pointer; font-size: 13px; color: var(--text); transition: all .15s; user-select: none; }
+.chip:hover { border-color: var(--primary); }
+.chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn { display: inline-block; padding: 11px 22px; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s; }
+.btn.primary { background: var(--primary); color: #fff; }
+.btn.primary:hover { background: #9a7209; }
+.btn.primary:disabled { background: #d4c9a8; cursor: not-allowed; }
+.btn.outline { background: var(--card); color: var(--primary); border: 1px solid var(--primary); }
+.btn.block { width: 100%; }
+.btn-row { display: flex; gap: 10px; margin-top: 14px; }
+.status-pill { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.status-pill.pending_review { background: #fef3e0; color: #b8860b; }
+.status-pill.approved { background: #e3f6ec; color: var(--green); }
+.status-pill.rejected { background: #fde8e8; color: var(--accent); }
+.status-pill.revised { background: #e8f0fd; color: var(--blue); }
+.consult-item { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; background: #fff; }
+.consult-item .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.consult-item .time { font-size: 12px; color: var(--text2); }
+.consult-item .symptoms { font-size: 13px; color: var(--text); margin-bottom: 6px; }
+.consult-item .ai { font-size: 12px; color: var(--blue); background: #f0f5fd; padding: 6px 10px; border-radius: 6px; margin-bottom: 6px; }
+.consult-item .rx { font-size: 13px; color: var(--green); background: #f0faf4; padding: 8px 10px; border-radius: 6px; }
+.consult-item .rx b { color: var(--green); }
+.consult-item .reject { font-size: 13px; color: var(--accent); background: #fdf0f0; padding: 8px 10px; border-radius: 6px; }
+.empty { text-align: center; color: var(--text2); padding: 30px 0; font-size: 14px; }
+.loading { text-align: center; color: var(--text2); padding: 20px 0; font-size: 13px; }
+.err { background: #fdf0f0; color: var(--accent); padding: 10px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; display: none; }
+.err.show { display: block; }
+.followup-q { background: #f0f5fd; border: 1px solid #d4e3f8; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: var(--text); }
+.followup-done { background: #f0faf4; border: 1px solid #cdeeda; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: var(--green); }
+.toast-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.82); color: #fff; padding: 10px 20px; border-radius: 10px; font-size: 13px; z-index: 9999; max-width: 80%; }
+.photo-box { border: 1px dashed var(--border); border-radius: 10px; padding: 16px; text-align: center; color: var(--text2); font-size: 13px; cursor: pointer; margin-top: 8px; }
+.photo-box img { max-width: 100%; max-height: 180px; border-radius: 8px; }
+#result-box { display: none; }
+.result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.flow-steps { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }
+.flow-step { flex: 1; min-width: 90px; text-align: center; font-size: 11px; padding: 8px 4px; border-radius: 8px; background: #f5f0e3; color: var(--text2); }
+.flow-step.done { background: #e3f6ec; color: var(--green); font-weight: 600; }
+.flow-step.current { background: var(--primary); color: #fff; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page-header-bar">
+  <button class="back-btn" onclick="history.back()">← 返回</button>
+  <span class="phb-title">🏠 家庭问诊</span>
+</div>
+
+<div class="wrap">
+  <div class="err" id="err-box"></div>
+
+  <!-- 步骤1: 提交问诊 -->
+  <div class="card" id="consult-card">
+    <h2>🩺 在线问诊 <span class="status-pill pending_review" style="font-size:11px">医生后台审核制</span></h2>
+    <div class="sub">提交后由后台医生审核出具方案（互联网医院模式），全程可追踪。</div>
+    <h3>① 就诊成员</h3>
+    <select id="patient-select"><option value="">加载中…</option></select>
+    <h3>② 主要不适（点选，可多选）</h3>
+    <div class="chip-group" id="symptom-chips"></div>
+    <h3>③ 详细描述</h3>
+    <textarea id="complaint" placeholder="例：最近一周总感觉没力气，早上起来头晕，心慌，睡眠不好…"></textarea>
+    <div class="followup-area" id="followup-box" style="margin-top:8px"></div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="btn outline" id="followup-btn" onclick="askFollowUp()" style="flex:1;padding:9px;font-size:13px">🤖 AI 追问（补充问诊）</button>
+    </div>
+    <h3>④ 舌象照片（可选，辅助辨证）</h3>
+    <div class="photo-box" id="photo-box" onclick="document.getElementById('photo-input').click()">
+      📷 点击拍照 / 上传舌象照片
+      <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none">
+    </div>
+    <div class="btn-row">
+      <button class="btn primary block" id="submit-btn" onclick="submitConsult()">提交问诊，等待医生审核</button>
+    </div>
+  </div>
+
+  <!-- 步骤2: 提交结果 + 状态追踪 -->
+  <div class="card" id="result-box">
+    <div class="result-header">
+      <h2 style="margin:0">📋 问诊单 <span id="result-id" style="font-size:12px;color:var(--text2)"></span></h2>
+      <span class="status-pill" id="result-status-pill">待审</span>
+    </div>
+    <div class="flow-steps" id="flow-steps">
+      <div class="flow-step" data-step="1">1. 提交问诊</div>
+      <div class="flow-step" data-step="2">2. 医生审核</div>
+      <div class="flow-step" data-step="3">3. 出具方案</div>
+    </div>
+    <div id="result-content"></div>
+    <div class="btn-row">
+      <button class="btn outline" onclick="location.reload()">再问一单</button>
+      <button class="btn primary" onclick="loadHistory()">刷新状态</button>
+    </div>
+  </div>
+
+  <!-- 历史记录 -->
+  <div class="card">
+    <h2>🗂 问诊记录</h2>
+    <div id="history-list"><div class="loading">加载中…</div></div>
+  </div>
+
+  <!-- 随访计划 -->
+  <div class="card">
+    <h2>📅 随访计划 <button class="btn outline" onclick="loadFollowups()" style="padding:4px 12px;font-size:12px;float:right">🔄 刷新</button></h2>
+    <div id="followup-list"><div class="loading">加载中…</div></div>
+  </div>
+
+  <!-- 复诊单 -->
+  <div class="card">
+    <h2>🏥 复诊安排 <button class="btn outline" onclick="loadRevisits()" style="padding:4px 12px;font-size:12px;float:right">🔄 刷新</button></h2>
+    <div id="revisit-list"><div class="loading">加载中…</div></div>
+  </div>
+</div>
+
+<script src="js/nav.js"></script>
+<script>
+(function() {
+  'use strict';
+  // ═══ 症状快捷点选（家庭场景高频症状）═══
+  var SYMPTOM_CHIPS = ['乏力','头晕','头痛','失眠','心悸','胸闷','腹胀','食欲差','便秘','腹泻','咳嗽','咽痛','腰酸','腿软','怕冷','怕热','出汗多','口干','口苦','水肿','皮肤痒','关节痛','情绪低落','易怒'];
+  var selected = [];
+  var photoData = null;
+  var currentPatient = '';
+
+  // ═══ 患者加载 ═══
+  function loadPatients() {
+    fetch('/api/patients/list')
+      .then(function(r) { return r.json().catch(function() { return null; }); })
+      .then(function(d) {
+        var sel = document.getElementById('patient-select');
+        var list = (d && d.ok && d.patients) ? d.patients : [];
+        if (list.length === 0) {
+          // 兜底：内置家庭样例
+          list = [
+            { patient_id: 'P001', name: '张阿姨', role: '长辈' },
+            { patient_id: 'P002', name: '李叔叔', role: '长辈' },
+            { patient_id: 'P003', name: '小张', role: '成人' },
+            { patient_id: 'P004', name: '张小宝', role: '儿童' }
+          ];
+        }
+        sel.innerHTML = '<option value="">选择就诊成员…</option>' + list.map(function(p) {
+          return '<option value="' + (p.patient_id || p.id) + '">' + (p.name || p.patient_name || p.patient_id) + (p.role ? '（' + p.role + '）' : '') + '</option>';
+        }).join('');
+      })
+      .catch(function() { /* 网络错误已由兜底处理 */ });
+  }
+
+  // ═══ 症状 chips ═══
+  function renderChips() {
+    var box = document.getElementById('symptom-chips');
+    box.innerHTML = SYMPTOM_CHIPS.map(function(s) {
+      return '<div class="chip' + (selected.indexOf(s) >= 0 ? ' active' : '') + '" onclick="toggleSymptom(this)">' + s + '</div>';
+    }).join('');
+  }
+  window.toggleSymptom = function(el) {
+    var s = el.textContent;
+    var idx = selected.indexOf(s);
+    if (idx >= 0) { selected.splice(idx, 1); el.classList.remove('active'); }
+    else { selected.push(s); el.classList.add('active'); }
+  };
+
+  // ═══ 照片 ═══
+  document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('photo-input');
+    if (input) input.addEventListener('change', function(e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      if (f.size > 5 * 1024 * 1024) { showErr('图片不能超过 5MB'); return; }
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        photoData = ev.target.result.split(',')[1];
+        var box = document.getElementById('photo-box');
+        box.innerHTML = '<img src="' + ev.target.result + '" alt="舌象照片"><div style="margin-top:6px">✅ 已上传，点击更换</div>';
+      };
+      reader.readAsDataURL(f);
+    });
+  });
+
+  // ═══ 多轮问诊：AI 追问（inhouse-next-symptom）═══
+  var followupState = { asked: [], syndrome: '', active: false };
+
+  window.askFollowUp = function() {
+    var btn = document.getElementById('followup-btn');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    var box = document.getElementById('followup-box');
+    box.innerHTML = '<div class="loading">正在追问…</div>';
+    var pid = document.getElementById('patient-select').value || 'P001';
+    fetch('/api/tcm/inhouse-next-symptom', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        current_symptoms: selected.length ? selected : [],
+        asked_questions: followupState.asked,
+        syndrome: followupState.syndrome
+      })
+    })
+      .then(function(r) { return r.json().catch(function() { return null; }); })
+      .then(function(d) {
+        if (d && d.ok && d.next_question && d.next_question !== '还有其他不适吗？') {
+          followupState.asked.push(d.next_question);
+          box.innerHTML = '<div class="followup-q">🤖 AI 追问：<b>' + d.next_question + '</b>' +
+            (d.purpose ? '<br><small style="color:var(--text2)">' + d.purpose + '</small>' : '') +
+            '</div>' +
+            '<div class="btn-row" style="margin-top:8px">' +
+            '<button class="btn outline" style="flex:1;padding:8px" onclick="answerFollowUp(true)">✅ 有</button>' +
+            '<button class="btn outline" style="flex:1;padding:8px" onclick="answerFollowUp(false)">❌ 无</button>' +
+            '<button class="btn outline" style="flex:1;padding:8px" onclick="answerFollowUp(null)">⏭ 跳过</button>' +
+            '</div>';
+        } else {
+          box.innerHTML = '<div class="followup-done">✅ 问诊信息已足够，可直接提交</div>';
+        }
+      })
+      .catch(function() { box.innerHTML = '<div class="followup-done">问诊服务暂不可用，可直接提交</div>'; })
+      .finally(function() { btn.disabled = false; });
+  };
+
+  window.answerFollowUp = function(ans) {
+    var box = document.getElementById('followup-box');
+    if (ans !== null) {
+      // 把回答并入症状描述，下次追问更精准
+      var lastQ = followupState.asked[followupState.asked.length - 1] || '';
+      var qText = document.getElementById('complaint').value;
+      document.getElementById('complaint').value = (qText ? qText + '；' : '') + '（' + lastQ + '：' + (ans ? '有' : '无') + '）';
+    }
+    // 继续追问（最多 5 轮）
+    if (followupState.asked.length >= 5) {
+      box.innerHTML = '<div class="followup-done">✅ 已追问 5 轮，信息充分，可提交</div>';
+      return;
+    }
+    window.askFollowUp();
+  };
+
+  // ═══ 提交问诊 ═══
+  window.submitConsult = function() {
+    var pid = document.getElementById('patient-select').value;
+    var complaint = document.getElementById('complaint').value.trim();
+    if (!pid) { showErr('请先选择就诊成员'); return; }
+    if (selected.length === 0 && !complaint) { showErr('请至少填写症状或描述'); return; }
+    var btn = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = '提交中…';
+    showErr('');
+    var payload = {
+      patient_id: pid,
+      patient_name: document.getElementById('patient-select').selectedOptions[0].textContent.split('（')[0],
+      symptoms: selected,
+      complaint: complaint,
+      channel: 'family'
+    };
+    if (photoData) payload.tongue = { image: photoData, source: 'photo' };
+    fetch('/api/family/consult', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function(r) { return r.json().catch(function() { return null; }); })
+      .then(function(d) {
+        if (d && d.ok) {
+          toast('✅ 问诊已提交，等待医生审核');
+          showResult(d);
+          loadHistory();
+          // 清空表单
+          selected = []; renderChips();
+          document.getElementById('complaint').value = '';
+          document.getElementById('photo-box').innerHTML = '📷 点击拍照 / 上传舌象照片';
+          photoData = null;
+        } else {
+          showErr((d && d.error) || '提交失败，请重试');
+        }
+      })
+      .catch(function() { showErr('网络异常，请检查连接后重试'); })
+      .finally(function() { btn.disabled = false; btn.textContent = '提交问诊，等待医生审核'; });
+  };
+
+  // ═══ 结果展示 ═══
+  function showResult(d) {
+    var box = document.getElementById('result-box');
+    box.style.display = 'block';
+    document.getElementById('result-id').textContent = d.consult_id;
+    var pill = document.getElementById('result-status-pill');
+    pill.textContent = '待审'; pill.className = 'status-pill pending_review';
+    var flow = document.getElementById('flow-steps').children;
+    flow[0].classList.add('done');
+    flow[1].classList.add('current');
+    var content = document.getElementById('result-content');
+    if (d.ai_suggestion && d.ai_suggestion.syndrome) {
+      content.innerHTML = '<div class="ai">🤖 AI 初判：' + d.ai_suggestion.syndrome + (d.ai_suggestion.formula ? '（参考方：' + d.ai_suggestion.formula + '）' : '') + '<br><small>仅供参考，最终以医生审核方案为准</small></div>';
+      // 记录证型供多轮追问定向
+      followupState.syndrome = d.ai_suggestion.syndrome;
+    } else {
+      content.innerHTML = '<div class="ai">🤖 AI 初判：信息不足，等待医生补充问诊</div>';
+    }
+    box.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  // ═══ 方案报告导出（打印友好窗口）═══
+  window.exportReport = function(consultId) {
+    fetch('/api/family/consults?limit=200')
+      .then(function(r) { return r.json().catch(function() { return null; }); })
+      .then(function(d) {
+        var list = (d && d.ok && d.consults) ? d.consults : [];
+        var c = list.find(function(x) { return x.consult_id === consultId; });
+        if (!c || !c.review) { toast('该记录无审核方案，无法导出'); return; }
+        var win = window.open('', '_blank', 'width=500,height=700');
+        if (!win) { toast('浏览器拦截了弹窗，请允许后重试'); return; }
+        var d2 = win.document;
+        d2.open('text/html');
+        var herbsHtml = String(c.review.formula || '').split(/[+、,，;；\s]+/).filter(Boolean)
+          .map(function(h) { return '<li>' + h + '</li>'; }).join('');
+        d2.write('<html><head><meta charset="utf-8"><title>中医问诊方案</title>' +
+          '<style>body{font-family:serif;padding:24px;max-width:480px;margin:0 auto;color:#2c1810} ' +
+          'h1{text-align:center;font-size:20px;border-bottom:2px solid #b8860b;padding-bottom:8px} ' +
+          '.line{border-bottom:1px dashed #999;margin:10px 0} ' +
+          'table{width:100%;border-collapse:collapse;font-size:14px} ' +
+          'td{padding:6px 4px;vertical-align:top} td:first-child{width:80px;color:#6b5b4f} ' +
+          '.stamp{text-align:right;color:#b8860b;font-size:13px;margin-top:16px} ' +
+          '.footer{font-size:10px;color:#999;margin-top:20px;border-top:1px solid #e8dfc8;padding-top:8px;text-align:center}</style></head><body>' +
+          '<h1>中医问诊方案单</h1>' +
+          '<table>' +
+          '<tr><td>问诊编号</td><td>' + c.consult_id + '</td></tr>' +
+          '<tr><td>患者</td><td>' + (c.patient_name || c.patient_id) + '</td></tr>' +
+          '<tr><td>主诉</td><td>' + (c.complaint || (c.symptoms || []).join('、')) + '</td></tr>' +
+          '<tr><td>AI 初判</td><td>' + ((c.ai_suggestion && c.ai_suggestion.syndrome) || '—') + '</td></tr>' +
+          '<tr><td>审核医生</td><td>' + c.review.doctor_name + '</td></tr>' +
+          '<tr><td>审核时间</td><td>' + (c.review.reviewed_at || '').replace('T',' ').slice(0,16) + '</td></tr>' +
+          '</table><div class="line"></div>' +
+          '<p style="font-size:15px;font-weight:bold">辨证：' + (c.review.syndrome || '—') + '</p>' +
+          '<p style="font-size:15px;font-weight:bold">处方：' + (c.review.formula || '—') + '</p>' +
+          (herbsHtml ? '<ul>' + herbsHtml + '</ul>' : '') +
+          '<p style="font-size:14px;white-space:pre-wrap">医嘱：' + (c.review.advice || '—') + '</p>' +
+          '<div class="stamp">执业中医师：' + c.review.doctor_name + '</div>' +
+          '<div class="footer">⚠️ 本方案由 命理宝鉴·医道 辅助生成，经执业中医师审核，仅供家庭健康参考，不构成诊疗依据。如症状加重请及时就医。</div>' +
+          '</body></html>');
+        d2.close();
+        setTimeout(function() { win.print(); }, 300);
+      })
+      .catch(function() { toast('导出失败，请重试'); });
+  };
+
+  // ═══ 复诊单展示（家庭端查看转诊状态）═══
+  window.loadRevisits = function() {
+    var box = document.getElementById('revisit-list');
+    if (!box) return;
+    box.innerHTML = '<div class="loading">加载中…</div>';
+    fetch('/api/family/revisits?limit=10')
+      .then(function(r) { return r.json().catch(function() { return null; }); })
+      .then(function(d) {
+        var list = (d && d.ok && d.revisits) ? d.revisits : [];
+        if (list.length === 0) {
+          box.innerHTML = '<div class="empty">暂无复诊安排。若随访反馈症状加重，系统将自动为您转诊。</div>';
+          return;
+        }
+        box.innerHTML = list.map(function(r) {
+          var statusMap = { pending: ['待排期', 'pending_review'], scheduled: ['已排期', 'approved'], completed: ['已完成', 'approved'] };
+          var sp = statusMap[r.status] || [r.status, 'pending_review'];
+          var body = r.status === 'scheduled'
+            ? '<div class="rx">📅 复诊时间：<b>' + (r.schedule_at || '—') + '</b><br>医生：' + (r.doctor_name || '—') + (r.note ? ' · ' + r.note : '') + '</div>'
+            : (r.status === 'completed'
+              ? '<div class="rx">✅ 复诊已完成' + (r.new_syndrome ? ' · 新辨证：' + r.new_syndrome + ' · ' + (r.new_formula || '') : '') + '<br>' + (r.outcome || '') + '</div>'
+              : '<div class="reject">⏳ 等待医生排期，请保持通讯畅通</div>');
+          return '<div class="consult-item">' +
+            '<div class="head"><b>🏥 复诊单 · ' + (r.patient_name || r.patient_id) + '</b><span class="status-pill ' + sp[1] + '">' + sp[0] + '</span></div>' +
+            '<div class="symptoms">原因：' + (r.reason || '随访反馈症状加重') + '</div>' +
+            '<div class="symptoms" style="color:var(--text2)">原方案：' + (r.syndrome || '—') + ' · ' + (r.formula || '—') + '</div>' +
+            body +
+            '<div class="time">' + r.id + ' · ' + (r.created_at || '').replace('T', ' ').slice(5, 16) + '</div>' +
+            '</div>';
+        }).join('');
+      })
+      .catch(function() { box.innerHTML = '<div class="empty">复诊单加载失败</div>'; });
+  };
+
+  // ═══ 随访计划展示 ═══
+  window.loadFollowups = function() {
+    var box = document.getElementById('followup-list');
+    if (!box) return;
+    box.innerHTML = '<div class="loading">加载中…</div>';
+    fetch('/api/family/followups?limit=10')
+      .then(function(r) { return r.json().catch(function() { return null; }); })
+      .then(function(d) {
+        var list = (d && d.ok && d.followups) ? d.followups : [];
+        if (list.length === 0) {
+          box.innerHTML = '<div class="empty">暂无随访计划。医生出具方案后将自动生成 7 天随访提醒。</div>';
+          return;
+        }
+        box.innerHTML = list.map(function(f) {
+          var due = (f.due_at || '').replace('T', ' ').slice(5, 16);
+          var overdue = f.status === 'pending' && new Date(f.due_at) < new Date();
+          var pill = f.status === 'completed' ? '<span class="status-pill approved">已完成</span>'
+            : (overdue ? '<span class="status-pill rejected">待反馈</span>' : '<span class="status-pill pending_review">进行中</span>');
+          var feedback = f.status === 'completed'
+            ? '<div class="rx">📝 反馈：' + (f.feedback || '—') + (f.symptom_score ? ' · 症状评分 ' + f.symptom_score + '/10' : '') + '</div>'
+            : '<div class="btn-row" style="margin-top:6px">' +
+              '<button class="btn outline" style="flex:1;padding:8px;font-size:12px" onclick="completeFollowup(\'' + f.id + '\')">✅ 填写反馈</button>' +
+              '</div>';
+          return '<div class="consult-item">' +
+            '<div class="head"><b>📅 随访 · ' + (f.patient_name || f.patient_id) + '</b>' + pill + '</div>' +
+            '<div class="symptoms">' + (f.syndrome || '—') + ' · ' + (f.formula || '—') + '</div>' +
+            '<div class="time">应反馈时间：' + due + '（方案出具后 7 天）</div>' +
+            feedback + '</div>';
+        }).join('');
+      })
+      .catch(function() { box.innerHTML = '<div class="empty">随访加载失败</div>'; });
+  };
+
+  window.completeFollowup = function(id) {
+    // R802：prompt → openModal 表单（内嵌浏览器 prompt 静默失败）
+    var overlay = openModal(
+      '<div style="display:grid;gap:8px;min-width:280px">' +
+      '<input id="__cf_fb" placeholder="症状改善情况反馈" value="症状好转" style="padding:8px;border:1px solid #d1d5db;border-radius:6px">' +
+      '<select id="__cf_score" style="padding:8px;border:1px solid #d1d5db;border-radius:6px">' +
+      [0,1,2,3,4,5,6,7,8,9,10].map(function(n){ return '<option value="' + n + '"' + (n === 7 ? ' selected' : '') + '>症状评分 ' + n + ' 分' + (n === 10 ? '（完全恢复）' : n === 0 ? '（无改善）' : '') + '</option>'; }).join('') +
+      '</select>' +
+      '<button id="__cf_ok" style="padding:10px;border:none;border-radius:6px;background:#b8860b;color:#fff;cursor:pointer;font-weight:600">✅ 提交随访反馈</button></div>',
+      '完成随访');
+    overlay.querySelector('#__cf_ok').addEventListener('click', function() {
+      var feedback = overlay.querySelector('#__cf_fb').value.trim();
+      var score = parseInt(overlay.querySelector('#__cf_score').value, 10);
+      overlay.remove();
+      fetch('/api/family/followup/complete', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, feedback: feedback, symptom_score: isNaN(score) ? 5 : score })
+      })
+        .then(function(r) { return r.json().catch(function() { return null; }); })
+        .then(function(d) {
+          toast((d && d.ok) ? '✅ 随访已记录' : ('❌ ' + ((d && d.error) || '提交失败')));
+          loadFollowups();
+        })
+        .catch(function() { toast('❌ 网络异常'); });
+    });
+  };
+
+  // ═══ 历史记录 ═══
+  window.loadHistory = function() {
+    var box = document.getElementById('history-list');
+    box.innerHTML = '<div class="loading">加载中…</div>';
+    fetch('/api/family/consults?limit=20')
+      .then(function(r) { return r.json().catch(function() { return null; }); })
+      .then(function(d) {
+        var list = (d && d.ok && d.consults) ? d.consults : [];
+        if (list.length === 0) {
+          box.innerHTML = '<div class="empty">暂无问诊记录，点击上方「在线问诊」发起第一单</div>';
+          return;
+        }
+        box.innerHTML = list.map(renderItem).join('');
+      })
+      .catch(function() { box.innerHTML = '<div class="empty">加载失败，请刷新重试</div>'; });
+  };
+
+  function renderItem(c) {
+    var time = (c.created_at || '').replace('T', ' ').slice(5, 16);
+    var pillMap = { pending_review: ['待审', 'pending_review'], approved: ['已出方案', 'approved'], revised: ['已修订', 'revised'], rejected: ['已驳回', 'rejected'] };
+    var pill = pillMap[c.status] || [c.status, 'pending_review'];
+    var body = '';
+    if (c.status === 'approved' && c.review) {
+      body = '<div class="rx">🧑‍⚕️ 医生方案：<b>' + (c.review.syndrome || '—') + '</b> · ' + (c.review.formula || '—') + '<br>' + (c.review.advice || '') + '<br><small style="color:var(--text2)">审核医生：' + c.review.doctor_name + ' · ' + (c.review.reviewed_at || '').replace('T',' ').slice(5,16) + '</small></div>';
+    } else if (c.status === 'rejected' && c.review) {
+      body = '<div class="reject">❌ 已驳回：' + (c.review.notes || '信息不足，请补充后重新提交') + '</div>';
+    } else if (c.status === 'revised' && c.review) {
+      body = '<div class="rx">🔄 医生修订：<b>' + (c.review.syndrome || '—') + '</b> · ' + (c.review.formula || '—') + '<br>' + (c.review.advice || '') + '</div>';
+    } else {
+      body = '<div class="ai">🤖 AI 初判：' + ((c.ai_suggestion && c.ai_suggestion.syndrome) || '等待中') + '</div>';
+    }
+    return '<div class="consult-item">' +
+      '<div class="head"><b>' + (c.patient_name || c.patient_id) + '</b><span class="status-pill ' + pill[1] + '">' + pill[0] + '</span></div>' +
+      '<div class="symptoms">' + (c.complaint ? c.complaint.slice(0, 80) : (c.symptoms || []).join('、')) + '</div>' +
+      body +
+      '<div class="time">' + c.consult_id + ' · ' + time + (c.status === 'approved' || c.status === 'revised' ? ' · <a href="javascript:void(0)" onclick="exportReport(\'' + c.consult_id + '\')" style="color:var(--primary)">🖨 导出方案</a>' : '') + '</div>' +
+      '</div>';
+  }
+
+  // ═══ 工具 ═══
+  function showErr(msg) {
+    var box = document.getElementById('err-box');
+    if (!msg) { box.className = 'err'; box.textContent = ''; return; }
+    box.textContent = msg;
+    box.className = 'err show';
+    setTimeout(function() { box.className = 'err'; }, 4000);
+  }
+
+  // ═══ 初始化 ═══
+  document.addEventListener('DOMContentLoaded', function() {
+    renderChips();
+    loadPatients();
+    loadHistory();
+    loadFollowups();
+    loadRevisits();
+  });
+  // 若 DOMContentLoaded 已过（defer 场景）
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    renderChips(); loadPatients(); loadHistory(); loadFollowups(); loadRevisits();
+  }
+})();
+</script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ai-assistant.js"></script>
+</body>
+</html>

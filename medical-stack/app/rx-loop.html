@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/rx-loop.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>处方闭环 · 中医智能体</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="/css/mobile.css">
+
+<style>
+:root{--tcm:#b8860b;--tcm-bg:rgba(184,134,11,.06);--ok:#2e8b57;--warn:#d97706;--crit:#dc2626;--border:#e5e7eb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;background:#f9fafb;color:#1f2937;line-height:1.6}
+
+.page-header-bar{background:linear-gradient(135deg,var(--tcm),#8b6914);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.1);display:flex;align-items:center;gap:12px}
+.page-header-bar .dot{width:8px;height:8px;border-radius:50%;background:#fff;opacity:.8}
+.page-header-bar h1{font-size:17px;font-weight:600;flex:1}
+.page-header-bar a{color:#fff;text-decoration:none;font-size:14px;opacity:.9;padding:4px 10px;border:1px solid rgba(255,255,255,.3);border-radius:6px}
+
+.container{max-width:1200px;margin:0 auto;padding:16px}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.stat-card .num{font-size:28px;font-weight:700;color:var(--tcm)}
+.stat-card .label{font-size:12px;color:#6b7280;margin-top:4px}
+.stat-card.pending .num{color:var(--warn)}
+.stat-card.reviewed .num{color:var(--ok)}
+.stat-card.blocked .num{color:var(--crit)}
+
+.section{background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden}
+.section-title{background:var(--tcm-bg);padding:12px 16px;font-weight:600;color:var(--tcm);font-size:15px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.section-title .badge{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--tcm);color:#fff}
+
+.tab-row{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:0}
+.tab{padding:10px 20px;cursor:pointer;font-size:14px;color:#6b7280;border-bottom:2px solid transparent;transition:.2s}
+.tab.active{color:var(--tcm);border-bottom-color:var(--tcm);font-weight:600}
+
+.rx-list{list-style:none}
+.rx-item{padding:14px 16px;border-bottom:1px solid #f3f4f6;display:flex;gap:12px;align-items:flex-start}
+.rx-item:last-child{border-bottom:none}
+.rx-status{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.rx-status.pending{background:var(--warn)}
+.rx-status.reviewed{background:var(--ok)}
+.rx-status.rejected{background:var(--crit)}
+.rx-body{flex:1;min-width:0}
+.rx-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.rx-id{font-size:13px;color:#6b7280;font-family:monospace}
+.rx-time{font-size:12px;color:#9ca3af}
+.rx-diagnosis{font-size:14px;font-weight:500;margin-bottom:4px}
+.rx-herbs{font-size:13px;color:#4b5563;flex-wrap:wrap;display:flex;gap:4px}
+.rx-herbs .herb{background:#f3f4f6;padding:2px 8px;border-radius:4px;font-size:12px}
+.rx-actions{display:flex;gap:8px;margin-top:8px}
+.btn{padding:6px 14px;border-radius:6px;font-size:13px;border:1px solid var(--border);background:#fff;cursor:pointer;transition:.2s}
+.btn:hover{background:#f9fafb}
+.btn-approve{color:var(--ok);border-color:var(--ok)}
+.btn-approve:hover{background:var(--ok);color:#fff}
+.btn-reject{color:var(--crit);border-color:var(--crit)}
+.btn-reject:hover{background:var(--crit);color:#fff}
+.btn-detail{color:var(--tcm);border-color:var(--tcm)}
+.btn-detail:hover{background:var(--tcm);color:#fff}
+
+.safety-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500}
+.safety-tag.ok{background:#dcfce7;color:#166534}
+.safety-tag.warn{background:#fef3c7;color:#92400e}
+.safety-tag.crit{background:#fee2e2;color:#991b1b}
+
+.empty{text-align:center;padding:40px 20px;color:#9ca3af;font-size:14px}
+
+.detail-modal{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.detail-modal.show{display:flex}
+.detail-content{background:#fff;border-radius:12px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:24px}
+.detail-content h3{font-size:18px;margin-bottom:16px;color:var(--tcm)}
+.detail-section{margin-bottom:16px}
+.detail-section h4{font-size:13px;color:#6b7280;text-transform:uppercase;margin-bottom:6px}
+.detail-section p,.detail-section li{font-size:14px;color:#374151}
+.detail-section ul{padding-left:20px}
+.detail-close{margin-top:16px;width:100%;padding:10px;background:var(--tcm);color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer}
+
+@media(max-width:768px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .container{padding:12px}
+}
+@media(max-width:360px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .stat-card{padding:12px 8px}
+  .stat-card .num{font-size:22px}
+}
+</style>
+</head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+<div class="page-header-bar">
+  <span class="dot"></span>
+  <h1>处方闭环</h1>
+  <a href="/treatment-center.html">返回</a>
+</div>
+
+<div class="container">
+  <div class="stats-row">
+    <div class="stat-card pending">
+      <div class="num" id="stat-pending">-</div>
+      <div class="label">待审核</div>
+    </div>
+    <div class="stat-card reviewed">
+      <div class="num" id="stat-reviewed">-</div>
+      <div class="label">已审核</div>
+    </div>
+    <div class="stat-card blocked">
+      <div class="num" id="stat-blocked">-</div>
+      <div class="label">禁忌拦截</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-total">-</div>
+      <div class="label">处方总数</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="tab-row">
+      <div class="tab active" data-status="pending">待审核</div>
+      <div class="tab" data-status="reviewed">已审核</div>
+      <div class="tab" data-status="all">全部</div>
+    </div>
+    <ul class="rx-list" id="rx-list">
+      <li class="empty">加载中…</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">禁忌拦截能力 <span class="badge">实时</span></div>
+    <div style="padding:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+        <div style="padding:12px;border:1px solid var(--border);border-radius:8px">
+          <strong style="color:var(--crit)">十八反</strong>
+          <p style="font-size:13px;color:#6b7280;margin-top:4px">甘草↔海藻、乌头↔半夏 等 7 组反药自动拦截</p>
+        </div>
+        <div style="padding:12px;border:1px solid var(--border);border-radius:8px">
+          <strong style="color:var(--crit)">十九畏</strong>
+          <p style="font-size:13px;color:#6b7280;margin-top:4px">硫黄↔朴硝、人参↔五灵脂 等 9 组畏药自动拦截</p>
+        </div>
+        <div style="padding:12px;border:1px solid var(--border);border-radius:8px">
+          <strong style="color:var(--crit)">妊娠禁忌</strong>
+          <p style="font-size:13px;color:#6b7280;margin-top:4px">24 种绝对禁用 + 17 种慎用药 权重校验</p>
+        </div>
+        <div style="padding:12px;border:1px solid var(--border);border-radius:8px">
+          <strong style="color:var(--warn)">毒性药量</strong>
+          <p style="font-size:13px;color:#6b7280;margin-top:4px">附子>15g、马钱子>0.6g 等 12 种毒性药超量警戒</p>
+        </div>
+        <div style="padding:12px;border:1px solid var(--border);border-radius:8px">
+          <strong style="color:var(--warn)">老人慎用</strong>
+          <p style="font-size:13px;color:#6b7280;margin-top:4px">70 岁以上附子/麻黄/大黄 等 8 种自动提示</p>
+        </div>
+        <div style="padding:12px;border:1px solid var(--border);border-radius:8px">
+          <strong style="color:var(--warn)">儿童慎用</strong>
+          <p style="font-size:13px;color:#6b7280;margin-top:4px">12 岁以下川乌/草乌/马钱子 等 7 种自动提示</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="detail-modal" id="modal">
+  <div class="detail-content" id="modal-content">
+    <h3>处方详情</h3>
+    <div id="modal-body"></div>
+    <button class="detail-close" onclick="document.getElementById('modal').classList.remove('show')">关闭</button>
+  </div>
+</div>
+
+<script>
+const API = '';
+let currentStatus = 'pending';
+
+async function loadStats() {
+  try {
+    const [pend, rev] = await Promise.all([
+      fetch(API + '/api/prescription/review-queue?status=pending').then(r => r.json()),
+      fetch(API + '/api/prescription/review-queue?status=reviewed').then(r => r.json())
+    ]);
+    document.getElementById('stat-pending').textContent = pend.total || 0;
+    document.getElementById('stat-reviewed').textContent = rev.total || 0;
+    document.getElementById('stat-blocked').textContent = '-';
+    document.getElementById('stat-total').textContent = (pend.total || 0) + (rev.total || 0);
+  } catch(e) {
+    console.error('[sanitized] stats load error', e);
+  }
+}
+
+async function loadList(status) {
+  const list = document.getElementById('rx-list');
+  list.innerHTML = '<li class="empty">加载中…</li>';
+  try {
+    const data = await fetch(API + '/api/prescription/review-queue?status=' + status).then(r => r.json());
+    const items = data.records || [];
+    if (items.length === 0) {
+      list.innerHTML = '<li class="empty">暂无' + (status==='pending'?'待审核':'') + '处方</li>';
+      return;
+    }
+    list.innerHTML = items.map(function(rx) {
+      var herbs = (rx.herbs || []).map(function(h) {
+        return '<span class="herb">' + (h.name||h) + (h.dose?' '+h.dose+'g':'') + '</span>';
+      }).join('');
+      var sc = rx.safety_check || {};
+      var safetyHtml = '';
+      if (sc.ok === false || (sc.warnings && sc.warnings.length)) {
+        safetyHtml = '<span class="safety-tag warn">' + (sc.warning_count||0) + ' 注意</span>';
+      } else {
+        safetyHtml = '<span class="safety-tag ok">安全通过</span>';
+      }
+      var actions = '';
+      if (rx.status === 'pending') {
+        actions = '<div class="rx-actions">'
+          + '<button class="btn btn-approve" onclick="reviewRx(\'' + rx.rx_id + '\',\'approve\')">通过</button>'
+          + '<button class="btn btn-reject" onclick="reviewRx(\'' + rx.rx_id + '\',\'reject\')">驳回</button>'
+          + '<button class="btn btn-detail" onclick="showDetail(\'' + rx.rx_id + '\')">详情</button>'
+          + '</div>';
+      } else {
+        actions = '<div class="rx-actions"><button class="btn btn-detail" onclick="showDetail(\'' + rx.rx_id + '\')">详情</button></div>';
+      }
+      return '<li class="rx-item">'
+        + '<div class="rx-status ' + (rx.status||'pending') + '"></div>'
+        + '<div class="rx-body">'
+        +   '<div class="rx-header">'
+        +     '<span class="rx-id">' + (rx.rx_id||'').substring(0,20) + '…</span>'
+        +     '<span class="rx-time">' + ((rx.created_at||'').substring(0,16).replace('T',' ')) + '</span>'
+        +   '</div>'
+        +   '<div class="rx-diagnosis">' + ((rx.diagnosis||{}).syndrome||'未诊断') + ' · ' + (rx.patient_id||'匿名') + '</div>'
+        +   '<div class="rx-herbs">' + herbs + '</div>'
+        +   '<div style="margin-top:6px">' + safetyHtml + '</div>'
+        +   actions
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<li class="empty">加载失败</li>';
+    console.error('[sanitized] list error', e);
+  }
+}
+
+async function reviewRx(rxId, action) {
+  try {
+    var res = await fetch(API + '/api/prescription/verify', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({rx_id: rxId, action: action})
+    }).then(r => r.json());
+    if (res.ok) {
+      toast(action === 'approve' ? '处方已通过' : '处方已驳回');
+      loadList(currentStatus);
+      loadStats();
+    } else {
+      toast('操作失败: ' + (res.error||''));
+    }
+  } catch(e) {
+    toast('网络错误');
+  }
+}
+
+async function showDetail(rxId) {
+  try {
+    var data = await fetch(API + '/api/prescription/review-queue?status=all').then(r => r.json());
+    var rx = (data.records || []).find(function(r) { return r.rx_id === rxId; });
+    if (!rx) { toast('未找到处方'); return; }
+    var body = document.getElementById('modal-body');
+    var herbs = (rx.herbs || []).map(function(h) {
+      return '<li>' + (h.name||h) + ' ' + (h.dose||'') + 'g</li>';
+    }).join('');
+    var sc = rx.safety_check || {};
+    var warns = (sc.warnings || []).map(function(w) {
+      return '<li>' + w.message + '</li>';
+    }).join('');
+    body.innerHTML = ''
+      + '<div class="detail-section"><h4>处方编号</h4><p style="font-family:monospace;font-size:13px">' + rx.rx_id + '</p></div>'
+      + '<div class="detail-section"><h4>患者</h4><p>' + (rx.patient_id||'匿名') + '</p></div>'
+      + '<div class="detail-section"><h4>辨证</h4><p>' + ((rx.diagnosis||{}).syndrome||'') + '</p></div>'
+      + '<div class="detail-section"><h4>药材</h4><ul>' + herbs + '</ul></div>'
+      + '<div class="detail-section"><h4>安全性</h4><p>' + (sc.ok?'✅ 通过':'⚠️ 有提示') + '</p>' + (warns?'<ul style="color:#92400e">' + warns + '</ul>':'') + '</div>'
+      + '<div class="detail-section"><h4>状态</h4><p>' + (rx.status||'') + '</p></div>'
+      + '<div class="detail-section"><h4>医嘱</h4><p>' + (rx.advice||'无') + '</p></div>';
+    document.getElementById('modal').classList.add('show');
+  } catch(e) {
+    toast('加载失败');
+  }
+}
+
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    tab.classList.add('active');
+    currentStatus = tab.dataset.status;
+    loadList(currentStatus);
+  });
+});
+
+loadStats();
+loadList(currentStatus);
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

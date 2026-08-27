@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/emr.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>电子病历 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📋</text></svg>">
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:12px}
+.card{background:var(--card);border-radius:10px;padding:16px;margin:12px 0;border:1px solid var(--border)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:480px){.form-row{grid-template-columns:1fr}}
+.input,select,textarea{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);font-family:inherit}
+textarea{min-height:60px;resize:vertical}
+.label{font-size:11px;color:var(--text3);display:block;margin-bottom:2px}
+.btn{display:inline-block;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.section-title{font-size:13px;font-weight:600;color:var(--primary);padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:8px}
+.record-item{padding:8px;border-bottom:1px solid var(--border);cursor:pointer;font-size:12px}
+.record-item:hover{background:var(--bg)}
+.record-item .r-date{color:var(--text3);font-size:10px}
+.record-item .r-dx{color:var(--primary);font-weight:600}
+.preview{background:#faf8f5;border:1px dashed var(--border);border-radius:6px;padding:12px;margin-top:8px;font-size:12px;line-height:1.8;white-space:pre-wrap;display:none}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+.search-bar{display:flex;gap:6px;margin-bottom:12px}
+.search-bar input{flex:1;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script>
+var emrPage = null;
+
+function initEmrPage() {
+  if (typeof Paginator === "undefined") { showEmrList(); return; }
+  try {
+    var dp = createPage("tcm_patient_records", { pageSize: 15, sortBy: "created_at" });
+    emrPage = new Paginator("emr-list", dp, renderEmrRows, { pageSize: 15 });
+    emrPage.render();
+  } catch(e) { showEmrList(); }
+}
+
+function renderEmrRows(rows, info) {
+  var el = document.getElementById("emr-list");
+  if (!rows.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px">📋 暂无病历 — 完成一次诊断后自动生成</div>';
+    return;
+  }
+  var html = "";
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    html += '<div class="card" style="margin:6px 0;padding:10px;cursor:pointer" onclick="openEmr(\''+(r.id||"")+'\')">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center">'+
+        '<div><b>'+(r.patient_name||"—")+'</b> <span style="font-size:10px;color:var(--text3)">#'+(r.id||"").slice(-6)+'</span></div>'+
+        '<span style="font-size:10px;color:var(--text3)">'+(r.created_at||"").slice(0,10)+'</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--text2);margin-top:4px">'+(r.diagnosis||"—")+'</div>'+
+      '<div style="font-size:10px;color:var(--text3)">'+(r.doctor||"—")+'</div>'+
+    '</div>';
+  }
+  el.innerHTML = html;
+}
+
+function searchEmr(q) {
+  if (!emrPage) return;
+  if (!q) { emrPage.go(1); return; }
+  var result = emrPage.dp.search(q, ["patient_name","diagnosis","patient_id","doctor","herb_names"]);
+  renderEmrRows(result.items, { total: result.total });
+}
+
+setTimeout(initEmrPage, 200);
+setInterval(initEmrPage, 30000);
+// R800：统搜直达（emr.html?q=证型/姓名）→ 等待分页器就绪后自动检索
+(function(){
+  var _q0 = new URLSearchParams(location.search).get('q');
+  if (!_q0) return;
+  var _t = setInterval(function(){
+    if (window.emrPage) {
+      clearInterval(_t);
+      searchEmr(_q0);
+      var inp = document.querySelector('input[placeholder*="搜索"], input[placeholder*="检索"], #emr-search');
+      if (inp) inp.value = _q0;
+    }
+  }, 300);
+  setTimeout(function(){ clearInterval(_t); }, 10000);
+  // R800 修真：本地种子库与已签发病历（服务端 /api/tcm/cases）是两份数据，
+  // 统搜病例卡来自签发库——补一段签发库检索结果置顶，落点不再空
+  fetch('/api/tcm/cases').then(function(r){ return r.json(); }).then(function(d){
+    var list = d.cases || [];
+    var ql = _q0.toLowerCase();
+    var matched = list.filter(function(c){
+      return String(c.syndrome||'').includes(_q0) || String(c.formula||'').includes(_q0) ||
+             String(c.chief||'').includes(_q0) ||
+             (c.symptoms||[]).some(function(s){ return String(s).toLowerCase().includes(ql); });
+    });
+    if (!matched.length) return;
+    var host = document.getElementById('emr-list');
+    if (!host || !host.parentNode) return;
+    // 注：必须插为 emr-list 的兄弟节点而非子节点——Paginator.render() 会重写
+    // emr-list 的 innerHTML，子节点会被抹掉（onload 注入即被 200ms 后的首渲染覆盖）
+    var esc = function(s){ return String(s).replace(/</g,'&lt;'); };
+    var div = document.createElement('div');
+    div.innerHTML = '<div class="section-title">✅ 已签发病历 · 匹配 ' + matched.length + ' 份</div>' +
+      matched.slice(0, 10).map(function(c){
+        return '<div class="card" style="margin:6px 0;padding:10px">' +
+          '<div style="display:flex;justify-content:space-between"><b>' + esc(c.syndrome||'待辨证') + '</b>' +
+          '<span style="font-size:10px;color:var(--text3)">' + String(c.timestamp||'').slice(0,10) + '</span></div>' +
+          '<div style="font-size:11px;color:var(--text2);margin-top:4px">方剂：' + esc(c.formula||'—') + '</div>' +
+          '<div style="font-size:10px;color:var(--text3);margin-top:2px">' + esc((c.symptoms||[]).slice(0,5).join('、')) + '</div></div>';
+      }).join('');
+    host.parentNode.insertBefore(div, host);
+  }).catch(function(){});
+})();
+</script>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
+<script src="js/data-engine.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">电子病历</span>
+</div>
+
+<div class="container">
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>医生</b></span><span class="std-tag">⚙️ 功能 <b>电子病历</b></span><span class="std-tag">💎 使用价值 <b>7段标准化病历模板，保存/搜索/导出</b></span></div>
+  <div class="card"><h1 style="font-size:18px;text-align:center;letter-spacing:4px;color:var(--primary)">📋 电子病历系统</h1></div>
+
+  <!-- 新建 -->
+  <div class="card">
+    <h3>📝 新建病历</h3>
+    <div class="form-row">
+      <div><label class="label">姓名</label><input  class="input" id="emr-name" aria-label="emr name" data-validate="required|min=2"></div>
+      <div><label class="label">性别</label><select class="input" id="emr-gender"><option>男</option><option>女</option></select></div>
+    </div>
+    <div class="form-row">
+      <div><label class="label">年龄</label><input  class="input" id="emr-age" type="number" aria-label="emr age" data-validate="number"></div>
+      <div><label class="label">就诊日期</label><input  class="input" id="emr-date" type="date" aria-label="emr date" data-validate="required"></div>
+    </div>
+
+    <div class="section-title">① 主诉</div>
+    <textarea class="input" id="emr-complaint" placeholder="患者主要症状及持续时间"></textarea>
+
+    <div class="section-title">② 现病史</div>
+    <textarea class="input" id="emr-history" placeholder="发病经过、诊治经过、刻下症"></textarea>
+
+    <div class="section-title">③ 既往史</div>
+    <div class="form-row">
+      <div><input  class="input" id="emr-past" placeholder="既往疾病史" aria-label="既往疾病史"></div>
+      <div><input  class="input" id="emr-allergy" placeholder="过敏史" aria-label="过敏史"></div>
+    </div>
+    <div class="form-row">
+      <div><input  class="input" id="emr-family" placeholder="家族史" aria-label="家族史"></div>
+      <div><input  class="input" id="emr-habits" placeholder="个人生活史(烟酒等)" aria-label="个人生活史(烟酒等)"></div>
+    </div>
+
+    <div class="section-title">④ 望闻切诊</div>
+    <div class="form-row">
+      <div><label class="label">面色</label><select class="input" id="emr-complexion"><option>明润</option><option>晦暗</option><option>潮红</option><option>苍白</option><option>萎黄</option><option>黧黑</option></select></div>
+      <div><label class="label">舌色</label><select class="input" id="emr-tongue-color"><option>淡红</option><option>淡白</option><option>红</option><option>绛</option><option>紫暗</option></select></div>
+    </div>
+    <div class="form-row">
+      <div><label class="label">苔象</label><select class="input" id="emr-coating"><option>薄白</option><option>白腻</option><option>黄腻</option><option>黄燥</option><option>少苔</option><option>剥苔</option></select></div>
+      <div><label class="label">脉象</label><select class="input" id="emr-pulse"><option>弦</option><option>滑</option><option>细</option><option>浮</option><option>沉</option><option>数</option><option>迟</option><option>涩</option><option>洪</option></select></div>
+    </div>
+
+    <div class="section-title">⑤ 辨证论治</div>
+    <div class="form-row">
+      <div><label class="label">中医诊断(病名)</label><input  class="input" id="emr-tcm-disease" placeholder="如：不寐" aria-label="如：不寐"></div>
+      <div><label class="label">中医诊断(证型)</label><input  class="input" id="emr-tcm-syndrome" placeholder="如：心脾两虚证" aria-label="如：心脾两虚证"></div>
+    </div>
+    <div class="form-row">
+      <div><label class="label">治则治法</label><input  class="input" id="emr-treatment" placeholder="如：补益心脾，养血安神" aria-label="如：补益心脾，养血安神"></div>
+      <div><label class="label">西医诊断</label><input  class="input" id="emr-western-dx" placeholder="可选" aria-label="可选"></div>
+    </div>
+
+    <div class="section-title">⑥ 处方</div>
+    <div id="emr-herbs"></div>
+    <button class="btn small" style="background:var(--bg);border:1px solid var(--border);margin-top:4px" onclick="addHerbRow()">+ 添加中药</button>
+
+    <div class="section-title">⑦ 医嘱</div>
+    <textarea class="input" id="emr-advice" placeholder="煎服方法、饮食禁忌、复诊建议"></textarea>
+
+    <div class="btn-row">
+      <button class="btn green" onclick="saveEMR()">💾 保存病历</button>
+      <button class="btn primary" onclick="previewEMR()">📋 预览</button>
+    </div>
+    <div class="preview" id="emr-preview"></div>
+  </div>
+
+  <!-- 病历列表 -->
+  <div class="card">
+    <h3>📚 病历列表 · <span id="emr-count">0</span> 份</h3>
+    <div class="search-bar">
+      <input  placeholder="搜索患者姓名/诊断..." id="emr-search" oninput="renderList()" aria-label="搜索患者姓名/诊断..." data-validate="required|min=2">
+      <button class="btn small primary" onclick="renderList()">🔍</button>
+      <button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="exportCSV()">📥 导出</button>
+    </div>
+    <div id="emr-list"></div>
+  </div>
+</div>
+
+<script>
+document.getElementById('emr-date').value = new Date().toISOString().slice(0,10);
+addHerbRow();
+
+function addHerbRow() {
+  var div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:6px;margin-bottom:4px;align-items:center';
+  div.innerHTML = '<input  class="input" placeholder="药名" style="flex:2" aria-label="药名"><input  class="input" placeholder="剂量" style="flex:1;max-width:70px" aria-label="剂量"><input  class="input" placeholder="备注" style="flex:1;max-width:80px" aria-label="备注"><button class="btn small" style="background:var(--accent);color:#fff;padding:4px 6px" onclick="this.parentElement.remove()">✕</button>';
+  document.getElementById('emr-herbs').appendChild(div);
+}
+
+function collectEMR() {
+  var herbs = [];
+  document.querySelectorAll('#emr-herbs > div').forEach(function(row) {
+    var inputs = row.querySelectorAll('input');
+    if (inputs[0].value.trim()) herbs.push({ name: inputs[0].value.trim(), dosage: inputs[1].value.trim() || '9g', note: inputs[2].value.trim() });
+  });
+  return {
+    id: 'EMR' + Date.now().toString(36).toUpperCase(),
+    name: document.getElementById('emr-name').value.trim(),
+    gender: document.getElementById('emr-gender').value,
+    age: document.getElementById('emr-age').value,
+    date: document.getElementById('emr-date').value,
+    complaint: document.getElementById('emr-complaint').value.trim(),
+    history: document.getElementById('emr-history').value.trim(),
+    past: document.getElementById('emr-past').value.trim(),
+    allergy: document.getElementById('emr-allergy').value.trim(),
+    family: document.getElementById('emr-family').value.trim(),
+    habits: document.getElementById('emr-habits').value.trim(),
+    complexion: document.getElementById('emr-complexion').value,
+    tongue_color: document.getElementById('emr-tongue-color').value,
+    coating: document.getElementById('emr-coating').value,
+    pulse: document.getElementById('emr-pulse').value,
+    tcm_disease: document.getElementById('emr-tcm-disease').value.trim(),
+    tcm_syndrome: document.getElementById('emr-tcm-syndrome').value.trim(),
+    treatment: document.getElementById('emr-treatment').value.trim(),
+    western_dx: document.getElementById('emr-western-dx').value.trim(),
+    herbs: herbs,
+    advice: document.getElementById('emr-advice').value.trim(),
+    created_at: new Date().toISOString()
+  };
+}
+
+function saveEMR() {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  var emr = collectEMR();
+  if (!emr.name) return toast('请填写患者姓名');
+  if (!emr.complaint) return toast('请填写主诉');
+
+  TCM.store.push('emr', emr);
+  TCM.store.push('patient_records', {
+    patient_id: 'P' + emr.name,
+    patient_name: emr.name,
+    diagnosis: emr.tcm_syndrome || emr.tcm_disease,
+    herbs: emr.herbs,
+    created_at: emr.created_at
+  });
+  
+  document.getElementById('emr-count').textContent = (TCM.store.get('emr')||[]).length;
+  renderList();
+  toast('✅ 病历 ' + emr.id.slice(-6) + ' 已保存');
+}
+
+function previewEMR() {
+  var emr = collectEMR();
+  var preview = document.getElementById('emr-preview');
+  preview.style.display = 'block';
+  preview.innerHTML = 
+    '══════════════════════\n' +
+    '  门诊病历\n' +
+    '══════════════════════\n\n' +
+    '姓名: ' + (emr.name||'___') + '  性别: ' + emr.gender + '  年龄: ' + (emr.age||'___') + '\n' +
+    '就诊日期: ' + (emr.date||'___') + '\n\n' +
+    '【主诉】\n' + (emr.complaint||'___') + '\n\n' +
+    '【现病史】\n' + (emr.history||'___') + '\n\n' +
+    '【既往史】\n' + '既往疾病: ' + (emr.past||'无') + '\n过敏史: ' + (emr.allergy||'无') + '\n家族史: ' + (emr.family||'无') + '\n个人史: ' + (emr.habits||'无') + '\n\n' +
+    '【望闻切诊】\n' + '面色: ' + emr.complexion + ' | 舌色: ' + emr.tongue_color + ' | 苔象: ' + emr.coating + ' | 脉象: ' + emr.pulse + '\n\n' +
+    '【辨证论治】\n' + '中医诊断(病名): ' + (emr.tcm_disease||'___') + '\n中医诊断(证型): ' + (emr.tcm_syndrome||'___') + '\n治则治法: ' + (emr.treatment||'___') + '\n西医诊断: ' + (emr.western_dx||'无') + '\n\n' +
+    '【处方】\n' + emr.herbs.map(function(h) { return h.name + ' ' + h.dosage + (h.note ? ' (' + h.note + ')' : ''); }).join('\n') + '\n\n' +
+    '【医嘱】\n' + (emr.advice||'___') + '\n\n' +
+    '医师签名: ___________    日期: ' + (emr.date||'___') + '\n' +
+    '══════════════════════';
+}
+
+function renderList() {
+  var list = TCM.store.get('emr') || [];
+  var q = (document.getElementById('emr-search')?.value || '').toLowerCase();
+  if (q) list = list.filter(function(e) { 
+    return e.name.toLowerCase().includes(q) || (e.tcm_syndrome||'').toLowerCase().includes(q) || e.complaint.toLowerCase().includes(q);
+  });
+  
+  document.getElementById('emr-count').textContent = list.length;
+  var html = '';
+  for (var i = 0; i < Math.min(list.length, 30); i++) {
+    var e = list[i];
+    html += '<div class="record-item" onclick="viewEMR(\'' + e.id + '\')">' +
+      '<strong>' + e.name + '</strong> · ' + (e.tcm_syndrome||e.tcm_disease||'未诊断') + 
+      ' · 💊' + (e.herbs||[]).length + '味' +
+      '<div class="r-date">' + e.date + ' · ' + e.id.slice(-6) + '</div>' +
+      '</div>';
+  }
+  document.getElementById('emr-list').innerHTML = html || '<div style="padding:16px;text-align:center;color:var(--text3)">暂无病历</div>';
+}
+
+function viewEMR(id) {
+  var list = TCM.store.get('emr') || [];
+  var e = list.find(function(r) { return r.id === id; });
+  if (!e) return;
+  
+  // 填充表单
+  for (var k in e) {
+    var el = document.getElementById('emr-' + k.replace(/_/g,'-'));
+    if (el) el.value = e[k] || '';
+    if (k === 'herbs' && e[k] && e[k].length) {
+      document.getElementById('emr-herbs').innerHTML = '';
+      e[k].forEach(function(h) { addHerbRow(); });
+      var rows = document.querySelectorAll('#emr-herbs > div');
+      e[k].forEach(function(h,i) {
+        if (rows[i]) {
+          var inputs = rows[i].querySelectorAll('input');
+          inputs[0].value = h.name||'';
+          inputs[1].value = h.dosage||'';
+          inputs[2].value = h.note||'';
+        }
+      });
+    }
+  }
+  previewEMR();
+}
+
+function exportCSV() {
+  var list = TCM.store.get('emr') || [];
+  var csv = '病历ID,姓名,性别,年龄,日期,主诉,中医诊断,证型,处方,医嘱\n';
+  for (var i = 0; i < list.length; i++) {
+    var e = list[i];
+    csv += [e.id, e.name, e.gender, e.age, e.date, '"'+(e.complaint||'').replace(/"/g,'""')+'"', e.tcm_disease, e.tcm_syndrome, '"'+(e.herbs||[]).map(function(h){return h.name+h.dosage}).join('、')+'"', '"'+(e.advice||'').replace(/"/g,'""')+'"'].join(',') + '\n';
+  }
+  var blob = new Blob(['\uFEFF'+csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'emr-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  toast('✅ 导出' + list.length + '份病历');
+}
+
+renderList();
+document.getElementById('emr-count').textContent = (TCM.store.get('emr')||[]).length;
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+
+<script>
+function openEmr(id) {
+  try { if (typeof showEmrDetail === 'function') showEmrDetail(id); } catch(e) {}
+}
+</script>
+<div id="emr-data" style="margin:8px 0"></div>
+
+<script>
+// ═══ 电子病历 API 接入 ═══
+(function(){var api='/';window.loadEMR=function(pid){fetch(api+'/api/home/med-detail?patient_id='+(pid||'P001')).then(r=>r.json()).then(d=>{var el=document.getElementById('emr-data');if(el&&d.meds){el.innerHTML=(d.meds.length?d.meds.slice(0,6).map(function(m){return'<div style="padding:6px;border-bottom:1px solid #eee;font-size:13px"><strong>'+m.drug+'</strong> · '+m.time+' · 来源:'+(m.source||'EMR')+'</div>';}).join('')+'<div style="font-size:11px;color:var(--text2);padding:8px">共 '+d.meds.length+' 条记录</div>':'<div style="padding:20px;text-align:center;color:#999;font-size:13px">📋 暂无用药记录</div>');}}).catch(function(e){var el=document.getElementById('emr-data');if(el)el.innerHTML='<span style="color:#999">📡 API离线 · 使用本地数据</span>';});};window.addEventListener("DOMContentLoaded",function(){var el=document.getElementById("emr-data");if(el&&!el.innerHTML.trim())loadEMR("P001");});})();
+
+// ═══ 实时事件 + 可配置面板 ═══
+setTimeout(function(){
+  if (window.TCM && window.TCM.realtime) {
+    var evts = [];
+    window.TCM.realtime.on('emr.*', function(p, m) {
+      var ts = new Date(m.ts).toISOString().slice(11,19);
+      evts.push('[' + ts + '] ' + m.type + (p.id ? ' #' + p.id.slice(-6) : ''));
+      if (evts.length > 10) evts = evts.slice(-10);
+      var el = document.getElementById('emr-realtime');
+      if (el) el.innerHTML = evts.slice().reverse().map(function(e){return '<div style="padding:2px 0;border-bottom:1px dashed #eee">'+e+'</div>';}).join('');
+    });
+    var el = document.getElementById('emr-realtime');
+    if (el) el.innerHTML = '<div style="color:#999;text-align:center;padding:6px">等待事件…</div>';
+  }
+}, 300);
+</script>
+<div id="emr-realtime" style="margin:12px 8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:11px;font-family:monospace;max-height:140px;overflow-y:auto"></div>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

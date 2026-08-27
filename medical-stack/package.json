@@ -1,0 +1,28 @@
+{
+  "name": "mingli-medical-stack",
+  "version": "1.0.0",
+  "description": "命理宝鉴·医学栈（移植自 tcm-agent 基线，独立部署）",
+  "main": "server/api-server.js",
+  "scripts": {
+    "start": "node server/api-server.js",
+    "static": "python3 -m http.server 8931 --directory app/",
+    "serve": "node server/static-server.js",
+    "sync-kb": "node scripts/tcm-kb-sync.js",
+    "test": "node tests/e2e-test.js",
+    "verify": "node scripts/rehearsal.js && bash scripts/agent-selfcheck.sh",
+    "deploy": "node server/static-server.js & node server/api-server.js"
+  },
+  "keywords": [
+    "tcm",
+    "中医",
+    "ai",
+    "诊疗",
+    "穿戴设备"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "express": "^4.21.0",
+    "playwright": "^1.62.1"
+  }
+}

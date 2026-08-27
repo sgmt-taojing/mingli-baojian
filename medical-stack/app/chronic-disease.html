@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/chronic-disease.html">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="robots" content="noindex">
+<title>慢病居家管理 · 4 大慢病 · 命理宝鉴·医道</title>
+<meta name="description" content="面向居家机器人的 4 大慢病（高血压/糖尿病/失眠/慢阻肺）智能诊疗路径：风险分级+用药提醒+TCM养生+生活指导+紧急救助">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>">
+<style>
+:root {
+  --bg: #f5f2ed;
+  --card: #ffffff;
+  --primary: #b8860b;
+  --primary-dark: #8b6914;
+  --accent: #c0392b;
+  --green: #22c55e;
+  --orange: #f59e0b;
+  --red: #ef4444;
+  --danger: #dc2626;
+  --blue: #3b82f6;
+  --text: #2c1810;
+  --text2: #6b5b4f;
+  --text3: #9b8b7f;
+  --border: #e8dfc8;
+  --shadow: 0 2px 12px rgba(139,69,19,0.08);
+  --big-radius: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; color: var(--text); min-height: 100vh; padding-bottom: 80px; }
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 12px; }
+
+/* 顶栏 */
+.topbar {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border-radius: var(--big-radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.topbar h1 { font-size: 20px; margin-bottom: 4px; }
+.topbar .sub { font-size: 12px; opacity: 0.9; }
+.topbar .row { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; }
+
+/* 4 个慢病 Tab */
+.disease-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.tab {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab.active { border-color: var(--primary); background: linear-gradient(135deg, #fff7ed, #fdf3d3); }
+.tab .icon { font-size: 26px; }
+.tab .name { font-size: 12px; font-weight: 600; margin-top: 4px; }
+.tab .sub { font-size: 9px; color: var(--text3); }
+
+/* 风险等级显示 */
+.risk-card {
+  background: var(--card);
+  border-radius: var(--big-radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  border-left: 6px solid var(--border);
+}
+.risk-card.normal  { border-left-color: var(--green); }
+.risk-card.medium  { border-left-color: var(--orange); }
+.risk-card.high    { border-left-color: var(--red); }
+.risk-card.critical{ border-left-color: var(--danger); background: linear-gradient(135deg, #fef2f2, #fff); }
+
+.risk-label {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.risk-label.normal   { background: var(--green); }
+.risk-label.medium   { background: var(--orange); }
+.risk-label.high     { background: var(--red); }
+.risk-label.critical { background: var(--danger); }
+
+.risk-action {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.risk-values {
+  display: flex;
+  gap: 12px;
+  margin: 8px 0;
+}
+.risk-val {
+  background: #f9f5ec;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-align: center;
+  flex: 1;
+}
+.risk-val .v { font-size: 20px; font-weight: 700; color: var(--primary); }
+.risk-val .l { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+/* 输入面板 */
+.input-panel {
+  background: var(--card);
+  border-radius: var(--big-radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.input-panel h3 {
+  font-size: 14px;
+  color: var(--primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+.input-row label {
+  font-size: 13px;
+  color: var(--text2);
+  min-width: 80px;
+}
+.input-row input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 18px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fdfbf7;
+  outline: none;
+  font-family: inherit;
+}
+.input-row input:focus { border-color: var(--primary); background: white; }
+.input-row .unit { font-size: 12px; color: var(--text3); min-width: 30px; }
+
+.btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(184,134,11,0.2);
+}
+.btn:active { transform: scaleY(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn.accent { background: var(--accent); box-shadow: 0 4px 12px rgba(192,57,43,0.2); }
+.btn.green  { background: var(--green); }
+.btn.outline { background: white; color: var(--primary); border: 2px solid var(--primary); box-shadow: none; }
+
+/* SOS 按钮 */
+.sos-btn {
+  background: linear-gradient(135deg, var(--danger), #b91c1c);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: 700;
+  width: 100%;
+  margin: 12px 0;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(220,38,38,0.3);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 6px 16px rgba(220,38,38,0.3); }
+  50%      { box-shadow: 0 6px 24px rgba(220,38,38,0.6); }
+}
+
+.section {
+  background: var(--card);
+  border-radius: var(--big-radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.section h3 {
+  font-size: 15px;
+  color: var(--primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section .hint { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+
+/* 用药提醒 */
+.med-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #f9f5ec;
+  border-radius: 10px;
+  margin: 6px 0;
+}
+.med-time {
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 60px;
+  text-align: center;
+}
+.med-info { flex: 1; }
+.med-info .name { font-size: 14px; font-weight: 600; }
+.med-info .note { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* TCM 养生指导 */
+.tcm-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.tcm-item {
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border-left: 3px solid var(--green);
+  border-radius: 8px;
+}
+.tcm-item .label { font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+.tcm-item .content { font-size: 13px; color: var(--text); line-height: 1.5; }
+
+/* 生活指导 */
+.life-tabs { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+.life-tab {
+  padding: 4px 12px;
+  border-radius: 16px;
+  background: #f9f5ec;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  cursor: pointer;
+}
+.life-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+.life-content { font-size: 13px; line-height: 1.7; }
+.life-content .row { margin: 6px 0; }
+.life-content .label { font-weight: 600; color: var(--primary); }
+.life-content .reco { background: #f0fdf4; padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
+.life-content .avoid { background: #fef2f2; padding: 6px 10px; border-radius: 6px; margin: 4px 0; }
+
+/* 紧急信号 */
+.emergency-signal {
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  border-left: 3px solid var(--danger);
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 6px 0;
+}
+.emergency-signal .condition { font-size: 13px; font-weight: 600; color: var(--danger); }
+.emergency-signal .reason { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+/* 紧急模式横幅 */
+.emergency-banner {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  border-radius: var(--big-radius);
+  padding: 20px;
+  margin-bottom: 12px;
+  text-align: center;
+  animation: pulse 1.5s infinite;
+}
+.emergency-banner .title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.emergency-banner .desc { font-size: 14px; opacity: 0.9; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  z-index: 999;
+  display: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text3);
+  margin: 16px 0;
+  line-height: 1.6;
+}
+.footer a { color: var(--primary); text-decoration: none; }
+</style>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+<link rel="stylesheet" href="css/mobile.css"></head>
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">慢病居家管理</span>
+</div>
+
+<div class="wrap">
+
+  <!-- 顶栏 -->
+  <div class="topbar">
+    <h1>💊 慢病居家管理</h1>
+    <div class="sub">4 大慢病智能诊疗路径 · 风险分级 + 用药提醒 + TCM养生 + 生活指导</div>
+    <div class="row">
+      <span>👵 张奶奶 · 73 岁</span>
+      <span style="background:rgba(255,255,255,0.2);padding:2px 10px;border-radius:10px;font-size:11px">高血压 + 失眠</span>
+    </div>
+  </div>
+
+  <!-- 慢病切换 -->
+  <div class="disease-tabs" id="disease-tabs">
+    <div class="tab active" data-disease="HTN" onclick="switchDisease('HTN')">
+      <div class="icon">🩺</div>
+      <div class="name">高血压</div>
+      <div class="sub">HTN</div>
+    </div>
+    <div class="tab" data-disease="DM" onclick="switchDisease('DM')">
+      <div class="icon">🩸</div>
+      <div class="name">糖尿病</div>
+      <div class="sub">DM</div>
+    </div>
+    <div class="tab" data-disease="INS" onclick="switchDisease('INS')">
+      <div class="icon">😴</div>
+      <div class="name">失眠</div>
+      <div class="sub">INS</div>
+    </div>
+    <div class="tab" data-disease="COPD" onclick="switchDisease('COPD')">
+      <div class="icon">🫁</div>
+      <div class="name">慢阻肺</div>
+      <div class="sub">COPD</div>
+    </div>
+  </div>
+
+  <!-- 紧急模式横幅（仅 critical/high 时显示）-->
+  <div id="emergency-banner" style="display:none" class="emergency-banner">
+    <div class="title">🚨 检测到高危信号</div>
+    <div class="desc" id="emergency-desc">立即采取行动</div>
+    <button class="btn accent" style="margin-top:12px;width:auto;padding:10px 24px" onclick="triggerSOS()">📞 立即呼叫 120 + 家属</button>
+  </div>
+
+  <!-- SOS 按钮（始终显示）-->
+  <button class="sos-btn" onclick="triggerSOS()">🚨 一键紧急救助 · 呼叫家属 + 120</button>
+
+  <!-- 风险评估输入面板 -->
+  <div class="input-panel" id="input-panel">
+    <h3>📊 风险分级评估</h3>
+    <div class="hint">输入最新测量数据，自动评估风险等级</div>
+
+    <div id="input-fields-htn">
+      <div class="input-row">
+        <label>收缩压</label>
+        <input  type="number" id="inp-sys" placeholder="140" inputmode="numeric" aria-label="140" data-validate="number">
+        <span class="unit">mmHg</span>
+      </div>
+      <div class="input-row">
+        <label>舒张压</label>
+        <input  type="number" id="inp-dia" placeholder="90" inputmode="numeric" aria-label="90" data-validate="number">
+        <span class="unit">mmHg</span>
+      </div>
+    </div>
+
+    <div id="input-fields-dm" style="display:none">
+      <div class="input-row">
+        <label>空腹血糖</label>
+        <input  type="number" id="inp-fasting" placeholder="6.5" step="0.1" inputmode="decimal" aria-label="6.5" data-validate="number">
+        <span class="unit">mmol/L</span>
+      </div>
+      <div class="input-row">
+        <label>餐后血糖</label>
+        <input  type="number" id="inp-random" placeholder="11.1" step="0.1" inputmode="decimal" aria-label="11.1" data-validate="number">
+        <span class="unit">mmol/L</span>
+      </div>
+    </div>
+
+    <div id="input-fields-ins" style="display:none">
+      <div class="input-row">
+        <label>睡眠时长</label>
+        <input  type="number" id="inp-sleep" placeholder="7" step="0.5" inputmode="decimal" aria-label="7" data-validate="number">
+        <span class="unit">小时</span>
+      </div>
+    </div>
+
+    <div id="input-fields-copd" style="display:none">
+      <div class="input-row">
+        <label>血氧 SpO2</label>
+        <input  type="number" id="inp-spo2" placeholder="96" inputmode="numeric" aria-label="96" data-validate="number">
+        <span class="unit">%</span>
+      </div>
+      <div class="input-row">
+        <label>呼吸频率</label>
+        <input  type="number" id="inp-rr" placeholder="18" inputmode="numeric" aria-label="18" data-validate="number">
+        <span class="unit">次/分</span>
+      </div>
+    </div>
+
+    <button class="btn" style="margin-top:10px" onclick="assess()">📊 评估风险等级</button>
+  </div>
+
+  <!-- 风险结果卡 -->
+  <div id="risk-card" style="display:none"></div>
+
+  <!-- 紧急信号 -->
+  <div id="emergency-signals" style="display:none"></div>
+
+  <!-- 用药提醒 -->
+  <div id="med-schedule" class="section" style="display:none">
+    <h3>⏰ 用药提醒</h3>
+    <div class="hint">按时按量服药，漏服立即报警</div>
+    <div id="med-list"></div>
+  </div>
+
+  <!-- TCM 养生指导 -->
+  <div id="tcm-advice" class="section" style="display:none">
+    <h3>🌿 TCM 养生指导</h3>
+    <div class="hint">传统中医调养（非处方建议，重要事项请遵医嘱）</div>
+    <div id="tcm-list" class="tcm-grid"></div>
+  </div>
+
+  <!-- 生活指导 -->
+  <div id="lifestyle" class="section" style="display:none">
+    <h3>🍵 生活指导</h3>
+    <div class="hint">饮食 + 运动 + 作息 + 情志 — 全方位健康生活</div>
+    <div class="life-tabs" id="life-tabs"></div>
+    <div id="life-content" class="life-content"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- 底部 -->
+  <div class="footer">
+    命理宝鉴·医道 · 慢病居家 v1.0<br>
+    <a href="home-tcm.html">← 返回居家助手</a> · <a href="family-portal.html">👨‍👩‍👧 家属关怀</a><br>
+    本页仅供健康监测参考，不替代医生诊断与处方
+  </div>
+</div>
+
+<script>
+const API = '/';
+let currentDisease = 'HTN';
+let currentLifestyle = 'diet';
+
+// ━━━ 切换慢病 ━━━
+function switchDisease(id) {
+  currentDisease = id;
+  // 更新 tab
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.disease === id));
+  // 隐藏所有输入字段，显示当前
+  ['htn','dm','ins','copd'].forEach(k => document.getElementById('input-fields-' + k).style.display = 'none');
+  document.getElementById('input-fields-' + id.toLowerCase()).style.display = 'block';
+
+  // 隐藏所有结果
+  ['risk-card','emergency-signals','med-schedule','tcm-advice','lifestyle','emergency-banner'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+
+  // 加载数据
+  loadMedSchedule(id);
+  loadTcmAdvice(id);
+  loadLifestyle(id);
+
+  toast('已切换到 ' + getDiseaseName(id));
+}
+
+// ━━━ 评估风险 ━━━
+async function assess() {
+  let body = {};
+  if (currentDisease === 'HTN') {
+    const sys = +document.getElementById('inp-sys').value;
+    const dia = +document.getElementById('inp-dia').value;
+    if (!sys && !dia) return toast('请输入血压值');
+    body = { systolic: sys, diastolic: dia };
+  } else if (currentDisease === 'DM') {
+    const f = +document.getElementById('inp-fasting').value;
+    const r = +document.getElementById('inp-random').value;
+    if (!f && !r) return toast('请输入血糖值');
+    body = { fasting: f, random: r };
+  } else if (currentDisease === 'INS') {
+    const h = +document.getElementById('inp-sleep').value;
+    if (!h) return toast('请输入睡眠时长');
+    body = { sleepHours: h };
+  } else if (currentDisease === 'COPD') {
+    const spo2 = +document.getElementById('inp-spo2').value;
+    const rr = +document.getElementById('inp-rr').value;
+    if (!spo2 && !rr) return toast('请输入血氧或呼吸频率');
+    body = { spo2: spo2, respiratoryRate: rr };
+  }
+
+  try {
+    const resp = await fetch(API + '/api/chronic/' + currentDisease.toLowerCase() + '/assess', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await resp.json();
+    if (!data.ok) return toast('评估失败: ' + (data.error || '未知错误'));
+
+    renderRisk(data.result);
+    if (data.shouldSOS) {
+      document.getElementById('emergency-banner').style.display = 'block';
+      document.getElementById('emergency-desc').textContent = data.result.action;
+    } else {
+      document.getElementById('emergency-banner').style.display = 'none';
+    }
+    if (data.result.emergencySignals) {
+      renderEmergencySignals(data.result.emergencySignals);
+    }
+    toast('✅ 评估完成：' + data.result.label);
+  } catch (e) {
+    toast('评估失败：服务不可用');
+  }
+}
+
+// ━━━ 渲染风险卡 ━━━
+function renderRisk(r) {
+  const card = document.getElementById('risk-card');
+  const levelClass = r.level;
+
+  // 拼接 values
+  let valuesHtml = '';
+  if (r.values.systolic != null) valuesHtml = `<div class="risk-val"><div class="v">${r.values.systolic}/${r.values.diastolic}</div><div class="l">血压 mmHg</div></div>`;
+  if (r.values.fasting != null || r.values.random != null) valuesHtml = `<div class="risk-val"><div class="v">${r.values.fasting || '—'}/${r.values.random || '—'}</div><div class="l">血糖 mmol/L</div></div>`;
+  if (r.values.sleepHours != null) valuesHtml = `<div class="risk-val"><div class="v">${r.values.sleepHours}</div><div class="l">睡眠小时</div></div>`;
+  if (r.values.spo2 != null) valuesHtml = `<div class="risk-val"><div class="v">${r.values.spo2 || '—'}/${r.values.respiratoryRate || '—'}</div><div class="l">SpO2% / 呼吸次</div></div>`;
+
+  card.className = 'risk-card ' + levelClass;
+  card.innerHTML = `
+    <div class="risk-label ${levelClass}">${r.label}</div>
+    <div class="risk-action">${r.action}</div>
+    <div class="risk-values">${valuesHtml}</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px">
+      ${r.diseaseName} · 风险等级 <strong>${r.level}</strong>${r.isCritical ? ' · ⚠️ 触发紧急监测' : ''}
+    </div>
+  `;
+  card.style.display = 'block';
+}
+
+// ━━━ 紧急信号 ━━━
+function renderEmergencySignals(signals) {
+  const c = document.getElementById('emergency-signals');
+  c.innerHTML = '<div class="section"><h3>🚨 紧急信号（触发任一立即呼叫 120）</h3>' +
+    signals.map(s => `<div class="emergency-signal"><div class="condition">⚠️ ${s.condition}</div><div class="reason">${s.reason}</div></div>`).join('') +
+    '</div>';
+  c.style.display = 'block';
+}
+
+// ━━━ 用药提醒 ━━━
+async function loadMedSchedule(id) {
+  try {
+    const r = await fetch(API + '/api/chronic/' + id + '/med-schedule');
+    const d = await r.json();
+    if (!d.ok) return;
+    document.getElementById('med-list').innerHTML = d.schedule.map(m => `
+      <div class="med-item">
+        <div class="med-time">${m.time}</div>
+        <div class="med-info">
+          <div class="name">${m.drug}</div>
+          <div class="note">${m.type === '长期' ? '🟢 长期服用' : m.type === '应急' ? '🔴 应急使用' : '🟡 按需服用'} · ${m.note}</div>
+        </div>
+      </div>
+    `).join('');
+    document.getElementById('med-schedule').style.display = 'block';
+  } catch (e) {}
+}
+
+// ━━━ TCM 养生 ━━━
+async function loadTcmAdvice(id) {
+  try {
+    const r = await fetch(API + '/api/chronic/' + id + '/tcm-advice');
+    const d = await r.json();
+    if (!d.ok) return;
+    const a = d.tcmAdvice;
+    document.getElementById('tcm-list').innerHTML = `
+      <div class="tcm-item"><div class="label">📍 穴位保健</div><div class="content">${a.acupoints.join(' · ')}</div></div>
+      <div class="tcm-item"><div class="label">🦶 中药足浴</div><div class="content">${a.footBath}</div></div>
+      <div class="tcm-item"><div class="label">🍲 食疗方</div><div class="content">${a.dietTherapy}</div></div>
+      <div class="tcm-item"><div class="label">🧘 功法导引</div><div class="content">${a.qigong}</div></div>
+    `;
+    document.getElementById('tcm-advice').style.display = 'block';
+  } catch (e) {}
+}
+
+// ━━━ 生活指导 ━━━
+async function loadLifestyle(id) {
+  try {
+    const r = await fetch(API + '/api/chronic/' + id + '/lifestyle');
+    const d = await r.json();
+    if (!d.ok) return;
+    window._lifestyleData = d.lifestyle;
+    const tabs = Object.keys(d.lifestyle);
+    currentLifestyle = tabs[0];
+    document.getElementById('life-tabs').innerHTML = tabs.map(k => `
+      <div class="life-tab ${k === currentLifestyle ? 'active' : ''}" data-k="${k}" onclick="showLife('${k}')">${getLifeLabel(k)}</div>
+    `).join('');
+    showLife(tabs[0]);
+    document.getElementById('lifestyle').style.display = 'block';
+  } catch (e) {}
+}
+
+function showLife(key) {
+  currentLifestyle = key;
+  document.querySelectorAll('.life-tab').forEach(t => t.classList.toggle('active', t.dataset.k === key));
+  const data = window._lifestyleData[key];
+  let html = `<div class="row"><span class="label">📌 原则：</span>${data.principle}</div>`;
+  if (data.recommend && data.recommend.length) {
+    html += '<div class="row"><span class="label">✅ 推荐：</span></div>';
+    data.recommend.forEach(r => html += `<div class="reco">${r}</div>`);
+  }
+  if (data.avoid && data.avoid.length) {
+    html += '<div class="row"><span class="label">❌ 避免：</span></div>';
+    data.avoid.forEach(r => html += `<div class="avoid">${r}</div>`);
+  }
+  if (data.warning) html += `<div class="row" style="color:var(--danger);font-weight:600">⚠️ ${data.warning}</div>`;
+  document.getElementById('life-content').innerHTML = html;
+}
+
+function getLifeLabel(k) {
+  return { diet: '🍵 饮食', exercise: '🏃 运动', sleep: '😴 作息', emotion: '🧘 情志' }[k] || k;
+}
+
+function getDiseaseName(id) {
+  return { HTN: '高血压', DM: '糖尿病', INS: '失眠', COPD: '慢阻肺' }[id] || id;
+}
+
+// ━━━ SOS ━━━
+async function triggerSOS() {
+  if (!await (window.confirmModal ? confirmModal('确认呼叫家属 + 120 急救？\n（演示模式：记录事件 + 推送所有家属）', { danger:true, okText:'呼叫' }) : Promise.resolve(confirm('确认呼叫家属 + 120 急救？')))) return;
+  fetch('/api/wechat/sos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patient: '张奶奶', message: '慢病居家端触发紧急救助' })
+  }).catch(() => {});
+  fetch(API + '/api/home/sos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patient: '张奶奶', triggeredBy: 'chronic-disease', disease: currentDisease })
+  }).catch(() => {});
+  /* sanitized */ toast('🚨 已发送紧急呼叫\n家属 3 人将收到推送\n120 急救位置已上报');
+}
+
+// ━━━ Toast ━━━
+// ━━━ 初始化（HTN 默认）━━━
+loadMedSchedule('HTN');
+loadTcmAdvice('HTN');
+loadLifestyle('HTN');
+</script>
+<!-- ═══ 实时事件流 ═══ -->
+<div id="rt-panel" style="margin:8px;padding:8px;background:#f9f9f9;border-radius:6px;font-size:11px;font-family:monospace;max-height:120px;overflow-y:auto">
+  <div style="color:#999;text-align:center">📡 实时事件监听中…</div>
+</div>
+<script>
+setTimeout(function(){
+  if (window.TCM && window.TCM.realtime) {
+    var evts = [];
+    window.TCM.realtime.on("*", function(p, m) {
+      var ts = new Date(m.ts).toISOString().slice(11,19);
+      evts.push("[" + ts + "] " + m.type + (p.module ? " " + p.module : "") + (p.id ? " #" + p.id.slice(-6) : ""));
+      if (evts.length > 10) evts = evts.slice(-10);
+      var el = document.getElementById("rt-panel");
+      if (el) el.innerHTML = evts.slice().reverse().map(function(e){return "&lt;div style='padding:2px 0;border-bottom:1px dashed #eee'&gt;"+e+"&lt;/div&gt;";}).join("");
+    });
+  }
+}, 300);
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

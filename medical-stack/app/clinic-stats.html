@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>病历统计 · 命理宝鉴·医道</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b1020;color:#e8eefc;font-family:'PingFang SC','Microsoft YaHei',sans-serif;padding:24px 16px;max-width:1000px;margin:0 auto;line-height:1.7}
+h1{font-size:21px;color:#e8c87a;text-align:center;letter-spacing:2px;margin-bottom:4px}
+.sub{text-align:center;color:#7a8aab;font-size:12.5px;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.metric{background:#101a2e;border:1px solid rgba(120,160,255,.2);border-radius:12px;padding:14px;text-align:center}
+.metric b{display:block;font-size:26px;color:#4da3ff}
+.metric span{font-size:12px;color:#7a8aab}
+.panel{background:#101a2e;border:1px solid rgba(120,160,255,.2);border-radius:14px;padding:16px;margin-bottom:14px}
+.panel h3{color:#e8c87a;font-size:14.5px;margin-bottom:10px}
+.bar-row{display:flex;align-items:center;gap:10px;margin:6px 0;font-size:12.5px}
+.bar-row .name{width:150px;flex:none;text-align:right;color:#9db0d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-row .track{flex:1;height:16px;background:#0b1020;border-radius:8px;overflow:hidden}
+.bar-row .fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#4da3ff,#6a7bff)}
+.bar-row .n{width:44px;flex:none;color:#e8c87a;font-weight:700}
+.bar-row .pct{width:52px;flex:none;color:#7a8aab;font-size:11px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+th{color:#e8c87a;text-align:left;padding:6px 10px;border-bottom:1px solid rgba(232,200,122,.3)}
+td{padding:5px 10px;border-bottom:1px solid rgba(120,160,255,.1)}
+#status{display:flex;gap:10px;flex-wrap:wrap}
+#status .st{padding:8px 16px;border-radius:10px;font-size:13px;background:#0b1020;border:1px solid rgba(120,160,255,.25)}
+.loading{text-align:center;color:#7a8aab;padding:40px}
+</style>
+</head>
+<body>
+<h1>病历统计面板</h1>
+<div class="sub">命理宝鉴·医道 · 自动生成病历的分布与趋势 · 数据实时</div>
+
+<div class="grid" id="metrics">
+  <div class="metric"><b>-</b><span>病历总数</span></div>
+  <div class="metric"><b>-</b><span>待医生审核</span></div>
+  <div class="metric"><b>-</b><span>已交付</span></div>
+  <div class="metric"><b>-</b><span>近 14 天增量</span></div>
+</div>
+
+<div class="panel"><h3>📊 辨证分布 TOP 10</h3><div id="syndrome"></div></div>
+<div class="panel"><h3>🗂 状态分布</h3><div id="status"></div></div>
+<div class="panel"><h3>📈 近 14 天病历趋势</h3><div id="trend"></div></div>
+
+<script>
+var API = 'http://127.0.0.1:8972';
+fetch(API + '/api/clinic/stats')
+  .then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){ document.body.innerHTML += '<div class="loading">加载失败：' + (d.error||'') + '</div>'; return; }
+    // 指标
+    var st = d.byStatus || {};
+    var total = d.total || 0;
+    var pending = st.pending_review || 0;
+    var trendN = (d.trend||[]).reduce(function(a,x){return a+x[1]},0);
+    document.querySelectorAll('#metrics .metric b')[0].textContent = total;
+    document.querySelectorAll('#metrics .metric b')[1].textContent = pending;
+    document.querySelectorAll('#metrics .metric b')[2].textContent = st.delivered || 0;
+    document.querySelectorAll('#metrics .metric b')[3].textContent = trendN;
+    // 辨证分布
+    var max = d.topSyndromes.length ? d.topSyndromes[0][1] : 1;
+    document.getElementById('syndrome').innerHTML = d.topSyndromes.map(function(x){
+      var pct = Math.round(x[1]/total*1000)/10;
+      return '<div class="bar-row"><div class="name" title="'+x[0]+'">'+x[0]+'</div><div class="track"><div class="fill" style="width:'+Math.round(x[1]/max*100)+'%"></div></div><div class="n">'+x[1]+'</div><div class="pct">'+pct+'%</div></div>';
+    }).join('') || '<div class="muted">暂无数据</div>';
+    // 状态
+    var labels = {pending_review:'待审核', delivered:'已交付', rejected:'已驳回', unknown:'未标注'};
+    document.getElementById('status').innerHTML = Object.entries(st).map(function(x){
+      return '<div class="st">'+ (labels[x[0]]||x[0]) +'：<b style="color:#e8c87a">'+x[1]+'</b> 条</div>';
+    }).join('');
+    // 趋势
+    var maxT = Math.max.apply(null, d.trend.map(function(x){return x[1]})) || 1;
+    document.getElementById('trend').innerHTML = d.trend.map(function(x){
+      return '<div class="bar-row"><div class="name">'+x[0].slice(5)+'</div><div class="track"><div class="fill" style="width:'+Math.round(x[1]/maxT*100)+'%;background:linear-gradient(90deg,#3ddc97,#4da3ff)"></div></div><div class="n">'+x[1]+'</div></div>';
+    }).join('') || '<div class="muted">暂无趋势</div>';
+  }).catch(function(){ document.body.innerHTML += '<div class="loading">服务不可用</div>'; });
+</script>
+</body>
+</html>

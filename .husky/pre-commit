@@ -1,35 +1,3 @@
-#!/bin/bash
-cd "$(git rev-parse --show-toplevel)" || exit 0
-
-# --- 1. docs-lint ---
-DOCS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -c "^docs/" 2>/dev/null || echo "0")
-DOCS_CHANGED=${DOCS_CHANGED//[^0-9]/}
-DOCS_CHANGED=${DOCS_CHANGED:-0}
-if [ "$DOCS_CHANGED" -gt 0 ] 2>/dev/null; then
-  echo "📄 docs/ 变更 $DOCS_CHANGED 文件"
-  [ -f scripts/docs-lint.sh ] && bash scripts/docs-lint.sh 2>/dev/null
-fi
-
-# --- 2. acorn HTML 快扫 ---
-HTML_CHANGED=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -cE "^app/.*\.html$" 2>/dev/null || echo "0")
-HTML_CHANGED=${HTML_CHANGED//[^0-9]/}
-HTML_CHANGED=${HTML_CHANGED:-0}
-if [ "$HTML_CHANGED" -gt 0 ] 2>/dev/null; then
-  echo "🔍 app/*.html 变更 $HTML_CHANGED 文件，acorn 快扫..."
-  SCAN="$HOME/.openclaw-autoclaw/workspace/.openclaw/tmp/scan-all.js"
-  if [ -f "$SCAN" ]; then
-    git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E "^app/.*\.html$" | while read f; do
-      node "$SCAN" "$f" 2>/dev/null | grep "^❌" && echo "  ↑ $f" || true
-    done
-    echo "✅ acorn 快扫完成"
-  fi
-fi
-
-# --- 3. 修真闭环快扫（R682 反向追溯，仅提示不阻断） ---
-HEALTH_ALL="$HOME/.openclaw-autoclaw/workspace/scripts/health-check-all.sh"
-if [ -f "$HEALTH_ALL" ]; then
-  bash "$HEALTH_ALL" --quick 2>/dev/null || echo "⚠️ health-check-all 快扫完成（有提示项，详见报告）"
-fi
-
-echo "🎯 pre-commit 完成"
-exit 0
+#!/usr/bin/env sh
+# rules-check L1（AutoClaw 边界规则，勿删本行）
+python3 "$(git rev-parse --show-toplevel)/../_shared/scripts/rules-check.py" || exit 1

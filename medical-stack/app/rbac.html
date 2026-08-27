@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/rbac.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+<title>权限管理 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--purple:#7c3aed;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:sans-serif;min-height:100vh}
+.container{max-width:1100px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:768px){.grid2{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:left}
+th{color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase}
+.btn{padding:5px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none;display:inline-block}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.red{background:var(--accent);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:3px 8px;font-size:10px}
+.role-badge{padding:2px 8px;border-radius:10px;font-size:10px;display:inline-block}
+.rb-admin{background:#fef3c7;color:#92400e}.rb-doc{background:#dbeafe;color:#1e40af}.rb-pharma{background:#d1fae5;color:#065f46}.rb-patient{background:#ede9fe;color:#5b21b6}
+.perm-chip{padding:2px 6px;border-radius:3px;font-size:10px;background:#f0fdf4;color:#166534;margin:1px;display:inline-block}.perm-chip.deny{background:#fef2f2;color:#991b1b}
+.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center}
+.modal.show{display:flex}
+.modal-content{background:var(--card);border-radius:12px;padding:20px;max-width:500px;width:90%}
+.input,select{width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px;background:var(--bg);color:var(--text);margin:6px 0}
+.label{font-size:11px;color:var(--text3);margin:4px 0 2px;display:block}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="admin">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">权限管理</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>管理员</b></span><span class="std-tag">⚙️ 功能 <b>权限管理</b></span><span class="std-tag">💎 使用价值 <b>9角色矩阵+用户CRUD+审计日志</b></span></div>
+<div class="header"><h1>🛡️ 权限管理 · 角色与用户</h1></div>
+<div class="container">
+  <!-- 角色矩阵 -->
+  <div class="card">
+    <h3>📊 角色权限矩阵</h3>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>角色</th><th>患者</th><th>诊断</th><th>处方</th><th>药房</th><th>穿戴设备</th><th>管理</th><th>审计</th></tr></thead>
+        <tbody id="role-matrix"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- 用户列表 -->
+    <div class="card">
+      <h3>👥 用户管理 <button class="btn primary small" onclick="openAddUser()">+ 新增</button></h3>
+      <table><thead><tr><th>用户名</th><th>姓名</th><th>角色</th><th>科室</th><th>状态</th><th>操作</th></tr></thead>
+      <tbody id="user-list"></tbody></table>
+    </div>
+
+    <!-- 操作日志 -->
+    <div class="card">
+      <h3>📋 权限变更日志</h3>
+      <div id="audit-log" style="max-height:300px;overflow-y:auto;font-size:11px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 新增/编辑用户模态窗 -->
+<div class="modal" id="user-modal">
+  <div class="modal-content">
+    <h3 id="modal-title" style="margin-bottom:12px">新增用户</h3>
+    <label class="label">用户名</label><input  class="input" id="mu-username" placeholder="拼音字母" aria-label="拼音字母" data-validate="required|min=2">
+    <label class="label">密码</label><input  class="input" id="mu-password" type="password" placeholder="至少6位" autocomplete="new-password" aria-label="至少6位" data-validate="required|min=6">
+    <label class="label">姓名</label><input  class="input" id="mu-name" placeholder="真实姓名" aria-label="真实姓名" data-validate="required|min=2">
+    <label class="label">角色</label><select class="input" id="mu-role">
+      <option value="super_admin">超级管理员</option>
+      <option value="doctor_internal">内科医生</option>
+      <option value="doctor_acupuncture">针灸科医生</option>
+      <option value="doctor_gynecology">妇科医生</option>
+      <option value="doctor_pediatrics">儿科医生</option>
+      <option value="doctor_dermatology">皮肤科医生</option>
+      <option value="doctor_orthopedics">骨伤科医生</option>
+      <option value="pharmacist">药师</option>
+      <option value="patient">患者</option>
+    </select>
+    <label class="label">手机号</label><input  class="input" id="mu-phone" placeholder="选填" aria-label="选填" data-validate="phone">
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn small" style="background:var(--bg)" onclick="closeModal()">取消</button>
+      <button class="btn green small" id="mu-save-btn" onclick="saveUser()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ 角色权限矩阵 ═══
+var ROLE_MATRIX = {
+  super_admin:     {name:'超级管理员',patient:'✅',diagnosis:'✅',prescription:'✅',pharmacy:'✅',wearable:'✅',admin:'✅',audit:'✅'},
+  doctor_internal: {name:'内科医生',  patient:'✅',diagnosis:'✅',prescription:'✅',pharmacy:'🚫',wearable:'✅',admin:'🚫',audit:'🚫'},
+  doctor_acupuncture:{name:'针灸科医生',patient:'✅',diagnosis:'✅',prescription:'✅',pharmacy:'🚫',wearable:'✅',admin:'🚫',audit:'🚫'},
+  doctor_gynecology:{name:'妇科医生',  patient:'✅',diagnosis:'✅',prescription:'✅',pharmacy:'🚫',wearable:'✅',admin:'🚫',audit:'🚫'},
+  doctor_pediatrics:{name:'儿科医生',  patient:'✅',diagnosis:'✅',prescription:'✅',pharmacy:'🚫',wearable:'✅',admin:'🚫',audit:'🚫'},
+  doctor_dermatology:{name:'皮肤科医生',patient:'✅',diagnosis:'✅',prescription:'✅',pharmacy:'🚫',wearable:'✅',admin:'🚫',audit:'🚫'},
+  doctor_orthopedics:{name:'骨伤科医生',patient:'✅',diagnosis:'✅',prescription:'✅',pharmacy:'🚫',wearable:'✅',admin:'🚫',audit:'🚫'},
+  pharmacist:       {name:'药师',      patient:'✅',diagnosis:'🚫',prescription:'✅',pharmacy:'✅',wearable:'🚫',admin:'🚫',audit:'🚫'},
+  patient:          {name:'患者',      patient:'🚫',diagnosis:'🚫',prescription:'🚫',pharmacy:'🚫',wearable:'🚫',admin:'🚫',audit:'🚫'}
+};
+
+function renderMatrix() {
+  var html='';
+  for(var k in ROLE_MATRIX){
+    var r=ROLE_MATRIX[k];
+    var badge='rb-'+ (k.includes('admin')?'admin':k.includes('doctor')?'doc':k.includes('pharma')?'pharma':'patient');
+    html+='<tr><td><span class="role-badge '+badge+'">'+r.name+'</span></td>'+
+      '<td>'+r.patient+'</td><td>'+r.diagnosis+'</td><td>'+r.prescription+'</td>'+
+      '<td>'+r.pharmacy+'</td><td>'+r.wearable+'</td><td>'+r.admin+'</td><td>'+r.audit+'</td></tr>';
+  }
+  document.getElementById('role-matrix').innerHTML=html;
+}
+
+// ═══ 用户管理 ═══
+var editingUser=null;
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('tcm_users_db')||'{}'); }
+  catch(e) { return {}; }
+}
+function saveUsersDB(users) { localStorage.setItem('tcm_users_db', JSON.stringify(users)); }
+function initUsers() {
+  var users=getUsers();
+  if (!users.admin) {
+    users.admin = {id:'U001',username:'admin',password:'admin123',name:'系统管理员',role:'super_admin',enabled:true,created_at:new Date().toISOString()};
+    users.doc001 = {id:'D001',username:'doc001',password:'doc123',name:'张仲景',role:'doctor_internal',specialty:'internal',enabled:true,created_at:new Date().toISOString()};
+    users.doc002 = {id:'D002',username:'doc002',password:'doc123',name:'李时珍',role:'doctor_acupuncture',specialty:'acupuncture',enabled:true,created_at:new Date().toISOString()};
+    users.doc003 = {id:'D003',username:'doc003',password:'doc123',name:'傅青主',role:'doctor_gynecology',specialty:'gynecology',enabled:true,created_at:new Date().toISOString()};
+    users.pharma001 = {id:'P001',username:'pharma001',password:'pharma123',name:'孙思邈',role:'pharmacist',enabled:true,created_at:new Date().toISOString()};
+    users.patient01 = {id:'PT001',username:'patient01',password:'123456',name:'赵四海',role:'patient',enabled:true,created_at:new Date().toISOString()};
+    saveUsersDB(users);
+  }
+}
+initUsers();
+
+function renderUsers() {
+  var users=getUsers();
+  var html='';
+  for (var k in users) {
+    var u=users[k];
+    if (!u) continue;
+    var badge='rb-'+ (u.role&&u.role.includes('admin')?'admin':u.role&&u.role.includes('doctor')?'doc':u.role&&u.role.includes('pharma')?'pharma':'patient');
+    html+='<tr><td><strong>'+u.username+'</strong></td><td>'+u.name+'</td>'+
+      '<td><span class="role-badge '+badge+'">'+ (ROLE_MATRIX[u.role]?ROLE_MATRIX[u.role].name:u.role) +'</span></td>'+
+      '<td>'+(u.specialty||'-')+'</td>'+
+      '<td>'+(u.enabled!==false?'<span style="color:var(--green)">● 启用</span>':'<span style="color:var(--accent)">○ 禁用</span>')+'</td>'+
+      '<td>'+
+        '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="editUser(\''+u.username+'\')">✏️</button> '+
+        '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="toggleUser(\''+u.username+'\')">'+ (u.enabled!==false?'🔒':'🔓') +'</button> '+
+        (u.role==='super_admin'?'':'<button class="btn red small" onclick="delUser(\''+u.username+'\')">🗑</button>')+
+      '</td></tr>';
+  }
+  document.getElementById('user-list').innerHTML=html;
+}
+
+function renderAudit() {
+  var log=JSON.parse(localStorage.getItem('tcm_audit_log')||'[]');
+  var html='';
+  for(var i=Math.max(0,log.length-20);i<log.length;i++){
+    var l=log[i];
+    html+='<div style="padding:4px 0;border-bottom:1px solid var(--border)">'+
+      '<span style="color:var(--text3);margin-right:8px">'+new Date(l.time).toLocaleString('zh-CN')+'</span>'+
+      (l.action==='create'?'➕':l.action==='update'?'✏️':l.action==='delete'?'🗑':l.action==='toggle'?'🔒':'')+
+      ' '+l.detail+'</div>';
+  }
+  document.getElementById('audit-log').innerHTML=html||'暂无日志';
+}
+
+function auditLog(action,detail) {
+  var log=JSON.parse(localStorage.getItem('tcm_audit_log')||'[]');
+  log.push({time:new Date().toISOString(),action:action,detail:detail,operator:localStorage.getItem('tcm_user')||'unknown'});
+  if(log.length>200) log=log.slice(-200);
+  localStorage.setItem('tcm_audit_log',JSON.stringify(log));
+}
+
+function openAddUser(){editingUser=null;document.getElementById('modal-title').textContent='新增用户';document.getElementById('user-modal').classList.add('show');clearModal();}
+function closeModal(){document.getElementById('user-modal').classList.remove('show');}
+function clearModal(){['username','password','name','phone'].forEach(function(id){document.getElementById('mu-'+id).value='';});document.getElementById('mu-role').value='doctor_internal';}
+
+function editUser(username) {
+  var users=getUsers();
+  var u=users[username];
+  if(!u) return toast('用户不存在');
+  editingUser=username;
+  document.getElementById('modal-title').textContent='编辑用户: '+u.name;
+  document.getElementById('mu-username').value=u.username;
+  document.getElementById('mu-password').value='';
+  document.getElementById('mu-name').value=u.name;
+  document.getElementById('mu-role').value=u.role;
+  document.getElementById('mu-phone').value=u.phone||'';
+  document.getElementById('user-modal').classList.add('show');
+}
+
+function saveUser() {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  var username=document.getElementById('mu-username').value.trim();
+  var password=document.getElementById('mu-password').value.trim();
+  var name=document.getElementById('mu-name').value.trim();
+  var role=document.getElementById('mu-role').value;
+  var phone=document.getElementById('mu-phone').value.trim();
+  if(!username||!name) return toast('用户名和姓名为必填项');
+  var users=getUsers();
+  if(!editingUser&&users[username]) return toast('用户名已存在');
+  if(!editingUser&&password.length<6) return toast('密码至少6位');
+
+  var u=editingUser?(users[editingUser]||{}):{id:'U'+Date.now().toString(36).toUpperCase(),username:username,enabled:true,created_at:new Date().toISOString()};
+  u.name=name;
+  u.role=role;
+  if(phone) u.phone=phone;
+  if(password) u.password=password;
+  // preserve specialty for doctors
+  var SPECIALTIES={doctor_internal:'internal',doctor_acupuncture:'acupuncture',doctor_gynecology:'gynecology',doctor_pediatrics:'pediatrics',doctor_dermatology:'dermatology',doctor_orthopedics:'orthopedics'};
+  if(SPECIALTIES[role]) u.specialty=SPECIALTIES[role];
+
+  if(editingUser && editingUser!==username) { delete users[editingUser]; }
+  users[username]=u;
+  saveUsersDB(users);
+  auditLog(editingUser?'update':'create',username+' ('+ROLE_MATRIX[role].name+')');
+  closeModal(); renderAll(); toast((editingUser?'更新':'创建')+'用户 '+username+' 成功');
+}
+
+function toggleUser(username) {
+  var users=getUsers();
+  if(!users[username]) return;
+  users[username].enabled=!users[username].enabled;
+  saveUsersDB(users);
+  auditLog('toggle',username+' → '+(users[username].enabled?'启用':'禁用'));
+  renderAll(); toast('用户 '+username+' 已'+(users[username].enabled?'启用':'禁用'));
+}
+
+async function delUser(username) {
+  if(!await (window.confirmModal ? confirmModal('确认删除用户 '+username+'？此操作不可逆', { danger:true, okText:'删除' }) : Promise.resolve(confirm('确认删除用户 '+username+'？')))) return;
+  var users=getUsers();
+  if(users[username].role==='super_admin') return toast('不能删除超级管理员');
+  delete users[username];
+  saveUsersDB(users);
+  auditLog('delete',username);
+  renderAll(); toast('用户 '+username+' 已删除');
+}
+
+function renderAll(){renderMatrix();renderUsers();renderAudit();}
+renderAll();
+</script>
+<div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
+<script>
+// Enter键提交支持
+document.addEventListener('keydown', function(e){ if(e.key==='Enter'&&e.target.tagName==='INPUT'&&!e.shiftKey){ var b=document.querySelector('.btn.primary'); if(b)b.click(); }});
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

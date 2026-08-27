@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/emergency.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚨</text></svg>">
+<title>紧急救助 · 命理宝鉴·医道</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:12px}
+.header{background:linear-gradient(135deg,#7f1d1d,#c0392b);color:#fff;padding:16px;border-radius:0 0 12px 12px;margin-bottom:12px}
+.header h1{font-size:18px}
+.card{background:var(--card);border-radius:10px;padding:14px;margin:10px 0;border:1px solid var(--border)}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:8px}
+.alert-detect{background:var(--red-bg);border:1px solid #fca5a5;border-left:4px solid var(--accent);border-radius:8px;padding:12px;margin:8px 0;font-size:12px}
+.danger-chip{display:inline-block;padding:3px 8px;border-radius:10px;background:#fee2e2;color:#991b1b;font-size:11px;margin:2px}
+.call-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0}
+@media(max-width:600px){.call-grid{grid-template-columns:1fr}}
+.call-card{border-radius:10px;padding:14px;text-align:center;color:#fff;cursor:pointer;transition:.2s;border:none}
+.call-card:hover{transform:scale(1.03);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.call-card .icon{font-size:30px}
+.call-card .name{font-weight:700;font-size:14px;margin:6px 0 2px}
+.call-card .info{font-size:11px;opacity:.85}
+.cc-doctor{background:linear-gradient(135deg,#1a5276,#2980b9)}
+.cc-hospital{background:linear-gradient(135deg,#7f1d1d,#dc2626)}
+.cc-family{background:linear-gradient(135deg,#145a32,#16a34a)}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.step-pill{padding:6px 12px;border-radius:16px;font-size:11px;background:var(--blue-bg);color:var(--blue);border:1px solid #93c5fd}
+.step-pill.warn{background:var(--gold-bg);color:var(--gold);border-color:#fde68a}
+.step-pill.red{background:var(--red-bg);color:var(--accent);border-color:#fca5a5}
+.btn{display:inline-block;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;color:#fff}
+.btn.red{background:var(--accent)}
+.btn.green{background:var(--green)}
+.btn.blue{background:var(--blue)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js" defer></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script src="js/seed-loader.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="tcm">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">紧急救助</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>全部角色</b></span><span class="std-tag">⚙️ 功能 <b>居家紧急救助</b></span><span class="std-tag">💎 使用价值 <b>危险症状识别→一键呼叫医生/120/家属</b></span></div>
+<div class="header">
+  <h1>🚨 居家紧急救助 · 智能机器人联动</h1>
+  <div style="font-size:11px;opacity:.7">危险症状识别 → 一键呼叫医生/医院/家属</div>
+</div>
+<div class="container">
+  <!-- 症状输入 -->
+  <div class="card">
+    <h3>🔍 输入/点选症状（机器人人机交互采集）</h3>
+    <textarea class="input" id="emer-input" placeholder="例如：胸口剧痛，大汗淋漓，呼吸困难，意识模糊..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;min-height:60px"></textarea>
+    <div style="margin-top:8px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:4px">或点选：</div>
+      <div class="steps">
+        <span class="step-pill red" onclick="addEmer('胸痛')">胸痛</span>
+        <span class="step-pill red" onclick="addEmer('呼吸困难')">呼吸困难</span>
+        <span class="step-pill red" onclick="addEmer('意识模糊')">意识模糊</span>
+        <span class="step-pill red" onclick="addEmer('大汗淋漓')">大汗淋漓</span>
+        <span class="step-pill red" onclick="addEmer('剧烈头痛')">剧烈头痛</span>
+        <span class="step-pill warn" onclick="addEmer('高热')">高热</span>
+        <span class="step-pill warn" onclick="addEmer('呕血')">呕血</span>
+        <span class="step-pill warn" onclick="addEmer('抽搐')">抽搐</span>
+        <span class="step-pill warn" onclick="addEmer('严重外伤')">严重外伤</span>
+      </div>
+    </div>
+    <div style="margin-top:10px"><button class="btn red" onclick="detectEmergency()">🚨 检测紧急程度</button></div>
+  </div>
+
+  <!-- 检测结果 -->
+  <div id="emer-result"></div>
+
+  <!-- 一键呼叫面板 -->
+  <div id="call-panel" style="display:none">
+    <div class="card">
+      <h3>📞 一键呼叫（居家机器人联动）</h3>
+      <div class="call-grid">
+        <div class="call-card cc-doctor" onclick="callContact('doctor')">
+          <div class="icon">🩺</div>
+          <div class="name">值班医生</div>
+          <div class="info" id="info-doctor">加载中...</div>
+        </div>
+        <a class="call-card cc-hospital" href="tel:120" style="text-decoration:none;display:block">
+          <div class="icon">🏥</div>
+          <div class="name">急救中心 120</div>
+          <div class="info">24小时 · 紧急救护</div>
+        </a>
+        <div class="call-card cc-family" onclick="callContact('family')">
+          <div class="icon">👨‍👩‍👧</div>
+          <div class="name">通知家属</div>
+          <div class="info" id="info-family">SOS 推送紧急联系人</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 值班医生由排班系统实时推导；家属通知走 SOS 推送通道；危重情况请直接拨打 120</div>
+    </div>
+
+    <!-- 急救指引 -->
+    <div class="card">
+      <h3>⛑️ 急救指引</h3>
+      <div id="first-aid" style="font-size:12px;line-height:1.8"></div>
+    </div>
+  </div>
+
+  <!-- R817: 院内应急处置规程库 -->
+  <div class="card">
+    <h3>📖 应急处置规程库 <span style="font-size:10px;color:var(--text3);font-weight:normal">针灸应急 · 药物中毒 · 过敏 · 转诊红旗</span></h3>
+    <input class="input" id="proto-q" placeholder="🔍 检索：如 乌头 / 晕针 / 过敏 / 胸痛..." style="width:100%;padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:8px" oninput="searchProtocols(this.value)">
+    <div id="proto-list" style="font-size:12px"></div>
+  </div>
+
+  <!-- R817: 今日值班 / 周末快速响应面板 -->
+  <div class="card">
+    <h3>🗓 今日值班 · 快速响应</h3>
+    <div id="oncall-panel" style="font-size:12px;line-height:2">加载中...</div>
+  </div>
+
+  <!-- R817: 应急台账 + 响应统计 -->
+  <div class="card">
+    <h3>📊 应急台账 · 响应时长统计</h3>
+    <div id="emerg-stats" style="font-size:12px;margin-bottom:8px">加载中...</div>
+    <div id="emerg-events" style="font-size:12px;max-height:220px;overflow-y:auto"></div>
+  </div>
+</div>
+
+<script>
+// ═══ 危险症状分级 ═══
+var CRITICAL_PATTERNS = [
+  ['胸痛|胸口痛|胸口剧痛|心前区|压榨样', '疑似心梗 — 立即拨打120，保持患者静卧'],
+  ['呼吸困难|喘不上气|窒息', '呼吸急症 — 保持呼吸道通畅，侧卧防误吸'],
+  ['意识模糊|昏迷|叫不醒', '意识障碍 — 检查呼吸脉搏，必要时心肺复苏'],
+  ['大汗淋漓|冷汗', '休克征兆 — 平卧抬高下肢，保暖'],
+  ['剧烈头痛|炸裂样', '疑似脑出血 — 头部抬高，避免搬动'],
+  ['呕血|吐血', '消化道出血 — 禁食禁水，侧卧防窒息']
+];
+var WARNING_PATTERNS = [
+  ['高热|高烧', '高热 — 物理降温，多饮水，超过39℃就医'],
+  ['抽搐|惊厥', '抽搐 — 移开危险物，侧卧，勿塞物入口'],
+  ['严重外伤|流血不止', '外伤 — 加压止血，抬高患肢'],
+  ['农药|中毒|误服', '中毒 — 保留样本，尽快送医']
+];
+
+var detected = { critical: [], warning: [] };
+
+function addEmer(t) {
+  var ta = document.getElementById('emer-input');
+  ta.value = ta.value ? ta.value + '，' + t : t;
+}
+
+function detectEmergency() {
+  var text = document.getElementById('emer-input').value.trim();
+  if (!text) return toast('请描述症状');
+
+  detected = { critical: [], warning: [] };
+  for (var i = 0; i < CRITICAL_PATTERNS.length; i++) {
+    if (new RegExp(CRITICAL_PATTERNS[i][0]).test(text)) detected.critical.push(CRITICAL_PATTERNS[i][1]);
+  }
+  for (var j = 0; j < WARNING_PATTERNS.length; j++) {
+    if (new RegExp(WARNING_PATTERNS[j][0]).test(text)) detected.warning.push(WARNING_PATTERNS[j][1]);
+  }
+
+  var level = detected.critical.length ? 'CRITICAL' : detected.warning.length ? 'WARNING' : 'ROUTINE';
+  renderResult(level);
+}
+
+function renderResult(level) {
+  var html = '';
+  if (level === 'CRITICAL') {
+    html += '<div class="alert-detect" style="border-color:var(--accent);background:var(--red-bg)">' +
+      '<strong style="color:var(--accent);font-size:14px">🔴 紧急！检测到危险症状</strong>' +
+      '<div style="margin-top:6px">' + detected.critical.map(function(c){ return '<div style="padding:2px 0">• ' + c + '</div>'; }).join('') + '</div>' +
+      '<div style="margin-top:6px;font-size:11px" id="emer-evt-hint">⏱️ 正在登记应急事件并通知值班医生...</div></div>';
+    document.getElementById('call-panel').style.display = 'block';
+    renderFirstAid(detected.critical);
+  } else if (level === 'WARNING') {
+    html += '<div class="alert-detect" style="border-color:var(--gold);background:var(--gold-bg)">' +
+      '<strong style="color:var(--gold);font-size:14px">🟡 注意！建议尽快就医</strong>' +
+      '<div style="margin-top:6px">' + detected.warning.map(function(c){ return '<div style="padding:2px 0">• ' + c + '</div>'; }).join('') + '</div>' +
+      '<div style="margin-top:6px;font-size:11px" id="emer-evt-hint">建议联系值班医生咨询或前往医院</div></div>';
+    document.getElementById('call-panel').style.display = 'block';
+    renderFirstAid(detected.warning);
+  } else {
+    html += '<div class="alert-detect" style="border-color:var(--green);background:var(--green-bg)">' +
+      '<strong style="color:var(--green)">🟢 未检测到紧急危险信号</strong>' +
+      '<div style="margin-top:4px;font-size:11px">可继续观察或预约就诊。若症状持续加重，请立即就医。</div></div>';
+    document.getElementById('call-panel').style.display = 'none';
+  }
+  document.getElementById('emer-result').innerHTML = html;
+
+  // R817：应急事件登记走服务端真台账，离线才回退本地
+  var symptoms = document.getElementById('emer-input').value;
+  fetch('/api/emergency/event', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ level: level, symptoms: symptoms, source: 'emergency-page' }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (d.ok) {
+        var hint = document.getElementById('emer-evt-hint');
+        if (hint && level !== 'ROUTINE') hint.textContent = '✅ 事件 ' + d.event.id + ' 已入台账，值班医生可见并签收计时';
+        loadEmergEvents();
+      } else { throw new Error(d.error || 'failed'); }
+    }).catch(function() {
+      var log = JSON.parse(localStorage.getItem('tcm_emergency_log') || '[]');
+      log.unshift({ time: new Date().toISOString(), level: level, symptoms: symptoms, offline: true });
+      localStorage.setItem('tcm_emergency_log', JSON.stringify(log.slice(0, 50)));
+      var hint = document.getElementById('emer-evt-hint');
+      if (hint && level !== 'ROUTINE') hint.textContent = '📡 服务离线 · 事件已本地暂存，危重请直接拨打 120';
+    });
+}
+
+function renderFirstAid(advices) {
+  var html = '<ol style="padding-left:18px">';
+  var base = ['保持冷静，安抚患者', '立即拨打急救电话或呼叫家属', '不要随意搬动患者（除非处于危险环境）', '记录发病时间和症状变化'];
+  var all = base.concat(advices);
+  for (var i = 0; i < all.length; i++) {
+    html += '<li>' + all[i] + '</li>';
+  }
+  html += '</ol>';
+  document.getElementById('first-aid').innerHTML = html;
+}
+
+var ONCALL = null;
+
+function callContact(type) {
+  if (type === 'doctor') {
+    var oc = ONCALL && ONCALL.oncall;
+    toast(oc ? ('📞 值班医生：' + oc.name + ' · ' + (oc.specialty_name||'') + '（' + oc.mode + '）— 请到工作站或电话联系') : '📞 值班信息加载中，请稍后');
+  } else if (type === 'family') {
+    if (window.triggerSOS) window.triggerSOS();
+    else toast('SOS 通道不可用，请直接电话联系家属', 'warn');
+  }
+}
+
+/* ═══ R817: 今日值班 / 周末快速响应 ═══ */
+function loadOncall() {
+  fetch('/api/emergency/oncall').then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) return;
+    ONCALL = d;
+    var oc = d.oncall;
+    if (oc) document.getElementById('info-doctor').textContent = oc.name + ' · ' + (oc.specialty_name || '值班');
+    var html = '';
+    if (d.weekend) html += '<div class="alert-detect" style="border-color:var(--gold);background:var(--gold-bg)">🗓 <strong>周末快速响应模式</strong> — ' + escHtml2(d.note || '') + '</div>';
+    if (d.duty && d.duty.length) {
+      html += '<div>今日在岗：' + d.duty.map(function(x){ return '<strong>' + x.avatar + ' ' + x.name + '</strong>（' + x.specialty_name + ' · ' + x.slots.join('/') + ' · ' + x.mode + '）'; }).join('、') + '</div>';
+    } else if (oc) {
+      html += '<div>今日无固定排班 → <strong style="color:var(--accent)">' + oc.avatar + ' ' + oc.name + '</strong>（' + oc.specialty_name + '）轮换值班 on-call，SLA ' + Math.round(d.sla_seconds/60) + ' 分钟</div>';
+    }
+    document.getElementById('oncall-panel').innerHTML = html || '暂无排班数据';
+  }).catch(function(){ document.getElementById('oncall-panel').textContent = '📡 值班服务离线'; });
+}
+
+/* ═══ R817: 应急规程库 ═══ */
+var protoTimer = null;
+function searchProtocols(q) {
+  clearTimeout(protoTimer);
+  protoTimer = setTimeout(function() {
+    fetch('/api/emergency/protocols' + (q ? '?q=' + encodeURIComponent(q) : '')).then(function(r){ return r.json(); }).then(function(d) {
+      if (!d.ok) return;
+      document.getElementById('proto-list').innerHTML = d.protocols.length ? d.protocols.map(function(p) {
+        return '<details style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:6px 0">' +
+          '<summary style="cursor:pointer;font-weight:700">🚑 ' + p.title + ' <span style="font-size:10px;color:var(--text3);font-weight:normal">' + p.category + '</span></summary>' +
+          '<div style="margin-top:6px;line-height:1.9">' +
+          '<div><strong>识别：</strong>' + p.recognition + '</div>' +
+          '<div><strong>处置：</strong><ol style="padding-left:18px;margin:4px 0">' + p.steps.map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol></div>' +
+          '<div style="color:var(--accent)"><strong>禁忌：</strong>' + p.forbidden + '</div>' +
+          '<div style="color:var(--accent)"><strong>转诊指征：</strong>' + p.referral + '</div>' +
+          (p.prevention ? '<div style="color:var(--text3)"><strong>预防：</strong>' + p.prevention + '</div>' : '') +
+          '</div></details>';
+      }).join('') : '<div style="color:var(--text3);padding:8px">未匹配到规程，危重情况直接拨打 120</div>';
+    }).catch(function(){ document.getElementById('proto-list').textContent = '📡 规程库离线'; });
+  }, 250);
+}
+
+/* ═══ R817: 应急台账 + 响应统计 ═══ */
+function loadEmergEvents() {
+  fetch('/api/emergency/events').then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) return;
+    var s = d.stats || {};
+    var fmt = function(sec){ return sec == null ? '—' : (sec >= 60 ? Math.round(sec/60) + ' 分钟' : sec + ' 秒'); };
+    document.getElementById('emerg-stats').innerHTML =
+      '共 ' + d.total + ' 起（🔴' + s.by_level.CRITICAL + ' 🟡' + s.by_level.WARNING + ' 🟢' + s.by_level.ROUTINE + '）· 待签收 ' + d.pending +
+      ' · 平均响应 <strong>' + fmt(s.avg_response_seconds) + '</strong> · SLA 达成率 <strong>' + (s.sla_rate == null ? '—' : s.sla_rate + '%') + '</strong>' +
+      ' · 周末：' + s.weekend_total + ' 起 / 平均 ' + fmt(s.weekend_avg_response_seconds) + ' / SLA ' + (s.weekend_sla_rate == null ? '—' : s.weekend_sla_rate + '%');
+    var lv = { CRITICAL: '🔴', WARNING: '🟡', ROUTINE: '🟢' };
+    document.getElementById('emerg-events').innerHTML = d.list.length ? d.list.map(function(e) {
+      var resp = e.status === 'responded'
+        ? '✅ ' + (e.responder || '') + ' · 响应 ' + fmt(e.response_seconds) + (e.within_sla ? '' : ' <span style="color:var(--accent)">超SLA</span>')
+        : '<button class="btn green" style="padding:4px 12px;font-size:11px" onclick="respondEvent(\'' + e.id + '\')">签收</button>';
+      return '<div style="border-bottom:1px solid var(--border);padding:6px 0">' +
+        (lv[e.level] || '⚪') + ' ' + (e.created_at || '').slice(5, 16).replace('T', ' ') + (e.weekend ? ' <span style="color:var(--gold)">周末</span>' : '') +
+        ' · ' + (e.symptoms ? String(e.symptoms).slice(0, 40) : '—') + ' · ' + resp + '</div>';
+    }).join('') : '<div style="color:var(--text3);padding:8px">暂无应急事件</div>';
+  }).catch(function(){ document.getElementById('emerg-stats').textContent = '📡 台账服务离线'; });
+}
+
+function respondEvent(id) {
+  fetch('/api/emergency/respond', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (d.ok) { toast('✅ 已签收 · 响应 ' + d.event.response_seconds + ' 秒'); loadEmergEvents(); }
+      else toast('签收失败：' + (d.error || ''), 'warn');
+    }).catch(function(){ toast('网络错误', 'warn'); });
+}
+
+function escHtml2(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+// 初始化
+loadOncall();
+searchProtocols('');
+loadEmergEvents();
+setInterval(loadEmergEvents, 30000);
+
+</script>
+<script>window.triggerSOS=function(){fetch("/api/wechat/sos",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({patient:"紧急患者",message:"SOS求助"})}).then(r=>r.json()).then(d=>{toast("🚨 SOS已发送 · 3位家属已通知 · 事件#"+d.total);}).catch(e=>toast("🚨 SOS本地已记录 · 请拨打120"));};</script><script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/privacy-consent.js"></script>
+<script src="js/desktop-hud.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>

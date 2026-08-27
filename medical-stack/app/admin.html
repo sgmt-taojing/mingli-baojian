@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/admin.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>患者管理 · 命理宝鉴·医道</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>📊</text></svg>">
+<style>
+:root{
+  --bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;
+  --accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;
+  --text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;
+  --red-bg:#fef2f2;--green-bg:#f0fdf4;--blue-bg:#eff6ff;--gold-bg:#fffbeb;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:12px}
+
+/* Header */
+.admin-header{background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.admin-header h1{font-size:20px;letter-spacing:2px}
+.admin-header .nav-links{display:flex;gap:12px}
+.admin-header a{color:rgba(255,255,255,.7);font-size:12px;text-decoration:none;padding:4px 10px;border-radius:6px}
+.admin-header a:hover,.admin-header a.active{background:rgba(255,255,255,.15);color:#fff}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+@media(max-width:768px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--card);border-radius:10px;padding:14px;text-align:center;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.stat-card .stat-value{font-size:28px;font-weight:700;color:var(--primary)}
+.stat-card .stat-label{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-card.p0 .stat-value{color:var(--accent)}
+.stat-card.p1 .stat-value{color:var(--gold)}
+.stat-card.p2 .stat-value{color:var(--blue)}
+.stat-card.p3 .stat-value{color:var(--green)}
+
+/* Search */
+.search-bar{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.search-input{flex:1;min-width:200px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--card)}
+.search-input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(107,58,31,.1)}
+.filter-select{padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--card);color:var(--text)}
+
+/* Table */
+.table-wrap{background:var(--card);border-radius:10px;border:1px solid var(--border);overflow-x:auto;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#faf8f5;padding:10px 8px;text-align:left;font-weight:600;color:var(--text2);border-bottom:2px solid var(--border);font-size:12px;white-space:nowrap}
+td{padding:8px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:hover{background:var(--bg)}
+tr.archived{opacity:.4}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.badge.p0{background:var(--red-bg);color:var(--accent)}
+.badge.p1{background:var(--gold-bg);color:var(--gold)}
+.badge.p2{background:var(--blue-bg);color:var(--blue)}
+.badge.p3{background:var(--green-bg);color:var(--green)}
+
+/* Pagination */
+.pagination{display:flex;justify-content:center;align-items:center;gap:4px;margin:16px 0}
+.page-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);cursor:pointer;color:var(--text)}
+.page-btn:hover{background:var(--bg)}
+.page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
+.page-info{font-size:12px;color:var(--text3);margin:0 8px}
+
+/* Buttons */
+.btn{display:inline-block;padding:8px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.2s}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.secondary{background:var(--bg);color:var(--primary);border:1px solid var(--border)}
+.btn.accent{background:var(--accent);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.small{padding:4px 10px;font-size:11px}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:999;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:12px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;padding:20px}
+.modal h3{font-size:16px;color:var(--primary);margin-bottom:12px}
+.modal .close-btn{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)}
+.modal-card{background:var(--card);border-radius:12px;max-width:600px;width:90%;max-height:85vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:16px;color:var(--primary);margin:0}
+.modal-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--text3);padding:0 4px}
+.modal-close:hover{color:var(--accent)}
+.modal-body{padding:20px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--border)}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:600}
+.form-row input,.form-row select,.form-row textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;background:var(--card);color:var(--text)}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(107,58,31,.1)}
+.form-row-2{display:flex;gap:12px}
+.form-row-2>div{flex:1}
+.switch-label{display:inline-flex;align-items:center;gap:6px;font-weight:400!important;cursor:pointer}
+.mini-btn{padding:2px 6px;font-size:11px;border-radius:4px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--text2)}
+.mini-btn:hover{border-color:var(--primary);color:var(--primary)}
+.mini-btn.danger:hover{border-color:var(--accent);color:var(--accent)}
+
+/* QR section */
+.qr-section{text-align:center;padding:16px;margin-top:12px;border-top:1px solid var(--border)}
+.qr-section canvas{display:inline-block}
+.qr-url{font-size:11px;color:var(--text3);word-break:break-all;margin-top:8px}
+.copy-btn{cursor:pointer;color:var(--blue);font-size:11px;text-decoration:underline}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999;animation:toastIn .3s}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* Bulk select */
+.bulk-bar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--blue-bg);border-radius:8px;margin-bottom:8px;font-size:12px;display:none}
+.bulk-bar.show{display:flex}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<script src="js/nav.js"></script>
+<script src="js/global-search.js"></script>
+<script src="js/ai-voice-assistant.js"></script>
+<script src="js/rx-loop.js" defer></script>
+<script src="js/seed-loader.js"></script>
+<script src="js/data-engine.js"></script>
+
+<style>
+.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
+.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
+.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
+.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
+.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
+.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
+.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
+.phb-back:hover { color: var(--primary, #b8860b); }
+.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
+.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
+.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
+.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
+.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
+.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
+.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+</style>
+</head>
+<script src="js/smart-search.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/realtime-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<body>
+
+<!-- page-header-bar -->
+<div class="page-header-bar" data-theme="admin">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">患者管理</span>
+</div>
+
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>管理员</b></span><span class="std-tag">⚙️ 功能 <b>患者管理</b></span><span class="std-tag">💎 使用价值 <b>索引/搜索/分页/批量/归档/CSV/QR</b></span></div>
+
+<div class="admin-header">
+  <div>
+    <h1>📊 患者管理</h1>
+    <div style="font-size:11px;opacity:.6;margin-top:4px">命理宝鉴·医道 · 病例索引 · 查询 · 归档 · 扫码查报告</div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">🏥 辨证论治</a>
+    <a href="clinical.html">🔬 四诊采集</a>
+    <a href="admin.html" class="active">📊 患者管理</a>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Stats -->
+  <div id="admin-stats"></div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">总病例</div></div>
+    <div class="stat-card p0"><div class="stat-value" id="stat-p0">0</div><div class="stat-label">🔴 紧急</div></div>
+    <div class="stat-card p1"><div class="stat-value" id="stat-p1">0</div><div class="stat-label">🟡 建议就诊</div></div>
+    <div class="stat-card p3"><div class="stat-value" id="stat-archive">0</div><div class="stat-label">📦 已归档</div></div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input  class="search-input" id="search-input" placeholder="搜索患者ID、主诉、症状、方剂..." oninput="debounceSearch()" aria-label="搜索患者ID、主诉、症状、方剂..." data-validate="required|min=2">
+    <select class="filter-select" id="filter-urgency" onchange="search()">
+      <option value="">全部级别</option>
+      <option value="P0_EMERGENCY">🔴 紧急</option>
+      <option value="P1_SUGGEST_VISIT">🟡 建议就诊</option>
+      <option value="P2_HEALTH_TIP">🟢 健康提示</option>
+      <option value="P3_NORMAL">✅ 正常</option>
+    </select>
+    <select class="filter-select" id="filter-date" onchange="search()">
+      <option value="all">全部时间</option>
+      <option value="today">今天</option>
+      <option value="7d">最近7天</option>
+      <option value="30d">最近30天</option>
+      <option value="90d">最近90天</option>
+      <option value="archived">📦 已归档</option>
+    </select>
+    <select class="filter-select" id="filter-sort" onchange="search()">
+      <option value="newest">最新优先</option>
+      <option value="oldest">最早优先</option>
+      <option value="urgency">紧急优先</option>
+      <option value="name">姓名拼音</option>
+    </select>
+    <button class="btn primary" onclick="search()">🔍 查询</button>
+    <button class="btn secondary" onclick="exportCSV()">📥 导出CSV</button>
+    <button class="btn primary" onclick="addPatient()">➕ 新增患者</button>
+    <button class="btn small secondary" onclick="openSettings()">⚙️ 设置</button>
+  </div>
+
+  <!-- Bulk actions -->
+  <div class="bulk-bar" id="bulk-bar">
+    <span id="bulk-count">已选 0 条</span>
+    <button class="btn small secondary" onclick="selectAll()">全选</button>
+    <button class="btn small secondary" onclick="clearSelect()">取消选择</button>
+    <button class="btn small secondary" onclick="batchArchive()">📦 批量归档</button>
+    <button class="btn small accent" onclick="batchDelete()">🗑️ 批量删除</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:30px"><input  type="checkbox" id="select-all-check" onchange="toggleSelectAll()" aria-label="select all check"></th>
+          <th>ID</th>
+          <th>患者</th>
+          <th>姓名</th>
+          <th>性别</th>
+          <th>年龄</th>
+          <th>主诉</th>
+          <th>紧急</th>
+          <th>方剂</th>
+          <th>时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="case-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination"></div>
+
+  <!-- R811：诊疗记录分页表（Paginator/tb-body 挂载点，原容器从未存在） -->
+  <div class="table-wrap" style="margin-top:16px">
+    <h3 style="font-size:14px;color:var(--primary);margin:0 0 8px">🗂 诊疗记录</h3>
+    <table>
+      <thead><tr><th>患者ID</th><th>姓名</th><th>诊断</th><th>药材</th><th>医生</th><th>日期</th></tr></thead>
+      <tbody id="tb-body"></tbody>
+    </table>
+  </div>
+  <div style="text-align:center;font-size:11px;color:var(--text3);margin-bottom:16px" id="result-info"></div>
+</div>
+
+<!-- Edit/Add Patient Modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeEditModal()">✕</button>
+    <h3 id="edit-modal-title">➕ 新增患者</h3>
+    <form id="edit-form" onsubmit="event.preventDefault();savePatient();">
+      <input  type="hidden" id="edit-id" / aria-label="edit id">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+        <label style="font-size:13px;color:var(--text2);">姓名 *
+          <input  id="edit-name" type="text" required maxlength="20" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin-top:4px;display:block;box-sizing:border-box;" / aria-label="edit name" data-validate="required|min=2">
+        </label>
+        <label style="font-size:13px;color:var(--text2);">患者ID
+          <input  id="edit-pid" type="text" readonly style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin-top:4px;display:block;box-sizing:border-box;background:#f9fafb;" / aria-label="edit pid">
+        </label>
+        <label style="font-size:13px;color:var(--text2);">性别
+          <select id="edit-gender" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin-top:4px;display:block;box-sizing:border-box;">
+            <option value="男">男</option>
+            <option value="女">女</option>
+          </select>
+        </label>
+        <label style="font-size:13px;color:var(--text2);">年龄
+          <input  id="edit-age" type="number" min="0" max="120" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin-top:4px;display:block;box-sizing:border-box;" / aria-label="edit age" data-validate="number">
+        </label>
+        <label style="font-size:13px;color:var(--text2);">联系电话
+          <input  id="edit-phone" type="tel" pattern="[0-9\-+]{6,20}" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin-top:4px;display:block;box-sizing:border-box;" / aria-label="edit phone" data-validate="phone">
+        </label>
+        <label style="font-size:13px;color:var(--text2);">紧急分级
+          <select id="edit-urgency" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin-top:4px;display:block;box-sizing:border-box;">
+            <option value="P3_NORMAL">✅ 正常</option>
+            <option value="P2_HEALTH_TIP">🟢 健康提示</option>
+            <option value="P1_SUGGEST_VISIT">🟡 建议就诊</option>
+            <option value="P0_EMERGENCY">🔴 紧急</option>
+          </select>
+        </label>
+      </div>
+      <label style="display:block;margin-top:12px;font-size:13px;color:var(--text2);">主诉 *
+        <textarea id="edit-complaint" required maxlength="500" rows="3" style="width:100%;padding:8px;border:1px solid #d1d5db;border-radius:6px;margin-top:4px;resize:vertical;display:block;box-sizing:border-box;"></textarea>
+      </label>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;">
+        <button type="button" class="btn small secondary" onclick="closeEditModal()">取消</button>
+        <button type="submit" class="btn small primary">💾 保存</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Settings Modal (可配置化) -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeSettings()">✕</button>
+    <h3>⚙️ 表格设置</h3>
+    <p style="color:var(--text2);font-size:13px;margin-bottom:12px;">个性化你的表格视图（自动保存到本地）</p>
+    <div style="margin-top:12px;">
+      <label style="display:block;margin-bottom:12px;font-size:14px;">每页显示
+        <select id="set-perpage" onchange="applySettings()" style="margin-left:8px;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;">
+          <option value="10">10 条</option>
+          <option value="15">15 条</option>
+          <option value="20">20 条</option>
+          <option value="50">50 条</option>
+        </select>
+      </label>
+      <label style="display:block;margin-bottom:12px;font-size:14px;">默认排序
+        <select id="set-sort" onchange="applySettings()" style="margin-left:8px;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;">
+          <option value="time-desc">时间倒序</option>
+          <option value="time-asc">时间正序</option>
+          <option value="urgency">紧急优先</option>
+          <option value="name">姓名</option>
+        </select>
+      </label>
+      <label style="display:block;margin-bottom:12px;font-size:14px;">
+        <input  type="checkbox" id="set-show-archived" onchange="applySettings()" / aria-label="set show archived">
+        默认显示已归档
+      </label>
+      <label style="display:block;margin-bottom:12px;font-size:14px;">
+        <input  type="checkbox" id="set-confirm-delete" checked / aria-label="set confirm delete">
+        删除前需要二次确认
+      </label>
+      <button class="btn small secondary" onclick="resetSettings()" style="margin-top:8px;">🔄 恢复默认</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <h3>📋 病例详情</h3>
+    <div id="detail-content"></div>
+    <div class="qr-section" id="qr-section"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+// ═══ 全局状态 ═══
+let allCases = [];
+let filteredCases = [];
+let selectedIds = new Set();
+let currentPage = 1;
+const PER_PAGE = 15;
+
+// ═══ 初始化 ═══
+document.addEventListener('DOMContentLoaded', () => {
+  loadCases();
+});
+
+function loadCases() {
+  // 从 localStorage + 内置测试数据
+  const stored = JSON.parse(localStorage.getItem('tcm_clinical_history') || '[]');
+  const localHistory = JSON.parse(localStorage.getItem('tcm_history') || '[]');
+  
+  // 生成演示数据
+  const testData = generateTestData(50);
+  
+  allCases = [...stored.map((r,i) => ({
+    id: 'C' + Date.now().toString(36) + i,
+    patient_id: r.patient_id || 'local-' + i,
+    chief_complaint: r.four_methods?.inquiry?.chief_complaint || '',
+    extracted_terms: (r.extracted_terms || []).join(', '),
+    urgency_level: r.urgency_level || 'P2_HEALTH_TIP',
+    formula_name: r.suggested_formula?.formula || '',
+    formula_source: r.suggested_formula?.source || '',
+    created_at: r.timestamp || new Date().toISOString(),
+    archived: false,
+    four_methods: r.four_methods || {},
+    multischool_opinions: r.kb_multischool_opinions || {}
+  })), ...localHistory.map((r,i) => ({
+    id: 'H' + new Date(r.time).getTime().toString(36),
+    patient_id: 'web-' + (i+1),
+    chief_complaint: r.complaint || '',
+    extracted_terms: '',
+    urgency_level: r.urgency || 'P2',
+    formula_name: r.formula || '',
+    formula_source: '',
+    created_at: r.time || new Date().toISOString(),
+    archived: false
+  })), ...testData];
+
+  // 保存到 localStorage 作为持久化
+  if (allCases.length > 0 && !stored.length && !localHistory.length) {
+    persistCases();
+  }
+
+  updateStats();
+  search();
+}
+
+function generateTestData(count) {
+  const complaints = [
+    '失眠多梦，入睡困难两周', '头痛头晕，血压偏高', '胃痛腹胀，食欲不振',
+    '咳嗽咳痰，胸闷气短', '腰膝酸软，畏寒怕冷', '月经不调，痛经',
+    '便秘一周，口干口苦', '反复感冒，免疫力下降', '心悸胸闷，失眠健忘',
+    '皮肤瘙痒，湿疹反复', '咽喉肿痛，发热恶寒', '关节疼痛，屈伸不利'
+  ];
+  const formulas = ['归脾汤','桂枝汤','小柴胡汤','香砂六君子汤','逍遥散','参苓白术散','八珍汤','六味地黄丸','金匮肾气丸','温胆汤','',''];
+  const urgencies = ['P0_EMERGENCY','P1_SUGGEST_VISIT','P2_HEALTH_TIP','P2_HEALTH_TIP','P2_HEALTH_TIP','P3_NORMAL','P3_NORMAL'];
+  const termsMap = {
+    '失眠多梦': '失眠,多梦,乏力',
+    '头痛头晕': '头痛,头晕',
+    '胃痛腹胀': '腹胀,纳差,胃痛',
+    '咳嗽咳痰': '咳嗽,胸闷',
+    '腰膝酸软': '腰痛,乏力,畏寒',
+    '月经不调': '月经,痛经',
+    '便秘': '便秘,口苦',
+    '反复感冒': '发热,咳嗽',
+    '心悸胸闷': '心悸,失眠',
+    '皮肤瘙痒': '皮肤',
+    '咽喉肿痛': '发热,咽痛',
+    '关节疼痛': '关节痛',
+  };
+
+  const data = [];
+  for (let i = 0; i < count; i++) {
+    const complaint = complaints[i % complaints.length];
+    const terms = Object.entries(termsMap).find(([k]) => complaint.includes(k) || complaint.startsWith(k))?.[1] || '';
+    const daysAgo = (i * 19 + 7) % 180;
+    const date = new Date(Date.now() - daysAgo * 86400000);
+    data.push({
+      id: 'T' + (1000 + i),
+      patient_id: 'P' + (10000 + i),
+      chief_complaint: complaint,
+      extracted_terms: terms,
+      urgency_level: urgencies[i % urgencies.length],
+      formula_name: formulas[i % formulas.length],
+      formula_source: formulas[i % formulas.length] !== '归脾汤' ? '伤寒论' : '',
+      created_at: date.toISOString(),
+      archived: daysAgo > 90
+    });
+  }
+  return data;
+}
+
+function persistCases() {
+  try {
+    localStorage.setItem('tcm_admin_cases', JSON.stringify(allCases.slice(0, 500)));
+  } catch (e) {
+    /* sanitized */
+  }
+}
+
+// ═══ 统计 ═══
+function updateStats() {
+  document.getElementById('stat-total').textContent = allCases.length;
+  document.getElementById('stat-p0').textContent = allCases.filter(c => c.urgency_level === 'P0_EMERGENCY').length;
+  document.getElementById('stat-p1').textContent = allCases.filter(c => c.urgency_level === 'P1_SUGGEST_VISIT').length;
+  document.getElementById('stat-archive').textContent = allCases.filter(c => c.archived).length;
+}
+
+// ═══ 搜索/过滤 ═══
+let searchTimer;
+function debounceSearch() {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(search, 300);
+}
+
+function search() {
+  const q = (document.getElementById('search-input').value || '').toLowerCase();
+  const urgency = document.getElementById('filter-urgency').value;
+  const dateFilter = document.getElementById('filter-date').value;
+  const sort = document.getElementById('filter-sort').value;
+
+  filteredCases = allCases.filter(c => {
+    if (c.archived && dateFilter !== 'archived' && dateFilter !== 'all') return false;
+    if (dateFilter === 'archived') return c.archived;
+    if (!c.archived && dateFilter === 'archived') return false;
+    if (urgency && c.urgency_level !== urgency) return false;
+
+    // 时间过滤
+    if (dateFilter === 'today') {
+      const today = new Date().toDateString();
+      if (new Date(c.created_at).toDateString() !== today) return false;
+    } else if (dateFilter === '7d') {
+      if (Date.now() - new Date(c.created_at).getTime() > 7*86400000) return false;
+    } else if (dateFilter === '30d') {
+      if (Date.now() - new Date(c.created_at).getTime() > 30*86400000) return false;
+    } else if (dateFilter === '90d') {
+      if (Date.now() - new Date(c.created_at).getTime() > 90*86400000) return false;
+    }
+
+    // 关键词搜索（姓名/性别/年龄/主诉/症状/方剂全字段）
+    if (q) {
+      const ageStr = c.age ? String(c.age) : '';
+      return (c.chief_complaint || '').toLowerCase().includes(q) ||
+             (c.extracted_terms || '').toLowerCase().includes(q) ||
+             (c.patient_id || '').toLowerCase().includes(q) ||
+             (c.formula_name || '').toLowerCase().includes(q) ||
+             (c.id || '').toLowerCase().includes(q) ||
+             (c.name || '').toLowerCase().includes(q) ||
+             (c.gender || '').toLowerCase().includes(q) ||
+             (c.phone || '').toLowerCase().includes(q) ||
+             ageStr.includes(q);
+    }
+    return true;
+  });
+
+  // 排序
+  if (sort === 'oldest') filteredCases.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+  else if (sort === 'urgency') {
+    const order = {'P0_EMERGENCY':0,'P1_SUGGEST_VISIT':1,'P2_HEALTH_TIP':2,'P3_NORMAL':3};
+    filteredCases.sort((a,b) => (order[a.urgency_level]||9) - (order[b.urgency_level]||9));
+  } else if (sort === 'name') filteredCases.sort((a,b) => (a.name||'').localeCompare(b.name||'', 'zh-CN'));
+  else filteredCases.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+
+  // 加载表格设置
+  loadSettings();
+
+  currentPage = 1;
+  selectedIds.clear();
+  initPage();
+  renderPagination();
+  document.getElementById('bulk-bar').classList.remove('show');
+}
+
+// ═══ 表格渲染 ═══
+var adminPage = null;
+function initPage() { try { adminPage = new Paginator("tb-body", createPage("tcm_patient_records", { pageSize: 20 }), renderRows); adminPage.render(); } catch(e) { renderTable(); } }
+function renderRows(rows, info) {
+  var html = "";
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    html += "<tr><td>" + (r.patient_id||"") + "</td><td>" + (r.patient_name||"") + "</td><td>" + (r.diagnosis||"") + "</td><td>" + ((r.herbs||[]).map(function(h){return h.name}).join(", ")||"") + "</td><td>" + (r.doctor||"") + "</td><td style='font-size:10px;color:var(--text3)'>" + (r.created_at||"").slice(0,10) + "</td></tr>";
+  }
+  var el = document.getElementById("tb-body");
+  if (el) { el.innerHTML = html; }
+}
+
+function renderTable() {
+  const start = (currentPage - 1) * PER_PAGE;
+  const page = filteredCases.slice(start, start + PER_PAGE);
+  const tbody = document.getElementById('case-tbody');
+
+  if (!page.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text3)">无匹配病例<br><br><button class="btn primary" onclick="addPatient()">➕ 新增第一位患者</button></td></tr>';
+    return;
+  }
+
+  const urgencyLabels = {
+    'P0_EMERGENCY': ['🔴 紧急','p0'],
+    'P1_SUGGEST_VISIT': ['🟡 就诊','p1'],
+    'P2_HEALTH_TIP': ['🟢 提示','p2'],
+    'P3_NORMAL': ['✅ 正常','p3']
+  };
+
+  tbody.innerHTML = page.map(c => `
+    <tr class="${c.archived ? 'archived' : ''}">
+      <td><input  type="checkbox" ${selectedIds.has(c.id) ? 'checked' : ''} onchange="toggleSelect('${c.id}', this.checked)" aria-label="field"></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--text3)">${c.id.slice(-6)}</td>
+      <td style="font-size:11px">${c.patient_id}</td>
+      <td style="font-weight:600">${esc(c.name || '-')}</td>
+      <td style="font-size:11px;color:var(--text2)">${esc(c.gender || '-')}</td>
+      <td style="font-size:11px;color:var(--text2);text-align:center">${c.age || '-'}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(c.chief_complaint)}">${esc(c.chief_complaint.substring(0, 25))}${c.chief_complaint.length > 25 ? '...' : ''}</td>
+      <td><span class="badge ${(urgencyLabels[c.urgency_level]||['',''])[1]}">${(urgencyLabels[c.urgency_level]||['?'])[0]}</span></td>
+      <td style="font-size:11px;color:var(--green)">${c.formula_name ? '💊 '+esc(c.formula_name) : '-'}</td>
+      <td style="font-size:10px;color:var(--text3);white-space:nowrap">${formatDate(c.created_at)}</td>
+      <td>
+        <div class="btn-row">
+          <button class="btn small secondary" onclick="viewDetail('${c.id}')">查看</button>
+          <button class="btn small primary" onclick="editPatient('${c.id}')">编辑</button>
+          <button class="btn small secondary" onclick="toggleArchive('${c.id}')">${c.archived ? '还原' : '归档'}</button>
+          <button class="btn small accent" onclick="deletePatient('${c.id}')">删除</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  document.getElementById('result-info').textContent = 
+    `共 ${filteredCases.length} 条记录 · 第 ${currentPage}/${Math.ceil(filteredCases.length/PER_PAGE) || 1} 页`;
+}
+
+// ═══ 分页 ═══
+function renderPagination() {
+  const total = Math.ceil(filteredCases.length / PER_PAGE) || 1;
+  let html = '';
+  html += `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ 上一页</button>`;
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || Math.abs(i - currentPage) < 3) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if (Math.abs(i - currentPage) === 3) {
+      html += '<span style="padding:0 4px;color:var(--text3)">...</span>';
+    }
+  }
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===total?'disabled':''}>下一页 ›</button>`;
+  html += `<span class="page-info">共 ${total} 页</span>`;
+  document.getElementById('pagination').innerHTML = html;
+}
+
+function goPage(n) {
+  const total = Math.ceil(filteredCases.length / PER_PAGE) || 1;
+  if (n < 1 || n > total) return;
+  currentPage = n;
+  initPage();
+}
+
+// ═══ 选择 ═══
+function toggleSelect(id, checked) {
+  checked ? selectedIds.add(id) : selectedIds.delete(id);
+  updateBulkBar();
+}
+
+function toggleSelectAll() {
+  const checked = document.getElementById('select-all-check').checked;
+  const start = (currentPage - 1) * PER_PAGE;
+  const page = filteredCases.slice(start, start + PER_PAGE);
+  if (checked) page.forEach(c => selectedIds.add(c.id));
+  else page.forEach(c => selectedIds.delete(c.id));
+  updateBulkBar();
+  initPage();
+}
+
+function selectAll() {
+  filteredCases.forEach(c => selectedIds.add(c.id));
+  updateBulkBar();
+  initPage();
+}
+
+function clearSelect() {
+  selectedIds.clear();
+  document.getElementById('select-all-check').checked = false;
+  updateBulkBar();
+  initPage();
+}
+
+function updateBulkBar() {
+  const bar = document.getElementById('bulk-bar');
+  if (selectedIds.size > 0) {
+    bar.classList.add('show');
+    document.getElementById('bulk-count').textContent = `已选 ${selectedIds.size} 条`;
+  } else {
+    bar.classList.remove('show');
+  }
+}
+
+async function batchArchive() {
+  if (!selectedIds.size) return;
+  if (!await (window.confirmModal ? confirmModal(`确认归档 ${selectedIds.size} 条病例？`) : Promise.resolve(confirm(`确认归档 ${selectedIds.size} 条病例？`)))) return;
+  allCases.forEach(c => { if (selectedIds.has(c.id)) c.archived = true; });
+  selectedIds.clear();
+  persistCases();
+  updateStats();
+  search();
+  toast('✅ 已归档');
+}
+
+async function batchDelete() {
+  if (!selectedIds.size) return;
+  if (!await (window.confirmModal ? confirmModal(`⚠️ 确认永久删除 ${selectedIds.size} 条病例？此操作不可撤销！`, { danger:true, okText:'永久删除' }) : Promise.resolve(confirm(`⚠️ 确认永久删除 ${selectedIds.size} 条病例？此操作不可撤销！`)))) return;
+  allCases = allCases.filter(c => !selectedIds.has(c.id));
+  selectedIds.clear();
+  persistCases();
+  updateStats();
+  search();
+  toast('🗑️ 已删除');
+}
+
+function toggleArchive(id) {
+  const c = allCases.find(c => c.id === id);
+  if (c) { c.archived = !c.archived; persistCases(); search(); }
+}
+
+// ═══ 详情+扫码 ═══
+function viewDetail(id) {
+  const c = allCases.find(c => c.id === id);
+  if (!c) return;
+
+  const urgencyLabels = {P0_EMERGENCY:'🔴 紧急就医',P1_SUGGEST_VISIT:'🟡 建议就诊',P2_HEALTH_TIP:'🟢 健康提示',P3_NORMAL:'✅ 正常'};
+  
+  let html = '';
+  html += `<p><strong>病例ID:</strong> ${c.id}</p>`;
+  html += `<p><strong>患者ID:</strong> ${c.patient_id}</p>`;
+  html += `<p><strong>时间:</strong> ${formatDateTime(c.created_at)}</p>`;
+  html += `<p><strong>紧急分级:</strong> ${urgencyLabels[c.urgency_level] || c.urgency_level}</p>`;
+  html += `<p><strong>主诉:</strong> ${esc(c.chief_complaint)}</p>`;
+  if (c.extracted_terms) html += `<p><strong>提取症状:</strong> ${esc(c.extracted_terms)}</p>`;
+  if (c.formula_name) html += `<p><strong>参考方剂:</strong> 💊 ${esc(c.formula_name)}（${esc(c.formula_source)}）</p>`;
+  if (c.archived) html += `<p style="color:var(--text3)">📦 已归档</p>`;
+
+  document.getElementById('detail-content').innerHTML = html;
+
+  // 生成扫码URL
+  const reportUrl = `${location.origin}${location.pathname.replace('admin.html','')}report.html?id=${id}`;
+  document.getElementById('qr-section').innerHTML = `
+    <div style="margin-top:16px"><strong>📱 患者扫码查报告</strong></div>
+    <div id="qr-code" style="display:inline-block;margin:12px 0"></div>
+    <div class="qr-url" id="qr-url-text">${reportUrl}</div>
+    <span class="copy-btn" onclick="copyReportUrl()">📋 复制链接</span>
+  `;
+
+  document.getElementById('detail-modal').classList.add('show');
+
+  // 生成二维码
+  setTimeout(() => {
+    const qrEl = document.getElementById('qr-code');
+    if (qrEl && typeof QRCode !== 'undefined') {
+      qrEl.innerHTML = '';
+      new QRCode(qrEl, { text: reportUrl, width: 160, height: 160 });
+    }
+  }, 100);
+}
+
+function closeModal() {
+  document.getElementById('detail-modal').classList.remove('show');
+}
+
+function copyReportUrl() {
+  const url = document.getElementById('qr-url-text')?.textContent || '';
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => toast('✅ 链接已复制'));
+  } else {
+    toast('链接: ' + url);
+  }
+}
+
+// ═══ 导出CSV ═══
+function exportCSV() {
+  const data = filteredCases.length > 0 ? filteredCases : allCases;
+  const header = '病例ID,患者ID,主诉,提取症状,紧急级别,方剂,出处,时间,归档\n';
+  const rows = data.map(c => [
+    c.id, c.patient_id, `"${(c.chief_complaint||'').replace(/"/g,'""')}"`,
+    c.extracted_terms, c.urgency_level, c.formula_name, c.formula_source,
+    c.created_at, c.archived ? '是':'否'
+  ].join(',')).join('\n');
+  
+  const blob = new Blob(['\uFEFF' + header + rows], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `tcm-cases-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('✅ CSV导出完成');
+}
+
+// ═══ 工具 ═══
+function formatDate(d) {
+  const dt = new Date(d);
+  return dt.toLocaleDateString('zh-CN',{month:'2-digit',day:'2-digit'}) + ' ' + 
+         dt.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+}
+
+function formatDateTime(d) {
+  return new Date(d).toLocaleString('zh-CN');
+}
+
+// 键盘快捷键
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.ctrlKey && e.key === 'f') { e.preventDefault(); document.getElementById('search-input').focus(); }
+  if (e.ctrlKey && e.key === 'n') { e.preventDefault(); addPatient(); }
+});
+
+// ═══ CRUD：增 ═══
+function addPatient() {
+  const modal = document.getElementById('patient-modal');
+  document.getElementById('modal-title').textContent = '➕ 新增患者';
+  document.getElementById('edit-id').value = '';
+  document.getElementById('form-name').value = '';
+  document.getElementById('form-gender').value = '男';
+  document.getElementById('form-age').value = '';
+  document.getElementById('form-phone').value = '';
+  document.getElementById('form-id').value = '';
+  document.getElementById('form-complaint').value = '';
+  document.getElementById('form-formula').value = '';
+  document.getElementById('form-urgency').value = 'P3_NORMAL';
+  modal.classList.add('show');
+  setTimeout(() => document.getElementById('form-name').focus(), 100);
+}
+
+// ═══ CRUD：改 ═══
+function editPatient(id) {
+  const c = allCases.find(x => x.id === id);
+  if (!c) return toast('未找到记录');
+  const modal = document.getElementById('patient-modal');
+  document.getElementById('modal-title').textContent = '✏️ 编辑患者';
+  document.getElementById('edit-id').value = id;
+  document.getElementById('form-name').value = c.name || '';
+  document.getElementById('form-gender').value = c.gender || '男';
+  document.getElementById('form-age').value = c.age || '';
+  document.getElementById('form-phone').value = c.phone || '';
+  document.getElementById('form-id').value = c.patient_id || '';
+  document.getElementById('form-complaint').value = c.chief_complaint || '';
+  document.getElementById('form-formula').value = c.formula_name || '';
+  document.getElementById('form-urgency').value = c.urgency_level || 'P3_NORMAL';
+  modal.classList.add('show');
+  setTimeout(() => document.getElementById('form-name').focus(), 100);
+}
+
+// ═══ CRUD：保存 ═══
+function savePatient() {
+  // R743 修真——提交前统一校验（uiStates.validateInputs）
+  if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
+    var _vr = uiStates.validateInputs(document);
+    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+  }
+
+  const editId = document.getElementById('edit-id').value;
+  const data = {
+    name: document.getElementById('form-name').value.trim(),
+    gender: document.getElementById('form-gender').value,
+    age: parseInt(document.getElementById('form-age').value) || null,
+    phone: document.getElementById('form-phone').value.trim(),
+    patient_id: document.getElementById('form-id').value.trim() || ('P' + Date.now().toString(36)),
+    chief_complaint: document.getElementById('form-complaint').value.trim(),
+    formula_name: document.getElementById('form-formula').value.trim(),
+    urgency_level: document.getElementById('form-urgency').value
+  };
+  if (!data.name) return toast('⚠️ 请输入姓名');
+  if (!data.chief_complaint) return toast('⚠️ 请输入主诉');
+
+  if (editId) {
+    const idx = allCases.findIndex(x => x.id === editId);
+    if (idx >= 0) {
+      allCases[idx] = Object.assign({}, allCases[idx], data, { updated_at: new Date().toISOString() });
+      toast('✅ 已更新：' + data.name);
+    }
+  } else {
+    const newCase = Object.assign({}, data, {
+      id: 'C' + Date.now().toString(36) + (allCases.length + 1).toString(36),
+      created_at: new Date().toISOString(),
+      archived: false,
+      extracted_terms: ''
+    });
+    allCases.unshift(newCase);
+    toast('✅ 已新增：' + data.name);
+  }
+  persistCases();
+  closeModal();
+  search();
+}
+
+// ═══ CRUD：删 ═══
+async function deletePatient(id) {
+  const c = allCases.find(x => x.id === id);
+  if (!c) return;
+  if (!await (window.confirmModal ? confirmModal('确定删除「' + (c.name || c.patient_id) + '」的记录吗？\n此操作不可恢复。', { danger:true, okText:'删除' }) : Promise.resolve(confirm('确定删除该记录？')))) return;
+  allCases = allCases.filter(x => x.id !== id);
+  persistCases();
+  search();
+  toast('🗑️ 已删除');
+}
+
+// ═══ 批量删除（验证后） ═══
+async function batchDeleteConfirm() {
+  if (!selectedIds.size) return toast('⚠️ 请先勾选记录');
+  if (!await (window.confirmModal ? confirmModal('确定删除选中的 ' + selectedIds.size + ' 条记录吗？\n此操作不可恢复。', { danger:true, okText:'删除' }) : Promise.resolve(confirm('确定删除选中记录？')))) return;
+  const before = allCases.length;
+  allCases = allCases.filter(x => !selectedIds.has(x.id));
+  persistCases();
+  selectedIds.clear();
+  search();
+  toast('🗑️ 已删除 ' + (before - allCases.length) + ' 条');
+}
+
+// ═══ 关闭模态框 ═══
+function closeModal() {
+  document.getElementById('patient-modal').classList.remove('show');
+}
+
+// ═══ 表格设置：本地存储控制显示列/分页/默认筛选 ═══
+const DEFAULT_SETTINGS = { perPage: 15, showArchive: false, sortDefault: 'newest', autoRefresh: 30 };
+let tableSettings = Object.assign({}, DEFAULT_SETTINGS);
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('tcm_admin_settings') || 'null');
+    if (saved) tableSettings = Object.assign({}, DEFAULT_SETTINGS, saved);
+  } catch (e) { /* sanitized */ }
+  // 应用到控件
+  const perPage = document.getElementById('setting-per-page');
+  if (perPage) perPage.value = tableSettings.perPage;
+  const showArch = document.getElementById('setting-show-archive');
+  if (showArch) showArch.checked = tableSettings.showArchive;
+  const sortEl = document.getElementById('filter-sort');
+  if (sortEl && tableSettings.sortDefault && !sortEl.value) sortEl.value = tableSettings.sortDefault;
+  // 应用到全局
+  window.PER_PAGE = tableSettings.perPage;
+  const dateF = document.getElementById('filter-date');
+  if (dateF && tableSettings.showArchive) dateF.value = 'all';
+}
+
+function saveSettings() {
+  const perPage = parseInt(document.getElementById('setting-per-page').value) || 15;
+  const showArch = document.getElementById('setting-show-archive').checked;
+  const sortDef = document.getElementById('filter-sort').value || 'newest';
+  const autoRef = parseInt(document.getElementById('setting-auto-refresh').value) || 0;
+  tableSettings = { perPage, showArchive: showArch, sortDefault: sortDef, autoRefresh: autoRef };
+  try { localStorage.setItem('tcm_admin_settings', JSON.stringify(tableSettings)); } catch (e) { /* sanitized */ }
+  PER_PAGE = perPage;
+  currentPage = 1;
+  search();
+  toast('⚙️ 已保存表格设置');
+}
+
+// ═══ 自动刷新 ═══
+let autoRefreshTimer = null;
+function setupAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  const sec = (tableSettings.autoRefresh || 0);
+  if (sec > 0) {
+    autoRefreshTimer = setInterval(() => {
+      // 仅当页面可见时才刷新
+      if (document.visibilityState === 'visible') {
+        loadCases();
+      }
+    }, sec * 1000);
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && tableSettings.autoRefresh > 0) {
+    loadCases();
+  }
+});
+
+// ═══ 导入/导出 JSON ═══
+function exportPatients() {
+  const blob = new Blob([JSON.stringify(allCases, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'patients_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ 已导出 JSON');
+}
+
+function importPatients(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const arr = JSON.parse(e.target.result);
+      if (!Array.isArray(arr)) throw new Error('格式错误：需为数组');
+      const before = allCases.length;
+      arr.forEach((c, i) => {
+        if (!c.id) c.id = 'I' + Date.now().toString(36) + i;
+        allCases.push(Object.assign({}, c, { archived: false }));
+      });
+      persistCases();
+      search();
+      toast('✅ 已导入 ' + arr.length + ' 条，新增 ' + (allCases.length - before) + ' 条');
+    } catch (err) {
+      toast('❌ 导入失败：' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+</script>
+<!-- 患者编辑模态框 -->
+<div class="modal-overlay" id="patient-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 id="modal-title">✏️ 编辑患者</h3>
+      <button class="modal-close" onclick="closeModal()" aria-label="关闭">×</button>
+    </div>
+    <div class="modal-body">
+      <input  type="hidden" id="edit-id" aria-label="edit id">
+      <div class="form-row"><label>姓名 *</label><input  id="form-name" type="text" placeholder="例：张三" aria-label="例：张三" data-validate="required|min=2"></div>
+      <div class="form-row form-row-2">
+        <div><label>性别</label><select id="form-gender"><option value="男">男</option><option value="女">女</option></select></div>
+        <div><label>年龄</label><input  id="form-age" type="number" min="0" max="150" placeholder="例：35" aria-label="例：35" data-validate="number"></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div><label>手机号</label><input  id="form-phone" type="tel" placeholder="选填" aria-label="选填" data-validate="phone"></div>
+        <div><label>患者编号</label><input  id="form-id" type="text" placeholder="选填，自动生成" aria-label="选填，自动生成"></div>
+      </div>
+      <div class="form-row"><label>主诉 *</label><textarea id="form-complaint" rows="3" placeholder="例：失眠多梦，入睡困难两周"></textarea></div>
+      <div class="form-row form-row-2">
+        <div><label>推荐方剂</label><input  id="form-formula" type="text" placeholder="例：归脾汤" aria-label="例：归脾汤"></div>
+        <div><label>紧急级别</label>
+          <select id="form-urgency">
+            <option value="P0_EMERGENCY">🔴 紧急</option>
+            <option value="P1_SUGGEST_VISIT">🟡 建议就诊</option>
+            <option value="P2_HEALTH_TIP">🟢 健康提示</option>
+            <option value="P3_NORMAL">✅ 正常</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" onclick="closeModal()">取消</button>
+      <button class="btn primary" onclick="savePatient()">💾 保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 表格设置面板 -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal-card" style="max-width:480px">
+    <div class="modal-header"><h3>⚙️ 表格设置</h3><button class="modal-close" onclick="closeSettings()" aria-label="关闭">×</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>每页条数</label><select id="setting-per-page"><option value="10">10 条</option><option value="15">15 条</option><option value="20">20 条</option><option value="50">50 条</option></select></div>
+      <div class="form-row"><label>默认包含已归档</label><label class="switch-label"><input  type="checkbox" id="setting-show-archive" aria-label="setting show archive"> 启用</label></div>
+      <div class="form-row"><label>自动刷新间隔</label><select id="setting-auto-refresh"><option value="0">不自动刷新</option><option value="15">15 秒</option><option value="30">30 秒</option><option value="60">1 分钟</option><option value="300">5 分钟</option></select></div>
+      <div class="form-row"><label>导入 / 导出</label><div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn secondary" onclick="exportPatients()">📤 导出 JSON</button>
+        <label class="btn secondary" style="cursor:pointer">📥 导入 JSON<input  type="file" accept=".json" style="display:none" onchange="importPatients(this)" aria-label="field"></label>
+      </div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn secondary" onclick="closeSettings()">取消</button>
+      <button class="btn primary" onclick="saveSettings()">💾 保存设置</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openSettings() {
+  document.getElementById('settings-modal').classList.add('show');
+  loadSettings();
+  const autoEl = document.getElementById('setting-auto-refresh');
+  if (autoEl) autoEl.value = tableSettings.autoRefresh || 0;
+}
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('show');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  loadSettings();
+  setupAutoRefresh();
+});
+(function(){var a='/';fetch(a+'/api/tcm/dppo-stats').then(r=>r.json()).then(d=>{var el=document.getElementById('admin-stats');if(el)el.innerHTML='<div style="padding:12px;background:#f0fdf4;border-radius:8px;margin:8px 0"><strong>📊 系统真实数据</strong><br>DPPO反馈: '+d.total+'条 · 采纳率: '+d.rate+'%<br>KB证型: '+Object.keys(d.bySyndrome||{}).length+'个</div>';}).catch(function(){});})();
+</script>
+<!-- ═══ 运营配置中心 + 实时监听面板 ═══ -->
+<div style="margin:16px;padding:12px;background:var(--bg);border-radius:8px">
+  <h3 style="font-size:15px;color:var(--tcm);margin-bottom:8px">⚙️ 运营配置中心（可配置化提升）</h3>
+  <p style="font-size:11px;color:var(--text3);margin-bottom:8px">以下配置项被全站读取，修改后即时生效；支持导出/导入/重置/审计。</p>
+  <div id="config-panel"></div>
+</div>
+<div style="margin:8px 16px;padding:12px;background:var(--bg);border-radius:8px">
+  <h3 style="font-size:14px;color:var(--tcm);margin-bottom:8px">📡 实时事件流</h3>
+  <p style="font-size:11px;color:var(--text3);margin-bottom:6px">CRUD 操作会广播到所有打开的 Tab（多端联动）；同时记录到 audit 日志。</p>
+  <div id="realtime-panel" style="font-size:11px;font-family:monospace;max-height:200px;overflow-y:auto;background:#fff;padding:6px;border-radius:6px;border:1px solid var(--border)"></div>
+</div>
+<script>
+setTimeout(function(){
+  // 渲染配置面板
+  if (window.TCM && window.TCM.config) {
+    window.TCM.config.init('config-panel');  // R811 修真：方法名错误（renderPanel→init），配置面板从未渲染
+  }
+  // 实时事件流
+  var rtPanel = document.getElementById('realtime-panel');
+  if (rtPanel && window.TCM && window.TCM.realtime) {
+    var events = [];
+    window.TCM.realtime.on('*', function(payload, msg) {
+      var ts = new Date(msg.ts).toISOString().slice(11,19);
+      events.push('[' + ts + '] ' + msg.type + (payload.module ? ' ' + payload.module : '') + (payload.id ? ' #' + payload.id : ''));
+      if (events.length > 30) events = events.slice(-30);
+      rtPanel.innerHTML = events.slice().reverse().map(function(e){return '<div style="padding:2px 0;border-bottom:1px dashed var(--border)">'+e+'</div>';}).join('');
+    });
+    rtPanel.innerHTML = '<div style="color:var(--text3);text-align:center;padding:8px">等待实时事件… 进行 CRUD 操作后此处会显示事件流</div>';
+  }
+}, 200);
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</body>
+</html>

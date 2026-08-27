@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/admin-config.html">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>运营配置 · 命理宝鉴·医道</title>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --bg:#f5f5f5;--card:#fff;--text:#1a1a1a;--text2:#555;--text3:#999;
+  --border:#e0e0e0;--accent:#2e7d32;--green:#4caf50;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;font-size:14px}
+</style>
+</head>
+<body>
+
+<!-- ═══ 顶栏 ═══ -->
+<div class="page-header-bar" style="position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px">
+  <span style="width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block"></span>
+  <strong style="flex:1;font-size:16px">⚙️ 运营配置后台</strong>
+  <button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="location.href='rbac.html'">← 返回管理</button>
+</div>
+
+<!-- ═══ 说明 ═══ -->
+<div style="margin:12px;padding:12px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;font-size:12px;color:#8d6e63">
+  <strong>📌 使用对象：</strong>super_admin / admin_b（运营管理员）<br>
+  <strong>🔧 功能：</strong>系统参数配置、诊疗阈值、药房预警、排班、推送、穿戴设备、安全策略<br>
+  <strong>💡 价值：</strong>所有参数可配置化，运营无需改代码即可调整系统行为
+</div>
+
+<!-- ═══ 配置面板容器 ═══ -->
+<div id="config-panel" style="padding:0 12px 60px"></div>
+
+<script src="js/nav.js" defer></script>
+<script src="js/crud-engine.js"></script>
+<script src="js/config-engine.js"></script>
+<script>
+// ═══ 初始化配置面板 ═══
+document.addEventListener('DOMContentLoaded', function() {
+  // 等 crud-engine / config-engine 加载完
+  setTimeout(function() {
+    if (window.TCM && TCM.config) {
+      TCM.config.init('config-panel');
+    } else {
+      // config-engine 可能还没注册
+      var tryCount = 0;
+      var timer = setInterval(function() {
+        tryCount++;
+        if (window.TCM && TCM.config) {
+          clearInterval(timer);
+          TCM.config.init('config-panel');
+        } else if (tryCount > 20) {
+          clearInterval(timer);
+          document.getElementById('config-panel').innerHTML = 
+            '<div style="text-align:center;padding:40px;color:var(--text3)">⚠️ 配置引擎加载失败，请刷新重试</div>';
+        }
+      }, 100);
+    }
+  }, 200);
+});
+
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/ai-assistant.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<script src="js/ui/a11y.js"></script>
+<script src="js/sw-version-listener.js"></script>
+<script src="js/submit-guard.js"></script>
+<script src="js/escape-html.js"></script>
+</body>
+</html>
