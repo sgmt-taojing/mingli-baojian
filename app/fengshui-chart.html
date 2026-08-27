@@ -173,6 +173,7 @@ async function doPaipan(){
   const svg = await rSvg.text();
   renderChart(data.chart);
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
+  if(window.PaipanBaihua) PaipanBaihua.notify('fengshui', body);
   renderSvg(svg);
   renderFlow(data.flow, targetYear);
   if(data.interpretation) renderInterpretation(data.interpretation);
@@ -300,6 +301,7 @@ function renderInterpretation(i){
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/paipan-navigator.js" defer></script>
+<script src="js/paipan-baihua-panel.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){ try { I18N.init(); } catch(e){} });</script>
 </body>

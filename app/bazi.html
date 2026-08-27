@@ -790,12 +790,12 @@ async function generateBaziReport(){
       hour, gender, name, birthplace, residence, lunar: false
     };
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token', {signal: AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
-    
+
     const r = await fetch(API_BASE+'/api/paipan/bazi/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(r=>r.json());
     
     if(!r.ok){
@@ -938,14 +938,15 @@ async function generateBaziReport(){
       var body = { year:year, month:month, day:day, hour:hour, minute:minute, sex:sex, lng:lng, targetYear:targetYear, currentAge:currentAge, lang:_lang };
       showToast('排盘中…');
       var [r, rSvg] = await Promise.all([
-        fetch(API_BASE+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body)}),
-        fetch(API_BASE+'/api/paipan/calculate/svg',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify(Object.assign({}, body, {format:'json'}))})
+        fetch(API_BASE+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(body)}),
+        fetch(API_BASE+'/api/paipan/calculate/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(15000),body:JSON.stringify(Object.assign({}, body, {format:'json'}))})
       ]);
       var data = await r.json().catch(function(){ return {ok:false,error:'响应解析失败'}; });
       if(data.ok === false){ showToast('排盘失败: '+(data.error||'')); return; }
       var svgJson = await rSvg.json().catch(function(){ return null; });
       var svg = svgJson && svgJson.svg ? svgJson.svg : '';
       renderBaziBasic(data, {name:name, year:year, month:month, day:day, hour:hour, sex:sex, targetYear:targetYear});
+      if(window.PaipanBaihua) PaipanBaihua.notify('bazi', body);
       renderBaziSvg(svg);
       renderBaziFlow(data.flow, targetYear, currentAge);
       showToast('排盘完成 ✓');
@@ -957,6 +958,7 @@ async function generateBaziReport(){
 })();
 </script>
 <script src="js/paipan-navigator.js" defer></script>
+<script src="js/paipan-baihua-panel.js" defer></script>
 <script src="js/i18n.js?v=708i18n" defer></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
