@@ -143,26 +143,34 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
 const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-/* ─── 工具目录 ─── */
+/* ─── 工具目录（按用途排序：问事→命理→运势→规划→婚恋家庭→风水→号码姓名→日历幸运）─── */
 const TOOLS = [
+  // 问事起卦：当下有事，一事一问
   { id:'liuyao',  ico:'🪙', nm:'六爻问卦', ds:'一事一问 当下起卦', need:'question' },
   { id:'meihua',  ico:'🌸', nm:'梅花易数', ds:'随问起卦 快速直断', need:'question' },
   { id:'qimen',   ico:'🧭', nm:'奇门遁甲', ds:'办事出行 抉择运筹', need:'question' },
   { id:'liuren',  ico:'📿', nm:'大六壬',   ds:'人事细节 来意揣度', need:'question' },
+  // 命理排盘：看一生格局
   { id:'bazi',    ico:'📜', nm:'八字命理', ds:'一生格局 性格天赋', need:'birth' },
   { id:'ziwei',   ico:'🌌', nm:'紫微斗数', ds:'十二宫全观 人生地图', need:'birth' },
+  // 运势走势：今年到十年
   { id:'liunian', ico:'📅', nm:'流年运势', ds:'今年运气 逐月走势', need:'birthYear' },
-  { id:'hehun',   ico:'💑', nm:'合婚配对', ds:'两人缘分 婚配参考', need:'partner' },
-  { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
-  { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'阶段定位 五年路径', need:'birthYear' },
-  { id:'lifeindex',ico:'📊', nm:'命格指数', ds:'十二维评分 优势短板', need:'birthYear' },
   { id:'lifeflow', ico:'🌊', nm:'流年报告', ds:'本月大运 明年预览', need:'birth' },
   { id:'lifetimeline', ico:'📈', nm:'十年走势', ds:'黄金五年 转折提醒', need:'birth' },
-  { id:'huangli', ico:'📖', nm:'黄历择日', ds:'今日宜忌 选好日子', need:'none' },
+  { id:'lifeindex',ico:'📊', nm:'命格指数', ds:'十二维评分 优势短板', need:'birthYear' },
+  // 人生规划：阶段与路径
+  { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'阶段定位 五年路径', need:'birthYear' },
+  // 婚恋家庭：缘分与起名
+  { id:'hehun',   ico:'💑', nm:'合婚配对', ds:'两人缘分 婚配参考', need:'partner' },
+  { id:'qiming',  ico:'👶', nm:'宝宝起名', ds:'古籍取名 五行补益', need:'namebirth', ph:'输入姓氏 如 王', prompt:'宝宝（或改名者）的姓氏是？' },
+  // 风水堪舆：住宅办公
+  { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
+  // 号码姓名：日常所用
   { id:'mobile',  ico:'📱', nm:'手机号吉凶', ds:'号码数理 尾数五行', need:'text', ph:'输入手机号（11位）', prompt:'请把手机号发给我（只用于数理分析）：' },
   { id:'chepai',  ico:'🚗', nm:'车牌号吉凶', ds:'选号参考 数字形态', need:'text', ph:'输入车牌 如 粤A6688', prompt:'请把车牌号发给我（汉字字母都行，如 粤A6688）：' },
   { id:'xingming',ico:'✍️', nm:'姓名评分', ds:'五格三才 名字能量', need:'text', ph:'输入姓名 如 张伟', prompt:'请告诉我您要测的名字（2-4个字）：' },
-  { id:'qiming',  ico:'👶', nm:'宝宝起名', ds:'古籍取名 五行补益', need:'namebirth', ph:'输入姓氏 如 王', prompt:'宝宝（或改名者）的姓氏是？' },
+  // 日历幸运：每日必看
+  { id:'huangli', ico:'📖', nm:'黄历择日', ds:'今日宜忌 选好日子', need:'none' },
   { id:'lucky',   ico:'🍀', nm:'幸运数色', ds:'幸运数字 颜色方位', need:'birthYear' },
 ];
 const FACING_MAP = { '子':['子','午'],'午':['午','子'],'卯':['卯','酉'],'酉':['酉','卯'],'艮':['丑','未'],'坤':['未','丑'],'巽':['辰','戌'],'乾':['戌','辰'] };
