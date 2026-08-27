@@ -1,4 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 16:55 — 民俗工具中心卡片标题图化
+- 新增 app/assets/minsu/title-*.png ×12：宋体 Bold 描金竖向渐变 + 朱红印章（每工具一印字），透明底 @2x，PIL 确定性渲染（规避 AI 生图中文字讹误）；生成器 scripts/gen-minsu-titles.py（scripts/* 按仓库约定不入库）
+- minsu-center.html：12 张卡片 .ms-name 文字标题全部替换为 .ms-name-img（alt 保留原名，移动端 23px/桌面 27px 自适应）；排盘中心卡降透明度 0.75 保持次级视觉
+- 浏览器实测：12 图全部加载（naturalWidth 校验无 broken），移动视口上下两屏截图验收，金字印章在暗色卡片上对比清晰
 ## 2026-08-27 16:40 — 大众问事页 ask.html + 专业排盘权限收敛
 - 新增 app/ask.html（移动端问答式问事）：十工具网格（六爻/梅花/奇门/六壬=问事当下起盘；八字/紫微=出生信息；流年=出生年；合婚=双年份；风水=八朝向映射；黄历=直接查），聊天气泡采集、语音输入（webkitSpeechRecognition）、拍照上传（POST /api/v1/camera/upload-multipart，辅助备注不入排盘算法）
 - 提交链路：七盘 POST /api/paipan/:mod/baihua；民俗 GET /api/minsu/{huangli,liunian,hehun}；结果渲染总览卡+维度卡（吉绿凶红）+预测时间轴+回测验证按钮（存 localStorage mlbj_baihua_verify）+tips+免责+转人工入口
