@@ -1,4 +1,16 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 16:40 — 大众问事页 ask.html + 专业排盘权限收敛
+- 新增 app/ask.html（移动端问答式问事）：十工具网格（六爻/梅花/奇门/六壬=问事当下起盘；八字/紫微=出生信息；流年=出生年；合婚=双年份；风水=八朝向映射；黄历=直接查），聊天气泡采集、语音输入（webkitSpeechRecognition）、拍照上传（POST /api/v1/camera/upload-multipart，辅助备注不入排盘算法）
+- 提交链路：七盘 POST /api/paipan/:mod/baihua；民俗 GET /api/minsu/{huangli,liunian,hehun}；结果渲染总览卡+维度卡（吉绿凶红）+预测时间轴+回测验证按钮（存 localStorage mlbj_baihua_verify）+tips+免责+转人工入口
+- 新增 app/js/pro-gate.js（UX 软门禁）：JWT payload.roles 客户端解码，白名单 super_admin/admin_a/master，无权限遮罩引导至 ask.html / admin-login.html；11 个专业排盘页已挂载（注：排盘 API 本身仍公开，硬管控需服务端 RBAC，已留待后续）
+- 首页 index.html 患者区新增问事入口卡（绿色调）
+- 浏览器实测：紫微全链路（5维度卡+3预测+3回测）、黄历直接查（8维度卡）、奇门门禁（无token遮罩🔐/master token 放行）、首页入口卡全通过
+- 提交：main 1879b75
+## 2026-08-27 16:20 · OneFrame 面色 v2.0 交付（平台侧登记，本仓未代 commit）
+- [x] **面色 v2.0 模型入列 8941**：`oneframe-tcm-face-v2.0`（平台 AutoML AML-CLA-678B97）投放 models/（md5=012a44ed…双侧核验）+ labels.json 注册（类序同 v1.0）+ face-diag-svc MODELS 增列 + 重启生效（health 9 模型）
+- [x] **端到端实测**：真实面红例 v1 误判白 0.769 → v2 红 0.742；黄白边界例双方判黄（弱标签为白，模糊边界如实留痕 report.json）；真实域 vs 弱标签 0.253→0.845
+- [ ] **并行灰度约定**：面色/舌色/舌苔 v1.0 各保留 1 个周期后退役；real-val 0.475 弱标签局限已留痕，窗口①人工复核可升 v2b；tcm-agent 已同步（服务未重启留自验）
+
 ## 2026-08-27 16:10 — 点读能力推广：六爻点爻 / 紫微点宫 / 风水点宫
 - 数据：新增 yijing-yaoci.js——《周易》64卦卦辞+384爻辞通行本原文+白话直解，卦名匹配器（全名/后缀双路，八纯卦与复合卦全覆盖，Node 实测 16 组卦名匹配全对、64卦均6爻）
 - 引擎：buildLiuyaoYao（爻位/阴阳当位/六亲/日辰旺衰/世应/六神/旬空/动变+本卦与变卦爻辞双层）、buildZiweiPalace（十二宫含义/主星庙旺陷/四化/辅煞曜/长生）、buildFengshuiPalace（运山向三星/当运生气退气/14组山向组合/旺山旺向）
