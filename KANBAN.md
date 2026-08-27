@@ -1,4 +1,11 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 15:10 — 民俗工具白话解读全量落地（九工具+老黄历页）
+- 引擎：minsu-baihua-engine.js 九构建器（黄历/择日/太岁/节气/手机号/姓名/流年/幸运/合婚），词典含建除十二神/十二值神黄黑道/24节气养生/合婚等级/五格吉凶；修 mobile 尾号0被||吞掉 bug
+- 服务端：九个 minsu 端点 + daily-almanac 挂载 result.baihua（daily-almanac 字段适配复用 huangli 构建器），全部 try/catch 不阻塞主流程，curl 实测十端点全过
+- 前端：minsu-center renderBaihua（总览卡+卡片网格+提示行，置于结构化数据上方）+ 补齐 hehun 工具分支；huangli-daily 顶部白话面板
+- 顺带修复三个存量 bug：本地 8900 不代理 /api 致工具全挂（显式指 8920）；data.result 空值守卫拦截 chart 型响应的假阴性；esc 未定义（escape-html.js 导出为 escHtml）
+- 浏览器实测：民俗中心八工具+老黄历页白话块全部渲染通过
+- 提交：server 2474803 / main 712597c
 ## 2026-08-27 14:35 — 奇门九宫格点读解读
 - 引擎：buildQimenPalace 单宫白话构建器（宫位五行/八门门迫门制/九星/九神/十干克应/空亡马星/关联格局/值符值使要位+吉凶评级）
 - 端点：/api/paipan/qimen/baihua 支持 palace 参数返回 palaceDetail
