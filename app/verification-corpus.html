@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>排盘验证数据库 · 校正中心</title>
+<style>
+:root{--bg:#0d1117;--card:#161b22;--border:#30363d;--text:#c9d1d9;--green:#3fb950;--yellow:#d29922;--red:#f85149;--blue:#58a6ff}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+h1{font-size:20px}
+.stats{display:flex;gap:12px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 16px;text-align:center;min-width:100px}
+.stat .num{font-size:22px;font-weight:700}
+.stat .label{font-size:12px;color:#8b949e;margin-top:2px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.panel h2{font-size:15px;margin-bottom:12px;color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#1c2129;text-align:left;padding:8px;border-bottom:1px solid var(--border);color:#8b949e;font-weight:500}
+td{padding:8px;border-bottom:1px solid #21262d;vertical-align:top}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px}
+.badge.verified{background:#0d2818;color:var(--green);border:1px solid var(--green)}
+.badge.pending{background:#2d2200;color:var(--yellow);border:1px solid var(--yellow)}
+.badge.mismatch{background:#2d0a0a;color:var(--red);border:1px solid var(--red)}
+.btn{background:#238636;color:#fff;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px}
+.btn:hover{background:#2ea043}
+.btn:disabled{background:#30363d;cursor:not-allowed}
+.form-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+input,select{background:#0d1117;border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text);font-size:13px}
+#msg{margin-top:8px;font-size:13px;color:var(--green);min-height:18px}
+.progress{background:#21262d;border-radius:4px;height:6px;margin-top:6px;overflow:hidden}
+.progress-bar{background:linear-gradient(90deg,#238636,#3fb950);height:100%;transition:width .3s}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🔮 排盘验证数据库 · 校正中心</h1>
+  <div class="stats">
+    <div class="stat"><div class="num" id="total">-</div><div class="label">样本总量</div></div>
+    <div class="stat"><div class="num" id="verified" style="color:var(--green)">-</div><div class="label">已验证</div></div>
+    <div class="stat"><div class="num" id="pending" style="color:var(--yellow)">-</div><div class="label">待验证</div></div>
+    <div class="stat"><div class="num" id="hitrate" style="color:var(--blue)">-</div><div class="label">平均命中率</div></div>
+    <div class="stat"><div class="num" id="goal">10000</div><div class="label">万人目标</div></div>
+  </div>
+</div>
+
+<div class="progress"><div class="progress-bar" id="goalbar" style="width:0%"></div></div>
+<div style="font-size:11px;color:#8b949e;margin:4px 0 16px" id="goaltext">距万人目标</div>
+
+<div class="panel">
+  <h2>➕ 增补样本（身边人/名人/古籍命例）</h2>
+  <div class="form-row">
+    <input id="f-name" placeholder="姓名" style="width:120px">
+    <select id="f-cal"><option value="lunar">农历</option><option value="solar">公历</option></select>
+    <input id="f-date" placeholder="如 1991-05-12" style="width:140px">
+    <input id="f-hour" placeholder="时辰 如 00:45" style="width:110px">
+    <select id="f-gender"><option value="male">男</option><option value="female">女</option></select>
+    <input id="f-place" placeholder="出生地" style="width:110px">
+  </div>
+  <div class="form-row">
+    <select id="f-source"><option>身边实测</option><option>名人公开</option><option>古籍命例</option><option>倪师课件</option><option>舒涵课件</option><option>历史人物</option></select>
+    <input id="f-facts" placeholder="已发生事实（JSON 或 简述，如：2016年生女/2019年结婚/2020迁居济南）" style="flex:1;min-width:280px">
+    <button class="btn" onclick="addSample()">入库</button>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<div class="panel">
+  <h2>📋 样本库（最新 100 条）</h2>
+  <table>
+    <thead><tr><th>姓名</th><th>来源</th><th>出生</th><th>事实数</th><th>状态</th><th>命中率</th><th>操作</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>🔄 自动校验说明</h2>
+  <p style="font-size:13px;line-height:1.8">
+  每条样本入库后自动走验证链条：<br>
+  ① 本地排盘引擎出盘（含真太阳时）→ ② 逐事件反推（事件年月 vs 盘面信号）→ ③ 命中/不命中记分 → ④ 错题三级归因（规则错→古籍复核 / 排盘错→引擎修真 / 记载错→降权）→ ⑤ 知识库规则可信度动态调整<br>
+  每日 14:00 自动增量采集名人；古籍命例与课件案例批量蒸馏持续入库。
+  </p>
+</div>
+
+<script>
+const API='http://127.0.0.1:8920';
+function fmt(b){try{const j=typeof b==='string'?JSON.parse(b):b;const d=j.lunar_date||`${j.year||'?'}-${j.month||'?'}-${j.day||'?'}`;return `${j.lunar?'农':'公'} ${d} ${j.hour||j.raw_time||''}`}catch(e){return '—'}}
+async function load(){
+  try{
+    const r=await fetch(API+'/api/verification/corpus?limit=100');const d=await r.json();
+    if(!d.ok)throw 0;
+    document.getElementById('total').textContent=d.total;
+    document.getElementById('verified').textContent=d.stats.verified||0;
+    document.getElementById('pending').textContent=d.stats.pending||0;
+    document.getElementById('hitrate').textContent=d.stats.avg_score?Math.round(d.stats.avg_score*100)+'%':'—';
+    const pct=Math.min(100,(d.total/10000*100)).toFixed(2);
+    document.getElementById('goalbar').style.width=pct+'%';
+    document.getElementById('goaltext').textContent=`完成 ${pct}%（${d.total}/10000）`;
+    const tb=document.getElementById('tbody');tb.innerHTML='';
+    (d.rows||[]).forEach(row=>{
+      let facts=[];try{facts=Object.values(JSON.parse(row.facts_json||'{}')).flatMap(v=>Array.isArray(v)?v:[])}catch(e){}
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${row.name}</td><td>${row.source}</td><td>${fmt(row.birth_json)}</td><td>${facts.length||'—'}</td>
+      <td><span class="badge ${row.verify_status}">${{verified:'已验证',pending:'待验证',mismatch:'存疑',record_error:'记载疑'}[row.verify_status]||row.verify_status}</span></td>
+      <td>${row.verify_score?Math.round(row.verify_score*100)+'%':'—'}</td>
+      <td>${row.verify_status==='pending'&&facts.length?'<button class="btn" style="padding:4px 10px;font-size:12px" onclick="verifyOne(\''+row.person_id+'\')">校验</button>':'—'}</td>`;
+      tb.appendChild(tr);
+    });
+  }catch(e){document.getElementById('msg').textContent='接口未就绪（/api/verification/corpus）'}
+}
+async function addSample(){
+  const name=document.getElementById('f-name').value.trim();
+  const date=document.getElementById('f-date').value.trim();
+  if(!name||!date){show('姓名与出生日期必填');return}
+  const body={name,cal:document.getElementById('f-cal').value,date,hour:document.getElementById('f-hour').value.trim(),gender:document.getElementById('f-gender').value,place:document.getElementById('f-place').value.trim(),source:document.getElementById('f-source').value,facts_text:document.getElementById('f-facts').value.trim()};
+  try{const r=await fetch(API+'/api/verification/corpus/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json();show(d.ok?'入库成功（'+(d.paipan_ok?'已排盘':'排盘待补')+'）':('失败：'+d.error));load()}catch(e){show('提交失败，请检查服务')}
+}
+async function verifyOne(pid){
+  show('校验中…');
+  try{const r=await fetch(API+'/api/verification/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({person_id:pid})});
+  const d=await r.json();show(d.ok?`校验完成：命中 ${d.hits}/${d.total_events} 事件（${d.detail||''}）`:'校验失败：'+d.error);load()}catch(e){show('校验请求失败')}
+}
+function show(t){document.getElementById('msg').textContent=t}
+load();setInterval(load,30000);
+</script>
+</body>
+</html>

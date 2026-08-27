@@ -1,6 +1,6 @@
 # mingli-baojian · 项目智能体工作台（AGENT.md）
 
-> 2026-08-17 项目 agent 化体系 · 总指挥：主 agent（AutoClaw）
+> 2026-08-17 项目 agent 化体系 · 总指挥：主 agent
 
 ## 一、身份与职责
 - **角色**：命理宝鉴智能体（命理唯一源 · 底层能力）
@@ -11,7 +11,7 @@
 ## 二、知识源
 | 源 | 路径 | 用途 |
 |----|------|------|
-| 命理 KB | server/database/yidao.db（kb_formal 54,484 条） | 排盘/命理/民俗 |
+| 命理 KB | server/database/yidao.db（kb_formal 60,966 条，2026-08-27 实查） | 排盘/命理/民俗 |
 | 医学模块 | yidao.db（tcm 模块 20K+ 条，TCM-SYNC 同步） | 中医知识 |
 | 人脸算法 | server/face-embed-server.py（:8958） | 医保人脸核对/特征提取 |
 | 命理档案 | data/mingli.db（master_cases） | 命理档案（pending_review 待命理师修订） |

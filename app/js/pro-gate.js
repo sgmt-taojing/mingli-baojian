@@ -43,4 +43,14 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
   else run();
+
+  // R-PRO-RBAC：专业请求助手——自动携带 admin_token（服务端 paipan:pro 硬管控配套）
+  window.proFetch = function (url, opts) {
+    opts = opts || {};
+    var token = localStorage.getItem('admin_token') || '';
+    var headers = opts.headers || {};
+    if (token && !headers.Authorization) headers.Authorization = 'Bearer ' + token;
+    opts.headers = headers;
+    return fetch(url, opts);
+  };
 })();
