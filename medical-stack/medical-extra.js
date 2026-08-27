@@ -35,10 +35,14 @@ fs.mkdirSync(ANN_DIR, { recursive: true });
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
+// SEC-001：仅放行本机来源（工作台页 8973 → 8974 跨端口属合法）
+const LOCAL_ORIGIN_RE = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const o = req.headers.origin || '';
+  if (LOCAL_ORIGIN_RE.test(o)) res.setHeader('Access-Control-Allow-Origin', o);
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.end();
+  if (o && !LOCAL_ORIGIN_RE.test(o)) return res.status(403).json({ ok: false, error: '仅允许本机来源调用' });
   next();
 });
 

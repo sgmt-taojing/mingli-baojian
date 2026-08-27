@@ -86,17 +86,31 @@ const pinyin = (() => {
   try { return require('./kb-store/pinyin'); } catch (e) { console.error('[pinyin] 加载失败:', e.message); return { variants: () => [''], full: () => '', isLatin: () => false }; }
 })();
 
-// CORS：允许 8931 静态服务及本地开发跨端口访问
-// R763 修真：ACAH 补 X-Trace-Id / X-Skip-Interceptor / X-Case-Id ——
+// CORS：仅放行本机来源（127.0.0.1/localhost 任意端口），杜绝任意网站跨域打本地 API
+// SEC-001（2026-08-27 审计）：原 ACAO:* + verify 可选鉴权 = 任意网页可代审处方
+// R763 修真保留：ACAH 补 X-Trace-Id / X-Skip-Interceptor / X-Case-Id ——
 // 拦截器给每个 fetch 附加 X-Trace-Id，但预检白名单未列 → 浏览器 CORS 校验失败
 // → SW networkFirst 捕获后兑底 503 {offline:true}（curl 无 CORS 逻辑测不出来）
+const LOCAL_ORIGIN_RE = /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/;
+function isLocalOrigin(req) {
+  const o = req.headers.origin || '';
+  if (!o) return true; // curl/本地工具无 Origin，属可信本机调用
+  return LOCAL_ORIGIN_RE.test(o);
+}
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const o = req.headers.origin || '';
+  if (LOCAL_ORIGIN_RE.test(o)) res.setHeader('Access-Control-Allow-Origin', o);
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Trace-Id,X-Skip-Interceptor,X-Case-Id');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
+
+// SEC-001 同源守卫：敏感写操作拒绝跨域网页调用（浏览器跨域必带 Origin）
+function localOriginGuard(req, res, next) {
+  if (!isLocalOrigin(req)) return res.status(403).json({ ok: false, error: '仅允许本机来源调用' });
+  next();
+}
 
 // ═══════════════════════════════════════════════
 // JWT 中间件（可选鉴权 - 端点级控制）
@@ -3263,10 +3277,12 @@ app.post('/api/prescription/settle', optionalAuth, async (req, res) => {
 });
 
 // 处方审核 + 全流程流转（审核/调配/发药/完成）
-app.post('/api/prescription/verify', optionalAuth, async (req, res) => {
+app.post('/api/prescription/verify', localOriginGuard, optionalAuth, async (req, res) => {
   try {
     const { rx_id, action, notes } = req.body;
     if (!rx_id || !action) return res.status(400).json({ ok: false, error: 'rx_id 和 action 必填' });
+    // SEC-001：核验人必须可溯源（登录用户或显式 reviewer），拒绝匿名核验
+    if (!req.body.reviewer && !req.user) return res.status(401).json({ ok: false, error: '核验人不可匿名：需登录或提供 reviewer' });
     // R531: 支持完整状态流转 approve/reject/modify/dispense/ready/complete
     if (!['approve', 'reject', 'modify', 'dispense', 'ready', 'complete'].includes(action)) {
       return res.status(400).json({ ok: false, error: 'action 必须是 approve/reject/modify/dispense/ready/complete' });
