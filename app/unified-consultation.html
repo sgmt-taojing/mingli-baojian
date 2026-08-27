@@ -422,8 +422,9 @@ function initEngine(){
         }
       },
       onStatus: s => {
-        $('kbLabel').textContent = s;
-        $('kbDot').className = 'dot' + (s === 'searching' ? ' active' : '');
+        // R-REG: s 为状态对象 {tier,latencyMs,...}，此前直接渲染导致 [object Object]
+        $('kbLabel').textContent = (typeof s === 'string') ? s : (s && s.tier ? s.tier + ' ' + (s.latencyMs || 0) + 'ms' : '就绪');
+        $('kbDot').className = 'dot' + ((typeof s === 'string' && s === 'searching') ? ' active' : '');
       }
   });
 
@@ -839,6 +840,8 @@ function setReviewStatus(status, notes){
   badge.textContent = status === 'approved' ? '已通过' : status === 'rejected' ? '已驳回' : '待审核';
   badge.className = 'badge ' + status;
   saveEmr();
+  // R-REG: 已归档病历须幂等回写审核状态到 medical_cases（此前仅写会话快照，审核不落库）
+  if (App.caseId) archiveEmr();
   toast(`审核${status === 'approved' ? '通过' : status === 'rejected' ? '驳回' : '待审'}已记录`);
 }
 
