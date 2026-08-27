@@ -124,7 +124,7 @@ async function generateFullReport(mod){
     
     if(!r.ok){
       const fn = typeof showToast==='function'?showToast:typeof toast==='function'?toast:alert;
-      fn('报告生成失败：'+(r.error||''));
+      fn('报告生成失败：'+((r.message&&r.message!=='未知错误'?r.message:'')||r.error||'请检查输入')+(Array.isArray(r.missing)&&r.missing.length?('（缺少：'+r.missing.join('、')+'）'):(r.data&&Array.isArray(r.data.missing)&&r.data.missing.length?('（缺少：'+r.data.missing.join('、')+'）'):'')));
       return;
     }
     
