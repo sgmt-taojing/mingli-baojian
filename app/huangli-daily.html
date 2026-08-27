@@ -50,8 +50,10 @@
   </div>
 </div>
 
+<script src="js/escape-html.js"></script>
 <script>
-const API = (location.protocol === 'file:' ? 'http://127.0.0.1:8920' : '');
+const esc = window.escHtml || window.escapeHtml || function(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));};
+const API = (location.protocol === 'file:' || location.port === '8900' ? 'http://127.0.0.1:8920' : '');
 
 async function load() {
   const now = new Date();
@@ -87,11 +89,33 @@ async function load() {
   }
 }
 
+function renderBaihua(b) {
+  if (!b || !b.ok) return '';
+  const LV = { good: '#10b981', bad: '#ef4444', neutral: '#8b7e6a' };
+  let h = '<div class="panel" style="border-color:var(--gold);background:rgba(201,168,76,.06)">';
+  h += '<div class="panel-title">💬 白话解读</div>';
+  h += `<div style="font-size:14px;line-height:1.9;margin-bottom:10px">${esc(b.overview || '')}</div>`;
+  if (b.cards && b.cards.length) {
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px">';
+    for (const cd of b.cards) {
+      const col = LV[cd.level] || LV.neutral;
+      h += `<div style="border:1px solid var(--border);border-left:3px solid ${col};border-radius:6px;padding:8px 10px">`;
+      h += `<div style="font-size:12px;color:${col};font-weight:bold;margin-bottom:4px">${esc(cd.title || '')}</div>`;
+      h += `<div style="font-size:12px;line-height:1.8">${esc(cd.plain || '')}</div></div>`;
+    }
+    h += '</div>';
+  }
+  if (b.tips && b.tips.length) {
+    h += `<div style="margin-top:10px;font-size:12px;opacity:.65;line-height:1.8">${b.tips.map(t => '💡 ' + esc(t)).join('<br>')}</div>`;
+  }
+  return h + '</div>';
+}
+
 function render(d) {
   const gz = d.ganzhi || {};
   const yi = (d.yi || []).join(' · ');
   const ji = (d.ji || []).join(' · ');
-  document.getElementById('content').innerHTML = `
+  document.getElementById('content').innerHTML = renderBaihua(d.baihua) + `
     <div class="panel">
       <div class="panel-title">干支</div>
       <div class="gzz">

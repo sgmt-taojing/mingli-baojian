@@ -158,10 +158,38 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <div id="ms-result" style="display:none;max-width:600px;margin:16px auto;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px"></div>
 
 <script>
+// escape-html.js 导出的是 escHtml；此处统一别名（含兜底）
+const esc = window.escHtml || window.escapeHtml || function(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));};
+// 白话解读渲染（R-MINSU-BAIHUA：总览卡 + 卡片网格 + 提示行，置于结构化数据上方）
+function renderBaihua(b){
+  if(!b || !b.ok) return '';
+  const LV={good:'#4ec9b0',bad:'#ef4444',neutral:'#8b7e6a'};
+  let h='<div style="border:1px solid var(--gold);border-radius:8px;padding:12px 14px;margin-bottom:12px;background:rgba(212,167,106,.06)">';
+  h+='<div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:6px">💬 白话解读</div>';
+  h+='<div style="font-size:13px;line-height:1.9;color:var(--paper)">'+esc(b.overview||'')+'</div>';
+  if(b.cards&&b.cards.length){
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px">';
+    for(const cd of b.cards){
+      const col=LV[cd.level]||LV.neutral;
+      h+='<div style="border:1px solid var(--border);border-left:3px solid '+col+';border-radius:6px;padding:8px 10px">';
+      h+='<div style="font-size:12px;color:'+col+';font-weight:bold;margin-bottom:4px">'+esc(cd.title||'')+'</div>';
+      h+='<div style="font-size:12px;line-height:1.8;color:var(--paper)">'+esc(cd.plain||'')+'</div>';
+      h+='</div>';
+    }
+    h+='</div>';
+  }
+  if(b.tips&&b.tips.length){
+    h+='<div style="margin-top:10px;font-size:11px;color:var(--paper3);line-height:1.8">'+b.tips.map(t=>'💡 '+esc(t)).join('<br>')+'</div>';
+  }
+  h+='</div>';
+  return h;
+}
 async function showTool(tool){
   const result=document.getElementById('ms-result');
   result.style.display='block';
   result.innerHTML='<div style="text-align:center;color:var(--paper3)">查询中...</div>';
+  // 本地静态服务(8900)不代理 /api，显式指向 8920；生产同源部署时走相对路径
+  const API=(location.protocol==='file:'||location.port==='8900')?'http://127.0.0.1:8920':'';
   let url='',html='';
   if(tool==='huangli'){
     const d=new Date();
@@ -178,12 +206,14 @@ async function showTool(tool){
     url='/api/minsu/liunian?year=2026&birthYear=1990';
   }else if(tool==='lucky'){
     url='/api/minsu/lucky?birthYear=1990';
+  }else if(tool==='hehun'){
+    url='/api/minsu/hehun?maleYear=1990&femaleYear=1992';
   }
   try {
-    const r=await fetch(url,{signal:AbortSignal.timeout(10000)});
+    const r=await fetch(API+url,{signal:AbortSignal.timeout(10000)});
     const data=await r.json();
     if(!data.ok){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px">查询失败: '+(data.error||'未知错误')+'</div>';return;}
-    if(!data.result || data.result.length===0){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px"><div style="font-size:32px;margin-bottom:8px">📭</div><div>暂无记录</div></div>';return;}
+    if((tool==='family'||tool==='holidays')&&(!data.result || data.result.length===0)){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px"><div style="font-size:32px;margin-bottom:8px">📭</div><div>暂无记录</div></div>';return;}
   const c=data.chart;
   if(tool==='huangli'){
     html=`<h3 style="color:var(--gold);margin-bottom:8px">📅 ${c.date} 黄历</h3>`;
@@ -239,8 +269,17 @@ async function showTool(tool){
     html+=`幸运色：${c.luckyColors.join('、')} | 方位：${c.luckyDirection} | 季节：${c.luckySeason}<br>`;
     html+=`<span style="color:var(--jade)">${c.suggestion}</span>`;
     html+='</div>';
+  }else if(tool==='hehun'){
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">💑 合婚：${c.male.shengxiao}(${c.male.year}) × ${c.female.shengxiao}(${c.female.year})</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    html+=`男方：${c.male.ganZhi}年 ${c.male.wuxing}（纳音${c.male.nayin}）<br>`;
+    html+=`女方：${c.female.ganZhi}年 ${c.female.wuxing}（纳音${c.female.nayin}）<br>`;
+    html+=`生肖：${c.sxRelation}（${c.sxScore}分） | 五行：${c.wxRelation}（${c.wxScore}分） | 天干：${c.ganRelation}<br>`;
+    html+=`总分：<b style="color:var(--gold)">${c.totalScore}</b>（${c.grade}）<br>`;
+    html+=`<span style="color:var(--jade)">${c.suggestion}</span>`;
+    html+='</div>';
   }
-  result.innerHTML=html;
+  result.innerHTML=renderBaihua(data.baihua)+html;
   } catch(e) {
     console.warn('[showTool]', esc(e.message));
     result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px">网络异常，请稍后重试</div>';
