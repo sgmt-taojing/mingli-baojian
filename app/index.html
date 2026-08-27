@@ -99,6 +99,8 @@
 .glyph-steel{background:linear-gradient(135deg,rgba(127,140,141,.22),rgba(127,140,141,.08));color:var(--steel);border:1px solid rgba(127,140,141,.3)}
 
 .icon-name{font-size:14px;color:var(--paper);font-weight:500;letter-spacing:1px;text-align:center}
+.icon-name-img{height:22px;width:auto;display:block;margin:0 auto}
+.icon-card[style*="grid-column"] .icon-name-img{height:27px;margin:0}
 .icon-sub{font-size:11px;color:var(--paper3);letter-spacing:.5px;text-align:center;margin-top:-4px}
 
 /* 分组标题 */
@@ -599,5 +601,40 @@
 </style>
 
 <footer style="text-align:center;padding:14px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 入口大厅 · 按身份精准分流</footer>
+<script>
+/* R-TITLE-IMG：卡片文字标题 → 金字印章图片（生成器 scripts/gen-title-images.py，alt 保留原文） */
+(function(){
+  const MAP = {
+    '问事 · 白话解读':'index-ask','一句话直达':'index-voice','AI 助手':'index-ai','命理速览':'index-quick',
+    '人生规划':'index-lifeplan','命格指数':'index-lifeindex','流年报告':'index-lifeflow','十年走势':'index-timeline',
+    '青年规划':'index-youth','黄历':'index-almanac','每日黄历':'index-huangli','快速占卜':'index-zhanbu','民俗中心':'index-minsu',
+    '综合问诊台 · 患者专有通道':'index-clinic','症状自查':'index-symptom','望诊采集':'index-camera','我的就医记录':'index-journey','患者门户':'index-portal',
+    '智能问诊室':'index-doc-room','医生工作台':'index-doc-panel','医生会诊':'index-doc-consult','初诊采集':'index-doc-intake',
+    '名老中医':'index-doc-master','处方开方':'index-doc-rx','辨证论治':'index-doc-bianzheng','舌脉图谱':'index-doc-tongue',
+    '中医诊所':'index-doc-clinic','患者档案':'index-doc-archive','报告中心':'index-doc-report','运营后台':'index-admin-ops',
+    '命理师工作台':'index-master-work','命理采集':'index-master-intake','分类断事':'index-master-cate','复核':'index-master-review',
+    '命理档案':'index-master-archive','命理名家':'index-master-famous','病案合参':'index-master-case','紫微病象':'index-master-ziwei',
+    '知识库':'index-master-kb','KB 洞察':'index-master-kbinsight','命理工具':'index-master-tools','专业排盘':'index-master-pro',
+    '易经起卦':'index-master-yijing','奇门遁甲':'index-master-qimen',
+    '管理员登录':'index-admin-login','工单管理':'index-admin-ticket','监控总览':'index-admin-monitor','商城管理':'index-admin-shop','知识洞察':'index-admin-kb'
+  };
+  function swap(){
+    document.querySelectorAll('.icon-name').forEach(el => {
+      const key = MAP[el.textContent.trim()];
+      if (!key) return;
+      const img = document.createElement('img');
+      img.className = 'icon-name-img';
+      img.src = 'assets/titles/' + key + '.png';
+      img.alt = el.textContent.trim();
+      el.replaceWith(img);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', swap);
+  else swap();
+  // 「全部」分区由 buildAll 动态生成，需在其渲染后再换一次
+  const _orig = window.__buildAllHook;
+  document.addEventListener('DOMContentLoaded', () => setTimeout(swap, 0));
+})();
+</script>
 </body>
 </html>

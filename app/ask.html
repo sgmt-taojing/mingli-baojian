@@ -20,6 +20,7 @@ h1{font-size:19px;color:var(--gold2);text-align:center;margin:8px 0 2px}
 .tool.sel{border-color:var(--gold);background:rgba(201,168,76,.12);box-shadow:0 0 0 1px var(--gold)}
 .tool .ico{font-size:24px;display:block;margin-bottom:4px}
 .tool .nm{font-size:13px;font-weight:600;color:var(--paper)}
+.tool .nm-img{height:19px;width:auto;display:block;margin:2px auto 1px}
 .tool .ds{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
 /* 聊天气泡 */
 .chat{display:flex;flex-direction:column;gap:10px;margin:14px 0}
@@ -163,7 +164,7 @@ const $ = id => document.getElementById(id);
 
 /* ─── 第一步：工具网格 ─── */
 $('toolGrid').innerHTML = TOOLS.map((t,i) =>
-  `<div class="tool" data-id="${t.id}"><span class="ico">${t.ico}</span><div class="nm">${t.nm}</div><div class="ds">${t.ds}</div></div>`
+  `<div class="tool" data-id="${t.id}"><span class="ico">${t.ico}</span><img class="nm-img" src="assets/titles/ask-${t.id}.png" alt="${t.nm}"><div class="ds">${t.ds}</div></div>`
 ).join('');
 document.querySelectorAll('.tool').forEach(el => el.onclick = () => selectTool(el.dataset.id, el));
 
