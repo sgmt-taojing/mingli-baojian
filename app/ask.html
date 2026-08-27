@@ -119,6 +119,9 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
       <div class="row hidden" id="partnerRow">
         <input type="number" id="pYear" placeholder="对方出生年 如1992" style="width:160px">
       </div>
+      <div class="row hidden" id="textRow">
+        <input type="text" id="textInput" placeholder="" style="flex:1">
+      </div>
       <button class="btn" id="birthNext">开始解读</button>
       <button class="btn2" id="skipBirth">跳过出生信息（以当下时间起盘）</button>
     </div>
@@ -156,6 +159,11 @@ const TOOLS = [
   { id:'lifeflow', ico:'🌊', nm:'流年报告', ds:'本月大运 明年预览', need:'birth' },
   { id:'lifetimeline', ico:'📈', nm:'十年走势', ds:'黄金五年 转折提醒', need:'birth' },
   { id:'huangli', ico:'📖', nm:'黄历择日', ds:'今日宜忌 选好日子', need:'none' },
+  { id:'mobile',  ico:'📱', nm:'手机号吉凶', ds:'号码数理 尾数五行', need:'text', ph:'输入手机号（11位）', prompt:'请把手机号发给我（只用于数理分析）：' },
+  { id:'chepai',  ico:'🚗', nm:'车牌号吉凶', ds:'选号参考 数字形态', need:'text', ph:'输入车牌 如 粤A6688', prompt:'请把车牌号发给我（汉字字母都行，如 粤A6688）：' },
+  { id:'xingming',ico:'✍️', nm:'姓名评分', ds:'五格三才 名字能量', need:'text', ph:'输入姓名 如 张伟', prompt:'请告诉我您要测的名字（2-4个字）：' },
+  { id:'qiming',  ico:'👶', nm:'宝宝起名', ds:'古籍取名 五行补益', need:'namebirth', ph:'输入姓氏 如 王', prompt:'宝宝（或改名者）的姓氏是？' },
+  { id:'lucky',   ico:'🍀', nm:'幸运数色', ds:'幸运数字 颜色方位', need:'birthYear' },
 ];
 const FACING_MAP = { '子':['子','午'],'午':['午','子'],'卯':['卯','酉'],'酉':['酉','卯'],'艮':['丑','未'],'坤':['未','丑'],'巽':['辰','戌'],'乾':['戌','辰'] };
 
@@ -168,13 +176,22 @@ $('toolGrid').innerHTML = TOOLS.map((t,i) =>
 ).join('');
 document.querySelectorAll('.tool').forEach(el => el.onclick = () => selectTool(el.dataset.id, el));
 
+// R-DEEPLINK: ?tool=xxx 直达（首页/民俗中心等入口跳转自选工具）
+(function(){
+  const q = new URLSearchParams(location.search).get('tool');
+  if (!q) return;
+  const el = document.querySelector('.tool[data-id="' + q + '"]');
+  if (el) setTimeout(() => el.click(), 120);
+})();
+
 function selectTool(id, el) {
   state.tool = TOOLS.find(t => t.id === id);
   document.querySelectorAll('.tool').forEach(x => x.classList.remove('sel'));
   el.classList.add('sel');
   $('step2').classList.remove('hidden');
-  bot(`好，用「${state.tool.nm}」为您看。${state.tool.need==='none' ? '' : '先说说您想问什么事？'}`);
-  if (state.tool.need === 'none') { askBirthIfNeeded(); }
+  const noQuestion = state.tool.need === 'text' || state.tool.need === 'namebirth' || state.tool.need === 'none';
+  bot(`好，用「${state.tool.nm}」为您看。${noQuestion ? '' : '先说说您想问什么事？'}`);
+  if (noQuestion) { askBirthIfNeeded(); }
   else { $('askInput').classList.remove('hidden'); $('questionText').focus(); }
   $('step2').scrollIntoView({ behavior:'smooth' });
 }
@@ -212,6 +229,24 @@ function askBirthIfNeeded() {
     document.querySelector('#askBirth .row').classList.add('hidden'); // 出生年月日行
     $('facingRow').classList.remove('hidden');
     $('askBirth').classList.remove('hidden');
+  } else if (need === 'text') {
+    bot(state.tool.prompt || '请输入：');
+    $('sexRow').classList.add('hidden'); $('calendarRow').classList.add('hidden');
+    document.querySelector('#askBirth .row').classList.add('hidden'); // 出生年月日行
+    document.querySelectorAll('#askBirth .row')[2].classList.add('hidden'); // 时辰行
+    $('skipBirth').style.display = 'none';
+    $('textInput').placeholder = state.tool.ph || '';
+    $('textRow').classList.remove('hidden');
+    $('askBirth').classList.remove('hidden');
+    $('textInput').focus();
+  } else if (need === 'namebirth') {
+    bot((state.tool.prompt || '姓氏是？') + '再填出生信息（起名要结合生辰五行）：');
+    $('calendarRow').classList.add('hidden');
+    $('sexRow').classList.remove('hidden'); // 起名需性别
+    $('skipBirth').style.display = 'none';
+    $('textInput').placeholder = state.tool.ph || '输入姓氏';
+    $('textRow').classList.remove('hidden');
+    $('askBirth').classList.remove('hidden');
   } else {
     submitAsk(); // none：直接起盘
   }
@@ -238,6 +273,20 @@ function collectBirth(skip) {
     if (!state.facing) { bot('请点选一个朝向。'); return; }
     state.birth = { facing: state.facing };
     me('朝向：' + document.querySelector('#facingRow .chip.sel').textContent);
+  } else if (need === 'text') {
+    const v = $('textInput').value.trim();
+    if (!v) { bot(state.tool.prompt || '请先输入内容。'); return; }
+    if (state.tool.id === 'mobile' && v.replace(/\D/g, '').length < 7) { bot('手机号至少 7 位数字哦。'); return; }
+    if (state.tool.id === 'chepai' && v.replace(/\D/g, '').length < 3) { bot('车牌数字部分至少 3 位（如 粤A6688）。'); return; }
+    if (state.tool.id === 'xingming' && (v.length < 2 || v.length > 4)) { bot('姓名一般 2-4 个字（连名带姓一起填）。'); return; }
+    state.birth = { text: v };
+    me(v);
+  } else if (need === 'namebirth') {
+    const v = $('textInput').value.trim();
+    if (!v || v.length > 2) { bot('姓氏填 1-2 个字（如 王 / 欧阳）。'); return; }
+    if (!y || !m || !d) { bot('起名要结合生辰，年月日都要填哦。'); return; }
+    state.birth = { surname: v, year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value, sex: state.sex };
+    me(`姓 ${v} · ${y}年${m}月${d}日生 · ${state.sex === 'male' ? '男' : '女'}`);
   } else if (need === 'birthYear') {
     if (!y) { bot('至少填一下出生年份（如 1990）。'); return; }
     state.birth = { year:y, month:m||null, day:d||null };
@@ -325,6 +374,45 @@ async function fetchToolResult() {
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '查询失败');
     return { kind:'minsu', baihua: j.baihua, toolName:'合婚配对' };
+  }
+  // 民俗速查四件：手机号/车牌/姓名/幸运数色（GET + 服务端白话）
+  if (t === 'mobile' || t === 'chepai' || t === 'xingming') {
+    const apiMap = { mobile:'mobile', chepai:'plate', xingming:'xingming' };
+    const param = t === 'xingming' ? 'name' : 'number';
+    const r = await fetch(`${API}/api/minsu/${apiMap[t]}?${param}=${encodeURIComponent(state.birth.text)}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '分析失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  if (t === 'lucky') {
+    const r = await fetch(`${API}/api/minsu/lucky?birthYear=${state.birth.year}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '分析失败');
+    return { kind:'minsu', baihua: j.baihua, toolName:'幸运数色' };
+  }
+  // 宝宝起名：古籍词库 + 五行补益 + 防重名（CSRF 白名单内）
+  if (t === 'qiming') {
+    const bb = state.birth;
+    const r = await fetch(`${API}/api/minsu/xingming/suggest`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+      body: JSON.stringify({ surname: bb.surname, gender: bb.sex === 'male' ? 'M' : 'F', year: bb.year, month: bb.month, day: bb.day, hour: bb.hour }),
+      signal: AbortSignal.timeout(25000)
+    });
+    const j = await r.json();
+    const res0 = j && j.data && j.data.result;
+    if (!res0 || !res0.recommendations) throw new Error((j && (j.message || j.error)) || '起名生成失败');
+    const recs = res0.recommendations.slice(0, 8);
+    const b = {
+      overview: `姓「${res0.surname}」${res0.gender}宝宝：命局五行属${res0.dayElement || '—'}${(res0.wuxing_lack && res0.wuxing_lack.length) ? '，喜用补「' + res0.wuxing_lack.join('、') + '」' : ''}。从古籍词库 ${res0.totalCandidates} 个候选中精选 ${recs.length} 个，按五行契合与寓意排序。`,
+      cards: recs.map(n => ({
+        title: `${n.name} · ${n.score}分`,
+        plain: `${n.meaning || ''}——出自${n.source || ''}${n.sourceText ? '（' + n.sourceText + '）' : ''}。五行属${n.wuxing || '—'}${n.sancai && n.sancai.advice ? '，' + n.sancai.advice.replace(/^[✦○]\s*/, '') : ''}${n.familyNote ? '。避讳提示：' + n.familyNote : ''}`,
+        level: n.score >= 75 ? 'good' : 'neutral'
+      })),
+      tips: ['名字是长辈的心意与祝福，古籍出处让名字有文化底蕴', '最终定名前建议全家念几遍：顺口、好写、无谐音歧义最重要', '如需结合完整八字精算，可请命理师用专业排盘复核']
+    };
+    return { kind:'paipan', baihua: b, toolName: `宝宝起名 · ${res0.surname}姓` };
   }
   // 命格指数：十二维评分报告（CSRF 白名单内）
   if (t === 'lifeindex') {

@@ -76,7 +76,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 </div>
 <div class="ms-header">
   <div class="ms-title">节 民俗工具中心</div>
-  <div class="ms-subtitle">命理宝鉴 · 十二大民俗工具 · 经典依据</div>
+  <div class="ms-subtitle">命理宝鉴 · 十四大民俗工具 · 经典依据 · 白话解读</div>
 </div>
 <div class="ms-grid">
   <a class="ms-card ms-huangli" href="javascript:void(0)" onclick="showTool('huangli')">
@@ -109,11 +109,23 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
     <div class="ms-desc">尾数五行 · 81数理 · 组段分析 · 连号重号</div>
     <div class="ms-api">GET /api/minsu/mobile</div>
   </a>
-  <a class="ms-card ms-xingming" href="rename.html">
+  <a class="ms-card ms-xingming" href="javascript:void(0)" onclick="showTool('xingming')">
     <span class="ms-icon">写</span>
     <img class="ms-name-img" src="assets/minsu/title-xingming.png" alt="姓名学">
     <div class="ms-desc">三才五格 · 笔画五行 · 81数理 · 相生相克</div>
     <div class="ms-api">GET /api/minsu/xingming</div>
+  </a>
+  <a class="ms-card" href="javascript:void(0)" onclick="showTool('plate')" style="border-left:3px solid #63b3ed">
+    <span class="ms-icon">车</span>
+    <img class="ms-name-img" src="assets/minsu/title-plate.png" alt="车牌号码">
+    <div class="ms-desc">尾数五行 · 81数理 · 豹子号/顺子/对子</div>
+    <div class="ms-api">GET /api/minsu/plate</div>
+  </a>
+  <a class="ms-card" href="ask.html?tool=qiming" style="border-left:3px solid #ffd166">
+    <span class="ms-icon">名</span>
+    <img class="ms-name-img" src="assets/minsu/title-qiming.png" alt="宝宝起名">
+    <div class="ms-desc">古籍词库 · 五行补益 · 防重名 · 避讳提示</div>
+    <div class="ms-api">POST /api/minsu/xingming/suggest</div>
   </a>
   <a class="ms-card ms-liunian" href="javascript:void(0)" onclick="showTool('liunian')">
     <span class="ms-icon">更</span>
@@ -158,7 +170,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   </a>
 </div>
 <div class="ms-footer">
-  命理宝鉴 · 民俗工具中心 · 12 件工具 · 白话引擎 v2<br>
+  命理宝鉴 · 民俗工具中心 · 14 件工具 · 白话引擎 v2<br>
   <a href="index.html">← 返回首页</a>
 </div>
 
@@ -197,31 +209,78 @@ async function showTool(tool){
   result.innerHTML='<div style="text-align:center;color:var(--paper3)">查询中...</div>';
   // 本地静态服务(8900)不代理 /api，显式指向 8920；生产同源部署时走相对路径
   const API=(location.protocol==='file:'||location.port==='8900')?'http://127.0.0.1:8920':'';
-  let url='',html='';
-  if(tool==='huangli'){
-    const d=new Date();
-    url=`/api/minsu/huangli?year=${d.getFullYear()}&month=${d.getMonth()+1}&day=${d.getDate()}`;
-  }else if(tool==='zeri'){
-    url='/api/minsu/zeri?year=2026&month=8&event=%E5%AB%81%E5%A8%B6';
-  }else if(tool==='taisui'){
-    url='/api/minsu/taisui?year=2026';
-  }else if(tool==='jieqi'){
-    url='/api/minsu/jieqi?year=2026';
-  }else if(tool==='mobile'){
-    url='/api/minsu/mobile?number=13800138000';
-  }else if(tool==='liunian'){
-    url='/api/minsu/liunian?year=2026&birthYear=1990';
-  }else if(tool==='lucky'){
-    url='/api/minsu/lucky?birthYear=1990';
-  }else if(tool==='hehun'){
-    url='/api/minsu/hehun?maleYear=1990&femaleYear=1992';
+  let url='',html='',postBody=null;
+  const nowD=new Date(), CY=nowD.getFullYear(), CM=nowD.getMonth()+1;
+  // ── 免输入工具：直接出结果（当前年/日）──
+  if(tool==='huangli') url=`/api/minsu/huangli?year=${CY}&month=${CM}&day=${nowD.getDate()}`;
+  else if(tool==='taisui') url=`/api/minsu/taisui?year=${CY}`;
+  else if(tool==='jieqi') url=`/api/minsu/jieqi?year=${CY}`;
+  else if(tool==='holidays') url=`/api/minsu/holidays?year=${CY}`;
+  else {
+    // ── 需输入工具：先渲染输入表单，提交后调 runTool ──
+    const F={
+      zeri:{t:'择日建议',h:`<select id="f1" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><option>嫁娶</option><option>开业</option><option>搬家</option><option>出行</option><option>动土</option><option>祭祀</option><option>安葬</option></select><input id="f2" type="number" value="${CY}" style="width:90px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f3" type="number" value="${CM}" min="1" max="12" style="width:64px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'选事项 + 年月（默认本月）'},
+      mobile:{t:'手机号吉凶',h:`<input id="f1" type="tel" placeholder="输入手机号（11位）" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'只用于数理分析，不会保存'},
+      plate:{t:'车牌号吉凶',h:`<input id="f1" type="text" placeholder="输入车牌 如 粤A6688" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'汉字字母都行，按数字部分起数理'},
+      xingming:{t:'姓名评分',h:`<input id="f1" type="text" placeholder="输入姓名（连名带姓 2-4 字）" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'五格三才按繁体笔画计算'},
+      liunian:{t:'流年运程',h:`<input id="f1" type="number" placeholder="出生年 如1990" style="width:150px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:`看 ${CY} 年逐月运势`},
+      lucky:{t:'幸运数色',h:`<input id="f1" type="number" placeholder="出生年 如1990" style="width:150px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'按生年五行推幸运数字/颜色/方位'},
+      hehun:{t:'合婚配对',h:`<input id="f1" type="number" placeholder="男方出生年" style="width:130px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f2" type="number" placeholder="女方出生年" style="width:130px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'年柱粗筛版；精算请到「问事」用合婚 v2'},
+      family:{t:'家庭排盘',h:`<div id="famRows" style="width:100%"></div><button onclick="addFamRow()" style="padding:6px 14px;background:var(--card);color:var(--gold);border:1px dashed var(--gold);border-radius:6px;cursor:pointer">+ 加一位成员</button>`,hint:'至少两位成员（称呼+出生年）'},
+    }[tool];
+    if(!F){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px">工具未接入</div>';return;}
+    result.innerHTML=`<div style="font-size:14px;color:var(--gold);font-weight:bold;margin-bottom:8px">${F.t}</div>`
+      +`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">${F.h}</div>`
+      +`<div style="font-size:11px;color:var(--paper3);margin:6px 0 10px">${F.hint}</div>`
+      +`<button onclick="runTool('${tool}')" style="padding:9px 26px;background:linear-gradient(135deg,#c9a84c,#a67c2e);color:#1a1208;border:none;border-radius:6px;font-size:14px;cursor:pointer">开始分析</button>`;
+    if(tool==='family'){addFamRow();addFamRow();}
+    return;
   }
+  execTool(tool, url, null);
+}
+
+/* 家庭排盘动态行 */
+function addFamRow(){
+  const box=document.getElementById('famRows'); if(!box) return;
+  const i=box.children.length;
+  box.insertAdjacentHTML('beforeend',`<div style="display:flex;gap:8px;margin-bottom:6px"><input class="fam-role" placeholder="称呼 如爸爸" style="width:110px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input class="fam-year" type="number" placeholder="出生年 如1965" style="width:130px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"></div>`);
+}
+
+/* 输入型工具提交入口 */
+function runTool(tool){
+  const v=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const result=document.getElementById('ms-result');
+  let url='',postBody=null;
+  if(tool==='zeri'){ url=`/api/minsu/zeri?year=${v('f2')||new Date().getFullYear()}&month=${v('f3')||(new Date().getMonth()+1)}&event=${encodeURIComponent(v('f1')||'嫁娶')}`; }
+  else if(tool==='mobile'){ const n=v('f1'); if(n.replace(/\D/g,'').length<7){result.innerHTML='<div style="color:#ef4444;padding:10px">手机号至少 7 位数字哦。</div>';return;} url=`/api/minsu/mobile?number=${encodeURIComponent(n)}`; }
+  else if(tool==='plate'){ const n=v('f1'); if(n.replace(/\D/g,'').length<3){result.innerHTML='<div style="color:#ef4444;padding:10px">车牌数字部分至少 3 位（如 粤A6688）。</div>';return;} url=`/api/minsu/plate?number=${encodeURIComponent(n)}`; }
+  else if(tool==='xingming'){ const n=v('f1'); if(n.length<2||n.length>4){result.innerHTML='<div style="color:#ef4444;padding:10px">姓名填 2-4 个字（连名带姓）。</div>';return;} url=`/api/minsu/xingming?name=${encodeURIComponent(n)}`; }
+  else if(tool==='liunian'){ const n=v('f1'); if(!n){result.innerHTML='<div style="color:#ef4444;padding:10px">请填出生年份。</div>';return;} url=`/api/minsu/liunian?year=${new Date().getFullYear()}&birthYear=${n}`; }
+  else if(tool==='lucky'){ const n=v('f1'); if(!n){result.innerHTML='<div style="color:#ef4444;padding:10px">请填出生年份。</div>';return;} url=`/api/minsu/lucky?birthYear=${n}`; }
+  else if(tool==='hehun'){ const a=v('f1'),b=v('f2'); if(!a||!b){result.innerHTML='<div style="color:#ef4444;padding:10px">两位出生年份都要填哦。</div>';return;} url=`/api/minsu/hehun?maleYear=${a}&femaleYear=${b}`; }
+  else if(tool==='family'){
+    const rows=[...document.querySelectorAll('#famRows > div')];
+    const members=rows.map(r=>({role:r.querySelector('.fam-role').value.trim()||'成员',year:+r.querySelector('.fam-year').value})).filter(m=>m.year>1900&&m.year<=new Date().getFullYear());
+    if(members.length<2){result.innerHTML='<div style="color:#ef4444;padding:10px">至少两位成员且出生年有效。</div>';return;}
+    postBody={members};
+    url='/api/minsu/family';
+  }
+  execTool(tool, url, postBody);
+}
+
+/* 共享执行：取数 + 白话/结构化渲染 */
+async function execTool(tool, url, postBody){
+  const result=document.getElementById('ms-result');
+  const API=(location.protocol==='file:'||location.port==='8900')?'http://127.0.0.1:8920':'';
+  let html='';
+  result.innerHTML='<div style="text-align:center;color:var(--paper3)">🔮 分析中…</div>';
   try {
-    const r=await fetch(API+url,{signal:AbortSignal.timeout(10000)});
+    const r = postBody
+      ? await fetch(API+url,{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},body:JSON.stringify(postBody),signal:AbortSignal.timeout(12000)})
+      : await fetch(API+url,{signal:AbortSignal.timeout(10000)});
     const data=await r.json();
     if(!data.ok){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px">查询失败: '+(data.error||'未知错误')+'</div>';return;}
-    if((tool==='family'||tool==='holidays')&&(!data.result || data.result.length===0)){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px"><div style="font-size:32px;margin-bottom:8px">📭</div><div>暂无记录</div></div>';return;}
-  const c=data.chart;
+  const c=data.chart||{};
   if(tool==='huangli'){
     html=`<h3 style="color:var(--gold);margin-bottom:8px">📅 ${c.date} 黄历</h3>`;
     html+=`<div style="font-size:12px;line-height:2;color:var(--paper)">`;
@@ -284,6 +343,40 @@ async function showTool(tool){
     html+=`生肖：${c.sxRelation}（${c.sxScore}分） | 五行：${c.wxRelation}（${c.wxScore}分） | 天干：${c.ganRelation}<br>`;
     html+=`总分：<b style="color:var(--gold)">${c.totalScore}</b>（${c.grade}）<br>`;
     html+=`<span style="color:var(--jade)">${c.suggestion}</span>`;
+    html+='</div>';
+  }else if(tool==='xingming'){
+    const w=c.wuge||{};
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">写 「${esc(c.name||'')}」姓名分析</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    for(const k of ['tianGe','renGe','diGe','waiGe','zongGe']){
+      if(w[k]) html+=`${({tianGe:'天格',renGe:'人格',diGe:'地格',waiGe:'外格',zongGe:'总格'})[k]}：${w[k].value}画（${w[k].wuxing}·${w[k].ji?'吉':'平'}）　`;
+    }
+    html+='<br>';
+    if(c.sancai) html+=`三才：${c.sancai.tian}${c.sancai.ren}${c.sancai.di}（${c.sancai.relation||''}）<br>`;
+    html+=`评分：<b style="color:var(--gold)">${c.score}/100</b> | ${esc(c.suggestion||'')}`;
+    html+='</div>';
+  }else if(tool==='plate'){
+    const ft=[c.features&&c.features.repeatDesc,c.features&&c.features.seqDesc,c.features&&c.features.aabbDesc].filter(Boolean);
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">车 ${esc(c.number||'')} 分析</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    html+=`数字部分：${esc(c.digits||'')} | 尾数：${c.tailNumber}（${c.tailWuxing}） | 81数理：${c.luck81.number}（${c.luck81.luck}）<br>`;
+    if(ft.length) html+=`形态：${esc(ft.join('；'))}<br>`;
+    html+=`评分：<b style="color:var(--gold)">${c.score}/100</b> | ${esc(c.suggestion||'')}`;
+    html+='</div>';
+  }else if(tool==='family'){
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">👨‍👩‍👧 家庭排盘 · 评分 ${c.familyScore}/100</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    (c.members||[]).forEach(m=>{ html+=`${esc(m.role||m.name||'成员')}：${m.ganZhi}年 属${m.shengxiao}（${m.wuxing}）<br>`; });
+    html+=`五行分布：${Object.entries(c.wuxingDistribution||{}).map(([k,v])=>k+'×'+v).join('、')||'—'}${(c.missingWuxing||[]).length?` | 缺：<span style="color:var(--red)">${c.missingWuxing.join('、')}</span>`:'（齐全）'}<br>`;
+    (c.relations||[]).forEach(r=>{ html+=`${esc(r.a)} × ${esc(r.b)}：${r.relation}<br>`; });
+    html+=`<span style="color:var(--jade)">${esc(c.suggestion||'')}</span>`;
+    html+='</div>';
+  }else if(tool==='holidays'){
+    const list=(c.holidays||[]);
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">庆 ${c.year}年节日表（${c.count||list.length}个）</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    for(const h of list.slice(0,40)) html+=`${h.date||''}　${esc(h.name||'')} <span style="color:var(--paper3)">${esc(h.category||h.calendar||'')}</span><br>`;
+    if(list.length>40) html+=`<span style="color:var(--paper3)">…共 ${list.length} 个，以上前 40 个</span>`;
     html+='</div>';
   }
   result.innerHTML=renderBaihua(data.baihua)+html;
