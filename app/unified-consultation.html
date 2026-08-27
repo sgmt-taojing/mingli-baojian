@@ -164,6 +164,44 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 .emergency b{color:#fca5a5}
 .emergency .call{margin-left:auto;color:#fff;background:var(--red);padding:4px 12px;border-radius:14px;text-decoration:none;font-weight:600;font-size:12px}
 
+/* ═══ 叫号队列 ═══ */
+.queue-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.queue-bar input[type=text]{flex:1;min-width:120px;padding:8px 10px;font-size:13px;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.25);border-radius:6px;color:inherit}
+.queue-bar label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.queue-cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.queue-col h4{font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:6px}
+.q-chip{display:flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid rgba(201,168,76,.2);border-radius:6px;margin-bottom:5px;font-size:12px;background:rgba(255,255,255,.02)}
+.q-chip .no{color:var(--gold);font-weight:700;font-family:monospace}
+.q-chip .urgent-tag{color:#fff;background:var(--red);border-radius:4px;padding:0 4px;font-size:10px}
+.q-chip button{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(78,201,176,.4);background:rgba(78,201,176,.1);color:#4ec9b0;cursor:pointer}
+.q-chip.in-consult{border-color:rgba(78,201,176,.5);background:rgba(78,201,176,.08)}
+.q-chip.done{opacity:.55}
+.q-empty{font-size:11px;color:var(--muted);padding:6px 0}
+
+/* ═══ 医技开单 ═══ */
+.tech-tabs{display:flex;gap:6px;margin-bottom:8px}
+.tech-tab{padding:5px 14px;font-size:12px;border-radius:14px;border:1px solid rgba(201,168,76,.3);background:transparent;color:var(--paper2);cursor:pointer}
+.tech-tab.active{background:rgba(201,168,76,.18);color:var(--gold);font-weight:600}
+.tech-items{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tech-item{padding:5px 12px;font-size:12px;border-radius:6px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:var(--paper2);cursor:pointer;user-select:none}
+.tech-item.sel{border-color:#4ec9b0;background:rgba(78,201,176,.12);color:#4ec9b0}
+.tech-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.tech-row input[type=text]{flex:1;min-width:140px;padding:8px 10px;font-size:13px;background:rgba(255,255,255,.04);border:1px solid rgba(201,168,76,.25);border-radius:6px;color:inherit}
+.tech-orders{margin-top:10px}
+.t-order{border:1px solid rgba(255,255,255,.1);border-left:3px solid var(--gold);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:12px}
+.t-order .t-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.t-order .t-status{border-radius:4px;padding:1px 6px;font-size:10px}
+.t-order .st-ordered{background:rgba(201,168,76,.15);color:var(--gold)}
+.t-order .st-executed{background:rgba(99,179,237,.15);color:#63b3ed}
+.t-order .st-reported{background:rgba(78,201,176,.15);color:#4ec9b0}
+.t-order .st-cancelled{background:rgba(255,255,255,.08);color:var(--muted)}
+.t-order .t-items{color:var(--paper);margin:4px 0}
+.t-order .t-result{color:#9fd6c4;background:rgba(78,201,176,.06);border-radius:6px;padding:6px 8px;margin-top:4px;line-height:1.6}
+.t-order .t-acts{margin-left:auto;display:flex;gap:6px}
+.t-order .t-acts button{font-size:10px;padding:3px 10px;border-radius:10px;cursor:pointer;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.08);color:var(--gold)}
+.t-order .t-acts button.evidence{border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.1);color:#b79ef5}
+.t-order textarea{width:100%;margin-top:6px;padding:6px 8px;font-size:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:inherit;min-height:52px;font-family:inherit}
+
 @media(max-width:768px){
   .topbar{padding:8px 12px}
   .main-container{padding:12px 14px}
@@ -201,6 +239,23 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
     <span class="ic">⚠</span>
     <div>紧急情况请立即拨打 <b>120</b> 或前往最近急诊。本平台不能替代急救。</div>
     <a href="tel:120" class="call">📞 120</a>
+  </div>
+
+  <!-- ═══ 叫号队列（分诊台） ═══ -->
+  <div class="card" id="queuePanel" style="margin-bottom:var(--gap)">
+    <h3><span class="icon" style="background:rgba(201,168,76,.12)">📢</span>叫号队列 · 今日分诊<span class="label" id="queueLabel">—</span></h3>
+    <div class="queue-bar">
+      <input type="text" id="qName" placeholder="患者姓名">
+      <input type="text" id="qComplaint" placeholder="主诉（可选，如：咳嗽三周）">
+      <label><input type="checkbox" id="qUrgent"> 加急</label>
+      <button class="btn primary sm" onclick="queueCheckin()">🎫 取号</button>
+      <button class="btn green sm" onclick="queueCall()">🔔 叫下一位</button>
+    </div>
+    <div class="queue-cols">
+      <div class="queue-col"><h4>候诊 <span id="qWaitN">0</span></h4><div id="qWaiting"><div class="q-empty">暂无候诊</div></div></div>
+      <div class="queue-col"><h4>就诊中</h4><div id="qCurrent"><div class="q-empty">—</div></div></div>
+      <div class="queue-col"><h4>已完成 <span id="qDoneN">0</span></h4><div id="qDone"><div class="q-empty">—</div></div></div>
+    </div>
   </div>
 
   <div class="grid-tri">
@@ -299,6 +354,31 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
       </div>
 
     </div>
+  </div>
+
+  <!-- ═══ 医技开单（检验/检查申请 → 执行 → 报告回填 → 旁证入历） ═══ -->
+  <div class="emr-panel" id="techPanel" style="margin-bottom:var(--gap)">
+    <div class="emr-header">
+      <h2>🧪 医技开单 <span style="font-size:10px;color:var(--muted);font-weight:normal">检验 / 检查申请 · 结果回填后可一键接入病历旁证</span></h2>
+      <div class="emr-actions">
+        <button class="btn ghost sm" onclick="loadTechOrders()">🔄 刷新</button>
+      </div>
+    </div>
+    <div class="tech-row">
+      <input type="text" id="tPatient" placeholder="患者姓名（或从就诊中带入了）" style="max-width:200px">
+      <button class="btn ghost sm" onclick="fillFromQueue()">⬇ 从当前就诊带入</button>
+      <label style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px"><input type="checkbox" id="tUrgent"> 加急</label>
+    </div>
+    <div class="tech-tabs">
+      <button class="tech-tab active" data-cat="lab" onclick="setTechCat('lab')">🧫 检验</button>
+      <button class="tech-tab" data-cat="exam" onclick="setTechCat('exam')">🩻 检查</button>
+    </div>
+    <div class="tech-items" id="tItems"></div>
+    <div class="tech-row">
+      <input type="text" id="tNote" placeholder="备注（临床提示 / 注意事项，可选）">
+      <button class="btn primary sm" onclick="createTechOrder()">📤 开单</button>
+    </div>
+    <div class="tech-orders" id="tOrders"><div class="q-empty">暂无医技单</div></div>
   </div>
 
   <!-- ═══ 审核面板（医生/命理师可见） ═══ -->
@@ -865,5 +945,181 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <script src="js/mobile-nav.js" defer></script>
+<script>
+/* ═══ R-QUEUE 叫号队列 + R-TECH-ORDER 医技开单 ═══ */
+(function(){
+  const API = 'http://127.0.0.1:8920';
+  let _csrf = null;
+  async function getCsrf(){
+    if(!_csrf){ try{ const r = await fetch(API + '/api/csrf-token'); _csrf = (await r.json()).csrfToken || ''; }catch(e){ _csrf = ''; } }
+    return _csrf;
+  }
+  async function cPost(url, body){
+    const t = await getCsrf();
+    const r = await fetch(API + url, { method:'POST', headers:{ 'Content-Type':'application/json', 'X-CSRF-Token':t, 'X-Skip-Interceptor':'1' }, body: JSON.stringify(body) });
+    return r.json();
+  }
+  async function cGet(url){
+    const r = await fetch(API + url, { headers:{ 'X-Skip-Interceptor':'1' } });
+    return r.json();
+  }
+  const escH = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  /* ── 叫号队列 ── */
+  window.queueCheckin = async function(){
+    const name = document.getElementById('qName').value.trim();
+    if(!name){ toast('请填写患者姓名'); return; }
+    const j = await cPost('/api/clinic/queue/checkin', { name, complaint: document.getElementById('qComplaint').value.trim(), urgent: document.getElementById('qUrgent').checked });
+    if(!j.ok){ toast('取号失败：' + (j.error || '')); return; }
+    toast('🎫 ' + j.ticket + ' 取号成功，前面还有 ' + j.ahead + ' 位');
+    document.getElementById('qName').value = ''; document.getElementById('qComplaint').value = ''; document.getElementById('qUrgent').checked = false;
+    refreshQueue();
+  };
+  window.queueCall = async function(id){
+    const j = await cPost('/api/clinic/queue/call', id ? { id } : {});
+    if(!j.ok){ toast(j.error === 'QUEUE_EMPTY' ? '候诊队列已空' : '叫号失败'); return; }
+    toast('🔔 请 ' + j.ticket + ' ' + j.name + ' 就诊');
+    // 叫号即带入：医技开单患者名 + 病历主诉
+    document.getElementById('tPatient').value = j.name;
+    if(j.complaint && !App.emr.complaint){
+      App.emr.complaint = j.complaint;
+      const el = document.getElementById('emr-complaint');
+      if(el){ el.textContent = j.complaint; el.classList.remove('empty'); }
+    }
+    refreshQueue();
+  };
+  window.queueTransition = async function(id, to){
+    const j = await cPost('/api/clinic/queue/transition', { id, to });
+    if(!j.ok){ toast('状态流转失败：' + (j.status || j.error || '')); return; }
+    toast(({in_consult:'开始就诊', done:'就诊完成', skipped:'已过号'})[to] || to);
+    refreshQueue();
+  };
+  async function refreshQueue(){
+    let j;
+    try{ j = await cGet('/api/clinic/queue'); }catch(e){ return; }
+    if(!j.ok) return;
+    const w = document.getElementById('qWaiting'), c = document.getElementById('qCurrent'), d = document.getElementById('qDone');
+    if(!w) return;
+    document.getElementById('qWaitN').textContent = j.waiting.length;
+    document.getElementById('qDoneN').textContent = j.done.length;
+    document.getElementById('queueLabel').textContent = j.date + ' · 候诊 ' + j.waiting.length + ' 人';
+    w.innerHTML = j.waiting.length ? j.waiting.map(q =>
+      `<div class="q-chip"><span class="no">${escH(q.ticket)}</span>${q.urgent?'<span class="urgent-tag">急</span>':''}<span>${escH(q.name)}</span><button onclick="queueCall(${q.id})">叫号</button><button style="border-color:rgba(255,255,255,.2);color:#8b7e6a;background:transparent" onclick="queueTransition(${q.id},'skipped')">过号</button></div>`
+    ).join('') : '<div class="q-empty">暂无候诊</div>';
+    c.innerHTML = j.called.length ? j.called.map(q =>
+      `<div class="q-chip in-consult"><span class="no">${escH(q.ticket)}</span><span>${escH(q.name)}</span>${q.status==='called'
+        ? `<button onclick="queueTransition(${q.id},'in_consult')">开始</button>`
+        : `<button onclick="queueTransition(${q.id},'done')">完成</button>`}</div>`
+    ).join('') : '<div class="q-empty">—</div>';
+    d.innerHTML = j.done.length ? j.done.slice(0,8).map(q =>
+      `<div class="q-chip done"><span class="no">${escH(q.ticket)}</span><span>${escH(q.name)}</span><span style="margin-left:auto;font-size:10px;color:#8b7e6a">${q.status==='skipped'?'过号':'完成'}</span></div>`
+    ).join('') : '<div class="q-empty">—</div>';
+  }
+
+  /* ── 医技开单 ── */
+  let techCat = 'lab', techSel = new Set(), techCatalog = null, techOrders = [];
+  window.setTechCat = function(c){
+    techCat = c; techSel.clear();
+    document.querySelectorAll('.tech-tab').forEach(b => b.classList.toggle('active', b.dataset.cat === c));
+    renderTechItems();
+  };
+  function renderTechItems(){
+    const box = document.getElementById('tItems');
+    if(!techCatalog){ box.innerHTML = '<div class="q-empty">目录加载中…</div>'; return; }
+    box.innerHTML = (techCatalog[techCat] || []).map(it =>
+      `<span class="tech-item${techSel.has(it)?' sel':''}" onclick="toggleTechItem('${it}')">${escH(it)}</span>`
+    ).join('');
+  }
+  window.toggleTechItem = function(it){
+    techSel.has(it) ? techSel.delete(it) : techSel.add(it);
+    renderTechItems();
+  };
+  window.fillFromQueue = function(){
+    const cur = document.querySelector('#qCurrent .q-chip span:nth-child(3)');
+    if(cur){ document.getElementById('tPatient').value = cur.textContent; toast('已带入当前就诊患者'); }
+    else toast('当前无就诊中患者');
+  };
+  window.createTechOrder = async function(){
+    const patientName = document.getElementById('tPatient').value.trim();
+    if(!patientName){ toast('请填写患者姓名'); return; }
+    if(!techSel.size){ toast('请点选检验/检查项目'); return; }
+    const j = await cPost('/api/clinic/tech-order', {
+      patientName, category: techCat, items: [...techSel],
+      urgent: document.getElementById('tUrgent').checked,
+      note: document.getElementById('tNote').value.trim()
+    });
+    if(!j.ok){ toast('开单失败：' + (j.error || '')); return; }
+    toast('📤 医技单 #' + j.id + ' 已开出');
+    techSel.clear(); document.getElementById('tNote').value = ''; document.getElementById('tUrgent').checked = false;
+    renderTechItems(); loadTechOrders();
+  };
+  window.techTransition = async function(id, to){
+    let resultText;
+    if(to === 'reported'){
+      const ta = document.getElementById('tResult-' + id);
+      resultText = ta ? ta.value.trim() : '';
+      if(!resultText){ toast('请填写报告结果'); return; }
+    }
+    const j = await cPost('/api/clinic/tech-order/transition', { id, to, resultText });
+    if(!j.ok){ toast('流转失败：' + (j.status || j.error || '')); return; }
+    toast(({executed:'已执行/采样', reported:'报告已回填', cancelled:'已作废'})[to] || to);
+    loadTechOrders();
+  };
+  window.techEvidence = async function(id){
+    const o = techOrders.find(x => x.id === id);
+    if(!o || !o.resultText) return;
+    toast('🔬 旁证分析中…');
+    try{
+      const j = await cPost('/api/clinic/lab-evidence', { text: o.resultText });
+      if(!j.ok){ toast('旁证分析失败'); return; }
+      const abList = j.abnormals || [];
+      const ab = abList.slice(0,5).map(a => a.name + (a.flag || '')).join('、');
+      const wx = (j.wuxing_focus && j.wuxing_focus.length) ? '偏' + j.wuxing_focus.join('、') : '';
+      const ev = abList.slice(0,3).map(a => a.tcm_evidence).filter(Boolean).join('；');
+      const txt = '检验旁证（医技单 #' + id + '）：' + (ab ? '异常指标 ' + ab + '。' : '指标未见明显异常。') + (wx ? ' 五行佐证：' + wx + '。' : '') + (ev ? ' 中医提示：' + ev + '。' : '');
+      App.emr.examination = (App.emr.examination ? App.emr.examination + '\n' : '') + txt;
+      const el = document.getElementById('emr-examination');
+      if(el){ el.textContent = App.emr.examination; el.classList.remove('empty'); }
+      toast('✅ 旁证已写入病历四诊区');
+    }catch(e){ toast('旁证分析异常'); }
+  };
+  window.loadTechOrders = async function(){
+    let j;
+    try{ j = await cGet('/api/clinic/tech-orders'); }catch(e){ return; }
+    if(!j.ok) return;
+    if(j.catalog && !techCatalog){ techCatalog = j.catalog; renderTechItems(); }
+    techOrders = j.orders || [];
+    const box = document.getElementById('tOrders');
+    if(!techOrders.length){ box.innerHTML = '<div class="q-empty">暂无医技单</div>'; return; }
+    const ST = { ordered:'待执行', executed:'已执行', reported:'已回填', cancelled:'已作废' };
+    box.innerHTML = techOrders.map(o => `
+      <div class="t-order">
+        <div class="t-head">
+          <b>#${o.id}</b> ${o.urgent?'<span class="urgent-tag" style="color:#fff;background:var(--red);border-radius:4px;padding:0 4px;font-size:10px">急</span>':''}
+          <span>${escH(o.patientName)}</span>
+          <span style="color:var(--muted)">${o.category==='lab'?'检验':'检查'}</span>
+          <span class="t-status st-${o.status}">${ST[o.status]||o.status}</span>
+          <span class="t-acts">
+            ${o.status==='ordered'?`<button onclick="techTransition(${o.id},'executed')">执行/采样</button><button onclick="techTransition(${o.id},'cancelled')">作废</button>`:''}
+            ${o.status==='executed'?`<button onclick="document.getElementById('tResult-${o.id}').style.display='block'">回填报告</button>`:''}
+            ${o.status==='reported'?`<button class="evidence" onclick="techEvidence(${o.id})">🔬 接入病历旁证</button>`:''}
+          </span>
+        </div>
+        <div class="t-items">${o.items.map(escH).join(' · ')}${o.note?'　<span style="color:var(--muted)">备注：'+escH(o.note)+'</span>':''}</div>
+        ${o.status==='executed'?`<textarea id="tResult-${o.id}" style="display:none" placeholder="粘贴报告原文或关键指标，如：WBC 11.2↑，CRP 28↑，血糖 6.8"></textarea><button class="btn green sm" style="margin-top:4px" onclick="techTransition(${o.id},'reported')">✅ 提交报告</button>`:''}
+        ${o.resultText?`<div class="t-result">${escH(o.resultText)}</div>`:''}
+      </div>`).join('');
+  };
+
+  /* ── 启动 ── */
+  function init(){
+    refreshQueue();
+    loadTechOrders();
+    setInterval(refreshQueue, 8000);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
 </body>
 </html>
