@@ -1,4 +1,17 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 17:05 — 人生规划入口三面补齐（民俗中心/首页/问事页）
+- 盘点发现：lifeplan-detail.html 与 POST /api/ai/lifeplan-report 早已存在，但只在 reports-hub/site-nav/mindmap 等次级页互链，民俗工具中心、首页、问事页三大主入口均缺失
+- 民俗中心：新增第 12 件工具卡（🧭 + title-lifeplan.png 金字图 + 朱红「规」印 + 橙色边条），副标题「十一大」→「十二大」，页脚陈旧文案「8大工具引擎 v1.0」→「12 件工具 · 白话引擎 v2」
+- 首页患者区：新增人生规划 icon-card（橙色时钟 SVG glyph），位于命理速览后
+- 问事页 ask.html：TOOLS 加第 11 件 lifeplan（need=birthYear 复用出生年采集，性别 chip 对该工具显示、跳过按钮隐藏）；fetchToolResult 新增 lifeplan 分支调 /api/ai/lifeplan-report（CSRF 白名单内免 token），report.domains/next5Years/actions 映射为白话卡结构复用渲染
+- 浏览器实测：问事全链路 1990年女命「事业+健康」→ 12 领域评分卡 + 5 年路径时间轴全渲染；民俗中心新卡图片加载与文案修正核验；首页新卡核验
+- 提交：main 5637c5a
+## 2026-08-27 16:58 — 眼诊 svc 接入 OneFrame 巩膜 v2.0（平台侧交付登记）
+- models/oneframe-tcm-eye-v2.0.onnx 到位（md5=a47db58fd955c3dbd6f1ff89863aadb6，与平台侧一致）；vision-model-labels.json 注册（labels 目青/正常/目赤/目黄，input 320）
+- eye-diag-svc(8943) MODELS 增列 oneframe-tcm-eye-v2.0 重启生效（health 4 模型）
+- 端到端实测：真实结膜炎 v1 误判目青 0.72 → v2 正确目赤 0.9988；真实正常眼 v1 0.55 → v2 0.9999
+- v2=合成760+真实321真值重训，真实域真值一致率 0.467→0.969；yellow/cyan 无公开真实源仍仅合成（平台留痕）；v1 并行灰度 1 周期后替代
+- 报告 models/oneframe-tcm-eye-v2.0.report.json；按约定 mingli 侧只登记不代 commit
 ## 2026-08-27 16:55 — 民俗工具中心卡片标题图化
 - 新增 app/assets/minsu/title-*.png ×12：宋体 Bold 描金竖向渐变 + 朱红印章（每工具一印字），透明底 @2x，PIL 确定性渲染（规避 AI 生图中文字讹误）；生成器 scripts/gen-minsu-titles.py（scripts/* 按仓库约定不入库）
 - minsu-center.html：12 张卡片 .ms-name 文字标题全部替换为 .ms-name-img（alt 保留原名，移动端 23px/桌面 27px 自适应）；排盘中心卡降透明度 0.75 保持次级视觉
