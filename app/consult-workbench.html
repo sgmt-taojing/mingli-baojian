@@ -120,7 +120,14 @@ textarea.tall{min-height:200px}
 <!-- ═══ 第一步:采集 ═══ -->
 <div id="step1">
 <div class="panel">
-  <div class="panel-title">患者信息 <span class="sub">生辰用于命理轨排盘 · 本机记忆</span></div>
+  <div class="panel-title">患者信息 <span class="sub">生辰用于命理轨排盘 · 服务端建档，复诊可查</span></div>
+  <div class="frow" style="margin-bottom:8px">
+    <div class="fld" style="flex:1;min-width:180px"><label>🔍 老患者查询（姓名/手机号）</label><input id="pSearch" placeholder="输入姓名或手机号，回车查询" autocomplete="off"></div>
+    <div class="fld" style="max-width:110px;justify-content:flex-end"><label>&nbsp;</label><button class="btn" id="btnPSearch" style="width:100%">查询</button></div>
+    <div class="fld" style="max-width:130px;justify-content:flex-end"><label>&nbsp;</label><button class="btn" id="btnPSave" style="width:100%">💾 建档/保存</button></div>
+  </div>
+  <div id="pSearchResults" style="display:none;margin-bottom:8px"></div>
+  <div id="pCurrent" style="display:none;margin-bottom:8px;padding:8px 10px;border:1px solid var(--gold,#c9a84c);border-radius:8px;font-size:12px"></div>
   <div class="frow">
     <div class="fld" style="max-width:120px"><label>姓名</label><input id="pName" placeholder="患者姓名"></div>
     <div class="fld" style="max-width:76px"><label>性别</label><select id="pGender"><option>男</option><option>女</option></select></div>
@@ -128,7 +135,9 @@ textarea.tall{min-height:200px}
     <div class="fld"><label>月</label><input id="pMonth" type="number" min="1" max="12"></div>
     <div class="fld"><label>日</label><input id="pDay" type="number" min="1" max="31"></div>
     <div class="fld"><label>时辰(24h)</label><input id="pHour" type="number" min="0" max="23"></div>
+    <div class="fld"><label>手机号</label><input id="pPhone" type="tel" placeholder="选填·复诊好找"></div>
   </div>
+  <div id="pHistory" style="display:none;margin-top:8px;padding:8px 10px;background:rgba(78,201,176,.06);border-left:3px solid var(--jade,#4ec9b0);border-radius:6px;font-size:12px;line-height:1.8"></div>
 </div>
 <div class="grid2">
   <div class="panel">
@@ -276,10 +285,89 @@ $('btnCfgSave').addEventListener('click',function(){
 });
 
 /* ── 患者信息记忆 ── */
-['pName','pGender','pYear','pMonth','pDay','pHour'].forEach(function(k){
+['pName','pGender','pYear','pMonth','pDay','pHour','pPhone'].forEach(function(k){
   var v=localStorage.getItem('cw_'+k);if(v!==null)$(k).value=v;
   $(k).addEventListener('change',function(){localStorage.setItem('cw_'+k,$(k).value)});
 });
+
+/* ── 患者闭环：查询老患者 / 建档新患者 / 历史摘要 ── */
+var currentPatientId=parseInt(localStorage.getItem('cw_patient_id'))||null;
+var currentPatientSnap=null; // 选中时的表单快照，用于识别手动改动
+function setPatient(id,snap){
+  currentPatientId=id||null;currentPatientSnap=snap||null;
+  if(id)localStorage.setItem('cw_patient_id',id);else localStorage.removeItem('cw_patient_id');
+  var cur=$('pCurrent');
+  if(id&&snap){
+    cur.style.display='block';
+    cur.innerHTML='👤 当前患者：<b>'+esc(snap.name||'# '+id)+'</b>（档案 #'+id+'）'+(snap.birth_date?' · '+snap.birth_date:'')+' · 处方/批注将自动归入该档案 <button class="btn" id="btnPClear" style="padding:2px 8px;font-size:11px;margin-left:8px">换患者</button>';
+    $('btnPClear').addEventListener('click',function(){setPatient(null,null);$('pHistory').style.display='none'});
+    loadPatientHistory(id);
+  }else{cur.style.display='none';$('pHistory').style.display='none'}
+}
+function patientFormSnapshot(){return{name:$('pName').value.trim(),sex:$('pGender').value,birth_date:($('pYear').value&&$('pMonth').value&&$('pDay').value)?$('pYear').value+'-'+String($('pMonth').value).padStart(2,'0')+'-'+String($('pDay').value).padStart(2,'0'):'',birth_hour:$('pHour').value}}
+// 手动改动关键字段 → 与选中患者不一致则自动解除选中（防误归档到他人）
+['pName','pYear','pMonth','pDay'].forEach(function(k){
+  $(k).addEventListener('change',function(){
+    if(!currentPatientId||!currentPatientSnap)return;
+    var s=patientFormSnapshot();
+    if(s.name!==currentPatientSnap.name||s.birth_date!==currentPatientSnap.birth_date)setPatient(null,null);
+  });
+});
+function loadPatientHistory(id){
+  fetch(API+'/api/clinic/patient/'+id,{headers:{'X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000)})
+    .then(function(r){return r.json()}).then(function(res){
+      var d=res&&res.data?res.data:res;if(!d)return;
+      var h=$('pHistory');var parts=[];
+      if(d.cases&&d.cases.length){var c0=d.cases[0];parts.push('📋 最近病历('+(c0.created_at||'').slice(0,10)+')：'+(c0.symptoms||'').slice(0,60)+(c0.diagnosis?' → 辨证:'+String(c0.diagnosis).slice(0,40):'')+(c0.treatment_outcome?' · 疗效:'+c0.treatment_outcome:''))}
+      if(d.prescriptions&&d.prescriptions.length){var rx=d.prescriptions[0];parts.push('💊 最近处方 #' +rx.id+'('+(rx.signed_at||rx.created_at||'').slice(0,10)+' '+(rx.signer_name||'')+')：'+String(rx.prescription||'').slice(0,60))}
+      if(d.annotations&&d.annotations.length){var an=d.annotations[0];parts.push('🔮 最近命理批注 #' +an.id+'：'+String(an.annotation||'(草案)').slice(0,60))}
+      if(d.stats)parts.push('累计就诊 '+d.stats.total_cases+' 次 · 复诊 '+d.stats.follow_up_count+' 次');
+      if(parts.length){h.innerHTML=parts.join('<br>');h.style.display='block'}
+    }).catch(function(){});
+}
+function doPatientSearch(){
+  var q=$('pSearch').value.trim();
+  var box=$('pSearchResults');
+  fetch(API+'/api/clinic/patients?'+(q?'q='+encodeURIComponent(q):'limit=10'),{headers:{'X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000)})
+    .then(function(r){return r.json()}).then(function(res){
+      var d=res&&res.data?res.data:res;var list=(d&&d.patients)||[];
+      if(!list.length){box.innerHTML='<div style="padding:6px 4px;font-size:12px;color:var(--paper3,#8b7e6a)">未找到「'+esc(q)+'」——填好下方信息后点「建档/保存」即新建</div>';box.style.display='block';return}
+      box.innerHTML=list.map(function(p){
+        return '<div class="btn" style="display:block;text-align:left;margin:4px 0;padding:8px 10px;font-size:12px" data-pid="'+p.id+'" data-pname="'+esc(p.name||'')+'" data-psex="'+esc(p.sex||'')+'" data-pbirth="'+esc(p.birth_date||'')+'" data-phour="'+(p.birth_hour==null?'':p.birth_hour)+'">'
+          +'👤 <b>'+esc(p.name||'# '+p.id)+'</b> '+(p.sex||'')+' '+(p.birth_date||'生辰未录')
+          +' <span style="color:var(--paper3,#8b7e6a)">就诊'+p.case_count+'次 · 处方'+p.rx_count+' · 批注'+p.ml_count+(p.last_visit?' · 最近:'+String(p.last_visit).slice(0,10):'')+'</span></div>';
+      }).join('');
+      box.style.display='block';
+      [...box.querySelectorAll('[data-pid]')].forEach(function(el){
+        el.addEventListener('click',function(){
+          var bd=el.getAttribute('data-pbirth');
+          $('pName').value=el.getAttribute('data-pname');
+          if(el.getAttribute('data-psex'))$('pGender').value=el.getAttribute('data-psex');
+          if(bd){var ps=bd.split('-');$('pYear').value=ps[0];$('pMonth').value=parseInt(ps[1]);$('pDay').value=parseInt(ps[2])}
+          if(el.getAttribute('data-phour')!=='')$('pHour').value=el.getAttribute('data-phour');
+          ['pName','pGender','pYear','pMonth','pDay','pHour'].forEach(function(k){localStorage.setItem('cw_'+k,$(k).value)});
+          setPatient(parseInt(el.getAttribute('data-pid')),patientFormSnapshot());
+          box.style.display='none';setSt('capStatus','✅ 已调出患者档案','ok');
+        });
+      });
+    }).catch(function(e){box.innerHTML='<div style="font-size:12px;color:#ef4444">查询失败:'+esc(e.message)+'</div>';box.style.display='block'});
+}
+$('btnPSearch').addEventListener('click',doPatientSearch);
+$('pSearch').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doPatientSearch()}});
+$('btnPSave').addEventListener('click',function(){
+  var s=patientFormSnapshot();
+  if(!s.name){setSt('capStatus','建档需先填姓名','err');return}
+  var body={name:s.name,sex:s.sex,birth_date:s.birth_date||undefined,birth_hour:($('pHour').value!==''?parseInt($('pHour').value):undefined),phone:$('pPhone').value.trim()||undefined};
+  fetch(API+'/api/clinic/patient',{method:'POST',headers:hdr(),body:JSON.stringify(body)})
+    .then(function(r){return r.json()}).then(function(res){
+      var d=res&&res.data?res.data:res;
+      if(d&&d.patient_id){setPatient(d.patient_id,patientFormSnapshot());setSt('capStatus',d.created?'✅ 新患者建档成功（#'+d.patient_id+'）':'✅ 已有档案，已关联（#'+d.patient_id+'）','ok')}
+      else setSt('capStatus','建档失败:'+((res&&res.message)||''),'err');
+    }).catch(function(e){setSt('capStatus','建档请求失败:'+e.message,'err')});
+});
+// 恢复上次选中的患者
+if(currentPatientId)setPatient(currentPatientId,patientFormSnapshot());
+
 
 /* ── Token ── */
 token=localStorage.getItem('admin_token')||localStorage.getItem('token')||'';
@@ -380,14 +468,29 @@ function renderResult(d){
   $('docDiagnosis').value=pre;
 }
 
+/* ── 签名前确保患者已建档（匿名也允许，但有姓名就自动建档入库） ── */
+function ensurePatient(cb){
+  if(currentPatientId)return cb();
+  var s=patientFormSnapshot();
+  if(!s.name)return cb();
+  var body={name:s.name,sex:s.sex,birth_date:s.birth_date||undefined,birth_hour:($('pHour').value!==''?parseInt($('pHour').value):undefined),phone:$('pPhone').value.trim()||undefined};
+  fetch(API+'/api/clinic/patient',{method:'POST',headers:hdr(),body:JSON.stringify(body)})
+    .then(function(r){return r.json()}).then(function(res){
+      var d=res&&res.data?res.data:res;
+      if(d&&d.patient_id)setPatient(d.patient_id,patientFormSnapshot());
+      cb();
+    }).catch(function(){cb()});
+}
+
 /* ── 医生签名 ── */
 $('btnRxSign').addEventListener('click',function(){
   var diagnosis=$('docDiagnosis').value.trim(),prescription=$('docPrescription').value.trim();
   if(!diagnosis&&!prescription){setSt('rxStatus','请先填写辨证诊断或处方','err');return}
   if(!token){setSt('rxStatus','请先在上方填入签名 Token','err');return}
+  ensurePatient(function(){
   $('btnRxSign').disabled=true;setSt('rxStatus','建方中…','');
   fetch(API+'/api/clinic/prescription/draft',{method:'POST',headers:hdr(),
-    body:JSON.stringify({diagnosis:diagnosis,prescription:prescription})})
+    body:JSON.stringify({diagnosis:diagnosis,prescription:prescription,patientId:currentPatientId})})
   .then(function(r){return r.json()}).then(function(d){
     if(!d.ok){setSt('rxStatus','建方失败:'+(d.error||d.message||''),'err');$('btnRxSign').disabled=false;return}
     setSt('rxStatus','草案 #'+d.id+' 已建,签名中…','');
@@ -400,6 +503,7 @@ $('btnRxSign').addEventListener('click',function(){
       $('prodRx').textContent='#'+s.id+' · '+s.signer;checkDone();
     });
   }).catch(function(e){$('btnRxSign').disabled=false;setSt('rxStatus','请求失败:'+e.message,'err')});
+  });
 });
 
 /* ── 命理师签名(草案+签名一步完成) ── */
@@ -409,9 +513,10 @@ $('btnMlSign').addEventListener('click',function(){
   if(!token){setSt('mlStatus','请先在上方填入签名 Token','err');return}
   var y=parseInt($('pYear').value),m=parseInt($('pMonth').value),d=parseInt($('pDay').value);
   if(!y||!m||!d){setSt('mlStatus','患者生辰不全,无法落批注','err');return}
+  ensurePatient(function(){
   $('btnMlSign').disabled=true;setSt('mlStatus','草案落库中…','');
   fetch(API+'/api/clinic/mingli/draft',{method:'POST',headers:hdr(),
-    body:JSON.stringify({year:y,month:m,day:d,hour:($('pHour').value!==''?parseInt($('pHour').value):12),gender:$('pGender').value,name:$('pName').value||''})})
+    body:JSON.stringify({year:y,month:m,day:d,hour:($('pHour').value!==''?parseInt($('pHour').value):12),gender:$('pGender').value,name:$('pName').value||'',patientId:currentPatientId})})
   .then(function(r){return r.json()}).then(function(res){
     if(!res.ok){setSt('mlStatus','草案失败:'+(res.error||res.message||''),'err');$('btnMlSign').disabled=false;return}
     mlDraftId=res.id;setSt('mlStatus','草案 #'+res.id+' 落库,签名中…','');
@@ -424,6 +529,7 @@ $('btnMlSign').addEventListener('click',function(){
       $('prodMl').textContent='#'+s.id+' · '+s.signer;checkDone();
     });
   }).catch(function(e){$('btnMlSign').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
+  });
 });
 
 /* ── 完成态 ── */
@@ -471,8 +577,9 @@ $('btnCopyPatient').addEventListener('click',function(){
   copyText(t,function(){setSt('doneStatus','✅ 患者版报告已复制,直接粘贴发送即可','ok')});
 });
 $('btnNext').addEventListener('click',function(){
-  ['pName','pDialogue','wHr','wSpo2','wSbp','wDbp','docDiagnosis','docPrescription','mlAnnotation'].forEach(function(k){$(k).value='';localStorage.removeItem('cw_'+k)});
+  ['pName','pPhone','pDialogue','wHr','wSpo2','wSbp','wDbp','docDiagnosis','docPrescription','mlAnnotation'].forEach(function(k){$(k).value='';localStorage.removeItem('cw_'+k)});
   ['pYear','pMonth','pDay','pHour'].forEach(function(k){$(k).value='';localStorage.removeItem('cw_'+k)});
+  setPatient(null,null);$('pSearchResults').style.display='none';
   capturedFrame=null;$('camThumb').style.display='none';
   rxDone=null;mlDone=null;mlDraftId=null;lastResult=null;
   $('rxState').innerHTML='';$('mlState').innerHTML='';$('prodRx').textContent='待签名';$('prodMl').textContent='待签名';$('prodLink').textContent='签名后生成';
