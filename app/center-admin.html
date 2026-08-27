@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>管理服务中心 · 命理宝鉴</title>
+<style>
+:root{--ink:#080808;--paper:#f0e8d8;--paper2:#d4c9b0;--paper3:#a09080;--gold:#c9a84c;--gold2:#e8cc7a;--cinn2:#e74c3c;--accent:#e67e22;--border:rgba(201,168,76,.15)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080808;color:var(--paper);font-family:'Noto Serif SC','Songti SC',serif;font-size:13px;min-height:100vh}
+.wrap{max-width:1080px;margin:0 auto;padding:20px 20px 90px;display:flex;flex-direction:column;gap:20px}
+.back{color:var(--paper3);text-decoration:none;font-size:12px}
+.back:hover{color:var(--gold2)}
+.hero{display:flex;align-items:center;gap:16px;padding:20px 22px;border-radius:14px;background:linear-gradient(135deg,#e67e2222,#e67e2208);border:1px solid #e67e2244}
+.hero img{height:34px;width:auto}
+.hero-sub{font-size:12px;color:var(--paper3);margin-top:6px;letter-spacing:.5px}
+.hero-seal{margin-left:auto;width:52px;height:52px;border-radius:12px;background:#e67e22;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;box-shadow:0 4px 16px #e67e2266}
+.group-title{display:flex;align-items:center;gap:10px;margin-top:6px}
+.group-badge{font-size:11px;color:#e67e22;border:1px solid #e67e2266;border-radius:4px;padding:2px 8px;letter-spacing:1px}
+.group-desc{font-size:11px;color:var(--paper3)}
+.icon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+@media(max-width:640px){.icon-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+.icon-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 12px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.10);text-decoration:none;color:inherit;transition:all .25s;position:relative;min-height:128px;text-align:center}
+.icon-card:hover{transform:translateY(-3px);background:#e67e2214;border-color:#e67e2266;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.icon-card[data-hot="true"]::before{content:"";position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--cinn2);box-shadow:0 0 8px var(--cinn2)}
+.icon-glyph{font-size:26px;line-height:1}
+.icon-name{font-size:14px;color:var(--paper);letter-spacing:1px}
+.icon-sub{font-size:11px;color:var(--paper3)}
+.center-nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px;padding-top:18px;border-top:1px solid rgba(201,168,76,.12)}
+.center-nav a{font-size:12px;color:var(--paper3);text-decoration:none;border:1px solid rgba(201,168,76,.18);border-radius:16px;padding:6px 14px;transition:all .2s}
+.center-nav a:hover{color:var(--gold2);border-color:var(--gold)}
+.foot{text-align:center;font-size:11px;color:rgba(255,255,255,.28);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回入口大厅</a>
+  <div class="hero">
+    <div>
+      <img src="assets/titles/center-admin.png" alt="管理服务中心">
+      <div class="hero-sub">平台管理员 —— 运营监控，配置安全</div>
+    </div>
+    <div class="hero-seal">管</div>
+  </div>
+  <section>
+    <div class="group-title">
+      <span class="group-badge">运营总览</span>
+      <span class="group-desc">平台大盘 · 工单商城</span>
+    </div>
+    <div class="icon-grid">
+    <a class="icon-card" href="admin.html" data-hot="true">
+      <div class="icon-glyph">📊</div>
+      <div class="icon-name">运营后台</div>
+      <div class="icon-sub">平台运营 · 数据总览</div>
+    </a>
+    <a class="icon-card" href="monitor-hub.html">
+      <div class="icon-glyph">📡</div>
+      <div class="icon-name">监控总览</div>
+      <div class="icon-sub">服务健康 · 实时监控</div>
+    </a>
+    <a class="icon-card" href="admin-tickets.html">
+      <div class="icon-glyph">🎫</div>
+      <div class="icon-name">工单管理</div>
+      <div class="icon-sub">用户工单 · 处理跟进</div>
+    </a>
+    <a class="icon-card" href="admin-shop.html">
+      <div class="icon-glyph">🛒</div>
+      <div class="icon-name">商城管理</div>
+      <div class="icon-sub">商品订单 · 商城运营</div>
+    </a>
+    </div>
+  </section>
+  <section>
+    <div class="group-title">
+      <span class="group-badge">系统配置</span>
+      <span class="group-desc">引擎参数 · 运行健康</span>
+    </div>
+    <div class="icon-grid">
+    <a class="icon-card" href="config-center.html">
+      <div class="icon-glyph">⚙️</div>
+      <div class="icon-name">配置中心</div>
+      <div class="icon-sub">系统参数 · 集中配置</div>
+    </a>
+    <a class="icon-card" href="ai-engine-config.html">
+      <div class="icon-glyph">🧠</div>
+      <div class="icon-name">AI 引擎配置</div>
+      <div class="icon-sub">模型引擎 · 参数调优</div>
+    </a>
+    <a class="icon-card" href="vision-engine-health.html">
+      <div class="icon-glyph">💚</div>
+      <div class="icon-name">引擎健康</div>
+      <div class="icon-sub">视觉引擎 · 健康巡检</div>
+    </a>
+    </div>
+  </section>
+  <section>
+    <div class="group-title">
+      <span class="group-badge">知识运营</span>
+      <span class="group-desc">知识库建设与审计</span>
+    </div>
+    <div class="icon-grid">
+    <a class="icon-card" href="kb-insights.html">
+      <div class="icon-glyph">💡</div>
+      <div class="icon-name">KB 洞察</div>
+      <div class="icon-sub">知识图谱 · 覆盖洞察</div>
+    </a>
+    <a class="icon-card" href="kb-browser.html">
+      <div class="icon-glyph">📚</div>
+      <div class="icon-name">知识库浏览</div>
+      <div class="icon-sub">知识条目 · 浏览检索</div>
+    </a>
+    <a class="icon-card" href="kb-audit.html">
+      <div class="icon-glyph">🔍</div>
+      <div class="icon-name">KB 审计</div>
+      <div class="icon-sub">知识质量 · 审计校核</div>
+    </a>
+    </div>
+  </section>
+  <section>
+    <div class="group-title">
+      <span class="group-badge">安全合规</span>
+      <span class="group-desc">权限隐私 · 数据边界</span>
+    </div>
+    <div class="icon-grid">
+    <a class="icon-card" href="admin-login.html">
+      <div class="icon-glyph">🔐</div>
+      <div class="icon-name">管理员登录</div>
+      <div class="icon-sub">身份认证 · 权限分级</div>
+    </a>
+    <a class="icon-card" href="privacy-center.html">
+      <div class="icon-glyph">🛡️</div>
+      <div class="icon-name">隐私中心</div>
+      <div class="icon-sub">隐私合规 · 数据保护</div>
+    </a>
+    <a class="icon-card" href="export-guard.html">
+      <div class="icon-glyph">🚧</div>
+      <div class="icon-name">导出管控</div>
+      <div class="icon-sub">数据导出 · 边界管控</div>
+    </a>
+    <a class="icon-card" href="disclaimer.html">
+      <div class="icon-glyph">📜</div>
+      <div class="icon-name">免责声明</div>
+      <div class="icon-sub">平台免责 · 合规文本</div>
+    </a>
+    </div>
+  </section>
+  <div class="center-nav">
+    <a href="center-yuanzhu.html">缘主服务中心</a>
+    <a href="center-patient.html">患者服务中心</a>
+    <a href="center-doctor.html">医生服务中心</a>
+    <a href="center-master.html">命理师服务中心</a>
+  </div>
+  <div class="foot">命理宝鉴 · 管理服务中心 · 各角色服务中心互链互通</div>
+</div>
+<script src="js/mobile-nav.js" defer></script>
+</body>
+</html>
