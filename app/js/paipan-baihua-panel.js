@@ -155,6 +155,9 @@
 
   window.PaipanBaihua = {
     notify: function (module, requestBody) {
+      // R-TAP-X: 缓存各模块请求体，供点读弹层（PaipanTap）复用
+      window._paipanBody = window._paipanBody || {};
+      window._paipanBody[module] = requestBody || {};
       if (loading) return;
       loading = true;
       renderLoading();

@@ -205,7 +205,19 @@ function renderChart(c){
       html+=`<div class="fs-row"><span class="fs-label">向</span><span class="fs-val xiang">${pal.facingStar}</span></div>`;
     }
     div.innerHTML=html;
+    div.dataset.palace=p;
+    div.style.cursor='pointer';
     grid.appendChild(div);
+  }
+  // R-TAP-X: 点宫白话解读（九宫格逐宫可点；事件委托只绑一次）
+  if (window.PaipanTap && !grid._tapBound) {
+    grid._tapBound = true;
+    grid.style.position = 'relative';
+    PaipanTap.bind(grid, '.fs-gong', {
+      module: 'fengshui',
+      keyOf: function (el) { return 'pal' + el.dataset.palace; },
+      paramOf: function (el) { return { palace: +el.dataset.palace }; }
+    });
   }
   const info=document.getElementById('fs-info');
   info.style.display='grid';
@@ -301,6 +313,7 @@ function renderInterpretation(i){
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/paipan-navigator.js" defer></script>
+<script src="js/paipan-tap-pop.js" defer></script>
 <script src="js/paipan-baihua-panel.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){ try { I18N.init(); } catch(e){} });</script>

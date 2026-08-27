@@ -204,6 +204,7 @@
 </div>
 
 <script src="js/ziwei-engine.js" defer></script>
+<script src="js/paipan-tap-pop.js" defer></script>
 <script>
 const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 (function(){
@@ -246,6 +247,19 @@ function runZiweiPaipan(){
   var container = document.getElementById('ziwei-result');
   ZiweiEngine.renderChart(container, result, name, sex);
 
+  // R-TAP-X: 缓存请求体 + 点宫白话解读（十二宫逐宫可点）
+  window._paipanBody = window._paipanBody || {};
+  window._paipanBody['ziwei'] = { year: year, month: month, day: day, hour: hour, lunar: zwCalMode === 'lunar', sex: sex };
+  var zwGrid = container.querySelector('.ziwei-grid');
+  if (window.PaipanTap && zwGrid) {
+    zwGrid.style.position = 'relative';
+    PaipanTap.bind(zwGrid, '.ziwei-gong', {
+      module: 'ziwei',
+      keyOf: function (el) { return 'zw' + el.dataset.palace; },
+      paramOf: function (el) { return { palace: el.dataset.palace }; }
+    });
+  }
+
   // 交叉比对提示
   var compareEl = document.getElementById('zw-compare-result');
   if(compareEl){
@@ -284,12 +298,12 @@ async function generateZiweiReport(){
     const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
     const body = { year, month, day, hour, gender, name, lunar, leapMonth: false, lang: _lang };
     
-    const csrfRes = await fetch(API_BASE+'/api/csrf-token', {signal: AbortSignal.timeout(15000)}).then(r=>r.json()).catch(()=>({csrfToken:''}));
+    const csrfRes = await fetch(API_BASE+'/api/csrf-token', {signal: AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
-    
+
     const r = await fetch(API_BASE+'/api/paipan/ziwei/report', { signal: AbortSignal.timeout(15000),
       method:'POST',
-      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+      headers:{'Content-Type':'application/json','X-CSRF-Token':csrf,'X-Skip-Interceptor':'1'},
       body: JSON.stringify(body), signal: AbortSignal.timeout(15000) }).then(r=>r.json());
     
     if(!r.ok){

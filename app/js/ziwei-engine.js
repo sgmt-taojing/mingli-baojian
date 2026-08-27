@@ -266,7 +266,7 @@
       var cls = 'ziwei-gong';
       if(p.isMingGong) cls += ' gong-ming';
       if(p.isShenGong) cls += ' gong-shen';
-      html += '<div class="' + cls + '">';
+      html += '<div class="' + cls + '" data-palace="' + p.name + '" style="cursor:pointer">';
       html += '<div class="gong-name">' + p.name;
       if(p.isMingGong) html += ' <span class="gong-tag">命</span>';
       if(p.isShenGong) html += ' <span class="gong-tag shen">身</span>';

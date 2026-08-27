@@ -229,7 +229,7 @@ function renderChart(c){
     // 伏神: 本爻下伏神（隐藏六亲）
     const fs=(c.fushen||[]).find(f=>f.position===y.position);
     const fsHtml=fs?`<div style="font-size:9px;color:var(--paper3)">伏${fs.liuqin}${fs.ganZhi}${fs.wuxing}</div>`:'';
-    html+=`<div class="ly-yao"${y.kong?' style="opacity:.55"':''}>`;
+    html+=`<div class="ly-yao" data-pos="${y.position}"${y.kong?' style="opacity:.55;cursor:pointer"':' style="cursor:pointer"'}>`;
     html+=`<div class="ly-yao-pos">${y.positionName}</div>`;
     html+=`<div class="ly-yao-line">${line}</div>`;
     html+=`<div class="ly-yao-gz">${y.ganZhi}${kong}</div>`;
@@ -239,6 +239,17 @@ function renderChart(c){
     html+=`</div>`;
   }
   chart.innerHTML=html;
+
+  // R-TAP-X: 点爻白话解读（初/二/三/四/五/上 逐爻可点；事件委托只绑一次）
+  if (window.PaipanTap && !chart._tapBound) {
+    chart._tapBound = true;
+    chart.style.position = 'relative';
+    PaipanTap.bind(chart, '.ly-yao', {
+      module: 'liuyao',
+      keyOf: function (el) { return 'yao' + el.dataset.pos; },
+      paramOf: function (el) { return { yao: +el.dataset.pos }; }
+    });
+  }
 
   // 信息卡片
   const info=document.getElementById('ly-info');
@@ -331,6 +342,7 @@ function renderInterpretation(i){
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/paipan-navigator.js" defer></script>
+<script src="js/paipan-tap-pop.js" defer></script>
 <script src="js/paipan-baihua-panel.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 </body>
