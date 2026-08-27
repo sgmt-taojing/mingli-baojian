@@ -1,4 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 14:25 — 统一问诊台全链路回归
+- 链路：采集→EMR→KB实时检索(5条命中)→AI副驾驶追问(十问)→归档#20→医生修改并通过→落库approved+版本快照→驳回→status=rejected 全部正确
+- 修复：审核状态不落库（setReviewStatus 补幂等归档回写 medical_cases.review_status）；KB 状态标签 [object Object] 显示 bug
+- 观察项：KB tier 客户端评分偏严（命中仍判「AI 兜底」，证型自动写入不触发）；sessionId 刷新即新会话（跨页审核接续依赖双师审核台）
+- 测试病历 #19/#20 已清理；提交 main 5f54dd4
 ## 2026-08-27 14:15 — 问诊台患者管理闭环
 - 服务端：POST /api/clinic/patient 幂等建档（手机号hash>姓名+生日复用）、GET /api/clinic/patients 姓名/手机号搜索+最近患者（带就诊/处方/批注计数）、GET /api/clinic/patient/:id 升级解密病历+处方史+批注史；修搜索 WHERE AND/OR 优先级 bug
 - 问诊台：老患者查询回填+历史摘要、建档保存、签名前自动建档、patientId 随处方/命理草案归档、手动改关键字段自动解除选中防误归档、下一位患者完整清理
