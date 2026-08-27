@@ -176,7 +176,7 @@ function paipanAndDraft(){
   
   // 后端精排（8911 代理，成功则覆盖）
   var body={year:y,month:m,day:d,hour:h};
-  fetch(API+'/api/paipan/calculate', {signal: AbortSignal.timeout(15000), method:'POST',headers:authHeaders(),body:JSON.stringify(body)})
+  fetch(API+'/api/paipan/calculate', {signal: AbortSignal.timeout(15000), method:'POST',headers:Object.assign({}, authHeaders(), {'X-Skip-Interceptor':'1'}),body:JSON.stringify(body)})
   .then(function(r){return r.json()}).then(function(res){
     if(res&&res.ok){
       var c=res.chart||res.data||{};

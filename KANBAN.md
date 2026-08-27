@@ -1,4 +1,14 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 19:20 — ✅ 民俗工具全面集成 + 改进建议能力（五工具三入口 · 引擎级"怎么改"）
+- server 5d09186：analyzePlate 车牌分析 + R-IMPROVE 改进建议（姓名笔画目标/通关五行；手机车牌尾号替换方案）+ 评分与81数理挂钩 + 流年趋避/合婚化解/家庭白话
+- 主仓：ask.html 19 工具（新增手机号/车牌/姓名/宝宝起名/幸运数色 + text/namebirth 输入流 + ?tool= 深链）；首页信众区 5 新卡；minsu-center 全工具表单化（废演示假数据）+ 车牌/起名新卡；divination-tools 六死链修复
+- 验收：curl 冒烟全过；浏览器实测 手机号/宝宝起名/姓名评分(李四35分→5条具体改进)/车牌/家庭排盘 全链路
+## 2026-08-27 19:20 — hand-diag-svc 接入 OneFrame 指甲 v2.0（平台侧交付登记）
+- models/oneframe-tcm-nail-v2.0.onnx 到位（md5=bf459ddf73cb16f97f2bd19f637ea81a，与平台侧一致）；vision-model-labels.json 注册（labels 青/淡红/紫/红/白，task=hand-nail，input 320）
+- hand-diag-svc(8944) MODELS 增列 oneframe-tcm-nail-v2.0 重启生效（health 10 模型）
+- 端到端实测：真实淡红甲 v1 误判白 0.63 → v2 淡红 1.0000；真实白甲 v1 0.94 → v2 1.0000
+- v2=合成950+真实509源仓真值重训，真实域真值一致率 0.181→1.000；red/purple/cyan 无公开真实源仍仅合成（平台留痕）；v1 并行灰度 1 周期后替代
+- 报告 models/oneframe-tcm-nail-v2.0.report.json；按约定 mingli 侧只登记不代 commit
 ## 2026-08-27 18:32 — ✅ face-ocr(:8913) 修真完成：悬空软链跳过 + stat 兜底，服务恢复 UP
 - server 6d36252：get_model_path 模糊匹配跳过 broken symlink；初始化 stat 加 OSError 兜底
 - 重启后 /health 200，13 个缺失模型降级为告警日志，OCR/PIL 启发式链路不受影响
