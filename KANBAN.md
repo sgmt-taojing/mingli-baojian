@@ -1,4 +1,10 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 14:35 — 奇门九宫格点读解读
+- 引擎：buildQimenPalace 单宫白话构建器（宫位五行/八门门迫门制/九星/九神/十干克应/空亡马星/关联格局/值符值使要位+吉凶评级）
+- 端点：/api/paipan/qimen/baihua 支持 palace 参数返回 palaceDetail
+- 前端：点宫浮动解读层（悬于宫上方、顶行自动下翻、吉绿凶红配色、点宫切换/空白/ESC 关闭）；发现并规避页面无全局 esc 的存量隐患
+- 浏览器实测：排盘→点兑宫(吉)→切坤宫(凶)→空白关闭→ESC关闭 全通过
+- 提交：server 260ac3e / main a26c30f
 ## 2026-08-27 14:25 — 统一问诊台全链路回归
 - 链路：采集→EMR→KB实时检索(5条命中)→AI副驾驶追问(十问)→归档#20→医生修改并通过→落库approved+版本快照→驳回→status=rejected 全部正确
 - 修复：审核状态不落库（setReviewStatus 补幂等归档回写 medical_cases.review_status）；KB 状态标签 [object Object] 显示 bug
