@@ -2,7 +2,7 @@
  * 排盘白话解读 · 共享前端面板 v1.0 (R-BAIHUA-2026-08-27)
  * 契约：POST /api/paipan/:module/baihua
  *   → { ok, module, overview, cards[{title,plain,level}], forecast[{period,plain,tone}],
- *       backtest[{period,plain,verifyAsk,tone}], tips[] }
+ *       backtest[{period,plain,verifyAsk,tone}], tips[], actions[{title,plain,level}] }
  * 行为：
  *   - 排盘完成后由页面调用 PaipanBaihua.notify(module, requestBody)
  *   - 渲染四区块：①白话总览 ②逐要素卡（level 配色）③往后预测时间轴 ④往前验证（可答符合/不符合）
@@ -90,6 +90,27 @@
         grid.appendChild(card);
       });
       panel.appendChild(grid);
+    }
+
+    // ②·5 行动方案（具体怎么做）
+    if (data.actions && data.actions.length) {
+      panel.appendChild(el('div', 'color:var(--gold,#c9a84c);font-size:12px;font-weight:600;margin:10px 0 6px', '🎯 行动方案 · 照着做'));
+      var actBox = el('div', 'display:flex;flex-direction:column;gap:6px;margin-bottom:12px');
+      data.actions.forEach(function (a, i) {
+        var row = el('div', 'display:flex;gap:8px;align-items:flex-start;background:rgba(78,201,176,.05);border:1px solid rgba(78,201,176,.18);border-radius:8px;padding:8px 10px');
+        row.appendChild(el('span', 'flex-shrink:0;width:18px;height:18px;border-radius:50%;background:rgba(201,168,76,.2);color:var(--gold,#c9a84c);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:600', String(i + 1)));
+        var body = el('div', 'flex:1;min-width:0');
+        var tline = el('div', 'display:flex;justify-content:space-between;align-items:center;margin-bottom:3px');
+        tline.appendChild(el('span', 'color:var(--jade,#4ec9b0);font-size:12px;font-weight:600', a.title));
+        if (a.level && LEVEL_LABEL[a.level]) {
+          tline.appendChild(el('span', 'font-size:10px;padding:1px 6px;border-radius:8px;border:1px solid ' + (LEVEL_COLOR[a.level] || '#888') + ';color:' + (LEVEL_COLOR[a.level] || '#888'), LEVEL_LABEL[a.level]));
+        }
+        body.appendChild(tline);
+        body.appendChild(el('div', 'font-size:12px;line-height:1.7;color:var(--paper,#e8dcc8)', a.plain));
+        row.appendChild(body);
+        actBox.appendChild(row);
+      });
+      panel.appendChild(actBox);
     }
 
     // ③ 往后预测
