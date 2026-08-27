@@ -159,7 +159,7 @@
   <div class="hall-hero">
     <div>
       <div class="hall-hero-title">入口大厅 · 按身份分流</div>
-      <div class="hall-hero-sub">患者（含缘主信众）问诊 · 医生复核 · 命理师断事 · 三种身份各有专属工作台</div>
+      <div class="hall-hero-sub">信众问事看运势 · 患者走专有问诊通道 · 医生复核 · 命理师断事 · 五种身份各有专属工作台</div>
     </div>
     <div class="hall-hero-stats" id="hallStats">
       <div class="hall-hero-stat"><strong id="statKb">—</strong><span>知识条数</span></div>
@@ -169,22 +169,23 @@
   </div>
 
   <div class="flow-hint-hall">
-    <span>点击上方角色胶囊切换身份（患者/医生/命理师）；点击任意功能图标进入。</span>
+    <span>点击上方角色胶囊切换身份（信众大众/患者/医生/命理师）；点击任意功能图标进入。</span>
   </div>
 
   <div class="role-switch" role="tablist" aria-label="角色切换">
-    <button id="rolePatient" class="active" data-role-tab="patient" role="tab" aria-selected="true">患者</button>
+    <button id="roleFolk" class="active" data-role-tab="folk" role="tab" aria-selected="true">信众 · 大众</button>
+    <button id="rolePatient" data-role-tab="patient" role="tab" aria-selected="false">患者</button>
     <button id="roleDoctor" data-role-tab="doctor" role="tab" aria-selected="false">医生</button>
     <button id="roleMaster" data-role-tab="master" role="tab" aria-selected="false">命理师</button>
     <button id="roleAdmin" data-role-tab="admin" role="tab" aria-selected="false">管理员</button>
     <button id="roleAll" data-role-tab="all" role="tab" aria-selected="false">全部</button>
   </div>
 
-  <!-- 患者 -->
-  <section data-role="patient" class="active" aria-label="患者入口">
+  <!-- 信众 · 大众（命理） -->
+  <section data-role="folk" class="active" aria-label="信众大众入口">
     <div class="group-title">
-      <span class="badge patient">患者入口</span>
-      <span>看诊 · 排盘 · 问事</span>
+      <span class="badge">信众 · 大众</span>
+      <span>问事 · 运势 · 规划 · 民俗</span>
     </div>
 
     <a class="icon-card" data-hot="true" href="ask.html" aria-label="问事" style="grid-column:1/-1;border-color:rgba(78,201,176,.4);background:linear-gradient(135deg,rgba(78,201,176,.08),rgba(78,201,176,.02))">
@@ -204,25 +205,10 @@
       </div>
       <div style="font-size:20px;color:var(--gold2)">→</div>
     </a><div class="icon-grid">
-      <a class="icon-card" data-hot="true" href="integrated-clinic.html" aria-label="综合问诊台">
-        <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><rect x="8" y="4" width="32" height="40" rx="4" fill="rgba(201,168,76,.15)" stroke="#c9a84c" stroke-width="2"/><rect x="14" y="10" width="20" height="24" rx="2" fill="#1a3a2a"/><path d="M18 16h12M18 20h12M18 24h8" stroke="#2ecc71" stroke-width="2" stroke-linecap="round"/><rect x="14" y="38" width="20" height="3" rx="1.5" fill="#c9a84c"/></svg></div>
-        <div class="icon-name">综合问诊台</div>
-        <div class="icon-sub">采集→AI→复核→EMR</div>
-      </a>
       <a class="icon-card" href="ai-assistant.html" aria-label="AI 助手">
         <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="rgba(155,89,182,.12)" stroke="#9b59b6" stroke-width="2"/><circle cx="24" cy="24" r="12" fill="none" stroke="#9b59b6" stroke-width="1.5"/><circle cx="24" cy="24" r="5" fill="#9b59b6"/><path d="M24 4v8M24 36v8M4 24h8M36 24h8" stroke="#9b59b6" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="24" r="2.5" fill="#e8cc7a"/></svg></div>
         <div class="icon-name">AI 助手</div>
         <div class="icon-sub">24+ 模块对话</div>
-      </a>
-      <a class="icon-card" href="tcm-symptom.html" aria-label="症状自查">
-        <div class="icon-glyph glyph-jade"><svg viewBox="0 0 48 48"><path d="M24 4c-8 0-14 6-14 14v12l-4 8h36l-4-8V18c0-8-6-14-14-14z" fill="rgba(231,76,60,.12)" stroke="#e74c3c" stroke-width="2"/><path d="M17 24c2 3 4.5 4.5 7 4.5s5-1.5 7-4.5" stroke="#e74c3c" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="18" cy="17" r="2" fill="#e74c3c"/><circle cx="30" cy="17" r="2" fill="#e74c3c"/></svg></div>
-        <div class="icon-name">症状自查</div>
-        <div class="icon-sub">问诊 → 辨证</div>
-      </a>
-      <a class="icon-card" href="camera-capture.html" aria-label="望诊采集">
-        <div class="icon-glyph glyph-jade"><svg viewBox="0 0 48 48"><path d="M6 18h8l4-6h12l4 6h8v20H6z" fill="rgba(201,168,76,.12)" stroke="#c9a84c" stroke-width="2" stroke-linejoin="round"/><circle cx="24" cy="27" r="8" fill="#0d1a0d" stroke="#c9a84c" stroke-width="2"/><circle cx="24" cy="27" r="4" fill="#2ecc71"/><circle cx="21" cy="24" r="1.5" fill="#fff"/></svg></div>
-        <div class="icon-name">望诊采集</div>
-        <div class="icon-sub">面/舌/体一键拍照</div>
       </a>
       <a class="icon-card" data-hot="true" href="paipan-quick.html" aria-label="命理速览">
         <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="19" fill="rgba(201,168,76,.1)" stroke="#c9a84c" stroke-width="2"/><path d="M24 5a9.5 9.5 0 010 19 9.5 9.5 0 000 19 19 19 0 000-38z" fill="#e74c3c" opacity=".75"/><path d="M24 5a9.5 9.5 0 010 19 9.5 9.5 0 000 19" fill="#2ecc71" opacity=".8"/><circle cx="24" cy="14.5" r="2.5" fill="#fff"/><circle cx="24" cy="33.5" r="2.5" fill="#111"/></svg></div>
@@ -233,6 +219,26 @@
         <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="19" fill="rgba(230,126,34,.1)" stroke="#e67e22" stroke-width="2"/><path d="M24 10v14l9 6" stroke="#e67e22" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 38h20" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round"/><circle cx="24" cy="24" r="2.5" fill="#e8cc7a"/></svg></div>
         <div class="icon-name">人生规划</div>
         <div class="icon-sub">阶段定位 · 五年路径</div>
+      </a>
+      <a class="icon-card" href="lifeindex-detail.html" aria-label="命格指数">
+        <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><rect x="9" y="26" width="6" height="14" rx="1.5" fill="#c9a84c" opacity=".55"/><rect x="21" y="18" width="6" height="22" rx="1.5" fill="#c9a84c" opacity=".8"/><rect x="33" y="10" width="6" height="30" rx="1.5" fill="#e8cc7a"/><path d="M8 42h32" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="icon-name">命格指数</div>
+        <div class="icon-sub">十二维评分 · 优势短板</div>
+      </a>
+      <a class="icon-card" href="lifeflow-report.html" aria-label="流年报告">
+        <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><path d="M6 30c6-10 12-10 18 0s12 10 18 0" stroke="#63b3ed" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M6 18c6-10 12-10 18 0s12 10 18 0" stroke="#c9a84c" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/><circle cx="24" cy="24" r="19" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity=".5"/></svg></div>
+        <div class="icon-name">流年报告</div>
+        <div class="icon-sub">本月大运 · 明年预览</div>
+      </a>
+      <a class="icon-card" href="lifeflow-timeline.html" aria-label="十年走势">
+        <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><path d="M8 36L18 24l8 6 14-16" stroke="#2ecc71" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 14h8v8" stroke="#2ecc71" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 42h32" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="icon-name">十年走势</div>
+        <div class="icon-sub">黄金五年 · 转折提醒</div>
+      </a>
+      <a class="icon-card" href="youthplan-detail.html" aria-label="青年规划">
+        <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><path d="M24 6l4 10 10 2-10 4-4 10-4-10-10-4 10-2z" fill="rgba(230,126,34,.25)" stroke="#e67e22" stroke-width="2" stroke-linejoin="round"/><circle cx="24" cy="38" r="4" fill="none" stroke="#c9a84c" stroke-width="2"/><path d="M24 34v-4" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="icon-name">青年规划</div>
+        <div class="icon-sub">学业职业 · 成长路线</div>
       </a>
       <a class="icon-card" href="divination-almanac.html" aria-label="黄历">
         <div class="icon-glyph glyph-steel"><svg viewBox="0 0 48 48"><rect x="6" y="8" width="36" height="34" rx="3" fill="rgba(201,168,76,.12)" stroke="#c9a84c" stroke-width="2"/><rect x="6" y="8" width="36" height="8" rx="3" fill="#c9a84c"/><circle cx="15" cy="12" r="2" fill="#111"/><circle cx="33" cy="12" r="2" fill="#111"/><text x="24" y="34" text-anchor="middle" font-size="14" fill="#e8cc7a" font-weight="bold">宜</text></svg></div>
@@ -249,6 +255,40 @@
         <div class="icon-name">快速占卜</div>
         <div class="icon-sub">一事一占 · 即时解卦</div>
       </a>
+      <a class="icon-card" href="minsu-center.html" aria-label="民俗工具中心">
+        <div class="icon-glyph glyph-gold"><svg viewBox="0 0 48 48"><path d="M16 10h16l3 8H13z" fill="#e74c3c" opacity=".8"/><rect x="14" y="18" width="20" height="14" rx="7" fill="rgba(231,76,60,.2)" stroke="#e74c3c" stroke-width="2"/><path d="M24 32v6m-4 0h8" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/><path d="M20 24h8" stroke="#e8cc7a" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="icon-name">民俗中心</div>
+        <div class="icon-sub">十二件民俗工具</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 患者（专有医疗通道） -->
+  <section data-role="patient" aria-label="患者入口">
+    <div class="group-title">
+      <span class="badge patient">患者专区</span>
+      <span>专有问诊通道 · 医疗闭环</span>
+    </div>
+
+    <a class="icon-card" data-hot="true" href="integrated-clinic.html" aria-label="综合问诊台" style="grid-column:1/-1;border-color:rgba(41,128,185,.4);background:linear-gradient(135deg,rgba(41,128,185,.08),rgba(41,128,185,.02))">
+      <div class="icon-glyph" style="font-size:22px">🩺</div>
+      <div style="flex:1">
+        <div class="icon-name" style="font-size:15px">综合问诊台 · 患者专有通道</div>
+        <div class="icon-sub" style="font-size:12px">音视频采集 → AI 初诊 → 双师审核 → 电子病历/处方</div>
+      </div>
+      <div style="font-size:20px;color:var(--cyan2)">→</div>
+    </a>
+    <div class="icon-grid">
+      <a class="icon-card" href="tcm-symptom.html" aria-label="症状自查">
+        <div class="icon-glyph glyph-jade"><svg viewBox="0 0 48 48"><path d="M24 4c-8 0-14 6-14 14v12l-4 8h36l-4-8V18c0-8-6-14-14-14z" fill="rgba(231,76,60,.12)" stroke="#e74c3c" stroke-width="2"/><path d="M17 24c2 3 4.5 4.5 7 4.5s5-1.5 7-4.5" stroke="#e74c3c" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="18" cy="17" r="2" fill="#e74c3c"/><circle cx="30" cy="17" r="2" fill="#e74c3c"/></svg></div>
+        <div class="icon-name">症状自查</div>
+        <div class="icon-sub">问诊 → 辨证</div>
+      </a>
+      <a class="icon-card" href="camera-capture.html" aria-label="望诊采集">
+        <div class="icon-glyph glyph-jade"><svg viewBox="0 0 48 48"><path d="M6 18h8l4-6h12l4 6h8v20H6z" fill="rgba(201,168,76,.12)" stroke="#c9a84c" stroke-width="2" stroke-linejoin="round"/><circle cx="24" cy="27" r="8" fill="#0d1a0d" stroke="#c9a84c" stroke-width="2"/><circle cx="24" cy="27" r="4" fill="#2ecc71"/><circle cx="21" cy="24" r="1.5" fill="#fff"/></svg></div>
+        <div class="icon-name">望诊采集</div>
+        <div class="icon-sub">面/舌/体一键拍照</div>
+      </a>
       <a class="icon-card" href="patient-journey.html" aria-label="我的就医记录">
         <div class="icon-glyph glyph-cyan"><svg viewBox="0 0 48 48"><path d="M12 4h18l8 8v32H12z" fill="rgba(201,168,76,.12)" stroke="#c9a84c" stroke-width="2" stroke-linejoin="round"/><path d="M30 4v8h8" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linejoin="round"/><rect x="17" y="20" width="16" height="3" rx="1.5" fill="#e74c3c"/><rect x="17" y="27" width="16" height="3" rx="1.5" fill="#2ecc71"/><rect x="17" y="34" width="10" height="3" rx="1.5" fill="#c9a84c"/></svg></div>
         <div class="icon-name">我的就医记录</div>
@@ -258,11 +298,6 @@
         <div class="icon-glyph glyph-cyan"><svg viewBox="0 0 48 48"><circle cx="24" cy="16" r="8" fill="rgba(201,168,76,.15)" stroke="#c9a84c" stroke-width="2"/><path d="M8 42c0-9 7-14 16-14s16 5 16 14" fill="rgba(201,168,76,.12)" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/><path d="M20 28l4 5 4-5" fill="none" stroke="#c9a84c" stroke-width="1.5"/></svg></div>
         <div class="icon-name">患者门户</div>
         <div class="icon-sub">挂号 / 预约</div>
-      </a>
-      <a class="icon-card" href="monitor-hub.html" aria-label="监控总览">
-        <div class="icon-glyph glyph-jade"><svg viewBox="0 0 48 48"><rect x="4" y="8" width="40" height="26" rx="3" fill="rgba(201,168,76,.1)" stroke="#c9a84c" stroke-width="2"/><rect x="8" y="12" width="14" height="8" rx="1" fill="#2ecc71" opacity=".8"/><rect x="26" y="12" width="14" height="8" rx="1" fill="#e67e22" opacity=".8"/><rect x="8" y="24" width="14" height="6" rx="1" fill="#5dade2" opacity=".8"/><rect x="26" y="24" width="14" height="6" rx="1" fill="#2ecc71" opacity=".5"/><path d="M16 34v4M32 34v4M12 42h24" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"/></svg></div>
-        <div class="icon-name">监控总览</div>
-        <div class="icon-sub">全项目健康一屏看</div>
       </a>
     </div>
   </section>
