@@ -859,6 +859,7 @@ async function generateBaziReport(){
     if(tags && data.day_master) tags.innerHTML = '<span class="rb-tag">'+data.day_master+'</span><span class="rb-tag">'+(isEn?'Year '+(meta.targetYear||'')+':':meta.targetYear+'年流年')+'</span>';
     var result = document.getElementById('baziResult');
     if(result){ result.classList.add('visible'); result.style.display = 'block'; }
+    if(window.PaipanNav) PaipanNav.notifyChart(data);
     // R738: AI 命理解读（日主+五行走 KB）
     setTimeout(function(){
       var holder = document.getElementById('aiBaziBtn');
@@ -955,6 +956,7 @@ async function generateBaziReport(){
   };
 })();
 </script>
+<script src="js/paipan-navigator.js" defer></script>
 <script src="js/i18n.js?v=708i18n" defer></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>

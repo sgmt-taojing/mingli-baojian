@@ -178,6 +178,7 @@ async function doPaipan(){
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   const svg = await rSvg.text();
   renderChart(data.chart);
+  if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
   renderSvg(svg);
   renderFlow(data.flow, targetYear, currentAge);
   if(data.interpretation) renderInterpretation(data.interpretation);
@@ -293,6 +294,7 @@ function renderInterpretation(i){
 <script src="js/mobile-nav.js"></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
-<script src="js/error-interceptor.js" defer></script>
+<script src="js/paipan-navigator.js" defer></script>
+  <script src="js/error-interceptor.js" defer></script>
 </body>
 </html>
