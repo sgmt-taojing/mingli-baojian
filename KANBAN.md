@@ -1,4 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-27 14:15 — 问诊台患者管理闭环
+- 服务端：POST /api/clinic/patient 幂等建档（手机号hash>姓名+生日复用）、GET /api/clinic/patients 姓名/手机号搜索+最近患者（带就诊/处方/批注计数）、GET /api/clinic/patient/:id 升级解密病历+处方史+批注史；修搜索 WHERE AND/OR 优先级 bug
+- 问诊台：老患者查询回填+历史摘要、建档保存、签名前自动建档、patientId 随处方/命理草案归档、手动改关键字段自动解除选中防误归档、下一位患者完整清理
+- 浏览器实测：搜索→选中→回填→历史摘要→下一位→新建档(#28)→清理 全链路通过
+- 提交：server 092b1c9 / main 1255f28
 ## 2026-08-27 14:00 — 白话解读引擎 + 报告层优化（双专项）
 - 专项一：paipan-baihua-engine.js 七模块白话构建器（总览/要素卡/未来3年预测/过往3年回测），端点 POST /api/paipan/:module/baihua 全模块实测通过；前端共享件 paipan-baihua-panel.js 接入 7 个排盘页（预测时间轴+验证按钮存 localStorage），浏览器实测奇门/八字两页通过
 - 专项二：报告层——seg0 白话总览置顶（延迟 unshift 防索引错位）、seg1 修「局局」bug+日干支去重、KB 标题级污染过滤（福利/到课/PAGE BREAK）、seg3 真实逐年走势替换模板空话、seg4 占位句替换白话要素卡、各段白话小结；奇门+八字报告回归通过
