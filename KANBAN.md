@@ -1,4 +1,10 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 14:58 — ✅ G8 院内页面急救话术分层（ADR-009 · P1）
+- **两处院内页消费者话术→机构版**：`integrated-clinic.html:136` 与 `unified-consultation.html:266` 的「拨打 120 或前往最近急诊。本平台不能替代急救」与院内场景错位（患者已在院、医师在场）→ 统一修订为「本系统为辅助诊疗工具，最终诊疗决策由执业医师作出；急危重症请按院内急诊流程处置」，unified-consultation 的 `tel:120` 拨号按钮同步改为静态「院内急诊流程」标识
+- **全平台三层排查**（12 处命中逐一分类）：①院内层 2 处已修订；②混合层 1 处（master-disease-inline.js 危重信号 action → 「院外立即拨打 120 / 院内启动急诊流程」分层表述）；③消费者层 9 处**保留不动**（sos.html / home-care.html / emergency-contacts.html / doctor-response.html / medical-stack 的 emergency.html、home-tcm.html、chronic-disease.html、voice-diagnosis.html —— 居家/院外场景 120 话术本就正确）
+- medical-stack 内化页全扫：院内工作台页（ai-diagnosis/consult 等）无消费者急救话术残留，无需修订
+- 浏览器实测两页渲染正确、无 tel:120 残留、零加载报错
+- 注：G1/G5 已于本日 14:25 完成验收（见前条），本轮为简报复投
 ## 2026-08-28 14:50 — ✅ 问诊台双师审核台 AI 草稿助手上线（三大 aiEnhance 场景前端收口）
 - **审核面板新增「AI 草稿助手」**：📋 AI 病历草稿（四诊数据→G2CLAW 规范病历，实测 9-18s，自动解析证型"脾虚湿困证"+处方"参苓白术散加减"填入结构化字段）+ 🔮 AI 命理批注（生辰→命理师级批注，实测 43.7s，一键"写入审核意见"供命理师审改）；进度条+秒数计时+95s 超时+云端失败自动降级规则引擎保底；token 粘贴框（localStorage 记忆，复用工作台惯例）；命理专区仅 master 角色可见
 - **意外捕获并根修一个潜伏线上 bug**：`emrSyncThrottled()` 括号错位跑到 setEmr 函数体外成为顶层语句，加载即 TDZ 抛错（let 未初始化）导致主脚本中断——**initEngine() 从未在加载时执行**，语音/视觉/KB 三引擎全靠按钮懒初始化兜底。修复后全新加载零报错、四引擎全部就绪
