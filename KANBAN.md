@@ -1,4 +1,12 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 16:05 — ✅ keywords 全量补齐 + yidao.db 页级损坏根修（重大）
+- **keywords 补齐**（审计最后观察项收口）：`scripts/kb-keywords-fill.py` 规则法双通道提取（标题【】头/短标题 + 内置命理·中医领域词典长词优先命中，剔除 太阳/火星/太阴 等歧义词），3,710 条全补齐（含 16 条英文/OCR 乱码标题 module 兜底），格式统一 JSON 数组与存量一致；备份 `DELIVERY/kb-keywords-backup-20260828-155435.json`；写入后 missing=0、行数 74,752 不变、随机抽检 12 条质量合格
+- **数据库损坏根修**（审计 quick_check 发现，非本次写入引入——08-11 备份完好，损坏系历史遗留）：
+  - 损坏面：kb_formal 两处「页被二次引用」+ verification_corpus 两处溢出链异常 + 2 行乱码流水（匿名排盘自动记录）
+  - 修复：VACUUM INTO 全量重建（3.2GB→1.7GB，106 表行数全对账一致）→ 乱码行字段置安全值（pending/0/时间戳）→ 重建 idx_vcorp_status → integrity_check **OK**
+  - 换库：旧库保留为 `server/database/yidao.db.corrupt-backup-20260828`（3.4GB，确认无误后可删）；api-v2 bootout→换库→bootstrap 重启，/api/health、/api/kb/quality-report（total 74,752 grade A+）、8974 批注队列全部正常
+- **回归核验**：null entry_id=0；命理模块中医污染=0；meta-only 降权 2,628 / r39 降权 720 均在
+- **注意**：存量 45,946 条历史 keywords 为 n-gram 噪声片段（非 JSON 数组），本轮未动，如需清洗另立专项
 ## 2026-08-28 15:35 — ✅ KB 存量优化专项（看板观察项收口 · 全部可逆有备份）
 - **定性分析**（12,263 条短内容四类）：①方剂速记卡（tcm-formula 577，结构完整只是短）②口诀/经典卡（mantra/classics/koujue-daily 1,256，短是设计形态不宜注水）③截断型（huangdi-neijing 等口述切片断句，需回源重切）④低质/占位型（可优化）
 - **四项执行**（先备份受影响行至 `DELIVERY/kb-stock-backup-20260828-152946.json`）：
