@@ -1,4 +1,16 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 17:50 — ✅ 目录页点线碎片降权 1,215 条 + FTS5 双轨设计确认
+- **圈定**：content 含 4+ 连续点线且点线行收尾，纯目录页 1,215 条（短于 400 字或点线行占比≥40%）；75 条混合长文保留不动
+- **执行**：trust 0.2 + tags 加 meta-only/toc-page，备份 `DELIVERY/kb-toc-backup-20260828-*.json`；meta-only 总量 2,628→3,843
+- **FTS5 双轨设计发现**：kb_fts5.tags 是入库时抽取的关键词 n-gram（检索面），kb_formal.tags 是粗标签——两者本就不同源（69,807 条不一致系设计而非损坏）；本轮对 1,215 条降权条目覆写 FTS5 tags 收窄其检索面，与降权意图一致；stock-optimize 历史操作只同步 content 列未动 tags
+- **验证**：quick_check OK；/api/kb/recommend 与 FTS5 MATCH 检索正常
+- **注意**：kb_fts5.summary 与主表亦有 71,986 条历史差异（同源设计），未动
+## 2026-08-28 17:25 — ✅ OneFrame 唇诊 v3b 布控 8941（平台侧交付，仅登记不代 commit）
+- **模型**：`oneframe-tcm-lip-v3b`（平台 AutoML `AML-CLA-0C983C`，算法超市 active/released）——v3 初版红系塌缩未转正，v3b 类别平衡重建（rosy 降采样+红系弱标顶量+复核少数类增倍）
+- **四方评估**：pale 人工真值专项 0.780→**0.976**、真实弱标 0.937、crimson 75/81·purple_dark 57/68 不再塌缩、未见集 0.919、合成域回归 1.000
+- **落地**：`models/oneframe-tcm-lip-v3b.onnx`+`.report.json` 双载体（md5=0829d3e7 平台/mingli/tcm 三方一致）；`face-diag-svc.py` MODELS 增列 + `vision-model-labels.json` 标签登记；8941 重启生效（health 12 模型）
+- **8941 端到端实测**：pale 真值唇 v2 误判「红润有泽」0.82/0.88 → v3b 正确「淡白无华」0.886/0.967；crimson 真值唇 v2 误判红润 0.73 → v3b 正确「鲜红绛唇」0.850
+- **留痕**：crimson/purple_dark 真值仍薄（人工确认 3+7 张，余弱标顶量）、cracked 零真实料；灰度 1 周期后替代 v2.0
 ## 2026-08-28 17:20 — ✅ 截断型条目回源修复（定性纠偏 + 62 条真截断修复）
 - **定性纠偏**（避免误修）：9,507 条「非标点结尾」疑似中——①四库全书古籍切片（yizong-jinjian/jingyue/qianjin/bencao-gangmu 等，文言无句读、相邻条目连续，**属正常切片**）②tcm-formula/liuyue/koujue-daily 等以出处/来源标注结尾的结构化卡（设计形态）③KB-CASE-* 加密病历（enc: 前缀，不可处理）④huangdi-neijing PDFv4 目录页点线碎片（可另立降权专项）⑤OCR 转写碎片（ocr-batch26 等 514 条，需重跑 OCR，无净源可回）
 - **真截断修复 62 条**：`scripts/kb-trunc-repair.py`（可重复执行）——剥离「来源：」元数据头取正文前缀 → 源 JS 文件定位 → 提取外围字符串字面量反转义 → 校验前缀一致+长度增益 → 替换（kb_formal+FTS5 同写）
