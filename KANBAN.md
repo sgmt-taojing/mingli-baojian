@@ -1,4 +1,13 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 16:55 — ✅ keywords 历史噪声清洗专项（四轮收敛，74,752 条全量 JSON 化）
+- **背景**：上一轮补齐后发现存量 45,946 条历史 keywords 为早期 n-gram 提取噪声（"宫为十""主管相"式碎片）+ JSON 数组/逗号串格式混用
+- **脚本**：`scripts/kb-keywords-clean.py`（可重复执行）——保留规则六白名单（领域词典/来源书名/卷数/ASCII 模块标签/短标题回指/《》书名），不足 3 个用词典提取补齐，上限 8 个；三轮规则修补：转写长标题回指只保噪声（限 30 字）、纯 ASCII slug 标题头、日期数字碎片剔除
+- **四轮执行**（每轮先备份受影响行至 DELIVERY/）：
+  - R1 主清洗 42,020 条（备份 kb-keywords-clean-backup-20260828-164218.json）
+  - R2 格式迁移 18,713 条纯字符串→JSON 数组（kb-keywords-format-backup-*.json）
+  - R3 畸形数组 275 条修复 + 元素级扫除 13,075 条（纯数字/破损《/.j 截断尾；注：元素级扫除未逐行备份，变更仅限丢弃纯数字碎片，低风险）
+  - R4 碎片条目二次硬过滤 5,026 条（r45_palace_ext 1,867 / ziwei 236 / yijing 220 等；标题回指泄漏碎片，改用纯词典+白名单重建）（kb-keywords-suspect-backup-*.json）
+- **终验**：invalid JSON=0、missing=0、碎片占比过半条目=0、rows=74,752 不变、quick_check OK、/api/kb/quality-report 正常（A+）
 ## 2026-08-28 16:05 — ✅ keywords 全量补齐 + yidao.db 页级损坏根修（重大）
 - **keywords 补齐**（审计最后观察项收口）：`scripts/kb-keywords-fill.py` 规则法双通道提取（标题【】头/短标题 + 内置命理·中医领域词典长词优先命中，剔除 太阳/火星/太阴 等歧义词），3,710 条全补齐（含 16 条英文/OCR 乱码标题 module 兜底），格式统一 JSON 数组与存量一致；备份 `DELIVERY/kb-keywords-backup-20260828-155435.json`；写入后 missing=0、行数 74,752 不变、随机抽检 12 条质量合格
 - **数据库损坏根修**（审计 quick_check 发现，非本次写入引入——08-11 备份完好，损坏系历史遗留）：
