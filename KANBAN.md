@@ -1,4 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 11:30 — ✅ 命理批注 AI 增强接入（G2CLAW 云端）
+- `/api/clinic/mingli/draft` 新增 `aiEnhance:true`，排盘数据（四柱/五行/神煞压缩至 <650 字）→ G2CLAW 生成命理师级批注草稿（实测 38.6s / 367 字，结构：命局总评→喜用神→大运建议），命理师从"从零写"变"审改草稿"，大幅减负
+- prompt 极致压缩解决 G2CLAW 长 prompt 超时问题；CSRF 白名单已加
+- **三大 AI 增强场景全部落地**：报告润色（12s）+ 病历草稿（26s）+ 命理批注（39s）
+- server commit：`f02629f`
 ## 2026-08-28 11:15 — ✅ G2CLAW 云端 AI 接入两大核心场景（报告润色 + 病历草稿）
 - **报告 AI 润色层**：`/api/paipan/:module/baihua` 新增 `aiEnhance:true` 可选参数，规则引擎结构化输出 → G2CLAW 生成 650 字自然白话报告（实测 12.3s，专业术语+白话解释+行动建议），失败自动降级 MLX
 - **问诊台 AI 病历草稿**：`/api/clinic/ai-draft` 新增 `aiEnhance:true`，四诊数据+KB 匹配 → G2CLAW 生成规范中医病历（实测 25.6s，含辨证分析/处方加减/医嘱），CSRF 白名单已加（Bearer token+RBAC 认证保护）
