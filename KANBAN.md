@@ -1,4 +1,10 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 11:15 — ✅ G2CLAW 云端 AI 接入两大核心场景（报告润色 + 病历草稿）
+- **报告 AI 润色层**：`/api/paipan/:module/baihua` 新增 `aiEnhance:true` 可选参数，规则引擎结构化输出 → G2CLAW 生成 650 字自然白话报告（实测 12.3s，专业术语+白话解释+行动建议），失败自动降级 MLX
+- **问诊台 AI 病历草稿**：`/api/clinic/ai-draft` 新增 `aiEnhance:true`，四诊数据+KB 匹配 → G2CLAW 生成规范中医病历（实测 25.6s，含辨证分析/处方加减/医嘱），CSRF 白名单已加（Bearer token+RBAC 认证保护）
+- **设计原则**：规则引擎保底（零延迟）+ AI 增强可选（高质量），两条路并行不互斥
+- **providers 顺序修正**：云端 G2CLAW 优先 > 本地 MLX 降级，glm-5.2 生效
+- server commit：AI 增强层双端点 + providers 修正
 ## 2026-08-28 10:25 — ⚠️ G2CLAW 云端接入但批量不可用 + 8920 云端优先修正
 - **8920 providers 顺序修正**：云端(G2CLAW glm-5.2)优先于本地(MLX 7B)，有 key 时先走云端，失败降级 MLX——修正前 MLX 排前面导致 G2CLAW 永远走不到
 - **G2CLAW 密钥配入 launchd plist**（EnvironmentVariables），8920 重启后 provider=g2claw 生效
