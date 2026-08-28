@@ -110,6 +110,30 @@ def main():
     if no_kw > 0:
         report["issues"].append(f"keywords 缺失: {no_kw} 条")
 
+    # ═══ 4.5 术语污染检查（修真 R-TERM · 2026-08-28）═══
+    # 六经固定术语「太阳X」曾被 LLM 合规改写污染为「中医X」，此处做回归防护
+    TERM_POLLUTION = ['中医病纲要','中医蓄水','中医蓄血','中医中风','中医伤寒',
+                      '中医为表','中医提纲','一日中医','中医阳明','中医经证',
+                      '中医腑证','中医表证']
+    polluted = []
+    for bad in TERM_POLLUTION:
+        cur.execute("SELECT COUNT(*) FROM kb_formal WHERE content LIKE ? OR title LIKE ?",
+                    ('%' + bad + '%', '%' + bad + '%'))
+        n = cur.fetchone()[0]
+        if n: polluted.append(f"{bad}×{n}")
+    if polluted:
+        report["issues"].append(f"❌ 术语污染(太阳→中医): {', '.join(polluted)} — 跑 kb_backfill_entry_ids.py 同级修复")
+    else:
+        report["ok"].append("术语污染检查通过(太阳X 六经术语纯净)")
+
+    # entry_id NULL 回归检查（R117 曾修，后复发）
+    cur.execute("SELECT COUNT(*) FROM kb_formal WHERE entry_id IS NULL")
+    null_eid = cur.fetchone()[0]
+    if null_eid > 0:
+        report["issues"].append(f"❌ entry_id NULL 复发: {null_eid} 条 — 跑 kb_backfill_entry_ids.py")
+    else:
+        report["ok"].append("entry_id 无 NULL")
+
     # ═══ 5. 倪师字幕完整性 ═══
     if os.path.exists(SUBS):
         sub_files = [f for f in os.listdir(SUBS) if f.endswith('.txt') and f not in ('progress.log', 'run.log')]
