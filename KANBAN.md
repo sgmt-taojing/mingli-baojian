@@ -1,4 +1,14 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 15:35 — ✅ KB 存量优化专项（看板观察项收口 · 全部可逆有备份）
+- **定性分析**（12,263 条短内容四类）：①方剂速记卡（tcm-formula 577，结构完整只是短）②口诀/经典卡（mantra/classics/koujue-daily 1,256，短是设计形态不宜注水）③截断型（huangdi-neijing 等口述切片断句，需回源重切）④低质/占位型（可优化）
+- **四项执行**（先备份受影响行至 `DELIVERY/kb-stock-backup-20260828-152946.json`）：
+  - 注水桶清理 120 条：剔除万能废话尾缀「此知识点在传统命理/中医体系中有重要意义…」（kb_formal+FTS5 双修，残留 0）
+  - 纯元数据条目降权 2,628 条：「来源：…」无正文占位条目 → trust 0.2 + tags 标 meta-only（保审计溯源、降检索干扰）
+  - r39 模板三模块降权 720 条：双核/健康/事业组合卡（"具体行动：听音乐"式敷衍建议，trust 虚高 0.92-0.95）→ 统一 0.45 + audit_notes 标注
+  - tcm-formula 功效补齐 16 条：库内交叉引用同方功效（如 瓜蒂散→涌吐痰食、侯氏黑散→清热化痰祛风通络），标注引自库内论述；207 条库内无源不臆造
+- **验证**：低信任数 176→3,524 精确吻合（+3,348 降权）；FTS5 74,752/74,752 join 100%；审计 5 项全过
+- **遗留建议**：meta-only 2,628 条与 r39 720 条如确认无价值可退役删除（删除性操作待用户确认）；截断型条目需回源重切切片管线
+- commit：本次（scripts/kb-stock-optimize.py 可重复执行）
 ## 2026-08-28 14:58 — ✅ G8 院内页面急救话术分层（ADR-009 · P1）
 - **两处院内页消费者话术→机构版**：`integrated-clinic.html:136` 与 `unified-consultation.html:266` 的「拨打 120 或前往最近急诊。本平台不能替代急救」与院内场景错位（患者已在院、医师在场）→ 统一修订为「本系统为辅助诊疗工具，最终诊疗决策由执业医师作出；急危重症请按院内急诊流程处置」，unified-consultation 的 `tel:120` 拨号按钮同步改为静态「院内急诊流程」标识
 - **全平台三层排查**（12 处命中逐一分类）：①院内层 2 处已修订；②混合层 1 处（master-disease-inline.js 危重信号 action → 「院外立即拨打 120 / 院内启动急诊流程」分层表述）；③消费者层 9 处**保留不动**（sos.html / home-care.html / emergency-contacts.html / doctor-response.html / medical-stack 的 emergency.html、home-tcm.html、chronic-disease.html、voice-diagnosis.html —— 居家/院外场景 120 话术本就正确）
