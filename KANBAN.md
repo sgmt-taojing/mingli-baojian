@@ -1,4 +1,10 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 17:20 — ✅ 截断型条目回源修复（定性纠偏 + 62 条真截断修复）
+- **定性纠偏**（避免误修）：9,507 条「非标点结尾」疑似中——①四库全书古籍切片（yizong-jinjian/jingyue/qianjin/bencao-gangmu 等，文言无句读、相邻条目连续，**属正常切片**）②tcm-formula/liuyue/koujue-daily 等以出处/来源标注结尾的结构化卡（设计形态）③KB-CASE-* 加密病历（enc: 前缀，不可处理）④huangdi-neijing PDFv4 目录页点线碎片（可另立降权专项）⑤OCR 转写碎片（ocr-batch26 等 514 条，需重跑 OCR，无净源可回）
+- **真截断修复 62 条**：`scripts/kb-trunc-repair.py`（可重复执行）——剥离「来源：」元数据头取正文前缀 → 源 JS 文件定位 → 提取外围字符串字面量反转义 → 校验前缀一致+长度增益 → 替换（kb_formal+FTS5 同写）
+- 修复模块：authoritative 34 / nihaisha-tcm 17 / nihaisha 4 / 其他 7；典型：KJ2「曾国藩一生以」→ 补全至「…形成了以木（印）为通关用神的格局。」
+- **验证**：62 条全部完整收尾（56 句读 + 6 引号/列表合法结尾）；FTS5 零不一致；quick_check OK；备份 `DELIVERY/kb-trunc-backup-20260828-171513.json`
+- **遗留**：no_match 909 条（shuhan 课件转写与 JS 源不逐字对应等）；OCR 碎片与目录页碎片如需处理另立专项
 ## 2026-08-28 16:55 — ✅ keywords 历史噪声清洗专项（四轮收敛，74,752 条全量 JSON 化）
 - **背景**：上一轮补齐后发现存量 45,946 条历史 keywords 为早期 n-gram 提取噪声（"宫为十""主管相"式碎片）+ JSON 数组/逗号串格式混用
 - **脚本**：`scripts/kb-keywords-clean.py`（可重复执行）——保留规则六白名单（领域词典/来源书名/卷数/ASCII 模块标签/短标题回指/《》书名），不足 3 个用词典提取补齐，上限 8 个；三轮规则修补：转写长标题回指只保噪声（限 30 字）、纯 ASCII slug 标题头、日期数字碎片剔除
