@@ -1,4 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 09:25 — ⚠️ 大赛答题 v2 prompt 优化反降 + G2CLAW 直连不可用
+- **v2 优化 prompt 全量 200 题：28.5%**（v1 简洁 prompt 33.0%）——7B 小模型受长 system prompt 干扰，v2 加入性别规则/五行含义/十神对照后反而降低。结论：MLX 7B 天花板 ≈33%，prompt 工程收益为负
+- **G2CLAW 直连测试**：glm-5.2 模型可用但 10s/题+频繁超时（SSL handshake timeout），不适合批量 200 题场景。密钥已配入 launchd plist（8920 fallback 链可用，但直连批量不可行）
+- **准确率提升路径**：需更强模型（G2CLAW 稳定后重跑 / MLX v9.3 训练完成后评估 / 或接入更大本地模型）
+- **深度校验 v2（非大赛）保持 0.74**——这是规则引擎不是 LLM，不受模型能力限制，已可作为排盘质量量化基线
 ## 2026-08-28 08:55 — ✅ 前序任务全面盘点 + P0/P1 五项修真
 - **BaziQA 大赛答题引擎完成**：200 题全量跑完，MLX v9.0-7b 准确率 33.0%（超随机基线 +8pp），满分 1 人/优秀 5 人，verify_detail_json 写入 contest_qa_mlx 模式
 - **P0-B1 KB 统计失真修复**：直查 vs API 已一致（74,735/74,735），系 node:sqlite 缓存 stale 导致，launchctl kickstart 后恢复
