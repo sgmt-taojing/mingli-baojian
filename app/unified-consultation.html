@@ -8,6 +8,13 @@
 <meta name="theme-color"="#0a1628">
 <title>AI 实时诊疗一体化平台 · 命理宝鉴</title>
 <link rel="icon" href="favicon.svg">
+<script>
+// R-PROBE: 加载期错误捕获（先于一切脚本，供诊断/巡检读取）
+window.__loadErrs = [];
+window.addEventListener('error', function(e){
+  window.__loadErrs.push((e.message || 'err') + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno);
+});
+</script>
 <style>
 :root{
   --bg:#0a1628; --surface:#111d33; --card:rgba(255,255,255,.04);
@@ -147,6 +154,25 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 .review-panel textarea{width:100%;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;color:var(--paper);font-size:12px;font-family:inherit;resize:vertical;min-height:50px}
 .review-panel textarea:focus{outline:none;border-color:var(--gold)}
 .review-panel .review-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+
+/* ═══ R-AI-ASSIST: AI 草稿助手（G2CLAW 云端增强 + MLX 降级） ═══ */
+.ai-assist{background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.ai-assist .ai-title{font-size:12px;color:var(--violet,#b8a6e8);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ai-assist .ai-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.ai-assist input{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:6px;padding:5px 8px;color:var(--paper);font-size:12px;width:64px}
+.ai-assist input.wide{width:110px}
+.ai-assist select{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:6px;padding:5px 6px;color:var(--paper);font-size:12px}
+.ai-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;border:1px solid rgba(139,92,246,.5);background:rgba(139,92,246,.15);color:#b8a6e8;font-size:12px;font-weight:700;cursor:pointer}
+.ai-btn:hover:not(:disabled){filter:brightness(1.15)}
+.ai-btn:disabled{opacity:.5;cursor:not-allowed}
+.ai-prog{display:none;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-top:4px}
+.ai-prog.on{display:flex}
+.ai-prog .bar{flex:1;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.ai-prog .bar i{display:block;height:100%;width:30%;background:linear-gradient(90deg,#8b5cf6,#c9a84c);border-radius:2px;animation:aiSlide 1.2s ease-in-out infinite}
+@keyframes aiSlide{0%{margin-left:-30%}100%{margin-left:100%}}
+.ai-result{font-size:11px;color:var(--muted);margin-top:6px;display:none;background:rgba(0,0,0,.2);border-radius:6px;padding:8px;max-height:180px;overflow-y:auto;white-space:pre-wrap;line-height:1.6}
+.ai-result.on{display:block}
+.ai-result b{color:var(--gold)}
 
 /* ═══ 历史记录 ═══ */
 .history{max-height:100px;overflow-y:auto;margin-top:8px}
@@ -384,6 +410,34 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
   <!-- ═══ 审核面板（医生/命理师可见） ═══ -->
   <div class="review-panel" id="reviewPanel">
     <h3>🔍 审核签字 <span style="font-size:10px;color:var(--muted);margin-left:6px">仅医生/命理师可见</span></h3>
+
+    <!-- R-AI-ASSIST: AI 草稿助手（规则引擎保底 + G2CLAW 云端增强可选） -->
+    <div class="ai-assist">
+      <div class="ai-title">🤖 AI 草稿助手 <span style="font-size:10px;color:var(--muted);font-weight:normal">云端 G2CLAW 增强 · 失败自动降级本地 · 生成后仍需人工审核</span></div>
+      <div class="ai-row" id="aiTokenRow" style="display:none">
+        <input type="password" id="aiToken" class="wide" style="width:220px" placeholder="Bearer Token（医生/命理师账号）">
+        <button class="ai-btn" onclick="saveAiToken()">记住</button>
+      </div>
+      <div class="ai-row">
+        <button class="ai-btn" id="btnAiEmr" onclick="aiEmrDraft()">📋 AI 病历草稿</button>
+        <span style="font-size:10px;color:var(--muted)">四诊数据 → 辨证/处方草稿，填入病历</span>
+      </div>
+      <!-- 命理师专区（role=master 可见） -->
+      <div id="aiMingliBox" style="display:none;border-top:1px dashed rgba(139,92,246,.2);padding-top:8px;margin-top:4px">
+        <div class="ai-row">
+          <input id="mlYear" type="number" placeholder="年" min="1900" max="2100">
+          <input id="mlMonth" type="number" placeholder="月" min="1" max="12" style="width:48px">
+          <input id="mlDay" type="number" placeholder="日" min="1" max="31" style="width:48px">
+          <input id="mlHour" type="number" placeholder="时" min="0" max="23" style="width:48px">
+          <select id="mlGender"><option value="male">男</option><option value="female">女</option></select>
+          <input id="mlName" class="wide" placeholder="缘主姓名(可空)">
+          <button class="ai-btn" id="btnAiMingli" onclick="aiMingliDraft()">🔮 AI 命理批注</button>
+        </div>
+      </div>
+      <div class="ai-prog" id="aiProg"><div class="bar"><i></i></div><span id="aiProgText">AI 生成中… 0s</span></div>
+      <div class="ai-result" id="aiResult"></div>
+    </div>
+
     <div class="form-group">
       <label>审核意见（驳回或修改时填写）</label>
       <textarea id="reviewNotes" placeholder="例：辨证方向正确，建议加强活血化瘀…"></textarea>
@@ -451,6 +505,8 @@ function setRole(r){
   });
   // 医生/命理师可见审核
   $('reviewPanel').classList.toggle('show', r === 'doctor' || r === 'master');
+  // R-AI-ASSIST: 命理批注专区仅命理师可见
+  const mb = $('aiMingliBox'); if (mb) mb.style.display = (r === 'master') ? 'block' : 'none';
   toast('已切换到' + (r==='patient'?'患者':r==='doctor'?'医生':'命理师')+'视角');
 }
 
@@ -786,8 +842,8 @@ function setEmr(field, value){
   el.classList.remove('empty');
   $('emrDot').classList.add('active');
   setTimeout(() => $('emrDot').classList.remove('active'), 1500);
-}
   emrSyncThrottled();  // R721: 变更后节流上报
+}
 function appendEmr(field, value){
   if(!value) return;
   if(App.emr[field]){
@@ -898,6 +954,143 @@ function emrSyncThrottled(){
   _emrSyncTimer = setTimeout(saveEmr, 1500);
 }
 
+/* ═══ R-AI-ASSIST: AI 草稿助手（aiEnhance 三场景前端接入） ═══ */
+const AI_API = 'http://127.0.0.1:8920';
+let _aiCsrf = null, _aiTimer = null, _aiAbort = null;
+
+function getAiToken(){
+  return localStorage.getItem('mlbj_token') || localStorage.getItem('auth_token')
+      || localStorage.getItem('admin_token') || localStorage.getItem('token') || '';
+}
+function saveAiToken(){
+  const v = ($('aiToken').value || '').trim();
+  if(!v){ toast('请粘贴 Bearer Token'); return; }
+  localStorage.setItem('mlbj_token', v);
+  $('aiTokenRow').style.display = 'none';
+  toast('Token 已记住');
+}
+function ensureAiToken(){
+  if(getAiToken()) return true;
+  $('aiTokenRow').style.display = 'flex';
+  toast('请先粘贴医生/命理师 Bearer Token');
+  return false;
+}
+async function aiCsrf(){
+  if(!_aiCsrf){ try{ const r = await fetch(AI_API + '/api/csrf-token'); _aiCsrf = (await r.json()).csrfToken || ''; }catch(e){ _aiCsrf = ''; } }
+  return _aiCsrf;
+}
+function aiProgStart(label){
+  const p = $('aiProg'); p.classList.add('on');
+  $('aiResult').classList.remove('on');  // 新生成开始时隐藏旧结果，避免误读
+  const t0 = Date.now();
+  const el = $('aiProgText');
+  el.textContent = label + '… 0s（云端思考型模型约需 10-40 秒）';
+  clearInterval(_aiTimer);
+  _aiTimer = setInterval(() => { el.textContent = label + '… ' + Math.round((Date.now()-t0)/1000) + 's（云端思考型模型约需 10-40 秒）'; }, 1000);
+}
+function aiProgStop(){ clearInterval(_aiTimer); $('aiProg').classList.remove('on'); }
+async function aiPost(path, body, timeoutMs){
+  const csrf = await aiCsrf();
+  _aiAbort = new AbortController();
+  const timer = setTimeout(() => _aiAbort.abort(), timeoutMs || 95000);
+  try {
+    const r = await fetch(AI_API + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf, 'X-Skip-Interceptor': '1',
+                 'Authorization': 'Bearer ' + getAiToken() },
+      body: JSON.stringify(body), signal: _aiAbort.signal
+    });
+    return await r.json();
+  } finally { clearTimeout(timer); }
+}
+function aiShow(html){ const el = $('aiResult'); el.innerHTML = html; el.classList.add('on'); }
+
+// AI 病历草稿：四诊数据 → 规则引擎初稿 + 云端增强病历 → 填入病历区
+async function aiEmrDraft(){
+  if(!ensureAiToken()) return;
+  const btn = $('btnAiEmr'); btn.disabled = true;
+  aiProgStart('AI 病历草稿生成中');
+  try {
+    // 从实时病历区拆分四诊数据
+    const complaint = (App.emr.complaint || '').trim();
+    const exam = (App.emr.examination || '').trim();
+    if(!complaint){ toast('主诉为空：请先语音/文字录入主诉'); return; }
+    const symptoms = complaint.split(/[，。；、,.;\n]+/).map(s => s.trim()).filter(s => s.length >= 2).slice(0, 10);
+    const examParts = exam.split(/[，。；、,.;\n]+/).map(s => s.trim()).filter(Boolean);
+    const tongue = examParts.filter(s => /舌|苔/.test(s)).slice(0, 6);
+    const pulse = examParts.filter(s => /脉/.test(s)).slice(0, 6);
+    const r = await aiPost('/api/clinic/ai-draft', { symptoms, tongue, pulse, aiEnhance: true });
+    if(r.error){ toast('AI 草稿失败：' + r.error); return; }
+    // 规则引擎保底字段
+    if(r.zheng && r.zheng.length) setEmr('syndrome', r.zheng[0]);
+    if(r.formulas && r.formulas.length && !App.emr.prescription) setEmr('prescription', r.formulas.join(' 加减 '));
+    // 云端增强全文 → 诊断区
+    const ai = r.aiDraft;
+    let showTxt = '';
+    if(ai && ai.report){
+      setEmr('diagnosis', ai.report);
+      // 从云端病历解析证型/处方段补齐结构化字段（规则引擎未命中时兜底）
+      const rep = ai.report;
+      if(!App.emr.syndrome){
+        const mz = rep.match(/(?:综合辨证|证属|诊断为|辨证为|辨证属)\*{0,2}([\u4e00-\u9fff、]{2,20}?证)\*{0,2}/);
+        if(mz) setEmr('syndrome', mz[1]);
+      }
+      if(!App.emr.prescription){
+        const mr = rep.match(/处方(?:建议)?[】：:]*\s*\*{0,2}([\u4e00-\u9fff]{2,10}(?:汤|散|丸|饮|丹|膏)[^。\n]{0,80})/);
+        if(mr) setEmr('prescription', mr[1].trim());
+      }
+      showTxt = '<b>☁️ ' + escapeHtml(ai.provider) + ' · ' + (ai.elapsedMs/1000).toFixed(1) + 's</b>\n' + escapeHtml(ai.report);
+      toast('AI 病历草稿已填入（' + (ai.elapsedMs/1000).toFixed(0) + 's）');
+    } else {
+      setEmr('diagnosis', r.draft);
+      showTxt = '<b>⚙️ 规则引擎初稿（云端' + (ai && ai.error ? '超时/失败已降级' : '未启用') + '）</b>\n' + escapeHtml(r.draft.slice(0, 600));
+      toast('云端未响应，已用规则引擎初稿');
+    }
+    if(r.kbHits && r.kbHits.length){
+      showTxt += '\n\n<b>📚 KB 支撑：</b>' + r.kbHits.slice(0,3).map(h => escapeHtml(h.title || '')).join(' · ');
+    }
+    aiShow(showTxt);
+  } catch(e){
+    toast(e.name === 'AbortError' ? 'AI 生成超时（95s），请重试或稍后再试' : 'AI 服务不可用：' + e.message);
+  } finally { aiProgStop(); btn.disabled = false; }
+}
+
+// AI 命理批注：生辰 → 排盘 + 云端命理师级批注 → 供命理师审改
+async function aiMingliDraft(){
+  if(!ensureAiToken()) return;
+  const y = parseInt($('mlYear').value), m = parseInt($('mlMonth').value),
+        d = parseInt($('mlDay').value), h = $('mlHour').value === '' ? 12 : parseInt($('mlHour').value);
+  if(!y || !m || !d){ toast('请填写出生年月日（时辰可空，默认午时）'); return; }
+  const btn = $('btnAiMingli'); btn.disabled = true;
+  aiProgStart('AI 命理批注生成中');
+  try {
+    const r = await aiPost('/api/clinic/mingli/draft', {
+      year: y, month: m, day: d, hour: h,
+      gender: $('mlGender').value, name: $('mlName').value.trim(), aiEnhance: true
+    });
+    if(r.error){ toast('命理批注失败：' + r.error); return; }
+    const ai = r.aiAnnotation;
+    let showTxt = '';
+    if(ai && ai.draft){
+      showTxt = '<b>☁️ ' + escapeHtml(ai.provider) + ' · ' + (ai.elapsedMs/1000).toFixed(1) + 's · AI 批注草稿（请审改后采用）</b>\n' + escapeHtml(ai.draft);
+      showTxt += '\n\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent(ai.draft) + '">✍️ 写入审核意见</button>';
+      toast('AI 命理批注已生成（' + (ai.elapsedMs/1000).toFixed(0) + 's）');
+    } else {
+      showTxt = '<b>⚙️ 规则引擎草案（云端' + (ai && ai.error ? '超时/失败已降级' : '未启用') + '）</b>\n' + escapeHtml((r.draft || '').slice(0, 800));
+      toast('云端未响应，已用规则引擎草案');
+    }
+    aiShow(showTxt);
+  } catch(e){
+    toast(e.name === 'AbortError' ? 'AI 生成超时（95s），请重试或稍后再试' : 'AI 服务不可用：' + e.message);
+  } finally { aiProgStop(); btn.disabled = false; }
+}
+function adoptMingli(el){
+  const t = decodeURIComponent(el.dataset.t || '');
+  const box = $('reviewNotes');
+  box.value = (box.value ? box.value + '\n\n' : '') + '【命理批注】' + t;
+  toast('批注已写入审核意见，请审改后提交');
+}
+
 /* ═══ 审核 ═══ */
 function reviewApprove(){
   const notes = $('reviewNotes').value || '审核通过';
@@ -932,6 +1125,8 @@ function setReviewStatus(status, notes){
 // 启动
 initEngine();
 setDot('emr', '');  // 占位
+// R-AI-ASSIST: 无 token 时主动展示粘贴框
+try { if(!getAiToken()) $('aiTokenRow').style.display = 'flex'; } catch(_) {}
 // 已初始化完成
 </script>
 
