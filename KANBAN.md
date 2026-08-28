@@ -1,4 +1,17 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 08:55 — ✅ 前序任务全面盘点 + P0/P1 五项修真
+- **BaziQA 大赛答题引擎完成**：200 题全量跑完，MLX v9.0-7b 准确率 33.0%（超随机基线 +8pp），满分 1 人/优秀 5 人，verify_detail_json 写入 contest_qa_mlx 模式
+- **P0-B1 KB 统计失真修复**：直查 vs API 已一致（74,735/74,735），系 node:sqlite 缓存 stale 导致，launchctl kickstart 后恢复
+- **P0-B2 拦截器冲突确认已根修**：R-INT 兼容层（Response 包装对象）覆盖全站 143 页，旧写法 `r.json()` 免改即用，抽查 8 页无冲突
+- **P1-B3 深度校验 v2**：性别区分（男命财=妻/女命官=夫）+ 地支十神 + 大运十神联动 + 神煞参与，命中率 0.28→0.74（+164%），≥0.5 者 125/144，零命中降至 12
+- **P1-B4 8920 双连接竞态根治**：11 处 better-sqlite3 连接统一加 `busy_timeout=5000`，与 DatabaseSync 主连接对齐，消除写锁竞态
+- **P1-B5 face-ocr 评估结论**：8913 端口活跃运行（面诊/舌诊/眼诊端点），被 api-server-v2 代理引用，8941-8944 为模型层非替代关系，不退役
+- **A 类待用户决策**：C 类遗留页退役清单（SERVICE-BLUEPRINT.md 14 页）；AutoClaw 3 项陈旧 cron 复跑清零（需 openclaw CLI 权限）
+- server commit `61897f6` + `后续 commit`（busy_timeout）
+## 2026-08-28 09:00 — 🔄 BaziQA 大赛 200 题答题引擎启动（心跳推进）
+- 41 样本(200题)已全部有排盘 JSON，contest-answer-engine.py 后台跑 MLX v9.0 答题，日志 .openclaw/tmp/contest-answer-engine.log，产出验证得分写回 verification_corpus
+- 预计 30-60 分钟完成；下轮心跳查收准确率 vs 随机基线 25%
+
 ## 2026-08-28 08:40 — ✅ 校正库扩容：449条(净增266) + 深度校验基线 + 命理/医学分类
 - **分类**：140条倪师医案标记 `out_of_scope` 移交中医智能体；命理校正库保留 309 条纯命理样本
 - **扩容**：+BaziQA大赛赛题 41 条（2021-2025 全球命理师大赛真题，带标准答案，weight=1.5 最高档）；+Wikidata名人 183 条（六国华人，sitelinks>30 头部名人，精确生辰+结构化事件）
