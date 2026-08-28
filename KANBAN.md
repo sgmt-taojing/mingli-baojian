@@ -1,4 +1,16 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 14:25 — ✅ G1+G5 管理体系两项 P0 完成（能力覆盖审计-20260828 / ADR-007）
+### G1 · medical-stack 内化快照自动跟随（P0）
+- **问题**：medical-stack/server/kb-store/tcm-synced-kb.json 快照滞后主镜像 ~14.5h（52,655 vs 52,972 条），8972 服务的 KB 比自有 yidao.db 旧
+- **落地**：新增 `scripts/medical-stack-kb-follow.py`（复用 deploy 解包内化逻辑：镜像信封→裸模块映射→原子替换→条目数校验→SEC-001 标记核查→SQLite 快路径重建→8972 暖缓存+七能力验证）+ `scripts/tcm-import-and-follow.sh` 包装器，launchd `com.mingli-baojian.tcm-import` 15min 轮询已挂接（原 plist 备份 .bak-g1-*）
+- **热加载**：8972 loadKbCache 按 mtime 自动失效，无需重启；适配补齐 kb-sqlite-sync.js（medical-stack/scripts/，deploy LOCAL_KEEP 已加 scripts/ 防重部署清空）
+- **验收**：watchdog 链4 lag 868min → **-1.2min ≈ 0**（阈值已按 ADR-007 收紧 1440→60min），快照 52,972 条，8972 七能力（tongue/face/hand/inquiry/syndrome/formula/acupoint）全通；watchdog count_json_entries 已兼容裸模块映射格式
+### G5 · 端到端冒烟（P0 一次性，证据留存）
+- **链路 8/8 全通**（总耗时 ~40ms 本地）：建档叫号（queue_no=2, pid=empi-c2701d184166）→ 一帧四诊诊断 → EMR 生成（**case_id=CASE-1787898095391**，syndrome=方剂·四君子汤）→ 8974 AI 命理批注（**ann-52202b443f49**，pending+水印+免责声明齐全）→ annotation-queue 命中（**SLA=48h 计时正常**，age=0h overdue=false）→ 命理师 approve（ML-MASTER-001，水印解除）→ 药方生成（**rx-15ef68e1-45d7-4da1-8c81-b01d6b0b5d05**，四君子汤加减）→ 队列流转（waiting→called→in-consult→done）
+- **守卫验证**：R756 诊断输出零命理词 ✅；R757 正向（辨证无命理词）✅ + 负向探针（输入"日主戊土 大运流年 命宫"→ 正确降级"待辨证（命中非医学内容，需人工复核）"）✅
+- **证据**：`DELIVERY/g5-smoke-evidence-20260828-142135.json`（8 节点时间戳+3+1 项守卫记录），冒烟脚本 `scripts/g5-smoke-e2e.py` 可重复执行
+- 注：《能力覆盖审计-20260828.md》与 DECISIONS.md 原文未在本地检出（已搜索全工作区），按消息内联任务全文执行
+- commit：`5e729d1`（G1）+ 本次（G5）
 ## 2026-08-28 14:05 — ✅ 同步能力检查与优化（TCM 镜像同步质量修真）
 - **同步现状**：tcm-authoritative-full.json（160MB / 52,972 条 / 41 模块）03:24 同步至 mingli-baojian + smart-home-family；11:40 导入完成——新增 12 条 tcm-formula（金匮方略：一物瓜蒂汤/括蒌薤白白酒汤等），52,733 条幂等去重，KB 总量 74,750 与 FTS5 完全一致
 - **修真 1 · entry_id NULL 复发**：R117 回补脚本 06:14 入库但未执行，401 条 tcm-syndrome 重新裸奔——已执行回补（确定性 ID 6574504246000502..902）+ FTS5 内 401 条存量 NULL 同步回补，entry_id join 恢复 74,750/74,750 = 100%
