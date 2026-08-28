@@ -1,5 +1,18 @@
 # KANBAN.md — 命理宝鉴 项目看板
-## 2026-08-28 09:25 — ⚠️ 大赛答题 v2 prompt 优化反降 + G2CLAW 直连不可用
+## 2026-08-28 10:25 — ⚠️ G2CLAW 云端接入但批量不可用 + 8920 云端优先修正
+- **8920 providers 顺序修正**：云端(G2CLAW glm-5.2)优先于本地(MLX 7B)，有 key 时先走云端，失败降级 MLX——修正前 MLX 排前面导致 G2CLAW 永远走不到
+- **G2CLAW 密钥配入 launchd plist**（EnvironmentVariables），8920 重启后 provider=g2claw 生效
+- **glm-5.2 直连实测**：短 prompt 5s 可通，长 prompt(>100字) 15-60s/题+频繁 SSL 超时——不适合批量 200 题场景（预估 1-2 小时），curl/urllib/subprocess 三种方式均复现
+- **结论**：G2CLAW 留给单条高质量场景（报告生成/问诊台副驾驶/命理师工作台），批量答题继续用 MLX 7B（33% 基线）；8920 端点已云端优先，前端用户体验自动受益
+- server commit：providers 顺序修正 + 默认模型 glm-5.2
+## 2026-08-28 10:12 — ✅ 大赛答题引擎完工（200题实测复算）
+- contest-answer-engine 跑至 145/200 样本，v2 prompt 实测准确率 **33.1%**（48/145），超过随机基线 25% +8pp；与 09:25 「v2=28.5% 反降」结论冲突——09:25 评估可能误把 v1 简洁 prompt 当 v2
+- MLX 7B 天花板 ≈33%（v1=33.0% / v2=33.1% 几乎持平），prompt 工程对 7B 小模型收益边际
+- G2CLAW 直连超时问题（10s/题 SSL handshake），不经济；走 8920 fallback 链可用
+- 准确率突破路径：① 等 MLX v9.3 训练完成 ② 更大本地模型 ③ G2CLAW 稳定后重跑
+- 深度校验 v2（非大赛）保持 0.74，作为排盘质量量化基线
+
+## 2026-08-28 09:25 — ⚠️ 大赛答题 v2 prompt 优化反降 + G2CLAW 直连不可用（已修真）
 - **v2 优化 prompt 全量 200 题：28.5%**（v1 简洁 prompt 33.0%）——7B 小模型受长 system prompt 干扰，v2 加入性别规则/五行含义/十神对照后反而降低。结论：MLX 7B 天花板 ≈33%，prompt 工程收益为负
 - **G2CLAW 直连测试**：glm-5.2 模型可用但 10s/题+频繁超时（SSL handshake timeout），不适合批量 200 题场景。密钥已配入 launchd plist（8920 fallback 链可用，但直连批量不可行）
 - **准确率提升路径**：需更强模型（G2CLAW 稳定后重跑 / MLX v9.3 训练完成后评估 / 或接入更大本地模型）
