@@ -1,4 +1,25 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-28 21:10 — ✅ OCR 碎片评估收口：重跑 OCR 无必要，16 条乱码降权
+- **评估结论**：ocr/batch 系 1,934 条中 1,918 条内容良好（舒晗密训笔记/古籍 doc 切片等），真乱码仅 16 条（KB-nisha-* 扫描 PDF 转写崩坏）；早前"~900 OCR 碎片"系截断审计对转写稿非标点结尾的过度计数
+- **成本决策**：重跑 OCR 管线（找源 PDF→视觉模型→回切→入库）数天 vs 16 条降权几分钟——**不重跑**
+- **执行**：16 条 trust 0.2 + meta-only/ocr-garbage 标（FTS5 同写），备份 `DELIVERY/kb-ocr-garbage-backup-20260828-*.json`；meta-only 总量 3,843→3,859；quick_check OK
+- 至此 KB 质量侧专项全部收口（存量降权/keywords补齐/噪声清洗/截断修复/目录页降权/OCR乱码降权）
+## 2026-08-28 21:05 — 🌙 日结（cron 21:00 · 健康检查全绿）
+- 健康检查实探：6 服务全绿（8900/8901/8911/8912/8913/8920 均 200）+ kb-list/paipan-api OK + 8960=v9.0-7b 正常
+- KB total=74,752（quality-report A+）+ staging pending 0；今日无新蒸馏批次，全部修真走存量优化
+- 今日全节点（均已在上方逐条详细留痕）：
+  - G2CLAW 云端接入三层（10:25 providers 修正 → 11:15 报告润色+病历草稿 → 11:30 命理批注，三大 aiEnhance 场景全部落地）
+  - 同步能力修真（14:05 entry_id NULL 401 条回补 + 太阳→中医术语污染 19 条活体/12/13/13 四副本全净 + full_kb_audit 新增两项自动检查）
+  - 管理体系 G1+G5+G8 三 P0 一日清（G1 medical-stack 内化快照自动跟随 lag 868min→-1.2min、G5 端到端冒烟 8/8 全通+G5 守卫证据、G8 院内急救话术分层 12 处分类处置）
+  - 问诊台双师审核台 AI 草稿助手上线（14:50 ai-draft+mingli/draft 接入，意外根修潜伏线上 bug `emrSyncThrottled()` 括号错位 TDZ 抛错致 initEngine 从未执行）
+  - KB 存量优化专项（15:35 注水桶清理 120 + 纯元数据降权 2,628 + r39 模板降权 720 + tcm-formula 功效补齐 16）
+  - DB 损坏根修重大（16:05 yidao.db 页级损坏 VACUUM INTO 重建 3.2→1.7GB + integrity_check OK，旧库保留为 yidao.db.corrupt-backup-20260828）
+  - keywords 全量补齐（16:05 3,710 条 missing=0）+ 四轮历史噪声清洗收敛（16:55 74,752 条全 JSON 化 invalid=0）
+  - 截断型条目回源修复（17:20 定性纠偏 9,507 疑似→62 条真截断修复，备份 kb-trunc-backup-20260828-171513.json）
+  - OneFrame 唇诊 v3b 布控 8941（17:25 平台侧交付仅登记，pale 真值 0.976）
+  - 目录页点线碎片降权 1,215 条（17:50 meta-only 2,628→3,843，FTS5 双轨设计确认）
+- 阻塞/遗留：patrol 读数失实+cron 连败集群（主会话修真）；v9.3 走阈值触发制
+- 下一步动作（明日首推）：从「服务中心导航体验回归 · 五中心 × 主入口全链路走查」开始（接 8-27 21:10 计划）
 ## 2026-08-28 17:50 — ✅ 目录页点线碎片降权 1,215 条 + FTS5 双轨设计确认
 - **圈定**：content 含 4+ 连续点线且点线行收尾，纯目录页 1,215 条（短于 400 字或点线行占比≥40%）；75 条混合长文保留不动
 - **执行**：trust 0.2 + tags 加 meta-only/toc-page，备份 `DELIVERY/kb-toc-backup-20260828-*.json`；meta-only 总量 2,628→3,843
