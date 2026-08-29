@@ -1032,12 +1032,22 @@ async function aiEmrDraft(){
       // 从云端病历解析证型/处方段补齐结构化字段（规则引擎未命中时兜底）
       const rep = ai.report;
       if(!App.emr.syndrome){
-        const mz = rep.match(/(?:综合辨证|证属|诊断为|辨证为|辨证属)\*{0,2}([\u4e00-\u9fff、]{2,20}?证)\*{0,2}/);
-        if(mz) setEmr('syndrome', mz[1]);
+        // 主模式：「证属XX证」；兜底：「肝火扰心所致」类病机短语（云端草稿常不写「证」字尾）
+        const mz = rep.match(/(?:综合辨证|证属|证型[为是]?|诊断为|辨证为|辨证属)\*{0,2}[：: ]?\*{0,2}([\u4e00-\u9fff、]{2,24}?)(?:。|;|；|\n|\*)/);
+        if(mz) setEmr('syndrome', /证$/.test(mz[1]) ? mz[1] : mz[1] + '证');
+        else {
+          const mb = rep.match(/([\u4e00-\u9fff]{2,6}(?:扰心|化火|亏虚|不固|瘀阻|内扰|上炎|犯胃|犯肺|失调|不和|不寐|不宁|郁热|湿热|阴虚|阳虚|气虚|血虚))(?=[\u4e00-\u9fff、，]{0,14}(?:所致|引起|为患))/);
+          if(mb) setEmr('syndrome', mb[1] + '（待医师核证）');
+        }
       }
       if(!App.emr.prescription){
         const mr = rep.match(/处方(?:建议)?[】：:]*\s*\*{0,2}([\u4e00-\u9fff]{2,10}(?:汤|散|丸|饮|丹|膏)[^。\n]{0,80})/);
         if(mr) setEmr('prescription', mr[1].trim());
+        else {
+          // 兜底：任意处出现的「XX汤/丸」方名
+          const mf = rep.match(/([\u4e00-\u9fff]{2,8}(?:汤|散|丸|饮|丹|膏))/);
+          if(mf) setEmr('prescription', mf[1] + ' 加减（待医师核定）');
+        }
       }
       showTxt = '<b>☁️ ' + escapeHtml(ai.provider) + ' · ' + (ai.elapsedMs/1000).toFixed(1) + 's</b>\n' + escapeHtml(ai.report);
       toast('AI 病历草稿已填入（' + (ai.elapsedMs/1000).toFixed(0) + 's）');
