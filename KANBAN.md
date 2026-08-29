@@ -1,4 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-29 22:50 — ✅ 晚子时说明双端落地 + 边界回归脚本固化（21/21 全过）
+- **晚子时说明**：白话引擎 baihuaBazi 加「晚子时说明」卡（chart.input.solar 解析 23 点触发）；paipan-quick 前端子时选项同步提示（子时跨两天，23 点后日柱不翻/时柱次日起）
+- **回归固化**：`scripts/paipan-boundary-regression.js`（21 断言）——A 组八字 API 10 项（巳时丁巳 bug 锚点/早晚子时/立春交节时刻/寒露小寒换月）+ B 组紫微 4 项（12 宫/命身宫 isMingGong|isShenGong 标记/闰二月/23 点盘）+ C 组六爻 7 项（世应唯一且 0 基索引与 shiying 标记一致/干支六亲非空/白话无占位符）
+- 首跑 B1 断言按名称找身宫误报（实为 isShenGong 标记），修正后 21/21 全过；脚本退出码 0/1 可挂 CI/cron
 ## 2026-08-29 22:35 — ✅ 排盘参数语义全仓扫描 + 边界回归（结论：内核健壮，仅速览页一处 bug 已修）
 - **全仓时辰扫描**（15 页面+JS）：仅 paipan-quick.html 索引当小时（已修）；ziwei.html 用区间起点值（1=丑时，柱位正确）；ask/master-intake/clinic-consultation 均传 0-23 中点小时 ✓
 - **月份扫描**：getMonth() 调用均为 Date 构造场景（0 基正确），无 API 参数误用

@@ -194,6 +194,11 @@ async function runPaipan(){
     html += '<div class="info-card"><div class="k">💡 您最弱的五行</div><div class="v">' + esc(weakest) + ' · ' + esc(WX_BODY[weakest]) + '（后天可补养）</div></div>';
     html += '</div>';
 
+    // 子时学派说明（子时跨两天，23-1 点）
+    if (h === 0 || h === 23) {
+      html += '<div class="note">🌙 子时（23-1点）横跨两天：23 点后出生本盘按「日柱仍算当天、时柱按次日起」处理，0 点后属早子时按当天算——这是传统正统做法之一，深度详批可请命理师两盘参看。</div>';
+    }
+
     // AI 解读区
     html += '<div class="ai-zone" id="aiZone"><div class="btn-row"></div></div>';
     html += '<div class="note">📊 命盘由系统后台自动排定 · AI 解读引用经典知识库<br>排盘详细版请找命理师深度分析</div>';
