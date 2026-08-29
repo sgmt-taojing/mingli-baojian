@@ -38,6 +38,21 @@ header p{color:var(--dim);font-size:13px;margin-top:8px;letter-spacing:2px}
 .d-consult .domain-head h2{color:var(--green)}
 .d-kb .domain-head h2{color:var(--purple)}
 .d-acct .domain-head h2{color:var(--teal)}
+
+.loops{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.loop-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.loop-card h3{font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.loop-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:400}
+.loop-badge.ok{color:#4caf7d;border:1px solid rgba(76,175,125,.4)}
+.loop-badge.part{color:#d29922;border:1px solid rgba(210,153,34,.4)}
+.loop-card ol{list-style:none;counter-reset:step}
+.loop-card ol li{font-size:12px;color:var(--dim);padding:4px 0;border-bottom:1px dashed rgba(42,50,66,.6);counter-increment:step}
+.loop-card ol li::before{content:counter(step);display:inline-block;width:16px;height:16px;line-height:16px;text-align:center;border-radius:50%;border:1px solid var(--border);font-size:10px;margin-right:6px;color:var(--gold2)}
+.loop-card ol li:last-child{border-bottom:none}
+.loop-card a{color:var(--text);text-decoration:none;border-bottom:1px dotted rgba(201,168,76,.4)}
+.loop-card a:hover{color:var(--gold2)}
+.d-loops .domain-head h2{color:#e8cf8a}
+
 footer{text-align:center;color:var(--dim);font-size:11px;padding-top:20px;border-top:1px solid var(--border);margin-top:30px;line-height:1.8}
 </style>
 </head>
@@ -122,6 +137,64 @@ footer{text-align:center;color:var(--dim);font-size:11px;padding-top:20px;border
 <a class="svc" href="order.html"><div class="name">订单中心</div><div class="desc">服务订单管理</div><div class="role-tags"><span class="rt y">缘主</span></div></a>
 <a class="svc" href="merchant-apply.html"><div class="name">商家入驻</div><div class="desc">合作商家申请</div><div class="role-tags"><span class="rt o">机构</span></div></a>
 <a class="svc" href="center-admin.html"><div class="name">平台管理</div><div class="desc">后台运营管理</div><div class="role-tags"><span class="rt o">机构</span></div></a>
+</div>
+</section>
+
+
+<!-- 按服务对象 · 闭环体系导航 -->
+<section class="domain d-loops">
+<div class="domain-head"><span class="glyph">🔄</span><h2>按服务对象 · 闭环体系</h2><span class="sub">进入 → 使用 → 结果 → 反馈 → 进化 · 体系内一条链走完</span></div>
+<div class="loops">
+<div class="loop-card">
+<h3>👤 缘主体系 <span class="loop-badge ok">闭环 ✓</span></h3>
+<ol>
+<li>进入 · <a href="divination-membership.html">会员注册</a> / <a href="my-yuanzhu.html">个人中心</a></li>
+<li>使用 · <a href="ai-assistant.html">AI 问答</a> · <a href="ask.html">问事解读</a> · <a href="paipan-center.html">排盘</a></li>
+<li>结果 · <a href="lifeflow-report.html">流年报告</a> · <a href="lifeplan-detail.html">人生规划</a></li>
+<li>反馈 · <a href="feedback-center.html">反馈中心</a>（报告页直达）</li>
+<li>进化 · 咨询案例自动回流验证库</li>
+</ol>
+</div>
+<div class="loop-card">
+<h3>🏥 患者体系 <span class="loop-badge ok">闭环 ✓</span></h3>
+<ol>
+<li>进入 · <a href="clinic-live-room.html">智能问诊室建档</a></li>
+<li>使用 · <a href="clinic-consultation.html">诊疗</a> · <a href="doctor-elder.html">名医预约</a></li>
+<li>结果 · <a href="tcm-report.html">诊断报告</a> · 病历存档</li>
+<li>反馈 · 随访跟踪 + 医生复核</li>
+<li>进化 · 临床经验每日蒸馏入库</li>
+</ol>
+</div>
+<div class="loop-card">
+<h3>👨‍⚕️ 医生体系 <span class="loop-badge ok">闭环 ✓</span></h3>
+<ol>
+<li>进入 · <a href="doctor-panel.html">医生工作台</a></li>
+<li>使用 · <a href="doctor-intake.html">初诊采集</a> · <a href="integrated-clinic.html">综合问诊</a></li>
+<li>结果 · <a href="doctor-response.html">处方开方</a> · 统计面板</li>
+<li>反馈 · 审核日志全程留痕</li>
+<li>进化 · 诊疗知识反哺正式库</li>
+</ol>
+</div>
+<div class="loop-card">
+<h3>📜 命理师体系 <span class="loop-badge ok">闭环 ✓</span></h3>
+<ol>
+<li>进入 · <a href="master-workstation.html">命理师工作台</a></li>
+<li>使用 · <a href="master-intake.html">采集</a> · <a href="master-class.html">分类断事</a></li>
+<li>结果 · <a href="master-archive.html">命理档案</a> · 复核签发</li>
+<li>反馈 · 缘主确认反馈</li>
+<li>进化 · 判断错题入验证库迭代</li>
+</ol>
+</div>
+<div class="loop-card">
+<h3>🏢 机构体系 <span class="loop-badge part">闭环建设中</span></h3>
+<ol>
+<li>进入 · <a href="merchant-apply.html">商家入驻</a></li>
+<li>使用 · <a href="center-admin.html">运营管理</a> · <a href="kb-insights.html">数据洞察</a></li>
+<li>结果 · <a href="order.html">订单结算</a></li>
+<li>反馈 · 对账记录</li>
+<li>进化 · 经营分析报告（建设中）</li>
+</ol>
+</div>
 </div>
 </section>
 

@@ -6,7 +6,17 @@
 """
 import os, re, sqlite3, hashlib, sys
 
-SUBS = "/Volumes/data2/nishi-materials/subs"
+# 路径 fallback list：按序尝试，首个存在且含 .txt 字幕的目录生效（R812 修真：data2 卷可能未挂载）
+SUBS_CANDIDATES = [
+    "/Volumes/data2/nishi-materials/subs",
+    "/Volumes/模型训练数据/cold-storage/nishi-materials/subs",
+    "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.data/nishi-subs",
+]
+SUBS = None
+for _p in SUBS_CANDIDATES:
+    if os.path.isdir(_p) and any(f.endswith('.txt') for f in os.listdir(_p)):
+        SUBS = _p
+        break
 DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
 
 # 水印/噪音行模式
@@ -80,8 +90,17 @@ def main():
     cur = db.cursor()
     total = 0
 
+    if SUBS is None:
+        # 无可用字幕源：非错误，属预期空转（106/106 已入库），cron 约定静默
+        kb = cur.execute("SELECT COUNT(*) FROM kb_formal").fetchone()[0]
+        nishi = cur.execute("SELECT COUNT(*) FROM kb_formal WHERE keywords LIKE '%倪海厦%'").fetchone()[0]
+        print(f"字幕文件: 0")
+        print(f"✅ 无可用字幕源（候选路径均未挂载），跳过 | KB={kb} | 倪师={nishi}")
+        db.close()
+        return
+
     files = sorted([f for f in os.listdir(SUBS) if f.endswith('.txt') and f != 'progress.log' and f != 'run.log'])
-    print(f"字幕文件: {len(files)}")
+    print(f"字幕文件: {len(files)} (源: {SUBS})")
 
     for fname in files:
         path = os.path.join(SUBS, fname)

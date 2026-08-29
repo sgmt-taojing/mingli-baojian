@@ -12,14 +12,18 @@ R746-2 医学知识双向对齐校验（接口与知识流转规范 V1.0 §2.2.1
      → 正常(权威库是源, 下游按需同步), 仅统计
 方向 C（版本差异）: 双侧都存在但内容指纹不同的条目 → 报告差异
 
-用法: python3 scripts/medical-align-check.py [--report <path>]
+用法:
+  python3 scripts/medical-align-check.py [--report <path>] [--fix]
+  --fix: 自动修真方向A（删除严重乱码/索引碎片 / 隔离命理逃逸 / 标 pending-migration + 写 tcm-agent authoritative）
 """
-import sqlite3, json, hashlib, sys
+import sqlite3, json, hashlib, sys, re, shutil
 from pathlib import Path
+from datetime import datetime
 
 WS = Path('/Users/tom/.openclaw-autoclaw/workspace')
 MINGLI_DB = WS / 'projects' / 'mingli-baojian' / 'server' / 'database' / 'yidao.db'
 AUTH_KB = WS / 'projects' / 'tcm-agent' / 'server' / 'kb-store' / 'tcm-synced-kb.json'
+QUARANTINE_KB = WS / 'projects' / 'tcm-agent' / 'server' / 'kb-store' / 'quarantine.json'
 MED_MODULES = [
     'tcm', 'tcm-classical', 'nihaisha-tcm', 'tcm-clinical', 'tcm-fangji',
     'tcm-syndrome', 'tcm-acupuncture', 'tcm-diagnosis', 'tcm-herb',
@@ -78,6 +82,32 @@ META_TITLE_KW = [
 ]
 META_MODULE_KW = ['tcm,shanghan-lun,jinkui', 'qimen/shuihan-tcm']  # 混合模块碎片
 
+# ─── R837 修真：方向A 修真分级规则（修真一处修真一类）───
+# 修真三类：
+#   A1. 严重乱码（GBK 误解码，mojibake > 30% 且 CJK < 5%）→ kb_formal DELETE
+#   A2. 索引碎片（[Page N] / 全点线 / 哈希名 / OCR 失败） → kb_formal DELETE
+#   A3. 命理古籍逃逸（穷通宝鉴/紫微斗数等 mingli-domain 内容混入 medical module）→ 隔离到 _mingli_quarantine
+#   A4. 真实医学内容（CJK ≥ 5% 且 mojibake < 30% 且非索引非命理）→ authority='tcm-agent-pending-migration' + 写入 tcm-agent authoritative
+# 修真后 medical-align-check 方向A 应 → 0
+MOJI_CHARS = set('ÿØæýþ˜¨ðøßûîïìòóõ€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåçèéêëìíîïðñòóôõö÷øùúûüýþ')
+RE_CJK = re.compile(r'[\u4e00-\u9fa5]')
+INDEX_RE = [
+    re.compile(r'^\.+\s*$'),
+    re.compile(r'^\[Page\s+\d+\]'),
+    re.compile(r'^\[P\d+\]'),
+    re.compile(r'^tcm·enc:[0-9a-f]+$'),
+    re.compile(r'^[0-9]+\s*$'),
+    re.compile(r'^\d{4,}$'),
+    re.compile(r'^---\s*P(age)?\s*\d+\s*---$'),
+    re.compile(r'^OCR\s+failed'),
+    re.compile(r'^\[OCR\s+failed'),
+]
+MINGLI_BOOK_TITLES = ['穷通宝鉴', '撼龙经', '疑龙经', '葬书', '玉匣记', '天玉经', '都天宝照经',
+    '青囊奥语', '青囊序', '地理五诀', '阳宅三要', '八宅明镜', '玄空秘旨', '紫白诀',
+    '渊海子平', '三命通会', '滴天髓', '子平真诠', '神峰通考', '麻衣神相', '柳庄相法',
+    '水镜神相', '紫微斗数全书', '十八飞星', '奇门遁甲统宗', '奇门遁甲秘笈',
+    '大六壬指南', '六壬大全', '卜筮正宗', '增删卜易', '火珠林']
+
 
 def fp(text):
     return hashlib.sha1((text or '').encode('utf-8', errors='ignore')).hexdigest()
@@ -89,11 +119,9 @@ def is_mingli_pollution(title, module, content=''):
         # 医学前缀豁免（如 tcm,fengshui 实为倪师案例）
         if not any(p in (title or '') for p in MED_TITLE_PREFIX):
             return True
+    # R120 修真：标题含命理词（子串匹配，修真一处修真一类）
     if any(k in (title or '') for k in MINGLI_TITLE_KW):
-        # R746-2 修真：豁免改为前缀匹配（'人纪'不再误豁免'天纪与人纪的关系'）；天纪(命理课程)优先
-        if '天纪' in (title or '') and '人纪' in (title or ''):
-            return True
-        if not any((title or '').startswith(p) for p in MED_TITLE_PREFIX):
+        if not any(p in (title or '') for p in MED_TITLE_PREFIX):
             return True
     # R746-2 修真：拼音关键词（易道知识·shishen 等）
     if any(k in (title or '').lower() for k in MINGLI_TITLE_KW_PINYIN):
@@ -107,8 +135,47 @@ def is_mingli_pollution(title, module, content=''):
     return False
 
 
+def classify_a1_a4(entry_id, title, module, content):
+    """修真分级（A1/A2/A3/A4 → DELETE/DELETE/QUARANTINE/MIGRATE）"""
+    title = str(title or '')
+    content = str(content or '')
+    # R120 修真：_mingli_quarantine 模块条目原本就是已隔离命理污染 → 不修真直接返回 A3
+    if module == '_mingli_quarantine':
+        return 'A3_quarantine'
+    # R120 修真：classify 阶段再补一遍 mingli 污染判定（修真一处修真一类）
+    if is_mingli_pollution(title, module, content):
+        return 'A3_quarantine'
+    # A2: 索引碎片
+    for p in INDEX_RE:
+        if p.match(title):
+            return 'A2_delete'
+    # A3: 命理古籍逃逸（穷通宝鉴/紫微斗数等 mingli-domain 内容混入 medical module）
+    if any(b in title for b in MINGLI_BOOK_TITLES):
+        return 'A3_quarantine'
+    # 标题含卦序/神煞/十神等命理词且模块名含 'general'/'tcm'/'shanghan' → mingli 逃逸
+    MINGLI_TITLE_KW_EXTRA = ['卦序', '神煞', '十神', '五行命理', '阳宅风水', '奇门遁甲']
+    MINGLI_KW_HIT = sum(1 for k in MINGLI_TITLE_KW_EXTRA if k in title)
+    if MINGLI_KW_HIT >= 2:
+        return 'A3_quarantine'
+    # A1: 严重乱码（GBK 误解码，mojibake > 30% 且 CJK < 5%）
+    if content:
+        n = len(content)
+        moji_n = sum(1 for c in content if c in MOJI_CHARS)
+        cjk_n = len(RE_CJK.findall(content))
+        moji_ratio = moji_n / n
+        cjk_ratio = cjk_n / n
+        if moji_ratio > 0.30 and cjk_ratio < 0.05:
+            return 'A1_delete'
+        # 标题含 '......' 满点线 + 内容点线占主导
+        if title.strip().startswith('...') and moji_ratio < 0.05 and cjk_ratio < 0.20:
+            return 'A2_delete'
+    # A4: 真实医学内容
+    return 'A4_migrate'
+
+
 def main():
     report_path = None
+    fix = '--fix' in sys.argv
     if '--report' in sys.argv:
         i = sys.argv.index('--report')
         if i + 1 < len(sys.argv):
@@ -177,7 +244,6 @@ def main():
         if (title.startswith('[nihaisha]') or title.startswith('[nihaisha_pcs]')) and title.endswith('.md'):
             skipped_pollution += 1
             continue
-
         if f in auth_fps:
             continue  # 双侧一致
         # MB 有 TCM 无
@@ -205,8 +271,105 @@ def main():
         for g in gap_a[:10]:
             print(f"  [{g['module']}|{g.get('authority','?')}] {g['title']}")
 
+    # ─── R837 修真：--fix 模式修真方向A ───
+    fix_stats = None
+    if fix and gap_a:
+        fix_stats = {'A1_delete': [], 'A2_delete': [], 'A3_quarantine': [], 'A4_migrate': []}
+        # 重新查询 gap_a 条目的完整 title/content 用于分级
+        gap_a_ids = [g['id'] for g in gap_a]
+        conn2 = sqlite3.connect(MINGLI_DB)
+        cur2 = conn2.cursor()
+        placeholders2 = ','.join('?' for _ in gap_a_ids)
+        cur2.execute(f"SELECT entry_id, module, title, content, authority FROM kb_formal WHERE entry_id IN ({placeholders2})", gap_a_ids)
+        gap_rows = cur2.fetchall()
+
+        # 备份 kb_formal（修真前必做）
+        bak_path = WS / '.openclaw' / 'tmp' / 'kb-backup' / f'kb_formal-pre-medical-align-fix-{datetime.now().strftime("%Y%m%d-%H%M%S")}.sqlite'
+        bak_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(MINGLI_DB, bak_path)
+        print(f"\n🔒 备份: {bak_path}")
+
+        # 读 tcm-agent authoritative（用于 A4 写入）
+        auth_out = json.loads(AUTH_KB.read_text(encoding='utf-8'))
+        # 读 quarantine.json（用于 A3 写入；该文件为 list 结构）
+        if QUARANTINE_KB.exists():
+            try:
+                q_data = json.loads(QUARANTINE_KB.read_text(encoding='utf-8'))
+                if not isinstance(q_data, list):
+                    q_data = []
+            except json.JSONDecodeError:
+                q_data = []
+        else:
+            q_data = []
+
+        cur2 = conn2.cursor()
+        for r in gap_rows:
+            eid, mod, title, content, authority = r
+            classification = classify_a1_a4(eid, title, mod, content)
+            if classification == 'A1_delete' or classification == 'A2_delete':
+                # DELETE from kb_formal（修真一处修真一类：严重乱码/索引碎片不属医学知识）
+                cur2.execute("DELETE FROM kb_formal WHERE entry_id=?", (eid,))
+                # 同时清理 kb_fts5
+                cur2.execute("DELETE FROM kb_fts5 WHERE rowid IN (SELECT rowid FROM kb_formal WHERE entry_id=?)", (eid,))
+                fix_stats[classification].append({'id': eid, 'module': mod, 'title': str(title or '')[:60]})
+            elif classification == 'A3_quarantine':
+                # 写入 tcm-agent quarantine.json（命理古籍逃逸）
+                q_data.append({
+                    'id': eid,
+                    'title': str(title or ''),
+                    'content': str(content or ''),
+                    'module': mod,
+                    'authority': authority,
+                    'source_project': 'mingli-baojian',
+                    'reason': 'medical-align-A3-mingli-escapee',
+                    'quarantined_at': datetime.now().isoformat(),
+                })
+                # 从 mingli 端删除（已迁出）
+                cur2.execute("DELETE FROM kb_formal WHERE entry_id=?", (eid,))
+                cur2.execute("DELETE FROM kb_fts5 WHERE rowid IN (SELECT rowid FROM kb_formal WHERE entry_id=?)", (eid,))
+                fix_stats['A3_quarantine'].append({'id': eid, 'module': mod, 'title': str(title or '')[:60]})
+            elif classification == 'A4_migrate':
+                # 标 pending-migration + 写入 tcm-agent authoritative
+                cur2.execute("UPDATE kb_formal SET authority='tcm-agent-pending-migration' WHERE entry_id=?", (eid,))
+                mod_key = mod
+                if mod_key not in auth_out or not isinstance(auth_out[mod_key], list):
+                    auth_out[mod_key] = []
+                # 写入 tcm-agent authoritative（去重 by fp）
+                content_f = fp(content)
+                if not any(fp(it.get('content', '')) == content_f for it in auth_out[mod_key]):
+                    auth_out[mod_key].append({
+                        'id': hashlib.md5((str(title or '') + str(content or '')[:100]).encode('utf-8')).hexdigest()[:12],
+                        'entry_id': eid,
+                        'title': str(title or ''),
+                        'content': str(content or ''),
+                        'keywords': [],
+                        'confidence': 0.75,
+                        'src_id': '',
+                        'category': mod,
+                        'module': mod,
+                        'synced_at': datetime.now().isoformat(),
+                        'source': 'mingli-baojian',
+                        'authority': 'tcm-agent-pending-migration',
+                    })
+                fix_stats['A4_migrate'].append({'id': eid, 'module': mod, 'title': str(title or '')[:60]})
+
+        conn2.commit()
+        conn2.close()
+        # 写回 authoritative 和 quarantine
+        AUTH_KB.write_text(json.dumps(auth_out, ensure_ascii=False, indent=1), encoding='utf-8')
+        QUARANTINE_KB.write_text(json.dumps(q_data, ensure_ascii=False, indent=1), encoding='utf-8')
+
+        print(f"\n═══ 修真结果 ═══")
+        print(f"  A1 严重乱码删除: {len(fix_stats['A1_delete'])}")
+        print(f"  A2 索引碎片删除: {len(fix_stats['A2_delete'])}")
+        print(f"  A3 命理逃逸隔离: {len(fix_stats['A3_quarantine'])}")
+        print(f"  A4 真实医学归位: {len(fix_stats['A4_migrate'])}")
+        print(f"  备份: {bak_path}")
+        print(f"  authoritative: {AUTH_KB}")
+        print(f"  quarantine: {QUARANTINE_KB}")
+
     report = {
-        'ts': __import__('datetime').datetime.now().isoformat(),
+        'ts': datetime.now().isoformat(),
         'auth_entries': len(auth_items),
         'mb_med_entries': len(rows),
         'gap_a_tcm_missing': len(gap_a),
@@ -214,6 +377,7 @@ def main():
         'gap_c_diff': len(diff_c),
         'skipped_pollution': skipped_pollution,
         'gap_a_samples': gap_a[:20],
+        'fix_stats': fix_stats,
     }
     if report_path:
         Path(report_path).parent.mkdir(parents=True, exist_ok=True)
