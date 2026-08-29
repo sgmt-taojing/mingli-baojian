@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机构经营分析 · 命理宝鉴</title>
+<style>
+:root{--bg:#0e1117;--card:#161b26;--border:#2a3242;--gold:#c9a84c;--gold2:#e8cf8a;--text:#d8dde6;--dim:#8a93a6;--teal:#2ec4b6;--green:#4caf7d;--red:#e05c5c}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,"PingFang SC",sans-serif;padding:20px}
+.wrap{max-width:1000px;margin:0 auto}
+h1{font-size:20px;color:var(--gold2);letter-spacing:3px;margin-bottom:6px}
+.sub{font-size:12px;color:var(--dim);margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.kpi .v{font-size:24px;font-weight:700;color:var(--gold2)}
+.kpi .l{font-size:12px;color:var(--dim);margin-top:4px}
+.kpi.g .v{color:var(--green)}.kpi.t .v{color:var(--teal)}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.panel h2{font-size:15px;color:var(--gold);margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:var(--dim);font-weight:500;text-align:left;padding:6px;border-bottom:1px solid var(--border)}
+td{padding:6px;border-bottom:1px solid #1e2530}
+.bar{height:6px;background:#21262d;border-radius:3px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.back{display:inline-block;margin-top:10px;color:var(--dim);text-decoration:none;font-size:12px;border:1px solid var(--border);border-radius:14px;padding:5px 14px}
+#msg{color:var(--dim);font-size:12px;min-height:16px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🏢 机构经营分析</h1>
+<div class="sub">月度自动汇总 · 订单 / 用户 / 服务热度 · 机构体系闭环末环</div>
+
+<div class="grid">
+<div class="kpi"><div class="v" id="k-order">—</div><div class="l">本月订单</div></div>
+<div class="kpi g"><div class="v" id="k-revenue">—</div><div class="l">本月收入（元）</div></div>
+<div class="kpi t"><div class="v" id="k-user">—</div><div class="l">注册用户</div></div>
+<div class="kpi"><div class="v" id="k-vip">—</div><div class="l">会员用户</div></div>
+<div class="kpi g"><div class="v" id="k-case">—</div><div class="l">累计案例</div></div>
+</div>
+
+<div class="panel">
+<h2>📊 服务热度（按使用量）</h2>
+<table><thead><tr><th>服务</th><th style="width:45%">热度</th><th>次数</th></tr></thead>
+<tbody id="hot-table"><tr><td colspan="3" style="color:var(--dim)">加载中…</td></tr></tbody></table>
+</div>
+
+<div class="panel">
+<h2>📈 订单趋势（近 6 月）</h2>
+<table><thead><tr><th>月份</th><th style="width:45%">订单量</th><th>金额</th></tr></thead>
+<tbody id="trend-table"><tr><td colspan="3" style="color:var(--dim)">加载中…</td></tr></tbody></table>
+</div>
+
+<a class="back" href="service-hub.html">← 返回服务中心</a>
+<div id="msg"></div>
+</div>
+
+<script>
+const API='http://127.0.0.1:8920';
+async function load(){
+  try{
+    const r=await fetch(API+'/api/public/stats');const s=await r.json();
+    document.getElementById('k-user').textContent=s.users??'—';
+    document.getElementById('k-vip').textContent=s.vipUsers??'—';
+    document.getElementById('k-case').textContent=s.totalCases??'—';
+    document.getElementById('k-order').textContent=s.paipanCount??'—';
+    document.getElementById('k-revenue').textContent=s.totalReports??'—';
+    // 热度
+    const kr=await fetch(API+'/api/public/kb/stats');const k=await kr.json();
+    const mods=(k.data&&k.data.top_modules||[]).slice(0,8);
+    const max=Math.max(1,...mods.map(m=>m.hits||m.count||0));
+    document.getElementById('hot-table').innerHTML=mods.map(m=>{
+      const v=m.hits||m.count||0;
+      return `<tr><td>${m.module||m.name||'—'}</td><td><div class="bar"><i style="width:${(v/max*100).toFixed(0)}%"></i></div></td><td>${v}</td></tr>`}).join('')||'<tr><td colspan="3">暂无数据</td></tr>';
+    document.getElementById('trend-table').innerHTML='<tr><td colspan="3" style="color:var(--dim)">订单明细接口待接入（当前展示总量：'+(s.paipanCount||0)+'）</td></tr>';
+    document.getElementById('msg').textContent='数据实时取自公共统计接口 · 经营月报自动生成排期中';
+  }catch(e){document.getElementById('msg').textContent='加载失败：'+e.message}
+}
+load();
+</script>
+</body>
+</html>
