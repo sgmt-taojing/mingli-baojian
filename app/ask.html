@@ -143,7 +143,7 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
 const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-/* ─── 工具目录（按用途排序：问事→命理→运势→规划→婚恋家庭→风水→号码姓名→日历幸运）─── */
+/* ─── 工具目录（按人类需求顺序：问事→看自己→运势→婚恋→起名改名→号码→风水→规划→日历幸运）─── */
 const TOOLS = [
   // 问事起卦：当下有事，一事一问
   { id:'liuyao',  ico:'🪙', nm:'六爻问卦', ds:'一事一问 当下起卦', need:'question' },
@@ -153,22 +153,25 @@ const TOOLS = [
   // 命理排盘：看一生格局
   { id:'bazi',    ico:'📜', nm:'八字命理', ds:'一生格局 性格天赋', need:'birth' },
   { id:'ziwei',   ico:'🌌', nm:'紫微斗数', ds:'十二宫全观 人生地图', need:'birth' },
+  { id:'lifeindex',ico:'📊', nm:'命格指数', ds:'十二维评分 优势短板', need:'birthYear' },
   // 运势走势：今年到十年
   { id:'liunian', ico:'📅', nm:'流年运势', ds:'今年运气 逐月走势', need:'birthYear' },
   { id:'lifeflow', ico:'🌊', nm:'流年报告', ds:'本月大运 明年预览', need:'birth' },
   { id:'lifetimeline', ico:'📈', nm:'十年走势', ds:'黄金五年 转折提醒', need:'birth' },
-  { id:'lifeindex',ico:'📊', nm:'命格指数', ds:'十二维评分 优势短板', need:'birthYear' },
-  // 人生规划：阶段与路径
-  { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'阶段定位 五年路径', need:'birthYear' },
-  // 婚恋家庭：缘分与起名
+  // 婚恋家庭：缘分配对
   { id:'hehun',   ico:'💑', nm:'合婚配对', ds:'两人缘分 婚配参考', need:'partner' },
+  // 起名改名：人生大事（宝宝/改名/公司/测评）
   { id:'qiming',  ico:'👶', nm:'宝宝起名', ds:'古籍取名 五行补益', need:'namebirth', ph:'输入姓氏 如 王', prompt:'宝宝（或改名者）的姓氏是？' },
-  // 风水堪舆：住宅办公
-  { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
-  // 号码姓名：日常所用
+  { id:'gaiming', ico:'✏️', nm:'改名测评', ds:'现名评分 新名备选', need:'rename', ph:'输入现用姓名 如 张伟', prompt:'请告诉我您的现用姓名（连名带姓 2-4 字）：' },
+  { id:'gongsi',  ico:'🏢', nm:'公司取名', ds:'行业五行 字号吉凶', need:'company', ph:'如：科技公司，想带个「创」字', prompt:'说说行业和期望（如：科技公司，想带个「创」字）；测现有公司名就直接发名称：' },
+  { id:'xingming',ico:'✍️', nm:'姓名评分', ds:'五格三才 名字能量', need:'text', ph:'输入姓名 如 张伟', prompt:'请告诉我您要测的名字（2-4个字）：' },
+  // 号码吉凶：日常所用
   { id:'mobile',  ico:'📱', nm:'手机号吉凶', ds:'号码数理 尾数五行', need:'text', ph:'输入手机号（11位）', prompt:'请把手机号发给我（只用于数理分析）：' },
   { id:'chepai',  ico:'🚗', nm:'车牌号吉凶', ds:'选号参考 数字形态', need:'text', ph:'输入车牌 如 粤A6688', prompt:'请把车牌号发给我（汉字字母都行，如 粤A6688）：' },
-  { id:'xingming',ico:'✍️', nm:'姓名评分', ds:'五格三才 名字能量', need:'text', ph:'输入姓名 如 张伟', prompt:'请告诉我您要测的名字（2-4个字）：' },
+  // 风水堪舆：住宅办公
+  { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
+  // 人生规划：阶段与路径
+  { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'阶段定位 五年路径', need:'birthYear' },
   // 日历幸运：每日必看
   { id:'huangli', ico:'📖', nm:'黄历择日', ds:'今日宜忌 选好日子', need:'none' },
   { id:'lucky',   ico:'🍀', nm:'幸运数色', ds:'幸运数字 颜色方位', need:'birthYear' },
@@ -197,7 +200,7 @@ function selectTool(id, el) {
   document.querySelectorAll('.tool').forEach(x => x.classList.remove('sel'));
   el.classList.add('sel');
   $('step2').classList.remove('hidden');
-  const noQuestion = state.tool.need === 'text' || state.tool.need === 'namebirth' || state.tool.need === 'none';
+  const noQuestion = ['text','namebirth','rename','company','none'].includes(state.tool.need);
   bot(`好，用「${state.tool.nm}」为您看。${noQuestion ? '' : '先说说您想问什么事？'}`);
   if (noQuestion) { askBirthIfNeeded(); }
   else { $('askInput').classList.remove('hidden'); $('questionText').focus(); }
@@ -220,6 +223,11 @@ $('questionNext').onclick = () => {
 
 function askBirthIfNeeded() {
   const need = state.tool.need;
+  // 行复位：切换工具时先恢复默认（出生行/时辰行可见， facing/partner/text 隐藏），避免上次选择残留
+  const rows = document.querySelectorAll('#askBirth .row');
+  rows[0].classList.remove('hidden'); rows[2].classList.remove('hidden');
+  $('facingRow').classList.add('hidden'); $('partnerRow').classList.add('hidden'); $('textRow').classList.add('hidden');
+  $('skipBirth').style.display = '';
   if (need === 'birth' || need === 'birthYear') {
     bot(need === 'birth' ? '请告诉我您的出生信息（年月日必填，时辰不清楚可不选）：' : ((state.tool.id === 'lifeplan' || state.tool.id === 'lifeindex') ? '请告诉我您的出生年份，并点选性别：' : '请告诉我您的出生年份（看流年只需出生年，月日可不填更快速）：'));
     $('sexRow').classList.toggle('hidden', need !== 'birth' && state.tool.id !== 'lifeplan' && state.tool.id !== 'lifeindex');
@@ -255,6 +263,16 @@ function askBirthIfNeeded() {
     $('textInput').placeholder = state.tool.ph || '输入姓氏';
     $('textRow').classList.remove('hidden');
     $('askBirth').classList.remove('hidden');
+  } else if (need === 'rename' || need === 'company') {
+    // 改名/公司取名：主输入为文本；出生信息可选（填了更准：改名按本人命局补益，公司按创始人喜用）
+    bot(state.tool.prompt + '出生年月日选填——填了我按命局五行精准配，不填按姓名学通法评测。');
+    $('calendarRow').classList.add('hidden');
+    $('sexRow').classList.toggle('hidden', need !== 'rename'); // 公司取名无需性别
+    $('skipBirth').style.display = 'none';
+    $('textInput').placeholder = state.tool.ph || '';
+    $('textRow').classList.remove('hidden');
+    $('askBirth').classList.remove('hidden');
+    $('textInput').focus();
   } else {
     submitAsk(); // none：直接起盘
   }
@@ -295,6 +313,29 @@ function collectBirth(skip) {
     if (!y || !m || !d) { bot('起名要结合生辰，年月日都要填哦。'); return; }
     state.birth = { surname: v, year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value, sex: state.sex };
     me(`姓 ${v} · ${y}年${m}月${d}日生 · ${state.sex === 'male' ? '男' : '女'}`);
+  } else if (need === 'rename' || need === 'company') {
+    const v = $('textInput').value.trim();
+    if (need === 'rename') {
+      if (!v || v.length < 2 || v.length > 4) { bot('现用姓名要 2-4 个字（连名带姓一起填）。'); return; }
+      const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value } : {};
+      state.birth = { text: v, sex: state.sex, ...opt };
+      me(v + (opt.year ? ` · ${y}年${m}月${d}日生 · ${state.sex === 'male' ? '男' : '女'}` : ''));
+    } else {
+      if (!v || v.length < 2) { bot('至少说说行业，如「科技公司」；测现有公司名就直接发名称（2 个字以上）。'); return; }
+      // 心愿字提取：「带个X」「带「X」」
+      const wish = v.match(/带[个一]?[「“]?([一-龥])[」”]?/);
+      // 纯名称（不含行业词、不以机构后缀结尾）→ 视为现有公司名测评
+      const hasIndustryWord = /(科技|餐饮|金融|教育|文化|物流|地产|建筑|贸易|传媒|咨询|医药|农业|服装|酒店|旅游|能源|机械|汽车|珠宝|设计|广告|影视|娱乐|互联网|软件|信息|通信|智能|数据|新能源|投资|银行|保险|制造|出版|培训|文创|家具|园林|花卉|种植|健康|养生|美容|运输|航运|水产|饮品|酒业|物业|工程|装修|矿业|仓储|食品|化工|策划|品牌|公关|公司|店|厂|中心|工作室)/.test(v);
+      const isNameOnly = /^[一-龥A-Za-z0-9]{2,10}$/.test(v) && !hasIndustryWord;
+      const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value } : {};
+      if (isNameOnly) {
+        state.birth = { existingName: v, industry:'', ...opt };
+        me(`测现有公司名「${v}」`);
+      } else {
+        state.birth = { industry: v, wishChar: wish ? wish[1] : '', ...opt };
+        me(v + (opt.year ? ` · 创始人 ${y}年${m}月${d}日生` : ''));
+      }
+    }
   } else if (need === 'birthYear') {
     if (!y) { bot('至少填一下出生年份（如 1990）。'); return; }
     state.birth = { year:y, month:m||null, day:d||null };
@@ -421,6 +462,63 @@ async function fetchToolResult() {
       tips: ['名字是长辈的心意与祝福，古籍出处让名字有文化底蕴', '最终定名前建议全家念几遍：顺口、好写、无谐音歧义最重要', '如需结合完整八字精算，可请命理师用专业排盘复核']
     };
     return { kind:'paipan', baihua: b, toolName: `宝宝起名 · ${res0.surname}姓` };
+  }
+  // 改名测评：现名评分+短板 → 同姓备选（R-RENAME）
+  if (t === 'gaiming') {
+    const bb = state.birth;
+    const r = await fetch(`${API}/api/minsu/xingming/rename`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+      body: JSON.stringify({ fullName: bb.text, gender: bb.sex === 'male' ? 'M' : 'F', year: bb.year, month: bb.month, day: bb.day, hour: bb.hour }),
+      signal: AbortSignal.timeout(25000)
+    });
+    const j = await r.json();
+    const d = j && j.data;
+    if (!d || !d.current) throw new Error((j && (j.message || j.error)) || '改名测评失败');
+    const cur = d.current;
+    const cards = [
+      { title: `现名「${cur.fullName}」 · ${cur.score}分（${cur.rating}）`,
+        plain: (cur.analysis || '').split('\n').slice(1).join('；'), level: cur.score >= 80 ? 'good' : cur.score >= 65 ? 'neutral' : 'bad' },
+      { title: '🔍 改名必要性诊断', plain: (d.gaps || []).join('；') || '现名无明显短板', level: (d.gaps || []).some(g => g.includes('偏低') || g.includes('未补')) ? 'bad' : 'neutral' }
+    ].concat((d.suggestions || []).map(n => ({
+      title: `备选 · ${n.name} · ${n.score}分`,
+      plain: `${n.meaning || ''}——出自${n.source || ''}。五行属${n.wuxing || '—'}${n.sancai && n.sancai.advice ? '，' + n.sancai.advice.replace(/^[✦○]\s*/, '') : ''}`,
+      level: n.score >= 75 ? 'good' : 'neutral'
+    })));
+    const b = {
+      overview: `现名「${cur.fullName}」测评 ${cur.score} 分。${(d.wuxing_lack && d.wuxing_lack.length) ? '命局喜用「' + d.wuxing_lack.join('、') + '」，' : ''}从古籍词库精选 ${d.suggestions.length} 个同姓新名（已避开现名用字），按命盘契合度排序。`,
+      cards,
+      tips: ['改名收益看三点：补到喜用、避开高频重名、有古籍出处', '证件改名前先让家人朋友喊几天新名，顺口顺耳再定', '不改名也可用「字/号/网名」补益，效果同理更省事', '重大变更前建议命理师结合完整八字精算复核']
+    };
+    return { kind:'paipan', baihua: b, toolName: `改名测评 · ${cur.fullName}` };
+  }
+  // 公司取名/改名：行业五行 + 创始喜用 + 现名测评（R-COMPANY）
+  if (t === 'gongsi') {
+    const bb = state.birth;
+    const r = await fetch(`${API}/api/minsu/gongsi`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+      body: JSON.stringify({ industry: bb.industry || '', existingName: bb.existingName || '', wishChar: bb.wishChar || '', year: bb.year, month: bb.month, day: bb.day, hour: bb.hour, gender: bb.sex === 'female' ? 'F' : 'M' }),
+      signal: AbortSignal.timeout(25000)
+    });
+    const j = await r.json();
+    const d = j && j.data;
+    if (!d || !d.ok) throw new Error((j && (j.message || j.error)) || '公司取名失败');
+    const cards = [];
+    if (d.existing) {
+      cards.push({ title: `现名「${d.existing.name}」 · ${d.existing.score}分`, plain: d.existing.comment.join('；'), level: d.existing.score >= 70 ? 'good' : d.existing.score >= 50 ? 'neutral' : 'bad' });
+    }
+    (d.recommendations || []).slice(0, 8).forEach(n => cards.push({
+      title: `${n.name} · ${n.score}分`,
+      plain: `${n.meaning}。五行属${n.wuxing}${n.reasons && n.reasons.length ? '——' + n.reasons.join('，') : ''}`,
+      level: n.score >= 80 ? 'good' : 'neutral'
+    }));
+    const b = {
+      overview: d.industryWuxing
+        ? `「${d.industry}」五行属${d.industryWuxing}（${d.industryNote}）。${d.preferWuxing.length ? '喜用五行：' + d.preferWuxing.join('→') + '，' : ''}精选字号 ${Math.min(8, d.recommendations.length)} 个按契合度排序。`
+        : `按通用商业五行评测（行业未精确识别，描述再具体些会更准）。精选字号 ${Math.min(8, d.recommendations.length)} 个。`,
+      cards,
+      tips: d.tips || []
+    };
+    return { kind:'paipan', baihua: b, toolName: d.existing ? `公司改名 · ${d.existing.name}` : `公司取名 · ${d.industry || '通用'}` };
   }
   // 命格指数：十二维评分报告（CSRF 白名单内）
   if (t === 'lifeindex') {

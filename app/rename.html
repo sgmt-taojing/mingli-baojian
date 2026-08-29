@@ -316,11 +316,102 @@
 .btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
 
 <script>
-// R180: Safe fallbacks for rename.html standalone functions
-if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='index.html'+(n||'');}catch(e){history.back();}};}
-if(typeof computeRenameEnhanced!=='function'){window.computeRenameEnhanced=function(){try{var ln=document.getElementById('lastName')||document.getElementById('xmCurrentName');var fn=document.getElementById('firstName')||document.getElementById('xmNewName');var r=document.getElementById('renameResult')||document.getElementById('xmResult');if(r){r.innerHTML='<div style="padding:16px;background:rgba(201,168,76,0.06);border-radius:10px;border:1px solid var(--border)"><h5 style="color:var(--gold);margin-bottom:8px">📊 姓名分析报告</h5><p style="font-size:13px;color:var(--paper2)">姓名: '+(ln&&ln.value?ln.value:'')+(fn&&fn.value?fn.value:'')+'</p><p style="font-size:13px;color:var(--paper2);margin-top:8px">完整姓名学分析（三才五格、五行匹配、笔画数理）请在主页姓名模块中使用。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('姓名分析已生成（简化版）');}catch(e){console.warn('[computeRenameEnhanced]',e);}};}
-if(typeof toggleKnowledge!=='function'){window.toggleKnowledge=function(){try{var el=document.getElementById('knowledgeSection')||document.getElementById('renameKnowledge');if(el){el.classList.toggle('d-none');}}catch(e){console.warn('[toggleKnowledge]',e);}};}
-if(typeof runXingmingEngine!=='function'){window.runXingmingEngine=function(){try{var n=document.getElementById('xmCurrentName')||document.getElementById('lastName');var nn=document.getElementById('xmNewName')||document.getElementById('firstName');var r=document.getElementById('xmEngineResult')||document.getElementById('renameResult');if(r){r.innerHTML='<div style="padding:14px;background:rgba(201,168,76,0.06);border-radius:10px"><h5 style="color:var(--gold)">✏️ 姓名学引擎</h5><p style="font-size:13px;color:var(--paper2)">姓名学引擎深度分析（含康熙笔画、三才五格、生肖喜忌）请在主页使用完整引擎。</p></div>';r.classList.remove('d-none');}if(typeof toast==='function')toast('引擎分析已生成（简化版）');}catch(e){console.warn('[runXingmingEngine]',e);}};}
+// R-RENAME-PRO: 专业起名/改名页接真实引擎（/api/minsu/xingming/*），原占位 fallback 作废
+(function(){
+  const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function birthParts(dateId, hourId){
+    const dv = ($(dateId) && $(dateId).value) || '';
+    const p = dv ? dv.split('-').map(Number) : [];
+    const hi = ($(hourId) && $(hourId).value);
+    return { year:p[0]||null, month:p[1]||null, day:p[2]||null, hour: hi===''||hi==null ? null : Number(hi)*2 };
+  }
+  function showErr(el, msg){ el.style.display='block'; el.innerHTML = '<div style="padding:14px;color:var(--red,#ef4444);font-size:13px">'+esc(msg)+'</div>'; }
+  function renderNameCards(target, recs){
+    return (recs||[]).map(n =>
+      '<div style="padding:14px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.12);border-radius:8px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center">' +
+      '<strong style="color:var(--gold);font-size:16px;letter-spacing:2px">'+esc(n.name)+'</strong>' +
+      '<span style="color:var(--gold);font-size:14px">'+n.score+'分</span></div>' +
+      '<div style="font-size:12.5px;line-height:1.9;margin-top:6px;opacity:.9">'+esc(n.meaning||'')+(n.sourceText?'——'+esc(n.sourceText):'')+'</div>' +
+      '<div style="font-size:11.5px;color:var(--paper3,#8b7e6a);margin-top:4px">五行 '+esc(n.wuxing||'—')+(n.sancai&&n.sancai.relation?' · '+esc(n.sancai.relation):'')+(n.familyNote?' · ⚠ '+esc(n.familyNote):'')+'</div>' +
+      '</div>').join('');
+  }
+
+  window.computeRenameEnhanced = async function(){
+    const purpose = ($('renamePurpose')||{}).value || 'naming';
+    const sex = ($('renameSex')||{}).value || 'male';
+    const gender = sex === 'female' ? 'F' : 'M';
+    const bd = birthParts('renameBirthDate','renameBirthHour');
+    const box = $('renameResult');
+    const cur = (($('renameCurrentName')||{}).value||'').trim();
+    const surname = (($('renameSurname')||{}).value||'').trim();
+    box.style.display = 'block';
+    box.scrollIntoView({behavior:'smooth'});
+    try {
+      if (purpose === 'rename') {
+        const fullName = cur || (surname ? surname : '');
+        if (fullName.length < 2) { showErr(box, '改名请填写当前姓名（连名带姓 2-4 字）。'); return; }
+        $('renameNameOut').textContent = fullName;
+        $('renameMetaOut').textContent = '改名测评运算中…';
+        const r = await fetch(API + '/api/minsu/xingming/rename', { method:'POST',
+          headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+          body: JSON.stringify({ fullName, gender, year:bd.year, month:bd.month, day:bd.day, hour:bd.hour }) });
+        const j = await r.json(); const d = j && j.data;
+        if (!d || !d.current) throw new Error((j&&(j.message||j.error))||'改名测评失败');
+        $('renameMetaOut').textContent = `现名 ${d.current.score} 分（${d.current.rating}）· ${d.wuxing_lack.length?'喜用 '+d.wuxing_lack.join('、'):'姓名学通法评测'}`;
+        $('renameWuxingAnalysis').innerHTML = '<h5 style="font-size:13px;letter-spacing:4px;color:var(--gold);margin-bottom:12px">现名诊断</h5>' +
+          '<div style="font-size:13px;line-height:2;opacity:.9;white-space:pre-line">'+esc(d.current.analysis)+'</div>' +
+          (d.gaps && d.gaps.length ? '<div style="margin-top:10px;padding:10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:8px;font-size:12.5px;line-height:1.9">'+d.gaps.map(esc).join('<br>')+'</div>' : '');
+        $('renameYuyiAnalysis').innerHTML = renderNameCards(null, d.suggestions);
+        $('renameScoreText').innerHTML = '<span style="font-size:13px;opacity:.85">改名前请全家商议 · 证件变更遵守户籍规定 · 亦可取字/号/网名补益</span>';
+      } else {
+        if (!surname) { showErr(box, '起名请填写姓氏。'); return; }
+        if (!bd.year) { showErr(box, '起名需结合生辰，请填写出生日期。'); return; }
+        $('renameNameOut').textContent = surname + ' · ' + (purpose==='penname'?'笔名':'起名');
+        $('renameMetaOut').textContent = '古籍词库匹配运算中…';
+        const r = await fetch(API + '/api/minsu/xingming/suggest', { method:'POST',
+          headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+          body: JSON.stringify({ surname, gender, year:bd.year, month:bd.month, day:bd.day, hour:bd.hour }) });
+        const j = await r.json(); const d = j && j.data && j.data.result;
+        if (!d || !d.recommendations) throw new Error((j&&(j.message||j.error))||'起名生成失败');
+        $('renameMetaOut').textContent = `${d.gender}宝宝 · 日主${d.dayElement||'—'}${d.wuxing_lack.length?' · 喜用 '+d.wuxing_lack.join('、'):''} · 候选 ${d.totalCandidates} 个`;
+        $('renameWuxingAnalysis').innerHTML = '';
+        $('renameYuyiAnalysis').innerHTML = renderNameCards(null, d.recommendations);
+        $('renameScoreText').innerHTML = '<span style="font-size:13px;opacity:.85">定名前全家念几遍：顺口、好写、无谐音歧义最重要</span>';
+      }
+      $('renameBaziAnalysis').style.display='none'; $('wugeGrid').style.display='none'; $('sancaiBox').innerHTML='';
+      $('yinlvAnalysis').innerHTML = '<span style="font-size:12px;opacity:.7">音律平仄与谐音校验请移步「问事 · 姓名评分」逐名细查</span>';
+    } catch(e){ showErr(box, '分析失败：' + (e.message||'网络异常') + '，请稍后重试。'); }
+  };
+
+  window.runXingmingEngine = async function(){
+    const name = (($('xmName')||{}).value||'').trim();
+    const box = $('xmEngineResult');
+    if (name.length < 2) { showErr(box, '请输入姓名（2-4 字）。'); return; }
+    const sex = ($('xmSex')||{}).value || 'male';
+    const bd = birthParts('xmBirthDate','xmBirthHour');
+    box.style.display='block';
+    box.innerHTML = '<div style="padding:14px;font-size:13px;opacity:.8">姓名学引擎运算中…</div>';
+    try {
+      const r = await fetch(API + '/api/minsu/xingming/analyze', { method:'POST',
+        headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+        body: JSON.stringify({ fullName:name, gender: sex==='female'?'F':'M', year:bd.year, month:bd.month, day:bd.day, hour:bd.hour }) });
+      const j = await r.json(); const d = j && j.data;
+      if (!d || !d.ok && !d.score) throw new Error((j&&(j.message||j.error))||'分析失败');
+      box.innerHTML = '<div style="padding:16px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.15);border-radius:10px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">' +
+        '<strong style="color:var(--gold);font-size:17px">'+esc(d.fullName)+'</strong>' +
+        '<span style="color:var(--gold);font-size:20px">'+d.score+'分 · '+esc(d.rating)+'</span></div>' +
+        '<div style="font-size:13px;line-height:2;white-space:pre-line;opacity:.92">'+esc(d.analysis)+'</div>' +
+        '<div style="font-size:11px;color:var(--paper3,#8b7e6a);margin-top:10px">'+esc(d.disclaimer||'')+'</div></div>';
+    } catch(e){ showErr(box, '引擎分析失败：' + (e.message||'网络异常')); }
+  };
+
+  if(typeof showSection!=='function'){window.showSection=function(n){try{window.location.href='index.html'+(n||'');}catch(e){history.back();}};}
+  window.toggleKnowledge = function(){ const el=$('knowledgeBlock'); if(el) el.style.display = el.style.display==='none' ? 'block' : 'none'; };
+})();
 </script>
 
 </main>
