@@ -79,6 +79,9 @@ registerInsurance(app);
 // G12 轻预约挂号（slots/create/checkin/cancel 四 API + 爽约自动标记 + G10 短信）
 const { registerRoutes: registerAppointments } = require('./appointment-api');
 registerAppointments(app);
+// G13 医院报告回流家庭端·供给侧（link_token 关联 + 白名单组装 + 命理剥离守卫）
+const { registerRoutes: registerReflux } = require('./family-reflux');
+registerReflux(app);
 
 // R789 患者主索引 EMPI（任何异常回退老行为，绝不影响服务）
 const patientIndex = (() => {
