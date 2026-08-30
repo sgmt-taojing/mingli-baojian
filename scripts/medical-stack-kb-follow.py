@@ -106,16 +106,22 @@ def main() -> int:
         result.update(status="warn", reason="SEC-001 补丁标记缺失——代码层可能被意外覆盖，需人工核查")
 
     # 5. 主动重建 SQLite 快路径索引（异步，不阻塞）
+    # launchd 环境 PATH 极简，裸 "node" 找不到——先 which，再回退 Kimi 运行时绝对路径
     if SQLITE_SYNC.exists():
-        try:
-            subprocess.Popen(
-                ["node", str(SQLITE_SYNC)],
-                cwd=str(MS), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                start_new_session=True,
-            )
-            result["sqlite_sync"] = "spawned"
-        except Exception as e:  # noqa: BLE001
-            result["sqlite_sync"] = f"spawn failed: {e}"
+        import shutil
+        node_bin = shutil.which("node") or "/Applications/Kimi.app/Contents/Resources/resources/runtime/node"
+        if not Path(node_bin).exists():
+            result["sqlite_sync"] = "spawn failed: node 不可用（PATH 与回退路径均未命中）"
+        else:
+            try:
+                subprocess.Popen(
+                    [node_bin, str(SQLITE_SYNC)],
+                    cwd=str(MS), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    start_new_session=True,
+                )
+                result["sqlite_sync"] = "spawned"
+            except Exception as e:  # noqa: BLE001
+                result["sqlite_sync"] = f"spawn failed: {e}"
     else:
         result["sqlite_sync"] = "script missing (将走 JSON 慢路径并自愈)"
 
