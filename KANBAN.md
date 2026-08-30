@@ -1,4 +1,10 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 15:05 — 整改清单 10/10 全部销号 + 维基补跑看守上线
+- 【P3-8】holidays 假日端点补白话包装：baihuaHolidays（分类计数+最近节日倒计时+法定/佛诞/道诞/民俗四卡）；顺手修前端 h.date 恒空 bug（API 返回 solarDate/lunarDate）并按阳历排序。浏览器实测白话块渲染正常
+- 【P3-10】民俗中心输入型卡片收敛 ask.html 深链：hehun/mobile/xingming/plate→chepai/liunian/lucky 六张（累计 9 条深链）；无输入快览工具（黄历/择日/太岁/节气/节日/家庭）保留 showTool
+- 【看守】维基名人事件补跑看守上线（cron 17 * * * * Asia/Shanghai，automation_338ed549）：每小时探测 zh.wikipedia，通则跑 fill-wikidata-events.py（幂等断点续跑），补齐后自停；每次结果记看板
+- 【基线】复跑 diag-tools-full.py：历法 9/9 · 功能 16/16 · 报告 10/10 · issues 0。清单 10 项全销号（docs/tool-diagnosis-20260830.md）
+- 【提交】主仓 6e02ce9 · server 子仓 206fa7e
 ## 2026-08-30 14:10 — 整改清单 10 项销号 8 项，回归基线全绿
 - 【结论】P1 三条（ziwei双版改题区分/fengshui旧版归档/合婚升v2）+ P2 四条（hehun白话总览段·合婚v2 baihua·8911生肖字段·SVG同源确认）+ P3 多域直断 全部实测通过；复跑 `scripts/diag-tools-full.py`：历法 9/9 · 功能 16/16 · 报告 10/10 · issues 0
 - 【顺带修正】norm-report-engine.js 性别字段"male方"拼接 bug → 男/女方正确映射；诊断脚本两误报修正（zeri 参数/family 完整生辰）
