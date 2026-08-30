@@ -35,7 +35,7 @@ function showAdminDenied() {
       <p style="color:#aaa;margin:0 0 12px">当前角色无权访问此后台页面</p>
       <p style="color:#888;font-size:13px;margin:0 0 8px">需要角色：业务管理员 / 周易大师 / 中医医生 / 超管</p>
       <p style="color:#888;font-size:13px;margin:0 0 24px">当前角色：${roles.map(r => ADMIN_ROLE_DISPLAY[r] || r).join(', ') || '匿名'}</p>
-      <a href="divination-hub.html" style="display:inline-block;padding:8px 20px;background:var(--gold,#daa520);color:#000;border-radius:4px;text-decoration:none;font-weight:600">← 返回首页</a>
+      <a href="index.html" style="display:inline-block;padding:8px 20px;background:var(--gold,#daa520);color:#000;border-radius:4px;text-decoration:none;font-weight:600">← 返回首页</a>
     </div>
   `;
 }

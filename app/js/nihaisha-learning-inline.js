@@ -271,7 +271,7 @@ function showSection(id) {
 }
 
 function goHome() {
-  window.location.href = 'divination-hub.html';
+  window.location.href = 'index.html'; // R-RETIRE
 }
 
 function toggleMobileMenu() {

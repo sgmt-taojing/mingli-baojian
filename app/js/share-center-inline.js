@@ -29,7 +29,7 @@ function shareTo(channel){
   var profile = {};
   try { profile = JSON.parse(localStorage.getItem('userProfile') || '{}'); } catch(e){console.warn(e.message)}
   var name = profile.name || '缘主';
-  var url = location.origin + '/divination-hub.html';
+  var url = location.origin + '/index.html';
   var text = name + ' 邀您体验命理宝鉴 · 命理宝鉴';
 
   if (channel === 'link') {

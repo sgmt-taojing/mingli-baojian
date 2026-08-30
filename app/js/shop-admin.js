@@ -20,9 +20,9 @@ function initAuth() {
       setTimeout(function() { location.reload(); }, 800);
     } else if (pw !== null) {
       showToast('密码错误！');
-      setTimeout(function() { window.location.href = 'divination-hub.html'; }, 1500);
+      setTimeout(function() { window.location.href = 'index.html'; // R-RETIRE }, 1500);
     } else {
-      window.location.href = 'divination-hub.html';
+      window.location.href = 'index.html'; // R-RETIRE
     }
   });
   return false;

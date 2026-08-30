@@ -306,7 +306,7 @@ function openMobileTool(toolKey){
   if(typeof openTool === 'function'){
     openTool(toolKey);
   } else {
-    window.location.href = 'divination-hub.html#tool-' + toolKey;
+    window.location.href = 'ask.html'; // R-RETIRE: hub 已归档，工具直达问事页
   }
 }
 

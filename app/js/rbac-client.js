@@ -19,7 +19,7 @@
   const ROLES_KEY = 'userRoles';
   const USER_KEY = 'mlbj_user';
   const LOGIN_PAGE = 'login.html';
-  const HOME_PAGE = 'divination-hub.html';
+  const HOME_PAGE = 'index.html'; // R-RETIRE: divination-hub 遗留页已归档，首页统一入口
 
   // 旧版会员等级 → 新版角色映射（兼容）
   const VIP_LEVEL_TO_ROLE = {

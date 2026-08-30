@@ -35,7 +35,7 @@ function showAccessDenied() {
       <p style="color:var(--ink-2);margin:20px 0">当前角色无权访问 KB 批量管理后台</p>
       <p style="color:var(--ink-3);font-size:13px">需要角色：业务管理员 / 周易大师 / 中医医生 / 超管</p>
       <p style="color:var(--ink-3);font-size:13px">当前角色：${getCurrentRoles().map(r => ROLE_DISPLAY[r] || r).join(', ') || '匿名'}</p>
-      <a href="divination-hub.html" class="btn" style="display:inline-block;margin-top:20px">← 返回首页</a>
+      <a href="index.html" class="btn" style="display:inline-block;margin-top:20px">← 返回首页</a>
     </div>
   `;
 }

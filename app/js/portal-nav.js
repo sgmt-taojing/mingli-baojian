@@ -7,7 +7,7 @@
   var nav = document.createElement('nav');
   nav.className = 'mlb-nav';
   nav.innerHTML = [
-    '<a href="divination-hub.html">🏠 首页</a>',
+    '<a href="index.html">🏠 首页</a>',
     '<a href="naming-portal.html">🪪 命名</a>',
     '<a href="tcm-portal.html">🌿 中医</a>',
     '<a href="patient-portal.html">🩺 患者</a>',

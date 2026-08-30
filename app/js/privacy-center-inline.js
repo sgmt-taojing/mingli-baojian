@@ -181,7 +181,7 @@
     const r = await api('/api/v1/user/hard-delete', { method: 'POST' });
     if (r.code === 0 || r.ok === true) {
       showBanner('数据已物理删除', 'success');
-      setTimeout(function(){ location.href = 'divination-hub.html'; }, 3000);
+      setTimeout(function(){ location.href = 'index.html'; }, 3000);
     } else {
       showBanner('删除失败：' + (r.message || 'API 暂不可达'), 'error');
     }
