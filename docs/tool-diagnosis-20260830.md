@@ -34,13 +34,15 @@
 
 | # | 位置 | 问题 | 整改动作 | 状态 |
 |---|---|---|---|---|
-| 8 | holidays 假日端点 | 无 baihua 白话包装 | 补白话概述 | ⬜ 留待下轮 |
+| 8 | holidays 假日端点 | 无 baihua 白话包装 | minsu-baihua-engine 补 baihuaHolidays（分类计数+最近节日倒计时+法定/佛诞/道诞/民俗四卡+3条贴士）；端点挂 baihua；前端渲染顺手修 date 字段 bug（API 返回 solarDate/lunarDate，原取 h.date 恒空）并按阳历排序 | ✅ 14:45 实测：overview 含「55个节日·最近中秋节还有26天」，浏览器渲染白话块正常 |
 | 9 | 问事页占卜四盘 | 多域问题只直断首域 | detectDomains 多域返回（至多 3 域），四盘直断卡按域各出一张 | ✅ 14:05 实测双卡 |
-| 10 | 双入口话术 | 两套交互维护两遍 | 长期收敛到 ask.html 深链 | ⬜ 长期观察 |
+| 10 | 双入口话术 | 两套交互维护两遍 | 输入型卡片收敛到 ask.html 深链：hehun/mobile/xingming/plate→chepai/liunian/lucky 六张卡改为问事深链（累计9条）；无输入快览工具（黄历/择日/太岁/节气/节日/家庭）保留 showTool | ✅ 14:50 浏览器实测 9 条深链 |
 
-## 五、整改后回归基线（2026-08-30 14:10 复跑）
+## 五、整改后回归基线（2026-08-30 15:00 二次复跑）
 
-历法 9/9 PASS · 功能 16/16 OK · 报告 10/10 OK · issues 0。回归命令：`python3 scripts/diag-tools-full.py`
+历法 9/9 PASS · 功能 16/16 OK · 报告 10/10 OK · issues 0（P3-8/P3-10 收口后复跑仍全绿）。回归命令：`python3 scripts/diag-tools-full.py`
+
+**至此整改清单 10 项全部销号。**
 
 ## 三、已验证无需整改（销项记录）
 

@@ -119,7 +119,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
     <div class="ms-api">GET /api/minsu/holidays</div>
   </a></div>
 <div class="ms-group-head"><span class="ms-group-badge">缘 · 人生大事</span><span class="ms-group-desc">婚配 · 生育 · 家庭 · 规划</span></div>
-<div class="ms-grid"><a class="ms-card" href="javascript:void(0)" onclick="showTool('hehun')" style="border-left:3px solid #f472b6">
+<div class="ms-grid"><a class="ms-card" href="ask.html?tool=hehun" style="border-left:3px solid #f472b6">
     <span class="ms-icon">💕</span>
     <img class="ms-name-img" src="assets/minsu/title-hehun.png" alt="合婚分析">
     <div class="ms-desc">生肖六盒六冲 · 五行生克 · 纳音 · 吕才合婚法</div>
@@ -144,13 +144,13 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
     <div class="ms-api">POST /api/ai/lifeplan-report</div>
   </a></div>
 <div class="ms-group-head"><span class="ms-group-badge">数 · 号码姓名</span><span class="ms-group-desc">日常所用 · 数理趋吉 · 带改进建议</span></div>
-<div class="ms-grid"><a class="ms-card ms-mobile" href="javascript:void(0)" onclick="showTool('mobile')">
+<div class="ms-grid"><a class="ms-card ms-mobile" href="ask.html?tool=mobile">
     <span class="ms-icon">机</span>
     <img class="ms-name-img" src="assets/minsu/title-mobile.png" alt="手机号码">
     <div class="ms-desc">尾数五行 · 81数理 · 组段分析 · 连号重号</div>
     <div class="ms-api">GET /api/minsu/mobile</div>
   </a>
-  <a class="ms-card ms-xingming" href="javascript:void(0)" onclick="showTool('xingming')">
+  <a class="ms-card ms-xingming" href="ask.html?tool=xingming">
     <span class="ms-icon">写</span>
     <img class="ms-name-img" src="assets/minsu/title-xingming.png" alt="姓名学">
     <div class="ms-desc">三才五格 · 笔画五行 · 81数理 · 相生相克</div>
@@ -168,20 +168,20 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
     <div class="ms-desc">行业五行 · 创始喜用 · 字号吉凶测评</div>
     <div class="ms-api">POST /api/minsu/gongsi</div>
   </a>
-  <a class="ms-card" href="javascript:void(0)" onclick="showTool('plate')" style="border-left:3px solid #63b3ed">
+  <a class="ms-card" href="ask.html?tool=chepai" style="border-left:3px solid #63b3ed">
     <span class="ms-icon">车</span>
     <img class="ms-name-img" src="assets/minsu/title-plate.png" alt="车牌号码">
     <div class="ms-desc">尾数五行 · 81数理 · 豹子号/顺子/对子</div>
     <div class="ms-api">GET /api/minsu/plate</div>
   </a></div>
 <div class="ms-group-head"><span class="ms-group-badge">运 · 流年运势</span><span class="ms-group-desc">今年运气 · 幸运加持</span></div>
-<div class="ms-grid"><a class="ms-card ms-liunian" href="javascript:void(0)" onclick="showTool('liunian')">
+<div class="ms-grid"><a class="ms-card ms-liunian" href="ask.html?tool=liunian">
     <span class="ms-icon">更</span>
     <img class="ms-name-img" src="assets/minsu/title-liunian.png" alt="流年运程">
     <div class="ms-desc">生肖关系 · 五行年运 · 12流月评分</div>
     <div class="ms-api">GET /api/minsu/liunian</div>
   </a>
-  <a class="ms-card ms-lucky" href="javascript:void(0)" onclick="showTool('lucky')">
+  <a class="ms-card ms-lucky" href="ask.html?tool=lucky">
     <span class="ms-icon">🍀</span>
     <img class="ms-name-img" src="assets/minsu/title-lucky.png" alt="幸运数色">
     <div class="ms-desc">幸运数字 · 幸运色 · 方位 · 季节</div>
@@ -418,10 +418,10 @@ async function execTool(tool, url, postBody){
     html+=`<span style="color:var(--jade)">${esc(c.suggestion||'')}</span>`;
     html+='</div>';
   }else if(tool==='holidays'){
-    const list=(c.holidays||[]);
+    const list=(c.holidays||[]).slice().sort((a,b)=>((a.solarDate||'9999')<(b.solarDate||'9999')?-1:1));
     html=`<h3 style="color:var(--gold);margin-bottom:8px">庆 ${c.year}年节日表（${c.count||list.length}个）</h3>`;
     html+=`<div style="font-size:12px;line-height:2">`;
-    for(const h of list.slice(0,40)) html+=`${h.date||''}　${esc(h.name||'')} <span style="color:var(--paper3)">${esc(h.category||h.calendar||'')}</span><br>`;
+    for(const h of list.slice(0,40)) html+=`${esc(h.solarDate||h.lunarDate||'')}　${esc(h.name||'')}${h.days?` <span style="color:var(--jade)">${h.days}天</span>`:''} <span style="color:var(--paper3)">${esc(h.category||h.type||h.calendar||'')}</span><br>`;
     if(list.length>40) html+=`<span style="color:var(--paper3)">…共 ${list.length} 个，以上前 40 个</span>`;
     html+='</div>';
   }
