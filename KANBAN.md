@@ -1,4 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 20:20 — 批注层 approve 链接通（命理批注链真闭环）
+- 【R-ANN-LINK】adoptMingli 采纳即 POST 8974 annotate 入核对队列（幂等，一次会话一条，作者=AI命理引擎）；命理师点「通过」即 approve 签发（reviewer=命理师·问诊台，满足作者≠核对人双人复核）；驳回不触碰批注
+- 【实测】浏览器全链：采纳→队列 backlog 1→通过→批注 approved/水印解除/SLA 计时终止/队列归零；reviewBadge 同步「已通过」
+- 【闭环全景】采集→排盘→AI 草案→采纳入队→双师审核→批注签发→归档→患者合并报告，命理批注链端到端无断点
 ## 2026-08-30 19:40 — 患者端合并报告页落地 + mingli 持久化 bug 修复
 - 【R-MERGE】新增 report.html：病历+处方+检验旁证+命理合参+命理师批注一屏（?sid= 直达，待核批注带水印，支持打印/PDF）；服务端 GET /api/public/emr-report/:sid 解密合成全字段、拆出 ai_diagnosis 中的命理段、合并 8974 批注、未归档会话草稿兜底、限流+CSRF 白名单
 - 【bug 修】双轨改造的 mingli 草案此前以顶层对象发送，被 emr-session 字段白名单静默丢弃——改为 emr.mingli 可读文本（mingliText/emrWithMingli），归档后真实进入病历 ai_diagnosis【命理合参】段
