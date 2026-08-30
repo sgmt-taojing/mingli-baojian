@@ -1,4 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 20:30 — G1 链4验收入口：轮询健康 + 一个真实隐患修复
+- 【验收】tcm-import launchd 15min 轮询活跃（最近 20:13，exit 0）；watchdog 链4 lag = -3.3min（快照新于镜像，≤60min 达标）；8972 七能力齐全、KB 53413 条（R756 过滤后口径）；SEC-001 补丁标记在上次真实刷新时核查完好
+- 【修复】kb-follow 的 SQLite 索引重建在 launchd 极简 PATH 下裸调 node 失败（10:13 真实刷新时 spawn failed，靠慢路径自愈兜底）——改 which 优先 + Kimi 运行时绝对路径回退
+- 【说明】镜像自 10:10 未再更新（tcm-agent 源端无新出站），故 10:13 后每轮均为幂等秒退，属正常
 ## 2026-08-30 20:25 — G5 冒烟复跑 PASS（九节点真链路，含合并报告）
 - 冒烟病例 CASE-1788092387740 / 8920 病历 #22 / 处方 rx-4341e044；9 节点全 ok，守卫 R756/R757/SLA48h/MERGE_REPORT 全绿
 - 证据 DELIVERY/g5-smoke-evidence-20260830-201948.json；脚本扩至九节点可重复回归；CHANGELOG 已记
