@@ -76,6 +76,9 @@ registerFaceVerify(app);
 // 医保局人脸核对对接适配层
 const { registerRoutes: registerInsurance } = require('./insurance-adaptor');
 registerInsurance(app);
+// G12 轻预约挂号（slots/create/checkin/cancel 四 API + 爽约自动标记 + G10 短信）
+const { registerRoutes: registerAppointments } = require('./appointment-api');
+registerAppointments(app);
 
 // R789 患者主索引 EMPI（任何异常回退老行为，绝不影响服务）
 const patientIndex = (() => {
