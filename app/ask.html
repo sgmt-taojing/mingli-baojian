@@ -157,6 +157,12 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
         <button class="chip sel" data-sex="male">男</button>
         <button class="chip" data-sex="female">女</button>
       </div>
+      <div class="row hidden" id="placeRow">
+        <select id="bPlace" style="flex:1">
+          <option value="">出生地（选填 · 真太阳时校正，时辰更准）</option>
+          <option value="北京">北京</option><option value="天津">天津</option><option value="上海">上海</option><option value="重庆">重庆</option><option value="石家庄">石家庄</option><option value="太原">太原</option><option value="呼和浩特">呼和浩特</option><option value="沈阳">沈阳</option><option value="长春">长春</option><option value="哈尔滨">哈尔滨</option><option value="南京">南京</option><option value="杭州">杭州</option><option value="合肥">合肥</option><option value="福州">福州</option><option value="南昌">南昌</option><option value="济南">济南</option><option value="郑州">郑州</option><option value="武汉">武汉</option><option value="长沙">长沙</option><option value="广州">广州</option><option value="南宁">南宁</option><option value="海口">海口</option><option value="成都">成都</option><option value="贵阳">贵阳</option><option value="昆明">昆明</option><option value="拉萨">拉萨</option><option value="西安">西安</option><option value="兰州">兰州</option><option value="西宁">西宁</option><option value="银川">银川</option><option value="乌鲁木齐">乌鲁木齐</option><option value="香港">香港</option><option value="澳门">澳门</option><option value="台北">台北</option><option value="深圳">深圳</option><option value="厦门">厦门</option><option value="青岛">青岛</option><option value="大连">大连</option><option value="宁波">宁波</option><option value="苏州">苏州</option><option value="无锡">无锡</option><option value="佛山">佛山</option><option value="东莞">东莞</option><option value="珠海">珠海</option><option value="温州">温州</option><option value="泉州">泉州</option><option value="洛阳">洛阳</option><option value="烟台">烟台</option><option value="桂林">桂林</option><option value="三亚">三亚</option><option value="绵阳">绵阳</option><option value="遵义">遵义</option><option value="大理">大理</option><option value="丽江">丽江</option><option value="喀什">喀什</option><option value="日喀则">日喀则</option><option value="鄂尔多斯">鄂尔多斯</option><option value="包头">包头</option>
+        </select>
+      </div>
       <div class="row hidden" id="facingRow">
         <button class="chip" data-face="子">坐北朝南</button><button class="chip" data-face="午">坐南朝北</button>
         <button class="chip" data-face="卯">坐东朝西</button><button class="chip" data-face="酉">坐西朝东</button>
@@ -332,7 +338,7 @@ function askBirthIfNeeded() {
   const rows = document.querySelectorAll('#askBirth .row');
   rows[0].classList.remove('hidden'); rows[2].classList.remove('hidden');
   state._zwWarned = false; state.leap = false; const _bl=$('bLeap'); if(_bl) _bl.checked=false; const _lr=$('leapRow'); if(_lr) _lr.classList.add('hidden');
-  $('facingRow').classList.add('hidden'); $('partnerRow').classList.add('hidden'); $('textRow').classList.add('hidden'); const _ar=$('avoidRow'); if(_ar) _ar.classList.add('hidden');
+  $('facingRow').classList.add('hidden'); $('partnerRow').classList.add('hidden'); $('textRow').classList.add('hidden'); const _ar=$('avoidRow'); if(_ar) _ar.classList.add('hidden'); const _pr=$('placeRow'); if(_pr) _pr.classList.add('hidden');
   $('skipBirth').style.display = '';
   if (need === 'birth' || need === 'birthYear') {
     bot(need === 'birth' ? '请告诉我您的出生信息（年月日必填，时辰不清楚可不选）：' : ((state.tool.id === 'lifeplan' || state.tool.id === 'lifeindex') ? '请告诉我您的出生信息（年月日必填，时辰可空），并点选性别：' : '请告诉我您的出生年份（看流年只需出生年，月日可不填更快速）：'));
@@ -341,6 +347,7 @@ function askBirthIfNeeded() {
     // R-H3: 阴阳历切换对所有命盘类工具开放（不止紫微——很多信众只知农历生日）
     const LUNAR_OK = ['ziwei','bazi','lifeindex','lifeflow','lifetimeline','lifeplan'];
     $('calendarRow').classList.toggle('hidden', !LUNAR_OK.includes(state.tool.id));
+    $('placeRow').classList.remove('hidden'); // R-H4: 出生地选填（真太阳时校正）
     $('askBirth').classList.remove('hidden');
   } else if (need === 'partner') {
     bot('合婚先填您的出生信息（上方年月日，时辰选填），再填对方的——年月日填全可按双方完整八字合婚（日柱夫妻宫、五行互补都看得准）；只填年份则按年柱简评。');
@@ -375,6 +382,7 @@ function askBirthIfNeeded() {
   } else if (need === 'namebirth') {
     bot((state.tool.prompt || '姓氏是？') + '再填出生信息（起名要结合生辰五行）；有避讳字也顺手填上：');
     $('avoidRow').classList.remove('hidden');
+    $('placeRow').classList.remove('hidden'); // R-H4: 出生地选填（真太阳时校正）
     $('calendarRow').classList.add('hidden');
     $('sexRow').classList.remove('hidden'); // 起名需性别
     $('skipBirth').style.display = 'none';
@@ -450,7 +458,7 @@ function collectBirth(skip) {
     const v = $('textInput').value.trim();
     if (!v || v.length > 2) { bot('姓氏填 1-2 个字（如 王 / 欧阳）。'); return; }
     if (!y || !m || !d) { bot('起名要结合生辰，年月日都要填哦。'); return; }
-    state.birth = { surname: v, year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value, sex: state.sex, avoidChars: ($('avoidInput') && $('avoidInput').value.trim()) || '' };
+    state.birth = { surname: v, year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value, sex: state.sex, avoidChars: ($('avoidInput') && $('avoidInput').value.trim()) || '', birthplace: ($('bPlace') && $('bPlace').value) || '' };
     me(`姓 ${v} · ${y}年${m}月${d}日生 · ${state.sex === 'male' ? '男' : '女'}`);
   } else if (need === 'rename' || need === 'company') {
     const v = $('textInput').value.trim();
@@ -487,7 +495,7 @@ function collectBirth(skip) {
       bot('⚠️ 紫微斗数定盘全靠时辰——没有时辰，命宫位置和十四主星全都会错，出来的盘基本不能看。强烈建议问清时辰（可问家人或看出生证）。实在不清楚，再点一次「继续」我按午时粗排，并在报告里标明降级。');
       return;
     }
-    state.birth = { year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value, cal: state.cal, sex: state.sex };
+    state.birth = { year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value, cal: state.cal, sex: state.sex, birthplace: ($('bPlace') && $('bPlace').value) || '' };
     me(`${y}年${m}月${d}日${$('bHour').value === '' ? '' : ' ' + $('bHour').selectedOptions[0].textContent.split(' ')[0]}（${state.cal === 'lunar' ? '农历' : '阳历'}）· ${state.sex === 'male' ? '男' : '女'}`);
   }
   $('askBirth').classList.add('hidden');
@@ -764,7 +772,7 @@ async function fetchToolResult() {
     const bb = state.birth || {};
     const r = await fetch(`${API}/api/ai/lifeindex-report`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, lunar: bb.cal === 'lunar', concerns: state.question ? [state.question.slice(0,30)] : [] }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, lunar: bb.cal === 'lunar', birthplace: bb.birthplace || undefined, concerns: state.question ? [state.question.slice(0,30)] : [] }),
       signal: AbortSignal.timeout(20000)
     });
     const j = await r.json();
@@ -832,7 +840,7 @@ async function fetchToolResult() {
     const age = Math.max(1, now.getFullYear() - (bb.year || (now.getFullYear() - 30)));
     const r = await fetch(`${API}/api/ai/lifeplan-report`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, lunar: bb.cal === 'lunar', concerns: state.question ? [state.question.slice(0,30)] : [] }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, lunar: bb.cal === 'lunar', birthplace: bb.birthplace || undefined, birthPlace: bb.birthplace || undefined, concerns: state.question ? [state.question.slice(0,30)] : [] }),
       signal: AbortSignal.timeout(20000)
     });
     const j = await r.json();
@@ -858,6 +866,7 @@ async function fetchToolResult() {
     body.year = state.birth.year; body.month = state.birth.month; body.day = state.birth.day;
     body.hour = state.birth.hour != null ? state.birth.hour : 12;
     body.gender = state.birth.sex; body.sex = state.birth.sex;
+    if (state.birth.birthplace) body.birthplace = state.birth.birthplace; // R-H4 真太阳时
     if (t === 'ziwei' || t === 'bazi') body.lunar = state.birth.cal === 'lunar';
     if (t === 'ziwei' && state.leap && body.lunar) body.leapMonth = true;
   } else {
