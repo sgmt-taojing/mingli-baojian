@@ -933,12 +933,24 @@ function exportEmr(){
   a.click(); URL.revokeObjectURL(url);
   toast('病历已导出');
 }
+// R-MERGE-FIX: 命理草案序列化为可读文本（emr.mingli 白名单只收字符串；此前顶层对象被静默丢弃）
+function mingliText(){
+  const m = App.mingliDraft;
+  if (!m) return '';
+  const cards = (m.cards || []).map(c => c.title + '：' + c.plain).join('　');
+  return '【AI命理草案 · 待命理师核对】' + (m.overview || '') + (cards ? '　' + cards : '') + '（命理内容为传统易学参考，不构成医学诊断）';
+}
+function emrWithMingli(){
+  const t = mingliText();
+  return t ? Object.assign({}, App.emr, { mingli: t }) : App.emr;
+}
 function saveEmr(){
   // R721: 双写——上报后端 EMR 会话（医生/命理师实时可见）+ localStorage 兜底
+  const emrOut = emrWithMingli();
   const snapshot = {
     sessionId: App.sessionId,
     role: App.role,
-    emr: App.emr,
+    emr: emrOut,
     mingli: App.mingliDraft || null,
     savedAt: new Date().toISOString()
   };
@@ -948,7 +960,7 @@ function saveEmr(){
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     signal: AbortSignal.timeout(8000),
-    body: JSON.stringify({ sessionId: App.sessionId, role: App.role, emr: App.emr, mingli: App.mingliDraft || null })
+    body: JSON.stringify({ sessionId: App.sessionId, role: App.role, emr: emrOut, mingli: App.mingliDraft || null })
   }).then(r => r.json()).then(d => {
     if (d.ok) { setDot('emr', 'ok'); } else { setDot('emr', 'warn'); }
   }).catch(() => {
@@ -964,7 +976,7 @@ function archiveEmr(){
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     signal: AbortSignal.timeout(10000),
-    body: JSON.stringify({ sessionId: App.sessionId, role: App.role, emr: App.emr, mingli: App.mingliDraft || null })
+    body: JSON.stringify({ sessionId: App.sessionId, role: App.role, emr: emrWithMingli(), mingli: App.mingliDraft || null })
   }).then(r => r.json()).then(d => {
     if (d.ok) {
       App.caseId = d.caseId;
@@ -984,7 +996,7 @@ function showCaseId(caseId){
   const b = document.getElementById('caseIdBadge');
   if (!b || !caseId) return;
   b.style.display = 'inline-block';
-  b.textContent = '病历号 #' + caseId;
+  b.innerHTML = '病历号 #' + caseId + ' <a href="report.html?sid=' + encodeURIComponent(App.sessionId) + '" target="_blank" style="color:#c9a84c;text-decoration:underline;margin-left:4px">查看合并报告</a>';
   App.caseId = caseId;
 }
 // R727: 会话恢复时回查病历号（病历永久，内存过期也能查到）
