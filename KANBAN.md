@@ -1,4 +1,15 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 09:35 — ✅ C 类遗留页归档执行完毕（12 页归档 + 2 页纠错移出）
+- **归档 12 页**（用户拍板后执行）：index-global / ziwei-mingli / site-nav / mindmap / platform-overview / yanzhi / closed-loop-advisor / admin-profile-distill / kb-explore-submit / kb-graph-r68 / wechat-cases / wechat-disclaimer → `archive/legacy-pages-202608/`（git mv 100% rename，历史随时可恢复）
+- **两页移出清单（纠错）**：dashboard.html（monitor-hub 真实引用，跳转壳）+ **divination-hub.html**——归档前最终扫描发现它是 KB 模态入口契约的载体（api-server-v2 ENTRY_MAP 40+ 条 `divination-hub.html#xxx` 模态入口 + wechat-hub 工具 section 锚点跳转 + search-intelligence 合婚/黄历映射），归档会砸运行时契约，已回退保留。教训：「零 href 引用」不等于「零运行时依赖」，锚点契约要查 JS/server 侧
+- **连带修复**：10 处 JS「返回首页」/分享链接从 divination-hub 改指 index.html（rbac-client HOME_PAGE/portal-nav/privacy/share-center/shop-admin/nihaisha 等）；mobile-voice 工具跳转改指 ask.html（直达问事，比 hub 锚点更符合信众面口径）
+- 归档后探测：index/缘主中心/命理师中心/监控总览/问事 全 200 ✓
+- commits：`94d6bb3` + `789f9ff`
+## 2026-08-30 09:05 — 💚 心跳 09:00 全绿（6 服务全 OK + kb-list + paipan-api）
+- health-check.sh 实测：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200，kb-list + paipan-api OK，EXIT=0
+- 前轮 wikidata 300/国 进程已死（昨夜 PID 14087 不再存活）→ **本轮重新拉起** `fetch-wikidata-celebs.py 300`（PID 75034，nohup 后台续跑，日志 .openclaw/tmp/wikidata-fetch-0830.log）；直连 query.wikidata.org 3.4s 通，去重启幂等
+- 校正库当前 834 条（不含中医 140），扩到 300/国 预计可再补一批；维基导语抽取链路网络状态待进程推进后验收
+- 进行中无变化：C 类 13 页退役清单（待用户拍板）+ 服务中心导航体验回归（待主会话浏览器执行）；阻塞延续：patrol 读数失实/连败集群、⏭️ P2.8
 ## 2026-08-30 08:30 — ✅ 校正库扩容 515 条（→974）+ 两起事故根修 + 深度校验 v2 重建固化
 - **扩容**：Wikidata 名人 183→698 条（首轮抓取实际完成入库 515，去重幂等验证通过：二轮 224 条全判重）；命理校正库（不含移交中医 140）合计 **834 条**，排盘覆盖率 100%（除 32 条天纪 approximate 设计内走年柱轻校验，已 32/32 全命中）；刘善良身边实测样本农历1991-05-12→阳历1991-06-23 转换补排盘（甲木日主/甲子日甲子时）
 - **事故①根修**：batch-verify-corpus.py Python sqlite3 默认隔离级全程持写锁（结尾才 commit），与 8920 同步 better-sqlite3 写互卡 → **8920 事件循环冻结、全站假死**；修为 `isolation_level=None` autocommit + busy_timeout=8000，复跑期间 8920 健康 200/19ms
