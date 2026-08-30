@@ -52,7 +52,17 @@ h1{color:var(--gold);font-size:20px;margin-bottom:16px;text-align:center}
 .btn:hover:not(:disabled){filter:brightness(1.12)}
 .btn:active:not(:disabled){transform:scale(.97)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}</style>
+.btn:focus-visible{outline:2px solid #c9a84c;outline-offset:2px}
+/* G14: 信众求测表单 + 时间线 */
+.qc-in{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:14px;font-family:inherit}
+.qc-b{flex:1;min-width:0}
+.qc-timeline{display:flex;flex-direction:column;gap:8px}
+.qc-item{padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;border-left:3px solid var(--muted)}
+.qc-item.qc-done{border-left-color:var(--green)}
+.qc-item.qc-draft{border-left-color:var(--gold)}
+.qc-badge{font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);white-space:nowrap}
+.qc-done .qc-badge,.qc-badge.qc-done{color:var(--green);border-color:rgba(72,187,120,.4)}
+.qc-draft .qc-badge,.qc-badge.qc-draft{color:var(--gold);border-color:rgba(201,168,76,.4)}</style>
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
@@ -106,7 +116,59 @@ if(currentId==='yuanzhu')renderY();else if(currentId==='patient')renderP();else 
 function renderY(){fj(API+'/api/yuanzhu/profile/'+uid).then(function(d){var u=d.user||{},p=d.profile||{},h=d.paipan_history||[];var s='<div class="card"><div class="card-title">☯ 缘主档案</div><div class="info-grid">'+info('姓名',u.name||'')+info('性别',u.sex||'')+info('出生',u.birth_date||'')+info('日主',p.day_master||u.day_stem||'')+info('喜神',p.xi_ele||u.xi_ele||'')+info('生肖',p.zodiac||u.zodiac||'')+'</div></div>';s+='<div class="card"><div class="card-title">统计</div><div class="stat-row">'+stat(p.paipan_count||h.length,'排盘')+stat(h.length,'历史')+stat(p.push_opt_in?'订阅':'未订','推送')+'</div></div>';s+='<div class="bridge-box"><div class="bridge-title">周易→中医桥接</div><div class="bridge-content"><a class="btn btn-primary" href="javascript:loadB()">查看方案</a></div><div id="br"></div></div>';c.innerHTML=s})}
 function loadB(){var e=document.getElementById('br');if(!e)return;e.innerHTML='正在为您查阅典籍...';fj(API+'/api/clinic/bridge/'+uid).then(function(d){var b=d.tcm_bridge||{};e.innerHTML='<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;font-size:12px"><b>'+d.element+'</b>→'+b.organ+' | '+b.recommendation+'<br>食疗:'+b.foods+'<br>中药:'+b.herbs+'<br>穴位:'+b.acupoint+'</div>'})}
 function renderP(){fj(API+'/api/patient/profile/'+uid).then(function(d){var u=d.user||{},cs=d.cases||[],s=d.stats||{};var h='<div class="card"><div class="card-title">注 患者档案</div><div class="info-grid">'+info('姓名',u.name||'')+info('性别',u.sex||'')+info('出生',u.birth_date||'')+'</div></div>';h+='<div class="card"><div class="card-title">📊 诊疗统计</div><div class="stat-row">'+stat(s.total_cases||0,'诊疗')+stat(s.pending_cases||0,'待处理')+stat(s.completed_cases||0,'完成')+stat(s.follow_up_count||0,'复诊')+'</div></div>';if(cs.length>0){h+='<div class="card"><div class="card-title">📊 诊疗记录</div>';cs.forEach(function(c){h+='<div class="case-item"><div class="case-symptoms">'+c.symptoms+'</div>'+(c.diagnosis?'<div class="case-diagnosis">辨证:'+c.diagnosis+'</div>':'')+(c.treatment_outcome?'<div class="case-diagnosis">疗效:'+c.treatment_outcome+'</div>':'')+'</div>'});h+='</div>'}c.innerHTML=h})}
-function renderB(){var c=document.getElementById('content');c.innerHTML='<div class="card"><div class="card-title">莲 信众档案</div><div class="empty">开发中<br>• 法事记录 • 祈福登记<br>• 符咒档案 • 功德积累</div></div>'}
+function renderB(){var c=document.getElementById('content');c.innerHTML=
+'<div class="card"><div class="card-title">📮 发起求测</div>'+
+'<div style="display:grid;gap:8px">'+
+'<select id="qcCat" class="qc-in"><option value="">选择求测类目（16 域）</option></select>'+
+'<textarea id="qcMatter" class="qc-in" rows="2" placeholder="简述所问事项，如：想看看今年事业方向是否宜变动"></textarea>'+
+'<div style="display:flex;gap:8px"><input id="qcName" class="qc-in" placeholder="称呼（选填）"><select id="qcGender" class="qc-in" style="max-width:90px"><option value="男">男</option><option value="女">女</option></select></div>'+
+'<div style="display:flex;gap:6px;flex-wrap:wrap"><input id="qcY" class="qc-in qc-b" placeholder="出生年"><input id="qcM" class="qc-in qc-b" placeholder="月"><input id="qcD" class="qc-in qc-b" placeholder="日"><input id="qcH" class="qc-in qc-b" placeholder="时(选填)"></div>'+
+'<input id="qcPhone" class="qc-in" placeholder="手机号（接收核对完成通知）" inputmode="tel" maxlength="11">'+
+'<label style="font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:flex-start;line-height:1.5"><input type="checkbox" id="qcAge" style="margin-top:2px">我已年满 18 周岁。未成年人暂不开放信众求测服务。</label>'+
+'<button class="btn btn-primary" id="qcSubmit" onclick="submitQiuce()" style="padding:10px">提交求测（AI 初稿 → 命理师核对）</button>'+
+'<div style="font-size:11px;color:var(--muted);line-height:1.6">本服务为传统易学参考，不构成医学诊断或重大决策依据；AI 初稿经命理师核对后方可作为正式报告。</div>'+
+'</div></div>'+
+'<div class="card"><div class="card-title">📋 我的报告 <button class="btn" style="float:right;padding:2px 10px;font-size:11px" onclick="loadMyQiuce()">刷新</button></div><div id="qcMine"><div class="empty">填写手机号提交求测后，这里会出现您的报告时间线</div></div></div>'+
+'<div class="card"><div class="card-title">🩺 我的就诊记录（只读）</div><div id="qcEmr"><div class="empty">与求测同手机号自动关联，仅展示不修改</div></div></div>';
+var sel=document.getElementById('qcCat');QIUCE_CATS.forEach(function(k){var o=document.createElement('option');o.value=k.id;o.textContent=k.name+(k.needBirth?'（需生辰）':'');sel.appendChild(o)});
+try{var saved=localStorage.getItem('qiuce_phone');if(saved)document.getElementById('qcPhone').value=saved;if(saved){loadMyQiuce();loadMyEmr()}}catch(e){}}
+var QIUCE_CATS=[{id:'bazi',name:'八字命理',needBirth:1},{id:'ziwei',name:'紫微斗数',needBirth:1},{id:'liuyao',name:'六爻问事'},{id:'qimen',name:'奇门遁甲'},{id:'liuren',name:'大六壬'},{id:'meihua',name:'梅花易数'},{id:'fengshui',name:'风水堪舆'},{id:'hehun',name:'合婚配对',needBirth:1},{id:'zeri',name:'黄历择日'},{id:'xingming',name:'姓名评分'},{id:'mobile',name:'手机号吉凶'},{id:'chepai',name:'车牌吉凶'},{id:'zhanbu',name:'卦象占卜'},{id:'lifeplan',name:'人生规划',needBirth:1},{id:'liunian',name:'流年运势',needBirth:1},{id:'family',name:'家庭合盘',needBirth:1}];
+function qcPost(u,body){return fetch(API+u,{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},body:JSON.stringify(body),signal:AbortSignal.timeout(30000)}).then(function(r){return r.json()})}
+function qcGet(u){return fetch(API+u,{headers:{'X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()})}
+function qcToast(msg){var m=document.getElementById('qcMine');}
+function submitQiuce(){var phone=document.getElementById('qcPhone').value.trim();
+if(!/^1\d{10}$/.test(phone)){alert('请填写正确的 11 位手机号');return}
+if(!document.getElementById('qcAge').checked){alert('请确认您已年满 18 周岁');return}
+var body={phone:phone,category:document.getElementById('qcCat').value,matter:document.getElementById('qcMatter').value.trim(),name:document.getElementById('qcName').value.trim(),gender:document.getElementById('qcGender').value,birthYear:document.getElementById('qcY').value,birthMonth:document.getElementById('qcM').value,birthDay:document.getElementById('qcD').value,birthHour:document.getElementById('qcH').value,ageConfirmed:true};
+if(!body.category){alert('请选择求测类目');return}
+if(body.matter.length<4){alert('请简述所问事项（至少 4 字）');return}
+var btn=document.getElementById('qcSubmit');btn.disabled=true;btn.textContent='提交中，AI 正在起稿…';
+qcPost('/api/public/qiuce',body).then(function(d){btn.disabled=false;btn.textContent='提交求测（AI 初稿 → 命理师核对）';
+if(d&&(d.code===0||d.ok)){try{localStorage.setItem('qiuce_phone',phone)}catch(e){}alert('求测已入队（编号 '+(d.data&&d.data.id)+'），AI 初稿已生成，命理师核对后会短信通知您');loadMyQiuce();loadMyEmr()}
+else alert(d&&(d.message||d.error)||'提交失败')}).catch(function(e){btn.disabled=false;btn.textContent='提交求测（AI 初稿 → 命理师核对）';alert('网络异常，请稍后再试')})}
+function loadMyQiuce(){var phone=document.getElementById('qcPhone').value.trim();if(!/^1\d{10}$/.test(phone))return;
+qcGet('/api/public/qiuce/mine?phone='+phone).then(function(d){var m=document.getElementById('qcMine');var list=(d&&d.data&&d.data.list)||(d&&d.list)||[];
+if(!list.length){m.innerHTML='<div class="empty">暂无求测记录</div>';return}
+var h='<div class="qc-timeline">';list.forEach(function(it){var cls=it.status==='master_reviewed'?'qc-done':it.status==='ai_draft'?'qc-draft':'qc-wait';
+h+='<div class="qc-item '+cls+'"><div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:13px">'+escapeHtml(it.categoryName)+' · #'+it.id+'</b><span class="qc-badge">'+escapeHtml(it.statusLabel)+'</span></div>'+
+'<div style="font-size:12px;color:var(--muted);margin:4px 0">'+escapeHtml(it.matter)+'</div>'+
+'<div style="font-size:11px;color:var(--muted)">'+escapeHtml(it.created_at||'')+'</div>'+
+'<div style="margin-top:6px;display:flex;gap:8px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="viewQiuce('+it.id+')">查看报告</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="againQiuce(\''+it.category+'\')">再次求测</button></div></div>'});
+m.innerHTML=h+'</div>'}).catch(function(){})}
+function viewQiuce(id){var phone=document.getElementById('qcPhone').value.trim();
+qcGet('/api/public/qiuce/'+id+'?phone='+phone).then(function(d){var it=(d&&d.data)||d||{};
+var w=document.getElementById('qcView');if(!w){w=document.createElement('div');w.id='qcView';document.getElementById('qcMine').parentNode.appendChild(w)}
+w.innerHTML='<div class="qc-item" style="border-color:var(--gold)"><div style="display:flex;justify-content:space-between;align-items:center"><b>'+escapeHtml(it.categoryName||'')+' 报告 · #'+id+'</b><span class="qc-badge '+(it.status==='master_reviewed'?'qc-done':'qc-draft')+'">'+escapeHtml(it.statusLabel||'')+'</span></div>'+
+(it.reviewer?'<div style="font-size:11px;color:var(--green);margin-top:4px">核对：'+escapeHtml(it.reviewer)+(it.reviewedAt?' · '+escapeHtml(it.reviewedAt):'')+'</div>':'')+
+'<pre style="white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.8;margin-top:8px;max-height:50vh;overflow:auto">'+escapeHtml(it.draft||'报告整理中')+'</pre>'+
+'<div style="font-size:11px;color:var(--muted);margin-top:6px">'+escapeHtml(it.disclaimer||'')+'</div></div>';
+w.scrollIntoView({behavior:'smooth'})}).catch(function(){alert('查询失败')})}
+function againQiuce(cat){document.getElementById('qcCat').value=cat;document.getElementById('qcMatter').value='';document.getElementById('qcMatter').focus();window.scrollTo({top:0,behavior:'smooth'})}
+function loadMyEmr(){var phone=document.getElementById('qcPhone').value.trim();if(!/^1\d{10}$/.test(phone))return;
+qcGet('/api/public/my-emr?phone='+phone).then(function(d){var m=document.getElementById('qcEmr');var list=(d&&d.data&&d.data.list)||[];
+if(!list.length){m.innerHTML='<div class="empty">该手机号暂无就诊记录</div>';return}
+var h='';list.forEach(function(it){h+='<div class="case-item"><div class="case-symptoms">病历 #'+it.caseId+' · '+escapeHtml(it.complaint||'—')+'</div><div class="case-diagnosis">'+escapeHtml(it.syndrome||'')+' · '+(it.reviewStatus==='approved'?'医师已审核':'待审核')+' · '+escapeHtml(it.created_at||'')+'</div></div>'});
+m.innerHTML=h+'<div style="font-size:11px;color:var(--muted)">仅展示，不可修改；完整病历请走患者通道</div>'}).catch(function(){})}
 function renderW(){fj(API+'/api/wellness/profile/'+uid).then(function(d){var r=d.data||{};var h='<div class="card"><div class="card-title">草 康养人档案</div><div class="info-grid">'+info('姓名',r.name||'')+info('性别',r.sex||'')+info('年龄',r.age||'')+info('身高/体重',r.height||'')+info('出生',r.birth_date||'')+info('日主五行',r.day_element?(r.day_master+' / '+r.day_element):'')+'</div></div>';h+='<div class="card"><div class="card-title">警 风险等级</div>';var rl=r.risk_level||'normal';var rcl={high:'#f56565',mid:'#ed8936',normal:'#48bb78'}[rl]||'#48bb78';var rn={high:'高风险',mid:'中风险',normal:'正常'}[rl]||'正常';h+='<div style="padding:12px;background:'+rcl+'22;border-radius:8px;text-align:center"><div style="font-size:24px;color:'+rcl+'"><b>'+rn+'</b></div><div style="font-size:11px;color:var(--muted);margin-top:4px">综合日主五行+家族遗传+症状评估</div></div></div>';h+='<div class="card"><div class="card-title">因 家族遗传</div><div style="font-size:12px;line-height:1.6">'+(r.family_genetic||'无')+'</div></div>';if(r.bp)h+='<div class="card"><div class="card-title">🩺 西医指标</div><div style="font-size:12px;line-height:1.8">血压:'+r.bp+' | 心率:'+r.hr+' | 血糖:'+r.glucose+' | 血脂:'+r.lipid+'<br>肝:'+r.liver+' | 肾:'+r.kidney+'</div></div>';h+='<div class="card"><div class="card-title">中医体质</div><div style="font-size:12px;line-height:1.6">怕冷热:'+(r.temp_pref||'')+' | 出汗:'+(r.sweat||'')+' | 食欲:'+(r.appetite||'')+'<br>睡眠:'+(r.sleep||'')+' | 大便:'+(r.bowel||'')+' | 情绪:'+(r.mood||'')+' | 精力:'+(r.energy||'')+'<br>当前症状:'+(r.symptoms||'无')+'</div></div>';h+='<a class="btn btn-primary" href="wellness-guide.html" style="display:block;padding:12px;background:var(--gold);color:var(--bg);text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:10px">🔄 重新生成健康预测</a>';
 h+='<a class="btn btn-primary" href="wellness-weekly.html" style="display:block;padding:12px;background:var(--green);color:#000;text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px">📅 进入周分析中心</a>';
 h+='<a class="btn btn-primary" href="report-ocr.html" style="display:block;padding:12px;background:var(--purple);color:#fff;text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px">📊 体检报告OCR</a><a class="btn" href="report-interpret.html" style="display:block;padding:12px;background:var(--orange);color:#fff;text-align:center;border-radius:8px;text-decoration:none;font-weight:600;margin-top:8px">📊 统一报告解读</a>';

@@ -46,9 +46,13 @@ function containsMingli(text) {
 // ── 通知模板（机构版话术，流程性内容）──
 const TEMPLATES = {
   // ② 批注待核对提醒 → 当值命理师（48h SLA 计时起点）
-  annotation_pending: (v) => `【命理宝鉴】新病例待核对：病历 ${v.emrId} 已入批注队列，请在 48 小时内完成核对。登录工作台处理。`,
-  // ③ 批注完成通知 → 患者
-  annotation_done: (v) => `【命理宝鉴】您的就诊报告已完成医师核对，病历号 ${v.caseId || v.emrId}。请凭会话凭证在报告页查看。`,
+  annotation_pending: (v) => String(v.emrId||'').startsWith('QIUCE-')
+    ? `【命理宝鉴】新求测待核对：编号 ${v.emrId} 已入批注队列，请在 48 小时内完成核对。登录工作台处理。`
+    : `【命理宝鉴】新病例待核对：病历 ${v.emrId} 已入批注队列，请在 48 小时内完成核对。登录工作台处理。`,
+  // ③ 批注完成通知 → 患者/信众（G14：QIUCE 求测报告用信众版话术）
+  annotation_done: (v) => String(v.emrId||'').startsWith('QIUCE-')
+    ? `【命理宝鉴】您的求测报告已完成命理师核对，编号 ${v.emrId}。请登录信众中心「我的报告」查看。`
+    : `【命理宝鉴】您的就诊报告已完成医师核对，病历号 ${v.caseId || v.emrId}。请凭会话凭证在报告页查看。`,
   // ④ 病历/报告出具通知（机构版）
   report_ready: (v) => `【命理宝鉴】您的电子病历已出具，病历号 ${v.caseId || v.emrId}。本系统为辅助诊疗工具，最终诊疗决策由执业医师作出。`,
   // ① 验证码

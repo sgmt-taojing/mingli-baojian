@@ -1,5 +1,11 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-08-31 07:30 — ✅ G14 信众服务旅程补全（任务书五项全收口）
+- 求测入队（16 域+未成年双闸）→ 真引擎 AI 初稿 → 8974 批注核对 → 信众版短信 → 我的报告时间线（三态标识）→ 报告自查（核对人留痕）→ 再次求测 全链 mock PASS
+- 双身份：medical_cases.patient_phone_hash 新列 + /api/public/my-emr 只读视图实证（病历 #30 ↔ 求测同号）
+- 信众版短信话术按 QIUCE 前缀切换，过命理断语守卫；430px 零溢出；UI 回归 PASS
+- 证据 DELIVERY/g11-pwa/g14-person-center-believer.png；至此 G10/G11/G12/G13/G14 全部落地
+
 ## 2026-08-31 07:20 — ✅ 管理体系任务书 G10/G12/G13/G11 四项落地（G14 待动）
 - G10 短信适配层：send_code/verify_code/send_notice + mock outbox + 命理断语守卫；四场景全验（命理师登录码/批注待核提醒/批注完成通知患者/报告出具通知）；主仓 6022da6
 - G12 轻预约挂号：appointment 模型 + slots/创建/checkin/cancel + 爽约自动标记 + 短信 mock；全流程实测过

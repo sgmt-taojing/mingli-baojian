@@ -1,5 +1,14 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · G14 信众（信众服务旅程补全 · 全旅程 mock PASS）
+- 发起求测：person-center 信众页新增表单——16 域类目（八字/紫微/六爻/奇门/六壬/梅花/风水/合婚/择日/姓名/手机号/车牌/占卜/人生规划/流年/家庭合盘，生辰依赖项标注）+ 事项 + 手机号 + **未成年双闸**（18 岁声明确认 + 出生年校验，2015 年生实测 422 MINOR_REJECTED）
+- 后端 `POST /api/public/qiuce`：入队即调 normReportEngine 生成 AI 初稿（真引擎，实测产出「基于《渊海子平》古法推演」全文）→ 同步推 8974 批注队列（emr_id=QIUCE-N，当值命理师短信提醒自动发出）
+- 报告自查：`GET /qiuce/mine`（时间线 + 状态标识 排队中/AI 初稿/命理师已核对，实时回查 8974 升级）+ `GET /qiuce/:id`（手机号归属校验只读详情，带核对人/时间/免责声明）；「再次求测」一键复测
+- 信众×患者双身份：medical_cases 增 `patient_phone_hash`（emr-archive 写入时从 patientInfo.phone 落哈希），`GET /api/public/my-emr?phone=` 同手机号关联病历只读列表（实证病历 #30 关联到求测同号 138****0099）
+- 话术红线：8974 批注短信按 QIUCE 前缀切信众版（「求测报告已完成命理师核对」/「新求测待核对」），医学话术不外溢到信众域；页面机构版声明 + 不诱导不恐吓
+- 验收：求测→排盘→批注核对→短信→报告自查→复测 全旅程 mock 通过（#1 已核对/#2 AI 初稿）；430px 视口零溢出；UI 五节点回归 PASS
+- 证据：`DELIVERY/g11-pwa/g14-person-center-believer.png`（信众全旅程整页截图）；脚本 `scripts/g14-person-center-shot.js`
+
 ## 2026-08-31 · G11 PWA（移动端双端规范化 · 验收 PASS）
 - 双端重切：`mobile-capture.html` 患者采集端（一帧采集/排队状态/报告查看入口）；`mobile-interact.html` 全量重写为「命理师核对台」——批注队列 48h SLA 倒计时 + 核对/驳回 + 批注历史（8974 新增 `GET /api/annotation-history`）+ G10 短信码鉴权门（未验证只读队列）
 - PWA 四件套：`app/pwa/pwa-inject.js`（注册 SW + 安装到桌面按钮 + 安全区适配）；manifest/图标复用既有；四页（mobile-capture/mobile-interact/index/unified-consultation）注入完成
