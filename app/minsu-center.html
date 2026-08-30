@@ -249,7 +249,7 @@ async function showTool(tool){
       xingming:{t:'姓名评分',h:`<input id="f1" type="text" placeholder="输入姓名（连名带姓 2-4 字）" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'五格三才按繁体笔画计算'},
       liunian:{t:'流年运程',h:`<input id="f1" type="number" placeholder="出生年 如1990" style="width:150px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:`看 ${CY} 年逐月运势`},
       lucky:{t:'幸运数色',h:`<input id="f1" type="number" placeholder="出生年 如1990" style="width:150px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'按生年五行推幸运数字/颜色/方位'},
-      hehun:{t:'合婚配对',h:`<input id="f1" type="number" placeholder="男方出生年" style="width:130px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f2" type="number" placeholder="女方出生年" style="width:130px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'年柱粗筛版；精算请到「问事」用合婚 v2'},
+      hehun:{t:'合婚配对',h:`<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%"><span style="color:var(--paper3);font-size:12px">男方</span><input id="f1" type="number" placeholder="年*" style="width:74px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f3" type="number" placeholder="月" min="1" max="12" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f4" type="number" placeholder="日" min="1" max="31" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f5" type="number" placeholder="时0-23" min="0" max="23" style="width:70px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%"><span style="color:var(--paper3);font-size:12px">女方</span><input id="f2" type="number" placeholder="年*" style="width:74px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f6" type="number" placeholder="月" min="1" max="12" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f7" type="number" placeholder="日" min="1" max="31" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f8" type="number" placeholder="时0-23" min="0" max="23" style="width:70px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"></div>`,hint:'年份必填；月日填全自动升级全八字合婚（夫妻宫/五行互补五维加权），只填年份按年柱简评'},
       family:{t:'家庭排盘',h:`<div id="famRows" style="width:100%"></div><button onclick="addFamRow()" style="padding:6px 14px;background:var(--card);color:var(--gold);border:1px dashed var(--gold);border-radius:6px;cursor:pointer">+ 加一位成员</button>`,hint:'至少两位成员（称呼+出生年）'},
     }[tool];
     if(!F){result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px">工具未接入</div>';return;}
@@ -281,7 +281,19 @@ function runTool(tool){
   else if(tool==='xingming'){ const n=v('f1'); if(n.length<2||n.length>4){result.innerHTML='<div style="color:#ef4444;padding:10px">姓名填 2-4 个字（连名带姓）。</div>';return;} url=`/api/minsu/xingming?name=${encodeURIComponent(n)}`; }
   else if(tool==='liunian'){ const n=v('f1'); if(!n){result.innerHTML='<div style="color:#ef4444;padding:10px">请填出生年份。</div>';return;} url=`/api/minsu/liunian?year=${new Date().getFullYear()}&birthYear=${n}`; }
   else if(tool==='lucky'){ const n=v('f1'); if(!n){result.innerHTML='<div style="color:#ef4444;padding:10px">请填出生年份。</div>';return;} url=`/api/minsu/lucky?birthYear=${n}`; }
-  else if(tool==='hehun'){ const a=v('f1'),b=v('f2'); if(!a||!b){result.innerHTML='<div style="color:#ef4444;padding:10px">两位出生年份都要填哦。</div>';return;} url=`/api/minsu/hehun?maleYear=${a}&femaleYear=${b}`; }
+  else if(tool==='hehun'){
+    const a=v('f1'),b=v('f2');
+    if(!a||!b){result.innerHTML='<div style="color:#ef4444;padding:10px">两位出生年份都要填哦。</div>';return;}
+    const mM=v('f3'),dM=v('f4'),mF=v('f6'),dF=v('f7');
+    const mFull=!!(mM&&dM), fFull=!!(mF&&dF);
+    if((mM&&!dM)||(!mM&&dM)||(mF&&!dF)||(!mF&&dF)){result.innerHTML='<div style="color:#ef4444;padding:10px">月、日要一起填才排得出八字哦，要么都填要么都留空。</div>';return;}
+    if(mFull&&fFull){
+      postBody={ male:[+a,+mM,+dM, v('f5')===''?'':+v('f5')].filter(x=>x!==''), female:[+b,+mF,+dF, v('f8')===''?'':+v('f8')].filter(x=>x!=='') };
+      url='/api/minsu/hehun/v2';
+    } else {
+      url=`/api/minsu/hehun?maleYear=${a}&femaleYear=${b}`;
+    }
+  }
   else if(tool==='family'){
     const rows=[...document.querySelectorAll('#famRows > div')];
     const members=rows.map(r=>({role:r.querySelector('.fam-role').value.trim()||'成员',year:+r.querySelector('.fam-year').value})).filter(m=>m.year>1900&&m.year<=new Date().getFullYear());
@@ -358,6 +370,16 @@ async function execTool(tool, url, postBody){
     html+=`五行：${c.wuxing} | 幸运数字：${c.luckyNumbers.join('、')}<br>`;
     html+=`幸运色：${c.luckyColors.join('、')} | 方位：${c.luckyDirection} | 季节：${c.luckySeason}<br>`;
     html+=`<span style="color:var(--jade)">${c.suggestion}</span>`;
+    html+='</div>';
+  }else if(tool==='hehun' && data.dimensions){
+    // v2 全八字合婚：五维加权
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">💑 全八字合婚 · 总分 <b>${data.total_score}</b>（${esc(data.verdict||'')}）</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    html+=`男方：${esc((data.male.pillars||{}).year||'')} ${esc((data.male.pillars||{}).month||'')} ${esc((data.male.pillars||{}).day||'')} ${esc((data.male.pillars||{}).hour||'')}（属${esc(data.male.shengxiao||'')}·${esc(data.male.nayin_year||'')}）<br>`;
+    html+=`女方：${esc((data.female.pillars||{}).year||'')} ${esc((data.female.pillars||{}).month||'')} ${esc((data.female.pillars||{}).day||'')} ${esc((data.female.pillars||{}).hour||'')}（属${esc(data.female.shengxiao||'')}·${esc(data.female.nayin_year||'')}）<br>`;
+    (data.dimensions||[]).forEach(d=>{ html+=`${esc(d.name)}：<b style="color:${d.score>=70?'var(--green)':d.score<50?'var(--red)':'var(--gold)'}">${d.score}分</b>（权重${Math.round((d.weight||0)*100)}%）——${esc((d.notes||[]).join('；'))}<br>`; });
+    if((data.advice||[]).length) html+=`<span style="color:var(--jade)">${data.advice.map(a=>esc(a)).join('<br>')}</span><br>`;
+    html+=`<span style="color:var(--paper3);font-size:11px">合婚看趋势不看定数：低分项是经营方向提醒，不是判语。</span>`;
     html+='</div>';
   }else if(tool==='hehun'){
     html=`<h3 style="color:var(--gold);margin-bottom:8px">💑 合婚：${c.male.shengxiao}(${c.male.year}) × ${c.female.shengxiao}(${c.female.year})</h3>`;

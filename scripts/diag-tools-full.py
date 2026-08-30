@@ -59,7 +59,7 @@ for y, sx in SX.items():
 # ═══ 2. 民俗端点功能矩阵（正常参数 + 异常参数）═══
 MINSU = [
   ('GET', '/api/minsu/huangli?year=2026&month=8&day=30', None, '黄历'),
-  ('GET', '/api/minsu/zeri?year=2026&month=9&day=15&matter=结婚', None, '择日'),
+  ('GET', '/api/minsu/zeri?year=2026&month=9&event=%E5%AB%81%E5%A8%B6', None, '择日'),
   ('GET', '/api/minsu/taisui?year=2026', None, '太岁'),
   ('GET', '/api/minsu/jieqi?year=2026&month=8', None, '节气'),
   ('GET', '/api/minsu/holidays?year=2026', None, '假日'),
@@ -103,7 +103,7 @@ REPORTS = [
   ('meihua', dict(B, query='今年事业如何')),
   ('fengshui', dict(B, houseType='住宅', sittingMountain='子', facingMountain='午')),
   ('hehun', {'member1':B,'member2':dict(B,year=1992,month=9,day=3,gender='F')}),
-  ('family', {'members':[{'name':'父','year':1960,'month':3,'day':8},{'name':'母','year':1963,'month':7,'day':22}]}),
+  ('family', {'members':[{'name':'父','year':1960,'month':3,'day':8,'hour':8,'gender':'male'},{'name':'母','year':1963,'month':7,'day':22,'hour':6,'gender':'female'}]}),
   ('lifeplan', dict(B)),
 ]
 for m, body in REPORTS:
