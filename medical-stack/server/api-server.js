@@ -6091,6 +6091,482 @@ app.get('/api/emergency/events', optionalAuth, (req, res) => {
 });
 app.get('/api/prescription/feedback', (_req, res) => res.json({ ok: true, list: [], total: 0, note: 'prescription feedback stub (list)' }));
 
+// ═══ R860 能力补齐：与中医标准智能体（tcm-agent）全量对齐（2026-08-30 内化移植，不训练只适配）═══
+const symptomIdx = require('./kb/symptom-index');
+
+// —— 证型池（移植 R856/R857/R858：直接 → 别名 →「证」后缀双向）——
+let _synPool = null, _synFlatRef = null;
+function getSyndromePool() {
+  if (!_kbFlat) loadKbCache(false);
+  if (_synPool && _synFlatRef === _kbFlat) return _synPool;
+  const pool = new Map();
+  for (const it of _kbFlat) {
+    const t = String(it.title || '');
+    const ct = String(it.content || '');
+    if (it.module === 'tcm-zhongfu') {
+      if (t.length >= 2 && t.length <= 8 && ct.startsWith('【' + t + '】')) {
+        pool.set(t, it);
+      } else if (t.endsWith('证') && t.length >= 2 && t.length <= 8 && ct.includes('【证候表现】')) {
+        if (!pool.has(t)) pool.set(t, it);
+        const k2 = t.slice(0, -1);
+        if (!pool.has(k2)) pool.set(k2, it);
+      }
+    } else if (it.module === 'tcm-misc') {
+      const m = t.match(/^证型"(.+?)"如何辨证/);
+      if (m && m[1].length >= 2 && m[1].length <= 10) pool.set(m[1], it);
+    }
+  }
+  try {
+    const supPath = require('path').join(__dirname, 'kb', 'syndrome-supplement.json');
+    const sup = JSON.parse(require('fs').readFileSync(supPath, 'utf-8'));
+    for (const [t, e] of Object.entries(sup)) {
+      if (!pool.has(t)) pool.set(t, { title: t, content: e.content, module: 'tcm-zhongfu', confidence: e.confidence || 0.42, source: e.source || 'R858蒸馏' });
+    }
+  } catch (e) { /* 补充包缺失不阻断 */ }
+  _synPool = pool; _synFlatRef = _kbFlat;
+  return pool;
+}
+function prettySyndromeContent(it) {
+  return String(it.content || '')
+    .replace(/^Q:[^\n]*\n+A:\s*/, '')
+    .replace(/\n?注：AI辅助参考[^\n]*/g, '')
+    .replace(/^【.+?】\s*/, '')
+    .replace(/(证机概要|临床表现|代表方剂|辨证要点|治法|加减|主症|舌象|脉象)[：:]/g, '\n$1：')
+    .replace(/【(证候表现|证机分析|病因病机)】/g, '\n$1：')
+    .replace(/\n{2,}/g, '\n').trim();
+}
+function lookupSyndrome(title) {
+  const pool = getSyndromePool();
+  return pool.get(title)
+    || (SYNDROME_ALIASES[title] ? pool.get(SYNDROME_ALIASES[title]) : null)
+    || (title.endsWith('证') ? pool.get(title.slice(0, -1)) : pool.get(title + '证'));
+}
+function synGistOf(title) {
+  const it = lookupSyndrome(title);
+  if (!it) return '';
+  const ct = prettySyndromeContent(it);
+  const gj = ct.match(/证机概要：([^\n。]+)/);
+  const lc = ct.match(/(?:临床表现|主症|证候表现)：([^\n。]+)/);
+  const syms = lc ? lc[1].split(/[、，,]/).slice(0, 3).join('、') : '';
+  return (gj ? gj[1] + '：' : '') + syms;
+}
+
+// R860a 词条卡片：证型/药材/方剂/穴位即点即查（鉴别诊断栏同脏腑近证对比）
+app.get('/api/tcm/entry/info', (req, res) => {
+  try {
+    const name = String(req.query.name || '').trim().slice(0, 30);
+    if (!name) return res.status(400).json({ ok: false, error: '缺少 name 参数' });
+    loadKbCache(false);
+    const synPool = getSyndromePool();
+    const synHit = lookupSyndrome(name);
+    if (synHit) {
+      const ORGANS = ['心', '肝', '脾', '肺', '肾', '胃', '胆', '大肠', '小肠', '膀胱'];
+      const organ = ORGANS.find(o => String(synHit.title).includes(o)) || '';
+      const diffs = [];
+      if (organ) {
+        const seen = new Set([synHit.title]);
+        for (const [k, it] of synPool) {
+          if (diffs.length >= 5) break;
+          const tt = String(it.title || '');
+          if (k !== tt || seen.has(tt) || !tt.includes(organ)) continue;
+          seen.add(tt);
+          diffs.push({ name: tt, gist: synGistOf(tt) });
+        }
+      }
+      return res.json({ ok: true, module: 'tcm-syndrome', title: synHit.title,
+        content: prettySyndromeContent(synHit).slice(0, 800),
+        differentials: diffs,
+        confidence: synHit.confidence || null, source: synHit.source || 'tcm-zhongfu' });
+    }
+    const MODS = new Set(['tcm-herb', 'tcm-acupuncture', 'tcm-formula']);
+    const pool = _kbFlat.filter(it => MODS.has(it.module));
+    const stripped = name.replace(/^(炙|炒|煅|煨|酒|醋|盐|姜|蜜|生|熟|制)/, '');
+    const cands = [];
+    for (const it of pool) {
+      const t = String(it.title || '');
+      let rank = 0;
+      if (t === name) rank = 4;
+      else if (stripped !== name && t === stripped) rank = 3;
+      else if (t.includes(name)) rank = 2;
+      else if (String(it.content || '').includes(name)) rank = 1;
+      if (rank) cands.push({ rank, it });
+    }
+    cands.sort((a, b) => b.rank - a.rank || String(a.it.title).length - String(b.it.title).length);
+    const top = cands[0];
+    if (!top || (top.rank === 1 && name.length < 2)) {
+      return res.json({ ok: false, error: '未找到条目: ' + name });
+    }
+    res.json({ ok: true, module: top.it.module, title: top.it.title,
+      content: String(top.it.content || '').slice(0, 800),
+      confidence: top.it.confidence || null, source: top.it.source || '' });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// R860b 条目名清单（病历文本 linkify 用）：药材+方剂+证型正名一次下发
+let _entryNames = null;
+app.get('/api/tcm/entry/names', (req, res) => {
+  try {
+    loadKbCache(false);
+    if (!_entryNames) {
+      _entryNames = _kbFlat
+        .filter(it => it.module === 'tcm-herb' || it.module === 'tcm-formula')
+        .map(it => String(it.title || ''))
+        .filter(t => t.length >= 2 && t.length <= 8);
+      _entryNames = [...new Set([..._entryNames, ...getSyndromePool().keys()])];
+    }
+    res.json({ ok: true, count: _entryNames.length, names: _entryNames });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// R860c 症状→候选方召回（症状反向索引，R825 移植）
+app.get('/api/tcm/kb/formula-recall', (req, res) => {
+  try {
+    const _t0 = Date.now();
+    const q = String(req.query.q || '').trim().slice(0, 120);
+    const limit = Math.min(parseInt(req.query.limit, 10) || 8, 20);
+    if (!q) return res.status(400).json({ ok: false, error: '缺少 q 参数' });
+    const exclude = String(req.query.exclude || '').split(/[,，、]/).map(s => s.trim()).filter(Boolean);
+    const recall = symptomIdx.formulaRecall(q, limit, exclude.length ? exclude : null);
+    res.json({ ok: true, query: q, canon: recall.canon, excluded: exclude, formulas: recall.formulas, took_ms: Date.now() - _t0 });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: '候选方召回失败: ' + e.message });
+  }
+});
+
+// R860d 症状→方排除事件落库（高频排除=标签噪声信号，供周检复核）
+const RECALL_EXCLUSIONS_PATH = require('path').join(__dirname, '..', 'data', 'recall-exclusions.jsonl');
+app.post('/api/tcm/kb/recall-exclude', (req, res) => {
+  try {
+    const b = req.body || {};
+    const canon = String(b.canon || '').trim().slice(0, 20);
+    if (!canon) return res.status(400).json({ ok: false, error: '缺少 canon' });
+    const row = {
+      ts: new Date().toISOString(),
+      canon,
+      q: String(b.q || '').slice(0, 120),
+      top: (Array.isArray(b.top) ? b.top : []).slice(0, 3).map(s => String(s).slice(0, 20)),
+      doctor_id: String(b.doctor_id || 'D001').slice(0, 20),
+      src: String(b.src || 'symptom-panel').slice(0, 20),
+    };
+    require('fs').mkdirSync(require('path').dirname(RECALL_EXCLUSIONS_PATH), { recursive: true });
+    require('fs').appendFileSync(RECALL_EXCLUSIONS_PATH, JSON.stringify(row) + '\n');
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: '排除事件记录失败: ' + e.message });
+  }
+});
+
+// R860e 服药依从（家庭端回传 → 时间线/依从率）
+const ADHERENCE_FILE = path.join(__dirname, '..', 'data', 'med-adherence.json');
+function loadAdherence() {
+  try {
+    if (fs.existsSync(ADHERENCE_FILE)) {
+      const a = JSON.parse(fs.readFileSync(ADHERENCE_FILE, 'utf8') || '[]');
+      return Array.isArray(a) ? a : [];
+    }
+  } catch (e) { /* 损坏即空 */ }
+  return [];
+}
+function saveAdherence(list) {
+  try { fs.writeFileSync(ADHERENCE_FILE, JSON.stringify(list.slice(-5000), null, 1)); } catch (e) { /* 写盘失败不阻断 */ }
+}
+app.post('/api/home/med-adherence', optionalAuth, (req, res) => {
+  try {
+    const b = req.body || {};
+    const pid = String(b.patient_id || '').trim().slice(0, 40);
+    const drug = String(b.drug || '').trim().slice(0, 30);
+    const status = b.status === 'missed' ? 'missed' : 'taken';
+    if (!pid || !drug) return res.status(400).json({ ok: false, error: 'patient_id 与 drug 必填' });
+    const list = loadAdherence();
+    const rec = {
+      id: 'adh-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      patient_id: pid, drug, status,
+      dose: String(b.dose || '').slice(0, 20),
+      scheduled_time: String(b.time || '').slice(0, 10),
+      source: 'family-app',
+      ts: new Date().toISOString()
+    };
+    list.push(rec);
+    saveAdherence(list);
+    res.json({ ok: true, id: rec.id });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+app.get('/api/home/med-adherence', optionalAuth, (req, res) => {
+  try {
+    const pid = String(req.query.patient_id || '').trim().slice(0, 40);
+    const list = loadAdherence().filter(r => !pid || r.patient_id === pid);
+    res.json({ ok: true, records: list.slice(-200) });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// R860f 家庭账号绑定（登录账号 ↔ 就诊人；家庭端只见自家人，隐私合规必需件）
+const FAMILY_BIND_FILE = path.join(__dirname, '..', 'data', 'family-bindings.json');
+function loadFamilyBinds() {
+  try {
+    if (fs.existsSync(FAMILY_BIND_FILE)) {
+      const a = JSON.parse(fs.readFileSync(FAMILY_BIND_FILE, 'utf8') || '[]');
+      return Array.isArray(a) ? a : [];
+    }
+  } catch (e) { /* 损坏即空 */ }
+  return [];
+}
+function saveFamilyBinds(list) {
+  try { fs.writeFileSync(FAMILY_BIND_FILE, JSON.stringify(list, null, 1)); } catch (e) { /* 写盘失败不阻断 */ }
+}
+const FAMILY_RELATIONS = ['本人', '父母', '配偶', '子女', '兄弟姐妹', '其他'];
+app.get('/api/family/members', requireAuth, (req, res) => {
+  try {
+    const binds = loadFamilyBinds().filter(b => b.account === req.user.username);
+    const seeds = getPatients();
+    const members = binds.map(b => {
+      let info = null;
+      try { if (patientIndex) info = patientIndex.getPatient(b.patient_id); } catch (e) {}
+      const seed = !info ? seeds.find(p => p.patient_id === b.patient_id) : null;
+      return {
+        patient_id: b.patient_id,
+        relation: b.relation,
+        name: info ? (info.name_masked || '患者') : (seed ? String(seed.name || '患者') : '患者'),
+        age: info && info.birth_year ? (new Date().getFullYear() - info.birth_year) : (seed && seed.age ? seed.age : null),
+        bound_at: b.created_at
+      };
+    });
+    res.json({ ok: true, members });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+app.post('/api/family/bind', requireAuth, (req, res) => {
+  try {
+    const pid = String((req.body || {}).patient_id || '').trim().slice(0, 40);
+    let relation = String((req.body || {}).relation || '其他').slice(0, 8);
+    if (!FAMILY_RELATIONS.includes(relation)) relation = '其他';
+    if (!pid) return res.status(400).json({ ok: false, error: 'patient_id 必填' });
+    const inEmpi = patientIndex ? !!patientIndex.getPatient(pid) : false;
+    const inSeed = !inEmpi && getPatients().some(p => p.patient_id === pid);
+    if (!inEmpi && !inSeed) return res.status(404).json({ ok: false, error: '未找到该就诊人建档记录' });
+    const binds = loadFamilyBinds();
+    if (binds.some(b => b.account === req.user.username && b.patient_id === pid)) {
+      return res.json({ ok: true, duplicated: true, patient_id: pid });
+    }
+    binds.push({
+      id: 'fb-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      account: req.user.username, patient_id: pid, relation,
+      created_at: new Date().toISOString()
+    });
+    saveFamilyBinds(binds);
+    res.json({ ok: true, patient_id: pid });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+app.post('/api/family/unbind', requireAuth, (req, res) => {
+  try {
+    const pid = String((req.body || {}).patient_id || '').trim().slice(0, 40);
+    const binds = loadFamilyBinds();
+    const next = binds.filter(b => !(b.account === req.user.username && b.patient_id === pid));
+    saveFamilyBinds(next);
+    res.json({ ok: true, removed: binds.length - next.length });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// R860g 随访派发（AI 外呼/短信/5G消息；通道未配置→诚实返回，不外发不伪造）
+const CARRIER_CFG_FILE = path.join(__dirname, '..', 'data', 'carrier-config.json');
+const DISPATCH_FILE = path.join(__dirname, '..', 'data', 'followup-dispatches.json');
+function loadCarrierCfg() {
+  try { if (fs.existsSync(CARRIER_CFG_FILE)) return JSON.parse(fs.readFileSync(CARRIER_CFG_FILE, 'utf8') || '{}'); } catch (e) {}
+  return {};
+}
+function loadDispatches() {
+  try { if (fs.existsSync(DISPATCH_FILE)) return JSON.parse(fs.readFileSync(DISPATCH_FILE, 'utf8') || '[]'); } catch (e) {}
+  return [];
+}
+function loadFollowupList() {
+  const F = path.join(__dirname, '..', 'data', 'followups.json');
+  try { if (fs.existsSync(F)) return JSON.parse(fs.readFileSync(F, 'utf8') || '[]'); } catch (e) {}
+  return [];
+}
+// AI 外呼/短信脚本：合规开场（AI 身份告知+退出机制）→ 个性化关怀 → 结构化采集
+function buildCallScript(fu, channel) {
+  const name = fu.patient_name || '您';
+  const syn = String(fu.syndrome || '');
+  const fx = String(fu.formula || '');
+  const fxNote = fx && FU_FORMULA_NOTES.find(([re]) => re.test(fx));
+  const synCare = syn && FU_SYNDROME_CARE.find(([re]) => re.test(syn));
+  const s = {
+    opening: `您好，请问是${name}吗？我是中医馆的 AI 随访助手（智能语音，非真人）。本次随访约 1 分钟，您可随时说"挂断"结束。`,
+    care: `您上次就诊辨证为${syn || '调理中'}${fx ? '，服用' + fx : ''}。${fxNote ? fxNote[1] : '请按医嘱服药。'}`,
+    questions: [
+      '第一问：' + (synCare ? synCare[1].replace('？', '？请用 0 到 10 分描述症状程度，0 为完全好。') : '目前症状用 0 到 10 分评价，0 为完全好，10 为最严重？'),
+      '第二问：服药后有没有胃不舒服、腹泻、皮疹等不良反应？有或没有？',
+      '第三问：药是否按时按量服完了？'
+    ],
+    closing: '感谢您的配合。如出现高热不退、胸闷心慌、严重皮疹等情况，请立即就医或拨打 120。祝您早日康复。',
+    keypad_map: { score_0_10: '症状评分', adverse_yes_no: '不良反应', adherence_yes_no: '服药依从' }
+  };
+  if (channel === 'sms' || channel === 'rcs5g') {
+    return { text: `【中医馆随访】${name}：${s.care}${synCare ? synCare[1] : '目前恢复如何？'}如有不适请回复或致电医馆。（AI 随访，退订回 T）`, script: null };
+  }
+  return { text: null, script: s };
+}
+app.post('/api/followup/dispatch', optionalAuth, async (req, res) => {
+  try {
+    const { id, channel } = req.body || {};
+    if (!id) return res.status(400).json({ ok: false, error: 'id 必填' });
+    if (!['manual', 'sms', 'voice', 'rcs5g'].includes(channel)) return res.status(400).json({ ok: false, error: 'channel 须为 manual/sms/voice/rcs5g' });
+    const fu = loadFollowupList().find(f => f.id === id);
+    if (!fu) return res.status(404).json({ ok: false, error: '随访不存在' });
+    const payload = buildCallScript(fu, channel);
+    const rec = {
+      id: 'FD' + Date.now().toString(36).toUpperCase(),
+      fu_id: id, patient_name: fu.patient_name, channel,
+      payload, status: 'pending', created_at: new Date().toISOString()
+    };
+    const cfg = loadCarrierCfg();
+    if (channel === 'manual') {
+      rec.status = 'logged';
+      rec.note = '站内记录（医生确认发送）';
+    } else if (!cfg[channel] || !cfg[channel].enabled) {
+      rec.status = 'channel_unconfigured';
+      rec.note = `通道 ${channel} 未配置运营商凭证，未外发。请在 data/carrier-config.json 配置后重试。`;
+    } else {
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 8000);
+        const resp = await fetch(cfg[channel].endpoint, {
+          method: 'POST', signal: ctrl.signal,
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg[channel].appkey },
+          body: JSON.stringify({ payload, callback: cfg.callback_url || null })
+        });
+        clearTimeout(timer);
+        rec.status = resp.ok ? 'dispatched' : 'provider_error';
+        rec.provider_code = resp.status;
+        if (!resp.ok) rec.note = '运营商返回 ' + resp.status;
+      } catch (e) {
+        rec.status = 'provider_unreachable';
+        rec.note = String(e.message || e).slice(0, 120);
+      }
+    }
+    const list = loadDispatches();
+    list.unshift(rec);
+    fs.writeFileSync(DISPATCH_FILE, JSON.stringify(list.slice(0, 300), null, 2));
+    res.json({ ok: true, dispatch: rec });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+// 运营商回执：转写+结构化答案 → 自动回填随访完成态
+app.post('/api/followup/callback', (req, res) => {
+  try {
+    const { dispatch_id, call_status, duration_s, transcript, answers } = req.body || {};
+    if (!dispatch_id) return res.status(400).json({ ok: false, error: 'dispatch_id 必填' });
+    const list = loadDispatches();
+    const rec = list.find(d => d.id === dispatch_id);
+    if (!rec) return res.status(404).json({ ok: false, error: '派发记录不存在' });
+    rec.call_status = String(call_status || 'answered').slice(0, 20);
+    rec.duration_s = Math.min(parseInt(duration_s, 10) || 0, 3600);
+    rec.transcript = String(transcript || '').slice(0, 1000);
+    rec.answers = answers || {};
+    rec.status = rec.call_status === 'answered' ? 'answered' : 'failed';
+    rec.callback_at = new Date().toISOString();
+    fs.writeFileSync(DISPATCH_FILE, JSON.stringify(list, null, 2));
+    let fuUpdated = false;
+    if (rec.call_status === 'answered') {
+      const FOLLOWUP_FILE = path.join(__dirname, '..', 'data', 'followups.json');
+      const fus = loadFollowupList();
+      const fu = fus.find(f => f.id === rec.fu_id);
+      if (fu && fu.status !== 'completed') {
+        const score = answers && answers.score != null ? Math.min(Math.max(parseInt(answers.score, 10) || 0, 0), 10) : null;
+        fu.status = 'completed';
+        fu.completed_at = new Date().toISOString();
+        if (score != null) fu.symptom_score = score;
+        const adverse = answers && /^(是|有|yes)/i.test(String(answers.adverse || ''));
+        fu.feedback = `AI${rec.channel === 'voice' ? '语音' : '短信'}随访(${rec.duration_s}s)：${adverse ? '⚠️报告不良反应，需医生介入' : '无不良反应'}${score != null ? '，症状评分 ' + score + '/10' : ''}`;
+        if (adverse) fu.needs_review = true;
+        fu.dispatch_id = rec.id;
+        fs.writeFileSync(FOLLOWUP_FILE, JSON.stringify(fus, null, 2));
+        fuUpdated = true;
+      }
+    }
+    res.json({ ok: true, dispatch: rec, followup_updated: fuUpdated });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+// 派发台账 + 通道状态
+app.get('/api/followup/dispatches', optionalAuth, (req, res) => {
+  try {
+    const list = loadDispatches();
+    const cfg = loadCarrierCfg();
+    const channels = ['sms', 'voice', 'rcs5g'].map(c => ({ channel: c, configured: !!(cfg[c] && cfg[c].enabled), provider: (cfg[c] && cfg[c].provider) || null }));
+    res.json({
+      ok: true, total: list.length, channels,
+      stats: {
+        dispatched: list.filter(d => d.status === 'dispatched').length,
+        answered: list.filter(d => d.status === 'answered').length,
+        unconfigured: list.filter(d => d.status === 'channel_unconfigured').length
+      },
+      list: list.slice(0, 50)
+    });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// R860h 患者全景时间线：就诊(处方)+随访(症状评分)+评价+服药依从 跨源聚合，恢复曲线
+app.get('/api/patient/timeline', optionalAuth, (req, res) => {
+  try {
+    const name = String(req.query.name || '').slice(0, 20);
+    const pidRaw = String(req.query.patient_id || '').slice(0, 40);
+    if (!name && !pidRaw) return res.status(400).json({ ok: false, error: 'patient_id 或 name 必填其一' });
+    const pid = patientIndex ? patientIndex.resolvePatientId(pidRaw || null, name || null) : (pidRaw || name);
+    const visits = rxAllRecords()
+      .filter(r => r.patient_id === pid)
+      .map(r => ({
+        time: r.created_at, type: 'visit',
+        syndrome: typeof r.diagnosis === 'string' ? r.diagnosis : ((r.diagnosis && (r.diagnosis.syndrome || r.diagnosis.pattern)) || ''),
+        formula: r.formula || '',
+        herbs: (r.herbs || []).map(h => h.name).slice(0, 12),
+        doses: r.doses || 0, amount: r.price || 0,
+        status: r.status, paid: r.payment_status === 'paid', doctor_id: r.doctor_id || null
+      }))
+      .sort((a, b) => String(a.time).localeCompare(String(b.time)));
+    const fus = loadFollowupList()
+      .filter(f => f.patient_id === pid || (name && f.patient_name === name))
+      .map(f => ({
+        time: f.completed_at || f.due_at, type: 'followup', status: f.status,
+        syndrome: f.syndrome || '', formula: f.formula || '',
+        score: typeof f.symptom_score === 'number' ? f.symptom_score : null,
+        feedback: f.feedback || '', needs_review: !!f.needs_review,
+        channel: f.dispatch_id ? 'carrier' : 'manual'
+      }))
+      .sort((a, b) => String(a.time).localeCompare(String(b.time)));
+    let reviews = [];
+    try { reviews = loadReviews().filter(v => v.patient_id === pid || (name && v.patient_name === name)).map(v => ({ time: v.created_at, type: 'review', rating: v.rating, comment: String(v.comment || '').slice(0, 60), doctor_id: v.doctor_id })); } catch (e) {}
+    let adherence = [];
+    try {
+      adherence = loadAdherence().filter(a => a.patient_id === pid)
+        .map(a => ({ time: a.ts, type: 'adherence', drug: a.drug, status: a.status, scheduled_time: a.scheduled_time }));
+    } catch (e) {}
+    const cut30 = Date.now() - 30 * 86400000;
+    const adh30 = adherence.filter(a => new Date(a.time).getTime() >= cut30);
+    const takenN = adh30.filter(a => a.status === 'taken').length;
+    const missedN = adh30.length - takenN;
+    const recovery = fus.filter(f => f.status === 'completed' && f.score != null)
+      .map(f => ({ date: String(f.time).slice(0, 10), score: f.score }));
+    const trend = recovery.length >= 2
+      ? (recovery[recovery.length - 1].score < recovery[0].score ? 'improving' : recovery[recovery.length - 1].score > recovery[0].score ? 'worsening' : 'stable')
+      : null;
+    const timeline = visits.concat(fus, reviews, adherence).sort((a, b) => String(b.time).localeCompare(String(a.time)));
+    res.json({
+      ok: true, patient_id: pid,
+      patient_name: patientIndex ? patientIndex.maskName(name || '') : name,
+      summary: {
+        visits: visits.length,
+        syndromes: [...new Set(visits.map(v => v.syndrome).filter(Boolean))],
+        formulas: [...new Set(visits.map(v => v.formula).filter(Boolean))],
+        followups_completed: fus.filter(f => f.status === 'completed').length,
+        latest_score: recovery.length ? recovery[recovery.length - 1].score : null,
+        trend,
+        adherence_30d: adh30.length ? { taken: takenN, missed: missedN, rate: +(takenN / adh30.length).toFixed(2) } : null
+      },
+      recovery, timeline: timeline.slice(0, 80)
+    });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+
 app.listen(PORT, "127.0.0.1", () => {
   console.warn(`🏥 命理宝鉴·医道 API 启动：http://localhost:${PORT}`);
   console.warn(`   端点: /api/tcm/{health,tongue,inquiry,diagnose,formula/search,acupoint/search,cases,eye-analyze,hand-analyze,wearable-ingest,collect-start,multi-modal-diagnose}`);
