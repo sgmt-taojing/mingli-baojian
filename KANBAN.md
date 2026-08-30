@@ -1,4 +1,8 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 21:00 — UI 回归脚本固化（scripts/ui-smoke-consultation.js）
+- puppeteer-core + 系统 Chrome 无头，五节点：开页→采集卡排盘出草案（含批注台回填断言）→归档回执+报告链接→SLA计时条→合并报告 mingli 落库断言
+- 两连跑 PASS（病历号 #24/#25），证据 JSON+报告页截图自动落 DELIVERY；退出码 0/1 可接 CI 或 cron
+- 以后每改问诊台/报告页，一条命令回归：`node scripts/ui-smoke-consultation.js`
 ## 2026-08-30 20:40 — UI 级端到端验收 PASS（真实点击路径）
 - 路径：采集卡填生辰点「排盘·AI命理」（草案 9 卡）→ setEmr 填四诊/辨证/处方 → 点「归档」（病历号 #23，回执带「查看合并报告」链接）→ 直达 report.html
 - 关键验证：**真实 UI 路径下 mingli 草案完整入病历**——报告页命理合参段含全部白话草案（日主丁火/五行账本/十神/神煞/大运），并带「待命理师核对」标识与免责声明
