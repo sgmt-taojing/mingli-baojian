@@ -1221,7 +1221,31 @@ function adoptMingli(el){
   const t = decodeURIComponent(el.dataset.t || '');
   const box = $('reviewNotes');
   box.value = (box.value ? box.value + '\n\n' : '') + '【命理批注】' + t;
+  registerMingliAnn(t);
   toast('批注已写入审核意见，请审改后提交');
+}
+// R-ANN-LINK: 采纳即入 8974 批注核对队列（emr_id=会话ID，作者=AI命理引擎，核对人须为命理师——双人复核）
+async function registerMingliAnn(content){
+  if (App.mingliAnnId || !content) return; // 幂等：一次会话一条
+  try {
+    const r = await fetch('http://127.0.0.1:8974/api/emr/' + encodeURIComponent(App.sessionId) + '/annotate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(6000),
+      body: JSON.stringify({ type: 'ai', author: 'AI命理引擎', content: String(content).slice(0, 4000) })
+    }).then(r => r.json());
+    if (r.ok) { App.mingliAnnId = r.annotation.id; loadSlaQueue(); }
+  } catch(_) { toast('批注旁路（8974）不可达：批注仅保留在审核意见中'); }
+}
+// R-ANN-LINK: 命理师审核通过 → 批注层 approve（作者 AI ≠ 核对人命理师，SLA 计时终止、水印解除）
+async function approveMingliAnn(){
+  if (!App.mingliAnnId) return;
+  try {
+    const r = await fetch('http://127.0.0.1:8974/api/annotations/' + App.mingliAnnId + '/approve', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(6000),
+      body: JSON.stringify({ reviewer: '命理师·问诊台' })
+    }).then(r => r.json());
+    if (r.ok) { toast('命理批注已核对签发（水印解除）'); loadSlaQueue(); }
+    else toast('批注核对未通过：' + (r.error || '未知'));
+  } catch(_) {}
 }
 
 /* ═══ 审核 ═══ */
@@ -1252,6 +1276,8 @@ function setReviewStatus(status, notes){
   saveEmr();
   // R-REG: 已归档病历须幂等回写审核状态到 medical_cases（此前仅写会话快照，审核不落库）
   if (App.caseId) archiveEmr();
+  // R-ANN-LINK: 命理师通过时同步批注层 approve（SLA 终止 + 水印解除）；驳回不触碰批注（待修订）
+  if (App.role === 'master' && status === 'approved') approveMingliAnn();
   toast(`审核${status === 'approved' ? '通过' : status === 'rejected' ? '驳回' : '待审'}已记录`);
 }
 
