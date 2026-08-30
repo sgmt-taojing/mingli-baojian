@@ -87,6 +87,15 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <a href="ask.html" style="color:var(--gold);font-weight:600;font-size:13px;text-decoration:none">问事服务中心 →</a>
   <div style="font-size:10px;color:var(--paper3);margin-top:4px">本页保留为「速查版」：点卡即查，适合熟手</div>
 </div>
+<div style="max-width:900px;margin:0 auto 16px;padding:10px 16px;border:1px solid var(--border);border-radius:10px;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap">
+  <span style="font-size:12px;color:var(--paper2)">👤 我的生辰（个人化 · 选填）：</span>
+  <input id="mbY" type="number" placeholder="年" style="width:74px;padding:6px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">
+  <input id="mbM" type="number" placeholder="月" min="1" max="12" style="width:56px;padding:6px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">
+  <input id="mbD" type="number" placeholder="日" min="1" max="31" style="width:56px;padding:6px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">
+  <button onclick="saveMyBirth()" style="padding:6px 14px;background:var(--card);color:var(--gold);border:1px solid var(--gold);border-radius:6px;cursor:pointer;font-size:12px">记住</button>
+  <button onclick="clearMyBirth()" style="padding:6px 10px;background:none;color:var(--paper3);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">清除</button>
+  <span id="mbHint" style="font-size:10px;color:var(--paper3)">填上后，黄历/择日/太岁会按你的生肖日支给出「与我何干」</span>
+</div>
 <div class="ms-group-head"><span class="ms-group-badge">时 · 时光选择</span><span class="ms-group-desc">看日子 · 择吉时 · 知节气</span></div>
 <div class="ms-grid"><a class="ms-card ms-huangli" href="javascript:void(0)" onclick="showTool('huangli')">
     <span class="ms-icon">历</span>
@@ -227,6 +236,17 @@ function renderBaihua(b){
   h+='</div>';
   return h;
 }
+/* R-PERSONAL：我的生辰（localStorage 记忆） */
+function saveMyBirth(){ const y=+document.getElementById('mbY').value, m=+document.getElementById('mbM').value||null, d=+document.getElementById('mbD').value||null;
+  if(!y||y<1900||y>2100){document.getElementById('mbHint').textContent='年份填 4 位（如 1990）';return;}
+  localStorage.setItem('ms-birth', JSON.stringify({y,m,d}));
+  document.getElementById('mbHint').textContent='已记住——黄历/择日/太岁现在按你的生肖日支个人化'; }
+function clearMyBirth(){ localStorage.removeItem('ms-birth'); ['mbY','mbM','mbD'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('mbHint').textContent='已清除，恢复通书版'; }
+(function initMyBirth(){ try{ const mb=JSON.parse(localStorage.getItem('ms-birth')||'null'); if(mb&&mb.y){ document.getElementById('mbY').value=mb.y; if(mb.m)document.getElementById('mbM').value=mb.m; if(mb.d)document.getElementById('mbD').value=mb.d;
+  document.getElementById('mbHint').textContent='已启用个人化（'+mb.y+'年'+(mb.m?mb.m+'月':'')+(mb.d?mb.d+'日':'')+'生）'; } }catch(_){}
+})();
+
 async function showTool(tool){
   const result=document.getElementById('ms-result');
   result.style.display='block';
@@ -235,9 +255,11 @@ async function showTool(tool){
   const API=(location.protocol==='file:'||location.port==='8900')?'http://127.0.0.1:8920':'';
   let url='',html='',postBody=null;
   const nowD=new Date(), CY=nowD.getFullYear(), CM=nowD.getMonth()+1;
+  // R-PERSONAL：我的生辰（localStorage），个人化工具自动附带
+  let _bp=''; try{const mb=JSON.parse(localStorage.getItem('ms-birth')||'null'); if(mb&&mb.y) _bp=`&birthYear=${mb.y}`+(mb.m?`&birthMonth=${mb.m}`:'')+(mb.d?`&birthDay=${mb.d}`:'');}catch(_){}
   // ── 免输入工具：直接出结果（当前年/日）──
-  if(tool==='huangli') url=`/api/minsu/huangli?year=${CY}&month=${CM}&day=${nowD.getDate()}`;
-  else if(tool==='taisui') url=`/api/minsu/taisui?year=${CY}`;
+  if(tool==='huangli') url=`/api/minsu/huangli?year=${CY}&month=${CM}&day=${nowD.getDate()}${_bp}`;
+  else if(tool==='taisui') url=`/api/minsu/taisui?year=${CY}${_bp}`;
   else if(tool==='jieqi') url=`/api/minsu/jieqi?year=${CY}`;
   else if(tool==='holidays') url=`/api/minsu/holidays?year=${CY}`;
   else {
@@ -275,7 +297,7 @@ function runTool(tool){
   const v=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
   const result=document.getElementById('ms-result');
   let url='',postBody=null;
-  if(tool==='zeri'){ url=`/api/minsu/zeri?year=${v('f2')||new Date().getFullYear()}&month=${v('f3')||(new Date().getMonth()+1)}&event=${encodeURIComponent(v('f1')||'嫁娶')}`; }
+  if(tool==='zeri'){ let _bp=''; try{const mb=JSON.parse(localStorage.getItem('ms-birth')||'null'); if(mb&&mb.y) _bp=`&birthYear=${mb.y}`+(mb.m?`&birthMonth=${mb.m}`:'')+(mb.d?`&birthDay=${mb.d}`:'');}catch(_){} url=`/api/minsu/zeri?year=${v('f2')||new Date().getFullYear()}&month=${v('f3')||(new Date().getMonth()+1)}&event=${encodeURIComponent(v('f1')||'嫁娶')}${_bp}`; }
   else if(tool==='mobile'){ const n=v('f1'); if(n.replace(/\D/g,'').length<7){result.innerHTML='<div style="color:#ef4444;padding:10px">手机号至少 7 位数字哦。</div>';return;} url=`/api/minsu/mobile?number=${encodeURIComponent(n)}`; }
   else if(tool==='plate'){ const n=v('f1'); if(n.replace(/\D/g,'').length<3){result.innerHTML='<div style="color:#ef4444;padding:10px">车牌数字部分至少 3 位（如 粤A6688）。</div>';return;} url=`/api/minsu/plate?number=${encodeURIComponent(n)}`; }
   else if(tool==='xingming'){ const n=v('f1'); if(n.length<2||n.length>4){result.innerHTML='<div style="color:#ef4444;padding:10px">姓名填 2-4 个字（连名带姓）。</div>';return;} url=`/api/minsu/xingming?name=${encodeURIComponent(n)}`; }
@@ -331,7 +353,8 @@ async function execTool(tool, url, postBody){
     html+=`<div style="font-size:12px;line-height:1.8">共${c.count}个吉日（建除：${c.goodJianchu}）<br>`;
     for(const g of c.goodDays.slice(0,8)){
       const hd=g.huangdao?'<span style="color:var(--gold)">黄道</span>':'<span style="color:var(--paper3)">黑道</span>';
-      html+=`${g.day}日 ${g.ganZhi} ${g.jianchu} ${g.zhishen}${hd} ${g.chongsha}<br>`;
+      const pm=g.personal==='avoid'?` <span style="color:var(--red)">✗ ${esc(g.personalNote||'慎选')}</span>`:(g.personal==='best'?` <span style="color:var(--jade)">★ ${esc(g.personalNote||'上选')}</span>`:'');
+      html+=`${g.day}日 ${g.ganZhi} ${g.jianchu} ${g.zhishen}${hd} ${g.chongsha}${pm}<br>`;
     }
     html+='</div>';
   }else if(tool==='taisui'){

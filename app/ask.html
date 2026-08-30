@@ -112,6 +112,25 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
         <button class="ibtn" id="photoBtn" title="拍照辅助（面相等，可选）">📷</button>
         <input type="file" id="photoFile" accept="image/*" capture="user" class="hidden">
       </div>
+      <!-- R-H5: 传统起卦入口（选填）：六爻摇卦 / 梅花报数；不用则按当下时间起局 -->
+      <div id="castRow" class="hidden" style="margin-top:8px">
+        <div id="yaoRow" class="hidden" style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:11px;color:var(--muted)">摇卦（选填，自下而上六爻）：</span>
+          <select class="yaoSel" style="width:64px"><option value="">初爻</option><option value="6">6 老阴</option><option value="7">7 少阳</option><option value="8">8 少阴</option><option value="9">9 老阳</option></select>
+          <select class="yaoSel" style="width:64px"><option value="">二爻</option><option value="6">6 老阴</option><option value="7">7 少阳</option><option value="8">8 少阴</option><option value="9">9 老阳</option></select>
+          <select class="yaoSel" style="width:64px"><option value="">三爻</option><option value="6">6 老阴</option><option value="7">7 少阳</option><option value="8">8 少阴</option><option value="9">9 老阳</option></select>
+          <select class="yaoSel" style="width:64px"><option value="">四爻</option><option value="6">6 老阴</option><option value="7">7 少阳</option><option value="8">8 少阴</option><option value="9">9 老阳</option></select>
+          <select class="yaoSel" style="width:64px"><option value="">五爻</option><option value="6">6 老阴</option><option value="7">7 少阳</option><option value="8">8 少阴</option><option value="9">9 老阳</option></select>
+          <select class="yaoSel" style="width:64px"><option value="">上爻</option><option value="6">6 老阴</option><option value="7">7 少阳</option><option value="8">8 少阴</option><option value="9">9 老阳</option></select>
+          <button id="autoShake" type="button" style="padding:4px 10px;font-size:11px;background:var(--card);color:var(--gold);border:1px solid var(--gold);border-radius:6px;cursor:pointer">代摇</button>
+        </div>
+        <div id="numRow" class="hidden" style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--muted)">报数起卦（选填，心中默想三个数）：</span>
+          <input type="number" id="num1" placeholder="数1" style="width:64px">
+          <input type="number" id="num2" placeholder="数2" style="width:64px">
+          <input type="number" id="num3" placeholder="数3(动爻)" style="width:84px">
+        </div>
+      </div>
       <button class="btn" id="questionNext">下一步</button>
     </div>
     <div id="askBirth" class="hidden">
@@ -123,6 +142,7 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
       <div class="row" id="calendarRow">
         <button class="chip sel" data-cal="solar">阳历</button>
         <button class="chip" data-cal="lunar">农历</button>
+        <label id="leapRow" class="hidden" style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px"><input type="checkbox" id="bLeap"> 是闰月</label>
       </div>
       <div class="row">
         <select id="bHour" style="flex:1">
@@ -142,6 +162,7 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
         <button class="chip" data-face="卯">坐东朝西</button><button class="chip" data-face="酉">坐西朝东</button>
         <button class="chip" data-face="艮">坐东北朝西南</button><button class="chip" data-face="坤">坐西南朝东北</button>
         <button class="chip" data-face="巽">坐东南朝西北</button><button class="chip" data-face="乾">坐西北朝东南</button>
+        <input type="number" id="buildYear" placeholder="建造/入住年(选填) 如2008" min="1900" max="2100" style="width:180px" title="三元九运：提供建造或入住年份，宅运盘才排得准">
       </div>
       <div class="row hidden" id="partnerRow">
         <input type="number" id="pYear" placeholder="对方出生年 如1992" style="width:110px">
@@ -157,6 +178,9 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
       </div>
       <div class="row hidden" id="textRow">
         <input type="text" id="textInput" placeholder="" style="flex:1">
+      </div>
+      <div class="row hidden" id="avoidRow">
+        <input type="text" id="avoidInput" placeholder="避讳字（选填）：家里长辈名中的字、不想用的字，如 军 兰" style="flex:1">
       </div>
       <button class="btn" id="birthNext">开始解读</button>
       <button class="btn2" id="skipBirth">跳过出生信息（以当下时间起盘）</button>
@@ -214,7 +238,7 @@ const TOOLS = [
 ];
 const FACING_MAP = { '子':['子','午'],'午':['午','子'],'卯':['卯','酉'],'酉':['酉','卯'],'艮':['丑','未'],'坤':['未','丑'],'巽':['辰','戌'],'乾':['戌','辰'] };
 
-const state = { tool:null, question:'', photoNote:'', cal:'solar', sex:'male', facing:null };
+const state = { tool:null, question:'', photoNote:'', cal:'solar', sex:'male', facing:null, leap:false, hourUnknown:false, _zwWarned:false };
 const $ = id => document.getElementById(id);
 
 /* ─── 第一步：工具网格（服务中心分组渲染） ─── */
@@ -262,6 +286,12 @@ function selectTool(id, el) {
   bot(`好，用「${state.tool.nm}」为您看。${noQuestion ? '' : '先说说您想问什么事？'}`);
   if (noQuestion) { askBirthIfNeeded(); }
   else { $('askInput').classList.remove('hidden'); $('questionText').focus(); }
+  // R-H5: 传统起卦入口可见性
+  const cr = $('castRow'), yr = $('yaoRow'), nr = $('numRow');
+  if (cr) cr.classList.toggle('hidden', !(id === 'liuyao' || id === 'meihua'));
+  if (yr) yr.classList.toggle('hidden', id !== 'liuyao');
+  if (nr) nr.classList.toggle('hidden', id !== 'meihua');
+  state.coins = null; state.nums = null;
   $('step2').scrollIntoView({ behavior:'smooth' });
 }
 
@@ -273,6 +303,23 @@ function scrollChat(){ const c=$('chat'); c.lastElementChild && c.lastElementChi
 $('questionNext').onclick = () => {
   const q = $('questionText').value.trim();
   if (!q) { $('questionText').classList.add('shake'); setTimeout(()=>$('questionText').classList.remove('shake'),400); return; }
+  // R-H5: 摇卦/报数（选了就必须完整，否则按时间起局）
+  if (state.tool && state.tool.id === 'liuyao') {
+    const vals = [...document.querySelectorAll('.yaoSel')].map(x => x.value);
+    const some = vals.some(v => v), all = vals.every(v => v);
+    if (some && !all) { bot('摇卦要六爻都选齐（自下而上），或者都不选按当下时间起卦。'); return; }
+    if (all) {
+      // 6/7/8/9 → 三枚铜钱（1=字面 0=背面）：老阴6=三字 少阳7=两字一背 少阴8=一字两背 老阳9=三背
+      const M = { '6':[1,1,1], '7':[1,1,0], '8':[1,0,0], '9':[0,0,0] };
+      state.coins = vals.map(v => M[v]);
+    }
+  }
+  if (state.tool && state.tool.id === 'meihua') {
+    const n1 = $('num1').value, n2 = $('num2').value, n3 = $('num3').value;
+    const some = [n1,n2,n3].some(v => v !== ''), all = [n1,n2,n3].every(v => v !== '');
+    if (some && !all) { bot('报数起卦要三个数都填（第三个数定动爻），或者都不填按当下时间起卦。'); return; }
+    if (all) state.nums = { num1:+n1, num2:+n2, num3:+n3 };
+  }
   state.question = q + (state.photoNote ? '（' + state.photoNote + '）' : '');
   me(q + (state.photoNote ? '\n📷 ' + state.photoNote : ''));
   $('askInput').classList.add('hidden');
@@ -284,13 +331,16 @@ function askBirthIfNeeded() {
   // 行复位：切换工具时先恢复默认（出生行/时辰行可见， facing/partner/text 隐藏），避免上次选择残留
   const rows = document.querySelectorAll('#askBirth .row');
   rows[0].classList.remove('hidden'); rows[2].classList.remove('hidden');
-  $('facingRow').classList.add('hidden'); $('partnerRow').classList.add('hidden'); $('textRow').classList.add('hidden');
+  state._zwWarned = false; state.leap = false; const _bl=$('bLeap'); if(_bl) _bl.checked=false; const _lr=$('leapRow'); if(_lr) _lr.classList.add('hidden');
+  $('facingRow').classList.add('hidden'); $('partnerRow').classList.add('hidden'); $('textRow').classList.add('hidden'); const _ar=$('avoidRow'); if(_ar) _ar.classList.add('hidden');
   $('skipBirth').style.display = '';
   if (need === 'birth' || need === 'birthYear') {
-    bot(need === 'birth' ? '请告诉我您的出生信息（年月日必填，时辰不清楚可不选）：' : ((state.tool.id === 'lifeplan' || state.tool.id === 'lifeindex') ? '请告诉我您的出生年份，并点选性别：' : '请告诉我您的出生年份（看流年只需出生年，月日可不填更快速）：'));
+    bot(need === 'birth' ? '请告诉我您的出生信息（年月日必填，时辰不清楚可不选）：' : ((state.tool.id === 'lifeplan' || state.tool.id === 'lifeindex') ? '请告诉我您的出生信息（年月日必填，时辰可空），并点选性别：' : '请告诉我您的出生年份（看流年只需出生年，月日可不填更快速）：'));
     $('sexRow').classList.toggle('hidden', need !== 'birth' && state.tool.id !== 'lifeplan' && state.tool.id !== 'lifeindex');
     $('skipBirth').style.display = (state.tool.id === 'lifeplan' || state.tool.id === 'lifeindex') ? 'none' : '';
-    $('calendarRow').classList.toggle('hidden', state.tool.id !== 'ziwei');
+    // R-H3: 阴阳历切换对所有命盘类工具开放（不止紫微——很多信众只知农历生日）
+    const LUNAR_OK = ['ziwei','bazi','lifeindex','lifeflow','lifetimeline','lifeplan'];
+    $('calendarRow').classList.toggle('hidden', !LUNAR_OK.includes(state.tool.id));
     $('askBirth').classList.remove('hidden');
   } else if (need === 'partner') {
     bot('合婚先填您的出生信息（上方年月日，时辰选填），再填对方的——年月日填全可按双方完整八字合婚（日柱夫妻宫、五行互补都看得准）；只填年份则按年柱简评。');
@@ -298,7 +348,7 @@ function askBirthIfNeeded() {
     $('partnerRow').classList.remove('hidden');
     $('askBirth').classList.remove('hidden');
   } else if (need === 'facing') {
-    bot('您家（或办公室）的朝向是哪个？站在屋里朝大门外看：');
+    bot('您家（或办公室）的朝向是哪个？站在屋里朝大门外看。知道房子哪年建的（或哪年入住的）就顺手填上——三元九运每20年一换，宅运盘按建造年排才准：');
     $('sexRow').classList.add('hidden'); $('calendarRow').classList.add('hidden');
     document.querySelector('#askBirth .row').classList.add('hidden'); // 出生年月日行
     $('facingRow').classList.remove('hidden');
@@ -323,7 +373,8 @@ function askBirthIfNeeded() {
     $('askBirth').classList.remove('hidden');
     $('textInput').focus();
   } else if (need === 'namebirth') {
-    bot((state.tool.prompt || '姓氏是？') + '再填出生信息（起名要结合生辰五行）：');
+    bot((state.tool.prompt || '姓氏是？') + '再填出生信息（起名要结合生辰五行）；有避讳字也顺手填上：');
+    $('avoidRow').classList.remove('hidden');
     $('calendarRow').classList.add('hidden');
     $('sexRow').classList.remove('hidden'); // 起名需性别
     $('skipBirth').style.display = 'none';
@@ -346,7 +397,11 @@ function askBirthIfNeeded() {
 }
 
 /* chip 选择 */
-document.querySelectorAll('#calendarRow .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#calendarRow .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); state.cal = c.dataset.cal; });
+document.querySelectorAll('#calendarRow .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#calendarRow .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); state.cal = c.dataset.cal; const lr=$('leapRow'); if(lr) lr.classList.toggle('hidden', state.cal !== 'lunar'); });
+const _bleap = $('bLeap'); if (_bleap) _bleap.onchange = () => { state.leap = _bleap.checked; };
+const _shake = $('autoShake'); if (_shake) _shake.onclick = () => {
+  document.querySelectorAll('.yaoSel').forEach(sel => { sel.value = String([6,7,8,9][Math.floor(Math.random()*4)]); });
+};
 document.querySelectorAll('#sexRow .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#sexRow .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); state.sex = c.dataset.sex; });
 document.querySelectorAll('#facingRow .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#facingRow .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); state.facing = c.dataset.face; });
 
@@ -354,6 +409,8 @@ $('birthNext').onclick = () => { collectBirth(false); };
 $('skipBirth').onclick = () => { collectBirth(true); };
 
 function collectBirth(skip) {
+  // R-H2: 记录时辰是否由用户实际提供（默认中值午时，报告需披露）
+  state.hourUnknown = !skip && $('bHour') && $('bHour').value === '';
   if (skip) { state.birth = null; me('先不提供出生信息，以当下时间起盘。'); submitAsk(); return; }
   const y = +$('bYear').value, m = +$('bMonth').value, d = +$('bDay').value;
   const need = state.tool.need;
@@ -370,7 +427,8 @@ function collectBirth(skip) {
     me(`我 ${y}年${m?m+'月':''}${d?d+'日':''}生 · 对方 ${py}年${pm?pm+'月':''}${pd?pd+'日':''}生`);
   } else if (need === 'facing') {
     if (!state.facing) { bot('请点选一个朝向。'); return; }
-    state.birth = { facing: state.facing };
+    const byr = +($('buildYear') && $('buildYear').value) || null;
+    state.birth = { facing: state.facing, buildYear: byr };
     me('朝向：' + document.querySelector('#facingRow .chip.sel').textContent);
   } else if (need === 'text') {
     const v = $('textInput').value.trim();
@@ -385,20 +443,20 @@ function collectBirth(skip) {
     if (!v) { bot(state.tool.prompt || '请先输入内容。'); return; }
     if (state.tool.id === 'mobile' && v.replace(/\D/g, '').length < 7) { bot('手机号至少 7 位数字哦。'); return; }
     if (state.tool.id === 'xingming' && (v.length < 2 || v.length > 4)) { bot('姓名一般 2-4 个字（连名带姓一起填）。'); return; }
-    const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value } : {};
+    const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value } : {};
     state.birth = { text: v, sex: state.sex, ...opt };
     me(v + (opt.year ? ` · ${y}年${m}月${d}日生` : ''));
   } else if (need === 'namebirth') {
     const v = $('textInput').value.trim();
     if (!v || v.length > 2) { bot('姓氏填 1-2 个字（如 王 / 欧阳）。'); return; }
     if (!y || !m || !d) { bot('起名要结合生辰，年月日都要填哦。'); return; }
-    state.birth = { surname: v, year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value, sex: state.sex };
+    state.birth = { surname: v, year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value, sex: state.sex, avoidChars: ($('avoidInput') && $('avoidInput').value.trim()) || '' };
     me(`姓 ${v} · ${y}年${m}月${d}日生 · ${state.sex === 'male' ? '男' : '女'}`);
   } else if (need === 'rename' || need === 'company') {
     const v = $('textInput').value.trim();
     if (need === 'rename') {
       if (!v || v.length < 2 || v.length > 4) { bot('现用姓名要 2-4 个字（连名带姓一起填）。'); return; }
-      const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value } : {};
+      const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value } : {};
       state.birth = { text: v, sex: state.sex, ...opt };
       me(v + (opt.year ? ` · ${y}年${m}月${d}日生 · ${state.sex === 'male' ? '男' : '女'}` : ''));
     } else {
@@ -408,7 +466,7 @@ function collectBirth(skip) {
       // 纯名称（不含行业词、不以机构后缀结尾）→ 视为现有公司名测评
       const hasIndustryWord = /(科技|餐饮|金融|教育|文化|物流|地产|建筑|贸易|传媒|咨询|医药|农业|服装|酒店|旅游|能源|机械|汽车|珠宝|设计|广告|影视|娱乐|互联网|软件|信息|通信|智能|数据|新能源|投资|银行|保险|制造|出版|培训|文创|家具|园林|花卉|种植|健康|养生|美容|运输|航运|水产|饮品|酒业|物业|工程|装修|矿业|仓储|食品|化工|策划|品牌|公关|公司|店|厂|中心|工作室)/.test(v);
       const isNameOnly = /^[一-龥A-Za-z0-9]{2,10}$/.test(v) && !hasIndustryWord;
-      const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value } : {};
+      const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value } : {};
       if (isNameOnly) {
         state.birth = { existingName: v, industry:'', ...opt };
         me(`测现有公司名「${v}」`);
@@ -423,6 +481,12 @@ function collectBirth(skip) {
     me(`${y} 年${m ? m + ' 月' : ''}${d ? d + ' 日' : ''}生`);
   } else {
     if (!y || !m || !d) { bot('出生年月日都要填哦，时辰可以不选。'); return; }
+    // R-ZW-HOUR: 紫微定盘全靠时辰，缺时辰强警告（再点一次继续才放行）
+    if (state.tool.id === 'ziwei' && $('bHour').value === '' && !state._zwWarned) {
+      state._zwWarned = true;
+      bot('⚠️ 紫微斗数定盘全靠时辰——没有时辰，命宫位置和十四主星全都会错，出来的盘基本不能看。强烈建议问清时辰（可问家人或看出生证）。实在不清楚，再点一次「继续」我按午时粗排，并在报告里标明降级。');
+      return;
+    }
     state.birth = { year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value, cal: state.cal, sex: state.sex };
     me(`${y}年${m}月${d}日${$('bHour').value === '' ? '' : ' ' + $('bHour').selectedOptions[0].textContent.split(' ')[0]}（${state.cal === 'lunar' ? '农历' : '阳历'}）· ${state.sex === 'male' ? '男' : '女'}`);
   }
@@ -620,7 +684,7 @@ async function fetchToolResult() {
     const bb = state.birth;
     const r = await fetch(`${API}/api/minsu/xingming/suggest`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ surname: bb.surname, gender: bb.sex === 'male' ? 'M' : 'F', year: bb.year, month: bb.month, day: bb.day, hour: bb.hour }),
+      body: JSON.stringify({ surname: bb.surname, gender: bb.sex === 'male' ? 'M' : 'F', year: bb.year, month: bb.month, day: bb.day, hour: bb.hour, avoidChars: bb.avoidChars || '' }),
       signal: AbortSignal.timeout(25000)
     });
     const j = await r.json();
@@ -700,7 +764,7 @@ async function fetchToolResult() {
     const bb = state.birth || {};
     const r = await fetch(`${API}/api/ai/lifeindex-report`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, concerns: state.question ? [state.question.slice(0,30)] : [] }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, lunar: bb.cal === 'lunar', concerns: state.question ? [state.question.slice(0,30)] : [] }),
       signal: AbortSignal.timeout(20000)
     });
     const j = await r.json();
@@ -722,7 +786,7 @@ async function fetchToolResult() {
     const bb = state.birth || {};
     const r = await fetch(`${API}/api/ai/lifeflow-report`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, sex: state.sex }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, sex: state.sex, lunar: bb.cal === 'lunar' }),
       signal: AbortSignal.timeout(20000)
     });
     const j = await r.json();
@@ -743,7 +807,7 @@ async function fetchToolResult() {
     const bb = state.birth || {};
     const r = await fetch(`${API}/api/ai/lifeflow-timeline`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, sex: state.sex, years: 10 }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, sex: state.sex, lunar: bb.cal === 'lunar', years: 10 }),
       signal: AbortSignal.timeout(25000)
     });
     const j = await r.json();
@@ -768,7 +832,7 @@ async function fetchToolResult() {
     const age = Math.max(1, now.getFullYear() - (bb.year || (now.getFullYear() - 30)));
     const r = await fetch(`${API}/api/ai/lifeplan-report`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, concerns: state.question ? [state.question.slice(0,30)] : [] }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, lunar: bb.cal === 'lunar', concerns: state.question ? [state.question.slice(0,30)] : [] }),
       signal: AbortSignal.timeout(20000)
     });
     const j = await r.json();
@@ -788,17 +852,21 @@ async function fetchToolResult() {
   }
   // 七盘走 baihua 端点
   const body = { question: state.question };
+  if (t === 'liuyao' && state.coins) body.coins = state.coins;
+  if (t === 'meihua' && state.nums) Object.assign(body, state.nums);
   if (state.birth && state.birth.month) {
     body.year = state.birth.year; body.month = state.birth.month; body.day = state.birth.day;
     body.hour = state.birth.hour != null ? state.birth.hour : 12;
     body.gender = state.birth.sex; body.sex = state.birth.sex;
-    if (t === 'ziwei') body.lunar = state.birth.cal === 'lunar';
+    if (t === 'ziwei' || t === 'bazi') body.lunar = state.birth.cal === 'lunar';
+    if (t === 'ziwei' && state.leap && body.lunar) body.leapMonth = true;
   } else {
     body.year = now.getFullYear(); body.month = now.getMonth()+1; body.day = now.getDate(); body.hour = now.getHours();
   }
   if (t === 'fengshui') {
     const [sit, face] = FACING_MAP[state.birth.facing] || ['子','午'];
     body.sittingMountain = sit; body.facingMountain = face;
+    if (state.birth.buildYear) body.buildYear = state.birth.buildYear;
     delete body.year; delete body.month; delete body.day; delete body.hour;
     body.year = now.getFullYear();
   }
@@ -817,6 +885,10 @@ function renderResult(res) {
   const b = res.baihua || {};
   const LV = { good:'good', bad:'bad', neutral:'neutral' };
   let h = '';
+  // R-H2: 时辰未提供时如实披露推算口径（时柱相关结论降级）
+  if (state.hourUnknown && state.birth && ['birth','namebirth','textopt','rename','company','partner'].includes(state.tool.need)) {
+    h += `<div class="res-card" style="border-left:3px solid #fbbf24;font-size:12px;color:var(--muted)">⏱️ 本次未提供时辰，按时辰中值（午时）推算：五行计数与命局方向不受影响，但时柱相关内容（子女宫、晚年运、精确起运年龄）仅供参考，补齐时辰后结论更准。</div>`;
+  }
   h += `<div class="res-card res-overview"><div class="cap">💬 ${esc(res.toolName)} · 白话总览${state.question ? '（问：' + esc(state.question.slice(0,30)) + '）' : ''}</div>${esc(b.overview || '解读已生成，见下方分维度详情。')}</div>`;
   if (b.cards && b.cards.length) {
     h += '<div class="dim-grid">';
