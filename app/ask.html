@@ -144,7 +144,16 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
         <button class="chip" data-face="巽">坐东南朝西北</button><button class="chip" data-face="乾">坐西北朝东南</button>
       </div>
       <div class="row hidden" id="partnerRow">
-        <input type="number" id="pYear" placeholder="对方出生年 如1992" style="width:160px">
+        <input type="number" id="pYear" placeholder="对方出生年 如1992" style="width:110px">
+        <input type="number" id="pMonth" placeholder="月" min="1" max="12" style="width:62px">
+        <input type="number" id="pDay" placeholder="日" min="1" max="31" style="width:62px">
+        <select id="pHour" style="width:120px">
+          <option value="" selected>对方时辰(选填)</option>
+          <option value="0">子时 23-1点</option><option value="2">丑时 1-3点</option><option value="4">寅时 3-5点</option>
+          <option value="6">卯时 5-7点</option><option value="8">辰时 7-9点</option><option value="10">巳时 9-11点</option>
+          <option value="12">午时 11-13点</option><option value="14">未时 13-15点</option><option value="16">申时 15-17点</option>
+          <option value="18">酉时 17-19点</option><option value="20">戌时 19-21点</option><option value="22">亥时 21-23点</option>
+        </select>
       </div>
       <div class="row hidden" id="textRow">
         <input type="text" id="textInput" placeholder="" style="flex:1">
@@ -284,7 +293,7 @@ function askBirthIfNeeded() {
     $('calendarRow').classList.toggle('hidden', state.tool.id !== 'ziwei');
     $('askBirth').classList.remove('hidden');
   } else if (need === 'partner') {
-    bot('合婚需要两人的出生年份。先填您的，再填对方的：');
+    bot('合婚先填您的出生信息（上方年月日，时辰选填），再填对方的——年月日填全可按双方完整八字合婚（日柱夫妻宫、五行互补都看得准）；只填年份则按年柱简评。');
     $('sexRow').classList.add('hidden'); $('calendarRow').classList.add('hidden');
     $('partnerRow').classList.remove('hidden');
     $('askBirth').classList.remove('hidden');
@@ -351,8 +360,14 @@ function collectBirth(skip) {
   if (need === 'partner') {
     const py = +$('pYear').value;
     if (!y || !py) { bot('两位出生年份都要填哦（如 1990 / 1992）。'); return; }
-    state.birth = { year:y, partnerYear:py };
-    me(`我 ${y} 年生，对方 ${py} 年生`);
+    const pm = +$('pMonth').value, pd = +$('pDay').value;
+    // 任一方填了月或日但没填全 → 提示（半套生辰无法排柱，比不填更容易误排）
+    const mineFull = !!(m && d), partnerFull = !!(pm && pd);
+    if ((m && !d) || (!m && d) || (pm && !pd) || (!pm && pd)) { bot('月、日要一起填才排得出八字哦，要么都填，要么都留空按年柱简评。'); return; }
+    state.birth = { year:y, month:m||null, day:d||null, hour: $('bHour').value === '' ? null : +$('bHour').value,
+      partnerYear:py, partnerMonth:pm||null, partnerDay:pd||null, partnerHour: $('pHour').value === '' ? null : +$('pHour').value,
+      fullBoth: mineFull && partnerFull };
+    me(`我 ${y}年${m?m+'月':''}${d?d+'日':''}生 · 对方 ${py}年${pm?pm+'月':''}${pd?pd+'日':''}生`);
   } else if (need === 'facing') {
     if (!state.facing) { bot('请点选一个朝向。'); return; }
     state.birth = { facing: state.facing };
@@ -485,10 +500,36 @@ async function fetchToolResult() {
     return { kind:'minsu', baihua: j.baihua, toolName:'流年运势' };
   }
   if (t === 'hehun') {
-    const r = await fetch(`${API}/api/minsu/hehun?maleYear=${state.sex === 'male' ? state.birth.year : state.birth.partnerYear}&femaleYear=${state.sex === 'male' ? state.birth.partnerYear : state.birth.year}`, { signal: AbortSignal.timeout(12000) });
+    const bb = state.birth;
+    // 双方月日齐全 → v2 全八字合婚（日柱夫妻宫/五行互补/日主相生/纳音，五维加权）
+    if (bb.fullBoth) {
+      const meArr = [bb.year, bb.month, bb.day, bb.hour != null ? bb.hour : 12];
+      const ptArr = [bb.partnerYear, bb.partnerMonth, bb.partnerDay, bb.partnerHour != null ? bb.partnerHour : 12];
+      const male = state.sex === 'male' ? meArr : ptArr;
+      const female = state.sex === 'male' ? ptArr : meArr;
+      const r = await fetch(`${API}/api/minsu/hehun/v2`, {
+        method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+        body: JSON.stringify({ male, female }), signal: AbortSignal.timeout(20000)
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || '合婚分析失败');
+      const b = {
+        overview: `男方「${j.male.pillars.year} ${j.male.pillars.month} ${j.male.pillars.day} ${j.male.pillars.hour}」(${j.male.shengxiao}·${j.male.nayin_year})，女方「${j.female.pillars.year} ${j.female.pillars.month} ${j.female.pillars.day} ${j.female.pillars.hour}」(${j.female.shengxiao}·${j.female.nayin_year})。五维加权总分 ${j.total_score} 分——${j.verdict}。`,
+        cards: (j.dimensions || []).map(d => ({
+          title: `${d.name} · ${d.score}分（权重 ${Math.round(d.weight*100)}%）`,
+          plain: (d.notes || []).join('；'),
+          level: d.score >= 70 ? 'good' : d.score < 50 ? 'bad' : 'neutral'
+        })),
+        tips: (j.advice || []).concat(['合婚看趋势不看定数：低分项是提醒经营方向，不是判语', '重大决定建议请命理师结合双方完整大运流年复核'])
+      };
+      return { kind:'paipan', baihua: b, toolName:`合婚配对 · ${j.total_score}分` };
+    }
+    // 仅有年份 → v1 年柱简评
+    const r = await fetch(`${API}/api/minsu/hehun?maleYear=${state.sex === 'male' ? bb.year : bb.partnerYear}&femaleYear=${state.sex === 'male' ? bb.partnerYear : bb.year}`, { signal: AbortSignal.timeout(12000) });
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '查询失败');
-    return { kind:'minsu', baihua: j.baihua, toolName:'合婚配对' };
+    if (j.baihua) j.baihua.overview = (j.baihua.overview || '') + '（本次按年柱简评——补上双方出生月日可升级为全八字合婚，日柱夫妻宫看得更准。）';
+    return { kind:'minsu', baihua: j.baihua, toolName:'合婚配对 · 年柱简评' };
   }
   // 民俗速查：车牌（GET + 服务端白话）
   if (t === 'chepai') {
@@ -796,11 +837,18 @@ function renderResult(res) {
   }
   if (b.tips && b.tips.length) h += `<div class="res-card tips">${b.tips.map(t => '💡 ' + esc(t)).join('<br>')}</div>`;
   $('resultArea').innerHTML = h;
-  // 验证反馈存 localStorage
+  // 验证反馈存 localStorage + 回传服务端入库（供命中率校准；静默失败不打扰）
   document.querySelectorAll('.vfy button').forEach(btn => btn.onclick = () => {
+    const bt = b.backtest[+btn.dataset.i];
+    const fit = btn.dataset.v === '1';
     const store = JSON.parse(localStorage.getItem('mlbj_baihua_verify') || '[]');
-    store.push({ tool: state.tool.id, period: b.backtest[+btn.dataset.i].period, fit: btn.dataset.v === '1', at: Date.now() });
+    store.push({ tool: state.tool.id, period: bt.period, fit, at: Date.now() });
     localStorage.setItem('mlbj_baihua_verify', JSON.stringify(store.slice(-100)));
+    fetch(API + '/api/feedback/baihua', {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+      body: JSON.stringify({ tool: state.tool.id, period: bt.period, text: bt.plain, verdict: fit ? 'fit' : 'unfit' }),
+      signal: AbortSignal.timeout(6000)
+    }).catch(() => {});
     btn.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('done'));
     btn.classList.add('done');
   });
