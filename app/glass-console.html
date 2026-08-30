@@ -1088,7 +1088,7 @@ function renderHistory() {
   $('#histCount').textContent = State.history.length;
   $('#askCount').textContent = State.history.filter(x=>x.type==='ask').length;
   if (!filtered.length) {
-    list.innerHTML = '<div class="empty"><div class="icon">空</div><div class="text">还没有记录</div><div class="hint">问诊 / OCR / 录音后会自动出现在这里</div></div>';
+    list.innerHTML = '<div class="empty"><div class="icon"><svg width="48" height="48" viewBox="0 0 48 48"><path d="M6 16l6-8h24l6 8v22a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M6 16h36M18 24h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div><div class="text">还没有记录</div><div class="hint">问诊 / OCR / 录音后会自动出现在这里</div></div>';
     return;
   }
   list.innerHTML = filtered.map(h => `
