@@ -89,9 +89,9 @@ if [ -f "$ALERT_CARD" ]; then
 import json
 d=json.load(open('$ALERT_CARD'))
 j=d.get('judgments',{})
-fa=j.get('faithfulness',{});co=j.get('cost-budget',{});la=j.get('latency',{})
+fa=j.get('faithfulness') or {};co=j.get('cost-budget') or {};la=j.get('latency') or {}
 print('faithfulness=%s target≥%s | cost=¥%s | latency=%sms' % (
-    fa.get('actual','?'), fa.get('threshold',{}).get('warn','?'),
+    fa.get('actual','?'), (fa.get('threshold') or {}).get('warn','?'),
     co.get('actual','?'), la.get('actual','?')))
 EOF
 )
