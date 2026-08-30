@@ -51,6 +51,7 @@
   <div id="main"><div class="lookup">
     <p style="color:var(--muted);margin-bottom:12px">输入会话 ID 查看您的合并报告（问诊完成归档后可查）</p>
     <input id="sidInput" placeholder="会话 ID，如 kmz_xxxxxx">
+    <div id="sidErr" style="display:none;color:#c0392b;font-size:13px;margin-top:6px"></div>
     <div style="margin-top:12px"><button class="btn" onclick="loadReport($('sidInput').value.trim())">查询报告</button></div>
   </div></div>
   <div class="disclaimer" id="disclaimer" style="display:none"></div>
@@ -67,7 +68,13 @@ function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&
 const STATUS_NM = { pending:'待审核', approved:'已审核', rejected:'已驳回', modified:'修改通过', draft:'草稿（未归档）', pending_master:'待命理师批注' };
 
 async function loadReport(sid, silent){
-  if (!sid) { alert('请输入会话 ID'); return; }
+  const errEl = $('sidErr');
+  if (errEl) errEl.style.display = 'none';
+  if (!sid) {
+    if (errEl) { errEl.textContent = '请输入会话 ID'; errEl.style.display = 'block'; }
+    $('sidInput').focus();
+    return;
+  }
   curSid = sid;
   if (!silent) $('main').innerHTML = '<div class="lookup" style="color:var(--muted)">加载中…</div>';
   try {

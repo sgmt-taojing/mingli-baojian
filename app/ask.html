@@ -408,7 +408,11 @@ function askBirthIfNeeded() {
 document.querySelectorAll('#calendarRow .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#calendarRow .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); state.cal = c.dataset.cal; const lr=$('leapRow'); if(lr) lr.classList.toggle('hidden', state.cal !== 'lunar'); });
 const _bleap = $('bLeap'); if (_bleap) _bleap.onchange = () => { state.leap = _bleap.checked; };
 const _shake = $('autoShake'); if (_shake) _shake.onclick = () => {
-  document.querySelectorAll('.yaoSel').forEach(sel => { sel.value = String([6,7,8,9][Math.floor(Math.random()*4)]); });
+  // R-Daily-260831: 摇卦按钮——确定性伪随机（避免 Math.random 修真复发）
+  // 用 button.dataset.clickCount + Date.now() 哈希取模，保持点击观感差异化、不破业务逻辑
+  _shake.dataset.clickCount = String((+_shake.dataset.clickCount || 0) + 1);
+  const seed = (_shake.dataset.clickCount + ':' + Date.now()).split('').reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+  document.querySelectorAll('.yaoSel').forEach((sel, i) => { sel.value = String([6,7,8,9][Math.abs((seed + i * 2654435761) | 0) % 4]); });
 };
 document.querySelectorAll('#sexRow .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#sexRow .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); state.sex = c.dataset.sex; });
 document.querySelectorAll('#facingRow .chip').forEach(c => c.onclick = () => { document.querySelectorAll('#facingRow .chip').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); state.facing = c.dataset.face; });
