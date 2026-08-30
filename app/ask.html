@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="问事 · 问答式采集，AI 自动排盘，白话解读 · 命理宝鉴">
-<title>问事 · 命理宝鉴</title>
+<meta name="description" content="问事服务中心 · 面向大众信众缘主：问答式采集，AI 自动排盘，白话解读 · 命理宝鉴">
+<title>问事服务中心 · 命理宝鉴</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
 :root{--bg:#0a0a12;--card:#15151f;--border:rgba(201,168,76,.25);--gold:#c9a84c;--gold2:#e8cc7a;--paper:#e8e0d0;--muted:#8b7e6a;--green:#4ec9b0;--red:#ef4444}
@@ -60,6 +60,19 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
 .vfy button.done{background:rgba(78,201,176,.15);color:var(--green);border-color:var(--green)}
 .tips{font-size:11.5px;color:var(--muted);line-height:1.9}
 .disclaimer{text-align:center;font-size:10.5px;color:#5a5347;margin-top:20px;line-height:1.8}
+/* 服务中心化 */
+.hero{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:14px;background:linear-gradient(135deg,#c9a84c22,#c9a84c08);border:1px solid #c9a84c44;margin:8px 0 12px}
+.hero img{height:30px;width:auto;display:block}
+.hero-sub{font-size:11.5px;color:var(--muted);margin-top:5px;letter-spacing:.5px;line-height:1.6}
+.hero-seal{margin-left:auto;width:46px;height:46px;border-radius:11px;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;box-shadow:0 4px 14px #c9a84c55;flex:none}
+.svc-strip{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}
+.svc-strip span{font-size:10.5px;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:3px 10px;background:var(--card)}
+.grp{display:flex;align-items:center;gap:8px;margin:14px 0 8px}
+.grp b{font-size:12px;color:var(--gold);border:1px solid #c9a84c66;border-radius:4px;padding:2px 8px;letter-spacing:1px;font-weight:600}
+.grp i{font-style:normal;font-size:10.5px;color:var(--muted)}
+.center-nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+.center-nav a{font-size:11.5px;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:14px;padding:5px 12px;transition:all .2s}
+.center-nav a:hover{color:var(--gold2);border-color:var(--gold)}
 .hidden{display:none!important}
 .shake{animation:sk .4s}
 @keyframes sk{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
@@ -67,12 +80,26 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
 </head>
 <body>
 <div class="wrap">
-  <h1>🔮 问事</h1>
-  <div class="sub">问答三步：选工具 → 说事情 → 得解读 · 全程白话 · 专业排盘后台自动完成</div>
+  <div class="hero">
+    <div>
+      <img src="assets/titles/ask-center-hero.png" alt="问事服务中心">
+      <div class="hero-sub">大众 · 信众 · 缘主 —— 选工具、说事情、得白话解读，专业排盘后台自动完成</div>
+    </div>
+    <div class="hero-seal">问</div>
+  </div>
+  <div class="svc-strip">
+    <span>🎙️ 语音输入</span><span>📷 拍照辅助</span><span>📜 全程白话报告</span><span>🔮 21 件工具</span><span>👤 命理师人工兜底</span>
+  </div>
 
-  <!-- 第一步：选工具 -->
+  <!-- 第一步：选工具（分组导航） -->
   <div id="step1">
-    <div class="tools" id="toolGrid"></div>
+    <div id="toolGrid"></div>
+    <div class="center-nav">
+      <a href="center-yuanzhu.html">缘主中心</a>
+      <a href="index.html">入口大厅</a>
+      <a href="center-master.html">命理师中心</a>
+      <a href="person-center.html">我的</a>
+    </div>
   </div>
 
   <!-- 第二步：问答采集 -->
@@ -181,10 +208,32 @@ const FACING_MAP = { '子':['子','午'],'午':['午','子'],'卯':['卯','酉']
 const state = { tool:null, question:'', photoNote:'', cal:'solar', sex:'male', facing:null };
 const $ = id => document.getElementById(id);
 
-/* ─── 第一步：工具网格 ─── */
-$('toolGrid').innerHTML = TOOLS.map((t,i) =>
-  `<div class="tool" data-id="${t.id}"><span class="ico">${t.ico}</span><img class="nm-img" src="assets/titles/ask-${t.id}.png" alt="${t.nm}"><div class="ds">${t.ds}</div></div>`
-).join('');
+/* ─── 第一步：工具网格（服务中心分组渲染） ─── */
+const GROUPS = [
+  ['问事起卦', '当下有事 · 一事一问'],
+  ['看自己 · 知命', '生辰命盘 · 格局天赋'],
+  ['运势走向', '今年运气 · 十年走势'],
+  ['婚恋合和', '两人缘分 · 婚配参考'],
+  ['起名改名', '宝宝/个人/公司 · 古籍五行'],
+  ['号码吉凶', '手机号/车牌 · 命局选号'],
+  ['风水堪舆', '住宅办公 · 方位吉凶'],
+  ['人生规划', '命局定位 · 五年路径'],
+  ['日历幸运', '黄历择日 · 幸运数色'],
+];
+const G_OF = { liuyao:0, meihua:0, qimen:0, liuren:0, bazi:1, ziwei:1, lifeindex:1,
+  liunian:2, lifeflow:2, lifetimeline:2, hehun:3, qiming:4, gaiming:4, gongsi:4, xingming:4,
+  mobile:5, chepai:5, fengshui:6, lifeplan:7, huangli:8, lucky:8 };
+let _gHtml = '', _lastG = -1;
+TOOLS.forEach(t => {
+  const g = G_OF[t.id] != null ? G_OF[t.id] : 0;
+  if (g !== _lastG) {
+    if (_lastG >= 0) _gHtml += '</div>';
+    _gHtml += `<div class="grp"><b>${GROUPS[g][0]}</b><i>${GROUPS[g][1]}</i></div><div class="tools">`;
+    _lastG = g;
+  }
+  _gHtml += `<div class="tool" data-id="${t.id}"><span class="ico">${t.ico}</span><img class="nm-img" src="assets/titles/ask-${t.id}.png" alt="${t.nm}"><div class="ds">${t.ds}</div></div>`;
+});
+$('toolGrid').innerHTML = _gHtml + '</div>';
 document.querySelectorAll('.tool').forEach(el => el.onclick = () => selectTool(el.dataset.id, el));
 
 // R-DEEPLINK: ?tool=xxx 直达（首页/民俗中心等入口跳转自选工具）
