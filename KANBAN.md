@@ -1,4 +1,15 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 09:55 — 问事全链条诊断 + 手机号/姓名命局个性化上线
+- 【诊断】问事 21 工具五维诊断完成：P0×2（命格指数/人生规划不收生辰·十维全 65 分假评分；排盘类 question 不消费）P1×2（合婚未升 v2 全八字；backtest 反馈只存 localStorage 不回传）P2×2（流年 forecast 空数组；幸运文案"利西方方"叠字）
+- 【姓名盘点】宝宝起名/改名测评/公司取名(含改名)/姓名评分四服务闭环确认无遗漏；修起名端点性别归一化 bug（中文"男"曾被误判为女，R-GENDER-FIX）
+- 【R-MOBILEFIT】新增 POST /api/minsu/mobile/advise：号码数理 + 八字扶抑喜用（身强喜异党/身弱喜同党，缺行置顶）→ 尾号契合判定(fit/plain/clash) + 81数理吉∩喜用五行精挑尾号；CSRF 白名单已加
+- 【前端】问事页新增 textopt 采集类型（文本必填+生辰选填）：手机号填生辰走命局契合报告（命局卡/契合卡/精挑尾号卡/数理卡），不填回落数理速查；姓名评分填生辰走 POST analyze 命局补益分析
+- 【回归】浏览器实测两轮全链路通过：手机号(13866668888·庚金身强→尾8属木 fit，精挑 1/3/8) + 姓名评分(张伟·35分·名生日主补益·重名提示)；8920 已重启，node --check 过
+## 2026-08-30 09:30 — 💚 心跳 09:30 全绿（6 服务 200 + EXIT=0）+ wikidata 扩容进程收官
+- 6 端口（8900/8901/8911/8912/8913/8920）curl 全 200，health-check.sh EXIT=0
+- **fetch-wikidata-celebs.py（PID 75034）已跑完**：合计 698 人去重后批量抽导语，维基链路仍不通（extract-fail 熔断生效）→ 仅生辰入库：新增 4 / 重复跳过 694 / 带事件 99，**校正库总量 978**（974→978）。结论：300/国 扩容增量已尽（幂等去重），后续增量待网络恢复复跑抽事件
+- 无新 distill-*.py 入库；进行中/阻塞项无变化（服务中心导航回归待主会话浏览器执行；patrol 读数失实、⏭️ P2.8 延续）
+
 ## 2026-08-30 09:35 — ✅ C 类遗留页归档执行完毕（12 页归档 + 2 页纠错移出）
 - **归档 12 页**（用户拍板后执行）：index-global / ziwei-mingli / site-nav / mindmap / platform-overview / yanzhi / closed-loop-advisor / admin-profile-distill / kb-explore-submit / kb-graph-r68 / wechat-cases / wechat-disclaimer → `archive/legacy-pages-202608/`（git mv 100% rename，历史随时可恢复）
 - **两页移出清单（纠错）**：dashboard.html（monitor-hub 真实引用，跳转壳）+ **divination-hub.html**——归档前最终扫描发现它是 KB 模态入口契约的载体（api-server-v2 ENTRY_MAP 40+ 条 `divination-hub.html#xxx` 模态入口 + wechat-hub 工具 section 锚点跳转 + search-intelligence 合婚/黄历映射），归档会砸运行时契约，已回退保留。教训：「零 href 引用」不等于「零运行时依赖」，锚点契约要查 JS/server 侧
