@@ -164,9 +164,9 @@ const TOOLS = [
   { id:'qiming',  ico:'👶', nm:'宝宝起名', ds:'古籍取名 五行补益', need:'namebirth', ph:'输入姓氏 如 王', prompt:'宝宝（或改名者）的姓氏是？' },
   { id:'gaiming', ico:'✏️', nm:'改名测评', ds:'现名评分 新名备选', need:'rename', ph:'输入现用姓名 如 张伟', prompt:'请告诉我您的现用姓名（连名带姓 2-4 字）：' },
   { id:'gongsi',  ico:'🏢', nm:'公司取名', ds:'行业五行 字号吉凶', need:'company', ph:'如：科技公司，想带个「创」字', prompt:'说说行业和期望（如：科技公司，想带个「创」字）；测现有公司名就直接发名称：' },
-  { id:'xingming',ico:'✍️', nm:'姓名评分', ds:'五格三才 名字能量', need:'text', ph:'输入姓名 如 张伟', prompt:'请告诉我您要测的名字（2-4个字）：' },
+  { id:'xingming',ico:'✍️', nm:'姓名评分', ds:'五格三才 名字能量', need:'textopt', ph:'输入姓名 如 张伟', prompt:'请告诉我您要测的名字（2-4个字）。出生年月日选填——填了我按您的命局五行看名字补益，不填按五格三才通法评测：' },
   // 号码吉凶：日常所用
-  { id:'mobile',  ico:'📱', nm:'手机号吉凶', ds:'号码数理 尾数五行', need:'text', ph:'输入手机号（11位）', prompt:'请把手机号发给我（只用于数理分析）：' },
+  { id:'mobile',  ico:'📱', nm:'手机号吉凶', ds:'数理+命局喜用 选号建议', need:'textopt', ph:'输入手机号（11位）', prompt:'请把手机号发给我（只用于数理分析）。出生年月日选填——填了我按您的命局喜用测契合、精挑尾号，不填按数理通法评测：' },
   { id:'chepai',  ico:'🚗', nm:'车牌号吉凶', ds:'选号参考 数字形态', need:'text', ph:'输入车牌 如 粤A6688', prompt:'请把车牌号发给我（汉字字母都行，如 粤A6688）：' },
   // 风水堪舆：住宅办公
   { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
@@ -255,6 +255,15 @@ function askBirthIfNeeded() {
     $('textRow').classList.remove('hidden');
     $('askBirth').classList.remove('hidden');
     $('textInput').focus();
+  } else if (need === 'textopt') {
+    // 文本必填 + 生辰选填（手机号/姓名评分：填生辰按命局精准配，不填按通法评测）
+    bot(state.tool.prompt || '请输入：');
+    $('sexRow').classList.add('hidden'); $('calendarRow').classList.add('hidden');
+    $('skipBirth').style.display = 'none';
+    $('textInput').placeholder = state.tool.ph || '';
+    $('textRow').classList.remove('hidden');
+    $('askBirth').classList.remove('hidden');
+    $('textInput').focus();
   } else if (need === 'namebirth') {
     bot((state.tool.prompt || '姓氏是？') + '再填出生信息（起名要结合生辰五行）：');
     $('calendarRow').classList.add('hidden');
@@ -307,6 +316,14 @@ function collectBirth(skip) {
     if (state.tool.id === 'xingming' && (v.length < 2 || v.length > 4)) { bot('姓名一般 2-4 个字（连名带姓一起填）。'); return; }
     state.birth = { text: v };
     me(v);
+  } else if (need === 'textopt') {
+    const v = $('textInput').value.trim();
+    if (!v) { bot(state.tool.prompt || '请先输入内容。'); return; }
+    if (state.tool.id === 'mobile' && v.replace(/\D/g, '').length < 7) { bot('手机号至少 7 位数字哦。'); return; }
+    if (state.tool.id === 'xingming' && (v.length < 2 || v.length > 4)) { bot('姓名一般 2-4 个字（连名带姓一起填）。'); return; }
+    const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 0 : +$('bHour').value } : {};
+    state.birth = { text: v, sex: state.sex, ...opt };
+    me(v + (opt.year ? ` · ${y}年${m}月${d}日生` : ''));
   } else if (need === 'namebirth') {
     const v = $('textInput').value.trim();
     if (!v || v.length > 2) { bot('姓氏填 1-2 个字（如 王 / 欧阳）。'); return; }
@@ -424,11 +441,79 @@ async function fetchToolResult() {
     if (!j.ok) throw new Error(j.error || '查询失败');
     return { kind:'minsu', baihua: j.baihua, toolName:'合婚配对' };
   }
-  // 民俗速查四件：手机号/车牌/姓名/幸运数色（GET + 服务端白话）
-  if (t === 'mobile' || t === 'chepai' || t === 'xingming') {
-    const apiMap = { mobile:'mobile', chepai:'plate', xingming:'xingming' };
-    const param = t === 'xingming' ? 'name' : 'number';
-    const r = await fetch(`${API}/api/minsu/${apiMap[t]}?${param}=${encodeURIComponent(state.birth.text)}`, { signal: AbortSignal.timeout(12000) });
+  // 民俗速查：车牌（GET + 服务端白话）
+  if (t === 'chepai') {
+    const r = await fetch(`${API}/api/minsu/plate?number=${encodeURIComponent(state.birth.text)}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '分析失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 手机号：有生辰走命局契合端点（喜用尾号精挑），无生辰走数理速查（R-MOBILEFIT）
+  if (t === 'mobile') {
+    const bb = state.birth;
+    if (bb.year) {
+      const r = await fetch(`${API}/api/minsu/mobile/advise`, {
+        method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+        body: JSON.stringify({ number: bb.text, year: bb.year, month: bb.month, day: bb.day, hour: bb.hour, gender: bb.sex === 'female' ? 'F' : 'M' }),
+        signal: AbortSignal.timeout(20000)
+      });
+      const j = await r.json();
+      const d = j && j.data;
+      if (!d || !d.base) throw new Error((j && (j.message || j.error)) || '号码分析失败');
+      const b0 = d.base, p = d.personal;
+      const cards = [];
+      if (p) {
+        cards.push({ title:`您的命局 · ${p.dayMaster} · ${p.strength}`,
+          plain:`日主五行属${p.dayElement}，${p.strength}（同党 ${p.tong} / 异党 ${p.yi}）。${p.wuxingLack.length ? '五行缺「' + p.wuxingLack.join('、') + '」，' : ''}喜用五行：${p.xiYong.join('、')}——号码、颜色、方位都优先往这上面靠。`, level:'neutral' });
+        const fitMap = {
+          fit:  ['✅ 尾数正合喜用', 'good',    `尾号 ${b0.tailNumber} 属${p.tailWuxing}，正在您的喜用五行里——这号码跟您合拍，放心用。`],
+          clash:['⚠️ 尾数踩了忌神', 'bad',    `尾号 ${b0.tailNumber} 属${p.tailWuxing}，落在忌神方向（${p.jiShen.join('、')}）——用着容易别扭，换号或办副卡时优先避开。`],
+          plain:['○ 尾数中性',      'neutral', `尾号 ${b0.tailNumber} 属${p.tailWuxing}，不帮不碍——无功无过，数理吉就行。`]
+        };
+        const fm = fitMap[p.fitLevel];
+        cards.push({ title: fm[0], plain: fm[2], level: fm[1] });
+        if (p.bestTails && p.bestTails.length) cards.push({ title:'🎯 为您精挑的尾号',
+          plain:`最后一位换成 ${p.bestTails.map(o => o.d + '（' + o.wx + '）').join(' / ')}：既合您的喜用五行，81数理又是吉数（${p.bestTails.map(o => o.tr).join(' / ')}），换号或办副卡照这个挑。${p.goodTails && p.goodTails.length ? '次选（数理吉、五行中性）：' + p.goodTails.map(o => o.d).join(' / ') + '。' : ''}`, level:'good' });
+      }
+      cards.push({ title:`数理总评 · ${b0.score}分`,
+        plain:`全号总和 ${b0.totalSum}，81数理 ${b0.luck81 && b0.luck81.number ? b0.luck81.number + '（' + b0.luck81.luck + '）' : '—'}。${b0.suggestion || ''}`, level: b0.score >= 70 ? 'good' : b0.score >= 50 ? 'neutral' : 'bad' });
+      const b = {
+        overview: p ? `号码 ${b0.number}，按您的八字（${p.dayMaster} · ${p.strength}）配号：${p.fitLevel === 'fit' ? '尾数正合喜用，是好号码。' : p.fitLevel === 'clash' ? '数理可用但尾数不合命局，建议按精挑尾号调整。' : '尾数中性，重点看数理吉凶与喜用方向。'}` : `号码 ${b0.number} 数理评分 ${b0.score} 分。`,
+        cards,
+        tips: (b0.improve || []).filter(s => !(p && s.includes('若知八字喜用'))).concat(['号码是辅助：顺耳好记 + 数理吉 + 合喜用就是上选，不必执念"全吉"。'])
+      };
+      return { kind:'paipan', baihua: b, toolName:'手机号 · 命局契合' };
+    }
+    const r = await fetch(`${API}/api/minsu/mobile?number=${encodeURIComponent(bb.text)}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '分析失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 姓名评分：有生辰走命局补益分析（POST analyze），无生辰走五格三才速查
+  if (t === 'xingming') {
+    const bb = state.birth;
+    if (bb.year) {
+      const r = await fetch(`${API}/api/minsu/xingming/analyze`, {
+        method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+        body: JSON.stringify({ fullName: bb.text, gender: bb.sex === 'female' ? 'F' : 'M', year: bb.year, month: bb.month, day: bb.day, hour: bb.hour }),
+        signal: AbortSignal.timeout(20000)
+      });
+      const j = await r.json();
+      const d = j && j.data;
+      if (!d || !d.fullName) throw new Error((j && (j.message || j.error)) || '姓名分析失败');
+      const cards = [
+        { title:`「${d.fullName}」 · ${d.score}分（${d.rating}）`, plain:(d.analysis || '').split('\n').slice(1).join('；'), level: d.score >= 80 ? 'good' : d.score >= 65 ? 'neutral' : 'bad' }
+      ];
+      if (d.sancai && d.sancai.advice) cards.push({ title:'名字与命局的配合', plain:`${d.sancai.advice}${d.nameWuxing && d.nameWuxing.length ? '（名字五行属' + d.nameWuxing.join('、') + '）' : ''}`, level: d.sancai.isBeneficial ? 'good' : 'neutral' });
+      if (d.classicSource) cards.push({ title:'古籍出处', plain:String(d.classicSource), level:'good' });
+      if (d.isHighFreq) cards.push({ title:'⚠️ 重名提示', plain:'这个名字重名率偏高，社交场合辨识度低——介意的话可以看看「改名测评」里的同音备选。', level:'neutral' });
+      const tips = (d.supplements && d.supplements.length ? d.supplements : []).concat(['名字是长期暗示：评分偏低别焦虑，可到「改名测评」看针对性的新名方案。']);
+      const b = { overview:`「${d.fullName}」结合您的生辰命局评测：综合 ${d.score} 分（${d.rating}）。${d.sancai && d.sancai.relation ? '名字与日主关系：' + d.sancai.relation + '。' : ''}`, cards, tips };
+      return { kind:'paipan', baihua: b, toolName:`姓名评分 · ${d.fullName}` };
+    }
+    const r = await fetch(`${API}/api/minsu/xingming?name=${encodeURIComponent(bb.text)}`, { signal: AbortSignal.timeout(12000) });
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '分析失败');
     if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
