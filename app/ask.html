@@ -153,7 +153,7 @@ const TOOLS = [
   // 命理排盘：看一生格局
   { id:'bazi',    ico:'📜', nm:'八字命理', ds:'一生格局 性格天赋', need:'birth' },
   { id:'ziwei',   ico:'🌌', nm:'紫微斗数', ds:'十二宫全观 人生地图', need:'birth' },
-  { id:'lifeindex',ico:'📊', nm:'命格指数', ds:'十二维评分 优势短板', need:'birthYear' },
+  { id:'lifeindex',ico:'📊', nm:'命格指数', ds:'真命盘十二维 优势短板', need:'birth' },
   // 运势走势：今年到十年
   { id:'liunian', ico:'📅', nm:'流年运势', ds:'今年运气 逐月走势', need:'birthYear' },
   { id:'lifeflow', ico:'🌊', nm:'流年报告', ds:'本月大运 明年预览', need:'birth' },
@@ -171,7 +171,7 @@ const TOOLS = [
   // 风水堪舆：住宅办公
   { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
   // 人生规划：阶段与路径
-  { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'阶段定位 五年路径', need:'birthYear' },
+  { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'命局阶段定位 五年路径', need:'birth' },
   // 日历幸运：每日必看
   { id:'huangli', ico:'📖', nm:'黄历择日', ds:'今日宜忌 选好日子', need:'none' },
   { id:'lucky',   ico:'🍀', nm:'幸运数色', ds:'幸运数字 颜色方位', need:'birthYear' },
@@ -605,12 +605,12 @@ async function fetchToolResult() {
     };
     return { kind:'paipan', baihua: b, toolName: d.existing ? `公司改名 · ${d.existing.name}` : `公司取名 · ${d.industry || '通用'}` };
   }
-  // 命格指数：十二维评分报告（CSRF 白名单内）
+  // 命格指数：真命盘十二维评分（R-REALSCORE，生辰必采）
   if (t === 'lifeindex') {
-    const age = Math.max(1, now.getFullYear() - ((state.birth && state.birth.year) || (now.getFullYear() - 30)));
+    const bb = state.birth || {};
     const r = await fetch(`${API}/api/ai/lifeindex-report`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ age, gender: state.sex, concerns: state.question ? [state.question.slice(0,30)] : [] }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, concerns: state.question ? [state.question.slice(0,30)] : [] }),
       signal: AbortSignal.timeout(20000)
     });
     const j = await r.json();
@@ -672,12 +672,13 @@ async function fetchToolResult() {
     };
     return { kind:'paipan', baihua: b, toolName: '十年走势' };
   }
-  // 人生规划：AI 报告端点（CSRF 白名单内），映射成白话卡结构复用渲染
+  // 人生规划：真命盘定位 + 五年路径（R-REALSCORE，生辰必采）
   if (t === 'lifeplan') {
-    const age = Math.max(1, now.getFullYear() - ((state.birth && state.birth.year) || (now.getFullYear() - 30)));
+    const bb = state.birth || {};
+    const age = Math.max(1, now.getFullYear() - (bb.year || (now.getFullYear() - 30)));
     const r = await fetch(`${API}/api/ai/lifeplan-report`, {
       method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
-      body: JSON.stringify({ age, gender: state.sex, concerns: state.question ? [state.question.slice(0,30)] : [] }),
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: state.sex, concerns: state.question ? [state.question.slice(0,30)] : [] }),
       signal: AbortSignal.timeout(20000)
     });
     const j = await r.json();
