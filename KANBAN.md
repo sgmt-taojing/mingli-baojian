@@ -1,4 +1,12 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 21:10 — UI 回归挂每日定时（launchd 21:17）
+- com.mingli-baojian.ui-smoke-daily：每日 21:17 跑 ui-smoke-daily.sh → 五节点回归，通过静默、失败写 logs/ui-smoke-daily.log（留 500 行）+ macOS 通知告警
+- 手动试跑包装器 PASS（病历号 #26，exit 0）；防回归从「记得跑」变「天天跑」
+## 2026-08-30 21:05 — 🌙 日结（cron 21:00 · 健康检查 EXIT=0 全绿）
+- 健康检查实探 EXIT=0；今日超级交付日：问诊台命理双轨链端到端闭环（双轨采集/批注 approve 双人复核/患者合并报告页/SLA 计时）+ UI 级端到端验收与回归脚本固化 + A/B 线审计整改全落地 + 排盘诊断整改 10/10 销号 + IA 中心化重构首轮 + 问事服务中心化 + 校正库扩容与维基看守上线
+- 已完结表新增 08-30 六行；⏭️ P2.8 问诊台后验收冲刺以 UI 级端到端验收收口（病历 #23-#25）
+- 进行中：无未收口开发项（维基补跑看守 cron 每小时自跑自停）；阻塞延续：patrol 读数失实+cron 连败集群（主会话修真）、v9.3 阈值触发制
+- 下一步动作：明日 06:00 验证 weekly-eval 修真复跑结果（a7e0ae2），随后主会话修 health-patrol 读数失实
 ## 2026-08-30 21:00 — UI 回归脚本固化（scripts/ui-smoke-consultation.js）
 - puppeteer-core + 系统 Chrome 无头，五节点：开页→采集卡排盘出草案（含批注台回填断言）→归档回执+报告链接→SLA计时条→合并报告 mingli 落库断言
 - 两连跑 PASS（病历号 #24/#25），证据 JSON+报告页截图自动落 DELIVERY；退出码 0/1 可接 CI 或 cron
@@ -840,13 +848,14 @@
 ## 进行中
 
 ### #5 BaziQA v9.2 全量评估未达标（t512 · 2026-08-19） ✅ 已评估完结（生产保持 v9.0）
+- **08-30 21:00 日结更新**：⏭️ P2.8 问诊台后验收冲刺已收口——当日以 UI 级端到端验收 PASS（真实点击路径，病历 #23）+ ui-smoke-consultation.js 五节点回归脚本两连跑 PASS（#24/#25）完成验收；同日问诊台落地双轨采集/批注 approve 闭环/患者合并报告页/SLA 计时（见已完结表 08-30 行）。
 - **08-29 21:03 日结**：今日全天心跳监测日（12 轮全绿零故障），无新推进；下一步动作不变（服务中心导航体验回归走查，待主会话浏览器）。
 - **08-28 01:30 心跳复核**：6 端口直探全 200（8900/8901/8911/8912/8913/8920）+ 8960=v9.0-7b ✅；无新蒸馏入库（最后 distill-*.py 仍为 08-16）；#5/#6 完结态不变。⏭️ P2.8 问诊台后验收冲刺仍待主会话（浏览器）执行。
 - **08-27 07:00 心跳复核**：6 服务全绿（07:00:07/07:00:14 双跑 HEALTHY，kb-list/paipan-api OK）；无新蒸馏入库（今日无 distill-*.py 执行）；3 项夜间 cron 连败仍为陈旧计数（周报/临床蒸馏/weekly-eval，a7e0ae2 下周一 06:00 复验）；#5/#6 完结态不变。⏭️ P2.8 问诊台后验收冲刺（2 新病例全链回归）已到期，cron 心跳会话无浏览器工具，待主会话执行。
 - **08-27 06:30 心跳复核**：6 服务全绿 + 8960=v9.0-7b ✅；无新蒸馏入库（今日无 distill-*.py 执行，vision last=08-16）；3 项夜间 cron 连败仍为陈旧计数（周报/临床蒸馏/weekly-eval），weekly-eval a7e0ae2 下周一 06:00 复验；#5/#6 完结态不变，无新动作。
 - **08-26 22:40 心跳复核**：6 服务直探全绿（8900/8901/8911/8912/8913/8920 均 200）+ 8960=v9.0-7b（/v1/models 200 返 mingli-sft-v9.0-7b）+ kb_formal=60,554 与 20:30 一致 + staging pending 0；无新蒸馏入库（今日无 distill-*.py 新执行）；22:25-22:31 曾现 1 项异常瞬时档（22:39/22:40 双跑 HEALTHY 自愈，延续已知档式漂移模式）。#5/#6 完结态不变，v9.3 阈值触发制不变；夜间 cron 连败三项（家庭健康周报/临床蒸馏/weekly-eval）为陈旧计数待复跑清零，weekly-eval 修真 a7e0ae2 下周一 06:00 验证。
 - **08-26 21:00 日结复核**：6 服务直探全绿（8900/8911/8912/8913/8920 均 200 + 8901 root 200）+ 8960=v9.0-7b（/v1/models 200）+ kb_formal=60,554 与 20:30 一致 + staging pending 0；无训练/评估进程残留。#5/#6 完结态不变，v9.3 阈值触发制不变。
-- **下一步动作（21:05 更新）**：明早执行问诊台全链路 P2.8 后验收冲刺——用 case#18 之外的 2 个新病例走 live-room→AI 草案→双师签名→患者报告全链回归（重点验互参提示盒预填与 labEvidence 加密列），发现缺陷即修真。
+- **下一步动作（08-30 21:00 更新）**：明日 06:00 验证 weekly-eval 修真复跑结果（commit a7e0ae2），随后主会话修 health-patrol 读数失实。
 - **08-26 18:30 心跳复核**：六端口 health-check.sh 全绿（18:30 三连跑 HEALTHY，kb-list + paipan-api OK）；staging 0 待审；kb_formal=60,554 与 16:30 一致，无新蒸馏入库、今日无 distill-*.py 新执行、无训练/评估进程；#5/#6 完结态不变。⚠️ 余项不变：家庭健康周报/临床蒸馏 402 计费、四路大师采集 data1 沙箱路径——待用户决策。
 - **08-26 18:00 心跳复核**：六端口全绿（18:00:47/18:01:02 双跑 HEALTHY，kb-list + paipan-api OK）；staging 0 待审；无新蒸馏入库、无训练/评估进程；#5/#6 完结态不变。✅ 已修真 weekly-eval 连败4根因（launchd 无 nvm PATH → `node: command not found`，/tmp/mingli-weekly-eval.err 实锤）：scripts/weekly-eval.sh 加 NODE_BIN 兜底（同 08-22 cron-distill-kb-link 修法）+ git 强制纳入（.gitignore scripts/* 曾漏管）commit a7e0ae2，syntax 校验通过，下周一 06:00 验证。⚠️ 余项：家庭健康周报/临床蒸馏 402 计费、四路大师采集 /Volumes/data1 沙箱路径——仍待用户决策。
 - **08-26 02:00 心跳复核**：六端口 health-check.sh 全绿；8960=v9.0-7b 进程存活；staging 0 待审；无训练/评估进程、无新蒸馏入库。⚠️ 新发现：4 个 cron 任务连败（四路大师采集 连败3「list /Volumes/data1 周易-中医 failed」——疑似沙箱路径权限而非磁盘未挂载（宿主 shell 可 ls，卷已挂载）；家庭健康周报/临床蒸馏 连败 402 Payment Required（模型计费问题）；weekly-eval 连败4 超时 model-call-started）。均已超 3 次阈值，health-patrol 持续告警中，待用户决策（修复计费/调整超时/禁用）。
@@ -896,6 +905,13 @@
 
 | 日期 | 任务 | 产出物 |
 |------|------|--------|
+| 2026-08-30 | 问诊台命理双轨链端到端闭环：双轨采集（R-DUAL-TRACK）+ 批注 approve 双人复核链（R-ANN-LINK）+ 患者合并报告页（R-MERGE）+ SLA 48h 计时（R-SLA）+ mingli 入病历 bug 修 | app/report.html + GET /api/public/emr-report/:sid + 病历 #21-#25 实测 |
+| 2026-08-30 | UI 级端到端验收 + 回归脚本固化：真实点击路径五节点（排盘草案→归档→报告→SLA→mingli 落库）两连跑 PASS | scripts/ui-smoke-consultation.js + DELIVERY/ui-smoke-report-case23-20260830.jpg |
+| 2026-08-30 | A线 28 工具审计整改 H1-H8 全落地 + B线医学能力与中医标准智能体 100% 对齐（tcm 164 条全集 + 补 13 条） | docs/audit-input-adequacy-20260830.md + docs/audit-flow-medical-parity-20260830.md |
+| 2026-08-30 | 排盘/民俗/报告全面诊断整改 10/10 销号 + 用神直断（R-YONGSHEN）+ 应期层（R-YINGQI）+ 真太阳时校正（R-H4，58 城经度表） | docs/tool-diagnosis-20260830.md + scripts/diag-tools-full.py 基线全绿 + server/city-lng.js |
+| 2026-08-30 | 全站 IA 诊断 + 中心化重构首轮 + C 类遗留页归档 12 页（divination-hub 锚点契约纠错保留） | docs/ia-diagnosis-20260830.md + archive/legacy-pages-202608/ |
+| 2026-08-30 | 问事页升级「问事服务中心」（21 工具 9 组）+ 手机号命局契合（R-MOBILEFIT）+ 合婚 v2 + 反馈回传闭环 + G5 九节点冒烟复跑 PASS + G1 链4 轮询验收（kb-follow PATH 修真） | ask.html + POST /api/minsu/mobile/advise + DELIVERY/g5-smoke-evidence-20260830-201948.json |
+| 2026-08-30 | 校正库扩容（Wikidata 300/国去重 698 人，校正库 974→978）+ 维基补跑看守 cron 上线（每小时幂等断点续跑自停） | fetch-wikidata-celebs.py + scripts/fill-wikidata-events.py |
 | 2026-08-26 | 问诊台全链路 P1→P2.8 八连击（核心链路/患者报告/实时问诊环/自动研判环/检验旁证/专科判读/签名链/检验×命理互参闭环）| consult-workbench + live-room + patient-report + lab-evidence + 互参提示盒（case#18 端到端实测）|
 | 2026-08-26 | OneFrame 9 模型齐套（算命组 3：掌纹/面相/痣相 + 问诊组 6：面色/唇/舌色/舌苔/巩膜/指甲）| 9 ONNX + labels.json 第 20-28 条 + 4 svc /health 在册 |
 | 2026-08-26 | p0-3 报告层全模块修真（bazi/ziwei/hehun/family/lifeplan/fengshui/liuyao 七模块五段 filled + KB 模块匹配）| server cff9ad7 + kb-module-filter 共享模块 |
