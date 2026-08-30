@@ -1,0 +1,101 @@
+{
+  "smoke": "G5-e2e",
+  "started_at": "2026-08-30T20:19:47",
+  "nodes": [
+    {
+      "node": "1-患者建档+叫号",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 79,
+      "ok": true,
+      "summary": "queue_no=1 pid=empi-c2701d184166"
+    },
+    {
+      "node": "2-一帧采集+四诊诊断",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 6,
+      "ok": true,
+      "summary": "urgency=None"
+    },
+    {
+      "node": "3-EMR生成(case-auto)",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 34,
+      "ok": true,
+      "summary": "case=CASE-1788092387740 syndrome=方剂·四君子汤"
+    },
+    {
+      "node": "4-AI命理批注(8974)",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 2,
+      "ok": true,
+      "summary": "ann-68d59e73b7e3 pending+水印+免责声明 ✓"
+    },
+    {
+      "node": "5-annotation-queue核验(SLA48h)",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 5,
+      "ok": true,
+      "summary": "队列命中 sla=48h age=0h overdue=False"
+    },
+    {
+      "node": "6-命理师approve",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 2,
+      "ok": true,
+      "summary": "approved by ML-MASTER-001 水印已解除"
+    },
+    {
+      "node": "7-病历+药方生成",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 4,
+      "ok": true,
+      "summary": "rx=rx-4341e044-792c-494c-9d39-8288d5c2fc67"
+    },
+    {
+      "node": "8-队列流转(waiting→called→in-consult→done)",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 3,
+      "ok": true,
+      "summary": "call✓ arrive(in-consult)✓ done✓"
+    },
+    {
+      "node": "9-合并报告(8920归档+emr-report+批注签发)",
+      "ts": "2026-08-30T20:19:47",
+      "elapsed_ms": 259,
+      "ok": true,
+      "summary": "8920 case=22 批注ann-01f309983cac pending→approved 报告两态读回 ✓"
+    }
+  ],
+  "guards": {
+    "R756_diagnose_no_mingli": {
+      "pass": true,
+      "leaked_words": []
+    },
+    "R757_syndrome_no_mingli": {
+      "pass": true,
+      "syndrome": "方剂·四君子汤",
+      "hit_words": [],
+      "downgrade_triggered": false
+    },
+    "SLA_48h": {
+      "pass": true,
+      "sla_hours": 48,
+      "age_hours": 0,
+      "overdue": false,
+      "backlog": 1
+    },
+    "MERGE_REPORT": {
+      "pass": true,
+      "case_id_8920": 22,
+      "ann": "ann-01f309983cac",
+      "mingli_section": true,
+      "disclaimer": true
+    }
+  },
+  "verdict": "PASS",
+  "case_id": "CASE-1788092387740",
+  "patient_id": "empi-c2701d184166",
+  "annotation_id": "ann-68d59e73b7e3",
+  "rx_id": "rx-4341e044-792c-494c-9d39-8288d5c2fc67",
+  "finished_at": "2026-08-30T20:19:48"
+}

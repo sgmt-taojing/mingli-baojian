@@ -12,6 +12,7 @@ from pathlib import Path
 
 API = "http://127.0.0.1:8972"
 EXTRA = "http://127.0.0.1:8974"
+API2 = "http://127.0.0.1:8920"  # 主 API（emr-archive / emr-report 所在）
 OUT = Path(__file__).resolve().parent.parent / "DELIVERY"
 
 evidence = {"smoke": "G5-e2e", "started_at": None, "nodes": [], "guards": {}, "verdict": None}
@@ -42,6 +43,20 @@ def post(base, path, body, timeout=60):
 
 def get(base, path, timeout=30):
     with urllib.request.urlopen(base + path, timeout=timeout) as r:
+        return json.loads(r.read().decode())
+
+# 8920 直连须带拦截器豁免头（X-Skip-Interceptor + 浏览器 UA）
+def post2(path, body, timeout=30):
+    req = urllib.request.Request(API2 + path, data=json.dumps(body).encode(),
+                                 headers={"Content-Type": "application/json",
+                                          "X-Skip-Interceptor": "1",
+                                          "User-Agent": "Mozilla/5.0"}, method="POST")
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode())
+
+def get2(path, timeout=30):
+    req = urllib.request.Request(API2 + path, headers={"X-Skip-Interceptor": "1", "User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
 
 @node("1-患者建档+叫号")
@@ -134,10 +149,46 @@ def step8(ctx):
     assert r3.get("ok"), r3
     return {"_summary": f"call✓ arrive(in-consult)✓ done✓"}
 
+@node("9-合并报告(8920归档+emr-report+批注签发)")
+def step9(ctx):
+    sid = ctx["session_id"]
+    # 9a 归档进 8920 medical_cases（emr.mingli 走【命理合参】段——R-MERGE-FIX 后真实落库）
+    r1 = post2("/api/public/emr-archive", {"sessionId": sid, "role": "doctor", "emr": {
+        "complaint": "胃脘胀满三日，伴食欲不振",
+        "examination": "舌淡红苔白腻，面色萎黄，脉细弱",
+        "syndrome": ctx.get("syndrome") or "脾胃气虚",
+        "prescription": "党参 9g, 白术 9g, 茯苓 9g, 炙甘草 6g, 陈皮 6g",
+        "mingli": "【AI命理草案 · 待命理师核对】甲木日元偏弱，土旺克木，脾胃运化受抑，与辨证互参（传统易学参考，不构成医学诊断）"}})
+    assert r1.get("ok") and r1.get("caseId"), r1
+    case_id_8920 = r1["caseId"]
+    # 9b 同 sid 在 8974 入一条批注（pending，带水印）
+    r2 = post(EXTRA, f"/api/emr/{sid}/annotate", {
+        "type": "ai", "author": "ai-mingli-v1",
+        "content": "甲木日元偏弱，土旺克木——与脾胃气虚辨证互参。（合并报告链路冒烟）"})
+    assert r2.get("ok"), r2
+    ann2 = r2["annotation"]["id"]
+    # 9c 合并报告读回：病历段 + 命理段 + pending 批注（水印态）
+    rep = get2(f"/api/public/emr-report/{sid}")
+    assert rep.get("ok") and rep.get("caseId") == case_id_8920, rep
+    s = rep.get("sections") or {}
+    assert s.get("mingli"), "命理合参段缺失"
+    assert s.get("prescription") and s.get("complaint"), "病历段缺失"
+    pend = [a for a in rep.get("annotations", []) if a["id"] == ann2 and a["status"] == "pending_review"]
+    assert pend, "pending 批注未合并进报告"
+    # 9d 命理师签发后再读回：approved + 水印解除
+    r3 = post(EXTRA, f"/api/annotations/{ann2}/approve", {"reviewer": "ML-MASTER-001"})
+    assert r3.get("ok"), r3
+    rep2 = get2(f"/api/public/emr-report/{sid}")
+    appr = [a for a in rep2.get("annotations", []) if a["id"] == ann2 and a["status"] == "approved" and not a.get("watermark")]
+    assert appr, "签发后报告内批注状态未更新"
+    evidence["guards"]["MERGE_REPORT"] = {"pass": True, "case_id_8920": case_id_8920,
+        "ann": ann2, "mingli_section": bool(s.get("mingli")), "disclaimer": bool(rep2.get("disclaimer"))}
+    return {"_summary": f"8920 case={case_id_8920} 批注{ann2} pending→approved 报告两态读回 ✓"}
+
 def main():
     evidence["started_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
     ctx = {}
-    steps = [step1, step2, step3, step4, step5, step6, step7, step8]
+    steps = [step1, step2, step3, step4, step5, step6, step7, step8, step9]
     failed = None
     for s in steps:
         try:

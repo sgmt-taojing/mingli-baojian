@@ -1,4 +1,7 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 20:25 — G5 冒烟复跑 PASS（九节点真链路，含合并报告）
+- 冒烟病例 CASE-1788092387740 / 8920 病历 #22 / 处方 rx-4341e044；9 节点全 ok，守卫 R756/R757/SLA48h/MERGE_REPORT 全绿
+- 证据 DELIVERY/g5-smoke-evidence-20260830-201948.json；脚本扩至九节点可重复回归；CHANGELOG 已记
 ## 2026-08-30 20:20 — 批注层 approve 链接通（命理批注链真闭环）
 - 【R-ANN-LINK】adoptMingli 采纳即 POST 8974 annotate 入核对队列（幂等，一次会话一条，作者=AI命理引擎）；命理师点「通过」即 approve 签发（reviewer=命理师·问诊台，满足作者≠核对人双人复核）；驳回不触碰批注
 - 【实测】浏览器全链：采纳→队列 backlog 1→通过→批注 approved/水印解除/SLA 计时终止/队列归零；reviewBadge 同步「已通过」
