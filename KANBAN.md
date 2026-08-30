@@ -1,4 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 19:40 — 患者端合并报告页落地 + mingli 持久化 bug 修复
+- 【R-MERGE】新增 report.html：病历+处方+检验旁证+命理合参+命理师批注一屏（?sid= 直达，待核批注带水印，支持打印/PDF）；服务端 GET /api/public/emr-report/:sid 解密合成全字段、拆出 ai_diagnosis 中的命理段、合并 8974 批注、未归档会话草稿兜底、限流+CSRF 白名单
+- 【bug 修】双轨改造的 mingli 草案此前以顶层对象发送，被 emr-session 字段白名单静默丢弃——改为 emr.mingli 可读文本（mingliText/emrWithMingli），归档后真实进入病历 ai_diagnosis【命理合参】段
+- 【实测】全链：建档→上报（含命理）→归档（caseId 21）→8974 批注→合并报告端点+页面渲染全通；测试批注已清理
+- 【入口】问诊台归档回执病历号旁新增「查看合并报告」直达链接
 ## 2026-08-30 19:05 — 双轨改造 + 真太阳时 + SLA计时 三件套落地
 - 【R-DUAL-TRACK】问诊台一帧采集同屏双轨：命理采集卡生辰填入即排盘出白话草案（8920 baihua），自动回填批注台生辰并入 EMR 载荷（emr-session/emr-archive/localStorage 三处带 mingli）——采集→排盘→草案→批注闭环；浏览器实测 1990/5/12 全链通过（主仓 252e391）
 - 【R-H4】真太阳时出生地校正：新建 city-lng.js（58 城经度表），问事页 birth/namebirth 流程加出生地选填；baihua/lifeindex/lifeplan 全链接入，校正与未命中均进 tips/建议披露；硬核实测：成都 9:30 未校正乙巳(巳时)→校正后真太阳时 08:30 甲辰(辰时)，时柱跨界修正生效（server 954bf38 / 主仓 c73999e）
