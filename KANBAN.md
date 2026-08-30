@@ -1,4 +1,23 @@
 # KANBAN.md — 命理宝鉴 项目看板
+
+## 2026-08-31 07:20 — ✅ 管理体系任务书 G10/G12/G13/G11 四项落地（G14 待动）
+- G10 短信适配层：send_code/verify_code/send_notice + mock outbox + 命理断语守卫；四场景全验（命理师登录码/批注待核提醒/批注完成通知患者/报告出具通知）；主仓 6022da6
+- G12 轻预约挂号：appointment 模型 + slots/创建/checkin/cancel + 爽约自动标记 + 短信 mock；全流程实测过
+- G13 报告回流供给侧：family-reflux.js（link/push/links）；全链路 mock 1 例 + 命理剥离双层阴性测试过
+- G11 PWA：mobile-interact 全量重写为命理师核对台（队列 SLA 倒计时/核对/历史/G10 鉴权门）；8974 新增 annotation-history；PWA 四件套注入四页；SW v6 隐私红线（患者/批注数据零缓存，实测缓存 30 条零敏感）；断网开壳双端过；430px 视口零溢出；UI 回归 PASS；证据 DELIVERY/g11-pwa/
+- ⏭️ 待动：G14 信众服务旅程补全（P2：求测入队/移动只读排盘/报告自查/复测回访/双身份只读/未成年禁入）
+
+## 2026-08-31 06:05 — ✅ weekly-eval 修真复跑验证通过（a7e0ae2 销号）
+- 06:00 定时触发成功：compliance 扫 39 文件/17135 cases · 0 issues，weekly-2026-W36.html 已生成，overall=OK 全绿
+- 连败计数（临床蒸馏/weekly-eval 各×4 陈旧）待下轮 patrol 刷新清零；launchctl 上次退出码仍显示 1，观察下轮是否归零
+- 心跳全绿：6 端口 200 + kb-list/paipan-api OK（06:03:39）；夜间无新 distill 入库、无新 commit（安静期正常）
+- 剩余待办：② patrol 读数失实修真 ③ 服务中心导航回归走查（待浏览器）④ C 类 13 页退役清单待拍板
+
+## 2026-08-31 02:07 — ⚠️ 心跳守门员：任务停滞告警（KANBAN ~5h 未更新）
+- [告警] 命理宝鉴 任务停滞：KANBAN.md 最后更新 2026-08-30 21:10（日结），至 08-31 02:07 已 ~5h 无更新；健康心跳正常（health.log mtime 02:01:50，6 端口全绿 200 + kb-list/paipan-api OK）
+- 「5 项异常」为已知陈旧计数（临床蒸馏/weekly-eval 连败4 待复跑清零 + patrol 读数失实），无新增异常
+- 进行中：无未收口开发项；待主会话动作：① weekly-eval 修真复跑已验证销号（06:00 复跑产出全绿 + e180a76 修 null 崩溃）② 修 health-patrol 读数失实 ③ 服务中心导航回归走查（待浏览器）④ C 类 13 页退役清单待拍板
+- 判定：夜间安静期（23:00-08:00）属预期停滞，晨间心跳恢复推进即可，无需夜间干预；已发 macOS 通知留痕（webchat 通道在 cron 沙箱不可达）
 ## 2026-08-30 21:10 — UI 回归挂每日定时（launchd 21:17）
 - com.mingli-baojian.ui-smoke-daily：每日 21:17 跑 ui-smoke-daily.sh → 五节点回归，通过静默、失败写 logs/ui-smoke-daily.log（留 500 行）+ macOS 通知告警
 - 手动试跑包装器 PASS（病历号 #26，exit 0）；防回归从「记得跑」变「天天跑」
@@ -1299,6 +1318,11 @@
 - 无新 distill-*.py 执行（16:00 后无新增），staging 0 待审
 - 阻塞延续：patrol 读数失实+cron 连败集群（主会话修真）、⏭️ P2.8 问诊台后验收冲刺待主会话浏览器执行
 - 下一步（明日首推不变）：「服务中心导航体验回归 · 五中心 × 主入口全链路走查」
+
+## 2026-08-31 06:30 — 💚 心跳全绿（EXIT=0）+ weekly-eval 修真复跑收口
+- 06:00 launchd 复跑真实产出：W36 周报 HTML + alert-card 全绿（OK），三项 eval 无数据属预期跳过；但 stderr 有 NoneType 崩溃 → exit=1（judgments 里三项均为 null，`or {}` 兜底缺失）
+- 修真：weekly-eval.sh alert-msg 段 null 判断兜底（`j.get(x) or {}`），复跑 EXIT=0，commit e180a76；KANBAN 待办① 销号
+- ⏭️ 待主会话：patrol 读数失实、服务中心导航回归（浏览器）、C 类 13 页退役拍板
 
 ## 2026-08-30 16:00 — 💚 心跳全绿（EXIT=0）
 - 6 服务健康，无新 distill 入库；进行中/阻塞无变化（服务中心导航回归待主会话浏览器执行；patrol 读数失实、⏭️ P2.8 延续）

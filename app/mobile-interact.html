@@ -1,1097 +1,191 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <script src="/js/escape-html.js" defer></script>
-<meta name="description" content="">
 <meta charset="UTF-8">
-<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-baojian/mobile-interact.html">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0a12">
+<title>命理师核对台 · 命理宝鉴</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/pwa/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0a0a12">
-<meta name="robots" content="noindex, nofollow">
-<title>人机交互 · 命理宝鉴 · 命理宝鉴</title>
+<meta name="apple-mobile-web-app-title" content="核对台">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
-:root{
-  --bg:#0a0a12; --card:#13141f; --border:rgba(255,255,255,0.08);
-  --text:#e0e0e8; --muted:#808096; --accent:#7c5ce7; --accent2:#00d4aa;
-  --gold:#f0b90b; --red:#ff5e7a; --blue:#5ec0ff; --orange:#ff9b5c;
-}
+:root{ --bg:#0a0a12; --card:#13141f; --border:rgba(255,255,255,.08); --text:#e0e0e8; --muted:#808096;
+  --gold:#f0b90b; --purple:#7c5ce7; --green:#00d4aa; --red:#ff5e7a; --orange:#ff9b5c; }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','PingFang SC',sans-serif;
-  background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;
-  overflow-x:hidden;-webkit-font-smoothing:antialiased;
-}
-
-/* ─── Layout ─── */
-.app-container{max-width:480px;margin:0 auto;padding:env(safe-area-inset-top,16px) 16px env(safe-area-inset-bottom,16px)}
-
-/* ─── Header ─── */
-.app-header{
-  display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;
-  border-bottom:1px solid var(--border);margin-bottom:16px
-}
-.app-logo{display:flex;align-items:center;gap:8px}
-.app-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.app-title{font-size:17px;font-weight:700}
-.app-status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px}
-.app-status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-
-/* ─── Tabs ─── */
-.app-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--card);border-radius:10px;padding:3px;border:1px solid var(--border);overflow-x:auto}
-.app-tab{
-  flex:1;padding:10px 6px;border-radius:8px;font-size:12px;font-weight:500;
-  text-align:center;cursor:pointer;transition:all 0.2s;color:var(--muted);border:none;background:none;
-  white-space:nowrap;min-width:80px
-}
-.app-tab.active{background:rgba(124,92,231,0.15);color:var(--accent);font-weight:600}
-
-/* ─── Sections ─── */
-.tab-section{display:none;flex-direction:column;gap:12px}
-.tab-section.active{display:flex}
-
-/* ─── Camera Module ─── */
-.camera-preview{
-  width:100%;aspect-ratio:1;border-radius:12px;overflow:hidden;
-  background:var(--card);border:1px solid var(--border);position:relative
-}
-.camera-preview video,.camera-preview canvas,.camera-preview img{
-  width:100%;height:100%;object-fit:cover
-}
-.camera-mode-label{
-  position:absolute;top:8px;left:8px;padding:2px 8px;border-radius:10px;
-  background:rgba(0,0,0,0.7);color:var(--accent2);font-size:11px;font-weight:600;z-index:5
-}
-.camera-stream-badge{
-  position:absolute;top:8px;right:8px;padding:2px 8px;border-radius:10px;
-  background:rgba(0,0,0,0.7);color:var(--accent2);font-size:10px;font-weight:600;z-index:5;
-  display:flex;align-items:center;gap:4px
-}
-.camera-stream-badge.active{color:var(--red);background:rgba(255,94,122,0.15)}
-.camera-stream-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:pulse 1s infinite}
-.camera-overlay-text{
-  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
-  color:white;font-size:12px;text-align:center;background:rgba(0,0,0,0.5);
-  padding:6px 16px;border-radius:20px;opacity:0.9;z-index:5
-}
-
-.camera-controls{display:flex;gap:8px}
-.camera-btn{
-  flex:1;padding:14px;border:1px solid var(--border);border-radius:10px;
-  background:var(--card);color:var(--text);font-size:14px;font-weight:600;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:all 0.15s
-}
-.camera-btn:active{transform:scale(0.97);opacity:0.8}
-.camera-btn.primary{background:var(--accent);border-color:var(--accent);color:white}
-.camera-btn.danger{background:var(--red);border-color:var(--red);color:white}
-.camera-btn:disabled{opacity:0.4;cursor:not-allowed}
-
-.camera-mode-select{
-  display:flex;gap:8px;overflow-x:auto;padding-bottom:4px
-}
-.camera-mode-chip{
-  padding:8px 16px;border-radius:20px;font-size:13px;font-weight:500;
-  border:1px solid var(--border);background:var(--card);color:var(--muted);
-  white-space:nowrap;cursor:pointer;transition:all 0.15s;flex-shrink:0
-}
-.camera-mode-chip.active{border-color:var(--accent);background:rgba(124,92,231,0.1);color:var(--accent)}
-
-.stream-frame-list{
-  display:flex;gap:6px;overflow-x:auto;padding:8px 0;
-  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch
-}
-.stream-frame-card{
-  flex-shrink:0;width:80px;height:80px;border-radius:8px;background:var(--card);
-  border:1px solid var(--border);position:relative;overflow:hidden;
-  scroll-snap-align:start
-}
-.stream-frame-card img{width:100%;height:100%;object-fit:cover}
-.stream-frame-card .ts{
-  position:absolute;bottom:0;left:0;right:0;font-size:9px;color:white;
-  background:rgba(0,0,0,0.6);padding:1px 4px;text-align:center
-}
-.stream-frame-card .badge{
-  position:absolute;top:2px;right:2px;font-size:8px;
-  background:var(--accent2);color:#000;padding:1px 4px;border-radius:4px;font-weight:700
-}
-
-/* ─── Search Module ─── */
-.search-input-wrap{
-  display:flex;gap:8px;background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:4px 14px;transition:border-color 0.2s
-}
-.search-input-wrap:focus-within{border-color:var(--accent)}
-.search-icon{color:var(--muted);display:flex;align-items:center}
-.search-input{
-  flex:1;background:none;border:none;outline:none;padding:12px 0;
-  font-size:16px;color:var(--text)
-}
-.search-input::placeholder{color:var(--muted);font-size:14px}
-.search-submit{
-  padding:8px 16px;border-radius:8px;background:var(--accent);color:white;
-  border:none;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0
-}
-.search-submit:active{opacity:0.8}
-
-/* ─── Result Card ─── */
-.result-card{
-  padding:14px;border-radius:10px;background:var(--card);border:1px solid var(--border);
-  transition:border-color 0.2s
-}
-.result-card:hover,.result-card:active{border-color:rgba(124,92,231,0.3)}
-.result-title{font-size:15px;font-weight:600;margin-bottom:6px;line-height:1.4}
-.result-snippet{font-size:13px;color:var(--muted);line-height:1.6;max-height:80px;overflow:hidden}
-.result-meta{display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--muted);flex-wrap:wrap}
-
-/* ─── States ─── */
-.state-loading{
-  display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px 0;color:var(--muted)
-}
-.state-spinner{width:28px;height:28px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.state-empty{text-align:center;padding:40px 0;color:var(--muted)}
-.state-empty-icon{font-size:40px;margin-bottom:10px}
-.state-error{text-align:center;padding:40px 0;color:var(--red)}
-
-/* ─── Analysis Panel ─── */
-.analysis-panel{
-  padding:16px;border-radius:12px;background:rgba(124,92,231,0.06);
-  border:1px solid rgba(124,92,231,0.15);margin-top:12px
-}
-.analysis-title{font-size:14px;font-weight:600;color:var(--accent);margin-bottom:8px}
-.analysis-text{font-size:13px;line-height:1.7;color:var(--muted);white-space:pre-wrap}
-.analysis-kb{font-size:12px;color:var(--accent2);margin-top:10px;padding:8px;background:rgba(0,212,170,0.05);border-radius:6px}
-
-/* ─── Voice Module ─── */
-.voice-orb-wrap{
-  display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 0
-}
-.voice-orb{
-  width:140px;height:140px;border-radius:50%;
-  background:radial-gradient(circle,var(--accent) 0%,transparent 70%);
-  display:flex;align-items:center;justify-content:center;font-size:48px;
-  cursor:pointer;transition:all 0.3s;border:2px solid var(--border);
-  position:relative
-}
-.voice-orb.listening{
-  background:radial-gradient(circle,var(--red) 0%,transparent 70%);
-  border-color:var(--red);
-  animation:orb-pulse 1.4s infinite
-}
-@keyframes orb-pulse{
-  0%{box-shadow:0 0 0 0 rgba(255,94,122,0.6)}
-  70%{box-shadow:0 0 0 30px rgba(255,94,122,0)}
-  100%{box-shadow:0 0 0 0 rgba(255,94,122,0)}
-}
-.voice-status{font-size:13px;color:var(--muted);text-align:center;line-height:1.7}
-.voice-transcript{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:14px;min-height:80px;font-size:14px;line-height:1.7;color:var(--text);
-  white-space:pre-wrap;word-break:break-word
-}
-.voice-transcript .live{color:var(--blue)}
-.voice-transcript .placeholder{color:var(--muted);font-style:italic}
-
-.voice-quick-actions{display:flex;gap:8px;flex-wrap:wrap}
-.voice-quick-btn{
-  padding:8px 14px;border-radius:18px;background:rgba(255,255,255,0.04);
-  border:1px solid var(--border);font-size:12px;color:var(--muted);
-  cursor:pointer;transition:all 0.15s
-}
-.voice-quick-btn:active{background:rgba(124,92,231,0.15);color:var(--accent)}
-
-.voice-history{
-  display:flex;flex-direction:column;gap:8px;max-height:280px;overflow-y:auto
-}
-.voice-msg{
-  padding:10px 14px;border-radius:10px;max-width:85%;font-size:13px;line-height:1.6;
-  word-break:break-word;white-space:pre-wrap
-}
-.voice-msg.user{
-  align-self:flex-end;background:var(--accent);color:white;border-bottom-right-radius:2px
-}
-.voice-msg.ai{
-  align-self:flex-start;background:var(--card);border:1px solid var(--border);
-  color:var(--text);border-bottom-left-radius:2px
-}
-.voice-msg .msg-meta{font-size:10px;opacity:0.7;margin-bottom:4px}
-
-@media(max-width:380px){
-  .app-tab{font-size:11px;padding:8px 4px;min-width:70px}
-  .voice-orb{width:110px;height:110px;font-size:38px}
-}
-@media(min-width:480px){
-  .app-container{max-width:420px}
-}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh}
+.wrap{max-width:480px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 20px)}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+h1{font-size:17px;color:var(--gold)}
+.links a{font-size:11px;color:var(--muted);text-decoration:none;margin-left:10px;border:1px solid var(--border);border-radius:8px;padding:3px 8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+.card h2{font-size:13px;color:var(--purple);margin-bottom:8px}
+.row{display:flex;gap:8px;align-items:center}
+input{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:9px 10px;color:var(--text);font-size:14px;min-width:0}
+button{border:none;border-radius:8px;padding:9px 14px;font-size:13px;cursor:pointer;background:var(--purple);color:#fff;white-space:nowrap}
+button.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+button.ok{background:var(--green);color:#062}
+button.no{background:transparent;border:1px solid var(--red);color:var(--red)}
+button:disabled{opacity:.45}
+.hint{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6}
+.sla{font-size:11px;border-radius:6px;padding:1px 7px}
+.sla.green{color:var(--green);border:1px solid rgba(0,212,170,.4)}
+.sla.yellow{color:var(--orange);border:1px solid rgba(255,155,92,.4)}
+.sla.red{color:var(--red);border:1px solid rgba(255,94,122,.5)}
+.ann{border-top:1px dashed var(--border);padding:10px 0}
+.ann .meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.ann .content{font-size:13px;margin:6px 0;white-space:pre-wrap;word-break:break-word;line-height:1.7}
+.ann .ops{display:flex;gap:8px}
+.ann .ops button{flex:1}
+.empty{color:var(--muted);font-size:12px;text-align:center;padding:16px 0}
+.tag{font-size:10px;border:1px solid var(--border);border-radius:6px;padding:0 5px;color:var(--muted)}
+.tag.ai{color:var(--purple);border-color:rgba(124,92,231,.4)}
+.badge-approved{color:var(--green)} .badge-rejected{color:var(--red)}
+.stat{display:flex;gap:10px;font-size:11px;color:var(--muted);margin-bottom:8px}
+.stat b{color:var(--text)}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);background:#22263a;border:1px solid var(--border);border-radius:10px;padding:9px 16px;font-size:13px;display:none;z-index:99;max-width:88%}
 </style>
-  <script src="/js/submit-guard.js" defer></script>
-<link rel="stylesheet" href="css/theme-unified.css">
 </head>
 <body>
-<header class="page-header-bar" data-theme="system">
-  <div class="phb-left">
-    <span class="phb-theme-dot" style="background:#3b7dd8"></span>
-    <span class="phb-title">人机交互</span>
-  </div>
-  <a href="index.html" class="phb-back">← 返回</a>
-</header>
-
-
-
-<div class="app-container">
-
-<!-- HEADER -->
-<header class="app-header">
-  <div class="app-logo">
-    <div class="app-logo-icon">☰</div>
-    <div>
-      <div class="app-title">命理宝鉴</div>
+<div class="wrap">
+  <header>
+    <h1>🔮 命理师核对台</h1>
+    <div class="links">
+      <a href="mobile-capture.html">采集端</a>
+      <a href="unified-consultation.html">桌面问诊台</a>
+      <a href="index.html">首页</a>
     </div>
-  </div>
-  <div class="app-status" id="statusDot">
-    <span class="app-status-dot"></span>KB 在线
-  </div>
-</header>
+  </header>
 
-<!-- TABS -->
-<nav class="app-tabs" id="appTabs">
-  <button class="app-tab active" data-tab="camera" onclick="switchTab('camera')">📷 拍照</button>
-  <button class="app-tab" data-tab="stream" onclick="switchTab('stream')">🎥 实时</button>
-  <button class="app-tab" data-tab="voice" onclick="switchTab('voice')">🎤 语音</button>
-  <button class="app-tab" data-tab="search" onclick="switchTab('search')">🔍 搜索</button>
-</nav>
-
-<!-- ═══ CAMERA MODULE (单张拍照诊断) ═══ -->
-<section class="tab-section active" id="cameraSection">
-  
-  <!-- 分析模式选择 -->
-  <div class="camera-mode-select" id="modeChips">
-    <span class="camera-mode-chip active" data-mode="face" onclick="setCameraMode('face')">👤 面诊</span>
-    <span class="camera-mode-chip" data-mode="tongue" onclick="setCameraMode('tongue')">👅 舌诊</span>
-    <span class="camera-mode-chip" data-mode="ocr-tcm" onclick="setCameraMode('ocr-tcm')">📄 病历OCR</span>
-    <span class="camera-mode-chip" data-mode="eye" onclick="setCameraMode('eye')">👁 眼诊</span>
-  </div>
-
-  <!-- 预览区 -->
-  <div class="camera-preview" id="cameraPreview">
-    <video id="cameraVideo" autoplay playsinline style="display:none"></video>
-    <canvas id="cameraCanvas" style="display:none"></canvas>
-    <div class="camera-mode-label" id="modeLabel">👤 面诊</div>
-    <div id="previewPlaceholder" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:13px;flex-direction:column;gap:8px">
-      <div style="font-size:36px">📷</div>
-      <div>打开相机后在此预览</div>
+  <!-- G10 验证码鉴权：核对操作前须验证手机号 -->
+  <div class="card" id="authCard">
+    <h2>🔐 命理师身份验证（G10 短信码）</h2>
+    <div class="row">
+      <input id="phone" type="tel" maxlength="11" placeholder="手机号（当值命理师）">
+      <button class="ghost" id="btnSend" onclick="sendCode()">发验证码</button>
     </div>
-    <div class="camera-overlay-text" id="overlayText" style="display:none"></div>
-  </div>
-
-  <!-- 控制按钮 -->
-  <div class="camera-controls">
-    <button class="camera-btn" id="btnCamera" onclick="toggleCamera()">📷 打开相机</button>
-    <button class="camera-btn primary" id="btnCapture" onclick="captureAndAnalyze()" disabled>📸 拍摄分析</button>
-  </div>
-
-  <!-- 分析结果 -->
-  <div id="analysisResult"></div>
-</section>
-
-<!-- ═══ STREAM MODULE (实时视频帧流 KB 识别) ═══ -->
-<section class="tab-section" id="streamSection">
-  
-  <div class="camera-mode-select">
-    <span class="camera-mode-chip active" data-stream-mode="face" onclick="setStreamMode('face')">👤 面部分析</span>
-    <span class="camera-mode-chip" data-stream-mode="tongue" onclick="setStreamMode('tongue')">👅 舌诊跟踪</span>
-    <span class="camera-mode-chip" data-stream-mode="hand" onclick="setStreamMode('hand')">✋ 手相识别</span>
-    <span class="camera-mode-chip" data-stream-mode="scene" onclick="setStreamMode('scene')">🏠 风水环境</span>
-  </div>
-
-  <div class="camera-preview" id="streamPreview">
-    <video id="streamVideo" autoplay playsinline muted style="display:none"></video>
-    <canvas id="streamCanvas" style="display:none"></canvas>
-    <div class="camera-mode-label" id="streamModeLabel">👤 面部分析</div>
-    <div class="camera-stream-badge" id="streamBadge" style="display:none">
-      <span class="camera-stream-dot"></span><span id="streamBadgeText">录制中</span>
+    <div class="row" style="margin-top:8px">
+      <input id="code" type="number" maxlength="6" placeholder="6 位验证码（mock 见服务端 outbox）">
+      <button id="btnVerify" onclick="verifyCode()">验证并进入</button>
     </div>
-    <div id="streamPlaceholder" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:13px;flex-direction:column;gap:8px">
-      <div style="font-size:36px">🎥</div>
-      <div>开启实时识别</div>
-      <div style="font-size:11px;opacity:0.7">每 2 秒采一帧送入 KB</div>
-    </div>
+    <div class="hint">5 分钟内有效 · 错 5 次锁 10 分钟 · 未验证只能浏览队列，不能核对</div>
   </div>
 
-  <div class="camera-controls">
-    <button class="camera-btn" id="btnStreamCamera" onclick="toggleStreamCamera()">🎥 打开摄像头</button>
-    <button class="camera-btn danger" id="btnStreamToggle" onclick="toggleStream()" disabled>⏺ 开始识别</button>
-    <button class="camera-btn" id="btnStreamClear" onclick="clearStreamFrames()">🗑 清空</button>
+  <div class="card">
+    <h2>⏳ 批注队列 · 48h SLA 倒计时</h2>
+    <div class="stat">待核 <b id="qBacklog">—</b> · 已超 48h <b id="qOverdue" style="color:var(--red)">—</b> · 已核 <b id="qApproved">—</b> · 已驳 <b id="qRejected">—</b>
+      <span style="flex:1"></span><button class="ghost" style="padding:2px 10px;font-size:11px" onclick="loadAll()">刷新</button></div>
+    <div id="queue"></div>
   </div>
 
-  <!-- 帧回看 -->
-  <div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:6px">📸 帧回看（最近 30 帧 · 滚动浏览）</div>
-    <div class="stream-frame-list" id="streamFrameList">
-      <div class="state-empty" style="padding:20px 0;width:100%;font-size:12px">
-        尚未采集帧
-      </div>
-    </div>
+  <div class="card">
+    <h2>📚 批注历史（最近 50 条）</h2>
+    <div id="history"></div>
   </div>
 
-  <!-- 最新识别结果 -->
-  <div id="streamAnalysis"></div>
-</section>
-
-<!-- ═══ VOICE MODULE (麦克风人机对话) ═══ -->
-<section class="tab-section" id="voiceSection">
-  
-  <div class="voice-orb-wrap">
-    <div class="voice-orb" id="voiceOrb" onclick="toggleVoiceRecord()">🎤</div>
-    <div class="voice-status" id="voiceStatus">点击话筒开始 · 长按连续对话</div>
-  </div>
-
-  <!-- 实时转写 -->
-  <div class="voice-transcript" id="voiceTranscript">
-    <span class="placeholder">说出你的问题…（示例：我最近总失眠多梦，可以怎么调理？）</span>
-  </div>
-
-  <!-- 快捷话术 -->
-  <div class="voice-quick-actions">
-    <span class="voice-quick-btn" onclick="askQuick('我的八字是什么')">📜 我的八字</span>
-    <span class="voice-quick-btn" onclick="askQuick('最近运势怎么样')">📈 近期运势</span>
-    <span class="voice-quick-btn" onclick="askQuick('帮我看看面相')">👤 看看面相</span>
-    <span class="voice-quick-btn" onclick="askQuick('健康需要注意什么')">💊 健康提示</span>
-    <span class="voice-quick-btn" onclick="askQuick('桂枝汤怎么用')">🌿 桂枝汤</span>
-    <span class="voice-quick-btn" onclick="askQuick('什么是五行')">☯ 五行入门</span>
-  </div>
-
-  <!-- 对话历史 -->
-  <div>
-    <div style="font-size:12px;color:var(--muted);margin:8px 0">💬 对话历史</div>
-    <div class="voice-history" id="voiceHistory">
-      <div class="state-empty" style="padding:20px 0;font-size:12px">
-        暂无对话
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ SEARCH MODULE ═══ -->
-<section class="tab-section" id="searchSection">
-  <div class="search-input-wrap">
-    <span class="search-icon">🔍</span>
-    <input  class="search-input" id="searchInput" type="search" 
-      placeholder="搜索命理宝鉴知识库…" 
-      autocomplete="off"
-      onkeydown="if(event.key==='Enter')mobileSearch()" aria-label="搜索命理宝鉴知识库…">
-    <button class="search-submit" onclick="mobileSearch()">搜索</button>
-  </div>
-
-  <!-- 热门搜索 -->
-  <div id="hotTags" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
-    <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;margin-right:4px">🔥</span>
-  </div>
-
-  <!-- 搜索结果 -->
-  <div id="searchResults">
-    <div class="state-empty">
-      <div class="state-empty-icon">🔍</div>
-      <div>输入关键词搜索</div>
-      <div style="font-size:12px;margin-top:4px;opacity:0.7">试试：桂枝汤 · 八字 · 倪海厦 · 数字化转型</div>
-    </div>
-  </div>
-</section>
-
+  <div class="hint" style="text-align:center">批注签发前逐条核对 · AI 草案未经核对不对外展示 · 命理内容为传统易学参考，不构成医学诊断</div>
 </div>
-
+<div id="toast"></div>
 <script>
-/* ═══════════════════════════════════════════════════════
-   mobile-interact.js — 手机端人机交互引擎 V2
-   新增：实时视频帧流 + 麦克风语音对话
-   ═══════════════════════════════════════════════════════ */
+const EXTRA = 'http://127.0.0.1:8974';
+const $ = id => document.getElementById(id);
+let authed = false, myPhone = '';
 
-// ===== Config =====
-const KB_FTS_API = '/api/public/kb/search-fts';
-const KB_HOT_API = '/api/public/kb-hot';
-const KB_HIT_API = '/api/public/kb-hit';
-const OCR_UPLOAD_API = '/api/v1/camera/upload-multipart';
-const ASR_ANALYZE_API = '/api/public/voice-analyze';
-const SOLVE_API = '/api/public/messiah-solve';
-const FEEDBACK_API = '/api/public/messiah-feedback';
-let MESSIAH_SESSION = '';  // 会话标识（同会话多轮自动关联）
-const STREAM_INTERVAL_MS = 2000; // 实时帧间隔
-const STREAM_FRAME_QUALITY = 0.65;
-const STREAM_MAX_FRAMES = 30;
-const LOCAL_IP = window.location.hostname || '127.0.0.1';
-
-// ===== State =====
-let cameraMode = 'face';
-let streamMode = 'face';
-let isCameraOn = false;
-let isStreamCameraOn = false;
-let isStreaming = false;
-let streamIntervalId = null;
-let videoStream = null;
-let streamVideoStream = null;
-let currentPhoto = null;
-let streamFrames = []; // {blob, dataUrl, timestamp, kb_match, status}
-
-// ===== Voice State =====
-let mediaRecorder = null;
-let mediaStream = null;
-let audioChunks = [];
-let isRecordingVoice = false;
-let recognition = null;
-let finalText = '';
-let voiceHistory = []; // {role:'user'|'ai', text, kbMatches}
-
-// ===== Tab Switch =====
-function switchTab(tab) {
-  // 切 Tab 时停掉当前 Tab 的硬件流（避免后台持续录制耗电/占带宽）
-  if (tab !== 'camera' && isCameraOn) stopCamera();
-  if (tab !== 'stream') {
-    if (isStreamCameraOn) stopStreamCamera();
-    if (isStreaming) stopStream();
-  }
-  if (tab !== 'voice' && isRecordingVoice) stopVoiceRecord();
-
-  document.querySelectorAll('.app-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  document.querySelectorAll('.tab-section').forEach(s => s.classList.toggle('active', s.id === tab + 'Section'));
+function toast(m){ const t=$('toast'); t.textContent=m; t.style.display='block'; clearTimeout(t._tm); t._tm=setTimeout(()=>t.style.display='none',2600); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+async function api(path, opts){
+  const r = await fetch(EXTRA + path, { signal: AbortSignal.timeout(8000), ...opts });
+  return r.json();
 }
 
-// ===== Camera Mode =====
-function setCameraMode(mode) {
-  cameraMode = mode;
-  const labels = { face: '👤 面诊', tongue: '👅 舌诊', 'ocr-tcm': '📄 病历OCR', eye: '👁 眼诊' };
-  document.getElementById('modeLabel').textContent = labels[mode] || mode;
-  document.querySelectorAll('#modeChips .camera-mode-chip').forEach(c => c.classList.toggle('active', c.dataset.mode === mode));
+/* ── G10 鉴权 ── */
+async function sendCode(){
+  const p = $('phone').value.trim();
+  if(!/^1\d{10}$/.test(p)){ toast('请输入 11 位手机号'); return; }
+  $('btnSend').disabled = true;
+  const r = await api('/api/sms/send-code', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone:p, scene:'master-login' }) });
+  $('btnSend').disabled = false;
+  toast(r.ok ? '验证码已下发（mock：见服务端 outbox 记录）' : (r.error || '发送失败'));
+}
+async function verifyCode(){
+  const p = $('phone').value.trim(), c = $('code').value.trim();
+  const r = await api('/api/sms/verify-code', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ phone:p, code:c, scene:'master-login' }) });
+  if(r.ok){
+    authed = true; myPhone = p;
+    $('authCard').querySelector('h2').innerHTML = '✅ 已验证：命理师 ' + p.replace(/^(\d{3})\d{4}(\d{4})$/,'$1****$2');
+    $('authCard').querySelectorAll('.row,.hint').forEach(e => e.style.display = 'none');
+    toast('验证通过，可执行核对');
+    loadAll();
+  } else toast(r.error || '验证失败');
 }
 
-// ===== Camera Toggle =====
-async function toggleCamera() {
-  if (isCameraOn) { stopCamera(); return; }
+/* ── 队列（SLA 倒计时）── */
+function slaBadge(a, slaHours){
+  const remain = slaHours - a.age_hours;
+  if (a.overdue) return `<span class="sla red">已超 ${(a.age_hours - slaHours).toFixed(1)}h</span>`;
+  const cls = remain < 8 ? 'yellow' : 'green';
+  return `<span class="sla ${cls}">剩 ${remain.toFixed(1)}h</span>`;
+}
+async function loadQueue(){
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 1280 } }
-    });
-    const video = document.getElementById('cameraVideo');
-    video.srcObject = stream;
-    video.style.display = 'block';
-    video.play();
-    document.getElementById('cameraCanvas').style.display = 'none';
-    document.getElementById('previewPlaceholder').style.display = 'none';
-    document.getElementById('btnCamera').innerHTML = '📷 关闭相机';
-    document.getElementById('btnCapture').disabled = false;
-    videoStream = stream;
-    isCameraOn = true;
-  } catch (e) {
-    showToast('无法访问相机：' + esc(e.message));
+    const q = await api('/api/annotation-queue');
+    $('qBacklog').textContent = q.backlog; $('qOverdue').textContent = q.overdue;
+    $('qApproved').textContent = q.stats.approved; $('qRejected').textContent = q.stats.rejected;
+    if(!q.queue.length){ $('queue').innerHTML = '<div class="empty">队列清空，无待核批注 ✅</div>'; return; }
+    $('queue').innerHTML = q.queue.map(a => `
+      <div class="ann">
+        <div class="meta">
+          <span>#${esc(a.emr_id)} <span class="tag ${a.type==='ai'?'ai':''}">${a.type==='ai'?'🤖 AI 草案':'✍️ 人工'}</span> ${esc(a.author||'')}</span>
+          ${slaBadge(a, q.sla_hours)}
+        </div>
+        <div class="content">${esc(a.content)}</div>
+        <div class="meta"><span>入队 ${esc((a.created_at||'').slice(0,16).replace('T',' '))} · 已等 ${a.age_hours}h</span></div>
+        <div class="ops">
+          <button class="ok" onclick="review('${a.id}','approve')" ${authed?'':'disabled'}>✅ 核对通过</button>
+          <button class="no" onclick="review('${a.id}','reject')" ${authed?'':'disabled'}>❌ 驳回</button>
+        </div>
+      </div>`).join('');
+  } catch(e){ $('queue').innerHTML = '<div class="empty">批注服务不可达：' + esc(e.message) + '</div>'; }
+}
+
+async function review(aid, action){
+  if(!authed){ toast('请先完成身份验证'); return; }
+  const reviewer = '命理师·' + myPhone.replace(/^(\d{3})\d{4}(\d{4})$/,'$1****$2');
+  let body = { reviewer };
+  if(action === 'reject'){
+    const reason = prompt('驳回原因（必填）：');
+    if(!reason) return;
+    body.reason = reason;
   }
+  const r = await api(`/api/annotations/${aid}/${action}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  if(r.ok){ toast(action === 'approve' ? '已核对签发（水印解除）' + (r.sms ? '，' + r.sms : '') : '已驳回'); loadAll(); }
+  else toast(r.error || '操作失败');
 }
 
-function stopCamera() {
-  if (videoStream) { videoStream.getTracks().forEach(t => t.stop()); videoStream = null; }
-  document.getElementById('cameraVideo').style.display = 'none';
-  document.getElementById('cameraCanvas').style.display = 'none';
-  document.getElementById('previewPlaceholder').style.display = 'flex';
-  document.getElementById('btnCamera').innerHTML = '📷 打开相机';
-  document.getElementById('btnCapture').disabled = true;
-  isCameraOn = false;
-}
-
-// ===== Capture & Analyze =====
-async function captureAndAnalyze() {
-  if (!isCameraOn) return showToast('请先打开相机');
-  const video = document.getElementById('cameraVideo');
-  const canvas = document.getElementById('cameraCanvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  canvas.style.display = 'block';
-
-  const resultEl = document.getElementById('analysisResult');
-  resultEl.innerHTML = '<div class="state-loading"><div class="state-spinner"></div><span>AI 分析中…</span></div>';
+/* ── 历史 ── */
+async function loadHistory(){
   try {
-    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.85));
-    const formData = new FormData();
-    formData.append('file', blob, 'capture.jpg');
-    formData.append('mode', cameraMode);
-    let ocrResult;
-    try {
-      const resp = await fetch(OCR_UPLOAD_API, { method: 'POST', body: formData, signal: AbortSignal.timeout(15000) });
-      ocrResult = await resp.json();
-    } catch {
-      ocrResult = { ok: false, analysis: { summary: '离线模式：相机已拍摄，请连接 KB 网络获取 AI 分析' }, mode: cameraMode };
-    }
-    let kbMatches = ocrResult.kb_matches || [];
-    if (!kbMatches.length && ocrResult.analysis?.summary) {
-      try {
-        const kbResp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(ocrResult.analysis.summary.substring(0,50))}&limit=3`, { signal: AbortSignal.timeout(15000) });
-        const kbData = await kbResp.json();
-        kbMatches = (kbData.results || []).slice(0, 3);
-      } catch {}
-    }
-    renderAnalysis(ocrResult, kbMatches, 'analysisResult');
-  } catch (e) {
-    resultEl.innerHTML = `<div class="state-error">分析失败: ${esc(e.message)}</div>`;
-  }
+    const h = await api('/api/annotation-history');
+    if(!h.history.length){ $('history').innerHTML = '<div class="empty">暂无历史批注</div>'; return; }
+    $('history').innerHTML = h.history.map(a => `
+      <div class="ann">
+        <div class="meta">
+          <span>#${esc(a.emr_id)} <span class="tag ${a.type==='ai'?'ai':''}">${a.type==='ai'?'🤖 AI':'✍️ 人工'}</span></span>
+          <span class="${a.status==='approved'?'badge-approved':'badge-rejected'}">${a.status==='approved'?'✅ 已核对':'❌ 已驳回'}</span>
+        </div>
+        <div class="content">${esc((a.content||'').slice(0,200))}</div>
+        <div class="meta"><span>核对：${esc(a.reviewer||'—')} · ${esc((a.reviewed_at||'').slice(0,16).replace('T',' '))}${a.reject_reason ? ' · 原因：' + esc(a.reject_reason) : ''}</span></div>
+      </div>`).join('');
+  } catch(e){ $('history').innerHTML = '<div class="empty">历史加载失败</div>'; }
 }
 
-function renderAnalysis(ocrResult, kbMatches, containerId = 'analysisResult') {
-  const modeLabels = { face:'面诊', tongue:'舌诊', 'ocr-tcm':'病历OCR', eye:'眼诊', hand:'手相', scene:'风水环境' };
-  const modeLabel = modeLabels[ocrResult.mode] || ocrResult.mode || cameraMode;
-  const summary = (typeof ocrResult.analysis === 'string' ? ocrResult.analysis : ocrResult.analysis?.summary) || ocrResult.summary || '分析完成';
-  const features = ocrResult.analysis?.features || ocrResult.features || {};
-
-  let html = `<div class="analysis-panel">
-    <div class="analysis-title">🧬 ${modeLabel}分析结果</div>
-    <div class="analysis-text">${escapeHtml(summary)}</div>`;
-
-  if (Object.keys(features).length > 0) {
-    html += '<div style="font-size:12px;color:var(--muted);margin-top:8px">';
-    for (const [k, v] of Object.entries(features).slice(0, 6)) {
-      html += `<span style="display:inline-block;padding:2px 8px;margin:2px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border)">${k}: ${v}</span>`;
-    }
-    html += '</div>';
-  }
-
-  if (kbMatches && kbMatches.length > 0) {
-    html += '<div class="analysis-kb">📚 知识库支撑 (' + kbMatches.length + ' 条引用)</div>';
-    kbMatches.slice(0, 3).forEach(m => {
-      const title = m.title || m.summary || m.entry_id || '';
-      const snippet = m.snippet || m.content || '';
-      html += `<div style="font-size:12px;color:var(--muted);margin:4px 0;padding:6px;background:rgba(255,255,255,0.02);border-radius:6px">
-        <strong>${escapeHtml(title.substring(0,50))}</strong>
-        <div style="margin-top:2px">${escapeHtml((snippet||'').substring(0,100))}</div>
-      </div>`;
-    });
-  }
-  html += '</div>';
-  document.getElementById(containerId).innerHTML = html;
-}
-
-function escapeHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-/* ═══════════════════════════════════════════════════════
-   STREAM MODULE — 实时视频帧流识别
-   每 2 秒拍一帧送入 KB 分析，保留最近 30 帧回看
-   ═══════════════════════════════════════════════════════ */
-
-function setStreamMode(mode) {
-  streamMode = mode;
-  const labels = { face:'👤 面部分析', tongue:'👅 舌诊跟踪', hand:'✋ 手相识别', scene:'🏠 风水环境' };
-  document.getElementById('streamModeLabel').textContent = labels[mode] || mode;
-  document.querySelectorAll('#streamSection .camera-mode-chip').forEach(c => c.classList.toggle('active', c.dataset.streamMode === mode));
-}
-
-async function toggleStreamCamera() {
-  if (isStreamCameraOn) { stopStreamCamera(); return; }
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-    });
-    const video = document.getElementById('streamVideo');
-    video.srcObject = stream;
-    video.style.display = 'block';
-    video.play();
-    document.getElementById('streamCanvas').style.display = 'none';
-    document.getElementById('streamPlaceholder').style.display = 'none';
-    document.getElementById('btnStreamCamera').innerHTML = '🎥 关闭摄像头';
-    document.getElementById('btnStreamToggle').disabled = false;
-    streamVideoStream = stream;
-    isStreamCameraOn = true;
-  } catch (e) {
-    showToast('无法访问相机：' + esc(e.message));
-  }
-}
-
-function stopStreamCamera() {
-  if (isStreaming) stopStream();
-  if (streamVideoStream) { streamVideoStream.getTracks().forEach(t => t.stop()); streamVideoStream = null; }
-  document.getElementById('streamVideo').style.display = 'none';
-  document.getElementById('streamCanvas').style.display = 'none';
-  document.getElementById('streamPlaceholder').style.display = 'flex';
-  document.getElementById('btnStreamCamera').innerHTML = '🎥 打开摄像头';
-  document.getElementById('btnStreamToggle').disabled = true;
-  document.getElementById('btnStreamToggle').className = 'camera-btn danger';
-  document.getElementById('btnStreamToggle').innerHTML = '⏺ 开始识别';
-  isStreamCameraOn = false;
-}
-
-function toggleStream() {
-  if (isStreaming) { stopStream(); return; }
-  startStream();
-}
-
-function startStream() {
-  if (!isStreamCameraOn) return showToast('请先打开摄像头');
-  isStreaming = true;
-  document.getElementById('btnStreamToggle').className = 'camera-btn primary';
-  document.getElementById('btnStreamToggle').innerHTML = '⏸ 暂停';
-  document.getElementById('streamBadge').style.display = 'flex';
-  document.getElementById('streamBadgeText').textContent = '实时识别中';
-  streamIntervalId = setInterval(captureStreamFrame, STREAM_INTERVAL_MS);
-  captureStreamFrame(); // 立即采一帧
-  showToast('已开启实时识别 · 每 2 秒/帧');
-}
-
-function stopStream() {
-  isStreaming = false;
-  if (streamIntervalId) clearInterval(streamIntervalId);
-  streamIntervalId = null;
-  document.getElementById('btnStreamToggle').className = 'camera-btn danger';
-  document.getElementById('btnStreamToggle').innerHTML = '⏺ 开始识别';
-  document.getElementById('streamBadge').style.display = 'none';
-}
-
-async function captureStreamFrame() {
-  const video = document.getElementById('streamVideo');
-  if (!video.videoWidth) return;
-  const canvas = document.getElementById('streamCanvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-
-  try {
-    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', STREAM_FRAME_QUALITY));
-    const dataUrl = canvas.toDataURL('image/jpeg', STREAM_FRAME_QUALITY);
-
-    const frameRecord = {
-      blob, dataUrl,
-      timestamp: Date.now(),
-      mode: streamMode,
-      status: 'pending',
-      kb_match: null,
-    };
-    streamFrames.unshift(frameRecord);
-    if (streamFrames.length > STREAM_MAX_FRAMES) streamFrames.pop();
-    renderStreamFrames();
-
-    // 后台异步送入 KB（不阻塞下帧）
-    fetch(`${OCR_UPLOAD_API}`, { signal: AbortSignal.timeout(15000),
-      method: 'POST',
-      body: (() => {
-        const fd = new FormData();
-        fd.append('file', blob, `frame_${frameRecord.timestamp}.jpg`);
-        fd.append('mode', streamMode);
-        return fd;
-      })(),
-      signal: AbortSignal.timeout(8000),
-    })
-    .then(r => r.json())
-    .then(data => {
-      frameRecord.status = data.ok ? 'done' : 'error';
-      frameRecord.kb_match = data.kb_matches || [];
-      frameRecord.analysis = (typeof data.analysis === 'string' ? data.analysis : data.analysis?.summary) || '';
-      renderStreamFrames();
-      // 自动展示最新一帧的 KB 结果
-      if (streamFrames[0] === frameRecord && frameRecord.kb_match?.length) {
-        renderStreamAnalysis(frameRecord);
-      }
-    })
-    .catch(err => {
-      frameRecord.status = 'error';
-      frameRecord.error = err.message;
-      renderStreamFrames();
-    });
-  } catch (e) {
-    console.warn('captureStreamFrame failed:', e);
-  }
-}
-
-function renderStreamFrames() {
-  const el = document.getElementById('streamFrameList');
-  if (streamFrames.length === 0) {
-    el.innerHTML = '<div class="state-empty" style="padding:20px 0;width:100%;font-size:12px">尚未采集帧</div>';
-    return;
-  }
-  el.innerHTML = streamFrames.map((f, i) => {
-    const t = new Date(f.timestamp);
-    const ts = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
-    const statusBadge = f.status === 'done' ? `<span class="badge">KB×${f.kb_match?.length||0}</span>` : f.status === 'error' ? `<span class="badge" style="background:var(--red)">!</span>` : `<span class="badge" style="background:var(--orange)">…</span>`;
-    return `<div class="stream-frame-card" onclick="showStreamFrameDetail(${i})">
-      <img src="${f.dataUrl}" alt="用户照片" alt="frame">
-      <div class="ts">${ts}</div>
-      ${statusBadge}
-    </div>`;
-  }).join('');
-}
-
-function showStreamFrameDetail(idx) {
-  const f = streamFrames[idx];
-  if (!f) return;
-  const el = document.getElementById('streamAnalysis');
-  el.innerHTML = `<div class="analysis-panel">
-    <div class="analysis-title">🧬 帧分析（${new Date(f.timestamp).toLocaleTimeString('zh-CN')}）</div>
-    <img src="${f.dataUrl}" alt="用户照片" style="width:100%;border-radius:8px;margin-bottom:8px">
-    ${f.analysis ? `<div class="analysis-text">${escapeHtml(f.analysis)}</div>` : '<div class="analysis-text" style="opacity:0.6">无识别结果</div>'}
-    ${f.kb_match?.length ? `<div class="analysis-kb">📚 KB 命中 ${f.kb_match.length} 条</div>` : ''}
-  </div>`;
-}
-
-function renderStreamAnalysis(frame) {
-  const el = document.getElementById('streamAnalysis');
-  el.innerHTML = `<div class="analysis-panel">
-    <div class="analysis-title">🧬 最新识别（${new Date(frame.timestamp).toLocaleTimeString('zh-CN')} · ${streamMode}）</div>
-    ${frame.analysis ? `<div class="analysis-text">${escapeHtml(frame.analysis)}</div>` : '<div class="analysis-text" style="opacity:0.6">无结构化分析输出</div>'}
-    ${frame.kb_match?.length ? `<div class="analysis-kb">📚 KB 命中 ${frame.kb_match.length} 条</div>` :
-      '<div class="analysis-kb" style="color:var(--muted)">📚 KB 无匹配（可调整 mode 或 KB 命中阈值）</div>'}
-  </div>`;
-}
-
-function clearStreamFrames() {
-  streamFrames = [];
-  document.getElementById('streamAnalysis').innerHTML = '';
-  renderStreamFrames();
-  showToast('已清空帧缓存');
-}
-
-/* ═══════════════════════════════════════════════════════
-   VOICE MODULE — 麦克风人机对话
-   • MediaRecorder 录音（audio/webm）
-   • Web Speech API 实时转写（中文）
-   • 转写结束 → 送入 KB + AI 助手 → 渲染对话
-   • 历史消息 + 快捷话术
-   ═══════════════════════════════════════════════════════ */
-
-async function toggleVoiceRecord() {
-  if (isRecordingVoice) { stopVoiceRecord(); return; }
-  startVoiceRecord();
-}
-
-async function startVoiceRecord() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    return showToast('浏览器不支持录音，请用 Chrome/Edge');
-  }
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    audioChunks = [];
-    mediaRecorder = new MediaRecorder(mediaStream);
-    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-    mediaRecorder.onstop = onVoiceRecordStop;
-    mediaRecorder.start();
-
-    isRecordingVoice = true;
-    document.getElementById('voiceOrb').classList.add('listening');
-    document.getElementById('voiceOrb').textContent = '⏹';
-    document.getElementById('voiceStatus').textContent = '🎙 正在听…（再次点击结束）';
-
-    startRecognition();
-  } catch (e) {
-    showToast('无法访问麦克风：' + esc(e.message));
-  }
-}
-
-function stopVoiceRecord() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-  isRecordingVoice = false;
-  document.getElementById('voiceOrb').classList.remove('listening');
-  document.getElementById('voiceOrb').textContent = '🎤';
-  document.getElementById('voiceStatus').textContent = '点击话筒开始 · 长按连续对话';
-}
-
-function onVoiceRecordStop() {
-  const blob = new Blob(audioChunks, { type: 'audio/webm' });
-  stopRecognition();
-  if (finalText && finalText.trim()) {
-    askAI(finalText.trim(), blob);
-  } else {
-    showToast('未识别到语音，请重试');
-  }
-  finalText = '';
-}
-
-function startRecognition() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    document.getElementById('voiceTranscript').innerHTML = '<span class="placeholder">⚠️ 浏览器不支持 Web Speech API（请用 Chrome/Edge）· 仍可录音后自动转写</span>';
-    return;
-  }
-  recognition = new SR();
-  recognition.lang = 'zh-CN';
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.onresult = e => {
-    let text = '';
-    for (let i = 0; i < e.results.length; i++) text += e.results[i][0].transcript;
-    finalText = text;
-    document.getElementById('voiceTranscript').innerHTML = '<span class="live">' + escapeHtml(text) + '</span>';
-  };
-  recognition.onerror = e => {
-    console.warn('ASR error', e.error);
-  };
-  try { recognition.start(); } catch (e) {}
-}
-
-function stopRecognition() {
-  if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
-}
-
-async function askQuick(q) {
-  document.getElementById('voiceTranscript').innerHTML = '<span>' + escapeHtml(q) + '</span>';
-  await askAI(q, null);
-}
-
-async function askAI(query, audioBlob) {
-  appendVoiceMessage('user', query);
-  document.getElementById('voiceTranscript').innerHTML = '<span class="placeholder">AI 思考中…</span>';
-
-  // 1) 同步调用 KB FTS5（秒回）
-  let kbMatches = [];
-  try {
-    const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(query)}&limit=5`, { signal: AbortSignal.timeout(15000) });
-    const data = await resp.json();
-    kbMatches = (data.results || []).slice(0, 5);
-  } catch {}
-
-  // 1.5) 同步调用弥撒亚 solve 端点（白盒 3 段链路：search→nn→guide）
-  let solveResult = null;
-  try {
-    // R472 · 多轮会话支持：同会话连续问 query，弥撒亚自动以ref_id串联上下文
-    if (!MESSIAH_SESSION) MESSIAH_SESSION = `mob-${Date.now().toString(36)}`;
-    const solveUrl = `${SOLVE_API}?q=${encodeURIComponent(query)}&session_id=${MESSIAH_SESSION}`;
-    const solveResp = await fetch(solveUrl, { signal: AbortSignal.timeout(5000) });
-    if (solveResp.ok) solveResult = await solveResp.json();
-  } catch {}
-
-  // 2) AI 助手回复（KB 命中 → 高置信度直答 + KB 引用，否则走通用 AI 入口）
-  let aiText = '';
-  try {
-    const aiResp = await fetch('/api/ai/public-chat', { signal: AbortSignal.timeout(15000),
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: query,
-        kb_matches: kbMatches.map(m => ({ title: m.title, snippet: m.snippet, module: m.module })),
-        source: 'mobile-voice',
-      }),
-      signal: AbortSignal.timeout(20000),
-    });
-    const aiData = await aiResp.json();
-    aiText = aiData.text || aiData.reply || aiData.answer || (kbMatches.length ? kbHitsSummary(kbMatches) : '');
-  } catch (e) {
-    aiText = kbMatches.length ? kbHitsSummary(kbMatches) : `网络异常：${esc(e.message)}。建议重试或检查服务状态。`;
-  }
-
-  if (!aiText) aiText = '抱歉，未能给出有效回复。请尝试更具体的提问。';
-  appendVoiceMessage('ai', aiText, kbMatches);
-  document.getElementById('voiceTranscript').innerHTML = '<span class="placeholder">继续点击话筒或快捷话术…</span>';
-
-  // 3) 命中打点
-  fetch(KB_HIT_API, { signal: AbortSignal.timeout(15000),
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({ query, hits: kbMatches.length, source: 'mobile-voice' }),
-    signal: AbortSignal.timeout(3000),
-  }).catch(() => {});
-
-  // 4) TTS 朗读（如可用）
-  if (window.speechSynthesis) {
-    try {
-      const u = new SpeechSynthesisUtterance(aiText.slice(0, 300));
-      u.lang = 'zh-CN';
-      u.rate = 1.05;
-      window.speechSynthesis.speak(u);
-    } catch {}
-  }
-}
-
-function kbHitsSummary(matches) {
-  return '📚 知识库为你匹配到以下内容：\n' + matches.slice(0, 3).map((m, i) =>
-    `${i + 1}. ${m.title || m.summary || m.entry_id || ''}\n   ${(m.snippet || m.content || '').substring(0, 100)}…`
-  ).join('\n');
-}
-
-function appendVoiceMessage(role, text, kbMatches) {
-  const el = document.getElementById('voiceHistory');
-  if (voiceHistory.length === 0) el.innerHTML = '';
-  const msgIdx = voiceHistory.length;
-  voiceHistory.push({ role, text, kbMatches: kbMatches || [], ts: Date.now(), session: MESSIAH_SESSION });
-  const t = new Date();
-  const tsLabel = `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
-  const meta = `<div class="msg-meta">${role === 'user' ? '👤 你' : '🤖 AI'} · ${tsLabel}${MESSIAH_SESSION ? ` · <span style="opacity:0.5">session:${MESSIAH_SESSION.slice(-6)}</span>` : ''}</div>`;
-  const kbHtml = kbMatches && kbMatches.length ? `<div style="margin-top:6px;font-size:11px;opacity:0.7">📚 ${kbMatches.length} 条 KB 引用</div>` : '';
-  // R472 · AI 回复后添加反馈按钮：👍 / 👎 一键闭环
-  const feedbackHtml = role === 'ai' ? `
-    <div class="msg-feedback" data-msg-idx="${msgIdx}" style="margin-top:6px;display:flex;gap:6px;font-size:12px">
-      <button class="fb-btn" data-score="5" data-idx="${msgIdx}" title="很准" aria-label="很准"><span aria-hidden="true">👍</span></button>
-      <button class="fb-btn" data-score="3" data-idx="${msgIdx}" title="一般" aria-label="一般"><span aria-hidden="true">😐</span></button>
-      <button class="fb-btn" data-score="1" data-idx="${msgIdx}" title="不准" aria-label="不准"><span aria-hidden="true">👎</span></button>
-      <span class="fb-status" data-idx="${msgIdx}" style="opacity:0.6;font-size:11px;margin-left:4px"></span>
-    </div>
-  ` : '';
-  el.insertAdjacentHTML('beforeend',
-    `<div class="voice-msg ${role}">${meta}<div>${escapeHtml(text)}</div>${kbHtml}${feedbackHtml}</div>`);
-  el.scrollTop = el.scrollHeight;
-
-  // R472 · 绑定反馈按钮点击事件
-  if (role === 'ai') {
-    el.querySelectorAll(`.fb-btn[data-idx="${msgIdx}"]`).forEach(btn => {
-      btn.addEventListener('click', () => submitFeedback(parseInt(btn.dataset.score, 10), msgIdx));
-    });
-  }
-}
-
-// R472 · 反馈闭环：POST /api/public/messiah-feedback → kb_feedback 表 → 明日 03:00 自动进化
-async function submitFeedback(score, msgIdx) {
-  const msg = voiceHistory[msgIdx];
-  if (!msg) return;
-  const statusEl = document.querySelector(`.fb-status[data-idx="${msgIdx}"]`);
-  // 标记已选
-  document.querySelectorAll(`.fb-btn[data-idx="${msgIdx}"]`).forEach(b => b.style.opacity = '0.4');
-  if (statusEl) statusEl.textContent = '提交中…';
-  try {
-    // 取首条 KB 引用作为 entry_id
-    const entryId = (msg.kbMatches && msg.kbMatches[0] && (msg.kbMatches[0].entry_id || msg.kbMatches[0].id)) || '';
-    const resp = await fetch(FEEDBACK_API, { signal: AbortSignal.timeout(15000),
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: msg.text ? msg.text.slice(0, 80) : '',
-        entry_id: entryId,
-        score: score,
-        comment: score >= 4 ? '准' : (score >= 2 ? '一般' : '不准'),
-        module: msg.kbMatches && msg.kbMatches[0] ? msg.kbMatches[0].module : '',
-        session_id: msg.session || MESSIAH_SESSION,
-        ref_id: msgIdx.toString(),
-        source: 'mobile-voice',
-      }),
-      signal: AbortSignal.timeout(3000),
-    });
-    const data = await resp.json();
-    if (statusEl) statusEl.textContent = data.received ? `✅ 已记录 ${score}分` : '❌ 失败';
-  } catch (e) {
-    if (statusEl) statusEl.textContent = `❌ ${esc(e.message).slice(0, 12)}`;
-  }
-}
-
-// ===== Mobile Search =====
-async function mobileSearch() {
-  const q = document.getElementById('searchInput').value.trim();
-  if (!q || q.length < 2) return;
-  const el = document.getElementById('searchResults');
-  el.innerHTML = '<div class="state-loading"><div class="state-spinner"></div><span>FTS5 检索中…</span></div>';
-  try {
-    const resp = await fetch(`${KB_FTS_API}?q=${encodeURIComponent(q)}&limit=10`, { signal: AbortSignal.timeout(15000) });
-    const data = await resp.json();
-    const results = data.results || data.data || [];
-    const engine = data.engine || 'fts5';
-    if (results.length === 0) {
-      el.innerHTML = '<div class="state-empty"><div class="state-empty-icon">🔍</div><div>未找到匹配结果</div><div style="font-size:12px;margin-top:4px">尝试缩短关键词或换用同义词</div></div>';
-      return;
-    }
-    el.innerHTML = `
-      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
-        找到 <strong>${(data.total||results.length).toLocaleString()}</strong> 条 · ${engine.toUpperCase()} BM25 · ${results.length} 条/页
-      </div>
-      ${results.map((r, i) => {
-        const title = r.title || r.summary || r.entry_id || '';
-        const snippet = r.snippet || r.content || '';
-        const module = r.module || '';
-        const trust = r.trust_score || r.confidence || '';
-        return `<div class="result-card">
-          <div class="result-title">${i+1}. ${escapeHtml(title.substring(0,80))}</div>
-          <div class="result-snippet">${escapeHtml((snippet||'').substring(0,150))}</div>
-          <div class="result-meta">
-            <span>📁 ${escapeHtml(module)}</span>
-            ${trust ? `<span>⚖️ ${(trust*100).toFixed(0)}%</span>` : ''}
-          </div>
-        </div>`;
-      }).join('')}
-    `;
-    fetch(KB_HIT_API, { signal: AbortSignal.timeout(15000),
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ query:q, hits:results.length, source:'kb-fts5' }),
-      signal: AbortSignal.timeout(3000),
-    }).catch(() => {});
-  } catch (e) {
-    el.innerHTML = `<div class="state-error">搜索失败: ${esc(e.message)}<br><button onclick="mobileSearch()" style="margin-top:10px;padding:8px 16px;border:1px solid var(--accent);border-radius:8px;background:none;color:var(--accent)">重试</button></div>`;
-  }
-}
-
-// ===== Hot Tags =====
-async function loadHotTags() {
-  try {
-    const resp = await fetch(`${KB_HOT_API}?limit=8`,{signal:AbortSignal.timeout(15000)});
-    const data = await resp.json();
-    const hot = data.hot || [];
-    const el = document.getElementById('hotTags');
-    el.innerHTML = '<span style="font-size:12px;color:var(--muted);display:flex;align-items:center;margin-right:4px">🔥</span>' +
-      hot.map(h => 
-        `<span onclick="document.getElementById('searchInput').value='${escapeHtml(h.q)}';mobileSearch()" style="padding:4px 10px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap">${escapeHtml(h.q)}</span>`
-      ).join('');
-  } catch {
-    document.getElementById('hotTags').innerHTML = 
-      '<span style="font-size:12px;color:var(--muted);display:flex;align-items:center;margin-right:4px">🔥</span>' +
-      ['用神','日主','大运','流年','桂枝汤','八字','倪海厦','ERP'].map(q =>
-        `<span onclick="document.getElementById('searchInput').value='${q}';mobileSearch()" style="padding:4px 10px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap">${q}</span>`
-      ).join('');
-  }
-}
-
-// ===== Toast =====
-function showToast(msg) {
-  let toast = document.getElementById('mobileToast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'mobileToast';
-    toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);padding:12px 24px;background:rgba(0,0,0,0.85);color:white;border-radius:8px;font-size:14px;z-index:9999;pointer-events:none;transition:opacity 0.3s';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = msg;
-  toast.style.opacity = '1';
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-}
-
-// ===== Init =====
-loadHotTags();
-
-// 检测本地/局域网连接
-fetch('/api/health',{signal:AbortSignal.timeout(15000)}).then(r => r.json()).then(d => {
-  document.getElementById('statusDot').innerHTML = '<span class="app-status-dot"></span>KB 在线 · ' + (d.service || 'ready');
-}).catch(() => {
-  document.getElementById('statusDot').innerHTML = '<span class="app-status-dot" style="background:var(--gold)"></span>KB 本地模式';
-});
-
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    loadHotTags();
-    // 切回前台时，自动停止后台流（避免耗电）
-    if (isStreaming && document.hidden) stopStream();
-    if (isRecordingVoice && document.hidden) stopVoiceRecord();
-  }
-});
-
-// 长按连续对话（orb）
-let voiceLongPressTimer = null;
-let voiceLongPressActive = false;
-const voiceOrb = () => document.getElementById('voiceOrb');
-if (voiceOrb()) {
-  voiceOrb().addEventListener('pointerdown', () => {
-    voiceLongPressActive = false;
-    voiceLongPressTimer = setTimeout(() => {
-      voiceLongPressActive = true;
-      if (!isRecordingVoice) startVoiceRecord();
-    }, 400);
-  });
-  voiceOrb().addEventListener('pointerup', () => {
-    clearTimeout(voiceLongPressTimer);
-    if (!voiceLongPressActive && isRecordingVoice) stopVoiceRecord();
-    voiceLongPressActive = false;
-  });
-  voiceOrb().addEventListener('pointerleave', () => {
-    clearTimeout(voiceLongPressTimer);
-    if (voiceLongPressActive && isRecordingVoice) stopVoiceRecord();
-    voiceLongPressActive = false;
-  });
-}
+function loadAll(){ loadQueue(); loadHistory(); }
+loadAll();
+setInterval(() => { if(document.visibilityState === 'visible') loadAll(); }, 60000);
 </script>
-<script src="js/error-interceptor.js" defer></script>
-<script src="js/mobile-nav.js" defer></script>
+<script src="/pwa/pwa-inject.js"></script>
 </body>
 </html>

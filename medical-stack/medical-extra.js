@@ -90,6 +90,16 @@ app.post('/api/sms/verify-code', (req, res) => {
   res.status(r.ok ? 200 : 400).json(r);
 });
 
+// G11: 批注历史（已核对/已驳回，最新在前）——移动端核对端「批注历史」数据源
+app.get('/api/annotation-history', (req, res) => {
+  const done = [];
+  for (const { emrId, a } of iterAll()) {
+    if (a.status === 'approved' || a.status === 'rejected') done.push({ ...a, emr_id: emrId });
+  }
+  done.sort((x, y) => (y.reviewed_at || '').localeCompare(x.reviewed_at || ''));
+  res.json({ ok: true, count: done.length, history: done.slice(0, 50) });
+});
+
 app.post('/api/emr/:id/annotate', (req, res) => {
   const emrId = req.params.id;
   const { type, author, content, patientPhone } = req.body || {};
