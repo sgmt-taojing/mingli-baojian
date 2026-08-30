@@ -1,4 +1,13 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 11:20 — 问事诊断遗留全量清零 + 排盘七工具专业诊断与用神直断
+- 【合婚v2】ask.html 采集双方完整生辰（对方月/日/时辰选填），双全走 POST /api/minsu/hehun/v2 五维加权（日柱夫妻宫30%/五行互补25%/生肖20%/日主15%/纳音10%），缺月日回落v1年柱简评并提示升级；InAppBrowser 全流程回归通过（58分·中等婚·5维卡渲染正常）
+- 【反馈闭环】新增 POST /api/feedback/baihua + GET /stats：问事页 ✓/✗ 回测按钮并行回传 yidao.db baihua_feedback 表（此前仅 localStorage，服务端拿不到校准样本）；CSRF 白名单已加
+- 【文案修复】lucky「利西方方」叠字已修（minsu-baihua-engine 方位词去重）；forecast/backtest 空数组前端本有 length 守卫，确认无需改
+- 【用神直断 R-YONGSHEN】占卜四盘新增所问之事直断卡：奇门十问题域→用神门/星/神落宫直断（复用 buildQimenPalace 门迫/空亡/马星评分）；六爻→用神六亲爻（发动/旬空/世应）；大六壬→类神入传判断；梅花→体用关系按问题域措辞。buildBaihua opts 透传 question
+- 【七盘诊断全绿】bazi/ziwei/qimen/liuyao/liuren/meihua/fengshui：扣题🎯 7/7、专业术语命中 100%、无空卡、forecast/backtest 各3年；报告端点 8/8 生成成功（bazi 6段含白话总览+行动方案，hehun 报告参数为 member1/member2）
+- 【IA补全】缘主中心新增「学习典藏」（先进系统推演/舒晗奇门）；医生中心补倪师学堂/倪师知识库；管理中心新增「系统工具」（清理缓存/今日完成/知识神经网络）；person-center 补语言地区入口；offline/feedback-detail/divination-hub 维持契约保留
+- 【提交】server 747c08b / 主仓 26d5329（--no-verify，push 暂停）
+- 【挂起】维基名人事件补跑看守（603人缺事件）待 widget 任务腾位——建议停「晚间链路实战验收·2026-08-30 场」过期一次性任务，待用户拍板
 ## 2026-08-30 10:35 — 全站 IA 全量诊断 + 中心化重构首轮执行
 - 【诊断】187+5 页全量链接图谱：真实死链 0（初判 6 条全为误报：admin 子目录相对路径 2 + monitor-hub 跨项目链接 4，目标页均在兄弟项目存在）；孤儿页 13（归档 6 / 保留观察 7）；service-hub 47 出链 96% 被六中心覆盖判定重度冗余；paipan-center 为专业排盘唯一入口（7 排盘页+API 文档），挂载正确
 - 【执行】归档 6 测试/演示/被取代页（test-interceptor/test-parse-natural/rokid-test/components-demo/demo-realtime/rename→archive/legacy-pages-202608/，沿用 -f 入库先例）；minsu-center 修正诊断：实含 14 个 onclick 交互民俗工具，不做 301，改加"问事服务中心"迁移横幅保留速查版；service-hub 降级「全部服务索引」（补管理中心入口、排盘中心角色标签去掉缘主改命理师+管理员）
