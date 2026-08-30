@@ -30,6 +30,8 @@ const ROOT = __dirname;
 const ANN_DIR = path.join(ROOT, 'data', 'annotations');
 const DISCLAIMER = '命理参考，非医学诊断';
 const SLA_HOURS = 48;
+// G10: 短信验证与提醒适配层（mock 先行：写 data/sms-outbox/，标「模拟外发」）
+const sms = require('./server/sms_adapter.js');
 
 fs.mkdirSync(ANN_DIR, { recursive: true });
 
@@ -76,9 +78,21 @@ app.get('/health', (req, res) => {
   res.json({ ok: true, service: '命理宝鉴·命理批注层', port: PORT, uptime: process.uptime() });
 });
 
+// ── G10① 命理师入驻/登录验证码（mock 通道，哈希落库，错五锁十）──
+app.post('/api/sms/send-code', (req, res) => {
+  const { phone, scene } = req.body || {};
+  const r = sms.sendCode(String(phone || ''), String(scene || 'master-login'));
+  res.status(r.ok ? 200 : 429).json(r);
+});
+app.post('/api/sms/verify-code', (req, res) => {
+  const { phone, code, scene } = req.body || {};
+  const r = sms.verifyCode(String(phone || ''), String(code || ''), String(scene || 'master-login'));
+  res.status(r.ok ? 200 : 400).json(r);
+});
+
 app.post('/api/emr/:id/annotate', (req, res) => {
   const emrId = req.params.id;
-  const { type, author, content } = req.body || {};
+  const { type, author, content, patientPhone } = req.body || {};
   if (!['ai', 'practitioner'].includes(type)) return res.status(400).json({ ok: false, error: 'type 须为 ai | practitioner' });
   if (!author || !content) return res.status(400).json({ ok: false, error: 'author 与 content 必填' });
   // 人工命理师直接批注仍需复核链（另一名命理师 approve），保持双轨一致
@@ -88,6 +102,7 @@ app.post('/api/emr/:id/annotate', (req, res) => {
     type,
     author,
     content,
+    patientPhone: /^1\d{10}$/.test(String(patientPhone || '')) ? String(patientPhone) : null, // G10③ 批注完成通知患者用
     disclaimer: DISCLAIMER,
     status: 'pending_review',
     watermark: '待命理师核对',
@@ -98,7 +113,17 @@ app.post('/api/emr/:id/annotate', (req, res) => {
   const list = readAnns(emrId);
   list.push(ann);
   writeAnns(emrId, list);
-  res.json({ ok: true, annotation: ann });
+  // G10② 批注待核对提醒 → 当值命理师（48h SLA 计时起点）；未配置当值号码则诚实跳过
+  let smsNote = null;
+  try {
+    const cfg = JSON.parse(fs.readFileSync(path.join(ROOT, 'server', 'config', 'carrier-config.local.json'), 'utf8'));
+    const duty = cfg.dutyMasterPhone || cfg.testPhone;
+    if (duty) {
+      const s = sms.sendNotice(duty, 'annotation_pending', { emrId });
+      smsNote = s.ok ? `已通知当值命理师（${s.mock ? '模拟外发' : '实发'}）` : `通知失败：${s.error}`;
+    }
+  } catch (_) { /* 无本地配置：跳过提醒 */ }
+  res.json({ ok: true, annotation: ann, sms: smsNote });
 });
 
 app.get('/api/emr/:id/annotations', (req, res) => {
@@ -141,7 +166,13 @@ app.post('/api/annotations/:aid/approve', (req, res) => {
   found.a.reviewer = reviewer;
   const list = readAnns(found.emrId).map(x => (x.id === found.a.id ? found.a : x));
   writeAnns(found.emrId, list);
-  res.json({ ok: true, annotation: found.a });
+  // G10③ 批注完成 → 通知患者查看病历（批注携带 patientPhone 时）
+  let smsNote = null;
+  if (found.a.patientPhone) {
+    const s = sms.sendNotice(found.a.patientPhone, 'annotation_done', { emrId: found.emrId });
+    smsNote = s.ok ? `已通知患者（${s.mock ? '模拟外发' : '实发'}）` : `通知失败：${s.error}`;
+  }
+  res.json({ ok: true, annotation: found.a, sms: smsNote });
 });
 
 app.post('/api/annotations/:aid/reject', (req, res) => {
