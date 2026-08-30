@@ -1,4 +1,25 @@
 # KANBAN.md — 命理宝鉴 项目看板
+## 2026-08-30 08:30 — ✅ 校正库扩容 515 条（→974）+ 两起事故根修 + 深度校验 v2 重建固化
+- **扩容**：Wikidata 名人 183→698 条（首轮抓取实际完成入库 515，去重幂等验证通过：二轮 224 条全判重）；命理校正库（不含移交中医 140）合计 **834 条**，排盘覆盖率 100%（除 32 条天纪 approximate 设计内走年柱轻校验，已 32/32 全命中）；刘善良身边实测样本农历1991-05-12→阳历1991-06-23 转换补排盘（甲木日主/甲子日甲子时）
+- **事故①根修**：batch-verify-corpus.py Python sqlite3 默认隔离级全程持写锁（结尾才 commit），与 8920 同步 better-sqlite3 写互卡 → **8920 事件循环冻结、全站假死**；修为 `isolation_level=None` autocommit + busy_timeout=8000，复跑期间 8920 健康 200/19ms
+- **事故②根修**：fetch-wikidata-celebs.py 维基导语 extract 链路当前网络不通（SSL handshake timeout）逐批干等 → 加熔断（连 2 批失败跳抽取保生辰入库）；SPARQL 亦间歇超时（中国/台湾/日本轮空），网络恢复后可复跑补齐（去重幂等）
+- **深度校验 v2 重建**：发现 8-28「v2=0.74」系**未落盘的临时执行**，脚本仓内一直是 v1；本轮批量跑被 v1 覆盖（144 条均分一度跌至 0.10）。已把 v2 规格（流年地支主气十神+大运干支十神联动+感情/婚姻性别区分：男看财女看官，性别不明保持并集）重建进脚本（mode=deep_shishen_v2）并复跑：均分 **0.23**，≥0.5 者 45/144。**口径修正：0.74 无法从已落盘资料复现，以 0.23 为当前可信基线**，0.74 旧记录标注存疑
+- **C 类遗留页退役清单**（07:25 条目，待用户拍板）：dashboard.html 系误判（被 monitor-hub/site-nav 引用），其余 13 页零引用可归档
+- commits：主仓 scripts 两修复；VERIFY 端点 429 限流对无事件样本无实际损失
+## 2026-08-30 08:00 — 💚 心跳 08:00 全绿（cron 30min · 6 服务 + KB/排盘抽查全 OK）
+- 6 端口探测：paipan(:8911) / tts(:8912) / face-ocr(:8913) / static(:8900) / api-v2(:8920) / kb-api(:8901 200 + /api/stats 30模块/3,767条) 全 200
+- paipan-api ✅（POST /paipan 1990/5/15/14/male 200）；KB 状态延续昨日，无新 distill-*.py 执行（早班蒸馏 9:00 才跑，本时点无入库），staging 0 待审
+- 进行中无变化：C 类 14 页退役清单核实（待用户拍板：dashboard 移出 C 类 / 其余 13 页 git mv 至 archive/）+ 校正库扩容 fetch-wikidata-celebs.py 300/国 后台跑（PID 14087）
+- 阻塞延续：patrol 读数失实+cron 连败集群（主会话修真）、v9.3 阈值触发制、⏭️ P2.8 问诊台后验收冲刺待主会话浏览器执行
+- 下一步（白天首推不变）：「服务中心导航体验回归 · 五中心 × 主入口全链路走查」
+
+## 2026-08-30 07:25 — 📋 C 类遗留页退役清单核实完毕（待用户决策）+ 校正库扩容进行中
+- **C 类 14 页逐页复核**（精确引用匹配，排除 person-dashboard 等误命中）：
+  - `dashboard.html` **误判**：被 monitor-hub.html / site-nav.html 真实引用 2 处，且为「跳转管理员后台」壳页 → 建议**移出 C 类**（改 B 类保留或收容进管理中心）
+  - 其余 13 页全站零引用（HTML+JS 双侧复核）：index-global / divination-hub / ziwei-mingli / site-nav / mindmap / platform-overview / yanzhi / closed-loop-advisor / admin-profile-distill / kb-explore-submit / kb-graph-r68 / wechat-cases / wechat-disclaimer
+  - 体量合计 ~224KB，mtime 均 08-23~08-27；ziwei-mingli（23KB）为旧紫微页，现紫微走 ziwei.html + paipan-center
+  - **处置建议**：13 页 `git mv` 至 `archive/legacy-pages-202608/`（git 历史保留，随时可恢复），不物理删除；待用户拍板后执行
+- **校正库扩容**：fetch-wikidata-celebs.py 300/国 后台跑（PID 14087）；Wikidata SPARQL 通，zh.wikipedia 导语 extract 当前网络超时（本机→维基百科链路不通，8-28 跑通时为正常），生辰数据不受影响、事件抽取将缺失
 ## 2026-08-29 23:55 — ✅ 积压任务清零三连：五中心走查 + 改号建议进化 + 问诊台全链路回归
 - **P0-A 五中心×主入口全链路走查**（8-27 起连挂 10 条首推，本轮回合执行完毕）：六中心（缘主/患者/医生/命理师/机构/管理）静态扫描零断链零断图；113 个去重目标页深度校验无空壳（4 个疑似页均为 JS 渲染页或跳转壳，正常）；110 个卡链 HTTP 探测全 200；六中心 123 张描金卡图逐一 GET 全 200；center-yuanzhu 浏览器实测 41 卡可见 30 图零失败。结论：**健康，零修复**
 - **P0-B 改号建议进化**：核查发现 R-IMPROVE 改进建议昨日已在（尾号替换方案）——本轮增强为「数理+五行双指引」：可选尾数逐个标注五行（0(金)/4(土)…）+ 按八字喜用选号方向（喜木1/8、喜水2/9、喜火3、喜土4/5、喜金0/6/7）+ 吉数情形也补进阶提示；analyzeMobile/analyzePlate 双引擎同改，问事页实测展示
