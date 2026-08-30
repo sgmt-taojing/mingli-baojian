@@ -451,6 +451,14 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
           <input id="mlName" class="wide" placeholder="缘主姓名(可空)">
           <button class="ai-btn" id="btnAiMingli" onclick="aiMingliDraft()">🔮 AI 命理批注</button>
         </div>
+        <!-- R-SLA: 批注队列 48h SLA 计时条（8974 批注旁路，命理师工作台） -->
+        <div id="slaBar" style="margin-top:6px;padding:6px 8px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.18);border-radius:6px;font-size:11px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span>⏳ 批注队列 <b id="slaBacklog">—</b> 条待核 · 超 48h <b id="slaOverdue" style="color:#f87171">—</b> 条</span>
+            <button class="ai-btn" style="padding:2px 8px;font-size:10px" onclick="loadSlaQueue()">刷新</button>
+          </div>
+          <div id="slaList" style="margin-top:4px;max-height:120px;overflow:auto"></div>
+        </div>
       </div>
       <div class="ai-prog" id="aiProg"><div class="bar"><i></i></div><span id="aiProgText">AI 生成中… 0s</span></div>
       <div class="ai-result" id="aiResult"></div>
@@ -525,8 +533,32 @@ function setRole(r){
   $('reviewPanel').classList.toggle('show', r === 'doctor' || r === 'master');
   // R-AI-ASSIST: 命理批注专区仅命理师可见
   const mb = $('aiMingliBox'); if (mb) mb.style.display = (r === 'master') ? 'block' : 'none';
+  if (r === 'master') loadSlaQueue(); // R-SLA: 切到命理师视角即拉批注队列
   toast('已切换到' + (r==='patient'?'患者':r==='doctor'?'医生':'命理师')+'视角');
 }
+
+// R-SLA: 批注队列 48h 计时（8974 旁路，只读医学正文）
+async function loadSlaQueue(){
+  const lb = $('slaBacklog'), lo = $('slaOverdue'), list = $('slaList');
+  if (!lb) return;
+  try {
+    const q = await fetch('http://127.0.0.1:8974/api/annotation-queue', { signal: AbortSignal.timeout(6000) }).then(r => r.json());
+    if (!q.ok) throw new Error(q.error || '队列接口异常');
+    lb.textContent = q.backlog; lo.textContent = q.overdue;
+    if (!q.queue.length) { list.innerHTML = '<div style="color:var(--muted)">队列清空，无待核批注 ✅</div>'; return; }
+    list.innerHTML = q.queue.map(a => {
+      const remain = Math.max(0, q.sla_hours - a.age_hours);
+      const color = a.overdue ? '#f87171' : (remain < 8 ? '#fbbf24' : 'var(--muted)');
+      const tag = a.overdue ? `已超 48h ${(a.age_hours - q.sla_hours).toFixed(1)}h` : `剩 ${remain.toFixed(1)}h`;
+      return `<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);color:${color}">`
+        + `#${escapeHtml(a.emr_id || '')} · ${a.type === 'ai' ? '🤖AI' : '✍️人工'} · ${escapeHtml(a.author || '')} · 已等 ${a.age_hours}h（${tag}）</div>`;
+    }).join('');
+  } catch(e){
+    lb.textContent = '—'; lo.textContent = '—';
+    list.innerHTML = '<div style="color:var(--muted)">批注服务（8974）不可达：' + escapeHtml(e.message) + '</div>';
+  }
+}
+setInterval(() => { if (App.role === 'master') loadSlaQueue(); }, 60000);
 
 // Toast
 function toast(msg){
