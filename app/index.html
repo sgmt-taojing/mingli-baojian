@@ -651,19 +651,24 @@
 })();
 
 // ═══ 拉取公开统计（异步降级） ═══
+// R-STAT-FIX：8900 静态层不代理 /api/public/stats（回 404 HTML 致「—」）；
+// 改直取权威源：8920 平台统计（病例/命理师）+ 8901 KB 统计（知识条数），各自独立降级
 (function(){
   const $kb = document.getElementById('statKb');
   const $cs = document.getElementById('statCases');
   const $mt = document.getElementById('statMaster');
-  fetch('/api/public/stats', { credentials: 'omit' })
+  fetch('http://127.0.0.1:8920/api/public/stats', { credentials: 'omit' })
     .then(r => r.ok ? r.json() : null)
     .then(d => {
       if(!d) return;
-      if(typeof d.kb_total !== 'undefined') $kb.textContent = d.kb_total;
-      if(typeof d.cases_total !== 'undefined') $cs.textContent = d.cases_total;
-      if(typeof d.masters_total !== 'undefined') $mt.textContent = d.masters_total;
+      if(typeof d.totalCases !== 'undefined') $cs.textContent = d.totalCases;
+      if(typeof d.masterUsers !== 'undefined') $mt.textContent = d.masterUsers;
     })
     .catch(() => {/* 静默降级，统计留默认 */});
+  fetch('http://127.0.0.1:8901/api/stats', { credentials: 'omit' })
+    .then(r => r.ok ? r.json() : null)
+    .then(d => { if(d && typeof d.total_entries !== 'undefined') $kb.textContent = d.total_entries; })
+    .catch(() => {/* 静默降级 */});
 })();
 
 // ═══ "全部"视图：拼接所有角色功能卡 ═══
