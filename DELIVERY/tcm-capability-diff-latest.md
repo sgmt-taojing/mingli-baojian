@@ -1,7 +1,7 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-08-31 16:04 ｜ 差集指纹 `e7ae6f5b7dcb72d1`
-- tcm 侧 HEAD：`4eba2e3 命理宝鉴合作服务入口(患者端4处)+clinic-links端点，全量能力交付医学栈`
+- 生成：2026-08-31 20:24 ｜ 差集指纹 `e7ae6f5b7dcb72d1`
+- tcm 侧 HEAD：`6925efc 契约v1.1.0：能力契约版本化+ops/contract与ops/kb-baseline对账出口(ADR-016/017)`
 - 结论：**✅ 全对齐（无待吸收增量）**
 
 ## L1 API 路由差集（tcm 有 · medical-stack 无）：0 条

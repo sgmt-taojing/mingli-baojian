@@ -18,5 +18,8 @@ KB=$(sqlite3 server/database/yidao.db "SELECT COUNT(*) FROM kb_formal;" 2>/dev/n
 [ -n "$KB" ] && [ "$KB" -gt 50000 ]; check $? "yidao KB（${KB:-0} 条）"
 N=$(sqlite3 data/mingli.db "SELECT COUNT(*) FROM master_cases;" 2>/dev/null | tr -d ' ')
 [ "$N" -ge 0 ]; check 0 "命理档案库（${N:-0}）"
+# G17-1：十节点端到端冒烟纳入每日自检（首部命理采集节点 + R756/R757/SLA 守卫）
+/usr/bin/python3 scripts/g5-smoke-e2e.py >/dev/null 2>&1
+check $? "十节点端到端冒烟（G5+G15）"
 echo "═ 结果: ✓ $OK · ✗ $FAIL ═"
 [ "$FAIL" = "0" ]

@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · G18/G17 裁判任务书（ADR-017）：补丁化机制建成 + 六层验收 5/6（L2 留红待裁判）
+- **G18 建成**：patches/ 三要素三类补丁（mingli-view/brand/disclaimer）+ reapply-patches.py 重放器（锚点失配 rc=2 转人工禁静默，台账落 DELIVERY/）；34 页废止整页重打包改补丁追平（page-follow.py 已删）；equiv-dual-run.py 对拍门两处必过（吸收激活门 + OTA publish 412/200 双向实测）
+- **G17 验收（复跑 203051）**：L5 十节点冒烟 PASS（新增命理采集首节点：三路特征/授权门负例/医学上下文零泄漏）｜L1 差集 PASS（tcm HEAD 6925efc 新增 ops/contract+ops/kb-baseline 当日移植，契约 v1.1.0 内化）｜L3 知识一致性 PASS（53,559/53,559 条相等，抽样 200 指纹 1.0）｜L4 R745 三阴性 PASS｜L6 旅程 PASS（G10 outbox 落库 + G13 命理词 422 剥离 + 干净内容 inbox）
+- **L2 留红待裁判**：端点零差异过、Recall@K Δ=0.0333（差案 B075，根因 tcm 运行时 KB 比权威导出多一批未导出条目 + ms 检索域含自有蒸馏条目）；三选项（tcm 补导出 / ms 检索域隔离 / 裁判调口径）见 DELIVERY/G17-delivery-report-20260831.md §3；未放行无令牌驻留，符合不过不激活
+- 对照集冻结 testdata/equiv-set-v1/（30 金案+10 合成帧全虚构，MANIFEST 登记 sha）；十节点已挂 agent-selfcheck 每日节奏
+- 交付报告：DELIVERY/G18-delivery-report-20260831.md、DELIVERY/G17-delivery-report-20260831.md；六层证据件 L*-evidence-20260831-203051.json
+
 ## 2026-08-31 · 医师工作台命理视图开关（进化建议 P1-① 落地，增量安全架构）
 - 新组件 app/js/mingli-annotation-view.js（副本 medical-stack/app/js/）：按角色默认视角（命理师/管理员→全版，医生→简版），右下角 ☯ 开关一键切换并记忆；简版折叠 [data-mingli-detail] 仅留徽标；页面置 window.MINGLI_EMR_ID 时自动从 8974 批注层渲染批注面板（CORS 已验证放行 localhost 域）
 - **唯一源头增量匹配**：tcm 源页面不直接改码——page-follow 新增 PAGE_INJECT 可重放补丁规则（treatment-center 医师工作台注入开关+URL emr 参数解析），重打包自动重放，本地增强永不丢；mingli 自有页（review-studio 双师审核台/medical-annotation-workbench）直接引用

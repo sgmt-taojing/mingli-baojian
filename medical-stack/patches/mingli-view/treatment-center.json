@@ -1,0 +1,16 @@
+{
+  "name": "mingli-view-treatment-center",
+  "class": "mingli-view",
+  "page": "treatment-center",
+  "baseline_head": "9365a5a",
+  "desc": "医师工作台命理视图开关（独立 JS，默认折叠）+ URL emr 参数批注面板",
+  "ops": [
+    {
+      "type": "inject",
+      "anchors": [
+        "</body>"
+      ],
+      "template": "<script>window.MINGLI_EMR_ID=new URLSearchParams(location.search).get(\"emr\")||new URLSearchParams(location.search).get(\"emr_id\")||\"\";</script>\n<script src=\"js/mingli-annotation-view.js\" defer></script>"
+    }
+  ]
+}

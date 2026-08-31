@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 g5-smoke-e2e.py — G5 一次性端到端冒烟（ADR-007 验收）
-链路：建档叫号(8972) → 一帧四诊诊断(8972) → EMR 生成(8972) → AI 命理批注(8974)
+链路（G17-1 十节点）：命理采集并轨(8920,首部) → 建档叫号(8972) → 一帧四诊诊断(8972) → EMR 生成(8972) → AI 命理批注(8974)
       → annotation-queue 核验 → 命理师 approve → 病历/药方生成(8972) → 队列流转(8972)
 守卫验证：R756（医学内容无命理泄漏）、R757（辨证结果无命理词）、SLA 48h 计时
 证据：每节点时间戳 + 关键响应落 DELIVERY/g5-smoke-evidence-<ts>.json
@@ -59,6 +59,34 @@ def get2(path, timeout=30):
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
 
+@node("0-命理采集并轨(G15授权门+仅入批注层)")
+def step0(ctx):
+    # 十节点首部（G17-1）：一帧采集带授权 → 命理三路特征；断言仅可入 8974 批注层、不进医学诊断上下文
+    frames = json.loads((Path(__file__).resolve().parent.parent /
+                         "testdata" / "equiv-set-v1" / "vision-frames-10.json").read_text())
+    img = frames["frames"][0]["jpeg_b64"]  # 虚构合成帧（纪律：禁真实患者数据）
+    # 0a 授权并轨
+    r = post2("/api/public/unified-vision-diagnosis",
+              {"image": img, "consent": {"mingli": True, "scope": "self"}}, timeout=90)
+    assert r.get("ok"), r
+    feats = r.get("mingli_features") or []
+    ok_feats = [f for f in feats if f.get("ok")]
+    assert len(ok_feats) == 3, f"命理三路易失: {len(ok_feats)}/3"
+    assert r.get("mingli_route") == "annotation-layer-only(8974)", r.get("mingli_route")
+    # 0b R756/R757：医学诊断上下文零命理词
+    med_text = json.dumps({"vision": r.get("vision"), "diagnosis": r.get("diagnosis")}, ensure_ascii=False)
+    leaked = [k for k in MINGLI_KW if k in med_text]
+    # 0c 负例：无授权 → 跳过
+    r2 = post2("/api/public/unified-vision-diagnosis", {"image": img}, timeout=90)
+    assert r2.get("mingli_consent") == "skipped_no_consent" and not r2.get("mingli_features"), r2.get("mingli_consent")
+    evidence["guards"]["G15_mingli_capture"] = {
+        "pass": not leaked and len(ok_feats) == 3,
+        "features": [f["mode"] for f in ok_feats], "leaked_words": leaked,
+        "no_consent_skipped": True}
+    return {"mingli_features": [{"mode": f["mode"], "top1": (f["features"]["top1"]["label"])}
+                                for f in ok_feats],
+            "_summary": f"三路特征✓ 授权门负例✓ 医学上下文零泄漏✓"}
+
 @node("1-患者建档+叫号")
 def step1(ctx):
     r = post(API, "/api/clinic/queue/checkin", {
@@ -101,9 +129,11 @@ def step3(ctx):
 
 @node("4-AI命理批注(8974)")
 def step4(ctx):
+    # 命理采集特征仅经此入批注层（G15 合流点）：内容携带节点0三路结构化特征
+    feat_txt = "；".join(f"{f['mode']}:{f['top1']}" for f in ctx.get("mingli_features", []))
     r = post(EXTRA, f"/api/emr/{ctx['case_id']}/annotate", {
         "type": "ai", "author": "ai-mingli-v1",
-        "content": "患者甲木日元偏弱，当前大运土旺克木，脾胃运化受抑，与辨证方向互参。建议配合情志调摄。（冒烟测试批注）"})
+        "content": f"[命理三相结构化特征·待命理师核对] {feat_txt}。患者甲木日元偏弱，当前大运土旺克木，脾胃运化受抑，与辨证方向互参。建议配合情志调摄。（冒烟测试批注）"})
     assert r.get("ok"), r
     a = r["annotation"]
     assert a["status"] == "pending_review" and a["watermark"] == "待命理师核对" and a["disclaimer"] == "命理参考，非医学诊断"
@@ -188,7 +218,7 @@ def step9(ctx):
 def main():
     evidence["started_at"] = time.strftime("%Y-%m-%dT%H:%M:%S")
     ctx = {}
-    steps = [step1, step2, step3, step4, step5, step6, step7, step8, step9]
+    steps = [step0, step1, step2, step3, step4, step5, step6, step7, step8, step9]
     failed = None
     for s in steps:
         try:

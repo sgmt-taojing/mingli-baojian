@@ -383,6 +383,52 @@ function registerRoutes(app, deps) {
     } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
   });
 
+  // ── 2026-08-31 移植：GET /api/ops/contract（ADR-016 契约查询，mingli 适配版）──
+  // 适配：契约版本/基线读 tcm 契约为上游参照，本侧补快照实测值（内化 KB 条数+冻结对拍集）
+  app.get('/api/ops/contract', (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const c = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'docs', 'capability-contract.json'), 'utf8'));
+      res.json({
+        ok: true,
+        contract_version: c.contract_version,
+        released_at: c.released_at,
+        rules: c.rules,
+        core_pages: c.core_pages,
+        kb_baseline: c.kb_baseline,
+        quality_gate_snapshot: c.quality_gate_snapshot,
+        side: 'mingli-medical-stack（移植适配，医学能力源自 tcm-agent，未二次训练）',
+        timestamp: new Date().toISOString()
+      });
+    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+
+  // ── 2026-08-31 移植：GET /api/ops/kb-baseline（ADR-017 对拍出口，mingli 适配版）──
+  // 适配：导出本侧内化快照条数 + 冻结对照集 equiv-set-v1（30 例，tcm 101 例抽样）
+  app.get('/api/ops/kb-baseline', (req, res) => {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const snap = JSON.parse(fs.readFileSync(path.join(__dirname, 'kb-store', 'tcm-synced-kb.json'), 'utf8'));
+      const equiv = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'testdata', 'equiv-set-v1', 'kb-cases-30.json'), 'utf8'));
+      const mods = snap.data || snap;  // 内化快照为裸模块映射（kb-follow 解包后形态）
+      const total = Object.values(mods).reduce((n, a) => n + (Array.isArray(a) ? a.length : 0), 0);
+      res.json({
+        ok: true,
+        side: 'mingli-medical-stack',
+        kb_entries_current: total,
+        bench: {
+          version: equiv.version, frozen_at: equiv.frozen_at,
+          source: equiv.source, cases_total: (equiv.cases || []).length
+        },
+        cases: equiv.cases || [],
+        usage: '只读对拍集（冻结不改，变更升版本号）；供 G18 equiv-dual-run 同案对拍',
+        timestamp: new Date().toISOString()
+      });
+    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+
   console.log('🩺 tcm 移植层已挂载（login-phone/patients-phone/ops×2/rbac×4/therapy×4/tele×2/inventory-item/shift-delete/efficacy-records，医学能力移植自 tcm-agent，未二次训练）');
 }
 

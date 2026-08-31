@@ -109,7 +109,23 @@ const server = http.createServer(async (req, res) => {
       if (req.headers['x-admin-token'] !== ADMIN_TOKEN) return send(res, 403, { ok: false, error: 'forbidden' });
       const body = JSON.parse(await readBody(req) || '{}');
       if (!body.name || !body.version || !body.type || !body.content) return send(res, 400, { ok: false, error: 'name/version/type/content 必填' });
-      if (!['kb-patch', 'rule-update', 'model-delta', 'full-image'].includes(body.type)) return send(res, 400, { ok: false, error: 'type 非法' });
+      if (!['kb-patch', 'rule-update', 'model-delta', 'full-image', 'medical-stack-patch'].includes(body.type)) return send(res, 400, { ok: false, error: 'type 非法' });
+
+      // G18 放行门：medical-stack-patch 类（或 medical-stack 前缀包）须持 30min 内同案对拍令牌
+      // 令牌由 scripts/equiv-dual-run.py --gate ota PASS 后写入；无令牌/过期 → 拒绝发布（不过即不激活）
+      const NEED_GATE = body.type === 'medical-stack-patch' || String(body.name).startsWith('medical-stack');
+      if (NEED_GATE) {
+        const GATE_FILE = path.join(__dirname, '..', 'data', 'equiv-gate-token.json');
+        try {
+          const g = JSON.parse(fs.readFileSync(GATE_FILE, 'utf8'));
+          const fresh = (Date.now() / 1000 - g.ts) < (g.ttl_s || 1800);
+          if (!fresh || g.gate !== 'ota') return send(res, 412, { ok: false, error: 'equiv_gate_required',
+            message: '须先跑 equiv-dual-run.py --gate ota 且 PASS（30min 内）' });
+        } catch (_) {
+          return send(res, 412, { ok: false, error: 'equiv_gate_required',
+            message: '无对拍放行令牌：须先跑 equiv-dual-run.py --gate ota 且 PASS' });
+        }
+      }
 
       // 内容序列化 + 写包文件（包内容 = {meta, payload}）
       const pkgFile = {

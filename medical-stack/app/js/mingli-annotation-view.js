@@ -32,9 +32,8 @@
   }
 
   function defaultMode() {
-    var roles = currentRoles();
-    var isMaster = roles.some(function (r) { return MASTER_ROLES.indexOf(r) >= 0; });
-    return isMaster ? 'full' : 'brief';
+    // G18：默认折叠（简版）对所有角色生效；命理师/管理员手动切全版，选择被记忆
+    return 'brief';
   }
 
   function getMode() {
