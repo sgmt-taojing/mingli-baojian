@@ -1,5 +1,11 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · 医学栈每日探针上线（三项目巡检口径拉齐）
+- 新增 scripts/medical-stack-daily-probe.sh：三服务在线（8972/8973/8974）+ 8973→8932 代理链真实命中 tcm-agent + 移植页/PWA 五路由 200 + KB 检索功能探针（固定查询词只读幂等，不写库不淤积）
+- launchd 任务 com.mingli-baojian.medical-daily-probe 注册在册（每日 07:43，避开整半点），手动触发 10/10 全绿
+- 口径与 family 第 12 项 G13 外发探针对齐：固定输入幂等、缺前置记警告不阻塞、失败即非零退出
+
+
 ## 2026-08-31 · 页面层自动跟随并入 G1 看守链（链4扩展）
 - scripts/medical-stack-page-follow.py 升级为自动侦察模式：tcm app × medical-stack/app 全部 64 个同名页逐页 transform 比对，内容不等即重打包，幂等秒退；新增页不自动内化，仍走链5差集报告+人工定性（G16-2 纪律）
 - 首轮自动侦察补抓 14 页漂移（mtime 法漏网：admin/index/login/patient-portal/pharmacy/report/mobile-interact/monitor-dashboard/realtime-assistant/wuzhen-diagnosis/clinic-stats/family-hub/inhouse-diagnosis/wearable-hub），含品牌残留修复与 seed-loader 补齐；冒烟判据改负向（无 TCM-Agent/tcm-agent 残留），13+1 全过
