@@ -48,6 +48,17 @@ INJECT_ANCHORS = ['<script src="js/ai-voice-assistant.js"></script>',
                   '<script src="js/global-search.js"></script>',
                   '<script src="js/nav.js"></script>']
 
+# 命理增强注入（mingli 自有能力挂接 tcm 源页面，可重放补丁——重打包不丢）
+# 键为页面名（不含 .html）；值为注入片段。片段必须引用 medical-stack/app/js/ 内自有脚本。
+MINGLI_VIEW_SNIPPET = (
+    '<script>window.MINGLI_EMR_ID=new URLSearchParams(location.search).get("emr")'
+    '||new URLSearchParams(location.search).get("emr_id")||"";</script>\n'
+    '<script src="js/mingli-annotation-view.js" defer></script>'
+)
+PAGE_INJECT = {
+    "treatment-center": MINGLI_VIEW_SNIPPET,  # 医师工作台：命理视图开关 + URL 携带 emr 时渲染批注面板
+}
+
 # ADR-009 消费者版话术（医院场景错位，出现即报告）
 CONSUMER_PHRASES = ["本平台不能替代急救", "紧急情况请立即拨打 120 或前往最近急诊"]
 
@@ -79,6 +90,11 @@ def transform(name: str, text: str, had_seed_loader: bool) -> tuple[str, list[st
         else:
             text = text.replace("</body>", SEED_LOADER + "\n</body>", 1)
             notes.append("seed-loader@</body>")
+    # d. 命理增强注入（PAGE_INJECT 登记页；幂等——片段已在则跳过）
+    snippet = PAGE_INJECT.get(name)
+    if snippet and snippet.split("\n")[-1] not in text:
+        text = text.replace("</body>", snippet + "\n</body>", 1)
+        notes.append("mingli-inject")
     return text, notes
 
 

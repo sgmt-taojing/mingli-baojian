@@ -1,5 +1,11 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · 医师工作台命理视图开关（进化建议 P1-① 落地，增量安全架构）
+- 新组件 app/js/mingli-annotation-view.js（副本 medical-stack/app/js/）：按角色默认视角（命理师/管理员→全版，医生→简版），右下角 ☯ 开关一键切换并记忆；简版折叠 [data-mingli-detail] 仅留徽标；页面置 window.MINGLI_EMR_ID 时自动从 8974 批注层渲染批注面板（CORS 已验证放行 localhost 域）
+- **唯一源头增量匹配**：tcm 源页面不直接改码——page-follow 新增 PAGE_INJECT 可重放补丁规则（treatment-center 医师工作台注入开关+URL emr 参数解析），重打包自动重放，本地增强永不丢；mingli 自有页（review-studio 双师审核台/medical-annotation-workbench）直接引用
+- 浏览器实测：开关挂载、全版→简版折叠命理轨出徽标、还原，全过
+- 机制说明入 TCM-ABSORPTION-SPEC 增补原则：命理对医学页的增强一律走「可重放补丁」或「独立 JS」，禁止直改 tcm 源页面
+
 ## 2026-08-31 · 合流链诊断修复 + 精准保障机制（对拍入看守链）
 - **诊断**：合流链六节点全通（采集/诊断/命理草案/批注/签名/患者端一屏三件），唯一断头在采集端——问诊台一帧采集不传 consent，G15 命理并轨永不触发
 - **修复**：unified-diagnosis.html 加「命理三相」授权门（ADR-008：本人/监护人互斥勾选、明确标注特征仅入批注层）；consent 随一帧请求传递；渲染层新增命理特征区（金色分域标识）与未授权提示——浏览器实测授权条展开/互斥/状态切换/请求体携带 consent 全过

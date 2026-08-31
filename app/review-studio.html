@@ -109,8 +109,9 @@ textarea.tall{min-height:180px}
         </div>
         <div class="status-line" id="rxStatus"></div>
       </div>
-      <!-- 命理师轨 -->
-      <div class="track ml">
+      <div data-mingli-badge-brief style="display:none;padding:10px;border:1px dashed rgba(212,175,55,.4);border-radius:8px;color:#c9b98a;font-size:12px">☯ 命理轨已折叠（简版视图） · 含 AI 命理草案与命理师批注 · 点右下角「命理视图」切全版</div>
+      <!-- 命理师轨（data-mingli：简版视图下折叠为徽标，mingli-annotation-view.js 驱动） -->
+      <div class="track ml" data-mingli-detail>
         <h3>☯ 命理师轨 · 命理审核 → 命理批注</h3>
         <div class="fld-label">排盘生辰(可修订后重新生成草案)</div>
         <div class="brow">
@@ -319,5 +320,6 @@ function rxFlow(id,action,btn){
 
 function setSt(id,txt,cls){var el=$(id);el.textContent=txt;el.className='status-line'+(cls?' '+cls:'')}
 </script>
+<script src="js/mingli-annotation-view.js" defer></script>
 </body>
 </html>
