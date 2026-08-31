@@ -7,6 +7,8 @@ tcm-capability-diff.py — 二阶段增量吸收·能力差集巡检（tcm-agent
   本脚本服务二阶段：tcm 后续增量成果按规划吸收——每次跟随链触发时比对四层差集：
     L1 API 路由（方法+路径 双维 diff）
     L2 关键模块导出函数（auth.js / sms_adapter.js）
+    L2.5 检索处理器特征哈希（search/formula-recall 函数体规范化 sha256；
+         防 L2 级排序逻辑漂移盲区——G17R L2 教训：路由/导出级 diff 看不见处理器内部漂移）
     L3 种子数据文件（doctor-profiles.json 等）
     L4 页面层（信息量参考，按「真缺口/已有等价/架构定位」三分法人工定性）
   差集内容 hash 不变则不重写报告（防噪音）；有变化才落 DELIVERY/tcm-capability-diff-latest.md。
@@ -63,6 +65,72 @@ def exports(path: Path) -> set:
     return set(EXPORT_RE.findall(sec))
 
 
+# L2.5：检索处理器特征哈希（裁判 G17R 撤销令采纳项——把 search handler 特征哈希纳入差集巡检）
+# 锚点 = 路由注册行；抽取整段 handler（花括号配平，忽略字符串/注释内的花括号），
+# 规范化（去注释/去空白）后 sha256。双侧哈希不一致即「处理器漂移」。
+PROCESSORS = ['/api/tcm/kb/search', '/api/tcm/kb/formula-recall']
+PROC_RE = {p: re.compile(r"app\.get\('" + re.escape(p) + r"'\s*,\s*(?:async\s*)?\(") for p in PROCESSORS}
+IDENT_RE = re.compile(r'[A-Za-z_$\u4e00-\u9fff0-9]+')
+
+
+def _extract_handler(text: str, start: int) -> str:
+    """从 handler 开括号位置起做花括号配平抽取（跳过字符串/模板串/注释）。"""
+    n, i = len(text), start
+    depth, state, quote = 0, 'code', ''
+    out = []
+    while i < n:
+        ch = text[i]
+        nxt = text[i + 1] if i + 1 < n else ''
+        if state == 'code':
+            if ch == '/' and nxt == '/':
+                state = 'line'; i += 2; continue
+            if ch == '/' and nxt == '*':
+                state = 'block'; i += 2; continue
+            if ch in ('"', "'", '`'):
+                state = 'str'; quote = ch; i += 1; continue
+            if ch == '{':
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+                if depth == 0:
+                    i += 1
+                    break
+            out.append(ch)
+        elif state == 'line':
+            if ch == '\n':
+                state = 'code'
+                out.append(ch)
+        elif state == 'block':
+            if ch == '*' and nxt == '/':
+                state = 'code'; i += 2; continue
+        else:  # str
+            if ch == '\\':
+                i += 2; continue
+            if ch == quote:
+                state = 'code'
+        i += 1
+    return ''.join(out)
+
+
+def processor_hash(path: Path, route: str) -> str | None:
+    try:
+        text = path.read_text(encoding='utf-8', errors='ignore')
+    except Exception:
+        return None
+    m = PROC_RE[route].search(text)
+    if not m:
+        return None
+    body = _extract_handler(text, m.end() - 1)
+    if not body:
+        return None
+    # 规范化：去注释（单行的 handler 内残留），只留标识符序列 + 运算符骨架
+    tokens = IDENT_RE.findall(body)
+    ops = re.sub(r'[A-Za-z_$\u4e00-\u9fff0-9\s]+', ' ', body)
+    ops = re.sub(r'\s+', '', ops)
+    norm = ' '.join(tokens) + '|' + ops
+    return hashlib.sha256(norm.encode('utf-8')).hexdigest()[:16]
+
+
 def pages(base: Path) -> set:
     app = base / 'app'
     if not app.is_dir():
@@ -101,9 +169,25 @@ def main() -> int:
     tcm_p, ms_p = pages(TCM), pages(ROOT)
     page_gap = len(tcm_p - ms_p)
 
+    # L2.5 处理器特征哈希比对
+    proc_rows = []
+    proc_drift = []
+    for p in PROCESSORS:
+        th = processor_hash(TCM / 'server' / 'api-server.js', p)
+        mh = processor_hash(MS / 'server' / 'api-server.js', p)
+        if th is None or mh is None:
+            proc_rows.append((p, th or 'MISSING', mh or 'MISSING', 'MISSING'))
+            proc_drift.append({'route': p, 'tcm': th, 'ms': mh, 'status': 'MISSING'})
+        elif th != mh:
+            proc_rows.append((p, th, mh, 'DRIFT'))
+            proc_drift.append({'route': p, 'tcm': th, 'ms': mh, 'status': 'DRIFT'})
+        else:
+            proc_rows.append((p, th, mh, 'OK'))
+
     payload = {
         'missing_api': missing_api, 'module_diffs': mod_diffs,
         'seed_missing': seed_missing, 'page_gap_count': page_gap,
+        'processor_hashes': [[r, th, mh, st] for r, th, mh, st in proc_rows],
     }
     digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:16]
 
@@ -114,13 +198,14 @@ def main() -> int:
         pass
 
     changed = prev.get('digest') != digest
-    clean = not missing_api and not mod_diffs and not seed_missing
+    clean = not missing_api and not mod_diffs and not seed_missing and not proc_drift
 
     summary = {
         'ts': now, 'digest': digest, 'changed': changed, 'clean': clean,
         'missing_api_count': len(missing_api),
         'missing_api': missing_api,  # R-DIFF-SLA：72h SLA 追踪需要条目级键
         'module_diffs': mod_diffs, 'seed_missing': seed_missing,
+        'processor_drift': proc_drift,
         'page_gap_count': page_gap,
         'extra_api_count': len(extra_api),
         'tcm_head': git_head(TCM),
@@ -151,6 +236,19 @@ def main() -> int:
             lines += [f"- `{k}` 缺：{', '.join(v)}" for k, v in mod_diffs.items()]
         else:
             lines += ["- （空）"]
+        lines += [
+            f"",
+            f"## L2.5 检索处理器特征哈希（排序逻辑漂移监控，G17R 采纳项）",
+            f"",
+            f"| 处理器 | tcm 哈希 | ms 哈希 | 状态 |",
+            f"|---|---|---|---|",
+        ]
+        lines += [f"| `{r}` | `{th}` | `{mh}` | {'✅ 一致' if st == 'OK' else ('🔴 漂移 DRIFT' if st == 'DRIFT' else '🔴 缺失 MISSING')} |"
+                  for r, th, mh, st in proc_rows]
+        lines += [
+            f"",
+            f"漂移处置：哈希不一致即排序/打分逻辑单侧变更——按 ADR-016 流程移植对齐或登记豁免，禁止静默放过。",
+        ]
         lines += [
             f"",
             f"## L3 种子数据差集：{len(seed_missing)} 项",

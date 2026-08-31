@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-09-01 · L2.5 检索处理器特征哈希巡检（G17R 撤销令采纳项落地）
+- `scripts/tcm-capability-diff.py` 新增 L2.5 层：`/api/tcm/kb/search`、`/api/tcm/kb/formula-recall` 两检索处理器函数体规范化哈希双侧比对（花括号配平抽取、跳过字符串/注释；规范化=标识符序列+运算符骨架），漂移/缺失即破坏 clean 态并入 digest
+- 动机：G17 L2 红牌教训——路由/导出级 diff 看不见处理器内部排序逻辑漂移（R825/R829 曾漏移植致 21:15 返工）
+- 实测：空白/注释扰动不误报 ✅、排序逻辑变更（系数 ×2）必检出 ✅；复跑双侧哈希一致（`4bd0daf0…`/`ac23b246…`），报告新增 L2.5 表格段
+- 挂载既有跟随链（tcm-import.plist → tcm-import-and-follow.sh 链 5），无新增定时项
+- 顺带检出 tcm 新差集：`get /api/tcm/twin`、`post /api/tcm/twin/snapshot`（D5 风险信号→主动召回闭环，契约 v1.3.4）→ KANBAN 列管待吸收（走 TCM-ABSORPTION-SPEC，医学域禁止二次训练）
+
 ## 2026-09-01 · WAL-F 斩草除根：全栈「按请求开关连接」模式清零
 - **范围**：继昨夜根修 R772/orchestrator 两处后，本次扫净同类隐患 9 处——wellness-routes（withDb + 4 处直连）、person-hub-routes（openDb 泄漏型）、agent-feedback-engine（_openDB 泄漏型）、ai-stream-engine（openKbDb 只读）、api-server-v2（orchestrate/guide 泄漏型×2、staging/list、staging/reject、kb-fingerprint/integrity、verification 三路由×3）、distillation-routes（/stats）、kb-graph-builder、kb-tiered-matcher
 - **统一修法**：yidao.db 连接全部改为进程期单例/复用主句柄，一律不 close；staging/reject 的 better-sqlite3 `.transaction()` 改为 node:sqlite 手工 BEGIN IMMEDIATE/COMMIT

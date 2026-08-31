@@ -14,8 +14,14 @@
 - 真根因：非导出缺口，是 ms 检索内核漂移——R829（切词窗 6→14+LCS 二级重排）+ R825（症状通道）未随 tcm 移植；语料 53,559 条本来就双侧相等
 - 处置：medical-stack 检索处理器移植对齐 tcm 8932 权威实现，8972 重启，B075 双侧 top1 一致
 - 验收：对拍 PASS（零差异 + Recall Δ=0.0000），六层复跑 6/6 PASS（证据 211202 批次）
-- [P2 新增] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
+- [P2 已落地 09-01 06:40] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
+
+## 2026-09-01 06:40 — ✅ L2.5 检索处理器特征哈希巡检落地（裁判 G17R 撤销令采纳项）
+- scripts/tcm-capability-diff.py 新增 L2.5 层：/api/tcm/kb/search 与 /api/tcm/kb/formula-recall 两处理器函数体（花括号配平抽取，跳过字符串/注释）规范化（标识符序列+运算符骨架）sha256，双侧不一致即报 DRIFT/MISSING，并入 digest 与 clean 判定
+- 测试：空白/注释扰动不误报 ✅，排序逻辑变更（系数 ×2）检出漂移 ✅；复跑双侧当前一致（R825/R829 已对齐）
+- 挂载：tcm-import.plist → tcm-import-and-follow.sh 链 5 自动生效，无需新增定时项
+- ⚠ 顺带发现新差集（L1）：tcm 新增 `get /api/tcm/twin` + `post /api/tcm/twin/snapshot`（D5 风险信号→主动召回闭环，契约 v1.3.4，HEAD 17dc1ce）→ **列管待吸收**（走 TCM-ABSORPTION-SPEC 流程：移植→适配→冒烟→留证；涉患者召回属医学域，禁止二次训练）
 
 ## 2026-09-01 06:35 — ✅ WAL-F 斩草除根：按请求开关连接模式清零【已完结】
 - 9 处残余点全部单例化（wellness/person-hub/feedback/ai-stream/api-server×7/distillation/graph-builder/tiered-matcher）；豁免 mingli.db×5 + Python 子进程×3（自闭合安全，注释说明）
