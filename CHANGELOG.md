@@ -1,5 +1,9 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · G15 命理视觉采集接线 + G16 差集清零
+- **G15 命理采集**：unified-vision-routes 新增命理三相路由（fortune_face 面相三停/fortune_mole 痣相部位/fortune_palm 掌纹主线，mingli 域、结构化特征无断语）；一帧采集医学四诊与命理三相后台并行（Promise.all 并发无感），mingliFeatures 不进医学检索与辨证（R756/R757 实测无泄漏）；ADR-008 授权门（未授权跳过/独立入口 403 MINGLI_CONSENT_REQUIRED）；自检升级为真实 classify 触发懒加载（7/7 通过）；端到端演示：三路特征→8974 批注队列（ann-e0d2398a0d35，48h SLA 计时中）——证据 DELIVERY/g15-vision-wiring-20260831.json
+- **G16 差集清零**：/api/public/clinic-links 确认已内化（medical-stack 4995 行，冒烟 200）；L4 页面差集 52 页三分法定性表落盘 DELIVERY/l4-page-triage-20260831.md——真缺口 0、已有等价 52（medical-stack/app 同名页）、架构定位 52（主 app/ 为命理域不放医学页）；另发现 34 页内容滞后于 tcm HEAD（08-27 快照），列 P2 页面层重打包排期；差集复跑 clean:true / missing_api 0「无待吸收增量」
+
 ## 2026-08-31 · 医学栈全量对齐 tcm（L4 页面差集清零）+ 能力清单收录
 - **L4 真缺口补齐**：移植 my-reports.html（患者报告收件箱）+ family-hub.html（家庭中心）入 medical-stack/app，PWA 资产（pwa/ 六件）随页落地
 - **静态服务修真**：medical-stack static-server 补 /pwa-inject.js /sw.js /manifest.json 三路由；launchd 环境下 sendFile/send 库 stat 异常（NotFoundError），改 readFile 直出（X-PWA-Route: readfile-v2 标记实测 200）

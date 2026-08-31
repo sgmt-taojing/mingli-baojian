@@ -1,5 +1,10 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-08-31 16:30 — ✅ G15 命理视觉采集接线（验收全过）+ G16 差集清零
+- G15：三路命理视觉路由接线完成（三个 fortune onnx 早已被子服务加载，本次接通路由层）；自检 7/7（医学4+命理3，真实 classify 懒加载触发）；授权门负例×2（skipped_no_consent / 403）、R756 泄漏检查 PASS、批注入队 ann-e0d2398a0d35
+- G16：clinic-links 已在免移植；52 页定性表（真缺口0/等价52/架构定位52），34 页内容滞后列 P2 页面层重打包；diff 复跑 clean:true
+- 随附建议（任务书三条进化项）：①医师工作台命理视图开关 ②48h SLA 三级升级上监控盘 ③差集吸收 72h SLA——待排期
+
 ## 2026-08-31 15:50 — ✅ review-studio 签名链全回归（API 七步 + UI 五步，含三负例）
 - API 链：MINGLI_NOT_FOUND/MINGLI_UNSIGNED 两负例拦截正确；draft(11)→sign(master#29)→rx draft(8, mingliAttached)→rx sign(doctor#29)→GET 随附 mingliConclusion 全绿
 - UI 链：队列选中回归病例 → AI 草案 #12 → 命理师签名 → 医生定稿（界面显示「☯ 命理结论已随处方归档」）；换未签名病例点定稿 → confirm 拦截，取消即中止

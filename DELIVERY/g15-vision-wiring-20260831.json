@@ -1,0 +1,356 @@
+{
+ "task": "G15 命理视觉采集接线",
+ "date": "2026-08-31",
+ "selftest": {
+  "ok": true,
+  "total": 7,
+  "passed": 7,
+  "verdict": "7/7",
+  "items": [
+   {
+    "mode": "face",
+    "domain": "tcm",
+    "ok": true,
+    "via": "http://127.0.0.1:8913/api/face/analyze"
+   },
+   {
+    "mode": "eye",
+    "domain": "tcm",
+    "ok": true,
+    "via": "http://127.0.0.1:8913/api/eye/analyze"
+   },
+   {
+    "mode": "tongue",
+    "domain": "tcm",
+    "ok": true,
+    "via": "http://127.0.0.1:8913/api/tongue/analyze"
+   },
+   {
+    "mode": "hand",
+    "domain": "tcm",
+    "ok": true,
+    "via": "http://127.0.0.1:8913/api/hand/analyze"
+   },
+   {
+    "mode": "fortune_face",
+    "domain": "mingli",
+    "model": "fortune-face-reading",
+    "ok": true,
+    "engine": "onnx"
+   },
+   {
+    "mode": "fortune_mole",
+    "domain": "mingli",
+    "model": "fortune-mole-reading",
+    "ok": true,
+    "engine": "onnx"
+   },
+   {
+    "mode": "fortune_palm",
+    "domain": "mingli",
+    "model": "fortune-palm-lines",
+    "ok": true,
+    "engine": "onnx"
+   }
+  ],
+  "ts": "2026-08-31T08:25:51.696Z"
+ },
+ "e2e_granted": {
+  "ok": true,
+  "syncToken": "ms-1788164699004-qw55e28l",
+  "timestamp": "2026-08-31T08:24:59.004Z",
+  "vision": [
+   {
+    "mode": "face",
+    "name": "面诊",
+    "ok": true,
+    "engine": "offline-pil",
+    "results": [],
+    "top1": null,
+    "kb_matches": [
+     {
+      "entry_id": "r15-tcm-089",
+      "module": "tcm",
+      "title": "面诊·五色主病",
+      "content": "《灵枢》'五色主病'：赤主热（白虎汤）；青主痛/瘀（血府逐瘀汤）；黄主湿/虚（茵陈蒿汤、参苓白术散）；白主虚/寒（八珍汤、四逆汤）；黑主肾虚/重病（六味地黄丸）。路总：五色在面部分布对应脏腑。",
+      "score": 0.89,
+      "matched": "面色红"
+     },
+     {
+      "entry_id": "KB-wangzhen-R200-049",
+      "module": "wangzhen",
+      "title": "五脏五色主病映射表",
+      "content": "五脏五色主病完整映射：\n\n| 病色 | 对应五脏 | 核心病机 | 面部典型特征 |\n|------|---------|---------|-------------|\n| 青色 | 肝 | 寒、痛、气滞、血瘀、肝郁 | 山根青（小儿惊风）、鼻头青（腹剧痛）、两颧青（肝郁血瘀） |\n| 赤色 | 心 | 实热、虚火、血热 | 全脸红（实火）、两颧午后潮红（阴虚虚火） |\n| 黄色 | 脾 | 脾虚、湿热、黄疸 | 萎黄（脾虚）、鲜黄（肝胆黄疸） |\n| 白色 | 肺 | 气虚、血虚、阳虚寒证 | 眼白蓝、面苍白（重度贫血） |\n| 黑色 | 肾 | 肾精亏虚、水饮、劳损、重症 | 黑眼圈、全",
+      "score": 0.89,
+      "matched": "面色红"
+     },
+     {
+      "entry_id": "r15-tcm-090",
+      "module": "tcm",
+      "title": "面诊·五脏分布",
+      "content": "面部五脏分布（《素问·刺热论》）：额→心（心火旺→额赤）；鼻→脾（脾虚→鼻黄）；左颊→肝（肝火→左颊红）；右颊→肺（肺热→右颊红）；下巴→肾（肾虚→下巴暗）。路总：面部分区辨脏腑是面诊核心。",
+      "score": 0.89,
+      "matched": "额头"
+     }
+    ],
+    "features": {},
+    "elapsedMs": 815
+   },
+   {
+    "mode": "eye",
+    "name": "眼诊",
+    "ok": true,
+    "engine": "offline-pil",
+    "results": [],
+    "top1": null,
+    "kb_matches": [
+     {
+      "entry_id": "KB-tcmfwd-01647",
+      "module": "nihaisha-tcm",
+      "title": "倪海厦课程·notes-bencao-scan-essence｜核心条目｜五轮眼诊（节选）",
+      "content": "术语：五轮眼诊（节选）；蒸馏说明：瞳孔黑属水（肾管）；瞳孔周边属土（脾管）与木（肝管）；眼白属金（肺管）。眼白发黄主肺热。",
+      "score": 0.89,
+      "matched": "五轮"
+     },
+     {
+      "entry_id": "r15-tcm-001",
+      "module": "tcm",
+      "title": "五轮学说·总论",
+      "content": "五轮学说将眼分为肉轮（胞睑-脾）、血轮（两眦-心）、气轮（白睛-肺）、风轮（黑睛-肝）、水轮（瞳神-肾）。五轮对应五脏，通过观察各轮变化推测脏腑盛衰。临床为目诊核心理论框架。",
+      "score": 0.89,
+      "matched": "五轮"
+     },
+     {
+      "entry_id": "r15-tcm-005",
+      "module": "tcm",
+      "title": "五轮·风轮（黑睛-肝）",
+      "content": "风轮指黑睛（角膜/虹膜），属肝木。黑睛星翳→肝火上炎/风热；黑睛混浊→肝胆湿热；黑睛溃疡→肝火炽盛；黑睛云翳→肝血不足。路总：黑睛反复生翳者从肝论治，用石决明散或拨云退翳丸。",
+      "score": 0.89,
+      "matched": "黑睛"
+     },
+     {
+      "entry_id": "KB-tcmfwd-01238",
+      "module": "nihaisha-tcm",
+      "title": "倪海厦课程·clinical-cases｜**模块三：肝胆与代谢性疾病治疗**",
+      "content": "**课程02（柴胡疏肝）、05（肝处方）、10（肝病加减）、13（大柴胡汤）、23（肝病）、25（肝处方）**\n**递进逻辑**：从肝经闭阻、气血瘀滞的基本病机出发，通过经典方剂（如柴胡疏肝散、分消汤）和针灸穴位（承山穴、人迎穴）教学，扩展至肝癌腹水、肝硬化的复杂病症处理。",
+      "score": 0.89,
+      "matched": "肝"
+     },
+     {
+      "entry_id": "tcm-zhongfu-suji-016",
+      "module": "tcm-zhongfu",
+      "title": "肝胆湿热",
+      "content": "【肝胆湿热】证机概要：湿热蕴结肝胆。临床表现：胁肋胀痛、黄疸、口苦纳呆、小便黄赤、舌红苔黄腻。代表方剂：茵陈蒿汤。辨证要点：抓住主症特点，结合舌脉。",
+      "score": 0.89,
+      "matched": "肝"
+     }
+    ],
+    "features": {},
+    "elapsedMs": 1054
+   },
+   {
+    "mode": "tongue",
+    "name": "舌诊",
+    "ok": true,
+    "engine": "offline-pil",
+    "results": [],
+    "top1": null,
+    "kb_matches": [
+     {
+      "entry_id": "KB-tcmfwd-01315",
+      "module": "nihaisha-tcm",
+      "title": "倪海厦课程·clinical-cases｜38倪师医案--红斑性狼疮案",
+      "content": "倪师通过一例红斑性狼疮患者的治疗过程，解析课程中的经方辨证与长期复诊思路。患者病程涉及情绪、妇科系统与肾功能等复杂问题；课程强调以固定方义为基础，再根据病程变化调整药味。相关病情、体重变化和附子类药物内容只作为原课程医案记录，不据此推导现实疗效或个人治疗方案。\n视频重点揭示了两个关键知识点：\n1. **“守方”与“调方”结合**：倪师以长期固定处方（如四逆汤类方）为基础，结合症状变化（如关节僵硬、皮肤发黄）调整药物配伍，例如加入黄连、黄芩等药，体现经方在复杂病机中的灵活运用。\n2. **生附子的课程观点**：课程区分生附子与炮附子的药性语境，并将其放在经方家的历史传承中讨论；附子高风险，不得据",
+      "score": 0.89,
+      "matched": "红舌"
+     },
+     {
+      "entry_id": "KB-tcmfwd-01565",
+      "module": "nihaisha-tcm",
+      "title": "倪海厦课程·notes-bencao-scan-essence｜核心条目｜人参/红参",
+      "content": "术语：人参/红参；蒸馏说明：大补元气之要药。以高丽产红参为佳，性温而力较峻，主治虚劳衰弱、重病大病初愈之气血双虚。",
+      "score": 0.89,
+      "matched": "红舌"
+     },
+     {
+      "entry_id": "KB-tcmfwd-01939",
+      "module": "huangdi-neijing",
+      "title": "《黄帝内经·素问》卷0·节1",
+      "content": "重廣𥙷注黃帝内經素問序\n臣聞安不忘危存不忘亡者往聖之先務求民之瘼\n恤民之隱者上主之深仁在昔黃帝之御極也以理\n身緒餘治天下坐於明堂之上臨觀八極考建五常\n以謂人之生也負隂而抱陽食味而被色外有寒暑\n之相盪内有喜怒之交侵天昬札瘥國家代有將欲\n斂時五福以敷鍚厥庶民乃與歧伯上窮天紀下極\n地理逺取諸物近取諸身更相問難垂法以福萬岀\n於是雷公之倫授業傳之而内經作矣歷代寳之未\n有失墜蒼周之興秦和述六氣之論具明於左史厥\n後越人得其一二演而述難經西漢倉公傳其舊學\n東漢仲景撰其遺論晉皇甫謐剌而爲甲乙及隋楊\n上善纂而爲太素時則有全元起者始爲之訓解闕\n第七一通迄唐寳應中太僕王冰篤好之得先師所\n藏之卷大爲次註猶是三皇遺文爛然",
+      "score": 0.89,
+      "matched": "黄苔"
+     },
+     {
+      "entry_id": "KB-tcmfwd-01940",
+      "module": "huangdi-neijing",
+      "title": "《黄帝内经·素问》卷0·节2",
+      "content": "國子博士臣髙保衡光䘵卿直秘閣臣林億等謹上\n重廣𥙷註黃帝内經素問序\n啓玄子王冰撰(爲太僕令年八十餘以壽終/新校正云按唐人物志冰仕唐)\n夫釋縛脫艱全眞導氣拯黎元於仁壽濟羸劣以獲\n安者非三聖道則不能致之矣孔安國序尚書曰伏\n羲神農黄帝之書謂之三墳言大道也班固漢書藝\n文志曰黃帝内經十八卷素問即其經之九卷也兼\n靈樞九卷廼其數焉(之序彼云七略藝文志黃帝内經十八卷今有/新校正云詳王氏此說蓋本皇甫士安用乙經)\n(張仲景及西晉王叔和脉經只爲之九卷皇甫士安名爲鍼經亦專名九卷楊/鍼經九卷素問九卷共十八卷即内經也故王氏遵而用之又素問外九卷漢)\n(書經籍志謂之九靈王冰名爲靈樞/玄操云黄帝内經二帙帙各九卷按隋)雖復年移代革",
+      "score": 0.89,
+      "matched": "黄苔"
+     },
+     {
+      "entry_id": "tcm-zhongfu-classic-047",
+      "module": "tcm-zhongfu",
+      "title": "先知智镜·红舌与绛舌：脏腑热证辨析",
+      "content": "先知智镜28舌象系统中，红舌与绛舌主脏腑热证辨析。【红舌】舌色鲜红主热证。舌尖红→心火亢盛（失眠多梦、口舌生疮）；舌边红→肝胆热盛（目赤肿痛、胁痛）；舌中红→脾胃热盛（消谷善饥、口臭）；全舌红→气分热盛（大热大渴）。【绛舌】舌色深红主热入营血。绛舌无苔→热入营血（身热夜甚、心烦不寐）；绛舌有黄苔→气营两燔。【代表方】导赤散、龙胆泻肝汤、清胃散、白虎汤、清营汤。【临床应用】先知智镜红舌系统提示：舌尖红+失眠→心火；舌边红+胁痛→肝火；舌红少苔+五心烦热→阴虚内热。",
+      "score": 0.83,
+      "matched": "红舌"
+     }
+    ],
+    "features": {},
+    "elapsedMs": 715
+   },
+   {
+    "mode": "hand",
+    "name": "手诊",
+    "ok": true,
+    "engine": "offline-pil",
+    "results": [],
+    "top1": null,
+    "kb_matches": [
+     {
+      "entry_id": "KB-tcm-38b5212d",
+      "module": "tcm",
+      "title": "掌色辨证总纲",
+      "content": "掌色主病：掌红赤=热证/阴虚火旺；掌白=气血虚/阳虚；掌青紫=瘀血/寒凝/疼痛；掌黄=脾虚湿困/黄疸；掌黑=肾虚/瘀血/重症。大鱼际红=肺热/胃火；小鱼际红=肾阴不足；全掌红=高血压/血热。",
+      "score": 0.88,
+      "matched": "掌色正常"
+     },
+     {
+      "entry_id": "KB-tcmfwd-00031",
+      "module": "tcm-diagnosis",
+      "title": "掌色变化与疾病诊断",
+      "content": "掌色与内脏关系、掌色与饮食、掌色与疾病（红白黄青紫黑六色主病）、掌的润燥望诊。到,提示肠道有宿便、燥矢滞留;多患有习惯性便秘或静脉 瘤或痔疮等。 ④日本的渡边正等人研究表明:右手掌有静脉怒张,提 示盲肠处有宿便滞留,左手掌有静脉怒张,提示左下腹乙状 结肠有粪便停滞。右手指关节处有静脉怒张,为右下腹升结 肠有粪便停滞。左手指关节处有静脉怒张,为左下腹降结肠 处有粪便停滞。 ⑤手掌“天纹”静脉怒张者为横结肠有粪便停滞,这种 人多数大脑左右半球的连接处“胼胝体”(又称脑桥)血管膨 胀,有引起脑溢血的危险,也容易患精神异常。 ⑥手掌“地纹”末端上看到青筋,一般不为病兆,在一 些健康人中也有此现象。 第",
+      "score": 0.87,
+      "matched": "掌色正常"
+     }
+    ],
+    "features": {},
+    "elapsedMs": 598
+   }
+  ],
+  "kb": [],
+  "diagnosis": {
+   "visual_features": [],
+   "inferred_syndromes": [],
+   "kb_top": [],
+   "summary": "特征不足，建议多模态采集"
+  },
+  "mingli_features": [
+   {
+    "mode": "fortune_face",
+    "name": "面相三停",
+    "domain": "mingli",
+    "model": "fortune-face-reading",
+    "ok": true,
+    "engine": "onnx",
+    "features": {
+     "top1": {
+      "label": "上停发达(早运)",
+      "confidence": 2.3939
+     },
+     "candidates": [
+      {
+       "label": "上停发达(早运)",
+       "confidence": 2.3939
+      },
+      {
+       "label": "失衡偏窄(起伏)",
+       "confidence": -0.1071
+      },
+      {
+       "label": "三停均匀(平稳)",
+       "confidence": -0.2232
+      }
+     ]
+    },
+    "elapsedMs": 41
+   },
+   {
+    "mode": "fortune_mole",
+    "name": "痣相部位",
+    "domain": "mingli",
+    "model": "fortune-mole-reading",
+    "ok": true,
+    "engine": "onnx",
+    "features": {
+     "top1": {
+      "label": "额部痣",
+      "confidence": 3.3288
+     },
+     "candidates": [
+      {
+       "label": "额部痣",
+       "confidence": 3.3288
+      },
+      {
+       "label": "眉眼间痣",
+       "confidence": 1.1483
+      },
+      {
+       "label": "下颌痣",
+       "confidence": -0.5157
+      }
+     ]
+    },
+    "elapsedMs": 43
+   },
+   {
+    "mode": "fortune_palm",
+    "name": "掌纹主线",
+    "domain": "mingli",
+    "model": "fortune-palm-lines",
+    "ok": true,
+    "engine": "onnx",
+    "features": {
+     "top1": {
+      "label": "断掌纹",
+      "confidence": 2.3593
+     },
+     "candidates": [
+      {
+       "label": "断掌纹",
+       "confidence": 2.3593
+      },
+      {
+       "label": "智慧线平直",
+       "confidence": 1.5863
+      },
+      {
+       "label": "感情线细弯",
+       "confidence": -1.2214
+      }
+     ]
+    },
+    "elapsedMs": 41
+   }
+  ],
+  "mingli_consent": "granted",
+  "mingli_route": "annotation-layer-only(8974)",
+  "user_context": {},
+  "elapsedMs": 1057
+ },
+ "e2e_negative": {
+  "no_consent_unified": {
+   "mingli_consent": "skipped_no_consent",
+   "mingli_features": []
+  },
+  "no_consent_fortune": {
+   "status": 403,
+   "error": "MINGLI_CONSENT_REQUIRED"
+  }
+ },
+ "r756_r757": {
+  "medical_diagnosis_mingli_word_leak": "PASS(无泄漏)",
+  "mingli_route": "annotation-layer-only(8974)"
+ },
+ "annotation_queue": {
+  "emr_id": "G15-DEMO-001",
+  "annotation_id": "ann-e0d2398a0d35",
+  "status": "pending_review",
+  "watermark": "待命理师核对",
+  "sla_48h_timer": "age_hours 计时中"
+ },
+ "note": "测试图为合成纯色图，仅验证链路；真实采集经移动端授权后走同一链路。三路 onnx 输出为 logits 分值（未 softmax），label 取自注册词典，仅结构化特征无断语。",
+ "ts": "2026-08-31T16:25:51.697225"
+}
