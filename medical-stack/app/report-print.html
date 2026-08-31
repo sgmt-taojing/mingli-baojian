@@ -53,6 +53,10 @@ h2{font-size:14pt;color:#8b4513;margin-top:16px}
 <h1>🏥 命理宝鉴·医道 中医诊断报告</h1>
 <div id="report"></div>
 <div class="sig">报告生成: <span id="time"></span></div>
+<div style="text-align:center;margin-top:16px;border-top:1px dashed #d8cbb8;padding-top:12px">
+  <div id="myrpt-qr" style="display:flex;justify-content:center;margin-bottom:6px"></div>
+  <div style="font-size:11px;color:#6b5b4f">扫码在手机上随时查阅病历/处方/检验报告（验证就诊手机号即可）</div>
+</div>
 <div class="disc">⚠️ 本报告由AI辅助生成，仅供执业医师参考。最终诊断以医师面诊为准。</div>
 <div class="no-print" style="text-align:center;margin-top:20px">
   <button onclick="window.print()" style="padding:10px 24px;font-size:14px;border-radius:8px;background:#8b4513;color:#fff;border:none;cursor:pointer">🖨️ 打印报告</button>
@@ -74,6 +78,10 @@ fetch('/api/tcm/longitudinal-recommend',{method:'POST',headers:{'Content-Type':'
     document.getElementById('report').appendChild(el);
   }
 }).catch(function(){});
+</script>
+<script src="js/vendor/qrcode.min.js"></script>
+<script>
+try { if (typeof QRCode !== 'undefined') new QRCode(document.getElementById('myrpt-qr'), { text: location.origin + '/my-reports.html', width: 108, height: 108, correctLevel: QRCode.CorrectLevel.M }); } catch (e) {}
 </script>
 <script src="js/error-interceptor.js"></script>
 <script src="js/common.js"></script>

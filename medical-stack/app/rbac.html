@@ -41,10 +41,10 @@ th{color:var(--text3);font-weight:600;font-size:10px;text-transform:uppercase}
 <script src="js/nav.js" defer></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
 
 <style>
 .page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
@@ -157,79 +157,68 @@ function renderMatrix() {
   document.getElementById('role-matrix').innerHTML=html;
 }
 
-// ═══ 用户管理 ═══
+// ═══ 用户管理（GAP-P2：接真实账号体系 /api/admin/users，超管专属，操作入服务端审计）═══
 var editingUser=null;
+var USERS_CACHE=[];
 
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem('tcm_users_db')||'{}'); }
-  catch(e) { return {}; }
+function rbacFetch(url, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {},
+    { 'Authorization': 'Bearer ' + (localStorage.getItem('tcm_token') || '') });
+  return fetch(url, opts).then(function(r){ return r.json(); });
 }
-function saveUsersDB(users) { localStorage.setItem('tcm_users_db', JSON.stringify(users)); }
-function initUsers() {
-  var users=getUsers();
-  if (!users.admin) {
-    users.admin = {id:'U001',username:'admin',password:'admin123',name:'系统管理员',role:'super_admin',enabled:true,created_at:new Date().toISOString()};
-    users.doc001 = {id:'D001',username:'doc001',password:'doc123',name:'张仲景',role:'doctor_internal',specialty:'internal',enabled:true,created_at:new Date().toISOString()};
-    users.doc002 = {id:'D002',username:'doc002',password:'doc123',name:'李时珍',role:'doctor_acupuncture',specialty:'acupuncture',enabled:true,created_at:new Date().toISOString()};
-    users.doc003 = {id:'D003',username:'doc003',password:'doc123',name:'傅青主',role:'doctor_gynecology',specialty:'gynecology',enabled:true,created_at:new Date().toISOString()};
-    users.pharma001 = {id:'P001',username:'pharma001',password:'pharma123',name:'孙思邈',role:'pharmacist',enabled:true,created_at:new Date().toISOString()};
-    users.patient01 = {id:'PT001',username:'patient01',password:'123456',name:'赵四海',role:'patient',enabled:true,created_at:new Date().toISOString()};
-    saveUsersDB(users);
-  }
-}
-initUsers();
 
 function renderUsers() {
-  var users=getUsers();
-  var html='';
-  for (var k in users) {
-    var u=users[k];
-    if (!u) continue;
-    var badge='rb-'+ (u.role&&u.role.includes('admin')?'admin':u.role&&u.role.includes('doctor')?'doc':u.role&&u.role.includes('pharma')?'pharma':'patient');
-    html+='<tr><td><strong>'+u.username+'</strong></td><td>'+u.name+'</td>'+
-      '<td><span class="role-badge '+badge+'">'+ (ROLE_MATRIX[u.role]?ROLE_MATRIX[u.role].name:u.role) +'</span></td>'+
-      '<td>'+(u.specialty||'-')+'</td>'+
-      '<td>'+(u.enabled!==false?'<span style="color:var(--green)">● 启用</span>':'<span style="color:var(--accent)">○ 禁用</span>')+'</td>'+
-      '<td>'+
-        '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="editUser(\''+u.username+'\')">✏️</button> '+
-        '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="toggleUser(\''+u.username+'\')">'+ (u.enabled!==false?'🔒':'🔓') +'</button> '+
-        (u.role==='super_admin'?'':'<button class="btn red small" onclick="delUser(\''+u.username+'\')">🗑</button>')+
-      '</td></tr>';
-  }
-  document.getElementById('user-list').innerHTML=html;
+  rbacFetch('/api/admin/users').then(function(d) {
+    if (!d.ok) {
+      document.getElementById('user-list').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--text3)">' + (d.error || '加载失败') + '</td></tr>';
+      return;
+    }
+    USERS_CACHE = d.users || [];
+    var html='';
+    USERS_CACHE.forEach(function(u) {
+      var badge='rb-'+ (u.role&&u.role.includes('admin')?'admin':u.role&&u.role.includes('doctor')?'doc':u.role&&u.role.includes('pharma')?'pharma':'patient');
+      html+='<tr><td><strong>'+u.username+'</strong></td><td>'+u.name+'</td>'+
+        '<td><span class="role-badge '+badge+'">'+ (u.roleName || u.role) +'</span></td>'+
+        '<td>'+(u.specialtyName||'-')+'</td>'+
+        '<td>'+(u.enabled!==false?'<span style="color:var(--green)">● 启用</span>':'<span style="color:var(--accent)">○ 禁用</span>')+'</td>'+
+        '<td>'+
+          '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="editUser(\''+u.username+'\')">✏️</button> '+
+          '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="toggleUser(\''+u.username+'\')">'+ (u.enabled!==false?'🔒':'🔓') +'</button> '+
+          (u.role==='super_admin'?'':'<button class="btn red small" onclick="delUser(\''+u.username+'\')">🗑</button>')+
+        '</td></tr>';
+    });
+    document.getElementById('user-list').innerHTML=html || '<tr><td colspan="6" style="text-align:center;padding:16px">暂无用户</td></tr>';
+  }).catch(function() {
+    document.getElementById('user-list').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:var(--text3)">📡 服务离线或未登录</td></tr>';
+  });
 }
 
 function renderAudit() {
-  var log=JSON.parse(localStorage.getItem('tcm_audit_log')||'[]');
-  var html='';
-  for(var i=Math.max(0,log.length-20);i<log.length;i++){
-    var l=log[i];
-    html+='<div style="padding:4px 0;border-bottom:1px solid var(--border)">'+
-      '<span style="color:var(--text3);margin-right:8px">'+new Date(l.time).toLocaleString('zh-CN')+'</span>'+
-      (l.action==='create'?'➕':l.action==='update'?'✏️':l.action==='delete'?'🗑':l.action==='toggle'?'🔒':'')+
-      ' '+l.detail+'</div>';
-  }
-  document.getElementById('audit-log').innerHTML=html||'暂无日志';
+  rbacFetch('/api/admin/rbac-audit').then(function(d) {
+    if (!d.ok) { document.getElementById('audit-log').innerHTML = d.error || '仅超管可见'; return; }
+    var html='';
+    (d.log || []).slice(0, 20).forEach(function(l) {
+      html+='<div style="padding:4px 0;border-bottom:1px solid var(--border)">'+
+        '<span style="color:var(--text3);margin-right:8px">'+new Date(l.ts).toLocaleString('zh-CN')+'</span>'+
+        (l.action==='create_user'?'➕':l.action==='change_role'?'✏️':l.action==='delete_user'?'🗑':'🔒')+
+        ' '+l.detail+' <span style="color:var(--text3)">by '+l.operator+'</span></div>';
+    });
+    document.getElementById('audit-log').innerHTML=html||'暂无日志';
+  }).catch(function(){ document.getElementById('audit-log').innerHTML='📡 服务离线'; });
 }
 
-function auditLog(action,detail) {
-  var log=JSON.parse(localStorage.getItem('tcm_audit_log')||'[]');
-  log.push({time:new Date().toISOString(),action:action,detail:detail,operator:localStorage.getItem('tcm_user')||'unknown'});
-  if(log.length>200) log=log.slice(-200);
-  localStorage.setItem('tcm_audit_log',JSON.stringify(log));
-}
-
-function openAddUser(){editingUser=null;document.getElementById('modal-title').textContent='新增用户';document.getElementById('user-modal').classList.add('show');clearModal();}
+function openAddUser(){editingUser=null;document.getElementById('modal-title').textContent='新增用户';document.getElementById('mu-username').disabled=false;document.getElementById('user-modal').classList.add('show');clearModal();}
 function closeModal(){document.getElementById('user-modal').classList.remove('show');}
 function clearModal(){['username','password','name','phone'].forEach(function(id){document.getElementById('mu-'+id).value='';});document.getElementById('mu-role').value='doctor_internal';}
 
 function editUser(username) {
-  var users=getUsers();
-  var u=users[username];
+  var u=USERS_CACHE.find(function(x){ return x.username===username; });
   if(!u) return toast('用户不存在');
   editingUser=username;
-  document.getElementById('modal-title').textContent='编辑用户: '+u.name;
+  document.getElementById('modal-title').textContent='变更角色: '+u.name+'（'+username+'）';
   document.getElementById('mu-username').value=u.username;
+  document.getElementById('mu-username').disabled=true;
   document.getElementById('mu-password').value='';
   document.getElementById('mu-name').value=u.name;
   document.getElementById('mu-role').value=u.role;
@@ -237,11 +226,13 @@ function editUser(username) {
   document.getElementById('user-modal').classList.add('show');
 }
 
+var ROLE_SPECIALTY={doctor_internal:'internal',doctor_acupuncture:'acupuncture',doctor_gynecology:'gynecology',doctor_pediatrics:'pediatrics',doctor_dermatology:'dermatology',doctor_orthopedics:'orthopedics'};
+
 function saveUser() {
   // R743 修真——提交前统一校验（uiStates.validateInputs）
   if (window.uiStates && uiStates.validateInputs && !window.__r743_injecting) {
     var _vr = uiStates.validateInputs(document);
-    if (!_vr.ok) { uiStates.showValidationErrors(_vr); return; }
+    if (!_vr.ok && !editingUser) { uiStates.showValidationErrors(_vr); return; }
   }
 
   var username=document.getElementById('mu-username').value.trim();
@@ -249,44 +240,43 @@ function saveUser() {
   var name=document.getElementById('mu-name').value.trim();
   var role=document.getElementById('mu-role').value;
   var phone=document.getElementById('mu-phone').value.trim();
+
+  if (editingUser) {
+    // 编辑 = 角色变更（姓名/手机号变更走服务端暂不支持，保护审计一致性）
+    rbacFetch('/api/admin/users/role', { method: 'POST', body: JSON.stringify({ username: editingUser, role: role, specialty: ROLE_SPECIALTY[role] || null }) })
+      .then(function(d) {
+        if (!d.ok) return toast(d.error || '变更失败', 'warn');
+        closeModal(); renderAll(); toast('✅ 角色已变更');
+      }).catch(function(){ toast('📡 服务离线', 'warn'); });
+    return;
+  }
+
   if(!username||!name) return toast('用户名和姓名为必填项');
-  var users=getUsers();
-  if(!editingUser&&users[username]) return toast('用户名已存在');
-  if(!editingUser&&password.length<6) return toast('密码至少6位');
-
-  var u=editingUser?(users[editingUser]||{}):{id:'U'+Date.now().toString(36).toUpperCase(),username:username,enabled:true,created_at:new Date().toISOString()};
-  u.name=name;
-  u.role=role;
-  if(phone) u.phone=phone;
-  if(password) u.password=password;
-  // preserve specialty for doctors
-  var SPECIALTIES={doctor_internal:'internal',doctor_acupuncture:'acupuncture',doctor_gynecology:'gynecology',doctor_pediatrics:'pediatrics',doctor_dermatology:'dermatology',doctor_orthopedics:'orthopedics'};
-  if(SPECIALTIES[role]) u.specialty=SPECIALTIES[role];
-
-  if(editingUser && editingUser!==username) { delete users[editingUser]; }
-  users[username]=u;
-  saveUsersDB(users);
-  auditLog(editingUser?'update':'create',username+' ('+ROLE_MATRIX[role].name+')');
-  closeModal(); renderAll(); toast((editingUser?'更新':'创建')+'用户 '+username+' 成功');
+  if(password.length<6) return toast('密码至少6位');
+  rbacFetch('/api/admin/users', { method: 'POST', body: JSON.stringify({ username: username, password: password, name: name, role: role, specialty: ROLE_SPECIALTY[role] || null, phone: phone }) })
+    .then(function(d) {
+      if (!d.ok) return toast(d.error || '创建失败', 'warn');
+      closeModal(); renderAll(); toast('✅ 用户 '+username+' 已创建');
+    }).catch(function(){ toast('📡 服务离线', 'warn'); });
 }
 
 function toggleUser(username) {
-  var users=getUsers();
-  if(!users[username]) return;
-  users[username].enabled=!users[username].enabled;
-  saveUsersDB(users);
-  auditLog('toggle',username+' → '+(users[username].enabled?'启用':'禁用'));
-  renderAll(); toast('用户 '+username+' 已'+(users[username].enabled?'启用':'禁用'));
+  var u=USERS_CACHE.find(function(x){ return x.username===username; });
+  if(!u) return;
+  rbacFetch('/api/admin/users/toggle', { method: 'POST', body: JSON.stringify({ username: username, enabled: u.enabled===false }) })
+    .then(function(d) {
+      if (!d.ok) return toast(d.error || '操作失败', 'warn');
+      renderAll(); toast('用户 '+username+' 已'+(u.enabled===false?'启用':'禁用'));
+    }).catch(function(){ toast('📡 服务离线', 'warn'); });
 }
 
 async function delUser(username) {
   if(!await (window.confirmModal ? confirmModal('确认删除用户 '+username+'？此操作不可逆', { danger:true, okText:'删除' }) : Promise.resolve(confirm('确认删除用户 '+username+'？')))) return;
-  var users=getUsers();
-  if(users[username].role==='super_admin') return toast('不能删除超级管理员');
-  delete users[username];
-  saveUsersDB(users);
-  auditLog('delete',username);
-  renderAll(); toast('用户 '+username+' 已删除');
+  rbacFetch('/api/admin/users/delete', { method: 'POST', body: JSON.stringify({ username: username }) })
+    .then(function(d) {
+      if (!d.ok) return toast(d.error || '删除失败', 'warn');
+      renderAll(); toast('用户 '+username+' 已删除');
+    }).catch(function(){ toast('📡 服务离线', 'warn'); });
 }
 
 function renderAll(){renderMatrix();renderUsers();renderAudit();}

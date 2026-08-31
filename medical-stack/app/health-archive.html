@@ -46,10 +46,10 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <script src="js/nav.js" defer></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
 
 <style>
 .page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
@@ -91,9 +91,21 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     <div class="sub">病历 · 处方 · 体检 · 随访 — 全生命周期健康时间线</div>
   </div>
 
+  <!-- R820: 服务端患者全景（就诊+随访+恢复曲线） -->
+  <div class="card">
+    <h3>🧬 患者疗效全景 <span style="font-size:10px;color:var(--text3);font-weight:normal">服务端真数据 · 跨就诊串联</span></h3>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input class="input" id="pt-q" placeholder="患者姓名或ID（如 彩排 / P001）" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:6px" aria-label="患者姓名或ID">
+      <button class="btn primary" style="padding:8px 16px;border:none;border-radius:6px;background:var(--primary);color:#fff;cursor:pointer" onclick="loadPatientTimeline()">查询</button>
+    </div>
+    <div id="pt-summary" style="font-size:12px;line-height:1.9"></div>
+    <div id="pt-curve"></div>
+    <div id="pt-timeline" style="font-size:12px;max-height:260px;overflow-y:auto"></div>
+  </div>
+
   <!-- 档案摘要 -->
   <div class="card">
-    <h3>👤 档案摘要</h3>
+    <h3>👤 档案摘要 <span style="font-size:10px;color:var(--text3);font-weight:normal">本机缓存</span></h3>
     <div class="metric-grid">
       <div class="metric"><div class="v" id="m-visits">0</div><div class="l">就诊次数</div></div>
       <div class="metric"><div class="v" id="m-rx">0</div><div class="l">处方数</div></div>
@@ -177,6 +189,78 @@ function renderAll() {
 }
 
 renderAll();
+
+/* ═══ R820: 患者疗效全景（服务端真数据） ═══ */
+function escPt(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function loadPatientTimeline() {
+  var q = document.getElementById('pt-q').value.trim() || new URLSearchParams(location.search).get('patient') || '';
+  if (!q) { document.getElementById('pt-summary').innerHTML = '<span style="color:var(--text3)">请输入患者姓名或ID</span>'; return; }
+  var qs = /^P\d|^anonymous/.test(q) ? 'patient_id=' + encodeURIComponent(q) : 'name=' + encodeURIComponent(q);
+  document.getElementById('pt-summary').textContent = '查询中...';
+  fetch('/api/patient/timeline?' + qs).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { document.getElementById('pt-summary').textContent = '查询失败：' + (d.error || ''); return; }
+    var s = d.summary;
+    var trendMap = { improving: '<span style="color:var(--green)">📈 好转中</span>', worsening: '<span style="color:var(--accent,#c0392b)">📉 加重，需关注</span>', stable: '➡️ 平稳' };
+    document.getElementById('pt-summary').innerHTML =
+      '<strong>' + escPt(d.patient_name || q) + '</strong>（' + escPt(d.patient_id) + '）· 就诊 <strong>' + s.visits + '</strong> 次 · 完成随访 ' + s.followups_completed + ' 次' +
+      (s.syndromes.length ? '<br>历次辨证：' + s.syndromes.map(escPt).join('、') : '') +
+      (s.formulas.length ? '<br>历次方剂：' + s.formulas.map(escPt).join('、') : '') +
+      (s.latest_score != null ? '<br>最新症状评分 <strong>' + s.latest_score + '/10</strong> ' + (trendMap[s.trend] || '') : '');
+    renderCurve(d.recovery);
+    renderPtTimeline(d.timeline);
+  }).catch(function() { document.getElementById('pt-summary').textContent = '📡 服务离线'; });
+}
+
+// 恢复曲线：随访症状评分走势（分越低越好）
+function renderCurve(recovery) {
+  var box = document.getElementById('pt-curve');
+  if (!recovery || !recovery.length) { box.innerHTML = ''; return; }
+  if (recovery.length === 1) {
+    box.innerHTML = '<div style="font-size:12px;color:var(--text2);margin:6px 0">📉 恢复曲线：仅 1 次评分（' + recovery[0].date + ' = ' + recovery[0].score + ' 分），再随访一次即可见走势</div>';
+    return;
+  }
+  var W = 320, H = 120, pad = 24;
+  var pts = recovery.map(function(r, i) {
+    var x = pad + i * (W - pad * 2) / (recovery.length - 1);
+    var y = pad + (r.score / 10) * (H - pad * 2);
+    return { x: x, y: y, d: r.d, s: r.s || r.score, score: r.score, date: r.date };
+  });
+  var line = pts.map(function(p){ return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+  var circles = pts.map(function(p) {
+    return '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" fill="' + (p.score <= 3 ? '#16a34a' : p.score <= 6 ? '#b8860b' : '#c0392b') + '"><title>' + p.date + '：' + p.score + ' 分</title></circle>';
+  }).join('');
+  var labels = pts.map(function(p) {
+    return '<text x="' + p.x + '" y="' + (p.y - 8) + '" font-size="9" text-anchor="middle" fill="#6b5b4f">' + p.score + '</text>' +
+           '<text x="' + p.x + '" y="' + (H - 4) + '" font-size="8" text-anchor="middle" fill="#9b8b7f">' + p.date.slice(5) + '</text>';
+  }).join('');
+  box.innerHTML = '<div style="font-size:11px;color:var(--text3);margin:8px 0 2px">📉 恢复曲线（随访症状评分，越低越好）</div>' +
+    '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:420px;background:var(--bg,#f5f2ed);border-radius:8px">' +
+    '<line x1="' + pad + '" y1="' + pad + '" x2="' + pad + '" y2="' + (H - pad) + '" stroke="#ddd6c8"/>' +
+    '<line x1="' + pad + '" y1="' + (H - pad) + '" x2="' + (W - pad) + '" y2="' + (H - pad) + '" stroke="#ddd6c8"/>' +
+    '<polyline points="' + line + '" fill="none" stroke="#6b3a1f" stroke-width="2"/>' + circles + labels + '</svg>';
+}
+
+function renderPtTimeline(timeline) {
+  var box = document.getElementById('pt-timeline');
+  if (!timeline || !timeline.length) { box.innerHTML = '<div style="color:var(--text3);padding:8px">该患者暂无服务端记录</div>'; return; }
+  var icon = { visit: '🩺', followup: '📞', review: '⭐' };
+  box.innerHTML = timeline.slice(0, 30).map(function(it) {
+    var detail = '';
+    if (it.type === 'visit') detail = escPt(it.syndrome || '') + (it.formula ? ' · ' + escPt(it.formula) : '') + (it.doses ? ' ×' + it.doses + '剂' : '') + (it.paid ? ' · 已结算¥' + it.amount : '');
+    else if (it.type === 'followup') detail = (it.status === 'completed' ? '已完成' : '待随访') + (it.score != null ? ' · 评分 ' + it.score + '/10' : '') + (it.feedback ? ' · ' + escPt(it.feedback.slice(0, 40)) : '') + (it.needs_review ? ' <span style="color:var(--accent,#c0392b)">⚠️需医生复核</span>' : '');
+    else detail = '评价 ' + (it.rating || '') + ' 星' + (it.comment ? ' · ' + escPt(it.comment) : '');
+    return '<div style="border-left:2px solid var(--border);padding:4px 0 4px 10px;margin:6px 0">' +
+      '<span style="color:var(--text3);font-size:10px">' + String(it.time || '').slice(0, 16).replace('T', ' ') + '</span> ' +
+      icon[it.type] + ' ' + detail + '</div>';
+  }).join('');
+}
+
+// URL 带 patient 参数时自动查询
+(function() {
+  var p = new URLSearchParams(location.search).get('patient');
+  if (p) { document.getElementById('pt-q').value = p; loadPatientTimeline(); }
+})();
 </script>
 <script src="js/error-interceptor.js"></script>
 <script src="js/common.js"></script>
@@ -188,5 +272,5 @@ renderAll();
 </body>
 </html>
 <script>
-(function(){var a='/';function load(){var p=new URLSearchParams(location.search).get('patient')||'P001';fetch(a+'/api/home/med-detail?patient_id='+p).then(r=>r.json()).then(d=>{var el=document.getElementById('archive-content')||document.body;if(d.meds){el.innerHTML='<div style="padding:12px"><h3>📋 '+p+' 健康档案</h3>'+d.meds.slice(0,10).map(function(m){return'<div style="padding:6px;border-bottom:1px solid #eee;font-size:13px"><strong>'+m.drug+'</strong> · '+m.time+' · '+m.dosage+'</div>';}).join('')+'<div style="font-size:11px;color:var(--text2);padding:8px">共 '+d.meds.length+' 条记录 · 来源: API</div></div>';}}).catch(function(){var el=document.getElementById('archive-content')||document.body;el.innerHTML='<span style="color:#999">📡 API离线</span>';});}window.addEventListener('DOMContentLoaded',load);})();
+(function(){var a='';function load(){var p=new URLSearchParams(location.search).get('patient')||'P001';fetch(a+'/api/home/med-detail?patient_id='+p).then(r=>r.json()).then(d=>{var el=document.getElementById('archive-content')||document.body;if(d.meds){el.innerHTML='<div style="padding:12px"><h3>📋 '+p+' 健康档案</h3>'+d.meds.slice(0,10).map(function(m){return'<div style="padding:6px;border-bottom:1px solid #eee;font-size:13px"><strong>'+m.drug+'</strong> · '+m.time+' · '+m.dosage+'</div>';}).join('')+'<div style="font-size:11px;color:var(--text2);padding:8px">共 '+d.meds.length+' 条记录 · 来源: API</div></div>';}}).catch(function(){var el=document.getElementById('archive-content')||document.body;el.innerHTML='<span style="color:#999">📡 API离线</span>';});}window.addEventListener('DOMContentLoaded',load);})();
 </script>

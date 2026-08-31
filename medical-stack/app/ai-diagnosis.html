@@ -125,7 +125,6 @@ textarea{resize:vertical;min-height:36px}
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js" defer></script>
 <script src="js/rx-loop.js" defer></script>
 <script src="js/smart-search.js"></script>
 <script src="js/ai-assistant.js"></script>
@@ -926,7 +925,7 @@ function submitConfirm() {
   };
 
   var apiBase = (window.TCM && TCM.API_BASE) || '';
-  fetch(apiBase + '/api/tcm/case-confirm', {
+  authFetch(apiBase + '/api/tcm/case-confirm', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(record)

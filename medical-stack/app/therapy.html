@@ -44,10 +44,10 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <script src="js/nav.js"></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
 
 <style>
 .page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
@@ -101,9 +101,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     <div class="grid2">
       <div><label class="label">患者姓名</label><input  class="input" id="tx-name" aria-label="tx name" data-validate="required|min=2"></div>
       <div><label class="label">电话</label><input  class="input" id="tx-phone" aria-label="tx phone" data-validate="phone"></div>
-      <div><label class="label">理疗师</label><select class="input" id="tx-therapist">
-        <option>王理疗师</option><option>李理疗师</option><option>陈理疗师</option>
-      </select></div>
+      <div><label class="label">治疗师</label><select class="input" id="tx-therapist"><option value="">加载医师中…</option></select></div>
       <div><label class="label">预约时间</label><input  class="input" id="tx-time" type="datetime-local" aria-label="tx time"></div>
     </div>
     <div><label class="label">症状/需求备注</label><textarea class="input" id="tx-note" placeholder="例如：颈椎酸痛，想推拿放松"></textarea></div>
@@ -156,7 +154,6 @@ function bookTherapy() {
   var svc = SERVICES.find(function(s){ return s.id === selectedService; });
 
   var booking = {
-    id: 'TX' + Date.now().toString(36).toUpperCase(),
     patient: name,
     phone: document.getElementById('tx-phone').value.trim(),
     therapist: document.getElementById('tx-therapist').value,
@@ -165,18 +162,30 @@ function bookTherapy() {
     price: svc.price,
     duration: svc.duration,
     note: document.getElementById('tx-note').value.trim(),
-    contraindication: svc.contraind,
-    status: 'pending',
-    created_at: new Date().toISOString()
+    contraindication: svc.contraind
   };
 
-  TCM.store.push('therapies', booking);
-  renderTxList();
-  toast('✅ 预约成功: ' + svc.name + ' · ¥' + svc.price + ' · ' + booking.therapist);
+  // GAP-P2：真服务端工单（持久化 + 预约短信提醒）
+  fetch('/api/therapy/orders', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(booking)
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { toast(d.error || '预约失败', 'warn'); return; }
+    renderTxList();
+    toast('✅ 预约成功: ' + svc.name + ' · ¥' + svc.price + ' · ' + (booking.therapist || '待分配'));
+  }).catch(function(){ toast('📡 服务离线，预约未保存', 'warn'); });
 }
 
 function renderTxList() {
-  var list = TCM.store.get('therapies') || [];
+  fetch('/api/therapy/orders').then(function(r){ return r.json(); }).then(function(d) {
+    var list = d.ok ? d.orders : [];
+    renderTxRows(list);
+  }).catch(function() {
+    document.getElementById('tx-list').innerHTML = '<div style="padding:16px;text-align:center;color:var(--text3)">📡 服务离线，治疗记录不可用</div>';
+  });
+}
+
+function renderTxRows(list) {
   var q = (document.getElementById('tx-search').value || '').toLowerCase();
   var filtered = q ? list.filter(function(t){ return (t.patient||'').toLowerCase().includes(q) || (t.service||'').includes(q); }) : list;
   document.getElementById('tx-count').textContent = '共 ' + list.length + ' 条';
@@ -186,41 +195,55 @@ function renderTxList() {
     var t = filtered[i];
     var st = t.status === 'done' ? '<span class="tx-status st-done">✅ 已完成</span>' : t.status === 'active' ? '<span class="tx-status st-active">⏳ 治疗中</span>' : '<span class="tx-status st-pending">📅 待治疗</span>';
     html += '<div class="tx-item"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">' +
-      '<strong>' + t.patient + '</strong> ' + t.service + ' · ' + t.therapist +
+      '<strong>' + t.patient + '</strong> ' + t.service + ' · ' + (t.therapist || '—') +
       ' <span style="color:var(--primary)">¥' + t.price + '</span> ' + st +
       '<span style="color:var(--text3);font-size:10px">' + (t.time||'').replace('T',' ') + '</span></div>' +
       (t.note ? '<div style="font-size:10px;color:var(--text2)">📝 ' + t.note + '</div>' : '') +
       '<div style="margin-top:4px">' +
-      (t.status !== 'done' ? '<button class="btn small" style="background:var(--gold-bg);color:var(--gold)" onclick="setTxStatus(\'' + t.id + '\',\'active\')">开始治疗</button> ' : '') +
-      '<button class="btn small" style="background:var(--green-bg);color:var(--green)" onclick="setTxStatus(\'' + t.id + '\',\'done\')">完成</button> ' +
+      (t.status === 'pending' ? '<button class="btn small" style="background:var(--gold-bg);color:var(--gold)" onclick="setTxStatus(\'' + t.id + '\',\'active\')">开始治疗</button> ' : '') +
+      (t.status !== 'done' ? '<button class="btn small" style="background:var(--green-bg);color:var(--green)" onclick="setTxStatus(\'' + t.id + '\',\'done\')">完成</button> ' : '') +
       '<button class="btn small" onclick="delTx(\'' + t.id + '\')">删除</button></div></div>';
   }
   document.getElementById('tx-list').innerHTML = html || '<div style="padding:16px;text-align:center;color:var(--text3)">暂无预约 — 选择疗法并填写信息开始</div>';
 }
 
 function setTxStatus(id, status) {
-  var list = TCM.store.get('therapies') || [];
-  var t = list.find(function(x){ return x.id === id; });
-  if (t) {
-    t.status = status;
-    if (status === 'done') t.completed_at = new Date().toISOString();
-    TCM.store.set('therapies', list);
-    toast(status === 'done' ? '✅ ' + t.patient + ' 治疗完成' : '⏳ 开始治疗');
-  }
-  renderTxList();
+  fetch('/api/therapy/order/status', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: id, status: status })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { toast(d.error || '操作失败', 'warn'); return; }
+    toast(status === 'done' ? '✅ 治疗完成' : '⏳ 开始治疗');
+    renderTxList();
+  }).catch(function(){ toast('📡 服务离线', 'warn'); });
 }
 
 function delTx(id) {
-  var list = TCM.store.get('therapies') || [];
-  TCM.store.set('therapies', list.filter(function(x){ return x.id !== id; }));
-  renderTxList();
-  toast('已删除');
+  if (!confirm('确认删除该治疗工单？')) return;
+  fetch('/api/therapy/order/delete', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: id })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { toast(d.error || '删除失败', 'warn'); return; }
+    renderTxList();
+    toast('已删除');
+  }).catch(function(){ toast('📡 服务离线', 'warn'); });
+}
+
+// GAP-P2：治疗师下拉接真实医师名录
+function loadTherapists() {
+  fetch('/api/doctors').then(function(r){ return r.json(); }).then(function(d) {
+    var sel = document.getElementById('tx-therapist');
+    if (!d.ok || !d.doctors || !d.doctors.length) { sel.innerHTML = '<option value="">未配置医师</option>'; return; }
+    sel.innerHTML = d.doctors.map(function(doc){ return '<option value="' + doc.name + '">' + doc.name + '（' + (doc.title || doc.specialty_name || '医师') + '）</option>'; }).join('');
+  }).catch(function(){ document.getElementById('tx-therapist').innerHTML = '<option value="">📡 离线</option>'; });
 }
 
 // 初始化
 var now = new Date(); now.setHours(now.getHours()+1);
 document.getElementById('tx-time').value = now.toISOString().slice(0,16);
 renderServices();
+loadTherapists();
 renderTxList();
 </script>
 <div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>

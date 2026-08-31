@@ -5,7 +5,7 @@
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/chronic-care.html">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>慢病管理 · 中医智能体</title>
+<title>慢病管理 · 命理宝鉴·医道</title>
 <link rel="icon" href="/favicon.ico">
 <link rel="stylesheet" href="/css/mobile.css">
 
@@ -93,17 +93,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue"
       <p class="desc">中医辨证（上消/中消/下消/阴阳两虚）+ 血糖管理 + 饮食运动指导</p>
       <div class="tags"><span class="tag">上消</span><span class="tag">中消</span><span class="tag">下消</span></div>
     </div>
-    <div class="disease-card" onclick="selectDisease('ins')">
+    <div class="disease-card" onclick="selectDisease('copd')">
       <div class="icon">🫁</div>
       <h3>慢阻肺</h3>
       <p class="desc">COPD 综合评估（肺脾气虚/肺肾两虚/痰瘀阻肺）+ 肺功能分期 + 康复指导</p>
       <div class="tags"><span class="tag">肺虚</span><span class="tag">肾虚</span><span class="tag">痰瘀</span></div>
     </div>
-    <div class="disease-card" onclick="selectDisease('copd')">
-      <div class="icon">❤️</div>
-      <h3>冠心病</h3>
-      <p class="desc">胸痹心痛辨证（心血瘀阻/痰浊内阻/心气不足/心肾阳虚）+ 心血管风险分层</p>
-      <div class="tags"><span class="tag">心血瘀阻</span><span class="tag">痰浊</span><span class="tag">心气虚</span></div>
+    <div class="disease-card" onclick="selectDisease('ins')">
+      <div class="icon">🌙</div>
+      <h3>失眠</h3>
+      <p class="desc">不寐辨证（心脾两虚/阴虚火旺/肝郁化火/心胆气虚）+ 睡眠评估 + 情志调摄指导</p>
+      <div class="tags"><span class="tag">心脾两虚</span><span class="tag">阴虚火旺</span><span class="tag">肝郁</span></div>
     </div>
   </div>
 
@@ -142,11 +142,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue"
         <label>年龄</label>
         <input  type="number" id="age" placeholder="请输入年龄" min="1" max="120" aria-label="请输入年龄" data-validate="required|number">
       </div>
+      <!-- GAP-P2：病种关键体征（评估端点硬依赖） -->
+      <div class="form-group vitals" id="vitals-htn" style="display:none">
+        <label>血压（mmHg）</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="v-systolic" placeholder="收缩压 如 145" aria-label="收缩压" style="flex:1">
+          <span>/</span>
+          <input type="number" id="v-diastolic" placeholder="舒张压 如 95" aria-label="舒张压" style="flex:1">
+        </div>
+      </div>
+      <div class="form-group vitals" id="vitals-dm" style="display:none">
+        <label>血糖（mmol/L）</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="v-fasting" placeholder="空腹 如 7.2" step="0.1" aria-label="空腹血糖" style="flex:1">
+          <input type="number" id="v-random" placeholder="随机 如 11.0" step="0.1" aria-label="随机血糖" style="flex:1">
+        </div>
+      </div>
+      <div class="form-group vitals" id="vitals-ins" style="display:none">
+        <label>每晚睡眠时长（小时）</label>
+        <input type="number" id="v-sleep" placeholder="如 5.5" step="0.5" min="0" max="16" aria-label="睡眠时长">
+      </div>
+      <div class="form-group vitals" id="vitals-copd" style="display:none">
+        <label>血氧 / 呼吸频率</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="v-spo2" placeholder="SpO₂ 如 93%" aria-label="血氧饱和度" style="flex:1">
+          <input type="number" id="v-rr" placeholder="呼吸 如 22次/分" aria-label="呼吸频率" style="flex:1">
+        </div>
+      </div>
       <button type="submit" class="btn-primary">评估风险</button>
     </form>
     <div class="result-box" id="result-box">
       <h4>评估结果</h4>
       <div id="result-content"></div>
+    </div>
+    <div id="mgmt-panel" style="display:none;margin-top:14px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+        <div style="background:#f8f5ee;border:1px solid var(--border);border-radius:8px;padding:12px"><h4 style="margin:0 0 8px;font-size:13px">💊 用药提醒模板</h4><div id="mgmt-med" style="font-size:12px;line-height:1.8">加载中…</div></div>
+        <div style="background:#f8f5ee;border:1px solid var(--border);border-radius:8px;padding:12px"><h4 style="margin:0 0 8px;font-size:13px">🥗 生活指导</h4><div id="mgmt-life" style="font-size:12px;line-height:1.8">加载中…</div></div>
+        <div style="background:#f8f5ee;border:1px solid var(--border);border-radius:8px;padding:12px"><h4 style="margin:0 0 8px;font-size:13px">🌿 中医养生指导</h4><div id="mgmt-tcm" style="font-size:12px;line-height:1.8">加载中…</div></div>
+      </div>
     </div>
   </div>
 </div>
@@ -154,10 +188,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue"
 <script>
 var currentDisease = null;
 function selectDisease(type) {
-  var titles = {htn:'高血压风险评估', dm:'糖尿病风险评估', ins:'慢阻肺风险评估', copd:'冠心病风险评估'};
+  var titles = {htn:'高血压风险评估', dm:'糖尿病风险评估', copd:'慢阻肺风险评估', ins:'失眠风险评估'};
   var endpoints = {htn:'/api/chronic/htn/assess', dm:'/api/chronic/dm/assess', ins:'/api/chronic/ins/assess', copd:'/api/chronic/copd/assess'};
   currentDisease = {type:type, endpoint:endpoints[type], title:titles[type]};
   document.getElementById('disease-title').textContent = currentDisease.title;
+  // GAP-P2：按病种显示对应体征输入
+  document.querySelectorAll('.vitals').forEach(function(el){ el.style.display = 'none'; });
+  var v = document.getElementById('vitals-' + type);
+  if (v) v.style.display = 'block';
+  document.getElementById('mgmt-panel').style.display = 'none';
   document.getElementById('assess-panel').style.display = 'block';
   document.getElementById('assess-panel').scrollIntoView({behavior:'smooth'});
 }
@@ -176,6 +215,12 @@ async function submitAssess(e) {
   var pulse = document.getElementById('pulse').value;
   var age = parseInt(document.getElementById('age').value) || 0;
   var payload = {symptom:symptom, tongue_features:tongue || undefined, pulse_features:pulse || undefined, age:age || undefined};
+  // GAP-P2：带上病种关键体征（评估端点硬依赖）
+  function num(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : undefined; }
+  if (currentDisease.type === 'htn') { payload.systolic = num('v-systolic'); payload.diastolic = num('v-diastolic'); }
+  if (currentDisease.type === 'dm') { payload.fasting = num('v-fasting'); payload.random = num('v-random'); }
+  if (currentDisease.type === 'ins') { payload.sleepHours = num('v-sleep'); }
+  if (currentDisease.type === 'copd') { payload.spo2 = num('v-spo2'); payload.respiratoryRate = num('v-rr'); }
   try {
     var res = await fetch(currentDisease.endpoint, {
       method:'POST',
@@ -185,16 +230,25 @@ async function submitAssess(e) {
     var box = document.getElementById('result-box');
     var content = document.getElementById('result-content');
     box.classList.add('show');
-    if (res.ok) {
-      var riskClass = res.urgency_level==='high'?'risk-high':res.urgency_level==='medium'?'risk-mid':'risk-low';
-      var riskLabel = {high:'高风险',medium:'中风险',low:'低风险'}[res.urgency_level||'medium'];
-      var syndromeText = (res.syndrome||res.primary_syndrome||'');
-      var adviceText = (res.tcm_advice||res.recommendations||'暂无建议');
-      content.innerHTML = ''
-        + '<p>风险等级: <span class="' + riskClass + '">' + riskLabel + '</span></p>'
-        + (syndromeText?'<p style="margin-top:8px">辨证: ' + syndromeText + '</p>':'')
-        + '<p style="margin-top:8px;font-size:13px;color:#6b7280">TCM建议: ' + adviceText + '</p>'
-        + '<p style="margin-top:8px;font-size:12px;color:#9ca3af">仅供学习参考，重要事项请遵医嘱</p>';
+    if (res.ok && res.result) {
+      var R = res.result;
+      var riskClass = R.isCritical ? 'risk-high' : (R.level === 'high' ? 'risk-high' : R.level === 'medium' ? 'risk-mid' : 'risk-low');
+      var html = '<p>' + (R.diseaseName || '') + ' 风险等级: <span class="' + riskClass + '" style="font-weight:700">' + (R.label || R.level || '—') + '</span></p>'
+        + (R.action ? '<p style="margin-top:6px">处置建议: ' + R.action + '</p>' : '');
+      if (R.values && Object.keys(R.values).length) {
+        html += '<p style="margin-top:6px;font-size:12px;color:#6b7280">录入值: ' + Object.entries(R.values).map(function(kv){ return kv[0] + '=' + kv[1]; }).join(' · ') + '</p>';
+      }
+      if (R.isCritical && res.shouldSOS) {
+        html += '<div style="margin-top:10px;padding:10px;background:#fef2f2;border:1px solid #ef4444;border-radius:8px;color:#b91c1c;font-size:13px;font-weight:600">🚨 危急值——建议立即启动院内急诊流程</div>';
+      }
+      if (R.emergencySignals && R.emergencySignals.length) {
+        html += '<div style="margin-top:8px;font-size:12px"><b>⚠️ 危险信号排查（需逐项询问）：</b>' +
+          R.emergencySignals.map(function(s){ return '<div style="margin-top:4px">· ' + s.condition + ' — <span style="color:#9ca3af">' + s.reason + '</span></div>'; }).join('') + '</div>';
+      }
+      if (R.tcmAdvice) html += '<p style="margin-top:8px;font-size:13px;color:#6b7280">中医调护: ' + (typeof R.tcmAdvice === 'string' ? R.tcmAdvice : JSON.stringify(R.tcmAdvice)) + '</p>';
+      html += '<p style="margin-top:8px;font-size:12px;color:#9ca3af">AI 辅助评估仅供执业医师参考，处置遵医嘱</p>';
+      content.innerHTML = html;
+      loadMgmtPanels(currentDisease.type);
     } else {
       content.innerHTML = '<p style="color:var(--crit)">评估失败: ' + (res.error||'') + '</p>';
     }
@@ -204,6 +258,39 @@ async function submitAssess(e) {
     box.classList.add('show');
     document.getElementById('result-content').innerHTML = '<p style="color:var(--crit)">网络错误</p>';
   }
+}
+
+// GAP-P2：评估后自动带出该慢病的用药/生活/中医养生三面板（接真端点）
+async function loadMgmtPanels(diseaseId) {
+  var panel = document.getElementById('mgmt-panel');
+  panel.style.display = 'block';
+  function renderList(el, data, keys) {
+    if (!data) { el.textContent = '暂无数据'; return; }
+    var items = [];
+    if (Array.isArray(data)) items = data;
+    else if (typeof data === 'object') {
+      keys.forEach(function(k) {
+        var v = data[k];
+        if (!v) return;
+        if (Array.isArray(v)) items = items.concat(v);
+        else items.push(v);
+      });
+      if (!items.length) items = [JSON.stringify(data)];
+    } else items = [String(data)];
+    el.innerHTML = items.map(function(x){ return '<div>· ' + String(x) + '</div>'; }).join('');
+  }
+  try {
+    var med = await fetch('/api/chronic/' + diseaseId + '/med-schedule').then(function(r){return r.json();});
+    renderList(document.getElementById('mgmt-med'), med.ok ? med.schedule : null, ['schedule','times','items','list']);
+  } catch(e) { document.getElementById('mgmt-med').textContent = '📡 服务离线'; }
+  try {
+    var life = await fetch('/api/chronic/' + diseaseId + '/lifestyle').then(function(r){return r.json();});
+    renderList(document.getElementById('mgmt-life'), life.ok ? life.lifestyle : null, ['diet','exercise','sleep','tips','advice','items']);
+  } catch(e) { document.getElementById('mgmt-life').textContent = '📡 服务离线'; }
+  try {
+    var tcm = await fetch('/api/chronic/' + diseaseId + '/tcm-advice').then(function(r){return r.json();});
+    renderList(document.getElementById('mgmt-tcm'), tcm.ok ? tcm.tcmAdvice : null, ['advice','acupoints','diet_therapy','tips','items']);
+  } catch(e) { document.getElementById('mgmt-tcm').textContent = '📡 服务离线'; }
 }
 </script>
 <script src="js/error-interceptor.js"></script>

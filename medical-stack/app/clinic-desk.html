@@ -129,6 +129,12 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 .rx-card{background:var(--bg);border-radius:8px;padding:12px;border:1px solid var(--border);margin:8px 0}
 .rx-herb{display:flex;justify-content:space-between;gap:4px;padding:3px 0;font-size:12px;border-bottom:1px dotted var(--border)}
 .rx-herb.auto-filled{background:#f0fdf4}
+/* R846 条目卡片按钮 */
+.entry-info-btn{flex:0 0 22px;height:22px;border:1px solid var(--border);border-radius:50%;background:var(--card);color:var(--primary);font-size:11px;cursor:pointer;line-height:1;padding:0}
+.entry-info-btn:hover{background:var(--primary);color:#fff}
+/* R846b 文本内条目链接（终审/病历） */
+.entry-link{color:var(--primary);cursor:pointer;border-bottom:1px dashed var(--primary);font-weight:600}
+.entry-link:hover{background:var(--primary);color:#fff;border-radius:3px}
 .safety-block{background:#fee2e2;border:1px solid #ef4444;border-radius:6px;padding:8px;margin:6px 0;font-size:11px;color:#991b1b}
 
 /* 签发凭证卡 */
@@ -259,6 +265,8 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     <h4>③ 问诊 — 主诉（AI 汇聚，可编辑）</h4>
     <textarea class="tcm-textarea" id="chief-complaint" placeholder="对话中自动汇聚主诉，也可手动输入..."></textarea>
     <div id="extracted-terms" style="font-size:11px;margin:4px 0"></div>
+    <!-- R831 主诉→候选方实时面板（症状通道 378 方，随输入即召） -->
+    <div id="formula-recall-panel"></div>
 
     <!-- 十问歌覆盖度 -->
     <h4>十问歌覆盖 <span style="font-size:9px;color:var(--text3)">缺项点提示即问</span></h4>
@@ -311,7 +319,10 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     <div id="dr-disease-kb"></div>
 
     <h4>医生判断</h4>
-    <input class="tcm-input" id="dr-syndrome" placeholder="最终辨证（可修改AI结果）" aria-label="最终辨证（可修改AI结果）">
+    <div style="position:relative">
+      <input class="tcm-input" id="dr-syndrome" placeholder="最终辨证（可修改AI结果）" aria-label="最终辨证（可修改AI结果）">
+      <button type="button" class="entry-info-btn" style="position:absolute;right:6px;top:50%;transform:translateY(-50%)" title="查看证型条目卡片（辨证依据/治法/代表方）" aria-label="查看证型条目卡片" onclick="showSyndromeCard(this)">ⓘ</button>
+    </div>
     <div style="position:relative">
       <input class="tcm-input" id="dr-formula" placeholder="方剂名称（首字母联想，如 btt→奔豚汤；选中自动展开药材）" aria-label="方剂名称" autocomplete="off" onchange="autoExpandRx(this.value)" oninput="rxExpandDebounced(this.value);fxSuggestDebounced(this.value)">
       <div id="fx-suggest" role="listbox" aria-label="方剂联想"></div>
@@ -758,8 +769,74 @@ function renderArchive(name, cases) {
     });
     if (cases.length > 5) html += '<div style="font-size:9px;color:var(--text3);margin-top:3px">…共 ' + cases.length + ' 次，可用顶部搜索栏「病例」检索全部</div>';
   }
+  html += '<div id="archive-efficacy"></div>';
   html += '</div>';
   box.innerHTML = html;
+  loadEfficacyHint(name);
+}
+
+/* R821 疗效回流：复诊患者进诊室，自动提示上疗程效果与守方/更方建议 */
+async function loadEfficacyHint(name) {
+  const box = document.getElementById('archive-efficacy');
+  if (!box || !name) return;
+  try {
+    const r = await fetch(API + '/api/patient/timeline?name=' + encodeURIComponent(name));
+    const d = await r.json();
+    if (!d.ok) return;
+    const s = d.summary || {};
+    const rec = d.recovery || [];
+    if (!rec.length) return;  // 无随访评分数据不出卡
+    const first = rec[0], last = rec[rec.length - 1];
+    const delta = last.score - first.score;
+    let verdict, color, bg;
+    if (s.trend === 'improving' && last.score <= 3) { verdict = '上疗程显效（' + first.score + '→' + last.score + ' 分），可考虑守方加减'; color = '#166534'; bg = '#f0fdf4'; }
+    else if (s.trend === 'improving') { verdict = '好转中（' + first.score + '→' + last.score + ' 分），守方观察'; color = '#166534'; bg = '#f0fdf4'; }
+    else if (s.trend === 'worsening') { verdict = '⚠️ 症状加重（' + first.score + '→' + last.score + ' 分），建议重新辨证更方'; color = '#991b1b'; bg = '#fef2f2'; }
+    else { verdict = '疗效平台（' + first.score + '→' + last.score + ' 分），可考虑调整剂量或加减'; color = '#92400e'; bg = '#fffbeb'; }
+    let html = '<div style="border:1px solid ' + color + ';background:' + bg + ';border-radius:6px;padding:6px 8px;margin-top:6px;font-size:11px;color:' + color + '">';
+    html += '<strong>📉 疗效回流</strong> · 随访 ' + rec.length + ' 次 · 最新 ' + last.date + ' 评分 <b>' + last.score + '/10</b>（Δ' + (delta > 0 ? '+' : '') + delta + '）';
+    html += '<br>' + verdict;
+    // 最近一条随访反馈（含不良反应告警）
+    const lastFu = (d.timeline || []).find(t => t.type === 'followup' && t.status === 'completed');
+    if (lastFu && lastFu.feedback) html += '<br><span style="opacity:.85">最近随访：' + escHtml(lastFu.feedback.slice(0, 50)) + '</span>';
+    if (lastFu && lastFu.needs_review) html += '<br><strong>⚠️ 患者随访中报告过不良反应，本次诊疗请务必复核用药</strong>';
+    // R822 更方建议：加重/平台时，从病种库调该证型历史有效方剂做候选（排除当前方）
+    if (s.trend === 'worsening' || s.trend === 'stable' || !s.trend) {
+      const lastVisit = (d.timeline || []).find(t => t.type === 'visit' && t.syndrome);
+      const curSyndrome = (lastVisit && lastVisit.syndrome) || '';
+      const curFormula = (lastVisit && lastVisit.formula) || '';
+      if (curSyndrome) {
+        try {
+          const kr = await fetch(API + '/api/disease-kb');
+          const kd = await kr.json();
+          const entry = (kd.kb || []).find(k => k.syndrome === curSyndrome || (curSyndrome.includes(k.syndrome) || (k.syndrome || '').includes(curSyndrome)));
+          const cands = entry ? (entry.top_formulas || []).filter(x => x.name && x.name !== curFormula).slice(0, 3) : [];
+          if (cands.length) {
+            html += '<div style="margin-top:6px;padding-top:5px;border-top:1px dashed ' + color + '"><strong>💡 更方候选</strong>（本病种库 ' + entry.cases + ' 例沉淀' + (entry.effective_rate != null ? ' · 随访有效率 ' + Math.round(entry.effective_rate * 100) + '%' : '') + '）：';
+            cands.forEach(x => {
+              html += '<div style="margin-top:3px">' + escHtml(x.name) + '（' + x.count + ' 例使用） ' +
+                '<span class="follow-chip" style="background:#fff;border-color:' + color + ';color:' + color + '" onclick="switchFormula(\'' + escHtml(x.name).replace(/'/g, '') + '\')">带入复核区</span></div>';
+            });
+            html += '<div style="font-size:9px;opacity:.75;margin-top:3px">⚠️ 候选仅供参考，须医师重新辨证后审定</div></div>';
+          }
+        } catch (e2) { /* 病种库不可达不影响主提示 */ }
+      }
+    }
+    html += '</div>';
+    box.innerHTML = html;
+    addEvidence('ai', '疗效回流：上疗程评分 ' + first.score + '→' + last.score + '（' + (s.trend === 'improving' ? '好转' : s.trend === 'worsening' ? '加重' : '平台') + '）');
+  } catch (e) { /* 静默：疗效数据不可达不阻塞诊疗 */ }
+}
+
+/* R822 更方带入：候选方剂进医生复核区并自动展开组成，医师加减审定 */
+async function switchFormula(fxName) {
+  if (!fxName) return;
+  const inp = document.getElementById('dr-formula');
+  inp.value = fxName;
+  inp.dataset.touched = '1';
+  await autoExpandRx(fxName);
+  addEvidence('ai', '更方建议采纳：候选方 ' + fxName + ' 已带入复核区，待医师审定');
+  toast('💡 ' + fxName + ' 已带入，请重新辨证后加减审定');
 }
 
 /* 延续就诊：载入上次方案（症状并入当次证据，方案进医嘱参考） */
@@ -827,8 +904,10 @@ function mergeComplaint(text) {
   const cc = document.getElementById('chief-complaint');
   if (document.activeElement === cc) return;   // 医生正在编辑时不打扰
   const cur = cc.value.trim();
-  if (!cur) { cc.value = text; return; }
-  if (!cur.includes(text.slice(0, 10))) cc.value = cur + '；' + text;
+  if (!cur) { cc.value = text; }
+  else if (!cur.includes(text.slice(0, 10))) { cc.value = cur + '；' + text; }
+  else return;
+  refreshFormulaRecall(cc.value);   // R831：AI 汇聚主诉后联动候选方面板
 }
 
 /* 十问歌覆盖度 + 追问提示 */
@@ -1168,7 +1247,8 @@ function renderAIPanel() {
   if (diagOff) {
     html += '<div class="ai-block" style="border-color:var(--accent)">⚠️ 辨证引擎暂不可用（' + escHtml(aiResult.diagnose.error||'') + '），其余模块正常</div>';
   } else {
-    html += '<div class="ai-syndrome">' + escHtml(f.matched_syndrome || '待四诊合参') + '</div>';
+    html += '<div class="ai-syndrome">' + escHtml(f.matched_syndrome || '待四诊合参') +
+      (f.matched_syndrome ? ' <button type="button" class="entry-info-btn" title="查看证型条目卡片（辨证依据/治法/代表方）" aria-label="查看证型条目卡片" onclick="showEntryCardByName(\'' + escHtml(f.matched_syndrome).replace(/'/g, "\\'") + '\', event.clientX, event.clientY)">ⓘ</button>' : '') + '</div>';
     html += '<div class="ai-formula">' + escHtml(f.formula || '—') + '</div>';
     html += '<div style="text-align:center;font-size:11px;color:var(--text3)">置信度 ' + Math.round((f.confidence||0)*100) + '% · ' + escHtml(f.source||'') + ' · 证据 ' + session.evidence.length + ' 条</div>';
   }
@@ -1184,8 +1264,13 @@ function renderAIPanel() {
     html += '<div class="ai-block" style="background:' + agreeUI[2] + '"><div class="ai-title" style="color:' + agreeUI[1] + '">⚖️ 双引擎交叉验证 · ' + agreeUI[0] + '</div>';
     html += '<div class="ai-row"><span>经方引擎</span><b>' + escHtml(engA || '—') + '</b><span>' + Math.round((f.confidence||0)*100) + '%</span></div>';
     html += '<div class="ai-row"><span>自研引擎 ' + escHtml(inhouse.model||'') + '</span><b>' + escHtml(engB || '—') + '</b><span>' + Math.round((inhouse.primary_syndrome?.confidence||0)*100) + '%</span></div>';
-    const diffs = (inhouse.differential || []).slice(0, 3);
-    if (diffs.length) html += '<div style="font-size:10px;color:var(--text2);margin-top:4px">鉴别: ' + diffs.map(x => escHtml(x.syndrome) + ' ' + Math.round((x.score||0)*100) + '%').join(' · ') + '</div>';
+    // R857：鉴别说理行（首选 vs 次选抓手）优先，老版百分比行兜底
+    if (inhouse.rationale) {
+      html += '<div style="font-size:11px;color:var(--text2);margin-top:4px;line-height:1.6">💬 ' + escHtml(inhouse.rationale) + '</div>';
+    } else {
+      const diffs = (inhouse.differential || []).slice(0, 3);
+      if (diffs.length) html += '<div style="font-size:10px;color:var(--text2);margin-top:4px">鉴别: ' + diffs.map(x => escHtml(x.syndrome) + (x.gist ? '（' + escHtml(x.gist) + '）' : '') + ' ' + Math.round((x.score||0)*100) + '%').join(' · ') + '</div>';
+    }
     html += '</div>';
   }
 
@@ -1392,9 +1477,91 @@ function addHerbRow(name, dose, auto) {
   const container = document.getElementById('rx-herbs');
   const row = document.createElement('div');
   row.className = 'rx-herb' + (auto ? ' auto-filled' : '');
-  row.innerHTML = '<input class="tcm-input" style="width:60%" placeholder="药材名" aria-label="药材名" value="' + (name||'') + '"><input class="tcm-input" style="width:40%" placeholder="剂量" aria-label="剂量" value="' + (dose||'') + '">';
+  row.innerHTML = '<input class="tcm-input" style="width:52%" placeholder="药材名" aria-label="药材名" value="' + (name||'') + '">' +
+    '<input class="tcm-input" style="width:34%" placeholder="剂量" aria-label="剂量" value="' + (dose||'') + '">' +
+    // R846：条目卡片——药名即点即出性味归经/主治/出处（KB 正名条目 465 方·190 药·361 穴）
+    '<button type="button" class="entry-info-btn" title="查看条目卡片" aria-label="查看条目卡片" onclick="showEntryCard(this)">ⓘ</button>';
   container.appendChild(row);
 }
+
+/* ── R846 条目卡片弹层（药材/腧穴/方剂共用，客户端缓存） ── */
+const _entryCardCache = {};
+async function showEntryCard(btn) {
+  const name = btn.parentElement.querySelector('input[aria-label="药材名"]').value.trim();
+  if (!name) return toast('请先填写药材名');
+  const r = btn.getBoundingClientRect();
+  showEntryCardByName(name, r.left, r.bottom + 6);
+}
+// R855：最终辨证 ⓘ——证型条目卡片（证机概要/临床表现/代表方剂/辨证要点）
+function showSyndromeCard(btn) {
+  const name = document.getElementById('dr-syndrome').value.trim();
+  if (!name) return toast('请先填写或采纳辨证结果');
+  const r = btn.getBoundingClientRect();
+  showEntryCardByName(name, r.left - 320, r.bottom + 6);
+}
+async function showEntryCardByName(name, x, y) {
+  let card = document.getElementById('entry-card');
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'entry-card';
+    card.style.cssText = 'position:fixed;z-index:9999;max-width:360px;background:var(--card,#fff);border:1px solid var(--border,#ddd);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:14px;font-size:12px;line-height:1.7';
+    document.body.appendChild(card);
+    document.addEventListener('click', function(ev) {
+      const c = document.getElementById('entry-card');
+      if (c && !c.contains(ev.target) && !ev.target.classList.contains('entry-info-btn') && !ev.target.classList.contains('entry-link')) c.remove();
+    });
+  }
+  card.style.left = Math.min(x, window.innerWidth - 380) + 'px';
+  card.style.top = Math.min(y, window.innerHeight - 260) + 'px';
+  card.innerHTML = '<b>' + name + '</b> <span style="opacity:.6">查询中…</span>';
+  if (!_entryCardCache[name]) {
+    try {
+      const resp = await fetch(API + '/api/tcm/entry/info?name=' + encodeURIComponent(name));
+      _entryCardCache[name] = await resp.json();
+    } catch (e) { _entryCardCache[name] = { ok: false, error: e.message }; }
+  }
+  const d = _entryCardCache[name];
+  if (!d || !d.ok) {
+    card.innerHTML = '<b>' + name + '</b><div style="opacity:.6;margin-top:6px">知识库暂无该条目——可点右上角「🔍 查 KB」检索</div>';
+    return;
+  }
+  const modName = { 'tcm-herb': '药材', 'tcm-acupuncture': '腧穴', 'tcm-formula': '方剂', 'tcm-syndrome': '证型' }[d.module] || d.module;
+  const lines = String(d.content || '').split('\n').filter(Boolean)
+    .map(l => '<div style="margin-top:4px">' + l.replace(/^(性味归经|功效|主治|出处|归经|定位|操作|证机概要|临床表现|代表方剂|辨证要点|主症|舌象|脉象|加减法|证候表现|证机分析)(：)/, '<b style="color:var(--primary,#2b6cb0)">$1</b>$2') + '</div>').join('');
+  // R856 鉴别诊断栏：同脏腑近证，点名可点跳转
+  const diffs = (d.differentials || []).map(x =>
+    '<div style="margin-top:3px">· <span class="entry-link" data-entry="' + x.name + '" title="点开鉴别">' + x.name + '</span> <span style="opacity:.7">' + escHtml(x.gist) + '</span></div>').join('');
+  card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' +
+    '<b style="font-size:14px">' + d.title + '</b>' +
+    '<span style="font-size:10px;opacity:.55;border:1px solid var(--border,#ddd);border-radius:8px;padding:1px 8px">' + modName + '</span></div>' +
+    lines +
+    (diffs ? '<div style="margin-top:8px;border-top:1px dashed var(--border,#ddd);padding-top:6px"><b style="color:var(--primary,#2b6cb0)">鉴别诊断</b>' + diffs + '</div>' : '') +
+    '<div style="margin-top:8px;font-size:10px;opacity:.45">R846 条目卡片 · 供医师参考，临证裁定</div>';
+}
+
+/* ── R846b 终审/病历文本 linkify：条目名变可点链接（单趟正则，防嵌套） ── */
+let _entryNamesList = null;
+async function loadEntryNames() {
+  if (_entryNamesList) return _entryNamesList;
+  try {
+    const r = await fetch(API + '/api/tcm/entry/names');
+    const d = await r.json();
+    _entryNamesList = d.ok ? d.names : [];
+  } catch (e) { _entryNamesList = []; }
+  _entryNamesList.sort((a, b) => b.length - a.length);  // 长名优先（炙甘草先于甘草）
+  return _entryNamesList;
+}
+function linkifyEntries(html) {
+  if (!_entryNamesList || !_entryNamesList.length) return html;
+  const re = new RegExp(_entryNamesList.map(n => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+  return html.replace(re, n => '<span class="entry-link" data-entry="' + n + '" title="点击查看条目卡片">' + n + '</span>');
+}
+document.addEventListener('click', function(ev) {
+  const el = ev.target.closest && ev.target.closest('.entry-link');
+  if (el) { ev.stopPropagation(); showEntryCardByName(el.dataset.entry, ev.clientX, ev.clientY + 8); }
+});
+
+
 
 /* ═══════════════════════ 医生确认 → 电子病历签发 + 电子处方签发（禁忌硬拦截） ═══════════════════════ */
 async function confirmDiagnosis(adoptAI) {
@@ -1444,8 +1611,9 @@ async function confirmDiagnosis(adoptAI) {
   } catch(e) { /* 终审服务不可达时降级到处方端 422 拦截兜底 */ }
   if (presignReview && presignReview.ok) {
     const LV = { critical:'🚫', warning:'⚠️', info:'ℹ️' };
+    await loadEntryNames();  // R846b：终审文本里的药名/方名变可点卡片链接
     const rows = (presignReview.checks || []).map(c =>
-      '<div style="padding:2px 0">' + (LV[c.level] || '•') + ' <b>[' + escHtml(c.cat) + ']</b> ' + escHtml(c.msg) + '</div>').join('');
+      '<div style="padding:2px 0">' + (LV[c.level] || '•') + ' <b>[' + escHtml(c.cat) + ']</b> ' + linkifyEntries(escHtml(c.msg)) + '</div>').join('');
     if (presignReview.verdict === 'block') {
       document.getElementById('rx-safety').innerHTML =
         '<div class="safety-block">🚫 <b>智能体终审未通过（' + presignReview.criticalCount + ' 项致命）</b>——签发已拦截<br>' + rows + '</div>';
@@ -1474,7 +1642,7 @@ async function confirmDiagnosis(adoptAI) {
   // 1. 电子处方签发（服务端强制十八反十九畏/剂量校验，critical 硬拦截 422）
   let rxOk = false, rxId = '';
   try {
-    const rxR = await fetch(API + '/api/prescription/create', { method:'POST', headers:{'Content-Type':'application/json'},
+    const rxR = await authFetch(API + '/api/prescription/create', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         patient_id: 'P-' + Date.now(), patient_name: p.name.v || '未命名',
         patient_profile: { age: p.age.v, gender: p.gender.v, history: [...session.history] },
@@ -1504,7 +1672,7 @@ async function confirmDiagnosis(adoptAI) {
     切: session.vision.vitals ? ('血压' + session.vision.vitals.systolic + '/' + session.vision.vitals.diastolic + ' · 心率' + session.vision.vitals.heart_rate) : '未采集'
   };
   try {
-    const cfR = await fetch(API + '/api/tcm/case-confirm', { method:'POST', headers:{'Content-Type':'application/json'},
+    const cfR = await authFetch(API + '/api/tcm/case-confirm', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         chief: complaint.split(/[；;。]/)[0] || syndrome,
         hpi: complaint,
@@ -1533,7 +1701,7 @@ async function confirmDiagnosis(adoptAI) {
     if (fuD.ok) followUp = fuD.recommendations;
   } catch(e) {}
   try {
-    await fetch(API + '/api/followup/create', { method:'POST', headers:{'Content-Type':'application/json'},
+    await authFetch(API + '/api/followup/create', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ patient_name: p.name.v || '未命名', syndrome, formula,
         advice: [usage + '，共' + doses + '剂', notes].filter(Boolean).join('；'), days: 7, session_id: clinicSessionId || null }) });
   } catch(e) {}
@@ -1601,7 +1769,7 @@ async function settleRx(method) {
   const info = document.getElementById('rx-settle-info');
   if (info) info.textContent = '⏳ 结算中...';
   try {
-    const r = await fetch(API + '/api/prescription/settle', { method:'POST', headers:{'Content-Type':'application/json'},
+    const r = await authFetch(API + '/api/prescription/settle', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ rx_id: issued.rxId, method }) });
     const d = await r.json();
     if (d.ok) {
@@ -1984,9 +2152,27 @@ function renderCopilot(d) {
     html += '<div class="cp-card" id="' + cid + '">' +
       '<div class="cp-title">🧠 辨证更新 <span class="cp-ms">' + d.ms + 'ms · 第' + d.turns + '轮</span></div>' +
       '<div style="font-size:12px;margin-top:2px"><b>' + escHtml(d.syndrome) + '</b>（' + Math.round((d.confidence || 0) * 100) + '%）→ <b style="color:var(--green)">' + escHtml(d.formula || '—') + '</b>' +
-      (diff ? '<br><span style="color:var(--text3);font-size:10px">鉴别：' + escHtml(diff) + (d.formulaOptions && d.formulaOptions.length > 1 ? ' · 备选：' + escHtml(d.formulaOptions.slice(1).join('、')) : '') + '</span>' : '') + '</div>' +
+      // R857：首选 vs 次选人话说理（证机+主症抓手），无说理时回退老版百分比行
+      (d.rationale ? '<br><span style="color:var(--text2);font-size:11px;line-height:1.6">💬 ' + escHtml(d.rationale) + '</span>' : (diff ? '<br><span style="color:var(--text3);font-size:10px">鉴别：' + escHtml(diff) + '</span>' : '')) +
+      (d.formulaOptions && d.formulaOptions.length > 1 ? '<br><span style="color:var(--text3);font-size:10px">备选：' + escHtml(d.formulaOptions.slice(1).join('、')) + '</span>' : '') + '</div>' +
       '<div class="cp-actions"><span class="cp-btn yes" onclick="adoptDelta(\'' + cid + '\',\'' + d.syndrome + '\',\'' + (d.formula || '') + '\')">✓ 采纳入方</span>' +
       '<span class="cp-btn no" onclick="rejectDelta(\'' + cid + '\',\'' + d.syndrome + '\',\'' + (d.formula || '') + '\')">✗ 驳回</span></div></div>';
+  }
+  // ①b KB 方剂召回卡（R826：症状反向索引直推，与引擎结论互参；C 源标注挖掘级）
+  if (d.kbRecall && d.kbRecall.formulas && d.kbRecall.formulas.length) {
+    const rid = 'cp-kb' + d.turns;
+    const SRC_BADGE = { A: '结构化', B: '方名条目', C: '古籍挖掘' };
+    html += '<div class="cp-card" id="' + rid + '" style="border-left:3px solid #7c3aed">' +
+      '<div class="cp-title">📚 KB 方剂召回 <span class="cp-ms">症状通道 · ' + escHtml(d.kbRecall.canon.join('、')) + '</span></div>' +
+      (d.kbDivergent ? '<div style="font-size:10px;color:#b45309;margin:2px 0">⚖️ 召回头名与引擎结论不一致，建议重点鉴别</div>' : '') +
+      '<div style="margin-top:3px">' + d.kbRecall.formulas.map(f => {
+        const refs = (f.refs || []).map(r => r.module + '·' + r.title).join('；');
+        return '<div class="cp-chip" style="display:flex;justify-content:space-between;align-items:center;margin:3px 0;padding:4px 8px;background:#faf5ff;color:#6d28d9" ' +
+          'title="命中症状：' + escHtml(f.matched.join('、')) + (refs ? '｜出处：' + escHtml(refs) : '') + '">' +
+          '<span><b>' + escHtml(f.name) + '</b> <span style="font-size:9px;opacity:.7">命中' + f.overlap + '症 · ' + SRC_BADGE[f.src] + (f.demoted ? ' · 已降级' : '') + '</span></span>' +
+          '<span style="white-space:nowrap"><span class="cp-btn yes" style="margin-left:6px" onclick="adoptRecall(\'' + rid + '\',\'' + escHtml(f.name) + '\')">入方</span>' +
+          '<span class="cp-btn no" onclick="rejectRecall(\'' + rid + '\',\'' + escHtml(f.name) + '\')">✗</span></span></div>';
+      }).join('') + '</div></div>';
   }
   // ② 问诊导航卡（R780：五级优先级 + 追问理由，点击标记已问）
   if (d.followups && d.followups.length) {
@@ -2059,6 +2245,31 @@ async function adoptDelta(cid, syndrome, formula) {
   syncSession();
 }
 
+/* KB 召回归方（R826）：只填方名不动辨证，dppo 记录召回采纳
+   R831：source 参数分流（kb-recall=引擎互参卡 / symptom-panel=主诉候选方面板） */
+async function adoptRecall(rid, formula, source) {
+  const fEl = document.getElementById('dr-formula');
+  if (fEl && formula) { fEl.value = formula; fEl.dataset.touched = '1'; autoExpandRx(formula); }
+  markCpCard(rid, '✓ 已入方：' + formula, 'var(--green)');
+  toast('✓ 候选方入方：' + formula);
+  apiCall('/api/tcm/dppo-feedback', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+    syndrome: 'KB召回', formula: formula, agreed: true, source: source || 'kb-recall',
+    doctor_id: (document.getElementById('dr-id') || {}).value || 'D001',
+    patient: session.profile.name.v, symptoms: [...session.symptoms]
+  })}, 5000).catch(() => {});
+  syncSession();
+}
+
+/* KB 召回驳回（R827）：dppo 负反馈带召回源，回流生成降级名单 */
+async function rejectRecall(rid, formula, source) {
+  toast('已记录驳回：' + formula + '（回流校准召回权重）');
+  apiCall('/api/tcm/dppo-feedback', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+    syndrome: 'KB召回', formula: formula, agreed: false, source: source || 'kb-recall',
+    doctor_id: (document.getElementById('dr-id') || {}).value || 'D001',
+    patient: session.profile.name.v, symptoms: [...session.symptoms]
+  })}, 5000).catch(() => {});
+}
+
 /* 驳回：dppo 负反馈，智能体后续结论不再自动入方（面板仍展示） */
 async function rejectDelta(cid, syndrome, formula) {
   markCpCard(cid, '✗ 已驳回', '#991b1b');
@@ -2088,6 +2299,8 @@ async function toggleDemo() {
   }
   sessionStorage.setItem('tcm_demo', '1');
   localStorage.removeItem(SESSION_KEY);
+  // R864：演示种子只在显式进入演示模式时注入（生产页面不再自动放假数据）
+  if (typeof window.seedDemoData === 'function') window.seedDemoData();
   location.reload();
 }
 function exitDemo() {
@@ -2103,6 +2316,129 @@ function demoBanner() {
   document.body.prepend(b);
 }
 function demoSleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* R831 主诉→候选方实时面板：主诉输入/AI 汇聚即召（400ms 防抖），
+   入方/驳回回流 dppo（source=symptom-panel），与 kbRecall 互参卡共用降级名单
+   R832：识别症状 chip 可点——点掉误识别症状即时重排候选，再点恢复；
+   主诉清空时排除集自动重置 */
+let _frTimer = null;
+const _frExcluded = new Set();
+function bindFormulaRecall() {
+  const ta = document.getElementById('chief-complaint');
+  if (!ta) return;
+  ta.addEventListener('input', () => {
+    if (!ta.value.trim()) _frExcluded.clear();   // 主诉清空 → 排除集重置
+    clearTimeout(_frTimer);
+    _frTimer = setTimeout(() => refreshFormulaRecall(ta.value), 400);
+  });
+  refreshFormulaRecall(ta.value);
+}
+
+/* 点 chip 切换排除/恢复，即时重排；排除动作上报服务端（R833 回流每周体检复核清单） */
+let _frLastTop = [];
+function toggleFrCanon(canon) {
+  if (_frExcluded.has(canon)) {
+    _frExcluded.delete(canon);
+  } else {
+    _frExcluded.add(canon);
+    const ta0 = document.getElementById('chief-complaint');
+    apiCall('/api/tcm/kb/recall-exclude', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+      canon: canon, q: (ta0 ? ta0.value : '').slice(0, 120), top: _frLastTop,
+      doctor_id: (document.getElementById('dr-id') || {}).value || 'D001', src: 'symptom-panel'
+    })}, 4000).catch(() => {});
+  }
+  const ta = document.getElementById('chief-complaint');
+  refreshFormulaRecall(ta ? ta.value : '');
+}
+
+/* R834 候选方 vs 处方草稿 组成差异对比：悬停 250ms 展开，移出收起；
+   组成取 /api/tcm/formula/herbs（与 autoExpandRx 同源），本地缓存 */
+const _frCompCache = {};
+let _frDiffTimer = null;
+async function frFetchHerbs(name) {
+  if (_frCompCache[name]) return _frCompCache[name];
+  try {
+    const r = await apiCall('/api/tcm/formula/herbs?name=' + encodeURIComponent(name), {}, 5000);
+    if (r && r.ok && r.herbs) { _frCompCache[name] = r.herbs.map(h => h.name); return _frCompCache[name]; }
+  } catch (e) {}
+  _frCompCache[name] = null;
+  return null;
+}
+function frDiffShow(rid, name) {
+  clearTimeout(_frDiffTimer);
+  _frDiffTimer = setTimeout(async () => {
+    const el = document.getElementById(rid + '-diff');
+    if (!el) return;
+    const draft = ((document.getElementById('dr-formula') || {}).value || '').trim();
+    const cand = await frFetchHerbs(name);
+    if (!cand) { el.innerHTML = '<span style="color:var(--text3)">组成未收录</span>'; el.style.display = 'block'; return; }
+    let html = '<span style="color:#15803d">组成 ' + cand.length + ' 味：' + escHtml(cand.join('、')) + '</span>';
+    if (draft && draft !== name) {
+      const cur = await frFetchHerbs(draft);
+      if (cur) {
+        const cs = new Set(cand), rs = new Set(cur);
+        const shared = cand.filter(h => rs.has(h));
+        const onlyC = cand.filter(h => !rs.has(h));
+        const onlyD = cur.filter(h => !cs.has(h));
+        html += '<br><span style="color:var(--text3)">vs 草稿「' + escHtml(draft) + '」：</span>' +
+          '<span style="color:#1d4ed8">共有 ' + shared.length + ' 味' + (shared.length ? '（' + escHtml(shared.join('、')) + '）' : '') + '</span>' +
+          (onlyC.length ? '<br><span style="color:#b45309">候选独有：' + escHtml(onlyC.join('、')) + '</span>' : '') +
+          (onlyD.length ? '<br><span style="color:#6b7280">草稿独有：' + escHtml(onlyD.join('、')) + '</span>' : '');
+      }
+    }
+    el.innerHTML = html;
+    el.style.display = 'block';
+  }, 250);
+}
+function frDiffHide(rid) {
+  clearTimeout(_frDiffTimer);
+  const el = document.getElementById(rid + '-diff');
+  if (el) el.style.display = 'none';
+}
+
+async function refreshFormulaRecall(text) {
+  const box = document.getElementById('formula-recall-panel');
+  if (!box) return;
+  const q = String(text || '').trim();
+  if (q.length < 2) { box.innerHTML = ''; return; }
+  try {
+    const ex = [..._frExcluded].join(',');
+    const r = await apiCall('/api/tcm/kb/formula-recall?q=' + encodeURIComponent(q) + '&limit=8' + (ex ? '&exclude=' + encodeURIComponent(ex) : ''), {}, 5000);
+    if (!r || !r.ok || r.__offline) return;
+    const SRC_BADGE = { A: '结构化', B: '方名条目', C: '古籍挖掘' };
+    // 识别症状渲染为可点 chip：正常=紫底，已排除=灰底划线，点击切换
+    const chipOf = c => {
+      const off = _frExcluded.has(c);
+      return '<span onclick="toggleFrCanon(\'' + escHtml(c) + '\')" title="' + (off ? '已排除，点击恢复' : '点击排除此症状后重排') + '" ' +
+        'style="cursor:pointer;display:inline-block;margin:1px 2px;padding:0 6px;border-radius:8px;font-size:10px;' +
+        (off ? 'background:#e5e7eb;color:#9ca3af;text-decoration:line-through' : 'background:#ede9fe;color:#6d28d9') + '">' +
+        escHtml(c) + (off ? ' ↩' : ' ✕') + '</span>';
+    };
+    // 展示集 = 本次生效症状 + 医生已排除症状（排除项划线呈现，点击恢复）
+    const shown = [...new Set([...(r.canon || []), ..._frExcluded])];
+    const head = '<div style="font-size:11px;font-weight:700;color:#6d28d9;margin:6px 0 2px">🌿 候选方 · 症状通道' +
+      (shown.length ? ' <span style="font-weight:400;color:var(--text3)">识别（点击可排除）：</span>' + shown.map(chipOf).join('') : '') + '</div>';
+    if (!r.formulas.length) {
+      box.innerHTML = r.canon.length || shown.length
+        ? head + '<div style="font-size:10px;color:var(--text3);margin-bottom:4px">症状通道未召回候选方（可换用 KB 检索）</div>'
+        : '';
+      return;
+    }
+    box.innerHTML = head + r.formulas.map((f, i) => {
+      const rid = 'frp-' + i;
+      const refs = (f.refs || []).map(x => x.module + '·' + x.title).join('；');
+      return '<div class="cp-chip" id="' + rid + '" style="margin:3px 0;padding:4px 8px;background:#f0fdf4;color:#15803d" ' +
+        'onmouseenter="frDiffShow(\'' + rid + '\',\'' + escHtml(f.name) + '\')" onmouseleave="frDiffHide(\'' + rid + '\')">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center" ' +
+        'title="命中症状：' + escHtml(f.matched.join('、')) + (refs ? '｜出处：' + escHtml(refs) : '') + '">' +
+        '<span><b>' + escHtml(f.name) + '</b> <span style="font-size:9px;opacity:.7">命中' + f.overlap + '症 · ' + (SRC_BADGE[f.src] || f.src) + (f.demoted ? ' · 已降级' : '') + '</span></span>' +
+        '<span class="cp-actions" style="white-space:nowrap"><span class="cp-btn yes" onclick="adoptRecall(\'' + rid + '\',\'' + escHtml(f.name) + '\',\'symptom-panel\')">入方</span>' +
+        '<span class="cp-btn no" onclick="rejectRecall(\'' + rid + '\',\'' + escHtml(f.name) + '\',\'symptom-panel\')">✗</span></span></div>' +
+        '<div id="' + rid + '-diff" style="display:none;font-size:10px;line-height:1.6;margin-top:3px;padding-top:3px;border-top:1px dashed #bbf7d0"></div></div>';
+    }).join('');
+    _frLastTop = r.formulas.slice(0, 3).map(f => f.name);   // R833：排除事件携带当时 top3
+  } catch (e) { /* 面板异常不打断问诊 */ }
+}
 
 /* 显式角色对话（走与真实监听同一管线：转写→抽取→主诉汇聚→增量辨证） */
 function demoSay(role, text) {
@@ -2194,6 +2530,7 @@ if (DEMO.active) localStorage.removeItem(SESSION_KEY);   // R809：演示一律�
 initCam();
 initClinicSession().then(async () => {
   updateQueueButton();
+  bindFormulaRecall();   // R831：主诉→候选方实时面板（含恢复会话后的首刷）
   if (DEMO.active) {
     demoBanner();
     const db = document.getElementById('btn-demo');

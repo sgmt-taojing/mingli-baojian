@@ -45,6 +45,9 @@ body { background: var(--bg); font-family: 'PingFang SC', sans-serif; }
 .med-status.missed { background: var(--accent); color: white; }
 .med-action { padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); cursor: pointer; font-size: 12px; }
 .med-action:hover { background: var(--primary); color: white; }
+/* R850 患者版条目卡片——药名点开看功效主治 */
+.entry-link{color:var(--primary);cursor:pointer;border-bottom:1px dashed var(--primary);font-weight:600}
+.entry-link:hover{background:var(--primary);color:#fff;border-radius:3px}
 
 .timeline { background: var(--card); border-radius: 12px; padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .timeline h3 { margin: 0 0 12px; font-size: 16px; color: var(--primary); }
@@ -135,16 +138,47 @@ body { background: var(--bg); font-family: 'PingFang SC', sans-serif; }
 </div>
 
 <script>
-const PATIENTS = [
-  { id: 'P001', name: '张奶奶', age: 73 },
-  { id: 'P002', name: '李爷爷', age: 78 },
-  { id: 'P003', name: '王女士', age: 42 },
-  { id: 'P004', name: '小宝',   age: 8 }
-];
-
-let currentPatient = 'P001';
+// R851：家庭成员从患者主索引实拉（真实建档患者），不再硬编码演示人名
+let PATIENTS = [];
+let currentPatient = '';
 let meds = [];
-let records = []; // 历史服药记录
+let records = []; // 服药依从记录（服务端为准，localStorage 仅离线兜底）
+
+async function loadFamilyPatients() {
+  // R853：优先账号绑定的家庭成员（只见自家人）；未登录/未绑定 → 引导去家庭中心
+  try {
+    const r = await fetch('/api/family/members', {
+      headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('tcm_token') || '') }
+    });
+    if (r.status === 401) {
+      document.getElementById('patient-tabs').innerHTML = '<div style="color:var(--text2);font-size:12px;padding:8px">请先<a href="login.html" style="color:var(--primary)">登录</a>后查看家庭成员服药任务</div>';
+      document.getElementById('med-items').innerHTML = '';
+      return;
+    }
+    const d = await r.json();
+    PATIENTS = (d.members || []).map(m => ({ id: m.patient_id, name: m.name + '（' + m.relation + '）', age: m.age }));
+  } catch (e) { PATIENTS = []; }
+  if (!PATIENTS.length) {
+    document.getElementById('patient-tabs').innerHTML = '<div style="color:var(--text2);font-size:12px;padding:8px">尚未绑定家庭成员——去<a href="family-hub.html" style="color:var(--primary)">🏡 家庭中心</a>绑定后，家人的服药任务会出现在这里</div>';
+    document.getElementById('med-items').innerHTML = '';
+    return;
+  }
+  if (!PATIENTS.some(p => p.id === currentPatient)) currentPatient = PATIENTS[0].id;
+  loadMeds();
+}
+
+// R851：依从记录从服务端实拉（入纵向病程的同一份数据）
+async function refreshAdherence() {
+  if (!currentPatient) return;
+  try {
+    const r = await fetch('/api/home/med-adherence?patient_id=' + encodeURIComponent(currentPatient));
+    const d = await r.json();
+    if (d.ok) {
+      records = (d.records || []).map(x => ({ drug: x.drug, time: x.scheduled_time, status: x.status, patient: x.patient_id, ts: x.ts }));
+      localStorage.setItem('tcm_med_records', JSON.stringify(records.slice(-100)));  // 离线缓存
+    }
+  } catch (e) { /* 离线时用本地缓存 */ }
+}
 
 // 智能推断药品的常见服用时间（基于中药功效）
 function inferTimes(drug) {
@@ -171,6 +205,7 @@ async function loadMeds() {
     const fullResp = await fetch('/api/home/med-detail?patient_id=' + currentPatient);
     const full = await fullResp.json();
     meds = full.meds || [];
+    await refreshAdherence();  // R851：依从记录服务端同源
     renderMeds();
   } catch (e) {
     // [sanitized] /* [sanitized] [;,]/* [sanitized] */'API failed', e) */;
@@ -200,7 +235,7 @@ function renderMeds() {
         <div class="med-item">
           <div class="med-time">${time}</div>
           <div>
-            <div class="med-drug">${m.drug}</div>
+            <div class="med-drug"><span class="entry-link" data-entry="${String(m.drug).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}" title="点击查看药物说明">${String(m.drug).replace(/&/g,'&amp;').replace(/</g,'&lt;')}</span></div>
             <div class="med-dose">${m.dose || '按方'} · 处方来源: ${m.source || 'EMR'}</div>
           </div>
           <div class="med-status ${status}">${status === 'taken' ? '✓ 已服' : '⏳ 待服'}</div>
@@ -217,23 +252,34 @@ function renderMeds() {
   document.getElementById('stat-pending').textContent = pending;
   document.getElementById('stat-missed').textContent = records.filter(r => r.status === 'missed').length;
 
-  // 时间轴
+  // 时间轴——R851：由真实依从记录逐日聚合，无记录的日子留空（不再编造数据）
   const bar = document.getElementById('timeline-bar');
   bar.innerHTML = '';
   for (let i = 6; i >= 0; i--) {
-    const dayTotal = 3; // 假设每日 3 次
-    const dayTaken = i === 0 ? taken : Math.max(0, dayTotal - (i % 4 === 0 ? 1 : 0));
-    const dayMissed = i === 0 ? 0 : (i % 4 === 0 ? 1 : 0);
-    const daySkipped = dayTotal - dayTaken - dayMissed;
-    const seg = document.createElement('div');
-    seg.className = 'bar-segment ' + (dayMissed > 0 ? 'missed' : 'taken');
-    seg.style.flex = dayTaken;
-    if (dayTaken > 0) seg.textContent = dayTaken;
-    bar.appendChild(seg);
+    const day = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    const dayRecs = records.filter(r => String(r.ts || '').slice(0, 10) === day);
+    const dayTaken = dayRecs.filter(r => r.status === 'taken').length;
+    const dayMissed = dayRecs.filter(r => r.status === 'missed').length;
+    if (!dayRecs.length) {
+      const seg = document.createElement('div');
+      seg.className = 'bar-segment';
+      seg.style.cssText = 'flex:1;background:var(--border);opacity:.35';
+      seg.title = day + ' 无记录';
+      bar.appendChild(seg);
+      continue;
+    }
+    const segT = document.createElement('div');
+    segT.className = 'bar-segment taken';
+    segT.style.flex = Math.max(dayTaken, 0.001);
+    if (dayTaken > 0) segT.textContent = dayTaken;
+    segT.title = day + ' 已服 ' + dayTaken;
+    bar.appendChild(segT);
     if (dayMissed > 0) {
       const m = document.createElement('div');
       m.className = 'bar-segment missed';
       m.style.flex = dayMissed;
+      m.textContent = dayMissed;
+      m.title = day + ' 漏服 ' + dayMissed;
       bar.appendChild(m);
     }
   }
@@ -246,10 +292,21 @@ function switchPatient(id) {
 
 async function markTake(drug, time) {
   const status = await (window.confirmModal ? confirmModal(`${drug} @ ${time}\n\n点击「确认」= 已服，「取消」= 漏服`, { okText:'已服', cancelText:'漏服' }) : Promise.resolve(confirm(`${drug} @ ${time}`)));
-  records.push({ drug, time, status: status ? 'taken' : 'missed', patient: currentPatient, ts: new Date().toISOString() });
-  // 持久化
-  localStorage.setItem('tcm_med_records', JSON.stringify(records.slice(-100)));
-  var t=document.createElement('div');t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#8b4513;color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999';t.textContent=status?'✓ 已记录已服':'✗ 已记录漏服，会自动推送给子女';document.body.appendChild(t);setTimeout(function(){t.remove()},2500);
+  const st = status ? 'taken' : 'missed';
+  records.push({ drug, time, status: st, patient: currentPatient, ts: new Date().toISOString() });
+  localStorage.setItem('tcm_med_records', JSON.stringify(records.slice(-100)));  // 离线兜底
+  // R851：依从回传服务端，入患者纵向病程（医生随访/疗效分析同源可见）
+  let synced = false;
+  try {
+    const r = await fetch('/api/home/med-adherence', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient_id: currentPatient, drug, time, status: st })
+    });
+    const d = await r.json();
+    synced = !!d.ok;
+  } catch (e) { /* 离线 */ }
+  var t=document.createElement('div');t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#8b4513;color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999';t.textContent=(status?'✓ 已记录已服':'✗ 已记录漏服，会自动推送给子女')+(synced?'':'（离线暂存本地）');document.body.appendChild(t);setTimeout(function(){t.remove()},2500);
   // 推送给子女（wechat-bot）
   fetch('/api/wechat/send', {
     method: 'POST',
@@ -259,14 +316,15 @@ async function markTake(drug, time) {
       type: 'medication',
       data: { time, drug, dose: '按方' }
     })
-  }).catch('e => /* [sanitized] [;,]/* [sanitized] */wechat-bot 离线) */');
+  }).catch(function(){ /* wechat-bot 离线 */ });
+  if (synced) await refreshAdherence();
   renderMeds();
 }
 
 // 初始化
 const saved = localStorage.getItem('tcm_med_records');
-if (saved) records = JSON.parse(saved);
-loadMeds();
+if (saved) { try { records = JSON.parse(saved); } catch (e) { records = []; } }
+loadFamilyPatients();
 </script>
 <script src="js/error-interceptor.js"></script>
 <script src="js/common.js"></script>
@@ -274,6 +332,53 @@ loadMeds();
 <script src="js/ui/a11y.js"></script>
 <script src="js/sw-version-listener.js"></script>
 <script src="js/submit-guard.js"></script>
+<script>
+/* ── R850 患者版条目卡片——服药清单药名点开看功效/主治/禁忌（复用 R846 端点） ── */
+const _medEntryCache = {};
+async function showMedEntryByName(name, x, y) {
+  let card = document.getElementById('entry-card');
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'entry-card';
+    card.style.cssText = 'position:fixed;z-index:9999;max-width:340px;background:var(--card,#fff);border:1px solid var(--border,#ddd);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:16px;font-size:13px;line-height:1.8;text-align:left';
+    document.body.appendChild(card);
+    document.addEventListener('click', function(ev) {
+      const c = document.getElementById('entry-card');
+      if (c && !c.contains(ev.target) && !ev.target.classList.contains('entry-link')) c.remove();
+    });
+  }
+  card.style.left = Math.min(x, window.innerWidth - 360) + 'px';
+  card.style.top = Math.min(y, window.innerHeight - 280) + 'px';
+  card.innerHTML = '<b>' + name + '</b> <span style="opacity:.6">查询中…</span>';
+  if (!_medEntryCache[name]) {
+    try {
+      const resp = await fetch('/api/tcm/entry/info?name=' + encodeURIComponent(name));
+      _medEntryCache[name] = await resp.json();
+    } catch (e) { _medEntryCache[name] = { ok: false, error: e.message }; }
+  }
+  const d = _medEntryCache[name];
+  if (!d || !d.ok) {
+    card.innerHTML = '<b>' + name + '</b><div style="opacity:.6;margin-top:6px">知识库暂无该药说明，用药请遵医嘱</div>';
+    return;
+  }
+  const modName = { 'tcm-herb': '药材', 'tcm-acupuncture': '穴位', 'tcm-formula': '方剂', 'tcm-syndrome': '证型' }[d.module] || d.module;
+  const lines = String(d.content || '').split('\n').filter(Boolean)
+    .map(l => '<div style="margin-top:4px">' + l.replace(/^(性味归经|功效|主治|出处|归经|定位|操作|禁忌|证机概要|临床表现|代表方剂|辨证要点|主症|舌象|脉象|加减法|证候表现|证机分析)(：)/, '<b style="color:var(--primary)">$1</b>$2') + '</div>').join('');
+  // R856 鉴别诊断栏：同脏腑近证，点名可点跳转
+  const diffs = (d.differentials || []).map(x =>
+    '<div style="margin-top:3px">· <span class="entry-link" data-entry="' + x.name + '" title="点开鉴别">' + x.name + '</span> <span style="opacity:.7">' + String(x.gist).replace(/</g,'&lt;') + '</span></div>').join('');
+  card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' +
+    '<b style="font-size:15px">' + d.title + '</b>' +
+    '<span style="font-size:10px;opacity:.55;border:1px solid var(--border);border-radius:8px;padding:1px 8px">' + modName + '</span></div>' +
+    lines +
+    (diffs ? '<div style="margin-top:8px;border-top:1px dashed var(--border);padding-top:6px"><b style="color:var(--primary)">鉴别诊断</b>' + diffs + '</div>' : '') +
+    '<div style="margin-top:10px;font-size:11px;color:var(--text2);border-top:1px dashed var(--border);padding-top:6px">📖 药物知识供您了解，剂量与用法请严格遵医嘱</div>';
+}
+document.addEventListener('click', function(ev) {
+  const el = ev.target.closest && ev.target.closest('.entry-link');
+  if (el) { ev.stopPropagation(); showMedEntryByName(el.dataset.entry, ev.clientX, ev.clientY + 8); }
+});
+</script>
 <script src="js/escape-html.js"></script>
 </body>
 </html>

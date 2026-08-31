@@ -108,6 +108,7 @@ body { background: var(--bg); font-family: 'PingFang SC', 'Microsoft YaHei', san
 .page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
 .phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
+<link rel="manifest" href="/pwa/manifest.json"><link rel="apple-touch-icon" href="/pwa/icon-192.png"><meta name="theme-color" content="#6b3a1f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="居家患者入口">
 <link rel="stylesheet" href="css/mobile.css"></head>
 <script src="js/nav.js"></script>
 <script src="js/global-search.js"></script>
@@ -158,8 +159,8 @@ if(localStorage.getItem("tcm_home_consent")) { document.getElementById("auth-gat
 <div class="wrap">
   <!-- 顶栏 -->
   <div class="topbar">
-    <h1>🏠 居家中医助手</h1>
-    <div class="sub">面向家庭的中医智能管家 · 拍照/问询/提醒/救助一站到底</div>
+    <h1>🏠 居家患者入口</h1>
+    <div class="sub">中医标准智能体 · 患者侧自助服务（拍照/问询/提醒/救助）；医师请用 <a href="mobile-interact.html" style="color:#ffe9b0;text-decoration:underline">医师移动工作台</a></div>
     <div class="row">
       <div class="who">👵 张奶奶 · 73 岁 · 高血压体质</div>
       <span class="switch" onclick="switchUser()">🔄 切换</span>
@@ -208,6 +209,12 @@ if(localStorage.getItem("tcm_home_consent")) { document.getElementById("auth-gat
       <div class="icon">👨‍👩‍👧</div>
       <div class="name">家属关怀</div>
       <div class="desc">子女端实时看<br>远程陪护</div>
+    </div>
+    <div class="tile" onclick="location.href='my-reports.html'" style="background:linear-gradient(135deg,#fff,#fdf6e8);border-color:var(--primary)">
+      <div class="icon">📮</div>
+      <div class="name">我的医院报告</div>
+      <div class="desc">病历/处方/检验<br>出具即回流</div>
+      <div class="badge" style="background:var(--primary)">新</div>
     </div>
     <div class="tile" onclick="location.href='treatment-center.html'" style="background:linear-gradient(135deg,#fff,#f0f7ff);border-color:var(--blue)">
       <div class="icon">🤖</div>
@@ -396,6 +403,9 @@ window.speakResult=function(text){
 <script src="js/sw-version-listener.js"></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
+<script src="/pwa-inject.js"></script>
+<div data-mingli-entry style="max-width:760px;margin:0 auto;padding:0 12px"></div>
+<script src="js/mingli-entry.js"></script>
 </body>
 </html><script>
 // ═══ 居家评估→跟进自动流水线 ═══

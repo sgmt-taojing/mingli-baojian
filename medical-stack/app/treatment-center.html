@@ -8,7 +8,6 @@
 <title>诊疗中心 · 中医智能协作工作台</title>
 <link rel="icon" href="data:," />
 <script src="js/nav.js" defer></script>
-<script src="js/seed-loader.js" defer></script>
 <script src="js/data-engine.js" defer></script>
 <script src="js/rx-loop.js" defer></script>
 <script src="js/global-search.js"></script>
@@ -908,7 +907,7 @@ async function finalizeCase() {
   };
 
   try {
-    var resp = await fetch('/api/prescription/create', {
+    var resp = await authFetch('/api/prescription/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

@@ -5,7 +5,7 @@
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/rx-loop.html">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>处方闭环 · 中医智能体</title>
+<title>处方闭环 · 命理宝鉴·医道</title>
 <link rel="icon" href="/favicon.ico">
 <link rel="stylesheet" href="/css/mobile.css">
 
@@ -246,11 +246,15 @@ async function loadList(status) {
 }
 
 async function reviewRx(rxId, action) {
+  // SEC-001：核验人必须可溯源——取登录用户，缺失时请医师报姓名留痕
+  var rxUser = {}; try { rxUser = JSON.parse(localStorage.getItem('tcm_user')||'{}'); } catch(e) {}
+  var reviewer = rxUser.name || prompt('请报核验医师姓名（处方流转留痕）');
+  if (!reviewer) { toast('已取消：核验人必填'); return; }
   try {
-    var res = await fetch(API + '/api/prescription/verify', {
+    var res = await authFetch(API + '/api/prescription/verify', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({rx_id: rxId, action: action})
+      body: JSON.stringify({rx_id: rxId, action: action, reviewer: reviewer})
     }).then(r => r.json());
     if (res.ok) {
       toast(action === 'approve' ? '处方已通过' : '处方已驳回');

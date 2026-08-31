@@ -41,10 +41,10 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <script src="js/nav.js"></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
 <script src="js/data-engine.js"></script>
 
 <style>
@@ -117,6 +117,12 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     <h3>✅ 最近完成的随访</h3>
     <div id="completed-list"></div>
   </div>
+
+  <!-- R819: 运营商通道派发台账 -->
+  <div class="card">
+    <h3>📡 运营商通道 · 派发台账 <span style="font-size:10px;color:var(--text3);font-weight:normal">AI语音/短信/5G消息 · 回执自动回填随访</span></h3>
+    <div id="dispatch-panel" style="font-size:12px">加载中...</div>
+  </div>
 </div>
 <script>
 const templates = {
@@ -171,7 +177,7 @@ function render() {
         '<div class="info"><strong>'+esc(f.patient_name||'—')+'</strong> · '+esc(f.syndrome||'')+(f.formula?' · '+esc(f.formula):'')+'<br>'+
         '<span style="font-size:10px;color:var(--text3)">'+fuTypeLabel(f.source||f.type)+' · 应访 '+dueDay+'</span></div>'+
         '<span class="badge '+(overdue?'overdue':'today')+'">'+(overdue?'⚠️逾期':dueDay===today?'📌今天':'待随访')+'</span>'+
-        '<button class="btn green small" onclick="sendFollowup(\'post_rx\',\''+pname+'\',\''+psyn+'\',\''+pfx+'\')">随访</button>'+
+        '<button class="btn green small" onclick="sendFollowup(\'post_rx\',\''+pname+'\',\''+psyn+'\',\''+pfx+'\',\''+f.id+'\')">随访</button>'+
         '<button class="btn small" style="background:var(--bg);border:1px solid var(--border)" onclick="completeFU(\''+f.id+'\')">✓</button>'+
       '</div>';
     }).join('');
@@ -188,7 +194,8 @@ function render() {
 }
 
 // R816：优先取服务端 AI 个性化话术（证型+方剂规则引擎），失败回退静态模板；发送前可编辑
-function sendFollowup(type, patient, syndrome, formula) {
+// R819：选运营商通道派发（AI语音/短信/5G消息/站内），回执自动回填随访
+function sendFollowup(type, patient, syndrome, formula, fuId) {
   var t = templates[type];
   var name = patient || '';
   var fallback = t ? '【'+t.title+'】'+(name?' '+name+'，':'')+t.msg : '您好，本次随访想了解您的恢复情况。请简单回复。';
@@ -196,31 +203,77 @@ function sendFollowup(type, patient, syndrome, formula) {
     var log = JSON.parse(localStorage.getItem('tcm_followup_log')||'[]');
     log.unshift({ time: new Date().toISOString(), type: type, patient: name, message: msg, status: 'sent' });
     localStorage.setItem('tcm_followup_log', JSON.stringify(log.slice(0,100)));
-    toast('✅ 随访消息已发送给 ' + (name||'患者'));
+    toast('✅ 随访消息已记录（站内）');
   };
-  if (!syndrome && !formula) { previewFU(fallback, done); return; }
+  if (!syndrome && !formula) { previewFU(fallback, done, null, null); return; }
   fetch('/api/followup/message', {method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({ type:type, patient_name:name, syndrome:syndrome||'', formula:formula||'' })})
     .then(function(r){ return r.json(); }).then(function(d) {
-      previewFU(d.ok && d.message ? d.message : fallback, done, d.matched);
-    }).catch(function(){ previewFU(fallback, done); });
+      previewFU(d.ok && d.message ? d.message : fallback, done, d.matched, fuId);
+    }).catch(function(){ previewFU(fallback, done, null, fuId); });
 }
 
-function previewFU(msg, done, matched) {
+function previewFU(msg, done, matched, fuId) {
   var tag = matched && (matched.formula_note || matched.syndrome_care)
     ? '<div style="font-size:10px;color:var(--green)">🤖 AI 话术 · 已按证型/方剂个性化</div>'
     : '<div style="font-size:10px;color:var(--text3)">📝 通用话术</div>';
+  var channelRow = fuId
+    ? '<select id="__fu_channel" style="padding:8px;border:1px solid #d1d5db;border-radius:6px">' +
+      '<option value="voice">📞 AI 语音外呼（运营商通道）</option>' +
+      '<option value="sms">💬 短信</option>' +
+      '<option value="rcs5g">📡 5G 消息</option>' +
+      '<option value="manual" selected>📋 站内记录</option></select>'
+    : '';
   var overlay = openModal(
     '<div style="display:grid;gap:8px;min-width:300px">' + tag +
     '<textarea id="__fu_msg" rows="5" style="padding:8px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;line-height:1.8">'+esc(msg)+'</textarea>' +
+    channelRow +
     '<button class="btn primary" id="__fu_send" style="padding:10px;border:none;border-radius:6px;background:var(--primary,#6b3a1f);color:#fff;cursor:pointer">📤 确认发送</button></div>',
     '随访话术预览');
   overlay.querySelector('#__fu_send').addEventListener('click', function() {
     var m = overlay.querySelector('#__fu_msg').value.trim();
     if (!m) { toast('话术不能为空', 'warn'); return; }
-    done(m); overlay.remove();
+    var chEl = overlay.querySelector('#__fu_channel');
+    var channel = chEl ? chEl.value : 'manual';
+    overlay.remove();
+    if (!fuId) { done(m); return; }
+    // R819：走运营商通道适配层派发，状态如实回报
+    fetch('/api/followup/dispatch', {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ id: fuId, channel: channel })})
+      .then(function(r){ return r.json(); }).then(function(d) {
+        if (!d.ok) { toast('派发失败：'+(d.error||''), 'warn'); return; }
+        var ds = d.dispatch;
+        if (ds.status === 'channel_unconfigured') toast('⚠️ ' + ds.note, 'warn');
+        else if (ds.status === 'dispatched') toast('✅ 已通过 ' + channel + ' 通道外发，等待回执');
+        else if (ds.status === 'logged') toast('✅ 已站内记录');
+        else toast('⚠️ ' + (ds.note || ds.status), 'warn');
+        loadDispatches();
+      }).catch(function(){ toast('网络错误', 'warn'); });
   });
 }
+
+// R819：派发台账 + 通道配置状态
+function loadDispatches() {
+  fetch('/api/followup/dispatches').then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) return;
+    var el = document.getElementById('dispatch-panel');
+    if (!el) return;
+    var chMap = { sms: '短信', voice: 'AI语音', rcs5g: '5G消息', manual: '站内' };
+    var chLine = d.channels.map(function(c) {
+      return (c.configured ? '🟢' : '⚪') + chMap[c.channel] + (c.configured ? '' : '（未配置）');
+    }).join(' · ');
+    var html = '<div style="font-size:11px;color:var(--text3);margin-bottom:6px">运营商通道：' + chLine + ' · 已外发 ' + d.stats.dispatched + ' · 已接听 ' + d.stats.answered + '</div>';
+    html += d.list.slice(0, 8).map(function(x) {
+      var stMap = { dispatched: '✅已外发', answered: '✅已接听回填', logged: '📋站内记录', channel_unconfigured: '⚠️通道未配置', provider_error: '❌运营商错误', provider_unreachable: '❌通道不可达', failed: '❌未接通' };
+      return '<div style="padding:4px 0;border-bottom:1px solid var(--border)">' +
+        (chMap[x.channel]||x.channel) + ' → <strong>' + esc(x.patient_name||'—') + '</strong> · ' +
+        (stMap[x.status]||x.status) + (x.transcript ? ' · <span style="color:var(--text3)">回执：' + esc(x.transcript.slice(0,40)) + '</span>' : '') +
+        '<span style="float:right;color:var(--text3);font-size:10px">' + (x.created_at||'').slice(5,16).replace('T',' ') + '</span></div>';
+    }).join('');
+    el.innerHTML = html;
+  }).catch(function(){});
+}
+loadDispatches();
 
 // R812：完成随访走真 API（服务端新增 /api/followup/complete）
 function completeFU(id) {
@@ -249,7 +302,7 @@ function addFollowup() {
     var formula = overlay.querySelector('#__fu_formula').value.trim();
     var days = parseInt(overlay.querySelector('#__fu_days').value, 10) || 7;
     if (!name || !diagnosis || !formula) { toast('姓名/诊断/方剂必填', 'warn'); return; }
-    fetch('/api/followup/create', {method:'POST',headers:{'Content-Type':'application/json'},
+    authFetch('/api/followup/create', {method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({ patient_name:name, syndrome:diagnosis, formula:formula, days:days })})
       .then(function(r){ return r.json(); }).then(function(d) {
         if (d.ok) { overlay.remove(); toast('✅ 随访已新增'); loadFollowups(); }
@@ -297,7 +350,7 @@ setInterval(loadFollowups, 60000);
 <div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
 <div id="followup-result" style="margin:8px;text-align:center;color:var(--text2)"></div>
 <script>
-(function(){var api='/';window.submitFollowup=function(pid,effect,notes){fetch(api+'/api/tcm/efficacy-analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:pid,days:90})}).then(r=>r.json()).then(d=>{var el=document.getElementById('followup-result');if(el)el.innerHTML='✅ 已提交 · '+d.totalRecords+'条记录';}).catch(function(e){var el=document.getElementById('followup-result');if(el)el.innerHTML='📡 API离线 · 本地已保存';});};})();
+(function(){var api='';window.submitFollowup=function(pid,effect,notes){fetch(api+'/api/tcm/efficacy-analysis',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient_id:pid,days:90})}).then(r=>r.json()).then(d=>{var el=document.getElementById('followup-result');if(el)el.innerHTML='✅ 已提交 · '+d.totalRecords+'条记录';}).catch(function(e){var el=document.getElementById('followup-result');if(el)el.innerHTML='📡 API离线 · 本地已保存';});};})();
 </script>
 <script src="js/error-interceptor.js"></script>
 <script src="js/common.js"></script>

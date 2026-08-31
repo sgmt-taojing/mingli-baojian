@@ -41,10 +41,10 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <script src="js/nav.js"></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
 
 <style>
 .page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
@@ -110,9 +110,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
       <h3>👨‍⚕️ 会诊信息</h3>
       <div class="grid2">
         <div><label class="label">患者</label><input  class="input" id="tc-patient" placeholder="患者姓名" aria-label="患者姓名" data-validate="required|min=2"></div>
-        <div><label class="label">接诊医生</label><select class="input" id="tc-doctor">
-          <option>张仲景(内科)</option><option>李时珍(针灸)</option><option>傅青主(妇科)</option><option>钱乙(儿科)</option><option>王清任(骨伤)</option>
-        </select></div>
+        <div><label class="label">接诊医生</label><select class="input" id="tc-doctor"><option value="">加载医师中…</option></select></div>
       </div>
       <div><label class="label">主诉</label><textarea class="input" id="tc-complaint" placeholder="请描述症状..."></textarea></div>
       <div><label class="label">共享病历（点击添加）</label><div id="tc-cases"></div></div>
@@ -197,26 +195,40 @@ function toggleMute() {
   toast('🎙 ' + (micMuted ? '已静音' : '已取消静音'));
 }
 
-function getCases() {
-  try { return JSON.parse(localStorage.getItem('tcm_patient_records') || '[]'); } catch(e) { return []; }
-}
+// GAP-P2：病历共享接真实患者档案（/api/patients/list），不再读 localStorage 假数据
+var _tcPatients = [];
+function getCases() { return _tcPatients; }
 
 function renderCases() {
-  var cases = getCases();
-  var html = '';
-  for (var i = 0; i < Math.min(cases.length, 6); i++) {
-    html += '<span class="case-chip" onclick="loadCase(' + i + ')">' + cases[i].patient_name + ' · ' + (cases[i].diagnosis||'') + '</span>';
-  }
-  document.getElementById('tc-cases').innerHTML = html || '<span style="font-size:11px;color:var(--text3)">暂无病历</span>';
+  fetch('/api/patients/list').then(function(r){ return r.json(); }).then(function(d) {
+    _tcPatients = d.patients || d.list || [];
+    var html = '';
+    for (var i = 0; i < Math.min(_tcPatients.length, 6); i++) {
+      var p = _tcPatients[i];
+      html += '<span class="case-chip" onclick="loadCase(' + i + ')">' + (p.name || p.patient_name || p.patient_id) + '</span>';
+    }
+    document.getElementById('tc-cases').innerHTML = html || '<span style="font-size:11px;color:var(--text3)">暂无建档患者</span>';
+  }).catch(function() {
+    document.getElementById('tc-cases').innerHTML = '<span style="font-size:11px;color:var(--text3)">📡 服务离线</span>';
+  });
 }
 
 function loadCase(i) {
   var c = getCases()[i];
   if (!c) return;
-  document.getElementById('tc-patient').value = c.patient_name;
-  document.getElementById('tc-complaint').value = (c.diagnosis||'') + '（共享病历）';
-  addMsg('系统', '已载入病历: ' + c.patient_name, 'doctor');
-  toast('📋 病历已载入');
+  var name = c.name || c.patient_name || c.patient_id;
+  document.getElementById('tc-patient').value = name;
+  addMsg('系统', '已载入患者档案: ' + name + (c.last_syndrome ? '（上次辨证：' + c.last_syndrome + '）' : ''), 'doctor');
+  toast('📋 患者档案已载入');
+}
+
+// GAP-P2：接诊医生接真实医师名录
+function loadTeleDoctors() {
+  fetch('/api/doctors').then(function(r){ return r.json(); }).then(function(d) {
+    var sel = document.getElementById('tc-doctor');
+    if (!d.ok || !d.doctors || !d.doctors.length) { sel.innerHTML = '<option value="">未配置医师</option>'; return; }
+    sel.innerHTML = d.doctors.map(function(doc){ return '<option value="' + doc.name + '">' + doc.name + '（' + (doc.specialty_name || '医师') + '）</option>'; }).join('');
+  }).catch(function(){ document.getElementById('tc-doctor').innerHTML = '<option value="">📡 离线</option>'; });
 }
 
 function startConsult() {
@@ -240,17 +252,21 @@ function saveConsultNote() {
   var complaint = document.getElementById('tc-complaint').value.trim();
   if (!patient) return toast('请填写患者姓名');
   var note = {
-    id: 'TC' + Date.now().toString(36).toUpperCase(),
     patient: patient,
     doctor: document.getElementById('tc-doctor').value,
     complaint: complaint || '在线问诊',
-    note: document.getElementById('tc-msg').value.trim() || '远程会诊完成',
-    time: new Date().toISOString()
+    note: document.getElementById('tc-msg').value.trim() || '远程会诊完成'
   };
-  TCM.store.push('consults', note);
-  renderHistory();
-  addMsg('系统', '📝 会诊结论已记录并归档', 'doctor');
-  toast('📝 会诊记录已保存');
+  // GAP-P2：会诊结论真持久化到服务端
+  fetch('/api/tele/consults', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(note)
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { toast(d.error || '保存失败', 'warn'); return; }
+    renderHistory();
+    addMsg('系统', '📝 会诊结论已记录并归档', 'doctor');
+    toast('📝 会诊记录已保存');
+  }).catch(function(){ toast('📡 服务离线，记录未保存', 'warn'); });
 }
 
 function addMsg(who, text, cls) {
@@ -270,17 +286,22 @@ function sendMsg() {
 }
 
 function renderHistory() {
-  var list = TCM.store.get('consults') || [];
-  var html = '';
-  for (var i = 0; i < Math.min(list.length, 10); i++) {
-    var c = list[i];
-    html += '<div class="msg-item"><strong>' + c.patient + '</strong> × ' + c.doctor +
-      ' <span style="color:var(--text3);font-size:10px">' + new Date(c.time).toLocaleString('zh-CN') + '</span>' +
-      '<div style="font-size:11px;color:var(--text2)">📝 ' + c.note + '</div></div>';
-  }
-  document.getElementById('tc-history').innerHTML = html || '<div style="padding:12px;color:var(--text3);font-size:12px">暂无会诊记录</div>';
+  fetch('/api/tele/consults').then(function(r){ return r.json(); }).then(function(d) {
+    var list = d.ok ? d.consults : [];
+    var html = '';
+    for (var i = 0; i < Math.min(list.length, 10); i++) {
+      var c = list[i];
+      html += '<div class="msg-item"><strong>' + c.patient + '</strong> × ' + c.doctor +
+        ' <span style="color:var(--text3);font-size:10px">' + new Date(c.time).toLocaleString('zh-CN') + '</span>' +
+        '<div style="font-size:11px;color:var(--text2)">📝 ' + c.note + '</div></div>';
+    }
+    document.getElementById('tc-history').innerHTML = html || '<div style="padding:12px;color:var(--text3);font-size:12px">暂无会诊记录</div>';
+  }).catch(function() {
+    document.getElementById('tc-history').innerHTML = '<div style="padding:12px;color:var(--text3);font-size:12px">📡 服务离线</div>';
+  });
 }
 
+loadTeleDoctors();
 renderCases();
 renderHistory();
 </script>

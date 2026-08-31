@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · 页面层重打包：34 页拉齐 tcm HEAD（G16 排期执行）
+- 机制：新增 scripts/medical-stack-page-follow.py——tcm HEAD 取页 → 补丁重放（canonical→mingli-medical / 品牌→命理宝鉴·医道 / seed-loader 按需注入）→ 品牌零残留+ADR-009 话术扫描 → 原子写入 → 8973 静态层逐页冒烟
+- 结果：34/34 写入零告警，冒烟 34/34 PASS；8972 七能力健康复核正常
+- 顺带收益：emr.html 获得 tcm R848 注入修复（escHtml+linkify）；rbac.html 清除 localStorage 演示口令块（admin/admin123 等硬编码）升级为 /api/admin/users 服务端鉴权
+- 发现：8931 端口被 tcm-agent 静态服务占用（EADDRINUSE），本侧静态层实际在 8973；watchdog/冒烟基准已统一指向 8973，端口归属冲突待两项目协调
+- 状态：medical-stack/page-follow-state.json
+
 ## 2026-08-31 · G15 命理视觉采集接线 + G16 差集清零
 - **G15 命理采集**：unified-vision-routes 新增命理三相路由（fortune_face 面相三停/fortune_mole 痣相部位/fortune_palm 掌纹主线，mingli 域、结构化特征无断语）；一帧采集医学四诊与命理三相后台并行（Promise.all 并发无感），mingliFeatures 不进医学检索与辨证（R756/R757 实测无泄漏）；ADR-008 授权门（未授权跳过/独立入口 403 MINGLI_CONSENT_REQUIRED）；自检升级为真实 classify 触发懒加载（7/7 通过）；端到端演示：三路特征→8974 批注队列（ann-e0d2398a0d35，48h SLA 计时中）——证据 DELIVERY/g15-vision-wiring-20260831.json
 - **G16 差集清零**：/api/public/clinic-links 确认已内化（medical-stack 4995 行，冒烟 200）；L4 页面差集 52 页三分法定性表落盘 DELIVERY/l4-page-triage-20260831.md——真缺口 0、已有等价 52（medical-stack/app 同名页）、架构定位 52（主 app/ 为命理域不放医学页）；另发现 34 页内容滞后于 tcm HEAD（08-27 快照），列 P2 页面层重打包排期；差集复跑 clean:true / missing_api 0「无待吸收增量」

@@ -33,6 +33,11 @@ textarea{min-height:60px;resize:vertical}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
 .search-bar{display:flex;gap:6px;margin-bottom:12px}
 .search-bar input{flex:1;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:13px}
+/* R848 条目卡片（复用问诊台 R846 契约） */
+.entry-link{color:var(--primary);cursor:pointer;border-bottom:1px dashed var(--primary);font-weight:600}
+.entry-link:hover{background:var(--primary);color:#fff;border-radius:3px}
+.entry-info-btn{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;color:var(--primary)}
+.entry-info-btn:hover{background:var(--primary);color:#fff}
 </style>
 <link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="css/standard.css">
@@ -243,7 +248,7 @@ addHerbRow();
 function addHerbRow() {
   var div = document.createElement('div');
   div.style.cssText = 'display:flex;gap:6px;margin-bottom:4px;align-items:center';
-  div.innerHTML = '<input  class="input" placeholder="药名" style="flex:2" aria-label="药名"><input  class="input" placeholder="剂量" style="flex:1;max-width:70px" aria-label="剂量"><input  class="input" placeholder="备注" style="flex:1;max-width:80px" aria-label="备注"><button class="btn small" style="background:var(--accent);color:#fff;padding:4px 6px" onclick="this.parentElement.remove()">✕</button>';
+  div.innerHTML = '<input  class="input" placeholder="药名" style="flex:2" aria-label="药名"><input  class="input" placeholder="剂量" style="flex:1;max-width:70px" aria-label="剂量"><input  class="input" placeholder="备注" style="flex:1;max-width:80px" aria-label="备注"><button type="button" class="entry-info-btn" title="查看条目卡片" aria-label="查看条目卡片" onclick="showEmrEntryCard(this)">ⓘ</button><button class="btn small" style="background:var(--accent);color:#fff;padding:4px 6px" onclick="this.parentElement.remove()">✕</button>';
   document.getElementById('emr-herbs').appendChild(div);
 }
 
@@ -308,7 +313,8 @@ function previewEMR() {
   var emr = collectEMR();
   var preview = document.getElementById('emr-preview');
   preview.style.display = 'block';
-  preview.innerHTML = 
+  // R848：先纯文本拼接 → 整体转义（修历史注入孔）→ 条目名 linkify
+  var txt =
     '══════════════════════\n' +
     '  门诊病历\n' +
     '══════════════════════\n\n' +
@@ -323,6 +329,8 @@ function previewEMR() {
     '【医嘱】\n' + (emr.advice||'___') + '\n\n' +
     '医师签名: ___________    日期: ' + (emr.date||'___') + '\n' +
     '══════════════════════';
+  var esc = window.escHtml || function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  preview.innerHTML = linkifyEmrEntries(esc(txt));
 }
 
 function renderList() {
@@ -404,7 +412,7 @@ function openEmr(id) {
 
 <script>
 // ═══ 电子病历 API 接入 ═══
-(function(){var api='/';window.loadEMR=function(pid){fetch(api+'/api/home/med-detail?patient_id='+(pid||'P001')).then(r=>r.json()).then(d=>{var el=document.getElementById('emr-data');if(el&&d.meds){el.innerHTML=(d.meds.length?d.meds.slice(0,6).map(function(m){return'<div style="padding:6px;border-bottom:1px solid #eee;font-size:13px"><strong>'+m.drug+'</strong> · '+m.time+' · 来源:'+(m.source||'EMR')+'</div>';}).join('')+'<div style="font-size:11px;color:var(--text2);padding:8px">共 '+d.meds.length+' 条记录</div>':'<div style="padding:20px;text-align:center;color:#999;font-size:13px">📋 暂无用药记录</div>');}}).catch(function(e){var el=document.getElementById('emr-data');if(el)el.innerHTML='<span style="color:#999">📡 API离线 · 使用本地数据</span>';});};window.addEventListener("DOMContentLoaded",function(){var el=document.getElementById("emr-data");if(el&&!el.innerHTML.trim())loadEMR("P001");});})();
+(function(){var api='';window.loadEMR=function(pid){fetch(api+'/api/home/med-detail?patient_id='+(pid||'P001')).then(r=>r.json()).then(d=>{var el=document.getElementById('emr-data');if(el&&d.meds){el.innerHTML=(d.meds.length?d.meds.slice(0,6).map(function(m){return'<div style="padding:6px;border-bottom:1px solid #eee;font-size:13px"><strong>'+m.drug+'</strong> · '+m.time+' · 来源:'+(m.source||'EMR')+'</div>';}).join('')+'<div style="font-size:11px;color:var(--text2);padding:8px">共 '+d.meds.length+' 条记录</div>':'<div style="padding:20px;text-align:center;color:#999;font-size:13px">📋 暂无用药记录</div>');}}).catch(function(e){var el=document.getElementById('emr-data');if(el)el.innerHTML='<span style="color:#999">📡 API离线 · 使用本地数据</span>';});};window.addEventListener("DOMContentLoaded",function(){var el=document.getElementById("emr-data");if(el&&!el.innerHTML.trim())loadEMR("P001");});})();
 
 // ═══ 实时事件 + 可配置面板 ═══
 setTimeout(function(){
@@ -430,5 +438,75 @@ setTimeout(function(){
 <script src="js/sw-version-listener.js"></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
+<script>
+/* ── R848 条目卡片：病历预览 linkify + 处方药材 ⓘ（复用问诊台 R846 接口契约） ── */
+var _emrEntryCache = {};
+function showEmrEntryCard(btn) {
+  var name = btn.parentElement.querySelector('input[aria-label="药名"]').value.trim();
+  if (!name) return toast('请先填写药名');
+  var r = btn.getBoundingClientRect();
+  showEmrEntryByName(name, r.left, r.bottom + 6);
+}
+async function showEmrEntryByName(name, x, y) {
+  var card = document.getElementById('entry-card');
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'entry-card';
+    card.style.cssText = 'position:fixed;z-index:9999;max-width:360px;background:var(--card,#fff);border:1px solid var(--border,#ddd);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:14px;font-size:12px;line-height:1.7';
+    document.body.appendChild(card);
+    document.addEventListener('click', function(ev) {
+      var c = document.getElementById('entry-card');
+      if (c && !c.contains(ev.target) && !ev.target.classList.contains('entry-info-btn') && !ev.target.classList.contains('entry-link')) c.remove();
+    });
+  }
+  card.style.left = Math.min(x, window.innerWidth - 380) + 'px';
+  card.style.top = Math.min(y, window.innerHeight - 260) + 'px';
+  card.innerHTML = '<b>' + name + '</b> <span style="opacity:.6">查询中…</span>';
+  if (!_emrEntryCache[name]) {
+    try {
+      var resp = await fetch('/api/tcm/entry/info?name=' + encodeURIComponent(name));
+      _emrEntryCache[name] = await resp.json();
+    } catch (e) { _emrEntryCache[name] = { ok: false, error: e.message }; }
+  }
+  var d = _emrEntryCache[name];
+  if (!d || !d.ok) {
+    card.innerHTML = '<b>' + name + '</b><div style="opacity:.6;margin-top:6px">知识库暂无该条目</div>';
+    return;
+  }
+  var modName = { 'tcm-herb': '药材', 'tcm-acupuncture': '腧穴', 'tcm-formula': '方剂', 'tcm-syndrome': '证型' }[d.module] || d.module;
+  var lines = String(d.content || '').split('\n').filter(Boolean)
+    .map(function(l){ return '<div style="margin-top:4px">' + l.replace(/^(性味归经|功效|主治|出处|归经|定位|操作|证机概要|临床表现|代表方剂|辨证要点|主症|舌象|脉象|加减法|证候表现|证机分析)(：)/, '<b style="color:var(--primary)">$1</b>$2') + '</div>'; }).join('');
+  // R856 鉴别诊断栏：同脏腑近证，点名可点跳转
+  var diffs = (d.differentials || []).map(function(x){
+    return '<div style="margin-top:3px">· <span class="entry-link" data-entry="' + x.name + '" title="点开鉴别">' + x.name + '</span> <span style="opacity:.7">' + String(x.gist).replace(/</g,'&lt;') + '</span></div>'; }).join('');
+  card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' +
+    '<b style="font-size:14px">' + d.title + '</b>' +
+    '<span style="font-size:10px;opacity:.55;border:1px solid var(--border);border-radius:8px;padding:1px 8px">' + modName + '</span></div>' +
+    lines +
+    (diffs ? '<div style="margin-top:8px;border-top:1px dashed var(--border);padding-top:6px"><b style="color:var(--primary)">鉴别诊断</b>' + diffs + '</div>' : '') +
+    '<div style="margin-top:8px;font-size:10px;opacity:.45">R848 条目卡片 · 供医师参考，临证裁定</div>';
+}
+var _emrEntryNames = null;
+async function loadEmrEntryNames() {
+  if (_emrEntryNames) return _emrEntryNames;
+  try {
+    var r = await fetch('/api/tcm/entry/names');
+    var d = await r.json();
+    _emrEntryNames = d.ok ? d.names : [];
+  } catch (e) { _emrEntryNames = []; }
+  _emrEntryNames.sort(function(a, b){ return b.length - a.length; });  // 长名优先
+  return _emrEntryNames;
+}
+function linkifyEmrEntries(html) {
+  if (!_emrEntryNames || !_emrEntryNames.length) return html;
+  var re = new RegExp(_emrEntryNames.map(function(n){ return n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g');
+  return html.replace(re, function(n){ return '<span class="entry-link" data-entry="' + n + '" title="点击查看条目卡片">' + n + '</span>'; });
+}
+document.addEventListener('click', function(ev) {
+  var el = ev.target.closest && ev.target.closest('.entry-link');
+  if (el) { ev.stopPropagation(); showEmrEntryByName(el.dataset.entry, ev.clientX, ev.clientY + 8); }
+});
+loadEmrEntryNames();  // 预取正名表，预览时即刻 linkify
+</script>
 </body>
 </html>

@@ -27,6 +27,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 .shift.am{background:var(--blue-bg);color:var(--blue)}
 .shift.pm{background:#fffbeb;color:#b8860b}
 .shift.night{background:#f5f0ff;color:#7c3aed}
+.shift.off{background:#fef2f2;color:#dc2626;text-decoration:line-through}
 .calendar-cell .no-shift{font-size:10px;color:var(--text3)}
 .doctor-list{font-size:13px;margin-top:8px;color:var(--text2)}
 .doctor-list div{padding:2px 0}
@@ -39,10 +40,10 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <script src="js/nav.js" defer></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
 
 <style>
 .page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
@@ -90,6 +91,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
       <button class="shift am" style="border:none;padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer" onclick="addShift('am')">+ 上午班</button>
       <button class="shift pm" style="border:none;padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer" onclick="addShift('pm')">+ 下午班</button>
       <button style="border:1px solid var(--border);padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer;background:var(--card)" onclick="addShift('night')">+ 夜班</button>
+      <button style="border:1px solid #dc2626;color:#dc2626;padding:6px 12px;border-radius:4px;font-size:12px;cursor:pointer;background:var(--card)" onclick="addShift('off')">🚫 停诊</button>
     </div>
     <div id="shift-form" style="display:none;margin-top:8px">
       <select id="shift-doctor" style="padding:6px;border:1px solid var(--border);border-radius:4px;margin-right:8px">
@@ -136,17 +138,22 @@ function loadAll() {
 function changeMonth(d) { currentMonth += d; if(currentMonth>11){currentMonth=0;currentYear++} if(currentMonth<0){currentMonth=11;currentYear--} render(); }
 function goToday() { const n=new Date(); currentYear=n.getFullYear(); currentMonth=n.getMonth(); render(); }
 
-// 某天的全部班次 = 周固定出诊 + 自定义班次
+// 某天的全部班次 = 周固定出诊 + 自定义班次（off 停诊会压住该医师当日固定班）
 function dayShifts(dateStr, weekday) {
   var list = [];
+  var offs = {};
+  shifts.filter(function(s){ return s.date === dateStr; }).forEach(function(s) {
+    if (s.type === 'off') offs[s.doctor_name || s.doctor_id] = true;
+  });
   Object.keys(recurring).forEach(function(did) {
     var r = recurring[did];
+    if (offs[r.name]) return; // 当日停诊
     (r.schedule[String(weekday)] || []).forEach(function(slot) {
       list.push({ doctor: r.name, type: slot, fixed: true });
     });
   });
   shifts.filter(function(s){ return s.date === dateStr; }).forEach(function(s) {
-    list.push({ doctor: s.doctor_name || s.doctor_id, type: s.type, fixed: false });
+    list.push({ doctor: s.doctor_name || s.doctor_id, type: s.type, fixed: false, id: s.id });
   });
   return list;
 }
@@ -174,7 +181,10 @@ function render() {
       '<div class="day">' + day + '</div>';
     if (list.length) {
       for (const sh of list) {
-        html += '<div class="shift ' + sh.type + '">' + (sh.type==='am'?'☀️':sh.type==='pm'?'🌤️':'🌙') + ' ' + sh.doctor + (sh.fixed?'':' *') + '</div>';
+        var icon = sh.type==='am'?'☀️':sh.type==='pm'?'🌤️':sh.type==='off'?'🚫':'🌙';
+        var label = sh.type==='off' ? sh.doctor + ' 停诊' : sh.doctor;
+        html += '<div class="shift ' + sh.type + '">' + icon + ' ' + label +
+          (sh.fixed ? '' : ' <span onclick="event.stopPropagation();delShift(\'' + sh.id + '\')" title="删除此班次" style="cursor:pointer;opacity:.7">✕</span>') + '</div>';
       }
     } else {
       html += '<div class="no-shift">休息</div>';
@@ -217,6 +227,21 @@ function saveShift() {
 }
 
 function cancelShift() { document.getElementById('shift-form').style.display = 'none'; }
+
+// GAP-P1：删除自定义班次（真服务端删除）
+function delShift(id) {
+  if (!id) return;
+  if (!confirm('确认删除该班次？')) return;
+  fetch('/api/schedule/shift/delete', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: id })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (!d.ok) { toast(d.error || '删除失败', 'warn'); return; }
+    shifts = shifts.filter(function(s){ return s.id !== id; });
+    render();
+    toast('🗑 班次已删除');
+  }).catch(function(){ toast('📡 服务离线', 'warn'); });
+}
 init();
 </script>
 <script src="js/error-interceptor.js"></script>
