@@ -1,6 +1,16 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
 
+## 2026-08-31 15:35 — ✅ tcm 能力两阶段吸收机制落地 + 字符徽章图标化 + 命理融入链强化
+- 【一阶段·能力对齐】方法+路径双维 diff 驱动，移植 18 条路由（login-phone/patients-phone/my-reports/ops×2/RBAC×4/therapy×4/tele×2/inventory-item/shift-delete/efficacy-records/send-code/admin-users/longitudinal-POST），全部 curl 冒烟 PASS（含 409/401 边界、收件箱全链、重启后令牌稳定）
+- 【同源修真】R853 两处从 tcm 移植：/api/auth/login 签真实 HMAC 令牌（原 demo-token 过不了 requireAuth）；JWT SECRET 落盘 data/.jwt-secret 0600（原进程随机 → 重启即全失效）；医师档案种子 doctor-profiles.json 对齐 users.json
+- 【二阶段·增量吸收】链5 tcm-capability-diff.py 上线：四层差集（API 路由/关键模块导出/种子数据/页面参考），KNOWN_EQUIV 已知等价登记防重复建设，digest 幂等防噪音，挂载 15min 轮询链；首跑 clean（tcm HEAD 5388880）；另修真 follow 脚本 skip 分支不心跳导致 watchdog 误判停滞 29h
+- 【规范】docs/TCM-ABSORPTION-SPEC.md v1.0：医学不训练/合流点唯一 8974/如实回报三原则 + 移植五步法
+- 【命理融入链】e_prescription 增 mingli_annotation_id：draft 验「已签名+同 case」、sign 复核并记审计（无批注定稿标「无命理批注」）、GET 随附 mingliConclusion；review-studio 医生定稿前未命理师签名 → 确认拦截，签名后显示「☯ 命理结论已随处方归档」
+- 【字符徽章图标化】36 处：六中心 hero-seal（🛡️🩺☯️🏛️🤒🙏）、monitor-portal 19 枚、folklore/naming/practice 门户 21 枚、index SVG 文字改图形；修复 monitor-portal 一含 \x01 控制符的损坏卡；text-icon-scan 增 hero-seal/symbol/SVG-text 三规则，扫描全绿，民俗门户浏览器目检 PASS
+- server 子仓 2d89eb6；主仓 6b2cd2a
+
+
 ## 2026-08-31 15:05 — ✅ 前序任务盘点全量收尾（生肖 P1 三件事 + 院内执行台）
 - A 地支关系扫描：主服务/六壬/家庭表全部正确，唯一错的 minsu 太岁刑害表上轮已修；family-yearly-huajie 补刑/害/破五态检测
 - B1 问事生肖语境：sxAskContext  prepend 白话概述，实测 liunian「您属马…贵人生肖羊虎狗」；接入 liunian/lucky/huangli/xingming

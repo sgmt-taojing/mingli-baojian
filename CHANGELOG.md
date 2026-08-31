@@ -1,6 +1,14 @@
 # mingli-baojian 更新日志
 
 
+## 2026-08-31 · tcm 两阶段吸收 + 徽章图标化 + 命理融入链
+- 移植层 tcm-ported-api.js 新建：18 路由适配挂载（CORS 后），数据落点与既有台账一致；family-reflux 增患者收件箱（patient-inbox.json）+ /api/my/reports
+- auth.js 移植 listAllUsers/setUserEnabled/deleteUser/updateUserRole/loginByPhone + R853 SECRET 持久化；sms_adapter 移植 vault 四函数 + therapy_booked 模板
+- 链5 能力差集巡检 scripts/tcm-capability-diff.py + TCM-ABSORPTION-SPEC.md v1.0；follow 脚本心跳修真
+- 处方链：e_prescription.mingli_annotation_id（draft/sign/GET 三点），review-studio 定稿次序门
+- 全站字符徽章→图标 36 处，text-icon-scan 规则加固（hero-seal/symbol/SVG text）
+
+
 ## 2026-08-31 · 生肖 P1 收尾 + 院内执行台
 - 问事生肖语境：api-server-v2 新增 sxAskContext/sxPrependOverview，liunian/lucky/huangli(birthYear)/xingming-analyze 概述前置生肖+贵人白话
 - 姓名生肖喜用：shengxiao-engine 新增 namingTips（KB naming 模块按生肖年检索）+ nobleZhis；xingming/analyze 挂 shengxiaoNaming/shengxiaoContext
