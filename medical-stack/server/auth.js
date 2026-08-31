@@ -82,7 +82,21 @@ const SPECIALTIES = {
 };
 
 // ═══ 简易 JWT（无外部依赖）═══
-const SECRET = process.env.TCM_JWT_SECRET || crypto.randomBytes(32).toString('hex');
+const SECRET = process.env.TCM_JWT_SECRET || (function loadOrCreateSecret() {
+  // 移植 tcm R853 修真：密钥进程随机 → 重启后所有令牌失效、users.json 密码哈希永不可验证。
+  // 落盘 data/.jwt-secret（0600，不入库），进程间稳定。
+  try {
+    const f = path.join(__dirname, '..', 'data', '.jwt-secret');
+    if (fs.existsSync(f)) {
+      const s = fs.readFileSync(f, 'utf8').trim();
+      if (s.length >= 32) return s;
+    }
+    const s = crypto.randomBytes(48).toString('hex');
+    fs.mkdirSync(path.dirname(f), { recursive: true });
+    fs.writeFileSync(f, s, { mode: 0o600 });
+    return s;
+  } catch (e) { return crypto.randomBytes(32).toString('hex'); }
+})();
 const TOKEN_EXPIRY = 12 * 3600 * 1000; // 12小时
 
 function createToken(payload) {
@@ -248,6 +262,74 @@ module.exports = {
   },
 
   verifyToken,
+
+  // ═══ 移植自 tcm（GAP-P2 RBAC + G10 验证码登录），只做适配不做二次训练 ═══
+  // RBAC 管理接口（全部用户，含启用状态；passwordHash 永不出参）
+  listAllUsers() {
+    const users = loadUsers();
+    return Object.values(users).map(u => ({
+      id: u.id, username: u.username, name: u.name, role: u.role,
+      roleName: ROLES[u.role]?.name || u.role,
+      specialty: u.specialty || null, specialtyName: SPECIALTIES[u.specialty]?.name || null,
+      enabled: u.enabled !== false, phone: u.phone || '', created_at: u.created_at
+    }));
+  },
+
+  setUserEnabled(username, enabled) {
+    const users = loadUsers();
+    const u = users[username];
+    if (!u) return { ok: false, error: '用户不存在' };
+    if (u.role === 'super_admin' && !enabled) return { ok: false, error: '超管账号不可禁用' };
+    u.enabled = !!enabled;
+    saveUsers(users);
+    return { ok: true, user: { username: u.username, enabled: u.enabled } };
+  },
+
+  deleteUser(username) {
+    const users = loadUsers();
+    const u = users[username];
+    if (!u) return { ok: false, error: '用户不存在' };
+    if (u.role === 'super_admin') return { ok: false, error: '超管账号不可删除' };
+    delete users[username];
+    saveUsers(users);
+    return { ok: true };
+  },
+
+  updateUserRole(username, role, specialty) {
+    const users = loadUsers();
+    const u = users[username];
+    if (!u) return { ok: false, error: '用户不存在' };
+    if (!ROLES[role]) return { ok: false, error: '角色无效: ' + role };
+    if (u.role === 'super_admin') return { ok: false, error: '超管角色不可变更' };
+    u.role = role;
+    u.specialty = specialty || null;
+    saveUsers(users);
+    return { ok: true, user: { username: u.username, role: u.role } };
+  },
+
+  // G10：验证码登录——手机号已核验（sms_adapter.verifyCode 通过）后按 phone 找医师并签发令牌
+  loginByPhone(phone) {
+    const users = loadUsers();
+    const user = Object.values(users).find(u => u.enabled && u.phone && u.phone === String(phone));
+    if (!user) return { ok: false, error: '该手机号未绑定医师账号' };
+    const token = createToken({
+      sub: user.id,
+      username: user.username,
+      name: user.name,
+      role: user.role,
+      specialty: user.specialty || null,
+      via: 'sms_code'
+    });
+    return {
+      ok: true, token,
+      user: {
+        id: user.id, username: user.username, name: user.name,
+        role: user.role, roleName: ROLES[user.role]?.name || user.role,
+        specialty: user.specialty || null, permissions: ROLES[user.role]?.permissions || []
+      }
+    };
+  },
+
   ROLES,
   SPECIALTIES
 };

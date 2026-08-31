@@ -105,6 +105,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// tcm 能力移植层（医学能力移植自 tcm-agent，适配不训练；命理合流仅限 8974 批注环节）
+// 挂载点在 CORS 中间件之后，保证跨端口页面调用带 ACAO 响应头
+const { registerRoutes: registerTcmPorted } = require('./tcm-ported-api');
+registerTcmPorted(app, {
+  requireAuth: (req, res, next) => requireAuth(req, res, next),
+  optionalAuth: (req, res, next) => optionalAuth(req, res, next),
+  rxAllRecords: () => rxAllRecords()
+});
+
 // ═══════════════════════════════════════════════
 // JWT 中间件（可选鉴权 - 端点级控制）
 // ═══════════════════════════════════════════════
@@ -1963,20 +1972,14 @@ app.post('/api/consult/:room/note', optionalAuth, (req, res) => {
 });
 
 // ═══════════════════════════════════════════════
-// 鉴权端点（演示）
+// 鉴权端点（移植 tcm R853 修真：走 auth.login 签发真实 HMAC 令牌，可过 requireAuth）
 // ═══════════════════════════════════════════════
 app.post('/api/auth/login', (req, res) => {
   try {
     const { username, password } = req.body || {};
-    if (username === 'admin' && password === 'admin123') {
-      const token = auth.signToken ? auth.signToken({ username, role: 'super_admin' }) : 'demo-admin-token';
-      return res.json({ ok: true, user: { username, role: 'super_admin' }, token });
-    }
-    if (username === 'doctor' && password === 'doctor123') {
-      const token = auth.signToken ? auth.signToken({ username, role: 'doctor_internal' }) : 'demo-doctor-token';
-      return res.json({ ok: true, user: { username, role: 'doctor_internal' }, token });
-    }
-    res.status(401).json({ ok: false, error: '账号或密码错误' });
+    const r = auth.login(String(username || ''), String(password || ''));
+    if (!r.ok) return res.status(401).json({ ok: false, error: r.error || '账号或密码错误' });
+    res.json(r);
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
@@ -4393,10 +4396,10 @@ app.post('/api/tcm/inhouse-next-symptom', optionalAuth, async (req, res) => {
   }
 });
 
-// 20. 纵向健康档案
-app.get('/api/tcm/longitudinal-profile', optionalAuth, async (req, res) => {
+// 20. 纵向健康档案（移植 tcm 同构：GET/POST 同一处理器，patient_id 取 query 或 body）
+const longitudinalProfileHandler = async (req, res) => {
   try {
-    const { patient_id } = req.query;
+    const patient_id = req.query.patient_id || (req.body && req.body.patient_id);
     const profile = {
       patient_id: patient_id || 'anonymous',
       // 体质演变
@@ -4419,7 +4422,9 @@ app.get('/api/tcm/longitudinal-profile', optionalAuth, async (req, res) => {
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }
-});
+};
+app.get('/api/tcm/longitudinal-profile', optionalAuth, longitudinalProfileHandler);
+app.post('/api/tcm/longitudinal-profile', optionalAuth, longitudinalProfileHandler);
 
 // 21. 神经网络预测（MLX 模型接口）
 app.post('/api/tcm/nn-predict', optionalAuth, async (req, res) => {

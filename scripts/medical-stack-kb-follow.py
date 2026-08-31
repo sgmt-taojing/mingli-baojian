@@ -60,10 +60,17 @@ def main() -> int:
     result["mirror_mtime"] = mirror_mt
     result["snapshot_mtime_before"] = snap_mt
 
-    # 1. 幂等：快照已不旧于镜像 → 秒退
+    # 1. 幂等：快照已不旧于镜像 → 秒退（但仍写心跳状态，否则 watchdog 误判链路停滞）
     if snap_mt >= mirror_mt:
         result.update(status="skipped", reason="snapshot up-to-date",
                       lag_min=0.0)
+        try:
+            state = json.loads(STATE.read_text(encoding="utf-8"))
+        except Exception:
+            state = {}
+        state.update({"last_run": result["ts"], "last_result": result,
+                      "snapshot_mtime": snap_mt})
+        STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
         print(json.dumps(result, ensure_ascii=False))
         return 0
 

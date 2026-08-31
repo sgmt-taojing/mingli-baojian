@@ -19,13 +19,45 @@
  */
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
 const sms = require('./sms_adapter.js'); // 复用命理关键词守卫口径
 
 const DB_PATH = path.join(__dirname, '..', 'data', 'appointments.db'); // 与 G12 共库（轻量表）
+const INBOX_FILE = path.join(__dirname, '..', 'data', 'patient-inbox.json'); // 本院患者/家属端收件箱（移植 tcm G13 主落点）
 const FAMILY_BASE = process.env.FAMILY_BASE || 'http://127.0.0.1:8970';
 const SOURCE = 'mingli-baojian';
 const REPORT_TYPES = ['emr', 'prescription', 'lab'];
+
+// ── 患者收件箱（只存白名单组装后的医学域载荷，与回流 family 同一份；命理批注从根本不存在）──
+function inboxAppend(phone, payload, pushedFamily) {
+  try {
+    let items = [];
+    if (fs.existsSync(INBOX_FILE)) items = JSON.parse(fs.readFileSync(INBOX_FILE, 'utf8') || '[]');
+    items.push({
+      id: 'INB' + Date.now().toString(36).toUpperCase(),
+      phone: String(phone),
+      link_token: payload.link_token,
+      report_type: payload.report_type, report_id: payload.report_id,
+      title: payload.title, summary: payload.summary,
+      created_at: payload.created_at, source: payload.source,
+      pushed_family: !!pushedFamily,
+      received_at: new Date().toISOString()
+    });
+    const tmp = INBOX_FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(items.slice(-1000), null, 2));
+    fs.renameSync(tmp, INBOX_FILE);
+  } catch (e) { console.error('[reflux-inbox] 落盘失败:', e.message); }
+}
+function inboxForPhone(phone, limit) {
+  let items = [];
+  try { if (fs.existsSync(INBOX_FILE)) items = JSON.parse(fs.readFileSync(INBOX_FILE, 'utf8') || '[]'); } catch (e) {}
+  return items.filter(i => i.phone === String(phone))
+    .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)))
+    .slice(0, limit || 50)
+    .map(i => ({ id: i.id, report_type: i.report_type, report_id: i.report_id, title: i.title,
+      summary: i.summary, created_at: i.created_at, source: i.source, pushed_family: i.pushed_family }));
+}
 
 let db;
 function init() {
@@ -132,11 +164,27 @@ function registerRoutes(app) {
       source: SOURCE,
     };
     const r = await postFamily(payload);
-    if (r.body && r.body.ok) {
-      return res.json({ ok: true, member_id: r.body.member_id, duplicated: !!r.body.duplicated, family: 'accepted' });
+    const accepted = !!(r.body && r.body.ok);
+    // 本院收件箱（G13 主落点，移植 tcm report-link 语义）：无论 family 是否接受，患者凭 token 可在本院自查
+    inboxAppend(phone, payload, accepted);
+    if (accepted) {
+      return res.json({ ok: true, member_id: r.body.member_id, duplicated: !!r.body.duplicated, family: 'accepted', inbox: true });
     }
     const famErr = (r.body && (r.body.error || r.body.code)) || r.error || `HTTP ${r.status}`;
-    res.status(502).json({ ok: false, error: `family 侧未接受：${famErr}`, family_code: r.body && r.body.code });
+    res.status(502).json({ ok: false, error: `family 侧未接受：${famErr}`, family_code: r.body && r.body.code, inbox: true, note: '已入本院收件箱，患者可凭 link_token 自查' });
+  });
+
+  // 患者/家属端：凭 lnk_ 令牌读自己的医院报告（移植 tcm /api/my/reports；本院收件箱，仅医学域内容）
+  app.get('/api/my/reports', (req, res) => {
+    try {
+      const token = String(req.query.token || '');
+      if (!token) return res.status(400).json({ ok: false, error: 'token 必填' });
+      const row = db.prepare(`SELECT phone, created_at FROM reflux_links WHERE link_token=?`).get(token);
+      if (!row) return res.status(401).json({ ok: false, error: '令牌无效或已解绑' });
+      const items = inboxForPhone(row.phone, parseInt(req.query.limit || '50', 10));
+      res.json({ ok: true, phone_masked: row.phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'),
+        bound_at: row.created_at, total: items.length, items });
+    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
   });
 
   // 内部核查：已登记关联（token 脱敏）

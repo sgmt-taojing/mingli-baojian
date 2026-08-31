@@ -145,7 +145,7 @@ textarea.tall{min-height:180px}
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 var API_MINGLI=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8911':'';
 var $=function(id){return document.getElementById(id)};
-var token='',csrfToken='',roles=[],queue=[],curCase=null,mlDraftId=null;
+var token='',csrfToken='',roles=[],queue=[],curCase=null,mlDraftId=null,mlSignedId=null;
 
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function decodeRoles(t){
@@ -201,19 +201,22 @@ function selectCase(id,el){
   if(curCase.birthDate){var mm=String(curCase.birthDate).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);if(mm){y=mm[1];m=mm[2];d=mm[3]}}
   $('bYear').value=y;$('bMonth').value=m;$('bDay').value=d;$('bHour').value=h;
   if(curCase.patientSex)$('bGender').value=curCase.patientSex.indexOf('女')>=0?'女':'男';
-  $('mlDraft').value='';$('mlAnnotation').value='';mlDraftId=null;
+  $('mlDraft').value='';$('mlAnnotation').value='';mlDraftId=null;mlSignedId=null;
   $('mlState').innerHTML='';$('mlStatus').textContent='';$('mlStatus').className='status-line';
   $('workArea').scrollIntoView({behavior:'smooth'});
 }
 
-// ── 医生:签名生成电子处方 ──
+// ── 医生:签名生成电子处方（次序：命理师审核签名在前，医生定稿在后；命理结论随处方归档）──
 $('btnRxSign').addEventListener('click',function(){
   if(!curCase)return;
   var diagnosis=$('docDiagnosis').value.trim(),prescription=$('docPrescription').value.trim();
   if(!diagnosis&&!prescription){setSt('rxStatus','请先填写辨证诊断或处方','err');return}
+  if(!mlSignedId){
+    if(!confirm('⚠ 命理师尚未审核签名。\n按平台规范应先完成「AI 命理草案→命理师审核签名」，再由医生定稿。\n\n仍要在无命理结论的情况下定稿吗？'))return;
+  }
   $('btnRxSign').disabled=true;setSt('rxStatus','建方中…','');
   fetch(API+'/api/clinic/prescription/draft',{method:'POST',headers:hdr(),
-    body:JSON.stringify({caseId:curCase.id,diagnosis:diagnosis,prescription:prescription,labEvidence:curCase.labEvidence||''})})
+    body:JSON.stringify({caseId:curCase.id,diagnosis:diagnosis,prescription:prescription,labEvidence:curCase.labEvidence||'',mingliAnnotationId:mlSignedId||undefined})})
   .then(function(r){return r.json()}).then(function(d){
     if(!d.ok){setSt('rxStatus','建方失败:'+(d.error||''),'err');$('btnRxSign').disabled=false;return}
     setSt('rxStatus','草案 #'+d.id+' 已建,签名中…','');
@@ -222,9 +225,10 @@ $('btnRxSign').addEventListener('click',function(){
         $('btnRxSign').disabled=false;
         if(!s.ok){setSt('rxStatus','签名失败:'+(s.error||''),'err');return}
         $('rxState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>'+
+          (s.mingliAttached?' <span class="signed-mark" style="border-color:#9b59b6;color:#b07cc6">☯ 命理结论已随处方归档</span>':'')+
           ' <button class="btn" style="padding:4px 10px;font-size:11px" onclick="rxFlow('+s.id+',\'dispense\',this)">🧪 调剂</button>'+
           ' <button class="btn" style="padding:4px 10px;font-size:11px" onclick="rxFlow('+s.id+',\'archive\',this)">🗄 归档</button>';
-        setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效(draft→signed),可按医学规范继续流转:调剂→归档','ok');
+        setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效(draft→signed)'+(s.mingliAttached?'，命理批注 #'+s.mingliAnnotationId+' 随案归档':'')+'，可按医学规范继续流转:调剂→归档','ok');
       });
   }).catch(function(e){$('btnRxSign').disabled=false;setSt('rxStatus','请求失败:'+e.message,'err')});
 });
@@ -298,7 +302,7 @@ $('btnMlSign').addEventListener('click',function(){
   .then(function(r){return r.json()}).then(function(s){
     $('btnMlSign').disabled=false;
     if(!s.ok){setSt('mlStatus','签名失败:'+(s.error==='NO_ROLE'?'当前账号非命理师角色':s.error||''),'err');return}
-    $('mlState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';
+    $('mlState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';mlSignedId=s.id;
     setSt('mlStatus','✅ 命理批注 #'+s.id+' 已生效(draft→signed)','ok');
   }).catch(function(e){$('btnMlSign').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
 });

@@ -22,6 +22,16 @@ const RULES = [
     clsGroup: 2,
   },
   {
+    name: 'hero-seal/symbol 徽章容器内含汉字',
+    re: new RegExp(`<(div|span|i|b)[^>]*class="([^"]*(hero-seal|symbol)[^"]*)"[^>]*>${CJK}{1,4}[️]?<`, 'g'),
+    clsGroup: 2,
+  },
+  {
+    name: 'icon-glyph 内联 SVG 含汉字 text',
+    re: new RegExp(`icon-glyph[^>]*>.*<text[^>]*>${CJK}+<\\/text>`, 'g'),
+    clsGroup: null,
+  },
+  {
     name: 'tab/card-title/badge 单汉字伪图标前缀',
     re: new RegExp(`<(div|span|button|a)[^>]*class="([^"]*(id-tab|nav-tab|card-title|badge|wz-card-title|ms-group-badge)[^"]*)"[^>]*>${CJK} [^<]{1,12}<`, 'g'),
     clsGroup: 2,

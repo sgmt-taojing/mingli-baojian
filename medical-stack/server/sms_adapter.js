@@ -63,6 +63,8 @@ const TEMPLATES = {
   appointment_cancel: (v) => `【命理宝鉴】您的预约（${v.date} ${v.slot}）已取消。`,
   // G14 信众报告
   seeker_report: (v) => `【命理宝鉴】您求测的${v.category || '命理'}报告已完成核对，请登录个人中心「我的报告」查看。内容仅供参考。`,
+  // 移植自 tcm：治疗预约提醒（机构版，流程性通知）
+  therapy_booked: (v) => `【命理宝鉴】${v.patient}：您已预约 ${v.time || '近日'} ${v.service}（${v.therapist || '治疗师'}）。禁忌提示：${v.contraindication || '无'}。如需取消请致电医馆。`,
 };
 
 // ── 出站记录（mock outbox）──
@@ -194,4 +196,38 @@ function verifyCode(phone, code, scene) {
   return { ok: false, error: `验证码错误（剩余 ${MAX_FAILS - rec.fails} 次机会）`, fails: rec.fails };
 }
 
-module.exports = { sendCode, verifyCode, sendNotice, containsMingli, TEMPLATES, _paths: { OUTBOX_DIR, VERIFY_FILE, CONFIG_FILE } };
+// ═══ 移植自 tcm：手机号 vault（明文仅存本机 0600，业务侧一律 phone_hash）═══
+const VAULT_FILE = path.join(DATA_DIR, 'phone-vault.json');
+// 与 auth.js 同一份 SECRET（哈希口径一致，密钥本身不落本文件）
+const VAULT_SECRET = (require('./auth').SECRET) || 'mingli-sms-fallback';
+const hashPhone = (phone) => crypto.createHmac('sha256', VAULT_SECRET).update('phone:' + String(phone)).digest('hex');
+
+function vaultRead() {
+  try { return JSON.parse(fs.readFileSync(VAULT_FILE, 'utf8')); } catch (_) { return {}; }
+}
+function vaultWrite(obj) {
+  const tmp = VAULT_FILE + '.tmp';
+  fs.writeFileSync(tmp, JSON.stringify(obj, null, 2), { mode: 0o600 });
+  fs.renameSync(tmp, VAULT_FILE);
+  try { fs.chmodSync(VAULT_FILE, 0o600); } catch (_) {}
+}
+/** 写入/更新 vault，返回 phone_hash */
+function vaultSet(ownerId, phone) {
+  const v = vaultRead();
+  v[String(ownerId)] = { phone: String(phone), hash: hashPhone(phone), updated_at: new Date().toISOString() };
+  vaultWrite(v);
+  return hashPhone(phone);
+}
+function vaultGet(ownerId) {
+  const e = vaultRead()[String(ownerId)];
+  return e ? e.phone : null;
+}
+function vaultGetByHash(phoneHash) {
+  const v = vaultRead();
+  for (const [ownerId, e] of Object.entries(v)) if (e.hash === phoneHash) return { ownerId, phone: e.phone };
+  return null;
+}
+
+module.exports = { sendCode, verifyCode, sendNotice, containsMingli, TEMPLATES,
+  hashPhone, maskPhone, vaultSet, vaultGet, vaultGetByHash,
+  _paths: { OUTBOX_DIR, VERIFY_FILE, CONFIG_FILE, VAULT_FILE } };
