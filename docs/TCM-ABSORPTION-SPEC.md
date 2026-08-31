@@ -1,6 +1,6 @@
 # TCM-ABSORPTION-SPEC · 中医标准智能体能力吸收规范（两阶段）
 
-版本：v1.0 ｜ 生效：2026-08-31 ｜ 依据：ADR-007（tcm 为医学能力唯一生产方）、能力覆盖审计-20260828、G1 任务书
+版本：v1.1 ｜ 生效：2026-08-31（v1.1 增精准保障与页面层/对拍入链） ｜ 依据：ADR-007（tcm 为医学能力唯一生产方）、能力覆盖审计-20260828、G1 任务书
 
 ## 〇、总原则（不可逾越）
 
@@ -32,7 +32,9 @@
 ```
 链3  import-tcm-kb.py            主镜像 KB → mingli 自有 yidao.db（mtime 幂等）
 链4  medical-stack-kb-follow.py  主镜像 KB → medical-stack 内化快照（mtime 幂等 + 心跳落盘）
-链5  tcm-capability-diff.py      tcm 代码增量 → 四层差集巡检（digest 幂等）★ 本轮新建
+链4b medical-stack-page-follow.py tcm 页面增量 → medical-stack 页面层重打包（64 同名页 transform 比对，内容幂等）
+链4c medical-stack-parity-check.py 同案对拍 tcm×medical-stack（精准保障，FAIL 即破窗当日处置）
+链5  tcm-capability-diff.py      tcm 代码增量 → 四层差集巡检（digest 幂等）
 ```
 
 ### 链5 四层差集
@@ -58,7 +60,17 @@
 - 链 5 指纹：`medical-stack/capability-diff-state.json` digest 变化才重写报告，防噪音。
 - 报告落点：`DELIVERY/tcm-capability-diff-latest.md`（人读）+ state json（机读）。
 
-## 三、命理内化挂载点（mingli 特有增量，勿回流 tcm）
+## 三、精准保障（移植≠失真 · 简单三条）
+
+目标：中医全量能力移植到命理宝鉴后，服务质量不低于生产方；接入命理能力只增维不减质。
+
+1. **不训练**：任何医学模型/知识不二次训练、不蒸馏改写；只允许「移植 + 适配（品牌/话术/端口/鉴权）」。
+2. **同案对拍**：每条移植能力入链前必须过 `medical-stack-parity-check.py`——同一输入同时打 tcm(8932) 与 medical-stack(8972)，HTTP 状态与关键字段一致才验收；金案只选确定性读接口，写接口以冒烟+边界码（401/404/409）验证。
+3. **持续保真**：对拍随 15min 看守轮询常驻（链4c），verdict=FAIL 即「保真破窗」，当日处置并留证；状态落 `medical-stack/parity-check-state.json`。
+
+首跑基线（2026-08-31 19:33）：PASS 5/5（七能力健康 / clinic-links / 词条即查 / 方反查边界一致性 / 条目名清单）。
+
+## 四、命理内化挂载点（mingli 特有增量，勿回流 tcm）
 
 ```
 一帧采集（舌/面/手 + 生辰/音视频）
@@ -73,7 +85,7 @@
 
 红线：命理批注不回流家庭端（reflux 结构性剥离 + 文本守卫）；短信只含流程通知（命理断语守卫）。
 
-## 四、变更管理
+## 五、变更管理
 
 - 本规范变更须更新版本号并记 CHANGELOG。
 - KNOWN_EQUIV 新增条目必须注明 mingli 侧落点，防止「等价」变成「漏移植」的借口。

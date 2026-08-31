@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · 合流链诊断修复 + 精准保障机制（对拍入看守链）
+- **诊断**：合流链六节点全通（采集/诊断/命理草案/批注/签名/患者端一屏三件），唯一断头在采集端——问诊台一帧采集不传 consent，G15 命理并轨永不触发
+- **修复**：unified-diagnosis.html 加「命理三相」授权门（ADR-008：本人/监护人互斥勾选、明确标注特征仅入批注层）；consent 随一帧请求传递；渲染层新增命理特征区（金色分域标识）与未授权提示——浏览器实测授权条展开/互斥/状态切换/请求体携带 consent 全过
+- **机制**：新增 scripts/medical-stack-parity-check.py（同案对拍 tcm 8932 × medical-stack 8972，5 金案），并入看守包装器为链4c，FAIL 即破窗；首跑基线 PASS 5/5
+- **规范**：TCM-ABSORPTION-SPEC 升 v1.1——「精准保障」三条（不训练/同案对拍/持续保真）+ 链路总览补 4b/4c
+- **排期**：三条进化建议落 KANBAN（命理视图开关 P1 / 48h SLA 三级上盘 P1 / 差集吸收 72h SLA P2）
+
 ## 2026-08-31 · 医学栈每日探针上线（三项目巡检口径拉齐）
 - 新增 scripts/medical-stack-daily-probe.sh：三服务在线（8972/8973/8974）+ 8973→8932 代理链真实命中 tcm-agent + 移植页/PWA 五路由 200 + KB 检索功能探针（固定查询词只读幂等，不写库不淤积）
 - launchd 任务 com.mingli-baojian.medical-daily-probe 注册在册（每日 07:43，避开整半点），手动触发 10/10 全绿

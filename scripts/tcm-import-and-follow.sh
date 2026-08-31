@@ -3,6 +3,7 @@
 # 1) import-tcm-kb.py：主镜像 → mingli 自有 yidao.db（链3，mtime 幂等）
 # 2) medical-stack-kb-follow.py：主镜像 → medical-stack 内化快照（链4，mtime 幂等）
 # 2b) medical-stack-page-follow.py：tcm 页面增量 → medical-stack 页面层重打包（链4扩展，内容幂等）
+# 2c) medical-stack-parity-check.py：同案对拍 tcm×medical-stack（精准保障，FAIL 即破窗）
 # 3) tcm-capability-diff.py：tcm 代码增量 → 四层差集巡检（链5，digest 幂等，差集不变不重写报告）
 # 各脚本各自幂等，镜像/差集未变时秒退；有增量时先入自有库、再刷内化快照与页面层、再出差集报告。
 set -uo pipefail
@@ -13,7 +14,9 @@ IMPORT_RC=$?
 FOLLOW_RC=$?
 /usr/bin/python3 "$BASE/medical-stack-page-follow.py"
 PAGE_RC=$?
+/usr/bin/python3 "$BASE/medical-stack-parity-check.py" --write-state
+PARITY_RC=$?
 /usr/bin/python3 "$BASE/tcm-capability-diff.py"
 DIFF_RC=$?
-# 任一失败以非零退出，launchd 日志可查
-[ $IMPORT_RC -eq 0 ] && [ $FOLLOW_RC -eq 0 ] && [ $PAGE_RC -eq 0 ] && [ $DIFF_RC -eq 0 ]
+# 任一失败以非零退出，launchd 日志可查（parity FAIL 即移植保真破窗，须当日处置）
+[ $IMPORT_RC -eq 0 ] && [ $FOLLOW_RC -eq 0 ] && [ $PAGE_RC -eq 0 ] && [ $PARITY_RC -eq 0 ] && [ $DIFF_RC -eq 0 ]

@@ -366,6 +366,17 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
           <div class="name">手诊</div>
           <div class="status" id="statusHand">待启动</div>
         </div>
+        <div class="algo-chip" id="algoMingli" onclick="toggleMingliBar()" style="border:1px dashed rgba(212,175,55,.4)">
+          <div class="name" style="color:var(--gold,#d4af37)">命理三相</div>
+          <div class="status" id="statusMingli">未授权</div>
+        </div>
+      </div>
+
+      <!-- G15/ADR-008 命理采集授权门：本人/监护人确认后才并轨采集，特征仅入批注层 -->
+      <div id="mingliConsentBar" style="display:none;margin-top:6px;padding:8px 10px;border:1px solid rgba(212,175,55,.35);border-radius:8px;font-size:11px;color:var(--muted)">
+        <label style="margin-right:12px;cursor:pointer"><input type="checkbox" id="mingliConsentSelf" onchange="setMingliConsent('self',this.checked)"> 本人同意</label>
+        <label style="margin-right:12px;cursor:pointer"><input type="checkbox" id="mingliConsentGuardian" onchange="setMingliConsent('guardian',this.checked)"> 监护人同意</label>
+        <span>命理三相（面相/痣相/掌纹）结构化特征仅入命理师批注层，不进入医学诊断上下文</span>
       </div>
 
       <!-- Status Bar -->
@@ -501,6 +512,7 @@ let state = {
   autoMode: false,
   stream: null,
   activeAlgos: { face: true, eye: true, tongue: true, hand: true },
+  mingliConsent: null,
   lastVisionResults: null,
   lastKBResults: null,
   syncToken: null,
@@ -668,6 +680,24 @@ function toggleAlgo(mode) {
   updateOverlay();
 }
 
+// ── G15 命理三相授权门（ADR-008 分域授权）──
+function toggleMingliBar() {
+  const bar = document.getElementById('mingliConsentBar');
+  bar.style.display = bar.style.display === 'none' ? 'block' : 'none';
+}
+function setMingliConsent(scope, on) {
+  // 互斥：本人/监护人二选一
+  const other = scope === 'self' ? 'mingliConsentGuardian' : 'mingliConsentSelf';
+  if (on) document.getElementById(other).checked = false;
+  state.mingliConsent = on ? { mingli: true, scope: scope } : null;
+  const chip = document.getElementById('algoMingli');
+  const label = state.mingliConsent
+    ? (scope === 'self' ? '本人已授权' : '监护人已授权')
+    : '未授权';
+  document.getElementById('statusMingli').textContent = label;
+  chip.classList.toggle('active', !!state.mingliConsent);
+}
+
 // ═══ Capture & Unified Vision Diagnosis ═══
 async function captureAll() {
   if (!state.cameraActive) return;
@@ -710,6 +740,7 @@ async function captureAll() {
         modes: activeModes,
         user_context: userContext,
         role: state.role,
+        consent: state.mingliConsent || undefined,
       }),
       signal: AbortSignal.timeout(15000),
     });
@@ -757,6 +788,26 @@ function renderVisionDiagnosis(data) {
       }
     });
     html += '</div>';
+  }
+
+  // G15 命理三相特征（授权并轨时返回；仅入批注层，非医学诊断依据）
+  if (data.mingli_consent === 'granted' && Array.isArray(data.mingli_features) && data.mingli_features.length) {
+    html += '<div class="diag-section" style="border:1px solid rgba(212,175,55,.35);border-radius:8px;padding:8px">' +
+      '<div class="label" style="color:var(--gold,#d4af37)">命理三相 · 结构化特征（已同步命理师批注层，非医学诊断依据）</div>';
+    data.mingli_features.forEach(f => {
+      if (f && f.ok && f.features && f.features.top1) {
+        html += `<div class="value"><strong style="color:var(--gold,#d4af37)">${esc(f.name)}</strong> · ${f.engine} · ${f.elapsedMs}ms<br>` +
+          `特征: <strong>${esc(f.features.top1.label)}</strong>` +
+          (f.features.candidates && f.features.candidates.length > 1
+            ? '<br>候选: ' + f.features.candidates.slice(1).map(x => esc(x.label)).join(' · ')
+            : '') + `</div>`;
+      } else {
+        html += `<div class="value"><strong style="color:var(--muted)">${esc(f && f.name || '命理特征')}</strong> · 无结果</div>`;
+      }
+    });
+    html += '</div>';
+  } else if (data.mingli_consent === 'skipped_no_consent') {
+    html += '<div class="diag-section" style="font-size:11px;color:var(--muted)">命理三相未授权，已跳过（点「命理三相」开关完成本人/监护人授权后自动并轨）</div>';
   }
 
   // Inferred syndromes
