@@ -1,5 +1,11 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · 页面层自动跟随并入 G1 看守链（链4扩展）
+- scripts/medical-stack-page-follow.py 升级为自动侦察模式：tcm app × medical-stack/app 全部 64 个同名页逐页 transform 比对，内容不等即重打包，幂等秒退；新增页不自动内化，仍走链5差集报告+人工定性（G16-2 纪律）
+- 首轮自动侦察补抓 14 页漂移（mtime 法漏网：admin/index/login/patient-portal/pharmacy/report/mobile-interact/monitor-dashboard/realtime-assistant/wuzhen-diagnosis/clinic-stats/family-hub/inhouse-diagnosis/wearable-hub），含品牌残留修复与 seed-loader 补齐；冒烟判据改负向（无 TCM-Agent/tcm-agent 残留），13+1 全过
+- 包装器 tcm-import-and-follow.sh 加第 2b 步，15min 轮询自动执行；全链实测 rc=0（import 幂等 / kb-follow lag=0 / page-follow 幂等 / diff clean，tcm HEAD 6090e0c 无新增差集）
+- 更正前条记录：8931 系 tcm 自有静态服务端口，本侧 medical-static 由 plist 固定 8973，无端口冲突；冒烟基准 8973 维持
+
 ## 2026-08-31 · 页面层重打包：34 页拉齐 tcm HEAD（G16 排期执行）
 - 机制：新增 scripts/medical-stack-page-follow.py——tcm HEAD 取页 → 补丁重放（canonical→mingli-medical / 品牌→命理宝鉴·医道 / seed-loader 按需注入）→ 品牌零残留+ADR-009 话术扫描 → 原子写入 → 8973 静态层逐页冒烟
 - 结果：34/34 写入零告警，冒烟 34/34 PASS；8972 七能力健康复核正常

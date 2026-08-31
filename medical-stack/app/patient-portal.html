@@ -35,8 +35,8 @@ textarea{min-height:80px;resize:vertical}
 <script src="js/nav.js"></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
-<script src="js/rx-loop.js" defer></script>
 <script src="js/seed-loader.js"></script>
+<script src="js/rx-loop.js" defer></script>
 <script src="js/data-engine.js"></script>
 
 <style>
@@ -56,6 +56,7 @@ textarea{min-height:80px;resize:vertical}
 .page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
 .phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>
+<link rel="manifest" href="/pwa/manifest.json"><link rel="apple-touch-icon" href="/pwa/icon-192.png"><meta name="theme-color" content="#6b3a1f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="患者服务">
 </head>
 <script src="js/smart-search.js"></script>
 <script src="js/ai-assistant.js"></script>
@@ -102,6 +103,30 @@ textarea{min-height:80px;resize:vertical}
     <div class="result-box" id="reg-result"></div>
   </div>
 
+  <!-- G12 轻预约挂号：验证码确认手机号 → 选时段 → 成功短信（mock 先行） -->
+  <div class="card">
+    <h3>🗓️ 预约挂号（夜门诊/择时就诊）</h3>
+    <div style="display:flex;gap:8px">
+      <input class="input" id="appt-date" type="date" style="flex:1" aria-label="预约日期" onchange="apptLoadSlots()">
+      <select class="input" id="appt-doctor" style="flex:1" aria-label="预约医师" onchange="apptLoadSlots()"></select>
+    </div>
+    <div id="appt-slots" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;font-size:12px">先选日期与医师</div>
+    <div style="display:flex;gap:8px">
+      <input class="input" id="appt-code" placeholder="短信验证码" style="flex:1" aria-label="短信验证码" inputmode="numeric" maxlength="6">
+      <button class="btn outline" id="appt-code-btn" onclick="apptSendCode()">获取验证码</button>
+    </div>
+    <button class="btn primary block" onclick="apptSubmit()">确认预约</button>
+    <div class="result-box" id="appt-result"></div>
+  </div>
+
+  <!-- 报告随身看：扫码绑定「我的医院报告」（离院引导） -->
+  <div class="card" style="text-align:center">
+    <h3>📮 报告随身看</h3>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">就诊后病历/处方/检验报告出具即回流<br>扫码或点击进入，验证手机号即可随时查阅</div>
+    <div id="myrpt-qr" style="display:flex;justify-content:center;margin:6px 0"></div>
+    <a class="btn outline" style="display:inline-block;margin-top:8px;text-decoration:none;padding:8px 18px" href="my-reports.html">进入「我的医院报告」→</a>
+  </div>
+
   <!-- 排班查看 -->
   <div class="card">
     <h3>📅 今日出诊医生</h3>
@@ -135,6 +160,7 @@ function loadDoctors() {
     DOCTORS = d.doctors || [];
     renderDoctorPicker();
     renderDoctors();
+    renderApptDoctors();
     // URL 预选（医生团队页「立即挂号」入口带 ?doctor=）
     var m = location.search.match(/[?&]doctor=([A-Za-z0-9]+)/);
     if (m) selectDoctor(m[1].toUpperCase());
@@ -150,6 +176,77 @@ function selectDoctor(id) {
   selectedDoctor = id;
   renderDoctorPicker();
 }
+
+// ═══ G12 预约挂号 ═══
+var apptSlot = '';
+function renderApptDoctors() {
+  var sel = document.getElementById('appt-doctor');
+  if (!sel || !DOCTORS.length) return;
+  sel.innerHTML = DOCTORS.map(function(p) { return '<option value="'+p.name+'">'+p.name+'（'+p.specialty_name+'）</option>'; }).join('');
+}
+function apptLoadSlots() {
+  var date = document.getElementById('appt-date').value;
+  var doctor = document.getElementById('appt-doctor').value;
+  var box = document.getElementById('appt-slots');
+  apptSlot = '';
+  if (!date || !doctor) { box.textContent = '先选日期与医师'; return; }
+  box.textContent = '号源加载中…';
+  fetch('/api/clinic/appointment/slots?doctor=' + encodeURIComponent(doctor) + '&date=' + date)
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (!d.ok) { box.textContent = d.error || '号源加载失败'; return; }
+      box.innerHTML = d.slots.map(function(s) {
+        var dis = s.past || s.remaining <= 0 || s.off;
+        return '<button type="button" ' + (dis ? 'disabled' : '') + ' onclick="apptPick(\''+s.slot+'\')" ' +
+          'style="padding:6px 10px;border-radius:6px;border:1px solid var(--border);font-size:12px;' +
+          (dis ? 'opacity:.4;cursor:not-allowed' : 'cursor:pointer;background:var(--card)') + '"' +
+          ' data-slot="'+s.slot+'">'+s.slot+(dis ? (s.off ? ' 停诊' : s.past ? ' 已过' : ' 约满') : ' 余'+s.remaining)+'</button>';
+      }).join('');
+    }).catch(function() { box.textContent = '📡 服务离线'; });
+}
+function apptPick(slot) {
+  apptSlot = slot;
+  document.querySelectorAll('#appt-slots button').forEach(function(b) {
+    b.style.borderColor = b.dataset.slot === slot ? 'var(--primary)' : 'var(--border)';
+    b.style.background = b.dataset.slot === slot ? 'var(--gold-bg)' : 'var(--card)';
+  });
+}
+function apptSendCode() {
+  var phone = document.getElementById('patient-phone').value.trim();
+  var btn = document.getElementById('appt-code-btn');
+  if (!/^1\d{10}$/.test(phone)) { alert('请先在上面挂号卡填好手机号'); return; }
+  btn.disabled = true;
+  fetch('/api/sms/send-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phone, scene: 'appointment' }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      alert(d.ok ? '验证码已发送（5 分钟内有效）' + (d.mock ? '【模拟外发】' : '') : (d.error || '发送失败'));
+      btn.disabled = false;
+    }).catch(function() { alert('📡 服务离线'); btn.disabled = false; });
+}
+function apptSubmit() {
+  var name = document.getElementById('patient-name').value.trim();
+  var phone = document.getElementById('patient-phone').value.trim();
+  var code = document.getElementById('appt-code').value.trim();
+  var date = document.getElementById('appt-date').value;
+  var doctor = document.getElementById('appt-doctor').value;
+  var box = document.getElementById('appt-result');
+  if (!name || !phone || !code || !date || !doctor || !apptSlot) { box.style.display='block'; box.textContent = '请完整填写：姓名/手机号/验证码/日期/医师/时段'; return; }
+  box.style.display = 'block'; box.textContent = '预约提交中…';
+  fetch('/api/clinic/appointment', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ patient_name: name, phone: phone, code: code, doctor_name: doctor, date: date, slot: apptSlot }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (d.ok) {
+        var a = d.appointment;
+        box.innerHTML = '✅ 预约成功：' + a.date + ' ' + a.slot + ' ' + a.doctor_name + '<br><span style="font-size:11px">确认短信' + (d.sms && d.sms.mock ? '已模拟外发（通道未配置）' : '已发送') + '；请提前 10 分钟到院报到</span>';
+        apptLoadSlots();
+      } else {
+        box.textContent = '❌ ' + (d.error || '预约失败');
+      }
+    }).catch(function() { box.textContent = '📡 服务离线，请稍后再试'; });
+}
+// 默认约今天
+(function() {
+  var d = document.getElementById('appt-date');
+  if (d) d.value = new Date().toLocaleDateString('sv-SE');
+})();
 
 function renderDoctorPicker() {
   var el = document.getElementById('doctor-picker');
@@ -494,5 +591,17 @@ setTimeout(initPtCrud, 300);
 <script src="js/sw-version-listener.js"></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
+<script src="js/vendor/qrcode.min.js"></script>
+<script>
+// 离院引导：本院基址二维码（患者扫码到「我的医院报告」绑定页）
+try {
+  if (typeof QRCode !== 'undefined') {
+    new QRCode(document.getElementById('myrpt-qr'), { text: location.origin + '/my-reports.html', width: 132, height: 132, correctLevel: QRCode.CorrectLevel.M });
+  }
+} catch (e) {}
+</script>
+<script src="/pwa-inject.js"></script>
+<div data-mingli-entry style="max-width:760px;margin:0 auto;padding:0 12px"></div>
+<script src="js/mingli-entry.js"></script>
 </body>
 </html>

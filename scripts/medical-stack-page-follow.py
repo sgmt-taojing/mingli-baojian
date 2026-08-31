@@ -88,15 +88,22 @@ def main() -> int:
     result = {"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "action": "page-follow",
               "pages": [], "warnings": []}
 
-    for name in LAG_PAGES:
+    # 自动侦察：tcm app 与本侧 app 的同名页全量比对，transform(src) != dst 即需重打包。
+    # 幂等：无增量时秒退（只写心跳状态）。新增页（tcm 有、本侧无）不在此自动内化，
+    # 仍由链5差集报告暴露，经定性后人工决策（G16-2 三分法）。
+    shared = sorted(p.stem for p in TCM_APP.glob("*.html")
+                    if (MS_APP / p.name).exists())
+    result["shared_pages"] = len(shared)
+
+    for name in shared:
         src = TCM_APP / f"{name}.html"
         dst = MS_APP / f"{name}.html"
-        if not src.exists():
-            result["warnings"].append(f"{name}: tcm 侧不存在，跳过")
-            continue
-        old = dst.read_text(encoding="utf-8") if dst.exists() else ""
+        old = dst.read_text(encoding="utf-8")
         had_seed = SEED_LOADER in old
         text, notes = transform(name, src.read_text(encoding="utf-8"), had_seed)
+
+        if text == old:
+            continue  # 幂等：无增量
 
         # 校验
         problems = []
@@ -128,7 +135,7 @@ def main() -> int:
                 with urllib.request.urlopen(
                         f"{STATIC_BASE}/{p['page']}.html", timeout=10) as r:
                     body = r.read().decode("utf-8", "replace")
-                good = r.status == 200 and (f"mingli-medical/{p['page']}.html" in body or "命理宝鉴" in body)  # canonical 或品牌（insurance-desk 无 canonical）
+                good = r.status == 200 and "TCM-Agent" not in body and "tcm-agent/" not in body  # 负向判据：无 tcm 品牌/canonical 残留（覆盖无 canonical 页如 mobile-interact/insurance-desk）
                 smoke_ok += good
                 smoke_fail += (not good)
             except Exception as e:
@@ -140,7 +147,8 @@ def main() -> int:
     result["status"] = "ok" if not result["warnings"] else "ok_with_warnings"
     STATE.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps({"status": result["status"],
-                      "pages": len(result["pages"]),
+                      "shared": result["shared_pages"],
+                      "changed": len(result["pages"]),
                       "written": sum(1 for p in result["pages"] if p.get("written")),
                       "smoke": result.get("smoke"),
                       "warnings": result["warnings"]}, ensure_ascii=False, indent=1))

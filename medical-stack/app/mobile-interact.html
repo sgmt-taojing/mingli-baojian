@@ -2,827 +2,419 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/mobile-interact.html">
-<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#6b3a1f">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📱</text></svg>">
-<link rel="manifest" href="manifest.json">
-<title>手机问诊 · 命理宝鉴·医道</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="医师工作台">
+<link rel="manifest" href="/pwa/manifest.json">
+<link rel="apple-touch-icon" href="/pwa/icon-192.png">
+<title>医师移动工作台 · 中医标准智能体</title>
 <style>
 :root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--gold:#b8860b;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f;--radius:12px}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
-.container{max-width:480px;margin:0 auto;padding:10px}
-.std-bar{font-size:9px;color:var(--text3);padding:4px 0;margin-bottom:4px;display:flex;gap:8px;flex-wrap:wrap}
-.std-tag{background:var(--card);border-radius:4px;padding:1px 5px;border:1px solid var(--border)}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh;padding-bottom:calc(76px + env(safe-area-inset-bottom,0))}
+.wrap{max-width:520px;margin:0 auto;padding:10px 12px}
 
-/* top bar */
-.top-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-bottom:8px}
-.top-bar h1{font-size:17px;color:var(--primary);display:flex;align-items:center;gap:6px}
-.battery-badge{font-size:10px;color:var(--text3)}
+.top-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 2px}
+.top-bar h1{font-size:17px;color:var(--primary)}
+.top-bar h1 small{font-size:10px;color:var(--text3);font-weight:400;display:block}
+.doc-badge{font-size:11px;color:var(--text2);text-align:right}
+.doc-badge b{color:var(--primary)}
 
-/* quick actions */
-.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.qa-btn{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 8px;text-align:center;cursor:pointer;transition:all .15s;font-size:11px}
-.qa-btn:active{transform:scale(.96);background:#faf6f0}
-.qa-btn .icon{font-size:24px;display:block;margin-bottom:4px}
-.qa-btn .label{font-weight:600;color:var(--text)}
-.qa-btn .hint{font-size:9px;color:var(--text3)}
+.xlinks{display:flex;gap:8px;margin:4px 0 10px}
+.xlinks a{flex:1;text-align:center;font-size:11px;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text2);text-decoration:none}
+.xlinks a b{display:block;font-size:13px;margin-bottom:1px;color:var(--primary)}
 
-/* card */
-.card{background:var(--card);border-radius:var(--radius);padding:14px;margin:10px 0;border:1px solid var(--border)}
-.card h3{font-size:14px;color:var(--primary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+/* 待办总览（首屏直出） */
+.todos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.todo{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:10px 4px;text-align:center;cursor:pointer}
+.todo .n{font-size:22px;font-weight:700;color:var(--primary)}
+.todo .n.hot{color:var(--accent)}
+.todo .t{font-size:10px;color:var(--text2);margin-top:2px}
 
-/* voice input area */
-.voice-area{text-align:center;padding:20px 0}
-.voice-btn{width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:28px;cursor:pointer;box-shadow:0 3px 12px rgba(107,58,31,.3);transition:all .2s}
-.voice-btn:active{transform:scale(.93)}
-.voice-btn.recording{animation:pulse 1.2s infinite;background:var(--accent)}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.5)}50%{box-shadow:0 0 0 16px rgba(192,57,43,0)}}
-.voice-text{font-size:15px;color:var(--text2);margin-top:12px;min-height:24px;line-height:1.5}
-.voice-hint{font-size:10px;color:var(--text3);margin-top:4px}
+/* 底部 Tab 栏 */
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0);z-index:50}
+.tabbar button{flex:1;border:none;background:none;padding:8px 0 6px;font-size:10px;color:var(--text3);cursor:pointer;position:relative}
+.tabbar button .ic{font-size:20px;display:block;margin-bottom:1px}
+.tabbar button.on{color:var(--primary);font-weight:700}
+.tabbar button .bdg{position:absolute;top:4px;right:50%;margin-right:-22px;background:var(--accent);color:#fff;font-size:9px;border-radius:8px;padding:0 5px;line-height:14px;min-width:14px}
 
-/* camera area */
-.camera-area{position:relative;height:180px;background:#000;border-radius:var(--radius);overflow:hidden;margin:8px 0}
-.camera-area video{width:100%;height:100%;object-fit:cover}
-.camera-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#fff;background:rgba(0,0,0,.35)}
-.camera-overlay .guide-box{width:60%;aspect-ratio:1;border:2px dashed rgba(255,255,255,.6);border-radius:12px;margin-bottom:8px}
-.camera-guide{font-size:11px;opacity:.8}
-.camera-actions{display:flex;gap:8px;margin-top:8px}
-.cam-btn{flex:1;padding:8px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600}
-.cam-btn.capture{background:var(--primary);color:#fff}
-.cam-btn.switch{background:#fff;color:var(--text);border:1px solid var(--border)}
+.pane{display:none}
+.pane.on{display:block}
 
-/* result cards */
-.result-item{display:flex;align-items:center;padding:10px;margin:6px 0;background:var(--bg);border-radius:8px;gap:10px}
-.result-item .r-icon{font-size:20px;flex-shrink:0}
-.result-item .r-body{flex:1}
-.result-item .r-title{font-size:12px;font-weight:600}
-.result-item .r-desc{font-size:10px;color:var(--text2)}
-.result-item .r-score{font-size:10px;color:var(--green);font-weight:700}
+.card{background:var(--card);border-radius:var(--radius);padding:12px;margin:8px 0;border:1px solid var(--border)}
+.card h4{font-size:13px;color:var(--primary);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.meta{font-size:11px;color:var(--text3);margin-bottom:6px}
+.body-text{font-size:12px;color:var(--text2);line-height:1.6;white-space:pre-wrap}
+.tag{display:inline-block;font-size:10px;border-radius:4px;padding:1px 6px;margin-right:4px}
+.tag.red{background:#fdecea;color:var(--accent)}
+.tag.green{background:#e8f7ee;color:var(--green)}
+.tag.gold{background:#faf3e0;color:var(--gold)}
+.tag.blue{background:#e8f0fe;color:var(--blue)}
+.actions{display:flex;gap:8px;margin-top:10px}
+.btn{flex:1;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.outline{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn.danger{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+.btn:active{transform:scale(.97)}
+.empty{text-align:center;color:var(--text3);font-size:12px;padding:26px 0}
+.loading{text-align:center;color:var(--text3);font-size:12px;padding:20px 0}
 
-/* toast */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999;transition:opacity .3s}
-
-/* bottom nav */
-.mobile-nav{position:sticky;bottom:0;background:var(--card);display:flex;justify-content:space-around;padding:6px 0 12px;border-top:1px solid var(--border);margin-top:10px}
-.mobile-nav .nav-item{text-align:center;font-size:9px;color:var(--text3);cursor:pointer;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:2px}
-.mobile-nav .nav-item .n-icon{font-size:18px}
-.mobile-nav .nav-item.active{color:var(--primary);font-weight:700}
-
-/* speech bubble */
-.speech-recording{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:1000}
-.speech-recording.active{display:flex}
-.speech-wave{display:flex;align-items:flex-end;gap:3px;height:60px;margin-bottom:20px}
-.speech-wave .bar{width:6px;background:var(--green);border-radius:3px;animation:wave 0.6s ease-in-out infinite alternate}
-.speech-wave .bar:nth-child(2){animation-delay:0.1s;height:40%}.speech-wave .bar:nth-child(3){animation-delay:0.2s;height:70%}.speech-wave .bar:nth-child(4){animation-delay:0.3s;height:50%}.speech-wave .bar:nth-child(5){animation-delay:0.4s;height:90%}.speech-wave .bar:nth-child(6){animation-delay:0.5s;height:60%}.speech-wave .bar:nth-child(7){animation-delay:0.6s;height:100%}
-@keyframes wave{0%{height:20%}100%{height:100%}}
-.speech-hint{color:rgba(255,255,255,.6);font-size:13px}
-</style>
-<link rel="stylesheet" href="css/mobile.css">
-<link rel="stylesheet" href="css/standard.css">
-<script src="js/nav.js"></script>
-<script src="js/global-search.js"></script>
-<script src="js/ai-voice-assistant.js"></script>
-<script src="js/crud-engine.js"></script>
-<script src="js/realtime-engine.js"></script>
-<script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
-<script src="js/data-engine.js"></script>
-
-<style>
-.page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
-.page-header-bar[data-theme="tcm"] { border-bottom-color: #b8860b; }
-.page-header-bar[data-theme="home"] { border-bottom-color: #2e8b57; }
-.page-header-bar[data-theme="admin"] { border-bottom-color: #475569; }
-.page-header-bar[data-theme="kb"] { border-bottom-color: #7c3aed; }
-.page-header-bar[data-theme="wellness"] { border-bottom-color: #f59e0b; }
-.phb-back { font-size: 22px; color: var(--text2, #6b5b4f); text-decoration: none; padding: 0 8px; }
-.phb-back:hover { color: var(--primary, #b8860b); }
-.phb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary, #b8860b); flex-shrink: 0; }
-.page-header-bar[data-theme="tcm"] .phb-dot { background: #b8860b; }
-.page-header-bar[data-theme="home"] .phb-dot { background: #2e8b57; }
-.page-header-bar[data-theme="admin"] .phb-dot { background: #475569; }
-.page-header-bar[data-theme="kb"] .phb-dot { background: #7c3aed; }
-.page-header-bar[data-theme="wellness"] .phb-dot { background: #f59e0b; }
-.phb-title { font-size: 15px; font-weight: 600; color: var(--text, #2c1810); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 登录遮罩（医师验证码鉴权 · G10） */
+.login-mask{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:var(--card);border-radius:16px;border:1px solid var(--border);padding:24px 20px;width:100%;max-width:360px}
+.login-card h2{font-size:16px;color:var(--primary);margin-bottom:4px}
+.login-card p{font-size:11px;color:var(--text3);margin-bottom:16px}
+.input{width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:10px;background:#fff}
+.code-row{display:flex;gap:8px}
+.code-row .input{flex:1}
+.code-row .btn{flex:0 0 108px}
+.login-err{color:var(--accent);font-size:11px;min-height:16px;margin-bottom:8px}
+.offline-note{display:none;background:#fef3c7;color:#92600a;font-size:11px;border-radius:8px;padding:8px 10px;margin-bottom:10px}
 </style>
 </head>
-<script src="js/smart-search.js"></script>
-<script src="js/ai-assistant.js"></script>
 <body>
 
-<!-- page-header-bar -->
-<div class="page-header-bar" data-theme="tcm">
-  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
-  <span class="phb-dot" aria-hidden="true"></span>
-  <span class="phb-title">手机问诊</span>
+<!-- 医师验证码登录（G10 鉴权，令牌仅存本页 sessionStorage） -->
+<div class="login-mask" id="login-mask">
+  <div class="login-card">
+    <h2>🩺 医师移动工作台</h2>
+    <p>手机验证码登录 · 审批/签发等操作全程留痕<br>辅助诊疗工具，最终诊疗决策由执业医师作出</p>
+    <input class="input" id="login-phone" placeholder="医师手机号" inputmode="numeric" maxlength="11">
+    <div class="code-row">
+      <input class="input" id="login-code" placeholder="验证码" inputmode="numeric" maxlength="6">
+      <button class="btn outline" id="login-code-btn" onclick="sendLoginCode()">获取验证码</button>
+    </div>
+    <div class="login-err" id="login-err"></div>
+    <button class="btn primary" style="width:100%" onclick="doLogin()">登录进入工作台</button>
+  </div>
 </div>
 
-<div class="container">
-  <div class="std-bar">
-    <span class="std-tag">👥 使用对象 <b>患者/医生</b></span>
-    <span class="std-tag">📱 功能 <b>手机端语音·摄像头·触觉交互</b></span>
-    <span class="std-tag">💎 使用价值 <b>语音录入症状·拍照舌面诊·触觉反馈</b></span>
-  </div>
-
-  <!-- top bar -->
+<div class="wrap">
+  <div class="offline-note" id="offline-note">📡 当前离线：可浏览页面框架，数据与操作不可用（操作不会伪造成功）</div>
   <div class="top-bar">
-    <h1>📱 手机问诊</h1>
-    <div class="battery-badge" id="conn-status">🟢 在线</div>
+    <h1>🩺 医师移动工作台<small>病历审批 · 药方确认 · 随访 · 急症 · 预约</small></h1>
+    <div class="doc-badge" id="doc-badge"></div>
   </div>
 
-  <!-- 快捷操作 -->
-  <div class="quick-actions">
-    <div class="qa-btn" onclick="startVoiceSymptom()">
-      <span class="icon">🎙️</span>
-      <span class="label">语音问诊</span>
-      <span class="hint">说出症状</span>
-    </div>
-    <div class="qa-btn" onclick="openTongueCamera()">
-      <span class="icon">📷</span>
-      <span class="label">舌面拍照</span>
-      <span class="hint">AI舌诊</span>
-    </div>
-    <div class="qa-btn" onclick="vibrateHaptic('medium')">
-      <span class="icon">📳</span>
-      <span class="label">一键挂号</span>
-      <span class="hint">快速取号</span>
-    </div>
+  <div class="xlinks">
+    <a href="doctor-dashboard.html"><b>🖥️ 桌面工作台</b>完整诊疗功能</a>
+    <a href="home-tcm.html"><b>🏠 居家患者入口</b>患者侧自助服务</a>
+    <a href="emergency.html"><b>🚑 急救指导</b>院前分诊话术</a>
   </div>
 
-  <!-- 语音输入区 -->
-  <div class="card" id="voice-card">
-    <h3>🎙️ 语音录入症状</h3>
-    <div class="voice-area">
-      <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">🎤</button>
-      <div class="voice-text" id="voice-text">点击麦克风，说出你的症状</div>
-      <div class="voice-hint" id="voice-hint">例如："头痛发烧咳嗽三天了"</div>
-    </div>
-    <div id="voice-result" style="margin-top:8px"></div>
+  <div class="todos" id="todos">
+    <div class="todo" onclick="switchTab('emr')"><div class="n" id="n-emr">–</div><div class="t">待批病历</div></div>
+    <div class="todo" onclick="switchTab('rx')"><div class="n" id="n-rx">–</div><div class="t">待审处方</div></div>
+    <div class="todo" onclick="switchTab('followup')"><div class="n" id="n-fu">–</div><div class="t">待随访</div></div>
+    <div class="todo" onclick="switchTab('emg')"><div class="n" id="n-emg">–</div><div class="t">急症待办</div></div>
   </div>
 
-  <!-- 拍照/舌诊区 -->
-  <div class="card" id="camera-card" style="display:none">
-    <h3>📷 舌面拍照诊断</h3>
-    <div class="camera-area" id="camera-area">
-      <video id="camera-video" autoplay playsinline></video>
-      <div class="camera-overlay" id="camera-overlay">
-        <div class="guide-box"></div>
-        <div class="camera-guide">请伸出舌头对准框内</div>
+  <!-- ① 病历审批 -->
+  <div class="pane" id="pane-emr">
+    <div id="list-emr"><div class="loading">载入中…</div></div>
+  </div>
+
+  <!-- ② 药方确认 -->
+  <div class="pane" id="pane-rx">
+    <div id="list-rx"><div class="loading">载入中…</div></div>
+  </div>
+
+  <!-- ③ 随访处理 -->
+  <div class="pane" id="pane-followup">
+    <div id="list-fu"><div class="loading">载入中…</div></div>
+  </div>
+
+  <!-- ④ 急症转办 -->
+  <div class="pane" id="pane-emg">
+    <div id="oncall-card"></div>
+    <div id="list-emg"><div class="loading">载入中…</div></div>
+    <div class="card">
+      <h4>➕ 登记应急事件</h4>
+      <div class="code-row" style="margin-bottom:8px">
+        <select class="input" id="emg-level" style="flex:1;margin:0">
+          <option value="CRITICAL">CRITICAL 危重</option>
+          <option value="WARNING">WARNING 警示</option>
+          <option value="ROUTINE" selected>ROUTINE 一般</option>
+        </select>
+        <button class="btn primary" style="flex:0 0 96px" onclick="emgReport()">登记</button>
       </div>
-    </div>
-    <div class="camera-actions">
-      <button class="cam-btn capture" onclick="capturePhoto()">📸 拍照分析</button>
-      <button class="cam-btn switch" onclick="toggleCamera()">🔄 翻转镜头</button>
-    </div>
-    <canvas id="camera-canvas" style="display:none"></canvas>
-    <div id="photo-result" style="margin-top:8px"></div>
-  </div>
-
-  <!-- 舌面照片档案（可追溯） -->
-  <div class="card">
-    <h3>📂 舌面照片档案 <span id="photo-count" style="font-size:10px;color:var(--text3);font-weight:400"></span></h3>
-    <div id="photo-archive" style="font-size:11px;color:var(--text2);max-height:200px;overflow-y:auto">
-      <div style="text-align:center;color:var(--text3);padding:12px">暂无拍照记录</div>
-    </div>
-    <div style="margin-top:8px;display:flex;gap:6px">
-      <button onclick="exportPhotoArchive()" style="flex:1;background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">📤 导出档案</button>
-      <button onclick="clearPhotoArchive()" style="flex:1;background:var(--card);color:var(--accent);border:1px solid var(--border);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">🗑 清空</button>
+      <input class="input" id="emg-symptoms" placeholder="症状简述（如：胸痛大汗 10 分钟）">
     </div>
   </div>
 
-  <!-- 最近智能分析结果 -->
-  <div class="card">
-    <h3>🧠 近期问诊结果</h3>
-    <div id="recent-results">
-      <div style="text-align:center;color:var(--text3);padding:12px">📋 开始语音问诊或拍照后，智能分析结果将显示在这里</div>
+  <!-- ⑤ 排班预约（G12） -->
+  <div class="pane" id="pane-appt">
+    <div class="card" style="display:flex;gap:8px;align-items:center">
+      <input class="input" id="appt-date" type="date" style="margin:0;flex:1" onchange="loadAppts()">
+      <button class="btn outline" style="flex:0 0 72px" onclick="loadAppts()">刷新</button>
     </div>
+    <div id="list-appt"><div class="loading">载入中…</div></div>
   </div>
+</div>
 
-  <!-- speech overlay -->
-  <div class="speech-recording" id="speech-overlay">
-    <div class="speech-wave">
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    </div>
-    <div class="speech-hint">正在聆听...（说完后松手或自动停止）</div>
-  </div>
-
-  <!-- bottom nav -->
-  <div class="mobile-nav">
-    <a class="nav-item active" href="mobile-interact.html"><span class="n-icon">📱</span>问诊</a>
-    <a class="nav-item" href="patient-portal.html"><span class="n-icon">📋</span>我的</a>
-    <a class="nav-item" href="doctor-dashboard.html"><span class="n-icon">🩺</span>医生</a>
-    <a class="nav-item" href="pharmacy.html"><span class="n-icon">💊</span>药房</a>
-    <a class="nav-item" href="ai-diagnosis.html"><span class="n-icon">🧠</span>AI</a>
-  </div>
+<div class="tabbar">
+  <button id="tab-emr" onclick="switchTab('emr')"><span class="ic">📋</span>病历审批<span class="bdg" id="bdg-emr" style="display:none"></span></button>
+  <button id="tab-rx" onclick="switchTab('rx')"><span class="ic">🌿</span>药方确认<span class="bdg" id="bdg-rx" style="display:none"></span></button>
+  <button id="tab-followup" onclick="switchTab('followup')"><span class="ic">📞</span>随访处理<span class="bdg" id="bdg-fu" style="display:none"></span></button>
+  <button id="tab-emg" onclick="switchTab('emg')"><span class="ic">🚑</span>急症转办<span class="bdg" id="bdg-emg" style="display:none"></span></button>
+  <button id="tab-appt" onclick="switchTab('appt')"><span class="ic">🗓️</span>排班预约</button>
 </div>
 
 <script>
-// ═══ 注册 Service Worker ═══
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js').then(function(reg) {
-    // [sanitized] [;,]/* [sanitized] */'[SW] 注册成功: ' + reg.scope);
-  }).catch(function(err) {
-    /* [sanitized] */
+'use strict';
+var TOKEN = sessionStorage.getItem('mw_token') || '';
+var DOCTOR = sessionStorage.getItem('mw_doctor') || '';
+var CUR_TAB = 'emr';
+
+function api(path, opts) {
+  opts = opts || {};
+  opts.headers = Object.assign({ 'Content-Type': 'application/json' }, opts.headers || {});
+  if (TOKEN) opts.headers['Authorization'] = 'Bearer ' + TOKEN;
+  if (opts.body && typeof opts.body !== 'string') opts.body = JSON.stringify(opts.body);
+  return fetch(path, opts).then(function(r){ return r.json(); });
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function toast(msg){ alert(msg); }
+
+// ═══ 登录（G10 验证码鉴权）═══
+function sendLoginCode() {
+  var phone = document.getElementById('login-phone').value.trim();
+  if (!/^1\d{10}$/.test(phone)) { document.getElementById('login-err').textContent = '请输入合法手机号'; return; }
+  var btn = document.getElementById('login-code-btn'); btn.disabled = true;
+  api('/api/sms/send-code', { method: 'POST', body: { phone: phone, scene: 'login' } }).then(function(d) {
+    document.getElementById('login-err').textContent = d.ok ? ('验证码已发送（5 分钟有效）' + (d.mock ? '【模拟外发】' : '')) : (d.error || '发送失败');
+    btn.disabled = false;
+  }).catch(function(){ document.getElementById('login-err').textContent = '📡 服务离线'; btn.disabled = false; });
+}
+function doLogin() {
+  var phone = document.getElementById('login-phone').value.trim();
+  var code = document.getElementById('login-code').value.trim();
+  api('/api/auth/login-phone', { method: 'POST', body: { phone: phone, code: code } }).then(function(d) {
+    if (!d.ok) { document.getElementById('login-err').textContent = d.error || '登录失败'; return; }
+    TOKEN = d.token; DOCTOR = (d.user && (d.user.name || d.user.username)) || phone;
+    sessionStorage.setItem('mw_token', TOKEN);
+    sessionStorage.setItem('mw_doctor', DOCTOR);
+    enterWorkbench();
+  }).catch(function(){ document.getElementById('login-err').textContent = '📡 服务离线'; });
+}
+function enterWorkbench() {
+  document.getElementById('login-mask').style.display = 'none';
+  document.getElementById('doc-badge').innerHTML = '<b>' + esc(DOCTOR) + '</b><br>已认证';
+  refreshAll();
+}
+if (TOKEN) { enterWorkbench(); }
+function syncOfflineNote() {
+  document.getElementById('offline-note').style.display = navigator.onLine ? 'none' : 'block';
+}
+window.addEventListener('offline', syncOfflineNote);
+window.addEventListener('online', syncOfflineNote);
+syncOfflineNote();
+
+// ═══ Tab 切换 ═══
+var TABS = ['emr', 'rx', 'followup', 'emg', 'appt'];
+function switchTab(t) {
+  CUR_TAB = t;
+  TABS.forEach(function(x) {
+    document.getElementById('tab-' + x).classList.toggle('on', x === t);
+    document.getElementById('pane-' + x).classList.toggle('on', x === t);
   });
+  loadTab(t);
+}
+function setBdg(key, n) {
+  var b = document.getElementById('bdg-' + key);
+  b.style.display = n > 0 ? '' : 'none';
+  b.textContent = n > 99 ? '99+' : n;
+  var todoN = document.getElementById('n-' + key);
+  if (todoN) { todoN.textContent = n; todoN.classList.toggle('hot', n > 0); }
 }
 
-// ═══ 网络状态 ═══
-function updateConnectionStatus() {
-  var el = document.getElementById('conn-status');
-  if (navigator.onLine) { el.innerHTML = '🟢 在线'; }
-  else { el.innerHTML = '🔴 离线'; }
-}
-window.addEventListener('online', updateConnectionStatus);
-window.addEventListener('offline', updateConnectionStatus);
-
-// ═══ 触觉反馈引擎 ═══
-function vibrateHaptic(type) {
-  if (!navigator.vibrate) return;
-
-  switch(type) {
-    case 'light': navigator.vibrate(10); break;
-    case 'medium': navigator.vibrate([30, 50, 30]); break;
-    case 'heavy': navigator.vibrate([50, 30, 50, 30, 100]); break;
-    case 'success': navigator.vibrate([20, 50, 20, 50, 60]); break;
-    case 'warning': navigator.vibrate([60, 30, 60]); break;
-    case 'error': navigator.vibrate([100, 100, 200]); break;
-    case 'toast':
-      if (!navigator.onLine) {
-        navigator.vibrate([50, 30, 100]);
-        showToast('未连接网络', 'error');
-        return;
-      }
-      // 快速挂号
-      var name = localStorage.getItem('tcm_current_patient') || '匿名患者';
-      var dept = '内科';
-      var reg = { patient_name: name, department_name: dept, status: 'registered',
-        time: new Date().toISOString(), id: 'reg_' + Date.now() };
-      var regs = JSON.parse(localStorage.getItem('tcm_registrations') || '[]');
-      regs.push(reg);
-      localStorage.setItem('tcm_registrations', JSON.stringify(regs));
-      navigator.vibrate([20, 50, 20, 50, 60]);
-      showToast('✅ 挂号成功 — ' + name + ' · ' + dept + '科');
-      break;
-    default: navigator.vibrate(20);
-  }
+// ═══ 数据加载 ═══
+function refreshAll() { loadEmr(); loadRx(); loadFu(); loadEmg(); }
+function loadTab(t) {
+  if (t === 'emr') loadEmr();
+  else if (t === 'rx') loadRx();
+  else if (t === 'followup') loadFu();
+  else if (t === 'emg') loadEmg();
+  else if (t === 'appt') loadAppts();
 }
 
-// ═══ 语音识别引擎 ═══
-var recognition = null;
-var isRecording = false;
-var voiceResults = [];
-
-function initSpeech() {
-  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    document.getElementById('voice-hint').textContent = '⚠️ 您的浏览器不支持语音识别（需要 HTTPS 或 localhost）';
-    document.getElementById('voice-btn').style.opacity = '0.5';
-    return false;
-  }
-
-  recognition = new SpeechRecognition();
-  recognition.lang = 'zh-CN';
-  recognition.interimResults = true;
-  recognition.continuous = true;
-  recognition.maxAlternatives = 2;
-
-  recognition.onresult = function(event) {
-    var transcript = '';
-    for (var i = event.resultIndex; i < event.results.length; i++) {
-      transcript += event.results[i][0].transcript;
-    }
-    var el = document.getElementById('voice-text');
-    if (el) el.textContent = transcript || '正在聆听...';
-  };
-
-  recognition.onerror = function(event) {
-    var hint = document.getElementById('voice-hint');
-    var el = document.getElementById('voice-text');
-    switch(event.error) {
-      case 'no-speech': hint.textContent = '未检测到语音，请再试一次'; break;
-      case 'audio-capture': hint.textContent = '未找到麦克风'; break;
-      case 'not-allowed': hint.textContent = '麦克风权限被拒绝，请在浏览器设置中开启'; break;
-      case 'network': hint.textContent = '网络错误，请检查连接'; break;
-      default: hint.textContent = '错误: ' + event.error;
-    }
-    stopVoice();
-  };
-
-  recognition.onend = function() {
-    if (isRecording) {
-      // 自动重启（连续模式）
-      try { recognition.start(); } catch(e) { stopVoice(); }
-    }
-  };
-
-  return true;
+// ① 病历审批：今日会话中 status=reviewing 的待签发病历
+function loadEmr() {
+  api('/api/clinic/sessions/today').then(function(d) {
+    if (!d.ok) { document.getElementById('list-emr').innerHTML = '<div class="empty">📡 服务离线，数据不可用</div>'; return; }
+    var list = (d.sessions || []).filter(function(s){ return s.status === 'reviewing'; });
+    setBdg('emr', list.length);
+    var box = document.getElementById('list-emr');
+    if (!list.length) { box.innerHTML = '<div class="empty">✅ 暂无待审批病历</div>'; return; }
+    box.innerHTML = list.map(function(s) {
+      var name = s.patient || (s.profile && s.profile.name ? (s.profile.name.v || s.profile.name) : '') || '未命名';
+      var syn = s.syndrome || (s.issued && (s.issued.syndrome || s.issued.diagnosis)) || '';
+      var symptoms = s.symptoms || [];
+      return '<div class="card"><h4>📋 ' + esc(name) + '<span class="tag blue">' + esc(s.sessionId.slice(-6)) + '</span></h4>' +
+        '<div class="meta">' + esc((s.updatedAt || s.createdAt || '').slice(5, 16).replace('T', ' ')) + '</div>' +
+        '<div class="body-text">' +
+          (s.complaint ? '主诉：' + esc(s.complaint) + '\n' : '') +
+          (Array.isArray(s.symptoms) && s.symptoms.length ? '症状：' + esc(s.symptoms.slice(0, 8).join('、')) + '\n' : '') +
+          (syn ? '辨证：' + esc(syn) : '辨证：未定') +
+        '</div>' +
+        '<div class="actions">' +
+          '<button class="btn primary" onclick="emrIssue(\'' + s.sessionId + '\')">✒️ 签发病历</button>' +
+          '<button class="btn outline" onclick="emrReturn(\'' + s.sessionId + '\')">退回补充</button>' +
+        '</div></div>';
+    }).join('');
+  }).catch(function(){ document.getElementById('list-emr').innerHTML = '<div class="empty">📡 服务离线</div>'; });
+}
+function emrIssue(id) {
+  if (!confirm('确认签发该病历？签发后进入药房与随访流程。')) return;
+  api('/api/clinic/session/' + id, { method: 'PUT', body: { status: 'issued' } }).then(function(d) {
+    if (!d.ok) { toast(d.error || '签发失败'); return; }
+    var fp = d.family_push;
+    toast('病历已签发' + (fp && fp.pushed ? '，已同步家庭档案' : fp && fp.queued ? '，家庭端暂不可达已缓存待推' : ''));
+    loadEmr();
+  }).catch(function(){ toast('📡 服务离线，操作未执行'); });
+}
+function emrReturn(id) {
+  if (!confirm('退回该病历至采集阶段补充信息？')) return;
+  api('/api/clinic/session/' + id, { method: 'PUT', body: { status: 'collecting' } }).then(function(d) {
+    if (d.ok) loadEmr(); else toast(d.error || '操作失败');
+  }).catch(function(){ toast('📡 服务离线，操作未执行'); });
 }
 
-function toggleVoice() {
-  if (!recognition && !initSpeech()) {
-    showToast('⚠️ 语音功能需要 HTTPS 环境', 'error');
-    return;
-  }
-
-  if (isRecording) {
-    stopVoice();
-  } else {
-    startVoice();
-  }
+// ② 药方确认：review-queue 中 pending 处方
+function loadRx() {
+  api('/api/prescription/review-queue?status=pending').then(function(d) {
+    if (!d.ok) { document.getElementById('list-rx').innerHTML = '<div class="empty">📡 服务离线，数据不可用</div>'; return; }
+    var list = (d.queue || []).filter(function(r){ return r.status === 'pending' || r.status === 'pending_review'; });
+    setBdg('rx', list.length);
+    var box = document.getElementById('list-rx');
+    if (!list.length) { box.innerHTML = '<div class="empty">✅ 暂无待确认处方</div>'; return; }
+    box.innerHTML = list.map(function(r) {
+      var herbs = (r.herbs || []).map(function(h){ return esc(h.name) + (h.dose ? h.dose + (h.unit || 'g') : ''); }).join('、');
+      var warn = r.safety_check && r.safety_check.warning_count > 0;
+      return '<div class="card"><h4>🌿 ' + esc((r.diagnosis && r.diagnosis.syndrome) || '处方') +
+        (warn ? '<span class="tag red">⚠ ' + r.safety_check.warning_count + ' 项注意</span>' : '<span class="tag green">禁忌校验通过</span>') + '</h4>' +
+        '<div class="meta">' + esc(r.rx_id) + ' · ' + esc((r.created_at || '').slice(5, 16).replace('T', ' ')) + ' · ' + (r.doses || 1) + ' 剂' + (r.price != null ? ' · ¥' + r.price : '') + '</div>' +
+        '<div class="body-text">' + herbs + (r.advice ? '\n医嘱：' + esc(r.advice) : '') +
+        (warn && r.safety_check.warnings ? '\n⚠ ' + esc(r.safety_check.warnings.slice(0, 3).join('；')) : '') + '</div>' +
+        '<div class="actions">' +
+          '<button class="btn primary" onclick="rxVerify(\'' + r.rx_id + '\',\'approve\')">✅ 确认</button>' +
+          '<button class="btn danger" onclick="rxReject(\'' + r.rx_id + '\')">驳回</button>' +
+        '</div></div>';
+    }).join('');
+  }).catch(function(){ document.getElementById('list-rx').innerHTML = '<div class="empty">📡 服务离线</div>'; });
+}
+function rxVerify(id, action, notes) {
+  api('/api/prescription/verify', { method: 'POST', body: { rx_id: id, action: action, notes: notes || '' } }).then(function(d) {
+    if (!d.ok) { toast(d.error || d.reason || '操作失败'); return; }
+    toast(action === 'approve' ? '处方已确认，进入药房调配' : '已驳回');
+    loadRx();
+  }).catch(function(){ toast('📡 服务离线，操作未执行'); });
+}
+function rxReject(id) {
+  var notes = prompt('驳回原因（将通知开方医师）：');
+  if (notes == null) return;
+  rxVerify(id, 'reject', notes);
 }
 
-function startVoice() {
-  try {
-    recognition.start();
-    isRecording = true;
-    document.getElementById('voice-btn').classList.add('recording');
-    document.getElementById('voice-btn').textContent = '⏹';
-    document.getElementById('speech-overlay').classList.add('active');
-    vibrateHaptic('light');
-  } catch(e) {
-    showToast('语音启动失败: ' + esc(e.message), 'error');
-  }
+// ③ 随访处理：今日到期 + 已逾期
+function loadFu() {
+  api('/api/followup/list?due=today').then(function(d) {
+    if (!d.ok) { document.getElementById('list-fu').innerHTML = '<div class="empty">📡 服务离线，数据不可用</div>'; return; }
+    var list = d.list || [];
+    setBdg('fu', list.length);
+    var box = document.getElementById('list-fu');
+    if (!list.length) { box.innerHTML = '<div class="empty">✅ 今日随访已清空</div>'; return; }
+    var now = Date.now();
+    box.innerHTML = list.map(function(f) {
+      var overdue = f.due_at && new Date(f.due_at).getTime() < now;
+      return '<div class="card"><h4>📞 ' + esc(f.patient_name || f.patient_id || '患者') +
+        (overdue ? '<span class="tag red">已逾期</span>' : '<span class="tag gold">今日到期</span>') + '</h4>' +
+        '<div class="meta">' + esc(f.type || '随访') + ' · 计划 ' + esc(String(f.due_at || '').slice(5, 16).replace('T', ' ')) + '</div>' +
+        '<div class="body-text">' + esc(f.note || f.content || f.script || '') + '</div>' +
+        '<div class="actions"><button class="btn primary" onclick="fuDone(\'' + f.id + '\')">✅ 完成随访</button></div></div>';
+    }).join('');
+  }).catch(function(){ document.getElementById('list-fu').innerHTML = '<div class="empty">📡 服务离线</div>'; });
+}
+function fuDone(id) {
+  var fb = prompt('随访反馈（如：症状评分 0-10，服药后变化）：');
+  if (fb == null) return;
+  var m = fb.match(/(\d{1,2})\s*分/);
+  api('/api/followup/complete', { method: 'POST', body: { id: id, feedback: fb, symptom_score: m ? parseInt(m[1], 10) : null } }).then(function(d) {
+    if (d.ok) { toast('随访已完成'); loadFu(); } else toast(d.error || '操作失败');
+  }).catch(function(){ toast('📡 服务离线，操作未执行'); });
 }
 
-function stopVoice() {
-  isRecording = false;
-  document.getElementById('voice-btn').classList.remove('recording');
-  document.getElementById('voice-btn').textContent = '🎤';
-  document.getElementById('speech-overlay').classList.remove('active');
-
-  try { recognition.stop(); } catch(e) {}
-
-  // 分析识别到的症状
-  var text = document.getElementById('voice-text').textContent;
-  if (text && text !== '点击麦克风，说出你的症状' && text !== '正在聆听...') {
-    analyzeSymptomText(text);
-  }
-
-  vibrateHaptic('medium');
+// ④ 急症转办：值班卡 + 待响应事件 + 登记
+function loadEmg() {
+  api('/api/emergency/oncall').then(function(d) {
+    var c = document.getElementById('oncall-card');
+    if (!d.ok) { c.innerHTML = ''; return; }
+    var oc = d.oncall;
+    c.innerHTML = '<div class="card"><h4>🛡️ 今日值班' + (d.weekend ? '<span class="tag red">周末快速响应</span>' : '<span class="tag green">工作日</span>') + '</h4>' +
+      '<div class="body-text">' + (oc ? '值班责任：' + esc(oc.name) + '（' + esc(oc.title || '') + ' ' + esc(oc.specialty_name || '') + ' · ' + esc(oc.mode) + '）' : '今日无排班') +
+      '\n响应 SLA：' + Math.round((d.sla_seconds || 300) / 60) + ' 分钟' +
+      (d.duty && d.duty.length > 1 ? '\n在岗：' + d.duty.map(function(x){ return esc(x.name); }).join('、') : '') + '</div></div>';
+  }).catch(function(){});
+  api('/api/emergency/events').then(function(d) {
+    if (!d.ok) { document.getElementById('list-emg').innerHTML = '<div class="empty">📡 服务离线，数据不可用</div>'; return; }
+    var list = (d.events || d.list || []).filter(function(e){ return e.status === 'pending'; });
+    setBdg('emg', list.length);
+    var box = document.getElementById('list-emg');
+    if (!list.length) { box.innerHTML = '<div class="empty">✅ 无待响应急症事件</div>'; return; }
+    box.innerHTML = list.map(function(e) {
+      var lv = e.level === 'CRITICAL' ? 'red' : e.level === 'WARNING' ? 'gold' : 'blue';
+      return '<div class="card"><h4>🚑 ' + esc(e.level || 'ROUTINE') + '<span class="tag ' + lv + '">' + esc((e.created_at || '').slice(11, 16)) + '</span></h4>' +
+        '<div class="body-text">' + esc(e.symptoms || '') + (e.source ? '\n来源：' + esc(e.source) : '') + '</div>' +
+        '<div class="actions"><button class="btn primary" onclick="emgRespond(\'' + e.id + '\')">📣 签收响应</button></div></div>';
+    }).join('');
+  }).catch(function(){ document.getElementById('list-emg').innerHTML = '<div class="empty">📡 服务离线</div>'; });
+}
+function emgRespond(id) {
+  api('/api/emergency/respond', { method: 'POST', body: { id: id } }).then(function(d) {
+    if (!d.ok) { toast(d.error || '操作失败'); return; }
+    var e = d.event || {};
+    toast('已签收，响应用时 ' + (e.response_seconds != null ? e.response_seconds + ' 秒' : '—') + (e.within_sla ? '（SLA 达标）' : ''));
+    loadEmg();
+  }).catch(function(){ toast('📡 服务离线，操作未执行'); });
+}
+function emgReport() {
+  var level = document.getElementById('emg-level').value;
+  var sym = document.getElementById('emg-symptoms').value.trim();
+  if (!sym) { toast('请填写症状简述'); return; }
+  api('/api/emergency/event', { method: 'POST', body: { level: level, symptoms: sym, source: 'mobile-workbench' } }).then(function(d) {
+    if (d.ok) { document.getElementById('emg-symptoms').value = ''; toast('已登记入应急台账'); loadEmg(); }
+    else toast(d.error || '登记失败');
+  }).catch(function(){ toast('📡 服务离线，操作未执行'); });
 }
 
-// 语音症状 → AI 分析
-function analyzeSymptomText(text) {
-  vibrateHaptic('success');
-
-  // 提取症状词
-  var symptomWords = ['头痛','头晕','发烧','发热','咳嗽','咳痰','流鼻涕','鼻塞',
-    '嗓子疼','咽喉痛','胃痛','肚子疼','腹胀','恶心','想吐','腹泻','便秘',
-    '失眠','睡不着','乏力','没力气','心慌','心悸','胸闷','气短',
-    '腰酸','腰痛','关节疼','怕冷','发冷','口干','口苦','出汗','盗汗',
-    '食欲不振','吃不下','浮肿','肿了','月经不调','痛经','皮肤痒'];
-
-  var found = [];
-  var lower = text.toLowerCase();
-  symptomWords.forEach(function(word) {
-    if (text.includes(word)) found.push(word);
-  });
-
-  // 如果没找到精确匹配，用AI引擎
-  if (found.length === 0) {
-    found = ['乏力', '头晕']; // 兜底
-  }
-
-  // 调用后端 NN 预测
-  var apiBase = (window.TCM && window.TCM.API_BASE) || '';
-  if (apiBase) {
-    fetch(apiBase + '/api/tcm/nn-predict', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ symptoms: found })
-    }).then(function(r) { return r.json(); }).then(function(d) {
-      showResult(text, found, d);
-    }).catch(function() {
-      showResult(text, found, { ok: false, scores: [] });
-    });
-  } else {
-    showResult(text, found, { ok: false, scores: [] });
-  }
+// ⑤ 排班预约（G12 移动端入口）
+function loadAppts() {
+  var date = document.getElementById('appt-date').value || new Date().toLocaleDateString('sv-SE');
+  api('/api/clinic/appointment/list?date=' + date).then(function(d) {
+    if (!d.ok) { document.getElementById('list-appt').innerHTML = '<div class="empty">📡 服务离线，数据不可用</div>'; return; }
+    var list = d.appointments || [];
+    var box = document.getElementById('list-appt');
+    if (!list.length) { box.innerHTML = '<div class="empty">当日暂无预约</div>'; return; }
+    box.innerHTML = list.map(function(a) {
+      var color = a.status === 'booked' ? 'gold' : a.status === 'checked_in' ? 'blue' : a.status === 'done' ? 'green' : 'red';
+      return '<div class="card"><h4>🗓️ ' + esc(a.slot) + ' · ' + esc(a.patient_name) +
+        '<span class="tag ' + color + '">' + esc(a.status_label || a.status) + '</span></h4>' +
+        '<div class="meta">' + esc(a.doctor_name) + (a.phone_masked ? ' · ' + esc(a.phone_masked) : '') + '</div></div>';
+    }).join('');
+  }).catch(function(){ document.getElementById('list-appt').innerHTML = '<div class="empty">📡 服务离线</div>'; });
 }
 
-function showResult(originalText, symptoms, aiResult) {
-  var html = '<div class="result-item">'+
-    '<div class="r-icon">🎙️</div>'+
-    '<div class="r-body"><div class="r-title">识别文本</div><div class="r-desc">' + originalText + '</div></div></div>'+
-    '<div class="result-item"><div class="r-icon">🔍</div>'+
-    '<div class="r-body"><div class="r-title">提取症状</div><div class="r-desc">' + symptoms.join(' · ') + '</div></div></div>';
-
-  if (aiResult.ok && aiResult.scores && aiResult.scores.length) {
-    html += '<div class="result-item"><div class="r-icon">🧠</div>'+
-      '<div class="r-body"><div class="r-title">AI 辨证 (NN)</div></div></div>';
-    aiResult.scores.slice(0, 3).forEach(function(s) {
-      html += '<div class="result-item" style="padding-left:40px">'+
-        '<div class="r-body"><div class="r-title">' + s.syndrome + '</div></div>'+
-        '<div class="r-score">' + (s.nn_score || s.score || 0).toFixed(2) + '</div></div>';
-    });
-  }
-
-  // 保存结果
-  voiceResults.unshift({ time: new Date().toISOString(), text: originalText, symptoms: symptoms, ai: aiResult });
-  if (voiceResults.length > 20) voiceResults = voiceResults.slice(0, 20);
-  updateRecentResults();
-
-  // 拼接补充问诊 + 跳转按钮
-  html += '<div class="result-item" style="background:#eef2ff;border:1px solid #c7d2fe">' +
-    '<div class="r-icon">📝</div><div class="r-body"><div class="r-title">补充问诊（5 维度）</div>' +
-    '<div class="r-desc">发热/出汗/二便/饮食/睡眠：点击跳转 AI 辨证工作台 → 选 [续诊]</div></div>' +
-    '<a href="ai-diagnosis.html?symptoms=' + encodeURIComponent(symptoms.join(',')) + '&voice=1" ' +
-    '   style="background:var(--primary);color:#fff;padding:6px 12px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600">前往辨证 →</a></div>';
-
-  html += '<div class="result-item" style="background:#f0fdf4;border:1px solid #86efac">' +
-    '<div class="r-icon">🩺</div><div class="r-body"><div class="r-title">补充问诊·就近推荐</div>' +
-    '<div class="r-desc">需要可面诊的医生？</div></div>' +
-    '<a href="call-center.html" style="background:var(--green);color:#fff;padding:6px 12px;border-radius:6px;font-size:11px;text-decoration:none;font-weight:600">一键挂号 →</a></div>';
-
-  document.getElementById('voice-result').innerHTML = html;
-  document.getElementById('voice-hint').textContent = '✅ 分析完成 — 可再次录音补充症状';
-}
-
-function startVoiceSymptom() {
-  document.getElementById('voice-card').scrollIntoView({ behavior: 'smooth' });
-  vibrateHaptic('medium');
-  setTimeout(function() { toggleVoice(); }, 400);
-}
-
-function updateRecentResults() {
-  var el = document.getElementById('recent-results');
-  if (!el) return;
-  var results = voiceResults.slice(0, 5);
-  if (!results.length) {
-    el.innerHTML = '<div style="text-align:center;color:var(--text3);padding:12px">📋 暂无记录</div>';
-    return;
-  }
-  var html = '';
-  results.forEach(function(r) {
-    var time = r.time.slice(11, 19);
-    html += '<div class="result-item" style="padding:8px;margin:4px 0">'+
-      '<div class="r-icon">🎙️</div>'+
-      '<div class="r-body"><div class="r-title" style="font-size:11px">' + (r.text||'').slice(0,30) + '</div>'+
-      '<div class="r-desc">' + (r.symptoms||[]).slice(0,4).join(' · ') + '</div></div>'+
-      '<div style="font-size:9px;color:var(--text3);min-width:40px;text-align:right">' + time + '</div></div>';
-  });
-  el.innerHTML = html;
-}
-
-// ═══ 照片档案：渲染/导出/清空 ═══
-function renderPhotoArchive() {
-  var photos = JSON.parse(localStorage.getItem('tcm_tongue_photos') || '[]');
-  var archiveEl = document.getElementById('photo-archive');
-  var countEl = document.getElementById('photo-count');
-  if (!archiveEl) return;
-  countEl.textContent = '(' + photos.length + '/50)';
-  if (!photos.length) {
-    archiveEl.innerHTML = '<div style="text-align:center;color:var(--text3);padding:12px">暂无拍照记录</div>';
-    return;
-  }
-  var html = '';
-  photos.slice(0, 10).forEach(function(p) {
-    var t = p.time.slice(5, 16).replace('T', ' ');
-    var qColor = p.quality && p.quality.pass ? '#16a34a' : '#dc2626';
-    html += '<div style="padding:8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">' +
-      '<div style="width:32px;height:32px;border-radius:6px;background:linear-gradient(135deg,#fbbf24,#dc2626);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px">🫦</div>' +
-      '<div style="flex:1;min-width:0">' +
-        '<div style="font-size:11px;font-weight:600">' + p.patient + ' · ' + t + '</div>' +
-        '<div style="font-size:10px;color:' + qColor + '">[' + (p.quality ? p.quality.label : '?') + '] ' + p.tongueColor + ' · ' + p.coating + '</div>' +
-      '</div>' +
-      '<div style="font-size:9px;color:var(--text3)">' + p.width + '×' + p.height + '</div>' +
-    '</div>';
-  });
-  archiveEl.innerHTML = html;
-}
-
-function exportPhotoArchive() {
-  var photos = JSON.parse(localStorage.getItem('tcm_tongue_photos') || '[]');
-  if (!photos.length) { showToast('暂无照片可导出', 'warning'); return; }
-  var blob = new Blob([JSON.stringify(photos, null, 2)], { type: 'application/json' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = 'tcm-tongue-photos-' + new Date().toISOString().slice(0, 10) + '.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('已导出 ' + photos.length + ' 张照片档案', 'success');
-  vibrateHaptic('success');
-}
-
-async function clearPhotoArchive() {
-  if (!await (window.confirmModal ? confirmModal('清空所有舌面照片档案？此操作不可恢复。', { danger:true, okText:'清空' }) : Promise.resolve(confirm('清空所有舌面照片档案？此操作不可恢复。')))) return;
-  localStorage.removeItem('tcm_tongue_photos');
-  renderPhotoArchive();
-  showToast('已清空照片档案', 'success');
-}
-
-// 页面加载时渲染
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', renderPhotoArchive);
-} else {
-  renderPhotoArchive();
-}
-
-// ═══ 摄像头舌诊 ═══
-var cameraStream = null;
-var facingMode = 'user'; // 默认前置
-
-function openTongueCamera() {
-  var card = document.getElementById('camera-card');
-  card.style.display = 'block';
-  card.scrollIntoView({ behavior: 'smooth' });
-  vibrateHaptic('medium');
-  startCamera();
-}
-
-function startCamera() {
-  var video = document.getElementById('camera-video');
-  var overlay = document.getElementById('camera-overlay');
-
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(function(t) { t.stop(); });
-  }
-
-  var constraints = {
-    video: { facingMode: facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
-    audio: false
-  };
-
-  navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-    cameraStream = stream;
-    video.srcObject = stream;
-    video.style.display = 'block';
-    overlay.style.display = 'flex';
-    vibrateHaptic('light');
-  }).catch(function(err) {
-    showToast('摄像头权限被拒绝: ' + err.message, 'error');
-    document.getElementById('camera-card').style.display = 'none';
-  });
-}
-
-function toggleCamera() {
-  facingMode = facingMode === 'user' ? 'environment' : 'user';
-  startCamera();
-  vibrateHaptic('light');
-}
-
-function capturePhoto() {
-  if (!cameraStream) { showToast('请先开启摄像头', 'error'); return; }
-
-  navigator.vibrate([30, 50, 30]); // 拍照触觉
-
-  var video = document.getElementById('camera-video');
-  var canvas = document.getElementById('camera-canvas');
-  canvas.width = video.videoWidth || 640;
-  canvas.height = video.videoHeight || 480;
-  var ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0);
-
-  var dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-  // 显示拍照结果 + 启动真实特征分析
-  var html = '<div class="result-item"><div class="r-icon">📸</div>'+
-    '<div class="r-body"><div class="r-title">拍照成功 ✓</div>'+
-    '<div class="r-desc">' + canvas.width + '×' + canvas.height + ' · ' + new Date().toLocaleTimeString('zh-CN') + '</div></div></div>'+
-    '<div class="result-item"><div class="r-icon">🔬</div>'+
-    '<div class="r-body"><div class="r-title">特征分析中...</div>'+
-    '<div class="r-desc">提取亮度·色度·对比度客观指标</div></div></div>';
-
-  document.getElementById('photo-result').innerHTML = html;
-  document.getElementById('camera-overlay').style.display = 'none';
-
-  // 真实图像特征提取（非随机）
-  try {
-    var features = extractImageFeatures(canvas);
-    var tongueColor = estimateTongueColor(features);
-    var coating = estimateCoating(features);
-    var quality = assessImageQuality(features);
-
-    // 存档 + 长期可追溯（最多保留 50 张）
-    var photoRecord = {
-      id: 'img_' + Date.now(),
-      time: new Date().toISOString(),
-      patient: localStorage.getItem('tcm_current_patient') || '匿名患者',
-      width: canvas.width,
-      height: canvas.height,
-      features: features,
-      tongueColor: tongueColor,
-      coating: coating,
-      quality: quality,
-      thumbnail: dataUrl.substring(0, 200) + '...[base64截断]'
-    };
-    var photos = JSON.parse(localStorage.getItem('tcm_tongue_photos') || '[]');
-    photos.unshift(photoRecord);
-    if (photos.length > 50) photos = photos.slice(0, 50);
-    localStorage.setItem('tcm_tongue_photos', JSON.stringify(photos));
-    renderPhotoArchive();
-
-    // R749 修真：拍照结论推送桌面 HUD（同源跨设备实时显示）
-    if (window.DesktopHUD) {
-      DesktopHUD.mount();
-      DesktopHUD.push({
-        source: 'tongue',
-        syndrome: tongueColor ? ('舌色·' + tongueColor) : '舌象分析',
-        detail: coating ? ('苔: ' + coating) : '',
-        confidence: quality ? (quality.score || null) : null,
-        urgency: 'P3_ROUTINE'
-      });
-    }
-    if (window.PrivacyConsent) PrivacyConsent.auditLog('mobile_capture', { mode: 'tongue', quality: quality ? quality.level : null });
-
-    // 渲染真实分析结果
-    var detailHtml = '<div class="result-item"><div class="r-icon">📊</div>'+
-      '<div class="r-body"><div class="r-title">客观特征（5 字段结构）</div>'+
-      '<div class="r-desc">' +
-        '图像质量：' + quality.label + '<br>' +
-        '舌色推断：' + tongueColor + '<br>' +
-        '苔色推断：' + coating + '<br>' +
-        '亮度：' + features.brightness.toFixed(1) + ' / 255<br>' +
-        '饱和度：' + features.saturation.toFixed(2) + '<br>' +
-        '对比度：' + features.contrast.toFixed(1) +
-      '</div></div>';
-
-    var statusHtml = quality.pass
-      ? '<div class="result-item" style="background:#f0fdf4;border:1px solid #86efac"><div class="r-icon">✅</div><div class="r-body"><div class="r-title">特征已就绪 · 可供 AI 辨证参考</div><div class="r-desc">特征已上传到本地照片库，医生/AI 可调阅。重要事项请以中医师面诊为准。</div></div></div>'
-      : '<div class="result-item" style="background:#fef2f2;border:1px solid #fca5a5"><div class="r-icon">⚠️</div><div class="r-body"><div class="r-title">质量不合格 · 建议重拍</div><div class="r-desc">' + quality.reason + '</div></div></div>';
-
-    var archiveHtml = '<div class="result-item" style="background:#f5f2ed"><div class="r-icon">📂</div><div class="r-body"><div class="r-title">已存档到照片库</div><div class="r-desc">累计 ' + photos.length + ' 张 · 医生工作台/患者档案可调阅</div></div></div>';
-
-    document.getElementById('photo-result').innerHTML = html + detailHtml + statusHtml + archiveHtml;
-
-    if (quality.pass) vibrateHaptic('success');
-    else vibrateHaptic('error');
-    navigator.vibrate(quality.pass ? [20, 50, 60] : [100, 100]);
-
-    // 舌面 → 服务器 tongue-engine → KB 蒸馏证据 联动
-    if (quality.pass && dataUrl) {
-      var apiBase = localStorage.getItem('tcm_api_base') || '/';
-      Promise.all([
-        fetch(apiBase + '/api/tcm/tongue-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: dataUrl }) }).then(r => r.json()),
-        fetch(apiBase + '/api/tcm/case-distill', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).then(r => r.json())
-      ]).then(function(results) {
-        var tongueR = results[0];
-        var distillR = results[1];
-        var kbHtml = '';
-        if (tongueR.ok) {
-          kbHtml += '<div class="result-item" style="background:#f0fdf4;border:1px solid #86efac"><div class="r-icon">🔬</div>' +
-            '<div class="r-body"><div class="r-title">AI 舌诊引擎</div>' +
-            '<div class="r-desc">舌色=' + tongueR.tongue_color + ' · 苔=' + tongueR.coating + ' · 湿=' + tongueR.moisture +
-            ' · KB: ' + (tongueR.kb_match.syndrome || '未知') + ' · ' + (tongueR.kb_match.formula || '—') +
-            '<br>建议: ' + tongueR.advice + ' (置信 ' + (tongueR.confidence * 100).toFixed(0) + '%)</div></div></div>';
-        }
-        if (distillR.ok && distillR.patterns) {
-          var matched = distillR.patterns.filter(function(p) { return tongueR.kb_match.syndrome && p.syndrome && p.syndrome.includes(tongueR.kb_match.syndrome); });
-          if (matched.length > 0) {
-            var top = matched[0];
-            kbHtml += '<div class="result-item" style="background:#fefce8"><div class="r-icon">📚</div>' +
-              '<div class="r-body"><div class="r-title">KB 蒸馏证据</div>' +
-              '<div class="r-desc">' + top.syndrome + ' (grade=' + top.grade + ' · trust=' + (top.confidence||0).toFixed(2) +
-              ' · ' + top.evidence_patients + '患者/' + top.evidence_occurrences + '次验证 · avg疗效' + (top.avg_effect||0).toFixed(1) +
-              ')</div></div></div>';
-          }
-        }
-        document.getElementById('photo-result').innerHTML += kbHtml;
-      });
-    }
-  } catch (err) {
-    document.getElementById('photo-result').innerHTML = html +
-      '<div class="result-item" style="background:#fef2f2"><div class="r-icon">❌</div><div class="r-body"><div class="r-title">特征提取失败</div><div class="r-desc">' + err.message + '</div></div></div>';
-  }
-}
-
-/**
- * 纯 JS 图像特征提取器（无任何依赖）
- * 输出：亮度·饱和度·对比度·R/G/B 均值·肤色像素占比·高光像素占比
- */
-function extractImageFeatures(canvas) {
-  var imgData = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
-  var data = imgData.data;
-  var step = Math.max(1, Math.floor(data.length / (4 * 200 * 200)));
-
-  var rSum = 0, gSum = 0, bSum = 0, n = 0;
-  var graySum = 0, graySumSq = 0;
-  var redPixels = 0, whitePixels = 0, skinPixels = 0;
-
-  for (var i = 0; i < data.length; i += step * 4) {
-    var r = data[i], g = data[i + 1], b = data[i + 2];
-    rSum += r; gSum += g; bSum += b;
-    var gray = 0.299 * r + 0.587 * g + 0.114 * b;
-    graySum += gray;
-    graySumSq += gray * gray;
-    n++;
-
-    if (r > 220 && g > 220 && b > 220) whitePixels++;
-    if (r > g + 30 && r > b + 30 && r > 100) redPixels++;
-    if (r > 95 && g > 40 && b > 20 && r > g && r > b) skinPixels++;
-  }
-
-  var brightness = n > 0 ? graySum / n : 0;
-  var variance = n > 1 ? (graySumSq / n) - (brightness * brightness) : 0;
-  var contrast = Math.sqrt(Math.max(0, variance));
-
-  return {
-    rMean: rSum / n, gMean: gSum / n, bMean: bSum / n,
-    brightness: brightness,
-    contrast: contrast,
-    saturation: n > 0 ? Math.max(rSum, gSum, bSum) / n - Math.min(rSum, gSum, bSum) / n : 0,
-    redRatio: redPixels / n,
-    whiteRatio: whitePixels / n,
-    skinRatio: skinPixels / n,
-    samples: n
-  };
-}
-
-/**
- * 根据 RGB 推断舌色（参考中医舌色分类）
- */
-function estimateTongueColor(features) {
-  var rMean = features.rMean, gMean = features.gMean, bMean = features.bMean;
-  var brightness = features.brightness, redRatio = features.redRatio, whiteRatio = features.whiteRatio;
-  if (whiteRatio > 0.4) return '图像过曝·无法判断';
-  if (brightness < 50) return '过暗·无法判断';
-  if (redRatio < 0.05) return '未见明显舌质红';
-
-  if (brightness > 200 && redRatio > 0.15) return '淡红舌（正常）';
-  if (brightness > 180 && rMean - gMean < 30) return '淡白舌（气血虚可能）';
-  if (rMean > 180 && rMean - bMean > 60 && redRatio > 0.25) return '红舌（热证可能）';
-  if (rMean > 150 && rMean - gMean < 20 && rMean - bMean < 30) return '绛红舌（热盛可能）';
-  if (bMean > rMean - 20 && bMean > 60) return '青紫舌（瘀血可能）';
-  return '淡红舌（正常范围）';
-}
-
-function estimateCoating(features) {
-  var brightness = features.brightness, whiteRatio = features.whiteRatio;
-  if (brightness > 200 && whiteRatio > 0.3) return '薄白苔';
-  if (brightness > 180 && whiteRatio > 0.5) return '白厚苔';
-  if (brightness < 150 && whiteRatio < 0.15) return '黄苔/灰黑苔';
-  if (whiteRatio < 0.05 && brightness < 100) return '少苔/无苔';
-  return '薄白苔';
-}
-
-function assessImageQuality(features) {
-  if (features.whiteRatio > 0.4) {
-    return { pass: false, label: '不合格（过曝）', reason: '图像过曝·逆光·美颜滤镜会使舌色识别失真。建议：关闭美颜滤镜·在自然光下重新拍摄。' };
-  }
-  if (features.brightness < 50) {
-    return { pass: false, label: '不合格（过暗）', reason: '光线过暗·未能提取有效特征。建议：开启闪光灯或移至明亮处拍摄。' };
-  }
-  if (features.contrast < 20) {
-    return { pass: false, label: '不合格（模糊）', reason: '图像对比度过低·可能是模糊或带滤镜。建议：对焦清晰后重新拍摄。' };
-  }
-  if (features.samples < 100) {
-    return { pass: false, label: '不合格（尺寸过小）', reason: '图像尺寸过小·特征采样不足。请拍摄更高分辨率照片。' };
-  }
-  return { pass: true, label: '合格', reason: '' };
-}
-
-// ═══ Toast通知 + 触觉 ═══
-function showToast(msg, type) {
-  var existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-
-  var t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
-  if (type === 'error') { t.style.background = 'var(--accent)'; navigator.vibrate([100, 100]); }
-  document.body.appendChild(t);
-
-  setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 300); }, 2000);
-}
-
-// ═══ 初始化 ═══
-function initMobile() {
-  updateConnectionStatus();
-  initSpeech();
-
-  // 如果没有语音支持，显示降级提示
-  if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
-    document.getElementById('voice-hint').textContent = '⚠️ 需要 HTTPS 环境启用语音功能';
-  }
-
-  // 预加载摄像头权限提示
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    document.getElementById('camera-card').querySelector('.camera-guide').textContent = 
-      '点击拍照分析 → 自动开启摄像头';
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(initMobile, 300);
-});
+// 初始化：URL 指定 tab（manifest shortcuts），默认病历审批
+document.getElementById('appt-date').value = new Date().toLocaleDateString('sv-SE');
+var initTab = (location.search.match(/[?&]tab=(\w+)/) || [])[1];
+if (initTab === 'followup') initTab = 'followup';
+if (TABS.indexOf(initTab) >= 0) switchTab(initTab); else switchTab('emr');
 </script>
-<script src="js/error-interceptor.js"></script>
-<script src="js/common.js"></script>
-<script src="js/privacy-consent.js"></script>
-<script src="js/desktop-hud.js"></script>
-<script src="js/ui/states.js"></script>
-<script src="js/ui/a11y.js"></script>
-<script src="js/sw-version-listener.js"></script>
-<script src="js/submit-guard.js"></script>
-<script src="js/escape-html.js"></script>
+<script src="/pwa-inject.js"></script>
+<script src="js/seed-loader.js"></script>
 </body>
 </html>
-
-<!-- auto-close div --></div>

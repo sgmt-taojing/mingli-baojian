@@ -27,10 +27,10 @@ body{background:linear-gradient(135deg,#f5f2ed 0%,#e8dcc8 100%);min-height:100vh
 <link rel="stylesheet" href="css/standard.css">
 <script src="js/nav.js" defer></script>
 <script src="js/ai-voice-assistant.js"></script>
+<script src="js/seed-loader.js"></script>
 <script src="js/crud-engine.js"></script>
 <script src="js/realtime-engine.js"></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js"></script>
 
 <style>
 .page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
@@ -142,6 +142,15 @@ function login() {
     specialty: user.specialty||null, specialtyName: user.specialtyName||null
   };
   localStorage.setItem('tcm_user', JSON.stringify(userData));
+
+  // R853：登录成功后换取服务端真实令牌（HMAC），供家庭绑定等 requireAuth 接口使用；
+  // 服务端无此账号（如权限页本地建的动态用户）时静默降级，家庭端会提示登录绑定
+  fetch('/api/auth/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: uname, password: pwd })
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if (d && d.token) localStorage.setItem('tcm_token', d.token);
+  }).catch(function(){});
 
   const redirects = {
     super_admin: 'flows.html',

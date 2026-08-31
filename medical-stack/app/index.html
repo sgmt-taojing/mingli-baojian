@@ -5,7 +5,7 @@
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/index.html">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="index, follow">
-<title>命理宝鉴·医道 · 命理宝鉴·医道</title>
+<title>中医智库 · 命理宝鉴·医道</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🏥</text></svg>">
 <style>
 :root{
@@ -125,7 +125,6 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <script src="js/crud-engine.js" defer></script>
 <script src="js/realtime-engine.js" defer></script>
 <script src="js/config-engine.js"></script>
-<script src="js/seed-loader.js" defer></script>
 
 <style>
 .page-header-bar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border, #e8dfc8); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 4px rgba(139,69,19,0.06); }
@@ -153,13 +152,13 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <div class="page-header-bar" data-theme="tcm">
   <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
   <span class="phb-dot" aria-hidden="true"></span>
-  <span class="phb-title">命理宝鉴·医道</span>
+  <span class="phb-title">中医智库</span>
 </div>
 
-<div class="std-bar"><span class="std-tag">👥 使用对象 <b>全部角色</b></span><span class="std-tag">⚙️ 功能 <b>命理宝鉴·医道·辨证论治</b></span><span class="std-tag">💎 使用价值 <b>知识检索+AI辨证+穴位方剂一站查询</b></span></div>
+<div class="std-bar"><span class="std-tag">👥 使用对象 <b>全部角色</b></span><span class="std-tag">⚙️ 功能 <b>中医智库·辨证论治</b></span><span class="std-tag">💎 使用价值 <b>知识检索+AI辨证+穴位方剂一站查询</b></span></div>
 
 <div class="tcm-header">
-  <h1>🏥 命理宝鉴·医道</h1>
+  <h1>🏥 中医智库</h1>
   <p>命理宝鉴·医道 · 多流派辨证 · 方证对应 · 针灸穴位</p>
   <div style="margin-top:8px">
     <span class="tcm-badge">伤寒论</span>
@@ -268,7 +267,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 // ═══════════════════════════════════════
 // 全局状态
 // ═══════════════════════════════════════
-const API_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8972' : '';
+const API_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8932' : '';
 const KB_SYNCED = null; // 动态加载
 let kbData = null;
 
@@ -498,7 +497,7 @@ async function searchKB() {
   if (!q) return toast('请输入搜索关键词');
 
   // R757 修真：服务端检索（不再客户端拉 85MB 全量遍历，<100ms 线性索引）
-  // 注意: 走同源相对路径(8931 代理到 8932)——apiBase(127.0.0.1:8972)跨源会被 CORS 拦截
+  // 注意: 走同源相对路径(8931 代理到 8932)——apiBase(127.0.0.1:8932)跨源会被 CORS 拦截
   let results = [];
   let j = null;
   try {

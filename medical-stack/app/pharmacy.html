@@ -33,14 +33,17 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 .btn.green{background:var(--green);color:#fff}
 .btn.small{padding:4px 10px;font-size:10px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+/* R849 条目卡片（复用问诊台 R846 契约）——药师审方即点即查 */
+.entry-link{color:var(--primary);cursor:pointer;border-bottom:1px dashed var(--primary);font-weight:600}
+.entry-link:hover{background:var(--primary);color:#fff;border-radius:3px}
 </style>
 <link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="css/standard.css">
 <script src="js/nav.js"></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
-<script src="js/rx-loop.js" defer></script>
 <script src="js/seed-loader.js"></script>
+<script src="js/rx-loop.js" defer></script>
 <script src="js/data-engine.js"></script>
 
 <style>
@@ -105,11 +108,80 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
   </div>
 
   <div class="card">
+    <h3>⚗️ 调配发药台</h3>
+    <div id="flow-list" style="font-size:12px;color:var(--text3)">加载中…</div>
+  </div>
+
+  <div class="card">
     <h3>📋 待审核处方</h3>
     <div id="pending-list">暂无待审核处方</div>
   </div>
 </div>
 <script>
+/* ── R849 条目卡片（复用问诊台 R846 契约）——药名即点即查性味归经/主治/出处 ── */
+var _phEntryCache = {};
+async function showPhEntryByName(name, x, y) {
+  var card = document.getElementById('entry-card');
+  if (!card) {
+    card = document.createElement('div');
+    card.id = 'entry-card';
+    card.style.cssText = 'position:fixed;z-index:9999;max-width:360px;background:var(--card,#fff);border:1px solid var(--border,#ddd);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:14px;font-size:12px;line-height:1.7;text-align:left';
+    document.body.appendChild(card);
+    document.addEventListener('click', function(ev) {
+      var c = document.getElementById('entry-card');
+      if (c && !c.contains(ev.target) && !ev.target.classList.contains('entry-link')) c.remove();
+    });
+  }
+  card.style.left = Math.min(x, window.innerWidth - 380) + 'px';
+  card.style.top = Math.min(y, window.innerHeight - 260) + 'px';
+  card.innerHTML = '<b>' + name + '</b> <span style="opacity:.6">查询中…</span>';
+  if (!_phEntryCache[name]) {
+    try {
+      var resp = await fetch('/api/tcm/entry/info?name=' + encodeURIComponent(name));
+      _phEntryCache[name] = await resp.json();
+    } catch (e) { _phEntryCache[name] = { ok: false, error: e.message }; }
+  }
+  var d = _phEntryCache[name];
+  if (!d || !d.ok) {
+    card.innerHTML = '<b>' + name + '</b><div style="opacity:.6;margin-top:6px">知识库暂无该条目</div>';
+    return;
+  }
+  var modName = { 'tcm-herb': '药材', 'tcm-acupuncture': '腧穴', 'tcm-formula': '方剂', 'tcm-syndrome': '证型' }[d.module] || d.module;
+  var lines = String(d.content || '').split('\n').filter(Boolean)
+    .map(function(l){ return '<div style="margin-top:4px">' + l.replace(/^(性味归经|功效|主治|出处|归经|定位|操作|禁忌|证机概要|临床表现|代表方剂|辨证要点|主症|舌象|脉象|加减法|证候表现|证机分析)(：)/, '<b style="color:var(--primary)">$1</b>$2') + '</div>'; }).join('');
+  // R856 鉴别诊断栏：同脏腑近证，点名可点跳转
+  var diffs = (d.differentials || []).map(function(x){
+    return '<div style="margin-top:3px">· <span class="entry-link" data-entry="' + x.name + '" title="点开鉴别">' + x.name + '</span> <span style="opacity:.7">' + _phEsc(x.gist) + '</span></div>'; }).join('');
+  card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">' +
+    '<b style="font-size:14px">' + d.title + '</b>' +
+    '<span style="font-size:10px;opacity:.55;border:1px solid var(--border);border-radius:8px;padding:1px 8px">' + modName + '</span></div>' +
+    lines +
+    (diffs ? '<div style="margin-top:8px;border-top:1px dashed var(--border);padding-top:6px"><b style="color:var(--primary)">鉴别诊断</b>' + diffs + '</div>' : '') +
+    '<div style="margin-top:8px;font-size:10px;opacity:.45">R849 条目卡片 · 审方辅助，临证裁定</div>';
+}
+var _phEntryNames = null;
+function loadPhEntryNames() {
+  if (_phEntryNames) return Promise.resolve(_phEntryNames);
+  return fetch('/api/tcm/entry/names').then(function(r){ return r.json(); }).then(function(d){
+    _phEntryNames = d.ok ? d.names : [];
+    _phEntryNames.sort(function(a, b){ return b.length - a.length; });  // 长名优先
+    return _phEntryNames;
+  }).catch(function(){ _phEntryNames = []; return _phEntryNames; });
+}
+function _phEsc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function phLink(plain) {  // 纯文本 → 转义 → 条目名 linkify
+  var html = _phEsc(plain);
+  if (!_phEntryNames || !_phEntryNames.length) return html;
+  var re = new RegExp(_phEntryNames.map(function(n){ return n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g');
+  return html.replace(re, function(n){ return '<span class="entry-link" data-entry="' + n + '" title="点击查看条目卡片">' + n + '</span>'; });
+}
+document.addEventListener('click', function(ev) {
+  var el = ev.target.closest && ev.target.closest('.entry-link');
+  if (el) { ev.stopPropagation(); showPhEntryByName(el.dataset.entry, ev.clientX, ev.clientY + 8); }
+});
+// 预取正名表；就绪后重渲染一次让首屏药名带上链接
+loadPhEntryNames().then(function(){ if (_phEntryNames.length && typeof loadAll === 'function') loadAll(); });
+
 const user = JSON.parse(localStorage.getItem('tcm_user')||'{}');
 document.getElementById('user-info').textContent = '👨‍⚕️ ' + (user.name||'药师');
 
@@ -121,20 +193,22 @@ function loadAll() {
     var records = data.queue || data.records || [];
     phRecords = records;
     var pending = records.filter(function(r){ return r.status==='pending'; });
-    var reviewed = records.filter(function(r){ return r.status==='reviewed'; });
+    // GAP-P1：统计卡接真实状态机
     document.getElementById('s-pending').textContent = pending.length;
-    document.getElementById('s-preparing').textContent = 0;
-    document.getElementById('s-ready').textContent = 0;
-    document.getElementById('s-completed').textContent = reviewed.length;
+    document.getElementById('s-preparing').textContent = records.filter(function(r){ return r.status==='dispensed'; }).length;
+    document.getElementById('s-ready').textContent = records.filter(function(r){ return r.status==='ready'; }).length;
+    document.getElementById('s-completed').textContent = records.filter(function(r){ return r.status==='completed'; }).length;
+    renderFlowList(records);
     var html = '';
     if (!pending.length) html = '<div style="padding:20px;text-align:center;color:var(--text3)">暂无待审核处方</div>';
     else pending.forEach(function(p) {
-      var herbs = (p.herbs||[]).map(function(h){ return (h.name||h)+(h.dose?' '+h.dose+'g':''); }).join('、');
+      var herbs = phLink((p.herbs||[]).map(function(h){ return (h.name||h)+(h.dose?' '+h.dose+'g':''); }).join('、'));
       html += '<div class="order-item"><div class="id">'+(p.rx_id||'').substring(0,16)+'</div><div class="info"><strong>'+(p.patient_id||'')+'</strong> · '+((p.diagnosis||{}).syndrome||'')+'</div><div>'+herbs+'</div><button class="btn green small" onclick="approveAPI(\''+(p.rx_id||'')+'\')">✅ 审核通过</button><button class="btn small" style="background:var(--accent);color:#fff" onclick="rejectAPI(\''+(p.rx_id||'')+'\')">❌ 退回</button></div>';
     });
     document.getElementById('pending-list').innerHTML = html;
     renderRxTable();
   }).catch(function() {
+    document.getElementById('flow-list').innerHTML = '<div style="padding:12px;text-align:center">📡 服务离线，调配发药暂不可用</div>';
     // localStorage fallback（离线模式）
     var rx = JSON.parse(localStorage.getItem('tcm_prescriptions')||'[]');
     var orders = JSON.parse(localStorage.getItem('tcm_pharmacy_orders')||'[]');
@@ -147,7 +221,7 @@ function loadAll() {
     var html = '';
     if (!pending.length) html = '<div style="padding:20px;text-align:center;color:var(--text3)">暂无待审核处方</div>';
     else pending.forEach(function(p) {
-      html += '<div class="order-item"><div class="id">'+p.id+'</div><div class="info"><strong>'+(p.patient?p.patient.name:'')+'</strong> · '+(p.diagnosis||'')+'</div><div>'+(p.herbs?p.herbs.map(function(h){return h.name+h.dosage;}).join('、'):'')+'</div><button class="btn green small" onclick="approve(\''+p.id+'\')">✅ 审核通过</button><button class="btn small" style="background:var(--accent);color:#fff" onclick="reject(\''+p.id+'\')">❌ 退回</button></div>';
+      html += '<div class="order-item"><div class="id">'+p.id+'</div><div class="info"><strong>'+(p.patient?p.patient.name:'')+'</strong> · '+(p.diagnosis||'')+'</div><div>'+(p.herbs?phLink(p.herbs.map(function(h){return h.name+h.dosage;}).join('、')):'')+'</div><button class="btn green small" onclick="approve(\''+p.id+'\')">✅ 审核通过</button><button class="btn small" style="background:var(--accent);color:#fff" onclick="reject(\''+p.id+'\')">❌ 退回</button></div>';
     });
     document.getElementById('pending-list').innerHTML = html;
     renderRxTable();
@@ -156,15 +230,15 @@ function loadAll() {
 
 async function approveAPI(rxId) {
   try {
-    var res = await fetch('/api/prescription/verify', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rx_id:rxId,action:'approve'})}).then(function(r){return r.json();});
-    if (res.ok) { toast('✅ 审核通过'); loadAll(); } else { toast('操作失败'); }
+    var res = await authFetch('/api/prescription/verify', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rx_id:rxId,action:'approve',reviewer:user.name||'药师'})}).then(function(r){return r.json();});
+    if (res.ok) { toast('✅ 审核通过'); loadAll(); } else { toast('操作失败'+(res.error?('：'+res.error):'')); }
   } catch(e) { toast('网络错误'); }
 }
 
 async function rejectAPI(rxId) {
   try {
-    var res = await fetch('/api/prescription/verify', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rx_id:rxId,action:'reject'})}).then(function(r){return r.json();});
-    if (res.ok) { toast('❌ 已退回'); loadAll(); } else { toast('操作失败'); }
+    var res = await authFetch('/api/prescription/verify', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rx_id:rxId,action:'reject',reviewer:user.name||'药师'})}).then(function(r){return r.json();});
+    if (res.ok) { toast('❌ 已退回'); loadAll(); } else { toast('操作失败'+(res.error?('：'+res.error):'')); }
   } catch(e) { toast('网络错误'); }
 }
 
@@ -191,14 +265,51 @@ function reject(rxId) {
   loadAll();
 }
 
-function markReady(orderId) {
-  var orders=JSON.parse(localStorage.getItem('tcm_pharmacy_orders')||'[]');
-  var idx=orders.findIndex(function(o){return o.id===orderId;});
-  if(idx===-1)return;
-  orders[idx].status='ready'; orders[idx].ready_at=new Date().toISOString();
-  localStorage.setItem('tcm_pharmacy_orders',JSON.stringify(orders));
-  toast('📦 调配完成，等待取药');
-  loadAll();
+// GAP-P1：调配发药台——全部走服务端真实状态机（dispense 服务端联动扣库存，未结算/缺药硬拦截）
+var FLOW_STEP = {
+  reviewed:  { action: 'dispense', label: '📦 开始调配', needPaid: true },
+  dispensed: { action: 'ready',    label: '✔️ 调配完成' },
+  ready:     { action: 'complete', label: '🏁 发药完成' }
+};
+
+function renderFlowList(records) {
+  var rows = records.filter(function(r){ return FLOW_STEP[r.status]; });
+  var box = document.getElementById('flow-list');
+  if (!rows.length) { box.innerHTML = '<div style="padding:12px;text-align:center">暂无待调配/待发药处方</div>'; return; }
+  box.innerHTML = rows.map(function(r) {
+    var step = FLOW_STEP[r.status];
+    var herbs = (r.herbs || []).map(function(h){ return (h.name || h) + (h.dose ? ' ' + h.dose + 'g' : ''); }).join('、');
+    var paid = r.payment_status === 'paid';
+    var price = (r.price && r.price.total != null) ? ' · ¥' + r.price.total : '';
+    var payTag = r.status === 'reviewed'
+      ? (paid ? '<span style="color:#16a34a">已结算</span>' : '<span style="color:#dc2626">未结算·须先收费</span>')
+      : '';
+    return '<div class="order-item">' +
+      '<div class="id">' + (r.rx_id || '').substring(0, 16) + '</div>' +
+      '<div class="info"><strong>' + _phEsc(r.patient_id || '') + '</strong> · ' + _phEsc((r.diagnosis || {}).syndrome || '') + price + ' ' + payTag + '</div>' +
+      '<div>' + phLink(herbs) + '</div>' +
+      '<button class="btn green small" onclick="flowAPI(\'' + (r.rx_id || '') + '\',\'' + step.action + '\')">' + step.label + '</button>' +
+      '</div>';
+  }).join('');
+}
+
+async function flowAPI(rxId, action) {
+  try {
+    var res = await authFetch('/api/prescription/verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rx_id: rxId, action: action, reviewer: user.name || '药师' })
+    }).then(function(r){ return r.json(); });
+    if (res.ok) {
+      toast({ dispense: '📦 已开始调配（库存已扣减）', ready: '✔️ 调配完成，等待取药', complete: '🏁 发药完成' }[action] || '✅ 已流转');
+      loadAll();
+    } else if (res.error === 'unpaid_required') {
+      toast('💰 处方未结算（¥' + (res.amount_due != null ? res.amount_due : '—') + '），请先到收费台收费', 'warn');
+    } else if (res.error === 'stock_insufficient') {
+      toast('🚫 ' + (res.message || '库存不足'), 'warn');
+    } else {
+      toast('操作失败' + (res.error ? ('：' + res.error) : ''), 'warn');
+    }
+  } catch (e) { toast('网络错误'); }
 }
 
 loadAll();
@@ -254,7 +365,7 @@ function renderPhRows(rows) {
   for (var i = 0; i < rows.length; i++) {
     var r = rows[i];
     var herbs = (r.herbs||(r.prescription||{}).herbs||[]);
-    var herbNames = Array.isArray(herbs) ? herbs.map(function(h){ return typeof h==="string"?h:(h.name||"")+(h.dose?" "+h.dose+"g":(h.dosage||"")); }).join(", ").slice(0,40) : "";
+    var herbNames = Array.isArray(herbs) ? phLink(herbs.map(function(h){ return typeof h==="string"?h:(h.name||"")+(h.dose?" "+h.dose+"g":(h.dosage||"")); }).join(", ").slice(0,40)) : "";
     var statusLabel = PH_STATUS_LABEL[r.status]||r.status||"—";
     var rid = r.rx_id||r.id||"";
     var patient = r.patient_id||r.patient_name||(r.patient&&r.patient.name)||"—";
@@ -276,7 +387,7 @@ function viewRx(rxid) {
   var r = null;
   for (var i = 0; i < phRecords.length; i++) { if ((phRecords[i].rx_id||phRecords[i].id)===rxid) { r = phRecords[i]; break; } }
   if (!r) { toast('未找到该处方'); return; }
-  var herbs = (r.herbs||(r.prescription||{}).herbs||[]).map(function(h){ return typeof h==="string"?h:(h.name||"")+(h.dose?" "+h.dose+"g":(h.dosage||"")); }).join("、") || "—";
+  var herbs = phLink((r.herbs||(r.prescription||{}).herbs||[]).map(function(h){ return typeof h==="string"?h:(h.name||"")+(h.dose?" "+h.dose+"g":(h.dosage||"")); }).join("、") || "—");
   var body = '<div style="font-size:13px;line-height:1.9">'+
     '<b>编号：</b>'+rxid+'<br><b>患者：</b>'+(r.patient_id||r.patient_name||(r.patient&&r.patient.name)||"—")+
     '<br><b>诊断：</b>'+((r.diagnosis||{}).syndrome||r.diagnosis||"—")+
@@ -296,13 +407,13 @@ window.addEventListener("DOMContentLoaded", function() {
 
 <script>
 // ═══ 药房 API 接入 ═══
-(function(){var api='/';window.loadPrescriptions=function(pid){fetch(api+'/api/home/med-detail?patient_id='+(pid||'P001')).then(r=>r.json()).then(d=>{var el=document.getElementById('rx-data');if(el&&d.meds){el.innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:6px">📋 '+d.meds.length+' 条处方</div>'+d.meds.slice(0,8).map(function(m){return'<div style="display:flex;justify-content:space-between;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;margin:4px 0;font-size:13px"><span>💊 '+m.drug+'</span><span style="color:var(--text2)">'+m.time+'</span><span style="color:var(--primary);font-weight:600">'+m.dosage+'</span></div>';}).join('');}}).catch(function(e){var el=document.getElementById('rx-data');if(el)el.innerHTML='<span style="color:#999">📡 API离线</span>';});};window.addEventListener("DOMContentLoaded",function(){loadPrescriptions("P001");});})();
+(function(){var api='';window.loadPrescriptions=function(pid){fetch(api+'/api/home/med-detail?patient_id='+(pid||'P001')).then(r=>r.json()).then(d=>{var el=document.getElementById('rx-data');if(el&&d.meds){el.innerHTML='<div style="font-size:13px;font-weight:600;margin-bottom:6px">📋 '+d.meds.length+' 条处方</div>'+d.meds.slice(0,8).map(function(m){return'<div style="display:flex;justify-content:space-between;padding:6px 8px;border:1px solid #e5e7eb;border-radius:6px;margin:4px 0;font-size:13px"><span>💊 '+phLink(m.drug)+'</span><span style="color:var(--text2)">'+m.time+'</span><span style="color:var(--primary);font-weight:600">'+m.dosage+'</span></div>';}).join('');}}).catch(function(e){var el=document.getElementById('rx-data');if(el)el.innerHTML='<span style="color:#999">📡 API离线</span>';});};window.addEventListener("DOMContentLoaded",function(){loadPrescriptions("P001");});})();
 </script>
 
   <div class="card" style="margin:10px 0"><h3>📦 库存预警</h3><div id="inv-alert"></div></div>
   <script>
   (function(){
-    var api='/';var stock={};
+    var api='';var stock={};
     var herbs=['甘草','人参','当归','黄芪','白术','茯苓','白芍','熟地','川芎','丹参','麦冬','五味子'];
     herbs.forEach(function(h,i){stock[h]=Math.max(2,20-Math.floor(i*1.7));});
     function renderStock(){

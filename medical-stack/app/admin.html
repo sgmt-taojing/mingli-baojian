@@ -116,8 +116,8 @@ tr.archived{opacity:.4}
 <script src="js/nav.js"></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
-<script src="js/rx-loop.js" defer></script>
 <script src="js/seed-loader.js"></script>
+<script src="js/rx-loop.js" defer></script>
 <script src="js/data-engine.js"></script>
 
 <style>
@@ -1030,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadSettings();
   setupAutoRefresh();
 });
-(function(){var a='/';fetch(a+'/api/tcm/dppo-stats').then(r=>r.json()).then(d=>{var el=document.getElementById('admin-stats');if(el)el.innerHTML='<div style="padding:12px;background:#f0fdf4;border-radius:8px;margin:8px 0"><strong>📊 系统真实数据</strong><br>DPPO反馈: '+d.total+'条 · 采纳率: '+d.rate+'%<br>KB证型: '+Object.keys(d.bySyndrome||{}).length+'个</div>';}).catch(function(){});})();
+(function(){var a='';fetch(a+'/api/tcm/dppo-stats').then(r=>r.json()).then(d=>{var el=document.getElementById('admin-stats');if(el)el.innerHTML='<div style="padding:12px;background:#f0fdf4;border-radius:8px;margin:8px 0"><strong>📊 系统真实数据</strong><br>DPPO反馈: '+d.total+'条 · 采纳率: '+d.rate+'%<br>KB证型: '+Object.keys(d.bySyndrome||{}).length+'个</div>';}).catch(function(){});})();
 </script>
 <!-- ═══ 运营配置中心 + 实时监听面板 ═══ -->
 <div style="margin:16px;padding:12px;background:var(--bg);border-radius:8px">

@@ -185,7 +185,7 @@ async function refresh(){
   // 综合KPI
   // R757 修真：OTA/隐私/检索隔离实时状态(R747-R756 新能力上监控)
   let otaTxt='—', kbTxt='—', privTxt='—';
-  try{const r=await fetch('http://localhost:8952/health',{signal:AbortSignal.timeout(2000)}).then(x=>x.json());otaTxt='✅ 活跃 · '+r.packages+' 包';}catch(e){otaTxt='⚠ 离线';}
+  try{const r=await fetch('/api/ops/ota-health',{signal:AbortSignal.timeout(3000)}).then(x=>x.json());otaTxt=r.online?('✅ 活跃 · '+(r.packages!=null?r.packages+' 包':'在线')):'⚠ 离线';}catch(e){otaTxt='⚠ 离线';}
   try{const d=await realJson(await fetch(API+'/api/tcm/kb'));kbTxt=(d&&d.total!=null)?d.total+' 条 · '+d.modules+' 模块':'—';}catch(e){}
   try{const arr=JSON.parse(localStorage.getItem('tcm_privacy_audit_v1')||'[]');privTxt=(arr.length||0)+' 条审计 · 已授权:'+((JSON.parse(localStorage.getItem('tcm_privacy_consent_v1')||'null'))?'是':'否');}catch(e){}
   let handTxt='—';
