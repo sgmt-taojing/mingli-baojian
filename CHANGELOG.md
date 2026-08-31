@@ -1,6 +1,15 @@
 # mingli-baojian 更新日志
 
 
+## 2026-08-31 · 生肖 P1 收尾 + 院内执行台
+- 问事生肖语境：api-server-v2 新增 sxAskContext/sxPrependOverview，liunian/lucky/huangli(birthYear)/xingming-analyze 概述前置生肖+贵人白话
+- 姓名生肖喜用：shengxiao-engine 新增 namingTips（KB naming 模块按生肖年检索）+ nobleZhis；xingming/analyze 挂 shengxiaoNaming/shengxiaoContext
+- 择日贵人日：zeri personal 按 nobleZhis 标 nobleDay 并升 best（实测属马未日命中）
+- 家庭流年：family-yearly-huajie 补刑/害/破太岁五态检测（复用 taiSui+taiSuiHuajie compact）
+- 院内执行台 app/clinic-ops.html 新建：收费结算/库存台账/排班/随访四页签，API 全走 8972；center-org.html 门诊运营组新增药房台/院内执行台两卡（标题图 c-org-pharmacy/c-org-ops）
+- 文字标识红线扫描通过；浏览器实测渲染与数据正常
+
+
 ## 2026-08-31 · 太岁×生肖知识激活 + 太岁工具修真
 - 修真：minsu getTaisui 刑/害映射表与传统规则不符（2026 刑误鸡害误鼠），改 fanTaiSuiList 统一判定；新增 taiSuiDirection/suiPoDirection 方位字段
 - shengxiao-engine 新增：ZHI_DIR/ZHI_MONTH/TAI_SUI_STATE_ADVICE 五态行事库、parseTaiSuiKb（星君/化解法/关键月份结构化解析）、taiSuiHuajie（plan 七段+compact 精简）、fanTaiSuiList（含 zhi 数组）
