@@ -1,16 +1,14 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-08-31 15:25 ｜ 差集指纹 `e7ae6f5b7dcb72d1`
-- tcm 侧 HEAD：`5388880 数字孪生接真实病程时间线+数据边界标注，缺口表12行全闭环`
+- 生成：2026-08-31 16:04 ｜ 差集指纹 `e7ae6f5b7dcb72d1`
+- tcm 侧 HEAD：`4eba2e3 命理宝鉴合作服务入口(患者端4处)+clinic-links端点，全量能力交付医学栈`
 - 结论：**✅ 全对齐（无待吸收增量）**
 
 ## L1 API 路由差集（tcm 有 · medical-stack 无）：0 条
 - （空）
 
-## 已知等价登记（勿重复建设）：3 条
-- `get /manifest.json` → mingli 8900 静态直挂 app/manifest.json
-- `get /pwa-inject.js` → mingli 等价物 /pwa/pwa-inject.js（8900 静态）
-- `get /sw.js` → mingli 等价物 /service-worker.js（8900 静态直挂 app/service-worker.js）
+## 已知等价登记（勿重复建设）：0 条
+- （空）
 
 ## L2 关键模块导出函数差集
 - （空）

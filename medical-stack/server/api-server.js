@@ -4990,6 +4990,18 @@ app.post('/api/tts', optionalAuth, async (req, res) => {
 });
 
 // 32. /api/public/kb/realtime-search — 实时 KB 搜索（realtime-assistant，同源优先）
+// 32b. /api/public/clinic-links — 院方对外服务链接（与 tcm-agent 对齐；mingli_portal_url 默认命理宝鉴入口大厅）
+// 边界：命理宝鉴主站为本项目自身体系，此端点服务 medical-stack 患者页入口卡（js/mingli-entry.js）
+app.get('/api/public/clinic-links', (_req, res) => {
+  let mingli = 'http://localhost:8900/';
+  try {
+    const c = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, '..', 'data', 'clinic-config.json'), 'utf8'));
+    if (c.mingli_portal_url) mingli = String(c.mingli_portal_url);
+  } catch (e) {}
+  res.setHeader('Cache-Control', 'no-cache');
+  res.json({ ok: true, mingli_portal_url: mingli });
+});
+
 // 常见证型别名映射（用户口语化输入 → 标准证型）
 const SYNDROME_ALIASES = {
   '气血两虚': ['心脾两虚', '气虚血瘀'],
