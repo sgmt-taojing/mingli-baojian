@@ -1,6 +1,15 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
 
+## 2026-08-31 09:50 — ✅ P0 接口同构 + P1 药房台（医学执行段开工）
+- 后端盘点结论：tcm 执行段后端（处方 settle/verify/review-queue/unpaid、库存、排班、随访、慢病、疗效、安全核查）**已全量内化 8972 并活化**（实测 8 端点在线，待收费 3 单 ¥92.01），无需 tcm 侧开发
+- P0 同构别名实测 PASS：/api/clinic/appointment{,/slots,/list,/checkin,/cancel}（body.id 口径+doctor_name 字段+日期维度列表）、/api/report-link/{bind,unbind,status,push-queue}（family_token 字段兼容）
+- P1 药房台 app/pharmacy.html 上线：审方→调配→待发药→完成六态流转（verify 六 action）、药名点查条目卡片（27 链接）、真实库存预警、机构版话术；浏览器实机验证 PASS（探针验证 CORS/留痕闸，不动真实数据）
+- 证据 DELIVERY/pharmacy-desk-20260831.png
+
+
+## 2026-08-31 09:13 — ⏸️ 维基补跑看守核查：18/18 趟「网络未恢复」（code=000/exit=28），补跑 0 趟、失败 0 趟；剩余缺事件人数仍 603（基线不变）；当前探测 zh.wikipedia 仍不通（000/28），看守已降频为 `17 */4 * * *`（每 4 小时一趟）省额度，待网络恢复后自动续跑。
+
 ## 2026-08-31 08:40 — ✅ 功能体系大盘点 + 医学对齐诊断（含 2 个 P0 干支修真）
 - 全量盘点：181 页 / 547 API（四服务合计）；tcm-agent 对侧 63 页 / 170 API；医学 API parity≈92%（13 条差集逐条定性）
 - 真缺口定位：医学闭环止于处方签发——药房/收费/库存/排班/随访调度五段 8972 有 API 无界面（P1 补建清单已出）

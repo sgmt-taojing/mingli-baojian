@@ -1,6 +1,14 @@
 # mingli-baojian 更新日志
 
 
+## 2026-08-31 · P0 接口同构 + P1 药房台
+- 盘点确认：医学执行段后端 tcm 已有且已全量内化 medical-stack(8972)——prescription 六态流转/inventory/schedule/followup/chronic/efficacy/safety/med-* 全部实测在线；按方案甲无需 tcm 再开发，mingli 直接活化适配
+- G12 预约加 tcm 同构别名：/api/clinic/appointment{,/slots,/list,/checkin,/cancel}——checkin/cancel 收 body.id、create 接受 doctor_name（appointments 表加列）、list 支持日期维度（导诊台视角，手机号脱敏）
+- G13 回流加 tcm 同构别名：/api/report-link/{bind,unbind,status,push-queue}——bind 兼容 family_token 字段，unbind/status 新增，push-queue 如实回报即时直推无队列
+- 新页 app/pharmacy.html（药房台）：待审核队列（安全警示/加急标识）+ 处方全流转表（搜索/过滤/详情弹窗）+ verify 六 action 全流转（审核→调配→发药，药师姓名强制留痕 SEC-001）+ 药名点查条目卡片（/api/tcm/entry/info）+ 真实库存预警（/api/inventory）+ 机构版话术（ADR-009）
+- 验证：别名全链 curl PASS；药房台浏览器实机 PASS（3 待审真实渲染、27 药名链接、假单探针正确 404、不改真实数据）；证据 DELIVERY/pharmacy-desk-20260831.png
+
+
 ## 2026-08-31 · 功能体系诊断 + 干支修真（黄历/择日切 lunar_python 权威源）
 - 盘点：181 页/547 API，六大角色中心+总枢纽+问事/民俗/身份三专中心全在线；医学 API 对齐 tcm 92%，差集 13 条定性（G12 预约/G13 回流路径未与 tcm 同构 → P0 加别名）
 - 修真 P0：黄历年月日干支+生肖由 toy 算法（产出非法「甲酉月」）切 daily-recommendation.py(lunar_python)；择日 v1 整月 subprocess 取权威干支/建除/值神/黄黑道/冲煞——实测 2026-09 嫁娶吉日全部权威（9-3 庚辰·成·金匮·黄道）

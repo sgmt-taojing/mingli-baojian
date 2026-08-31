@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>药房台 · 命理宝鉴医疗云</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.phb{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(139,69,19,.06)}
+.phb-back{font-size:22px;color:var(--text2);text-decoration:none;padding:0 8px}
+.phb-back:hover{color:var(--primary)}
+.phb-dot{width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.phb-title{font-size:15px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.phb-link{font-size:12px;color:var(--text2);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:12px}
+.phb-link:hover{color:var(--primary);border-color:var(--primary)}
+.container{max-width:1040px;margin:0 auto;padding:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.stat-card{background:var(--card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border)}
+.stat-card .val{font-size:24px;font-weight:700;color:var(--primary)}
+.stat-card .lbl{font-size:10px;color:var(--text3)}
+.card{background:var(--card);border-radius:10px;padding:16px;margin:12px 0;border:1px solid var(--border)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+.order-item{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap}
+.order-item .id{font-family:monospace;font-size:11px;color:var(--text3);min-width:90px}
+.order-item .info{flex:1;min-width:160px}
+.btn{display:inline-block;padding:7px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}
+.btn.green{background:var(--green);color:#fff}
+.btn.blue{background:var(--blue);color:#fff}
+.btn.red{background:var(--accent);color:#fff}
+.btn.small{padding:4px 10px;font-size:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--text3);font-size:11px;padding:6px 4px}
+td{padding:6px 4px;border-top:1px solid #f0ead0}
+.entry-link{color:var(--primary);cursor:pointer;border-bottom:1px dashed var(--primary);font-weight:600}
+.entry-link:hover{background:var(--primary);color:#fff;border-radius:3px}
+.warn-tag{display:inline-block;font-size:10px;background:#fef2f2;color:var(--accent);border-radius:8px;padding:1px 8px;margin-left:6px}
+.urgent-tag{display:inline-block;font-size:10px;background:#fff7ed;color:#ea580c;border-radius:8px;padding:1px 8px;margin-left:6px}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;display:flex;align-items:center;justify-content:center}
+.modal-box{background:#fff;border-radius:12px;max-width:520px;width:92%;max-height:80vh;overflow-y:auto;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.modal-box h4{color:var(--primary);margin-bottom:10px;font-size:15px}
+</style>
+</head>
+<body>
+
+<div class="phb">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot"></span>
+  <span class="phb-title">💊 药房台 · 审方 → 调配 → 发药</span>
+  <a class="phb-link" href="integrated-clinic.html">问诊台</a>
+  <a class="phb-link" href="center-org.html">机构中心</a>
+</div>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat-card"><div class="val" id="s-pending">–</div><div class="lbl">待审核</div></div>
+    <div class="stat-card"><div class="val" id="s-dispensing">–</div><div class="lbl">调配中</div></div>
+    <div class="stat-card"><div class="val" id="s-ready">–</div><div class="lbl">待发药</div></div>
+    <div class="stat-card"><div class="val" id="s-done">–</div><div class="lbl">已完成</div></div>
+  </div>
+
+  <div class="card">
+    <h3>📋 待审核处方 <span id="queue-note" style="font-size:11px;color:var(--text3);font-weight:400"></span></h3>
+    <div id="pending-list" style="color:var(--text3);font-size:13px">加载中…</div>
+  </div>
+
+  <div class="card">
+    <h3>📦 处方流转（全部）</h3>
+    <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;align-items:center">
+      <input id="ph-search" type="text" placeholder="🔍 搜索药材/处方号/患者…" style="flex:1;min-width:150px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px">
+      <select id="ph-status" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px">
+        <option value="">全部状态</option><option value="pending">待审核</option><option value="reviewed">已审核</option>
+        <option value="dispensed">调配中</option><option value="ready">待发药</option><option value="completed">已完成</option><option value="rejected">已退回</option>
+      </select>
+      <span id="ph-count" style="font-size:11px;color:var(--text3)">0 条</span>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>编号</th><th>患者</th><th>药材</th><th>状态</th><th>医师</th><th>时间</th><th></th></tr></thead>
+      <tbody id="ph-body"></tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>⚠️ 库存预警</h3>
+    <div id="inv-alert" style="font-size:12px;color:var(--text3)">加载中…</div>
+  </div>
+
+  <div style="font-size:10px;color:var(--text3);margin:16px 0 24px;text-align:center;border-top:1px solid var(--border);padding-top:10px">
+    ⚠️ 本系统为辅助诊疗工具，最终诊疗决策由执业医师作出；急危重症请按院内急诊流程处置。
+  </div>
+</div>
+
+<script>
+'use strict';
+var API = 'http://127.0.0.1:8972';
+var ST_LABEL = {pending:'⏳待审', pending_review:'⏳待审', reviewed:'✅已审', verified:'✅已审', rejected:'❌已退', paid:'💰已付', dispensed:'📦调配中', ready:'✔️待发药', completed:'🏁完成'};
+var phRecords = [];
+
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(msg){
+  var t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 2600);
+}
+
+/* ── 药名点查条目卡片（性味归经/主治/出处，8972 知识库） ── */
+var _entryCache = {}, _entryNames = null;
+function loadEntryNames(){
+  if (_entryNames) return Promise.resolve(_entryNames);
+  return fetch(API + '/api/tcm/entry/names').then(function(r){ return r.json(); }).then(function(d){
+    _entryNames = d.ok ? d.names : [];
+    _entryNames.sort(function(a,b){ return b.length - a.length; });
+    return _entryNames;
+  }).catch(function(){ _entryNames = []; return _entryNames; });
+}
+function linkify(plain){
+  var html = esc(plain);
+  if (!_entryNames || !_entryNames.length) return html;
+  var re = new RegExp(_entryNames.map(function(n){ return n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }).join('|'), 'g');
+  return html.replace(re, function(n){ return '<span class="entry-link" data-entry="' + n + '">'+n+'</span>'; });
+}
+async function showEntry(name, x, y){
+  var card = document.getElementById('entry-card');
+  if (!card) {
+    card = document.createElement('div'); card.id = 'entry-card';
+    card.style.cssText = 'position:fixed;z-index:999;max-width:360px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:14px;font-size:12px;line-height:1.7';
+    document.body.appendChild(card);
+    document.addEventListener('click', function(ev){
+      var c = document.getElementById('entry-card');
+      if (c && !c.contains(ev.target) && !(ev.target.classList && ev.target.classList.contains('entry-link'))) c.remove();
+    });
+  }
+  card.style.left = Math.min(x, window.innerWidth - 380) + 'px';
+  card.style.top = Math.min(y, window.innerHeight - 260) + 'px';
+  card.innerHTML = '<b>' + esc(name) + '</b> <span style="opacity:.6">查询中…</span>';
+  if (!_entryCache[name]) {
+    try { var resp = await fetch(API + '/api/tcm/entry/info?name=' + encodeURIComponent(name)); _entryCache[name] = await resp.json(); }
+    catch (e) { _entryCache[name] = { ok:false }; }
+  }
+  var d = _entryCache[name];
+  if (!d || !d.ok) { card.innerHTML = '<b>' + esc(name) + '</b><div style="opacity:.6;margin-top:6px">知识库暂无该条目</div>'; return; }
+  var lines = String(d.content || '').split('\n').filter(Boolean).map(function(l){
+    return '<div style="margin-top:4px">' + esc(l).replace(/^(性味归经|功效|主治|出处|归经|禁忌)(：)/, '<b style="color:var(--primary)">$1</b>$2') + '</div>';
+  }).join('');
+  card.innerHTML = '<b style="font-size:14px">' + esc(d.title || name) + '</b>' + lines +
+    '<div style="margin-top:8px;font-size:10px;opacity:.45">条目卡片 · 审方辅助，临证裁定</div>';
+}
+document.addEventListener('click', function(ev){
+  var el = ev.target.closest && ev.target.closest('.entry-link');
+  if (el) { ev.stopPropagation(); showEntry(el.dataset.entry, ev.clientX, ev.clientY + 8); }
+});
+
+/* ── 数据加载 ── */
+function herbText(r){
+  var herbs = r.herbs || (r.prescription || {}).herbs || [];
+  return herbs.map(function(h){ return typeof h === 'string' ? h : (h.name || '') + (h.dose ? ' ' + h.dose + (h.unit || 'g') : ''); }).join('、');
+}
+function loadQueue(){
+  fetch(API + '/api/prescription/review-queue?status=all').then(function(r){ return r.json(); }).then(function(d){
+    phRecords = d.queue || d.records || [];
+    var n = { pending:0, dispensed:0, ready:0, done:0 };
+    phRecords.forEach(function(r){
+      var s = r.status;
+      if (s === 'pending' || s === 'pending_review') n.pending++;
+      else if (s === 'dispensed') n.dispensed++;
+      else if (s === 'ready') n.ready++;
+      else if (s === 'completed') n.done++;
+    });
+    document.getElementById('s-pending').textContent = n.pending;
+    document.getElementById('s-dispensing').textContent = n.dispensed;
+    document.getElementById('s-ready').textContent = n.ready;
+    document.getElementById('s-done').textContent = n.done;
+    renderPending(); renderTable();
+    document.getElementById('queue-note').textContent = '（15 秒自动刷新 · 共 ' + phRecords.length + ' 条）';
+  }).catch(function(){
+    document.getElementById('pending-list').textContent = '📡 医疗后端（8972）离线，请检查 medical-api 服务';
+  });
+}
+function renderPending(){
+  var list = phRecords.filter(function(r){ return r.status === 'pending' || r.status === 'pending_review'; });
+  var el = document.getElementById('pending-list');
+  if (!list.length) { el.innerHTML = '<div style="padding:18px;text-align:center;color:var(--text3)">暂无待审核处方</div>'; return; }
+  el.innerHTML = list.map(function(p){
+    var warns = (p.safety_warnings || []).map(function(w){ return '<span class="warn-tag">⚠ ' + esc(w) + '</span>'; }).join('');
+    var urg = p.urgency && p.urgency !== 'normal' ? '<span class="urgent-tag">加急</span>' : '';
+    return '<div class="order-item">' +
+      '<div class="id">' + esc((p.rx_id || '').slice(0, 18)) + urg + '</div>' +
+      '<div class="info"><strong>' + esc(p.patient_id || '—') + '</strong>' +
+        (p.diagnosis && p.diagnosis.syndrome ? ' · ' + esc(p.diagnosis.syndrome) : '') + warns + '</div>' +
+      '<div style="width:100%;font-size:12px">' + linkify(herbText(p)) + '</div>' +
+      '<div style="display:flex;gap:6px">' +
+        '<button class="btn green small" data-act="approve" data-rx="' + esc(p.rx_id) + '">✅ 审核通过</button>' +
+        '<button class="btn red small" data-act="reject" data-rx="' + esc(p.rx_id) + '">❌ 退回</button>' +
+      '</div></div>';
+  }).join('');
+}
+function renderTable(){
+  var q = (document.getElementById('ph-search').value || '').toLowerCase();
+  var st = document.getElementById('ph-status').value;
+  var rows = phRecords.filter(function(r){
+    var s = r.status || '';
+    if (st && !(s === st || (st === 'pending' && s === 'pending_review') || (st === 'reviewed' && s === 'verified'))) return false;
+    if (q) {
+      var text = [r.rx_id, r.patient_id, r.doctor_id, r.doctor, herbText(r), r.diagnosis && r.diagnosis.syndrome].join(' ').toLowerCase();
+      if (text.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+  document.getElementById('ph-count').textContent = rows.length + ' 条';
+  var el = document.getElementById('ph-body');
+  if (!rows.length) { el.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:20px">📦 暂无记录</td></tr>'; return; }
+  el.innerHTML = rows.map(function(r){
+    var rid = r.rx_id || '';
+    var nextBtns = '';
+    if (r.status === 'reviewed' || r.status === 'verified') nextBtns = '<button class="btn blue small" data-act="dispense" data-rx="' + esc(rid) + '">开始调配</button>';
+    else if (r.status === 'dispensed') nextBtns = '<button class="btn blue small" data-act="ready" data-rx="' + esc(rid) + '">调配完成</button>';
+    else if (r.status === 'ready') nextBtns = '<button class="btn primary small" data-act="complete" data-rx="' + esc(rid) + '">确认发药</button>';
+    return '<tr><td>' + esc(rid.slice(-6)) + '</td><td>' + esc(r.patient_id || '—') + '</td>' +
+      '<td style="font-size:11px">' + linkify(herbText(r)).slice(0, 200) + '</td>' +
+      '<td>' + (ST_LABEL[r.status] || r.status || '—') + '</td><td>' + esc(r.doctor || r.doctor_id || '—') + '</td>' +
+      '<td style="font-size:10px;color:var(--text3)">' + esc((r.created_at || '').slice(0, 10)) + '</td>' +
+      '<td style="white-space:nowrap">' + nextBtns + ' <a href="javascript:void(0)" data-view="' + esc(rid) + '" style="font-size:11px;color:var(--primary)">详情</a></td></tr>';
+  }).join('');
+}
+
+/* ── 审核/流转操作 ── */
+var _reviewer = null;
+function reviewer(){
+  if (_reviewer) return _reviewer;
+  var n = prompt('请输入药师姓名（审核留痕，必填）：');
+  if (!n) return null;
+  _reviewer = n.trim().slice(0, 20);
+  return _reviewer;
+}
+async function verify(rxId, action){
+  var rv = reviewer(); if (!rv) return;
+  var notes = action === 'reject' ? (prompt('退回原因（可选）：') || '') : '';
+  try {
+    var res = await fetch(API + '/api/prescription/verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rx_id: rxId, action: action, reviewer: rv, notes: notes })
+    }).then(function(r){ return r.json(); });
+    if (res.ok) { toast({approve:'✅ 审核通过', reject:'❌ 已退回', dispense:'📦 开始调配', ready:'✔️ 调配完成，待发药', complete:'🏁 已发药完成'}[action] || '已操作'); loadQueue(); }
+    else toast('操作失败：' + (res.error || '未知'));
+  } catch (e) { toast('网络错误：' + e.message); }
+}
+function viewRx(rid){
+  var r = phRecords.find(function(x){ return x.rx_id === rid; });
+  if (!r) return;
+  var box = document.createElement('div'); box.className = 'modal-mask';
+  box.innerHTML = '<div class="modal-box"><h4>处方详情</h4><div style="font-size:13px;line-height:1.9">' +
+    '<b>编号：</b>' + esc(rid) + '<br><b>患者：</b>' + esc(r.patient_id || '—') +
+    '<br><b>诊断：</b>' + esc((r.diagnosis && r.diagnosis.syndrome) || '—') +
+    '<br><b>状态：</b>' + (ST_LABEL[r.status] || r.status || '—') +
+    '<br><b>医师：</b>' + esc(r.doctor || r.doctor_id || '—') +
+    '<br><b>药材：</b>' + linkify(herbText(r)) +
+    ((r.safety_warnings || []).length ? '<br><b style="color:var(--accent)">安全警示：</b>' + esc(r.safety_warnings.join('；')) : '') +
+    '</div><div style="text-align:right;margin-top:12px"><button class="btn primary" id="rx-close">关闭</button></div></div>';
+  document.body.appendChild(box);
+  box.querySelector('#rx-close').onclick = function(){ box.remove(); };
+  box.addEventListener('click', function(ev){ if (ev.target === box) box.remove(); });
+}
+document.addEventListener('click', function(ev){
+  var b = ev.target.closest && ev.target.closest('button[data-act]');
+  if (b) { verify(b.dataset.rx, b.dataset.act); return; }
+  var v = ev.target.closest && ev.target.closest('a[data-view]');
+  if (v) viewRx(v.dataset.view);
+});
+
+/* ── 库存预警（真实数据：/api/inventory） ── */
+function loadInventory(){
+  fetch(API + '/api/inventory').then(function(r){ return r.json(); }).then(function(d){
+    var el = document.getElementById('inv-alert');
+    if (!d.ok) { el.textContent = '库存服务异常'; return; }
+    var lows = (d.list || []).filter(function(i){ return i.low || (i.threshold != null && i.qty <= i.threshold); });
+    if (!lows.length) { el.innerHTML = '<span style="color:var(--green)">✓ 库存正常（共 ' + (d.total || 0) + ' 味药材，低库存 ' + (d.low_count || 0) + ' 味）</span>'; return; }
+    el.innerHTML = lows.map(function(i){
+      return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0eade"><span>' + esc(i.name || i.herb) + '</span><span style="color:var(--accent);font-weight:600">余 ' + esc(i.qty) + esc(i.unit || 'g') + '（警戒线 ' + esc(i.threshold || '-') + '）</span></div>';
+    }).join('');
+  }).catch(function(){ document.getElementById('inv-alert').textContent = '📡 库存接口离线'; });
+}
+
+document.getElementById('ph-search').addEventListener('input', function(){ clearTimeout(window._phd); window._phd = setTimeout(renderTable, 300); });
+document.getElementById('ph-status').addEventListener('change', renderTable);
+
+loadEntryNames().then(function(){ if (_entryNames.length) loadQueue(); else loadQueue(); });
+loadInventory();
+setInterval(loadQueue, 15000);
+setInterval(loadInventory, 60000);
+</script>
+</body>
+</html>

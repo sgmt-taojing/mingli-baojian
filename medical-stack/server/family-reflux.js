@@ -67,14 +67,45 @@ function registerRoutes(app) {
   init();
 
   // 患者登记 family link_token（token 由 family 端 bind 流程签发）
-  app.post('/api/reflux/link', (req, res) => {
-    const { phone, link_token } = req.body || {};
+  const linkHandler = (req, res) => {
+    const { phone } = req.body || {};
+    // tcm 同构兼容：tcm 侧字段名 family_token，mingli G13 原字段 link_token，两者同义
+    const link_token = (req.body || {}).link_token || (req.body || {}).family_token;
     if (!/^1\d{10}$/.test(String(phone || ''))) return res.status(400).json({ ok: false, error: 'phone 须为 11 位手机号' });
     if (!/^lnk_[0-9a-f]{16,}$/.test(String(link_token || ''))) return res.status(400).json({ ok: false, error: 'link_token 格式不合法（应形如 lnk_…，由家庭端绑定流程签发）' });
     db.prepare(`INSERT INTO reflux_links (phone, link_token) VALUES (?,?)
       ON CONFLICT(phone) DO UPDATE SET link_token=excluded.link_token, created_at=datetime('now','localtime')`)
       .run(phone, link_token);
-    res.json({ ok: true, phone: phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'), hint: '已关联。报告出具时可回流家庭端（仅医学域内容）' });
+    res.json({ ok: true, phone: phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'), link_token, bound_at: new Date().toISOString(), hint: '已关联。报告出具时可回流家庭端（仅医学域内容）' });
+  };
+  app.post('/api/reflux/link', linkHandler);
+  app.post('/api/report-link/bind', linkHandler); // tcm 同构别名（诊断-20260831 P0）
+
+  // 解绑（tcm 同构新增：mingli 侧按手机号删除关联）
+  const unbindHandler = (req, res) => {
+    const { phone } = req.body || {};
+    if (!/^1\d{10}$/.test(String(phone || ''))) return res.status(400).json({ ok: false, error: 'phone 须为 11 位手机号' });
+    const r = db.prepare(`DELETE FROM reflux_links WHERE phone=?`).run(phone);
+    res.json({ ok: true, unbound: r.changes, message: r.changes ? '已解除绑定，后续报告不再回流家庭端' : '该手机号无有效绑定' });
+  };
+  app.post('/api/report-link/unbind', unbindHandler);
+
+  // 绑定状态查询（tcm 同构新增；token 脱敏回显）
+  app.get('/api/report-link/status', (req, res) => {
+    const phone = String(req.query.phone || '');
+    if (!/^1\d{10}$/.test(phone)) return res.status(400).json({ ok: false, error: 'phone 必填且须为 11 位手机号' });
+    const link = db.prepare(`SELECT link_token, created_at FROM reflux_links WHERE phone=?`).get(phone);
+    res.json({
+      ok: true, bound: !!link, bound_at: link ? link.created_at : null,
+      link_token_masked: link ? link.link_token.slice(0, 8) + '…' + link.link_token.slice(-4) : null,
+      phone_masked: phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'),
+    });
+  });
+
+  // 推送队列核查（tcm 同构新增；mingli 为即时直推，无重试队列，如实回报）
+  app.get('/api/report-link/push-queue', (_req, res) => {
+    const n = db.prepare(`SELECT COUNT(*) AS n FROM reflux_links`).get().n;
+    res.json({ ok: true, items: [], links: n, note: 'mingli 侧为即时直推（sync push），无重试队列；推送结果见 /api/reflux/push 响应' });
   });
 
   // 推送报告到 family（白名单组装 + 命理剥离守卫）
@@ -121,7 +152,7 @@ function registerRoutes(app) {
     });
   });
 
-  console.log('🏠 G13 报告回流供给侧已挂载（/api/reflux/*，命理批注结构性剥离 + 文本守卫）');
+  console.log('🏠 G13 报告回流供给侧已挂载（/api/reflux/* + tcm 同构别名 /api/report-link/{bind,unbind,status,push-queue}，命理批注结构性剥离 + 文本守卫）');
 }
 
 module.exports = { registerRoutes, mingliScan };
