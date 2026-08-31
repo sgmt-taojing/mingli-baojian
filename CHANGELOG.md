@@ -1,6 +1,12 @@
 # mingli-baojian 更新日志
 
 
+## 2026-08-31 · 生肖知识激活 P0
+- 新引擎 shengxiao-engine.js：relZhi/relAnimals（婚配五档 tier）/nobles（六合+三合贵人）/taiSui（值冲刑害破五态）/personality（zodiac 模块性别分述，修正文混排按性别抽行）/taiSuiKb（taisui 模块逐年条目，过滤 markdown 标题）/buildSection（报告段构建）
+- norm-report-engine：generateNormReport 对 bazi/ziwei 注入 segSX「生肖关系」段（pillars 三级回退取值）；generateHehunReport 合婚判定切引擎五档，L4 性格适配/L5 相处建议按 tier/type 分支（新增六害/相刑/六破提示文案）
+- 实测：bazi report segments 7 段含生肖关系、ziwei 同注入、hehun 三合上婚/六冲下婚判定正确
+
+
 ## 2026-08-31 · 生肖知识应用诊断
 - 活体实测四报告：八字 150143 字符生肖仅 4 次且为巧合命中；紫微 144823 字符 0 次；六爻 0 次；合婚 32 次（六合/六冲判定正确但仅二态）
 - 知识库盘点：生肖直接相关 251 条、zodiac 模块 60 条（男女分述性格+本命佛）、三合 1268/六合 1375/六冲 217/相刑 227/相害 160、taisui 12 生肖逐年条目——储备充足但解读引擎三中枢零引用
