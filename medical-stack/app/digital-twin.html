@@ -117,29 +117,33 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <div class="header"><h1>🔄 数字孪生健康档案</h1><p>时序关联 · 趋势分析 · 五脏评分 · 体质推断 · 养生推荐</p></div>
 
 <div class="container">
-  <!-- Record entry -->
+  <!-- 患者选择（真实档案为主区，选患者即直出） -->
   <div class="card">
-    <h3>📝 添加就诊记录</h3>
-    <input  class="input" id="patient-id" placeholder="患者ID（留空自动生成）" aria-label="患者ID（留空自动生成）" data-validate="required|min=2">
-    <textarea class="input" id="complaint" placeholder="主诉/症状描述" style="min-height:50px"></textarea>
-    <div style="display:flex;gap:8px;margin-bottom:8px">
-      <select class="input" id="tongue-color"><option value="">舌色(选填)</option><option>淡红</option><option>淡白</option><option>红</option><option>绛</option><option>紫暗</option></select>
-      <select class="input" id="face-complexion"><option value="">面色(选填)</option><option>明润</option><option>晦暗</option><option>潮红</option><option>苍白</option><option>萎黄</option><option>黧黑</option></select>
+    <h3>👤 患者孪生档案 <span style="font-size:11px;color:var(--text3);font-weight:400">（服务端单一事实源 · 病历签发/处方/随访自动建楼）</span></h3>
+    <div style="display:flex;gap:8px">
+      <input class="input" id="patient-id" placeholder="患者ID（empi- 建档号）" aria-label="患者ID" data-validate="required|min=2" style="margin-bottom:0">
+      <button class="btn primary" style="white-space:nowrap" onclick="loadTwin()">📂 载入档案</button>
     </div>
-    <button class="btn primary" onclick="addRecord()">📊 记录 + 分析</button>
-    <button class="btn" style="margin-left:8px" onclick="loadRealProfile()">📂 载入真实病程（长程画像）</button>
-    <div style="font-size:10px;color:var(--text3);margin-top:6px">数据边界：上方录入的舌/面/症状在本地引擎演算（本地存储）；「载入真实病程」从服务端长程画像拉取该患者真实诊疗时间线。</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">输入建档号回车即载入。评分为辅助参考，不构成诊断结论。</div>
   </div>
 
-  <!-- Real Timeline -->
+  <!-- D3-2 证型演变轨迹 -->
+  <div class="card" id="traj-card" style="display:none">
+    <h3>🧭 证型演变轨迹 <span style="font-size:11px;color:var(--text3);font-weight:400">（真实病历证型 × 时间）</span></h3>
+    <div id="traj-chart"></div>
+    <div id="traj-list" style="margin-top:8px"></div>
+  </div>
+
+  <!-- 真实病程时间线（孪生快照事件流） -->
   <div class="card" id="real-card" style="display:none">
-    <h3>📂 真实病程时间线 <span style="font-size:11px;color:var(--text3);font-weight:400">（服务端 confirmed-cases / 处方 / 随访聚合）</span></h3>
+    <h3>📂 真实病程时间线 <span style="font-size:11px;color:var(--text3);font-weight:400">（服务端快照：病历/处方/随访）</span></h3>
     <div id="real-content" style="font-size:12px;line-height:1.9"></div>
   </div>
 
   <!-- Health Score -->
   <div class="card" id="score-card" style="display:none">
-    <h3>📊 健康综合评分</h3>
+    <div id="whatif-banner" style="display:none;background:var(--gold-bg);border:1px solid #fde68a;border-radius:8px;padding:6px 10px;font-size:12px;color:#92400e;margin-bottom:8px">🧪 当前显示为「假设演算」结果（本地预览，未入档）——重新「载入档案」恢复真实数据</div>
+    <h3>📊 健康综合评分 <span style="font-size:11px;color:var(--text3);font-weight:400">辅助参考</span></h3>
     <div class="score-ring" id="score-ring"></div>
     <div class="score-breakdown" id="score-breakdown"></div>
   </div>
@@ -152,9 +156,9 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 
   <!-- Constitution -->
   <div class="card" id="const-card" style="display:none">
-    <h3>🧬 体质推断</h3>
+    <h3>🧬 体质判定</h3>
     <div id="const-content"></div>
-    <div style="font-size:11px;color:var(--text3);margin-top:8px">注: 体质推断基于舌象+面色+症状综合分析，建议由执业医师最终确认</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:8px">口径：ZYYXH/T157-2009 转化分 · 体征映射推断（非量表作答），建议执业医师确认</div>
   </div>
 
   <!-- Trends -->
@@ -175,45 +179,94 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     <h3>🌿 个性化养生方案</h3>
     <div id="plan-content"></div>
   </div>
+
+  <!-- 假设演算（what-if · 不入档） -->
+  <div class="card" style="border-style:dashed">
+    <h3>🧪 假设演算 <span style="font-size:11px;color:var(--accent);font-weight:600">what-if · 本地演算 · 不入档</span></h3>
+    <textarea class="input" id="complaint" placeholder="假设症状描述（仅本地试算，不写入患者档案）" style="min-height:50px"></textarea>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select class="input" id="tongue-color"><option value="">舌色(选填)</option><option>淡红</option><option>淡白</option><option>红</option><option>绛</option><option>紫暗</option></select>
+      <select class="input" id="face-complexion"><option value="">面色(选填)</option><option>明润</option><option>晦暗</option><option>潮红</option><option>苍白</option><option>萎黄</option><option>黧黑</option></select>
+    </div>
+    <button class="btn" onclick="addRecord()">🧪 本地试算</button>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">数据边界：本区在浏览器本地演算（localStorage），用于方案试算/教学演示，<b>不写入患者档案</b>；真实档案由服务端诊疗事件自动生成。</div>
+  </div>
 </div>
 
 <script>
 var currentPatientId = null;
 var currentModel = null;
 
-// GAP-P2：载入服务端真实病程（长程画像引擎聚合 confirmed-cases/处方/随访）
-function loadRealProfile() {
+// D3 深化：真实档案为主区——服务端孪生模型（病历/处方/随访自动建楼）
+function loadTwin() {
   var pid = document.getElementById('patient-id').value.trim();
   if (!pid) return TCM.toast('请先填写患者ID（如 empi- 开头的建档号）');
-  fetch('/api/tcm/longitudinal-profile?patient_id=' + encodeURIComponent(pid))
+  currentPatientId = pid;
+  fetch('/api/tcm/twin?patient_id=' + encodeURIComponent(pid))
     .then(function(r){ return r.json(); })
     .then(function(d) {
-      var card = document.getElementById('real-card');
-      card.style.display = 'block';
+      document.getElementById('real-card').style.display = 'block';
       var box = document.getElementById('real-content');
-      if (!d.ok || !d.profile || !d.profile.timelineCount) {
-        box.innerHTML = '<span style="color:var(--text3)">该患者暂无真实诊疗记录（先经问诊台建档）</span>';
+      if (!d.ok || !d.model) {
+        box.innerHTML = '<span style="color:var(--text3)">该患者暂无孪生档案——病历签发 / 处方出具 / 随访完成后自动建楼</span>';
+        ['traj-card','score-card','organ-card','const-card','trends-card','risks-card','plan-card'].forEach(function(id){ document.getElementById(id).style.display='none'; });
         return;
       }
-      var p = d.profile;
-      var html = '<div style="margin-bottom:8px">📅 跨度 <b>' + p.timeSpan.label + '</b> · 事件 <b>' + p.timelineCount + '</b> · 累计方药 <b>' + p.summary.totalHerbsUsed + '</b> 种 · 慢病轨迹 <b>' + p.summary.chronicTrajectories + '</b> 条</div>';
-      html += p.timeline.map(function(e) {
-        return '<div style="border-left:3px solid var(--primary);padding:4px 10px;margin-bottom:4px;background:#faf8f2;border-radius:0 6px 6px 0">' +
-          '<b>' + e.date + '</b> · ' + (e.diagnosis || '随访') +
-          (e.complaint && e.complaint !== '随访' ? ' · ' + e.complaint : '') +
-          (e.herbs && e.herbs.length ? ' · 用药 ' + e.herbs.join('、') : '') +
-          (e.effect != null ? ' · 疗效 ' + e.effect + '分' : '') + '</div>';
-      }).join('');
-      box.innerHTML = html;
-      TCM.toast('📂 真实病程已载入（' + p.timelineCount + ' 条事件）');
+      var m = d.model;
+      currentModel = m;
+      // 事件流
+      var srcIcon = { emr: '📋 病历', prescription: '💊 处方', followup: '📞 随访', manual: '✍️ 补录' };
+      box.innerHTML = '<div style="margin-bottom:8px">快照 <b>' + m.snapshot_count + '</b> 条 · 更新于 <b>' + new Date(m.updated_at).toLocaleString('zh-CN') + '</b></div>' +
+        m.timeline.map(function(e) {
+          return '<div style="border-left:3px solid var(--primary);padding:4px 10px;margin-bottom:4px;background:#faf8f2;border-radius:0 6px 6px 0">' +
+            '<b>' + new Date(e.ts).toLocaleDateString('zh-CN') + '</b> · ' + (srcIcon[e.source] || e.source) +
+            (e.syndrome ? ' · ' + e.syndrome : '') + (e.formula ? ' · ' + e.formula : '') +
+            (e.effect ? ' · 疗效 ' + ({improved:'好转',worsened:'加重',stable:'平稳'}[e.effect]||e.effect) : '') +
+            (e.score != null ? ' · <b>' + e.score + '分/' + e.grade + '</b>' : '') + '</div>';
+        }).join('');
+      document.getElementById('whatif-banner').style.display = 'none';
+      renderAll(m);
+      renderTrajectory(m.syndrome_trajectory || []);
+      TCM.toast('📂 孪生档案已载入（' + m.snapshot_count + ' 条快照）');
     })
     .catch(function() { TCM.toast('📡 服务离线'); });
 }
 
+// D3-2 证型演变轨迹（SVG 折线 + 证型节点）
+function renderTrajectory(traj) {
+  var card = document.getElementById('traj-card');
+  if (!traj.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  var W = 720, H = 140, pad = 30;
+  var pts = traj.map(function(t, i) {
+    var x = traj.length === 1 ? W/2 : pad + i * (W - 2*pad) / (traj.length - 1);
+    var sc = t.score != null ? t.score : 50;
+    var y = H - pad - (Math.max(0, Math.min(100, sc)) / 100) * (H - 2*pad);
+    return { x: x, y: y, t: t };
+  });
+  var poly = pts.map(function(p){ return p.x + ',' + p.y; }).join(' ');
+  var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;background:#faf8f2;border-radius:8px">' +
+    '<line x1="'+pad+'" y1="'+(H-pad)+'" x2="'+(W-pad)+'" y2="'+(H-pad)+'" stroke="#ddd6c8"/>' +
+    '<polyline points="' + poly + '" fill="none" stroke="#6b3a1f" stroke-width="2"/>' +
+    pts.map(function(p){
+      return '<circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#c0392b"/>' +
+        '<text x="'+p.x+'" y="'+(p.y-8)+'" text-anchor="middle" font-size="10" fill="#6b5b4f">'+p.t.syndrome+'</text>' +
+        '<text x="'+p.x+'" y="'+(H-pad+14)+'" text-anchor="middle" font-size="9" fill="#9b8b7f">'+new Date(p.t.ts).toLocaleDateString('zh-CN')+'</text>';
+    }).join('') + '</svg>';
+  document.getElementById('traj-chart').innerHTML = svg;
+  // 证型转化提示
+  var changes = [];
+  for (var i = 1; i < traj.length; i++) {
+    if (traj[i].syndrome !== traj[i-1].syndrome) changes.push(traj[i-1].syndrome + ' → ' + traj[i].syndrome);
+  }
+  document.getElementById('traj-list').innerHTML = changes.length
+    ? '<span style="font-size:12px;color:var(--blue)">🔄 证型转化 ' + changes.length + ' 次：' + changes.join('；') + '</span>'
+    : '<span style="font-size:12px;color:var(--text3)">证型稳定：' + traj[0].syndrome + '（' + traj.length + ' 次诊疗）</span>';
+}
+
+// 假设演算（what-if · 本地预览 · 不入档）
 function addRecord() {
-  var pid = document.getElementById('patient-id').value.trim() || 'P' + Date.now().toString(36).toUpperCase();
-  document.getElementById('patient-id').value = pid;
-  currentPatientId = pid;
+  var pid = 'whatif-' + (document.getElementById('patient-id').value.trim() || 'anon');
 
   var record = {
     chief_complaint: document.getElementById('complaint').value.trim() || '健康随访',
@@ -224,7 +277,9 @@ function addRecord() {
   var result = TCM_DT.addRecord(pid, record);
   currentModel = result.model;
   renderAll(result.model);
-  TCM.toast('✅ 记录已添加 · 健康分: ' + result.model.health_score.total + '分 · ' + result.model.health_score.grade + '级');
+  document.getElementById('whatif-banner').style.display = 'block';
+  document.getElementById('traj-card').style.display = 'none';
+  TCM.toast('🧪 假设演算完成（本地预览，未入档）· 健康分: ' + result.model.health_score.total + '分');
 }
 
 function renderAll(model) {
@@ -258,28 +313,39 @@ function renderAll(model) {
   }
   document.getElementById('organ-grid').innerHTML = html;
 
-  // Constitution
+  // Constitution（服务端：judgement + 转化分；本地 what-if：置信度）
   var con = model.constitution;
   if (con) {
-    document.getElementById('const-content').innerHTML = 
-      '<div class="const-card"><div class="const-name">' + con.primary.name + '</div><div style="font-size:11px;color:var(--text3)">置信度: ' + con.primary.score + '分</div></div>' +
-      (con.secondary ? '<div style="font-size:12px;text-align:center;margin-top:4px">兼夹: ' + con.secondary.name + '(置信度' + con.secondary.score + ')</div>' : '');
+    var convTop = con.converted_scores ? Object.entries(con.converted_scores)
+      .filter(function(e){ return e[0] !== '平和质' && e[1] > 0; })
+      .sort(function(a,b){ return b[1]-a[1]; }).slice(0,3)
+      .map(function(e){ return e[0] + ' ' + e[1] + '分'; }).join(' · ') : '';
+    document.getElementById('const-content').innerHTML =
+      '<div class="const-card"><div class="const-name">' + (con.judgement || con.primary.name) + '</div>' +
+      '<div style="font-size:11px;color:var(--text3)">' + (con.converted_scores ? '转化分' : '置信度') + ': ' + con.primary.score + '分</div></div>' +
+      (con.secondary ? '<div style="font-size:12px;text-align:center;margin-top:4px">兼夹倾向: ' + con.secondary.name + '（' + con.secondary.score + '分）</div>' : '') +
+      (convTop ? '<div style="font-size:10px;color:var(--text3);text-align:center;margin-top:4px">偏颇转化分: ' + convTop + '</div>' : '');
   }
 
   // Trends
   var t = model.trends;
   if (t) {
     var trendClass = t.trend === 'improving' ? 'trend-improving' : t.trend === 'declining' ? 'trend-declining' : 'trend-stable';
-    var trendLabel = t.trend === 'improving' ? '📈 改善中' : t.trend === 'declining' ? '📉 下降中' : '➡️ 稳定';
-    document.getElementById('trends-content').innerHTML = 
-      '<span class="trend-badge ' + trendClass.replace('trend-','') + '">' + trendLabel + ' · 变化: ' + (t.slope > 0 ? '+' : '') + t.slope + '分</span>' +
-      '<div style="font-size:11px;color:var(--text3);margin-top:4px">平均分: ' + t.average_score + ' · 数据点: ' + t.data_points + ' · 常见症状: ' + (t.frequent_symptoms || []).join(', ') + '</div>';
+    var trendLabel = t.trend === 'improving' ? '📈 改善中' : t.trend === 'declining' ? '📉 下降中' : t.trend === 'insufficient' ? '⏳ 数据积累中' : '➡️ 稳定';
+    document.getElementById('trends-content').innerHTML =
+      '<span class="trend-badge ' + trendClass + '">' + trendLabel + (t.slope != null ? ' · 变化: ' + (t.slope > 0 ? '+' : '') + t.slope + '分' : '') + '</span>' +
+      '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + (t.average_score != null ? '平均分: ' + t.average_score + ' · ' : '') + '数据点: ' + t.data_points + (t.note ? ' · ' + t.note : '') + (t.frequent_symptoms ? ' · 常见症状: ' + t.frequent_symptoms.join(', ') : '') + '</div>';
 
-    // Timeline
+    // Timeline（服务端快照 ts/chief 与本地 what-if timestamp/chief_complaint 双形态兼容）
     var tlHtml = '';
-    for (var i = model.timeline.length - 1; i >= 0; i--) {
-      var s = model.timeline[i];
-      tlHtml += '<div class="timeline-item"><div class="ti-date">' + new Date(s.timestamp).toLocaleDateString('zh-CN') + '</div><div class="ti-content">' + s.chief_complaint.substring(0, 50) + ' · <strong>' + (s.health_score ? s.health_score.total + '分/' + s.health_score.grade : '?') + '</strong></div></div>';
+    var tl = model.timeline || [];
+    for (var i = 0; i < tl.length; i++) {
+      var s = tl[i];
+      var ts = s.ts || s.timestamp;
+      var txt = s.chief || s.chief_complaint || s.syndrome || '';
+      var sc = s.score != null ? s.score : (s.health_score ? s.health_score.total : null);
+      var gr = s.grade || (s.health_score ? s.health_score.grade : '');
+      tlHtml += '<div class="timeline-item"><div class="ti-date">' + new Date(ts).toLocaleDateString('zh-CN') + '</div><div class="ti-content">' + String(txt).substring(0, 50) + (sc != null ? ' · <strong>' + sc + '分/' + gr + '</strong>' : '') + '</div></div>';
     }
     document.getElementById('timeline').innerHTML = tlHtml;
   }

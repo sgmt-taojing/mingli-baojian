@@ -1,5 +1,11 @@
 # mingli-baojian 更新日志
 
+## 2026-09-01 · ADR-020 终局函执行：G17R 销账 + meta-only 2,637 条删除 + cron 指引交付
+- **G17R 终局**：裁判裁定 22:22《撤销令》最终有效（23:47 批复=重复粘贴作废）；我侧按撤销令执行获确认，G17 ADR-019 全签销账
+- **meta-only 删除（批准·三条件全落实）**：删除纯元数据占位条目 2,637 条（批复 2,628 + 同源 drift 9）；备份冷存扩展盘 `/Volumes/模型训练数据/cold-storage/kb-meta-only-backup-20260901-060002.json`（1.3MB，本机不留）；Recall 基线 `DELIVERY/kb-recall-baseline-20260901-060002.json`（20 词 FTS/普通双通道）；kb_formal/kb_fts5/kb_formal_fts 三轨同事务删除 75,545→72,908；toc-page 1,215 条按批复保留；删后 20 词检索复测零回归；**30 天观察期至 2026-10-01，无回归方可销备份**
+- **cron 连败 2 项（批准转交付）**：控制台操作指引 `DELIVERY/cron-console-fix-guide-20260901.md`——周报 timeoutSeconds 120→300 为用户唯一待操作项；临床经验蒸馏经核验已是单步版（连败为历史计数残留）
+- **旧账纪律**：C 类 13 页（08-30 已执行）、G17 L2、周报 300s 三条「待拍板」旧账核销；后续裁判裁决到达 24h 内销账
+
 ## 2026-08-31 深夜 · P0 事故：WAL 裂脑根修 + P2.8 问诊台双师全链终验通过
 - **事故定性**：8920 主库 yidao.db 发生 WAL 裂脑——主句柄持续写入「失链孤儿 WAL」（磁盘不可见、进程重启即丢），今日 19:34 起全部写入（测试用户/病例 #31-37/处方签名）险遭灭失；并连带挖出 verification_corpus 表存量物理损坏（B-tree 野指针，08-30 备份中已存在，非本次事故造成）
 - **真根因（以治法确诊）**：R772「排盘验证联动」在 /api/paipan/calculate 里按请求 `new better-sqlite3` 写连接 + `close()`——跨库（better-sqlite3 ↔ node:sqlite 主句柄）共存时，close 触发 SQLite 末连接语义删除/重建 -wal/-shm，主句柄沦为孤儿。POST /api/paipan/calculate 单发即可 100% 复现；Node fs 钩子打栈排除 JS 层删除，确认为 SQLite C 层行为

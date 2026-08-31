@@ -774,10 +774,49 @@ function renderArchive(name, cases) {
     });
     if (cases.length > 5) html += '<div style="font-size:9px;color:var(--text3);margin-top:3px">…共 ' + cases.length + ' 次，可用顶部搜索栏「病例」检索全部</div>';
   }
+  html += '<div id="archive-twin"></div>';
   html += '<div id="archive-efficacy"></div>';
   html += '</div>';
   box.innerHTML = html;
+  loadTwinPanel(name);
   loadEfficacyHint(name);
+}
+
+/* D4（契约 v1.3.3）：数字孪生进诊室——确认姓名即在档案卡直出体质判定+证型轨迹+最新评分，
+ * 复诊决策当场可用；数据源 /api/tcm/twin（服务端单一事实源），无档案时不占位。 */
+async function loadTwinPanel(name) {
+  const box = document.getElementById('archive-twin');
+  if (!box || !name) return;
+  try {
+    const r = await fetch(API + '/api/tcm/twin?name=' + encodeURIComponent(name));
+    const d = await r.json();
+    if (!d.ok || !d.model) { box.innerHTML = ''; return; }
+    const m = d.model;
+    const hs = m.health_score || {};
+    const traj = m.syndrome_trajectory || [];
+    // 证型轨迹横排 chips（同名折叠计数）
+    const chips = [];
+    traj.forEach(t => {
+      const last = chips[chips.length - 1];
+      if (last && last.s === t.syndrome) last.n++;
+      else chips.push({ s: t.syndrome, n: 1, f: t.formula });
+    });
+    const changed = chips.length > 1;
+    let html = '<div style="border:1px solid #c7d2fe;background:#eef2ff;border-radius:6px;padding:6px 8px;margin-top:6px;font-size:11px;color:#3730a3">';
+    html += '<strong>🔄 数字孪生</strong> · 快照 ' + m.snapshot_count + ' 条';
+    if (hs.total != null) html += ' · 最新健康值 <b>' + hs.total + '/100（' + hs.grade + '）</b>';
+    if (m.constitution && m.constitution.judgement) html += '<br>🧬 体质判定：<b>' + escHtml(m.constitution.judgement) + '</b>';
+    if (chips.length) {
+      html += '<br>🧭 证型轨迹：' + chips.map(c => escHtml(c.s) + (c.n > 1 ? '×' + c.n : '')).join(' → ');
+      if (changed) html += ' <span style="color:#1d4ed8">（转化 ' + (chips.length - 1) + ' 次）</span>';
+      else html += ' <span style="opacity:.7">（证型稳定）</span>';
+    }
+    if (m.risk_factors && m.risk_factors.length) html += '<br><span style="color:#991b1b">⚠️ ' + escHtml(m.risk_factors[0].detail) + '</span>';
+    html += '<br><a href="digital-twin.html" style="font-size:10px;color:#4f46e5">查看完整孪生档案 →</a>';
+    html += '<span style="font-size:9px;opacity:.7;margin-left:6px">辅助参考，不构成诊断结论</span></div>';
+    box.innerHTML = html;
+    if (changed) addEvidence('ai', '孪生提示：' + name + ' 证型轨迹 ' + chips.map(c => c.s).join('→'));
+  } catch (e) { /* 孪生服务不可达不阻断档案卡 */ }
 }
 
 /* R821 疗效回流：复诊患者进诊室，自动提示上疗程效果与守方/更方建议 */
