@@ -63,7 +63,8 @@ h1{color:var(--gold);font-size:20px;margin-bottom:16px;text-align:center}
 .qc-item.qc-draft{border-left-color:var(--gold)}
 .qc-badge{font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);white-space:nowrap}
 .qc-done .qc-badge,.qc-badge.qc-done{color:var(--green);border-color:rgba(72,187,120,.4)}
-.qc-draft .qc-badge,.qc-badge.qc-draft{color:var(--gold);border-color:rgba(201,168,76,.4)}</style>
+.qc-draft .qc-badge,.qc-badge.qc-draft{color:var(--gold);border-color:rgba(201,168,76,.4)}
+@keyframes qcToastIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}}</style>
   <link rel="stylesheet" href="css/mobile-nav.css">
 <link rel="stylesheet" href="css/theme-systems.css">
 <link rel="stylesheet" href="css/flow-engine.css">
@@ -136,17 +137,25 @@ try{var saved=localStorage.getItem('qiuce_phone');if(saved)document.getElementBy
 var QIUCE_CATS=[{id:'bazi',name:'八字命理',needBirth:1},{id:'ziwei',name:'紫微斗数',needBirth:1},{id:'liuyao',name:'六爻问事'},{id:'qimen',name:'奇门遁甲'},{id:'liuren',name:'大六壬'},{id:'meihua',name:'梅花易数'},{id:'fengshui',name:'风水堪舆'},{id:'hehun',name:'合婚配对',needBirth:1},{id:'zeri',name:'黄历择日'},{id:'xingming',name:'姓名评分'},{id:'mobile',name:'手机号吉凶'},{id:'chepai',name:'车牌吉凶'},{id:'zhanbu',name:'卦象占卜'},{id:'lifeplan',name:'人生规划',needBirth:1},{id:'liunian',name:'流年运势',needBirth:1},{id:'family',name:'家庭合盘',needBirth:1}];
 function qcPost(u,body){return fetch(API+u,{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},body:JSON.stringify(body),signal:AbortSignal.timeout(30000)}).then(function(r){return r.json()})}
 function qcGet(u){return fetch(API+u,{headers:{'X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000)}).then(function(r){return r.json()})}
-function qcToast(msg){var m=document.getElementById('qcMine');}
+function qcToast(msg,type){
+  type=type||'info';
+  var colors={info:'#3182ce',success:'#38a169',error:'#e53e3e',warn:'#dd6b20'};
+  var b=document.createElement('div');
+  b.textContent=msg;
+  b.style.cssText='position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:9999;padding:10px 18px;border-radius:8px;background:'+(colors[type]||colors.info)+';color:#fff;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.18);max-width:90vw;text-align:center;animation:qcToastIn .25s ease-out';
+  document.body.appendChild(b);
+  setTimeout(function(){b.style.opacity='0';b.style.transition='opacity .3s';setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b)},300)},type==='error'?3500:2200);
+}
 function submitQiuce(){var phone=document.getElementById('qcPhone').value.trim();
-if(!/^1\d{10}$/.test(phone)){alert('请填写正确的 11 位手机号');return}
-if(!document.getElementById('qcAge').checked){alert('请确认您已年满 18 周岁');return}
+if(!/^1\d{10}$/.test(phone)){qcToast('请填写正确的 11 位手机号','warn');return}
+if(!document.getElementById('qcAge').checked){qcToast('请确认您已年满 18 周岁','warn');return}
 var body={phone:phone,category:document.getElementById('qcCat').value,matter:document.getElementById('qcMatter').value.trim(),name:document.getElementById('qcName').value.trim(),gender:document.getElementById('qcGender').value,birthYear:document.getElementById('qcY').value,birthMonth:document.getElementById('qcM').value,birthDay:document.getElementById('qcD').value,birthHour:document.getElementById('qcH').value,ageConfirmed:true};
-if(!body.category){alert('请选择求测类目');return}
-if(body.matter.length<4){alert('请简述所问事项（至少 4 字）');return}
+if(!body.category){qcToast('请选择求测类目','warn');return}
+if(body.matter.length<4){qcToast('请简述所问事项（至少 4 字）','warn');return}
 var btn=document.getElementById('qcSubmit');btn.disabled=true;btn.textContent='提交中，AI 正在起稿…';
 qcPost('/api/public/qiuce',body).then(function(d){btn.disabled=false;btn.textContent='提交求测（AI 初稿 → 命理师核对）';
-if(d&&(d.code===0||d.ok)){try{localStorage.setItem('qiuce_phone',phone)}catch(e){}alert('求测已入队（编号 '+(d.data&&d.data.id)+'），AI 初稿已生成，命理师核对后会短信通知您');loadMyQiuce();loadMyEmr()}
-else alert(d&&(d.message||d.error)||'提交失败')}).catch(function(e){btn.disabled=false;btn.textContent='提交求测（AI 初稿 → 命理师核对）';alert('网络异常，请稍后再试')})}
+if(d&&(d.code===0||d.ok)){try{localStorage.setItem('qiuce_phone',phone)}catch(e){}qcToast('求测已入队（编号 '+(d.data&&d.data.id)+'），AI 初稿已生成，命理师核对后会短信通知您','success');loadMyQiuce();loadMyEmr()}
+else qcToast((d&&(d.message||d.error))||'提交失败','error')}).catch(function(e){btn.disabled=false;btn.textContent='提交求测（AI 初稿 → 命理师核对）';qcToast('网络异常，请稍后再试','error')})}
 function loadMyQiuce(){var phone=document.getElementById('qcPhone').value.trim();if(!/^1\d{10}$/.test(phone))return;
 qcGet('/api/public/qiuce/mine?phone='+phone).then(function(d){var m=document.getElementById('qcMine');var list=(d&&d.data&&d.data.list)||(d&&d.list)||[];
 if(!list.length){m.innerHTML='<div class="empty">暂无求测记录</div>';return}
@@ -163,7 +172,7 @@ w.innerHTML='<div class="qc-item" style="border-color:var(--gold)"><div style="d
 (it.reviewer?'<div style="font-size:11px;color:var(--green);margin-top:4px">核对：'+escapeHtml(it.reviewer)+(it.reviewedAt?' · '+escapeHtml(it.reviewedAt):'')+'</div>':'')+
 '<pre style="white-space:pre-wrap;word-break:break-word;font-size:12px;line-height:1.8;margin-top:8px;max-height:50vh;overflow:auto">'+escapeHtml(it.draft||'报告整理中')+'</pre>'+
 '<div style="font-size:11px;color:var(--muted);margin-top:6px">'+escapeHtml(it.disclaimer||'')+'</div></div>';
-w.scrollIntoView({behavior:'smooth'})}).catch(function(){alert('查询失败')})}
+w.scrollIntoView({behavior:'smooth'})}).catch(function(){qcToast('查询失败','error')})}
 function againQiuce(cat){document.getElementById('qcCat').value=cat;document.getElementById('qcMatter').value='';document.getElementById('qcMatter').focus();window.scrollTo({top:0,behavior:'smooth'})}
 function loadMyEmr(){var phone=document.getElementById('qcPhone').value.trim();if(!/^1\d{10}$/.test(phone))return;
 qcGet('/api/public/my-emr?phone='+phone).then(function(d){var m=document.getElementById('qcEmr');var list=(d&&d.data&&d.data.list)||[];
