@@ -1,5 +1,12 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-08-31 15:50 — ✅ review-studio 签名链全回归（API 七步 + UI 五步，含三负例）
+- API 链：MINGLI_NOT_FOUND/MINGLI_UNSIGNED 两负例拦截正确；draft(11)→sign(master#29)→rx draft(8, mingliAttached)→rx sign(doctor#29)→GET 随附 mingliConclusion 全绿
+- UI 链：队列选中回归病例 → AI 草案 #12 → 命理师签名 → 医生定稿（界面显示「☯ 命理结论已随处方归档」）；换未签名病例点定稿 → confirm 拦截，取消即中止
+- 证据：DELIVERY/review-studio-chain-regression-20260831.json；审计日志标「随附命理批注 #11」
+- 回归账号 uid=29（doctor+master），测试病例 #30、批注 #11/#12、处方 #8/#9（均标回归字样）
+
+
 
 ## 2026-08-31 15:35 — ✅ tcm 能力两阶段吸收机制落地 + 字符徽章图标化 + 命理融入链强化
 - 【一阶段·能力对齐】方法+路径双维 diff 驱动，移植 18 条路由（login-phone/patients-phone/my-reports/ops×2/RBAC×4/therapy×4/tele×2/inventory-item/shift-delete/efficacy-records/send-code/admin-users/longitudinal-POST），全部 curl 冒烟 PASS（含 409/401 边界、收件箱全链、重启后令牌稳定）

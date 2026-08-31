@@ -1,0 +1,23 @@
+{
+  "ts": "2026-08-31 15:45",
+  "scope": "review-studio 签名链全回归（命理融入链 P3）",
+  "account": "uid=29 roles=[doctor,master]（回归专用）",
+  "case": "medical_cases#30（回归测试病例·脾胃气虚）",
+  "api_chain": [
+    {"step": "负例·挂不存在批注", "result": "MINGLI_NOT_FOUND ✓"},
+    {"step": "mingli/draft", "result": "id=11 draft 9413字 ✓"},
+    {"step": "负例·未签名挂处方", "result": "MINGLI_UNSIGNED（need: 命理师先审核签名）✓"},
+    {"step": "mingli/sign", "result": "id=11 signed by master#29 ✓"},
+    {"step": "prescription/draft 挂已签批注", "result": "id=8 mingliAttached=true ✓"},
+    {"step": "prescription/sign", "result": "id=8 signed by doctor#29, mingliMissing=false ✓"},
+    {"step": "GET prescription/8", "result": "mingliConclusion 随附（批注原文+signerName）✓"}
+  ],
+  "ui_chain": [
+    {"step": "队列载入", "result": "22 病例，选中回归病例 ✓"},
+    {"step": "AI 命理草案", "result": "草案 #12 生成 ✓"},
+    {"step": "命理师签名", "result": "批注 #12 已生效 · master#29 ✓"},
+    {"step": "医生定稿", "result": "处方 #9 已生效，命理批注 #12 随案归档，界面显示「☯ 命理结论已随处方归档」✓"},
+    {"step": "拦截负例", "result": "换未签名病例点定稿 → confirm 弹窗，取消即中止，未建草案 ✓"}
+  ],
+  "audit": "case_review_logs 记「电子处方签名 #8（随附命理批注 #11）」"
+}

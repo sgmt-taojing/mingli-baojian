@@ -1,5 +1,9 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · review-studio 签名链回归留证
+- API 七步（两负例）+ UI 五步（一负例）全绿；证据 DELIVERY/review-studio-chain-regression-20260831.json
+
+
 
 ## 2026-08-31 · tcm 两阶段吸收 + 徽章图标化 + 命理融入链
 - 移植层 tcm-ported-api.js 新建：18 路由适配挂载（CORS 后），数据落点与既有台账一致；family-reflux 增患者收件箱（patient-inbox.json）+ /api/my/reports
