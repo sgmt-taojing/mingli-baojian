@@ -68,6 +68,21 @@ app.get('/health', (req, res) => {
   res.json({ ok: true, service: '命理宝鉴·医道 Static', port: PORT, uptime: process.uptime() });
 });
 
+// PWA 注入脚本（与 tcm-agent 对齐：/pwa-inject.js → app/pwa/pwa-inject.js，不缓存）
+// 注：launchd 环境下 sendFile/send 库 stat 异常（NotFoundError），改 readFile 直出
+const PWA_DIR = path.join(APP_DIR, 'pwa');
+function servePwaFile(res, file, contentType) {
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Content-Type', contentType);
+  require('fs').readFile(path.join(PWA_DIR, file), (err, buf) => {
+    if (err) return res.status(404).json({ ok: false, error: file + ' 缺失' });
+    res.end(buf);
+  });
+}
+app.get('/pwa-inject.js', (_req, res) => servePwaFile(res, 'pwa-inject.js', 'application/javascript; charset=utf-8'));
+app.get('/sw.js', (_req, res) => servePwaFile(res, 'sw.js', 'application/javascript; charset=utf-8'));
+app.get('/manifest.json', (_req, res) => servePwaFile(res, 'manifest.json', 'application/manifest+json'));
+
 // 所有页面的 SPA fallback
 const pages = [
   '/', '/login', '/doctor-dashboard', '/clinical', '/admin',

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>我的医院报告 · 中医标准智能体</title>
+<meta name="description" content="本院出具的门急诊病历、中药处方、检验报告，实时回流到此，患者与家属可随时查阅">
+<link rel="manifest" href="/pwa/manifest.json"><link rel="apple-touch-icon" href="/pwa/icon-192.png"><meta name="theme-color" content="#6b3a1f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="我的医院报告">
+<style>
+:root{--bg:#fff8ee;--card:#fff;--primary:#b8860b;--primary-dark:#8b6914;--accent:#c0392b;--green:#2e8b57;--blue:#2563eb;--text:#2c1810;--text2:#6b5b4f;--border:#e8dfc8}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding:14px}
+.topbar{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border-radius:16px;padding:18px 20px;margin-bottom:14px}
+.topbar h1{font-size:21px;margin-bottom:4px}
+.topbar .sub{font-size:12px;opacity:.92;line-height:1.6}
+.topbar a{color:#ffe9b0}
+.card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px;margin:10px 0}
+.input{width:100%;padding:13px;border:1px solid var(--border);border-radius:10px;font-size:16px;margin-bottom:10px}
+.btn{width:100%;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff}
+.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn:active{transform:scale(.98)}
+.code-row{display:flex;gap:8px}
+.code-row .input{flex:1}
+.code-row .btn{flex:0 0 128px;width:auto}
+.err{color:var(--accent);font-size:13px;min-height:18px;margin-bottom:8px}
+.hint{font-size:12px;color:var(--text2);line-height:1.7;margin-top:10px}
+.rpt{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:14px 16px;margin:10px 0}
+.rpt h3{font-size:17px;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.rpt .sum{font-size:15px;color:var(--text2);line-height:1.8;white-space:pre-wrap}
+.rpt .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#a39384;margin-top:8px}
+.tag{font-size:11px;border-radius:6px;padding:2px 8px;flex-shrink:0}
+.tag.emr{background:#e8f0fe;color:var(--blue)}
+.tag.prescription{background:#eaf7ee;color:var(--green)}
+.tag.lab{background:#faf3e0;color:var(--primary-dark)}
+.empty{text-align:center;color:var(--text2);font-size:14px;padding:30px 0;line-height:1.8}
+.advice{margin-top:8px;background:#f0f7ff;border-left:4px solid var(--blue);border-radius:8px;padding:8px 12px;font-size:14px;color:#1e40af}
+.sec-title{font-size:14px;font-weight:700;color:var(--primary-dark);margin:16px 2px 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <h1>📋 我的医院报告</h1>
+    <div class="sub">本院出具的门急诊病历、中药处方、检验报告，出具后实时回流到这里。<br>家属可用患者手机号协助绑定查阅。返回 <a href="home-tcm.html">居家患者入口</a></div>
+  </div>
+
+  <!-- 绑定/登录卡（手机号 + 短信验证码） -->
+  <div class="card" id="bind-card" style="display:none">
+    <div class="sec-title" style="margin-top:0">🔐 验证身份后查看</div>
+    <input class="input" id="p-name" placeholder="患者姓名（须在本院就诊建档过）">
+    <input class="input" id="p-phone" placeholder="就诊登记的手机号" inputmode="numeric" maxlength="11">
+    <div class="code-row">
+      <input class="input" id="p-code" placeholder="短信验证码" inputmode="numeric" maxlength="6">
+      <button class="btn ghost" id="p-code-btn" onclick="sendCode()">获取验证码</button>
+    </div>
+    <div class="err" id="p-err"></div>
+    <button class="btn" onclick="bind()">验证并查看我的报告</button>
+    <div class="hint">验证通过即完成「报告回流」绑定：今后病历/处方/检验出具时将自动同步到本页。<br>辅助诊疗工具，最终诊疗决策由执业医师作出。</div>
+  </div>
+
+  <!-- 报告列表 -->
+  <div id="list-wrap" style="display:none">
+    <div class="sec-title">📮 报告收件箱 <span id="total" style="font-weight:400;color:var(--text2)"></span></div>
+    <div id="list"></div>
+    <div class="card" style="text-align:center">
+      <button class="btn ghost" onclick="unbind()">解除绑定（不再同步新报告）</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+var TOKEN = localStorage.getItem('my_rpt_token') || '';
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+var TYPE_LABEL = { emr: ['📋 门诊病历', 'emr'], prescription: ['🌿 中药处方', 'prescription'], lab: ['🧪 检验报告', 'lab'] };
+
+function sendCode() {
+  var phone = document.getElementById('p-phone').value.trim();
+  if (!/^1\d{10}$/.test(phone)) { document.getElementById('p-err').textContent = '请输入合法手机号'; return; }
+  var btn = document.getElementById('p-code-btn'); btn.disabled = true;
+  fetch('/api/sms/send-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phone, scene: 'report-link' }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      document.getElementById('p-err').style.color = 'var(--green)';
+      document.getElementById('p-err').textContent = d.ok ? ('验证码已发送（5 分钟有效）' + (d.mock ? '【模拟外发，请询问院方工作人员】' : '')) : (d.error || '发送失败');
+      btn.disabled = false;
+    }).catch(function(){ document.getElementById('p-err').textContent = '📡 服务离线，请稍后再试'; btn.disabled = false; });
+}
+function bind() {
+  var name = document.getElementById('p-name').value.trim();
+  var phone = document.getElementById('p-phone').value.trim();
+  var code = document.getElementById('p-code').value.trim();
+  document.getElementById('p-err').style.color = 'var(--accent)';
+  if (!name || !phone || !code) { document.getElementById('p-err').textContent = '姓名/手机号/验证码都要填'; return; }
+  fetch('/api/report-link/bind', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patient_name: name, phone: phone, code: code }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (!d.ok) { document.getElementById('p-err').textContent = d.error || '验证失败'; return; }
+      TOKEN = d.link_token;
+      localStorage.setItem('my_rpt_token', TOKEN);
+      showList();
+    }).catch(function(){ document.getElementById('p-err').textContent = '📡 服务离线'; });
+}
+function unbind() {
+  if (!confirm('解除绑定后，新报告将不再同步到本页。历史报告仍由医院留存。确定解绑吗？')) return;
+  // 解绑需手机号+验证码本人确认：引导重新走验证
+  TOKEN = ''; localStorage.removeItem('my_rpt_token');
+  document.getElementById('list-wrap').style.display = 'none';
+  document.getElementById('bind-card').style.display = '';
+  document.getElementById('p-err').style.color = 'var(--text2)';
+  document.getElementById('p-err').textContent = '已退出。如需彻底解绑（停止同步），请到院或联系工作人员办理。';
+}
+function showList() {
+  document.getElementById('bind-card').style.display = 'none';
+  document.getElementById('list-wrap').style.display = '';
+  loadReports();
+}
+function loadReports() {
+  fetch('/api/my/reports?token=' + encodeURIComponent(TOKEN))
+    .then(function(r){ return r.json(); }).then(function(d) {
+      if (!d.ok) {
+        if (d.error && d.error.indexOf('令牌') >= 0) { unbind(); return; }
+        document.getElementById('list').innerHTML = '<div class="empty">📡 ' + esc(d.error || '加载失败') + '</div>'; return;
+      }
+      document.getElementById('total').textContent = '（共 ' + d.total + ' 份）';
+      if (!d.items.length) {
+        document.getElementById('list').innerHTML = '<div class="empty">暂无报告。<br>就诊后病历/处方/检验出具时会自动同步到这里。</div>'; return;
+      }
+      document.getElementById('list').innerHTML = d.items.map(function(it) {
+        var t = TYPE_LABEL[it.report_type] || ['📄 报告', 'emr'];
+        var adv = /医嘱[：:]([^；。]*)/.exec(it.summary || '');
+        return '<div class="rpt"><h3>' + t[0].split(' ')[0] + ' ' + esc(it.title.replace(/^[^·]*·\s*/, '')) +
+          '<span class="tag ' + t[1] + '">' + t[0].split(' ')[1] + '</span></h3>' +
+          '<div class="sum">' + esc(it.summary) + '</div>' +
+          (adv ? '<div class="advice">🩺 医嘱：' + esc(adv[1]) + '</div>' : '') +
+          '<div class="meta"><span>出具 ' + esc((it.created_at || '').slice(0, 16).replace('T', ' ')) + '</span><span>回流 ' + esc((it.received_at || '').slice(5, 16).replace('T', ' ')) + '</span></div></div>';
+      }).join('');
+    }).catch(function(){ document.getElementById('list').innerHTML = '<div class="empty">📡 服务离线，请稍后再试</div>'; });
+}
+if (TOKEN) showList(); else document.getElementById('bind-card').style.display = '';
+</script>
+<script src="/pwa-inject.js"></script>
+<div data-mingli-entry style="max-width:760px;margin:0 auto;padding:0 12px"></div>
+<script src="js/mingli-entry.js"></script>
+</body>
+</html>

@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · 医学栈全量对齐 tcm（L4 页面差集清零）+ 能力清单收录
+- **L4 真缺口补齐**：移植 my-reports.html（患者报告收件箱）+ family-hub.html（家庭中心）入 medical-stack/app，PWA 资产（pwa/ 六件）随页落地
+- **静态服务修真**：medical-stack static-server 补 /pwa-inject.js /sw.js /manifest.json 三路由；launchd 环境下 sendFile/send 库 stat 异常（NotFoundError），改 readFile 直出（X-PWA-Route: readfile-v2 标记实测 200）
+- **合作服务入口同步**：两页带 tcm 侧 mingli-entry 入口卡（经 8973→8932 代理取 /api/public/clinic-links，指向 8900 入口大厅），边界文案「命理参考 · 非医学诊断」原样保留
+- **能力清单收录**：docs/TCM-MEDICAL-CAPABILITY-MAP.md（tcm 180+ 端点七域契约 v1.0）
+- 巡检复核：能力差集 L1/L2/L3 全零（指纹 e7ae6f5b，tcm HEAD 563a1a3→4eba2e3）；两页无头实测 http 200 · 零 JS 报错（family-hub 需登录属正常守卫）
+
 ## 2026-08-31 · review-studio 签名链回归留证
 - API 七步（两负例）+ UI 五步（一负例）全绿；证据 DELIVERY/review-studio-chain-regression-20260831.json
 

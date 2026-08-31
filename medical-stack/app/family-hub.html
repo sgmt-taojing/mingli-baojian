@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>家庭健康中心 · TCM-Agent</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🏡</text></svg>">
+<style>
+:root{--bg:#fff8ee;--card:#fff;--primary:#b8860b;--accent:#c0392b;--green:#2e8b57;--blue:#2980b9;--text:#2c1810;--text2:#6b5b4f;--border:#e8dfc8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.container{max-width:760px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin:10px 0}
+.card h3{font-size:14px;color:var(--primary);margin-bottom:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;max-height:118px;overflow-y:auto}
+.chip{padding:6px 14px;border:1px solid var(--border);border-radius:16px;font-size:13px;cursor:pointer;background:var(--bg);color:var(--text2)}
+.chip.active{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.stat .v{font-size:22px;font-weight:700;color:var(--primary)}
+.stat .v.warn{color:var(--accent)}
+.stat .l{font-size:11px;color:var(--text2);margin-top:2px}
+.brief{font-size:12px;color:var(--text2);margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);line-height:1.9}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:560px){.tiles{grid-template-columns:1fr}}
+.tile{display:block;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-decoration:none;color:var(--text);transition:transform .15s}
+.tile:hover{transform:translateY(-1px);border-color:var(--primary)}
+.tile .ic{font-size:24px}
+.tile .nm{font-size:14px;font-weight:600;margin:6px 0 2px}
+.tile .ds{font-size:11px;color:var(--text2)}
+.sos-btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#c0392b,#a93226);color:#fff;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:1px}
+.sos-btn:active{transform:scale(.98)}
+.empty{text-align:center;color:var(--text2);font-size:13px;padding:16px;line-height:1.8}
+</style>
+<link rel="stylesheet" href="css/mobile.css">
+<link rel="stylesheet" href="css/standard.css">
+</head>
+<body>
+<div class="page-header-bar" data-theme="home">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot" aria-hidden="true"></span>
+  <span class="phb-title">家庭健康中心</span>
+</div>
+
+<div class="container">
+  <div class="std-bar"><span class="std-tag">👥 使用对象 <b>患者/家属</b></span><span class="std-tag">⚙️ 功能 <b>家庭健康门户</b></span><span class="std-tag">💎 使用价值 <b>服药·随访·应急 一个入口</b></span></div>
+
+  <!-- 家庭成员（R853：账号绑定制，只见自家人） -->
+  <div class="card">
+    <h3>👨‍👩‍👧 家庭成员 <span style="font-size:11px;font-weight:400;color:var(--text2)">账号绑定 · 仅显示自家人</span></h3>
+    <div class="chips" id="hub-members"></div>
+    <!-- 绑定面板：无绑定时自动展开 -->
+    <div id="hub-bind-card" style="display:none;margin-top:10px;border-top:1px dashed var(--border);padding-top:10px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">🔎 搜索就诊人姓名，绑定为你的家庭成员：</div>
+      <div style="display:flex;gap:6px">
+        <input id="hub-bind-q" placeholder="输入姓名（如：王）" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg)" oninput="hubBindSearch(this.value)">
+      </div>
+      <div id="hub-bind-results" style="margin-top:6px"></div>
+    </div>
+  </div>
+
+  <!-- 今日概览 -->
+  <div class="card" id="hub-today-card" style="display:none">
+    <h3>📊 今日概览 · <span id="hub-who"></span></h3>
+    <div class="stats">
+      <div class="stat"><div class="v" id="hub-total">—</div><div class="l">今日服药任务</div></div>
+      <div class="stat"><div class="v" style="color:var(--green)" id="hub-taken">—</div><div class="l">今日已服</div></div>
+      <div class="stat"><div class="v warn" id="hub-missed7">—</div><div class="l">近 7 日漏服</div></div>
+      <div class="stat"><div class="v" style="color:var(--blue)" id="hub-fu">—</div><div class="l">随访待完成</div></div>
+    </div>
+    <div class="brief" id="hub-brief"></div>
+  </div>
+
+  <!-- SOS 固定位（家庭端唯一主 SOS 入口） -->
+  <div class="card">
+    <button class="sos-btn" id="hub-sos-btn" onclick="hubSOS()">🚨 一键紧急求助 · 通知家属与值班医生</button>
+  </div>
+
+  <!-- 功能磁贴 -->
+  <div class="card">
+    <h3>🧭 家庭服务</h3>
+    <div class="tiles">
+      <a class="tile" href="med-tracker.html"><div class="ic">💊</div><div class="nm">服药追踪</div><div class="ds">今日清单 · 已服/漏服标记 · 药名点看说明</div></a>
+      <a class="tile" href="family-consult.html"><div class="ic">🩺</div><div class="nm">家庭问诊</div><div class="ds">居家问诊 · AI 追问 · 复诊衔接</div></a>
+      <a class="tile" href="health-archive.html"><div class="ic">📁</div><div class="nm">健康档案</div><div class="ds">纵向病程时间线 · 恢复曲线</div></a>
+      <a class="tile" href="family-portal.html"><div class="ic">👨‍👩‍👧</div><div class="nm">家庭成员</div><div class="ds">成员管理 · 消息推送记录</div></a>
+      <a class="tile" href="emergency.html"><div class="ic">🚨</div><div class="nm">紧急救助</div><div class="ds">应急预案库 · 值班医生 · 响应记录</div></a>
+      <a class="tile" href="home-tcm.html"><div class="ic">👵</div><div class="nm">老人端大字版</div><div class="ds">大字体简易模式 · 舌面拍照自查</div></a>
+    </div>
+  </div>
+</div>
+
+<script src="js/nav.js"></script>
+<script>
+/* ═══ R852 家庭健康中心：四页收拢为一个门户，数据全实拉；R853 账号绑定制 ═══ */
+var hubMembers = [], hubPid = '';
+function hubEsc(s) { return (window.TCM && TCM.esc) ? TCM.esc(s) : String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hubToast(msg) { if (window.TCM && TCM.toast) TCM.toast(msg); }
+function hubAuth() { return { 'Authorization': 'Bearer ' + (localStorage.getItem('tcm_token') || '') }; }
+
+async function hubLoadMembers() {
+  var host = document.getElementById('hub-members');
+  try {
+    var r = await fetch('/api/family/members', { headers: hubAuth() });
+    if (r.status === 401) {
+      host.innerHTML = '<div class="empty">请先<a href="login.html" style="color:var(--primary)">登录</a>后绑定家庭成员</div>';
+      return;
+    }
+    var d = await r.json();
+    hubMembers = d.members || [];
+  } catch (e) { hubMembers = []; }
+  if (!hubMembers.length) {
+    host.innerHTML = '<div class="empty">还没有绑定的家庭成员<br>在下方搜索就诊人姓名完成绑定</div>';
+    document.getElementById('hub-bind-card').style.display = 'block';
+    return;
+  }
+  hubPid = hubMembers[0].patient_id;
+  renderHubMembers();
+  hubRefresh();
+}
+
+function renderHubMembers() {
+  document.getElementById('hub-members').innerHTML = hubMembers.map(function(m){
+    return '<div class="chip' + (m.patient_id === hubPid ? ' active' : '') + '" onclick="hubSelect(\'' + hubEsc(m.patient_id) + '\')">' +
+      hubEsc(m.name) + ' · ' + hubEsc(m.relation) +
+      ' <span style="opacity:.6;margin-left:2px" title="解除绑定" onclick="event.stopPropagation();hubUnbind(\'' + hubEsc(m.patient_id) + '\',\'' + hubEsc(m.name) + '\')">✕</span></div>';
+  }).join('') + '<div class="chip" style="border-style:dashed" onclick="document.getElementById(\'hub-bind-card\').style.display=\'block\'">＋ 绑定家人</div>';
+}
+
+// R853 绑定：搜索 → 选关系 → 绑定
+var _hubBindT;
+async function hubBindSearch(q) {
+  clearTimeout(_hubBindT);
+  q = String(q || '').trim();
+  var host = document.getElementById('hub-bind-results');
+  if (!q) { host.innerHTML = ''; return; }
+  _hubBindT = setTimeout(async function() {
+    try {
+      var r = await fetch('/api/patients/list?q=' + encodeURIComponent(q));
+      var d = await r.json();
+      var list = (d.patients || []).slice(0, 6);
+      if (!list.length) { host.innerHTML = '<div style="font-size:12px;color:var(--text2);padding:6px">未找到「' + hubEsc(q) + '」的建档记录——需先就诊建档</div>'; return; }
+      host.innerHTML = list.map(function(p){
+        return '<div style="display:flex;align-items:center;gap:6px;padding:6px 4px;border-bottom:1px dashed var(--border);font-size:13px">' +
+          '<span style="flex:1">' + hubEsc(p.name) + (p.age ? ' · ' + p.age + '岁' : '') + (p.visit_count ? ' · 就诊' + p.visit_count + '次' : '') + '</span>' +
+          '<select id="hub-rel-' + hubEsc(p.id) + '" style="padding:4px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg)">' +
+            ['本人','父母','配偶','子女','兄弟姐妹','其他'].map(function(x){ return '<option>' + x + '</option>'; }).join('') + '</select>' +
+          '<button class="chip" style="cursor:pointer" onclick="hubBind(\'' + hubEsc(p.id) + '\')">绑定</button></div>';
+      }).join('');
+    } catch (e) { host.innerHTML = '<div style="font-size:12px;color:var(--text2);padding:6px">检索失败，请重试</div>'; }
+  }, 300);
+}
+
+async function hubBind(pid) {
+  var sel = document.getElementById('hub-rel-' + CSS.escape(pid));
+  var relation = sel ? sel.value : '其他';
+  try {
+    var r = await fetch('/api/family/bind', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, hubAuth()), body: JSON.stringify({ patient_id: pid, relation: relation }) });
+    var d = await r.json();
+    if (d.ok) {
+      hubToast(d.duplicated ? '已绑定过该成员' : '✅ 绑定成功');
+      document.getElementById('hub-bind-results').innerHTML = '';
+      document.getElementById('hub-bind-q').value = '';
+      hubLoadMembers();
+    } else hubToast('绑定失败：' + (d.error || ''));
+  } catch (e) { hubToast('网络错误，绑定未成功'); }
+}
+
+async function hubUnbind(pid, name) {
+  var yes = await (window.confirmModal ? confirmModal('确认解除与「' + name + '」的绑定？', { danger: true, okText: '解除绑定' }) : Promise.resolve(confirm('确认解除绑定？')));
+  if (!yes) return;
+  try {
+    var r = await fetch('/api/family/unbind', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, hubAuth()), body: JSON.stringify({ patient_id: pid }) });
+    var d = await r.json();
+    if (d.ok) { hubToast('已解除绑定'); hubPid = ''; hubLoadMembers(); document.getElementById('hub-today-card').style.display = 'none'; }
+  } catch (e) { hubToast('网络错误'); }
+}
+
+function hubSelect(pid) { hubPid = pid; renderHubMembers(); hubRefresh(); }
+
+async function hubRefresh() {
+  if (!hubPid) return;
+  document.getElementById('hub-today-card').style.display = 'block';
+  var who = hubMembers.filter(function(m){ return m.patient_id === hubPid; })[0];
+  document.getElementById('hub-who').textContent = who ? who.name : '';
+  var today = new Date().toISOString().slice(0, 10);
+  var cut7 = Date.now() - 7 * 86400000;
+
+  // 今日服药任务
+  try {
+    var rs = await fetch('/api/home/med-schedule', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ patient_id: hubPid }) });
+    var ds = await rs.json();
+    document.getElementById('hub-total').textContent = ds.total || 0;
+  } catch (e) { document.getElementById('hub-total').textContent = '—'; }
+
+  // 依从记录（今日已服 / 7 日漏服）
+  try {
+    var ra = await fetch('/api/home/med-adherence?patient_id=' + encodeURIComponent(hubPid));
+    var da = await ra.json();
+    var recs = da.records || [];
+    document.getElementById('hub-taken').textContent = recs.filter(function(x){ return x.status === 'taken' && String(x.ts).slice(0,10) === today; }).length;
+    document.getElementById('hub-missed7').textContent = recs.filter(function(x){ return x.status === 'missed' && new Date(x.ts).getTime() >= cut7; }).length;
+  } catch (e) { document.getElementById('hub-taken').textContent = '—'; document.getElementById('hub-missed7').textContent = '—'; }
+
+  // 随访待完成
+  try {
+    var rf = await fetch('/api/family/followups?limit=200');
+    var df = await rf.json();
+    var pend = (df.followups || []).filter(function(f){ return f.patient_id === hubPid && f.status === 'pending'; });
+    document.getElementById('hub-fu').textContent = pend.length;
+  } catch (e) { document.getElementById('hub-fu').textContent = '—'; }
+
+  // 纵向病程摘要
+  try {
+    var rt = await fetch('/api/patient/timeline?patient_id=' + encodeURIComponent(hubPid));
+    var dt = await rt.json();
+    if (dt.ok) {
+      var s = dt.summary || {};
+      var trendMap = { improving: '📈 好转中', worsening: '📉 需关注（症状加重）', stable: '➡️ 平稳' };
+      var parts = [];
+      parts.push('累计就诊 <b>' + (s.visits || 0) + '</b> 次');
+      if (s.trend) parts.push('恢复趋势 <b>' + (trendMap[s.trend] || s.trend) + '</b>');
+      if (s.adherence_30d) parts.push('近 30 天服药依从率 <b>' + Math.round(s.adherence_30d.rate * 100) + '%</b>（' + s.adherence_30d.taken + ' 服 / ' + s.adherence_30d.missed + ' 漏）');
+      if (s.latest_score != null) parts.push('最近症状评分 <b>' + s.latest_score + '</b>/10');
+      document.getElementById('hub-brief').innerHTML = parts.join('　·　') || '暂无病程记录';
+    }
+  } catch (e) { /* 摘要离线留空 */ }
+}
+
+async function hubSOS() {
+  var who = hubMembers.filter(function(m){ return m.patient_id === hubPid; })[0];
+  var name = who ? who.name : '家庭成员';
+  var yes = await (window.confirmModal ? confirmModal('🚨 确认为「' + name + '」发起紧急求助？\n将通知家属与值班医生', { danger: true, okText: '发起求助' }) : Promise.resolve(confirm('确认发起紧急求助？')));
+  if (!yes) return;
+  try {
+    var r = await fetch('/api/home/sos', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient_id: hubPid || 'unknown', patient: name, message: name + ' 发起紧急求助', severity: 'high' }) });
+    var d = await r.json();
+    fetch('/api/wechat/sos', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient: name, message: name + ' 发起紧急求助' }) }).catch(function(){});
+    hubToast(d.ok ? '🚨 SOS 已发出 · 事件 #' + (d.total || '—') + '，家属通知中' : '🚨 SOS 已本地记录');
+  } catch (e) { hubToast('🚨 SOS 本地已记录 · 紧急情况请直接拨打 120'); }
+}
+
+hubLoadMembers();
+</script>
+<script src="js/error-interceptor.js"></script>
+<script src="js/common.js"></script>
+<script src="js/ui/states.js"></script>
+<div data-mingli-entry style="max-width:760px;margin:0 auto;padding:0 12px"></div>
+<script src="js/mingli-entry.js"></script>
+</body>
+</html>
