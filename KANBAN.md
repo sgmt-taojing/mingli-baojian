@@ -17,6 +17,11 @@
 - [P2 新增] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
 
+## 2026-09-01 06:35 — ✅ WAL-F 斩草除根：按请求开关连接模式清零【已完结】
+- 9 处残余点全部单例化（wellness/person-hub/feedback/ai-stream/api-server×7/distillation/graph-builder/tiered-matcher）；豁免 mingli.db×5 + Python 子进程×3（自闭合安全，注释说明）
+- 10 端点压测探针全程零漂移；mingli/draft 回归即时落盘；模式定论写入 CHANGELOG 团队规范
+- 服务已重启在干净基线运行（PID 95527）
+
 ## 2026-09-01 06:05 — ✅ 裁判 ADR-020 终局函执行：旧账全销 + meta-only 删除落地
 - **G17R 冲突销账**：裁判裁定 22:22《撤销令》为最终有效（23:47 批复系重复粘贴作废），我侧按撤销令执行获确认正确，G17 ADR-019 全签销账，无后续动作
 - **三项拍板销账**：① C 类 13 页——08-30 已执行完毕（12 页归档+2 页纠错保留，94d6bb3/789f9ff），旧账系挂账未销，核销；② G17 L2——随 ADR-019 销账；③ 周报 300s——本函即批件，转「控制台操作指引」交付

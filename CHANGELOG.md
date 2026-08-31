@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-09-01 · WAL-F 斩草除根：全栈「按请求开关连接」模式清零
+- **范围**：继昨夜根修 R772/orchestrator 两处后，本次扫净同类隐患 9 处——wellness-routes（withDb + 4 处直连）、person-hub-routes（openDb 泄漏型）、agent-feedback-engine（_openDB 泄漏型）、ai-stream-engine（openKbDb 只读）、api-server-v2（orchestrate/guide 泄漏型×2、staging/list、staging/reject、kb-fingerprint/integrity、verification 三路由×3）、distillation-routes（/stats）、kb-graph-builder、kb-tiered-matcher
+- **统一修法**：yidao.db 连接全部改为进程期单例/复用主句柄，一律不 close；staging/reject 的 better-sqlite3 `.transaction()` 改为 node:sqlite 手工 BEGIN IMMEDIATE/COMMIT
+- **安全豁免**：mingli.db 五处（无共享常驻句柄，自闭合无害）与 Python 子进程三处（独立进程）维持原样，已在代码注释说明
+- **压测验证**：排盘×2 + 编排 + staging 读写 + 指纹 + 校验语料读写 + 蒸馏统计 + KB检索 + wellness 共 10 端点连续打满，WAL 探针全程零漂移（held=disk=28733602）；mingli/draft 回归草案即时磁盘可见（#13，已清理）；7 个改动文件 node --check 全过
+- **模式定论**（写入团队规范）：本服务 yidao.db 句柄只允许两种形态——进程期单例，或独立子进程自闭合；**禁止任何"按请求 open→close"写法**，health-patrol R-WALF 守卫兜底
+
 ## 2026-09-01 · ADR-020 终局函执行：G17R 销账 + meta-only 2,637 条删除 + cron 指引交付
 - **G17R 终局**：裁判裁定 22:22《撤销令》最终有效（23:47 批复=重复粘贴作废）；我侧按撤销令执行获确认，G17 ADR-019 全签销账
 - **meta-only 删除（批准·三条件全落实）**：删除纯元数据占位条目 2,637 条（批复 2,628 + 同源 drift 9）；备份冷存扩展盘 `/Volumes/模型训练数据/cold-storage/kb-meta-only-backup-20260901-060002.json`（1.3MB，本机不留）；Recall 基线 `DELIVERY/kb-recall-baseline-20260901-060002.json`（20 词 FTS/普通双通道）；kb_formal/kb_fts5/kb_formal_fts 三轨同事务删除 75,545→72,908；toc-page 1,215 条按批复保留；删后 20 词检索复测零回归；**30 天观察期至 2026-10-01，无回归方可销备份**
