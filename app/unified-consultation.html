@@ -462,6 +462,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
             <span>⏳ 批注队列 <b id="slaBacklog">—</b> 条待核 · 超 48h <b id="slaOverdue" style="color:#f87171">—</b> 条</span>
             <button class="ai-btn" style="padding:2px 8px;font-size:10px" onclick="loadSlaQueue()">刷新</button>
           </div>
+          <div id="slaTierPill" style="margin-top:4px"></div>
           <div id="slaList" style="margin-top:4px;max-height:120px;overflow:auto"></div>
         </div>
       </div>
@@ -497,6 +498,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 <script src="js/realtime/realtime-vision.js"></script>
 <script src="js/realtime/realtime-kb.js"></script>
 <script src="js/realtime/realtime-engine.js"></script>
+<script src="js/sla-tier-badge.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════
@@ -543,6 +545,7 @@ function setRole(r){
 }
 
 // R-SLA: 批注队列 48h 计时（8974 旁路，只读医学正文）
+// R-SLA-3TIER: 升级三级预警 24h 黄/36h 橙/48h 红（共享组件 sla-tier-badge.js）
 async function loadSlaQueue(){
   const lb = $('slaBacklog'), lo = $('slaOverdue'), list = $('slaList');
   if (!lb) return;
@@ -550,12 +553,16 @@ async function loadSlaQueue(){
     const q = await fetch('http://127.0.0.1:8974/api/annotation-queue', { signal: AbortSignal.timeout(6000) }).then(r => r.json());
     if (!q.ok) throw new Error(q.error || '队列接口异常');
     lb.textContent = q.backlog; lo.textContent = q.overdue;
+    const pill = $('slaTierPill');
+    if (pill && window.SLATier) pill.innerHTML = SLATier.renderPill(q);
     if (!q.queue.length) { list.innerHTML = '<div style="color:var(--muted)">队列清空，无待核批注 ✅</div>'; return; }
     list.innerHTML = q.queue.map(a => {
+      const t = window.SLATier ? SLATier.tierOf(a, q.sla_hours)
+        : { k: a.overdue ? 'red' : 'green', label: '', color: a.overdue ? '#f87171' : 'var(--muted)' };
       const remain = Math.max(0, q.sla_hours - a.age_hours);
-      const color = a.overdue ? '#f87171' : (remain < 8 ? '#fbbf24' : 'var(--muted)');
-      const tag = a.overdue ? `已超 48h ${(a.age_hours - q.sla_hours).toFixed(1)}h` : `剩 ${remain.toFixed(1)}h`;
-      return `<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);color:${color}">`
+      const tag = t.k === 'red' ? `已超 48h ${(a.age_hours - q.sla_hours).toFixed(1)}h` : `剩 ${remain.toFixed(1)}h`;
+      return `<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);color:${t.color}">`
+        + `<b style="font-size:11px">[${t.label}]</b> `
         + `#${escapeHtml(a.emr_id || '')} · ${a.type === 'ai' ? '🤖AI' : '✍️人工'} · ${escapeHtml(a.author || '')} · 已等 ${a.age_hours}h（${tag}）</div>`;
     }).join('');
   } catch(e){

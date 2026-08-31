@@ -66,12 +66,16 @@ else
 fi
 
 # 5c. cron 蒸馏管线日志 mtime 监控（日频 48h / 周频 8d）
-# R111 更新：distill-mingli-outbound.log 已废弃（旧 cron），现行权威产出是
-# mingli-tcm-daily-distill（每日 03:00）写的 server/kb/mingli-log.jsonl —— 改监控它
+# R111 更新：distill-mingli-outbound.log 已废弃（旧 cron）；
+# R-PATROL-FIX2 再更新：mingli-tcm-daily-distill 已停用（jobs.json enabled=false），
+# 其产物 server/kb/mingli-log.jsonl 自 08-26 停更——监控死写入方导致静默误报 137h。
+# 现行权威日频产出为 training-data/kb-web-distill/distill-*.jsonl（每日滚动，08-31 已验证在写），
+# 改监控该目录最新文件 mtime。
+LATEST_DISTILL=$(ls -t "$PROJECT_ROOT"/training-data/kb-web-distill/distill-*.jsonl 2>/dev/null | head -1)
 for LOG_PATH in \
     "/tmp/distill-tcm-outbound.log" \
     "/tmp/vision-distill.log" \
-    "$PROJECT_ROOT/server/kb/mingli-log.jsonl"; do
+    $LATEST_DISTILL; do
     if [ -f "$LOG_PATH" ]; then
         LOG_AGE_HR=$(( ( $(date +%s) - $(stat -f %m "$LOG_PATH") ) / 3600 ))
         if [ "$LOG_AGE_HR" -gt 48 ]; then
@@ -181,6 +185,14 @@ except Exception:
             [ -n "$line" ] && ALERTS+=("cron 任务连败: $line")
         done <<< "$BAD_CRON"
     fi
+fi
+
+# ===== R-DIFF-SLA 差集吸收 72h SLA：链5 新差集 72h 内须定性，超时告警上盘 =====
+DIFF_SLA_OUT=$(python3 "$PROJECT_ROOT/scripts/diff-sla-track.py" 2>/dev/null)
+if [ -n "$DIFF_SLA_OUT" ]; then
+    while IFS= read -r line; do
+        echo "$line" | grep -q '^WARN' && ALERTS+=("$(echo "$line" | sed 's/^WARN //')")
+    done <<< "$DIFF_SLA_OUT"
 fi
 
 # ===== R111 触发器巡检：kb_formal 关键触发器存在性 + hit_count NULL =====

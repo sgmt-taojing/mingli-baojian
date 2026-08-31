@@ -1,5 +1,15 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-08-31 21:00 — ✅ patrol 修真 + 双 SLA 机制落地（盘点收尾第一波）
+- [P1] ~~48h SLA 三级升级上监控盘~~ ✅ sla-tier-badge.js（24h黄/36h橙/48h红）× 问诊台面板 + monitor-hub 新卡，实测全过
+- [P2] ~~差集吸收 72h SLA~~ ✅ diff-sla-track.py 入 patrol 告警链（首见计时/消失销账/超时 WARN），实测 clean
+- patrol 读数失实 ✅ 修真（stdout 回显 + 静默监控改指活跃蒸馏产物）；patrol 现仅剩 2 项真实连败告警（非误报）
+- 【需 AutoClaw 控制台操作 · 文件直改被运行时回写覆盖（两次实测）】：
+  1. 「tcm-agent 家庭健康周报推送」（周日 20:00）：payload.timeoutSeconds 120→300（端点 17ms 健康，连败 6 周全是模型调用超时）
+  2. 「临床经验蒸馏（周一 06:00）」：payload 删第二步 batch-distill-clinical.py（文件已被 tmp 清理），改单步「跑 prepare-clinical-export.py 回摘要」；jobs.json.bak-20260831-patrolfix 存有修复前版本，修复文案在 CHANGELOG 21:00 条
+- 观察项（errs:1 未达告警阈）：四路大师增量采集（19:35 败）、名人八字采集（14:03 败，明日 14:00 复跑观察）
+- 维基事件补跑：网络仍不通（wikidata 直连 000），看守任务已挂（Blueprint 侧 succeeded 空转），等网通自动补
+
 ## 2026-08-31 20:35 — ✅ G18/G17 裁判任务书交付（5/6 层 PASS，L2 留红待裁判）
 - G18 三项全建：补丁机制（patches/ 三类三要素 + reapply-patches.py，失配转人工）｜34 页补丁追平（整页重打包废止）｜对拍放行门（equiv-dual-run.py 两处必过，OTA 412/200 实测）
 - G17 六层：L5 十节点 PASS（命理采集首节点入列）｜L1 PASS（tcm 6925efc 增量当日移植）｜L3 PASS（53,559 条相等+指纹 1.0）｜L4 PASS（三阴性）｜L6 PASS（G10 outbox+G13 剥离）｜**L2 FAIL：Recall Δ=0.0333，差案 B075，跨项目语料差 → 待裁判裁决三选项（见 G17 报告 §3）**

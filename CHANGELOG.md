@@ -1,5 +1,11 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · patrol 修真 + 48h SLA 三级上盘 + 差集 72h SLA 追踪（盘点收尾第一波）
+- **patrol 读数失实修真**：① health-check.sh 结果只写日志不回显 stdout → 心跳 cron 看空气，已加回显（实测 ✅ HEALTHY 全文输出）；② 静默误报根因——patrol 监控的 server/kb/mingli-log.jsonl 写入方 mingli-tcm-daily-distill 已停用（08-26 起），改监控活跃产物 training-data/kb-web-distill/distill-*.jsonl 最新文件
+- **cron 连败 2 项确诊**：家庭健康周报（模型调用 120s 超时×6 周，端点实测 17ms 健康）+ 临床经验蒸馏（payload 第二步脚本 batch-distill-clinical.py 已被 tmp 清理，agent 仍执行致 5 连败）。修复件已备好（超时 120→300 / payload 改单步），但 AutoClaw 运行时持有 jobs.json 内存态并回写覆盖文件直改（两次实测 mtime 回滚）——需控制台操作，步骤已落 KANBAN
+- **48h SLA 三级预警上盘（P1）**：新组件 app/js/sla-tier-badge.js（24h 黄/36h 橙/48h 红四态，8974 旁路只读，60s 自刷）；问诊台 unified-consultation 队列面板升三级色阶+汇总胶囊；monitor-hub 监控总览新增「命理批注队列 SLA」卡（含明细列表）；两页 200 + 内联脚本 6 块 node --check 全过
+- **差集吸收 72h SLA（P2）**：新 scripts/diff-sla-track.py——链5 状态条目级键（L1/L2/L3 + L4 超基线增量）首见计时、消失销账、超 72h 未定性 WARN；tcm-capability-diff.py 状态补 missing_api 条目清单；已接入 health-patrol 告警链（超时即上运维看板）；实测 clean rc=0
+
 ## 2026-08-31 · G18/G17 裁判任务书（ADR-017）：补丁化机制建成 + 六层验收 5/6（L2 留红待裁判）
 - **G18 建成**：patches/ 三要素三类补丁（mingli-view/brand/disclaimer）+ reapply-patches.py 重放器（锚点失配 rc=2 转人工禁静默，台账落 DELIVERY/）；34 页废止整页重打包改补丁追平（page-follow.py 已删）；equiv-dual-run.py 对拍门两处必过（吸收激活门 + OTA publish 412/200 双向实测）
 - **G17 验收（复跑 203051）**：L5 十节点冒烟 PASS（新增命理采集首节点：三路特征/授权门负例/医学上下文零泄漏）｜L1 差集 PASS（tcm HEAD 6925efc 新增 ops/contract+ops/kb-baseline 当日移植，契约 v1.1.0 内化）｜L3 知识一致性 PASS（53,559/53,559 条相等，抽样 200 指纹 1.0）｜L4 R745 三阴性 PASS｜L6 旅程 PASS（G10 outbox 落库 + G13 命理词 422 剥离 + 干净内容 inbox）

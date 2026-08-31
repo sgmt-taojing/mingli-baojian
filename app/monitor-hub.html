@@ -172,6 +172,19 @@
 
 <div id="alertBanner" class="banner"></div>
 
+<!-- R-SLA-3TIER: 命理批注队列 48h SLA 三级预警卡（24h 黄 / 36h 橙 / 48h 红，8974 旁路只读） -->
+<div class="project-grid" style="margin-bottom:14px">
+  <div class="card" style="padding:14px 16px">
+    <div class="card-header">
+      <div>
+        <h3 style="margin:0;font-size:14px">☯ 命理批注队列 · 48h SLA 三级预警</h3>
+        <div class="meta-info">命理师核对时限：24h 黄 / 36h 橙 / 48h 红 · 数据源 8974 批注层（旁路只读）</div>
+      </div>
+    </div>
+    <div id="slaTierCard" style="margin-top:8px"></div>
+  </div>
+</div>
+
 <div class="controls">
   <input type="text" id="searchInput" placeholder="🔍 搜索页面名称..." />
   <select id="filterHealth">
@@ -385,6 +398,8 @@ function updateTimestamp() {
 updateTimestamp();
 setInterval(updateTimestamp, 30000);
 </script>
+<script src="js/sla-tier-badge.js"></script>
+<script>SLATier.mount('slaTierCard', { detailed: true, refreshMs: 60000 });</script>
 <script src="js/mobile-nav.js" defer></script>
 </body>
 </html>

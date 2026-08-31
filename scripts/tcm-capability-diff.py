@@ -119,6 +119,7 @@ def main() -> int:
     summary = {
         'ts': now, 'digest': digest, 'changed': changed, 'clean': clean,
         'missing_api_count': len(missing_api),
+        'missing_api': missing_api,  # R-DIFF-SLA：72h SLA 追踪需要条目级键
         'module_diffs': mod_diffs, 'seed_missing': seed_missing,
         'page_gap_count': page_gap,
         'extra_api_count': len(extra_api),
