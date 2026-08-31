@@ -1,6 +1,12 @@
 # mingli-baojian 更新日志
 
 
+## 2026-08-31 · 生肖知识应用诊断
+- 活体实测四报告：八字 150143 字符生肖仅 4 次且为巧合命中；紫微 144823 字符 0 次；六爻 0 次；合婚 32 次（六合/六冲判定正确但仅二态）
+- 知识库盘点：生肖直接相关 251 条、zodiac 模块 60 条（男女分述性格+本命佛）、三合 1268/六合 1375/六冲 217/相刑 227/相害 160、taisui 12 生肖逐年条目——储备充足但解读引擎三中枢零引用
+- 交付 DELIVERY/生肖知识应用诊断-20260831.md（实测矩阵+断点定位+七维应用规划+P0/P1/P2 补全方案）
+
+
 ## 2026-08-31 · P0 接口同构 + P1 药房台
 - 盘点确认：医学执行段后端 tcm 已有且已全量内化 medical-stack(8972)——prescription 六态流转/inventory/schedule/followup/chronic/efficacy/safety/med-* 全部实测在线；按方案甲无需 tcm 再开发，mingli 直接活化适配
 - G12 预约加 tcm 同构别名：/api/clinic/appointment{,/slots,/list,/checkin,/cancel}——checkin/cancel 收 body.id、create 接受 doctor_name（appointments 表加列）、list 支持日期维度（导诊台视角，手机号脱敏）

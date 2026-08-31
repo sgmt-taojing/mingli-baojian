@@ -1,6 +1,27 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
 
+## 2026-08-31 13:50 — ✅ 生肖知识应用专项诊断（知识充足、引擎断流）
+- 实测矩阵：八字报告生肖仅 4 次（巧合值太岁）、紫微/六爻 0 次、合婚 32 次（仅六合/六冲二态）；民俗三件套已用✓
+- 断点：解读三中枢（engine-interpreters/chart-score/engine-facade）生肖引用全 0；zodiac 60 条性格+taisui 12 条逐年太岁+2000 条关系知识沉睡
+- 方案：P0 建 shengxiao-engine 统一关系网络引擎接入八字/紫微/合婚（五档婚配），P1 问事/姓名/风水接入，P2 本命佛仅信众版（守 R756）
+- 报告 DELIVERY/生肖知识应用诊断-20260831.md
+
+
+
+## 2026-08-31 13:30 — 💚 心跳 13:30 全绿（6 端口 200 + KB/排盘 OK · health-check 脚本静默无输出已旁证）
+- 实探：8900/8901/8911/8912/8913/8920 全 200，KB /api/stats 30模块/3767条（1.86MB），POST /paipan 1990/5/15/14/male 200
+- bash health-check.sh 输出完全为空（已 ls 确认脚本存在）→ patrol 读数失实修真项再现，端口直探旁证全绿即可判定
+- 今日 KB 蒸馏 20 条延续（11:00 已记）；无新 distill-*.py 执行；进行中无未收口开发项
+
+## 2026-08-31 12:00 — 💚 心跳 12:00 全绿（EXIT=0 · 6 端口 + KB/排盘 OK）
+- health-check EXIT=0：paipan/tts/face-ocr/static/api-v2/kb-api 全 200 + kb-list + paipan-api OK；「❌ N 项异常」为已知 patrol 读数失实（主会话修真）
+- 核查 data1-backup launchd 退出码 1 → data1 卷未挂载（/Volumes 无 data1），脚本按设计跳过非失败；本周无备份属预期，待挂载自动补
+- 今日 KB 蒸馏 20 条（distill-2026-08-31.jsonl 02:06 入库）维持；进行中无未收口开发项，待主会话：服务中心导航回归走查（待浏览器）、C 类 13 页退役清单拍板、patrol 读数失实修真
+
+## 2026-08-31 11:00 — 💚 心跳 11:00 全绿（EXIT=0）+ 今日 KB 蒸馏入库 20 条
+- 健康检查 EXIT=0 全绿；今日新蒸馏 training-data/kb-web-distill/distill-2026-08-31.jsonl 入库 20 条（含 fengshui 太岁化解等）；进行中无未收口开发项，待主会话：服务中心导航回归走查（待浏览器）、C 类 13 页退役清单拍板、patrol 读数失实修真
+
 ## 2026-08-31 09:50 — ✅ P0 接口同构 + P1 药房台（医学执行段开工）
 - 后端盘点结论：tcm 执行段后端（处方 settle/verify/review-queue/unpaid、库存、排班、随访、慢病、疗效、安全核查）**已全量内化 8972 并活化**（实测 8 端点在线，待收费 3 单 ¥92.01），无需 tcm 侧开发
 - P0 同构别名实测 PASS：/api/clinic/appointment{,/slots,/list,/checkin,/cancel}（body.id 口径+doctor_name 字段+日期维度列表）、/api/report-link/{bind,unbind,status,push-queue}（family_token 字段兼容）
