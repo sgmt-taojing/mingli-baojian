@@ -1,0 +1,77 @@
+{
+  "source_evidence": "g5-smoke-evidence-20260831-211204.json",
+  "returncode": 0,
+  "verdict": "PASS",
+  "nodes": [
+    {
+      "node": "0-命理采集并轨(G15授权门+仅入批注层)",
+      "ts": "2026-08-31T21:12:02",
+      "elapsed_ms": 1781,
+      "ok": true,
+      "summary": "三路特征✓ 授权门负例✓ 医学上下文零泄漏✓"
+    },
+    {
+      "node": "1-患者建档+叫号",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 62,
+      "ok": true,
+      "summary": "queue_no=6 pid=empi-c2701d184166"
+    },
+    {
+      "node": "2-一帧采集+四诊诊断",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 5,
+      "ok": true,
+      "summary": "urgency=None"
+    },
+    {
+      "node": "3-EMR生成(case-auto)",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 26,
+      "ok": true,
+      "summary": "case=CASE-1788181924234 syndrome=方剂·四君子汤"
+    },
+    {
+      "node": "4-AI命理批注(8974)",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 8,
+      "ok": true,
+      "summary": "ann-daa1eb03fc3c pending+水印+免责声明 ✓"
+    },
+    {
+      "node": "5-annotation-queue核验(SLA48h)",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 8,
+      "ok": true,
+      "summary": "队列命中 sla=48h age=0h overdue=False"
+    },
+    {
+      "node": "6-命理师approve",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 2,
+      "ok": true,
+      "summary": "approved by ML-MASTER-001 水印已解除"
+    },
+    {
+      "node": "7-病历+药方生成",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 5,
+      "ok": true,
+      "summary": "rx=rx-223a2e6a-2b56-4b03-9773-aa145cc12ac7"
+    },
+    {
+      "node": "8-队列流转(waiting→called→in-consult→done)",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 7,
+      "ok": true,
+      "summary": "call✓ arrive(in-consult)✓ done✓"
+    },
+    {
+      "node": "9-合并报告(8920归档+emr-report+批注签发)",
+      "ts": "2026-08-31T21:12:04",
+      "elapsed_ms": 282,
+      "ok": true,
+      "summary": "8920 case=36 批注ann-09abb08463c2 pending→approved 报告两态读回 ✓"
+    }
+  ]
+}

@@ -343,11 +343,13 @@ app.get('/api/tcm/kb/search', (req, res) => {
     if (!q) return res.status(400).json({ ok: false, error: '缺少 q 参数' });
     const cache = loadKbCache(false);
     // R119 修真：中文长句双字滑动窗口切词（原实现整句匹配，长问句 0 命中）
+    // R829 移植（自 tcm 8932，L2 对拍收口）：窗口上限 6→14——原 cap 只切前 7 字，
+    // 条文/板书类查询的高区分度尾部（如「板书实操」）被静默丢弃，目标条目被泛泛命中挤位
     const tokens = [];
     const raw = q.toLowerCase().split(/[\s,，、;；]+/).filter(Boolean);
     for (const t of raw) {
       if (/[\u4e00-\u9fa5]/.test(t) && t.length > 2) {
-        for (let i = 0; i + 2 <= t.length && i < 6; i++) tokens.push(t.slice(i, i + 2));
+        for (let i = 0; i + 2 <= t.length && i < 14; i++) tokens.push(t.slice(i, i + 2));
       } else {
         tokens.push(t);
       }
@@ -357,6 +359,9 @@ app.get('/api/tcm/kb/search', (req, res) => {
     // R790：纯拉丁查询（首字母/全拼）走预算列前缀匹配——「sjz」命中「四君子汤」，
     // 多音字变体空格分隔逐一同比；标题级命中给高分（3），全拼次之（2）
     const latinQ = pinyin.isLatin(q) ? q.toLowerCase() : null;
+    // R825 移植（自 tcm 8932）：症状通道——症状别名词典识别规范症状，方剂反向索引
+    // 按重叠数加权（boost>0 的条目即便文本 0 命中也进结果集，独立于文本通道）
+    const symBoost = latinQ ? null : symptomIdx.buildBoostMap(q, _kbFlat);
     // R798 标题反哺：查询若命中 tcm-formula 干净方名（418 首），凡标题含该方名的
     // 长前缀条目加权 3.2（高于子串 2.5、低于完整 4/前缀 3 之外独立通道），让方名命中排最前
     let fxMatch = null;
@@ -405,11 +410,33 @@ app.get('/api/tcm/kb/search', (req, res) => {
         const titleLc = it._titleLc || (it._titleLc = it.title.toLowerCase());
         score = tokens.reduce((s, t) => s + (hay.includes(t) ? (titleLc.includes(t) ? 2 : 1) : 0), 0);
       }
+      if (symBoost) score += symBoost.get(it.id) || 0;  // R825 移植
       if (score > 0) hits.push({ ...it, score });
+    }
+    // R825 移植：症状通道命中方剂的响应标注（医生可见「为何命中」）
+    const symCanon = symBoost ? symptomIdx.analyzeQuery(q) : [];
+    // R829 移植：二级重排——粗排 top-80 追加「去标点逐字引用加成」。
+    // 条文/板书类查询是馆藏原文的清洗版，目标条目含最长连续串，却被泛泛命中
+    // 挤出 top10；逐字加成只作用于粗排头部 80 条，成本有界
+    if (!latinQ && hits.length > 1) {
+      const qNorm = q.replace(/[^一-龥a-z0-9]/g, '');
+      if (qNorm.length >= 5) {
+        hits.sort((a, b) => b.score - a.score);
+        for (const h of hits.slice(0, 80)) {
+          const srcNorm = (h.title + ' ' + h.content + ' ' + h.keywords).replace(/[^一-龥a-z0-9]/g, '');
+          let best = 0; // 最长公共子串（查询侧枚举，长→短首个命中即停）
+          for (let L = Math.min(qNorm.length, 12); L >= 5 && !best; L--) {
+            for (let i = 0; i + L <= qNorm.length; i++) {
+              if (srcNorm.includes(qNorm.slice(i, i + L))) { best = L; break; }
+            }
+          }
+          if (best >= 5) h.score += best * 2;
+        }
+      }
     }
     // R761 修真：排序接入 trust_score(口语转写降权 0.4 生效; confidence 缺省回退 trust)
     hits.sort((a, b) => b.score - a.score || (b.confidence != null ? b.confidence : (b.trust_score || 0.5)) - (a.confidence != null ? a.confidence : (a.trust_score || 0.5)));
-    res.json({ ok: true, query: q, total_hits: hits.length, limit, took_ms: Date.now() - _t0, results: hits.slice(0, limit).map(({ content, ...rest }) => ({ ...rest, content: content.slice(0, 600) })) });
+    res.json({ ok: true, query: q, total_hits: hits.length, limit, took_ms: Date.now() - _t0, symptom_canon: symCanon, results: hits.slice(0, limit).map(({ content, ...rest }) => ({ ...rest, content: content.slice(0, 600) })) });
   } catch (e) {
     res.status(500).json({ ok: false, error: '检索失败: ' + e.message });
   }

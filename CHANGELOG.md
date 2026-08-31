@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 · L2 红牌收口：检索内核移植 R825+R829（裁判拍板方案 A，六层验收转全绿）
+- **真根因**（比原诊断更深一层）：B075 差案并非导出覆盖缺口——金匮截图证据条目双侧语料都在（精确标题查询双侧 top1 一致）；真因是 ms 检索内核滞后 tcm 三块：R829 切词窗口 6→14 + 二级重排逐字加成、R825 症状通道加权。窗口 6 把「板书实操」高区分度尾词丢弃，蒸馏笔记泛泛命中挤位
+- **移植**（TCM-ABSORPTION-SPEC 流程，只适配不训练）：medical-stack/server/api-server.js 检索处理器补齐 R829（cap 14 + top-80 LCS 逐字加成）+ R825（symBoost 加权 + symptom_canon 响应标注）；依赖模块 symptom-index.js/aliases/formula-symptom-index  diff 验证原本就一致，纯接线
+- **验收**：B075 双侧 top1 一致（金匮截图证据·金匮要略01）；对拍 PASS（端点零差异 + Recall 双侧 25/30 Δ=0.0000）；**G17 六层复跑全绿 PASS**（证据件 L*-evidence-20260831-211202.json）
+- **机制教训**：L1 差集巡检只看路由/导出函数，看不到处理器内部排序逻辑漂移——L2 对拍门正是为此而设，本次实案验证其不可替代；后续可考虑把检索处理器特征哈希纳入巡检（已记 KANBAN P2）
+- 边界说明：hits 总数 6744 vs 6733 的 11 条差是 R745 命理关键词过滤的合法边界（天纪等 18 条不回流），语料条数 53,559/53,559 相等
+
 ## 2026-08-31 · patrol 修真 + 48h SLA 三级上盘 + 差集 72h SLA 追踪（盘点收尾第一波）
 - **patrol 读数失实修真**：① health-check.sh 结果只写日志不回显 stdout → 心跳 cron 看空气，已加回显（实测 ✅ HEALTHY 全文输出）；② 静默误报根因——patrol 监控的 server/kb/mingli-log.jsonl 写入方 mingli-tcm-daily-distill 已停用（08-26 起），改监控活跃产物 training-data/kb-web-distill/distill-*.jsonl 最新文件
 - **cron 连败 2 项确诊**：家庭健康周报（模型调用 120s 超时×6 周，端点实测 17ms 健康）+ 临床经验蒸馏（payload 第二步脚本 batch-distill-clinical.py 已被 tmp 清理，agent 仍执行致 5 连败）。修复件已备好（超时 120→300 / payload 改单步），但 AutoClaw 运行时持有 jobs.json 内存态并回写覆盖文件直改（两次实测 mtime 回滚）——需控制台操作，步骤已落 KANBAN
