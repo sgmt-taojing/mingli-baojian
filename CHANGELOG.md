@@ -1,6 +1,13 @@
 # mingli-baojian 更新日志
 
 
+## 2026-08-31 · 太岁×生肖知识激活 + 太岁工具修真
+- 修真：minsu getTaisui 刑/害映射表与传统规则不符（2026 刑误鸡害误鼠），改 fanTaiSuiList 统一判定；新增 taiSuiDirection/suiPoDirection 方位字段
+- shengxiao-engine 新增：ZHI_DIR/ZHI_MONTH/TAI_SUI_STATE_ADVICE 五态行事库、parseTaiSuiKb（星君/化解法/关键月份结构化解析）、taiSuiHuajie（plan 七段+compact 精简）、fanTaiSuiList（含 zhi 数组）
+- 挂载：buildSection 生肖流年犯太岁年挂【化解方案】compact；/api/minsu/taisui 五类目各挂 huajie、个人化 fanTaisui 挂 huajie+huajieFull
+- 实测：taisui 端点五类目正确且各带化解、八字报告 2026 值太岁化解 6 条（星君文烈将军/贵人羊虎狗/方位南北/应期五月子月/古籍四条）
+
+
 ## 2026-08-31 · 生肖知识激活 P0
 - 新引擎 shengxiao-engine.js：relZhi/relAnimals（婚配五档 tier）/nobles（六合+三合贵人）/taiSui（值冲刑害破五态）/personality（zodiac 模块性别分述，修正文混排按性别抽行）/taiSuiKb（taisui 模块逐年条目，过滤 markdown 标题）/buildSection（报告段构建）
 - norm-report-engine：generateNormReport 对 bazi/ziwei 注入 segSX「生肖关系」段（pillars 三级回退取值）；generateHehunReport 合婚判定切引擎五档，L4 性格适配/L5 相处建议按 tier/type 分支（新增六害/相刑/六破提示文案）
