@@ -11,6 +11,10 @@ mkdir -p "$PROJ/logs"
   echo "===== $(date '+%Y-%m-%d %H:%M:%S') UI 回归开始 ====="
   "$NODE" "$PROJ/scripts/ui-smoke-consultation.js"
   RC=$?
+  echo "--- 文字标识红线扫描 ---"
+  "$NODE" "$PROJ/scripts/text-icon-scan.js"
+  SCAN_RC=$?
+  [ $SCAN_RC -ne 0 ] && RC=$SCAN_RC
   echo "===== 退出码 $RC ====="
 } >> "$LOG" 2>&1
 # 日志保留最近 500 行

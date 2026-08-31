@@ -229,7 +229,7 @@ h+='<div class="month-box '+cls+'"><div><b>'+mw.m+'</b></div><div>'+mw.wx+'月</
 h+='</div><div style="font-size:11px;color:var(--muted);margin-top:4px">危高风险=克我 🟡中风险=泄气/同气 🟢低风险=生我</div></div>';
 
 // 高风险月份预警
-h+='<div class="card"><div class="card-title">警 高风险月份精确预警</div>';
+h+='<div class="card"><div class="card-title">⚠️ 高风险月份精确预警</div>';
 monthWx.forEach(function(mw,i){var r=mRisk(mw.wx,yE);
 if(r==='danger'||r==='warn'){
 var jieqiDay=[6,4,6,5,6,7,7,8,8,8,7,7][i]||6;
@@ -256,7 +256,7 @@ h+='</div>';
 
 // 家族遗传+西医数据综合预警
 if(geneticRisk.length>0){
-h+='<div class="card" style="border-color:var(--red)"><div class="card-title" style="color:var(--red)">因 家族遗传风险预警</div>';
+h+='<div class="card" style="border-color:var(--red)"><div class="card-title" style="color:var(--red)">🧬 家族遗传风险预警</div>';
 geneticRisk.forEach(function(g){
 h+='<div class="organ-card"><div style="font-size:13px;font-weight:600;color:var(--red)">'+g+'</div>';
 if(g.indexOf('高血压')>=0||g.indexOf('心血管')>=0){

@@ -149,10 +149,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 <div class="section">
   <div class="section-title">👤 5 身份卡（缘主/患者/信众/康养人/普通）</div>
   <div class="identity-grid" id="identity-grid">
-    <div class="identity-card" data-type="yuanzhu"><div class="icon">星</div><div class="name">缘主（命理）</div><div class="count" id="cnt-yuanzhu">--</div></div>
-    <div class="identity-card" data-type="patient"><div class="icon">药</div><div class="name">患者（中医）</div><div class="count" id="cnt-patient">--</div></div>
-    <div class="identity-card" data-type="believer"><div class="icon">拜</div><div class="name">信众（民俗）</div><div class="count" id="cnt-believer">--</div></div>
-    <div class="identity-card" data-type="wellness"><div class="icon">盾</div><div class="name">康养人（预测）</div><div class="count" id="cnt-wellness">--</div></div>
+    <div class="identity-card" data-type="yuanzhu"><div class="icon">⭐</div><div class="name">缘主（命理）</div><div class="count" id="cnt-yuanzhu">--</div></div>
+    <div class="identity-card" data-type="patient"><div class="icon">💊</div><div class="name">患者（中医）</div><div class="count" id="cnt-patient">--</div></div>
+    <div class="identity-card" data-type="believer"><div class="icon">🙏</div><div class="name">信众（民俗）</div><div class="count" id="cnt-believer">--</div></div>
+    <div class="identity-card" data-type="wellness"><div class="icon">🛡️</div><div class="name">康养人（预测）</div><div class="count" id="cnt-wellness">--</div></div>
     <div class="identity-card" data-type="general"><div class="icon">📇</div><div class="name">普通档案</div><div class="count" id="cnt-general">--</div></div>
   </div>
 </div>
@@ -332,7 +332,7 @@ function renderOcr(d){
   var html = '';
   list.forEach(function(o){
     var cls = (o.title || '').indexOf('high') > -1 ? 'high' : (o.title || '').indexOf('mid') > -1 ? 'mid' : 'normal';
-    html += '<div class="event-item ' + cls + '"><div class="event-icon">查</div>';
+    html += '<div class="event-item ' + cls + '"><div class="event-icon">🔍</div>';
     html += '<div class="event-body"><div class="event-title">' + o.title + '</div>';
     html += '<div class="event-summary">' + (o.summary || '') + '</div>';
     html += '<div class="event-meta"><span>trust=' + o.trust_score + '</span><span>' + (o.entry_id || '').substr(0,30) + '</span></div>';
@@ -350,7 +350,7 @@ function renderWeekly(d){
   var html = '';
   list.forEach(function(w){
     var cls = w.outcome === 'better' ? 'normal' : w.outcome === 'worse' ? 'high' : 'mid';
-    html += '<div class="event-item ' + cls + '"><div class="event-icon">历</div>';
+    html += '<div class="event-item ' + cls + '"><div class="event-icon">📅</div>';
     html += '<div class="event-body"><div class="event-title">' + (w.week_start || '周') + ' · ' + w.outcome + '</div>';
     html += '<div class="event-summary">' + (w.symptoms || '症状稳定') + ' · ' + (w.lifestyle || '') + '</div>';
     html += '<div class="event-meta"><span>五行: ' + (w.element || '—') + '</span><span>KB: ' + (w.kb_extracted ? '✅' : '⏭') + '</span></div>';

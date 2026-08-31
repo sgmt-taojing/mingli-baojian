@@ -272,7 +272,7 @@ html+='<div style="font-size:11px;color:var(--muted);margin-top:6px">危红色=�
 html+='</div>'
 
 // 3. 高风险月份精确到日
-html+='<div class="card"><div class="card-title">警 高风险月份详细预警</div>'
+html+='<div class="card"><div class="card-title">⚠️ 高风险月份详细预警</div>'
 monthWx.forEach(function(mw,i){
 var r=monthRisk(mw.wx,yE)
 if(r.level==='danger'||r.level==='warn'){
@@ -309,7 +309,7 @@ html+='</div></div>'
 html+='</div>'
 
 // 5. 流年专项
-html+='<div class="card"><div class="card-title">网 2026丙午年流年专项</div>'
+html+='<div class="card"><div class="card-title">🌐 2026丙午年流年专项</div>'
 var cyRel=''
 if(cycle[cyE]===yE)cyRel='流年生我→体质好转期，但仍需养'
 else if(cycle[yE]===cyE)cyRel='流年我生→精力消耗大，需补气'
@@ -339,7 +339,7 @@ if(yE==='火'){html+='<b>专项（夏季）：</b>心电图+心脏彩超+动态�
 html+='</div></div>'
 
 // 7. 免责
-html+='<div class="card" style="border-color:var(--red)"><div class="card-title" style="color:var(--red)">警 免责声明</div><div style="font-size:11px;color:var(--muted);line-height:1.6">本预测基于传统命理五行理论结合中医脏腑理论，仅供参考。预测不能替代医学诊断。如有不适请及时就医，定期体检是最佳预防手段。</div></div>'
+html+='<div class="card" style="border-color:var(--red)"><div class="card-title" style="color:var(--red)">⚠️ 免责声明</div><div style="font-size:11px;color:var(--muted);line-height:1.6">本预测基于传统命理五行理论结合中医脏腑理论，仅供参考。预测不能替代医学诊断。如有不适请及时就医，定期体检是最佳预防手段。</div></div>'
 
 el.innerHTML=html
 window.scrollTo(0,0)

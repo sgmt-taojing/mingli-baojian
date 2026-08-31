@@ -119,7 +119,7 @@ var statusNames = {open:'待处理',in_progress:'处理中',resolved:'已解决'
 var priIcons = {urgent:'🔴 紧急',high:'🟠 高',normal:'🟡 普通',low:'🟢 低'};
 
 if (!ticketId) {
-  document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">败</div><div class="error-msg">缺少工单ID</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
+  document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">❌</div><div class="error-msg">缺少工单ID</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
 } else {
   loadTicket();
 }
@@ -133,13 +133,13 @@ function loadTicket() {
     .then(function(r) { return r.json(); })
     .then(function(r) {
       if (r.code !== 0) {
-        document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">查</div><div class="error-msg">' + escapeHtml(r.message || '工单不存在') + '</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
+        document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">🔍</div><div class="error-msg">' + escapeHtml(r.message || '工单不存在') + '</div><a href="feedback-center.html" class="back-link">返回反馈列表</a></div>';
         return;
       }
       renderTicket(r.data);
     })
     .catch(function(e) {
-      document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">警</div><div class="error-msg">查阅失败：' + escapeHtml(esc(e.message)) + '</div></div>';
+      document.getElementById('content').innerHTML = '<div class="error-box"><div class="error-icon">⚠️</div><div class="error-msg">查阅失败：' + escapeHtml(esc(e.message)) + '</div></div>';
     });
 }
 
