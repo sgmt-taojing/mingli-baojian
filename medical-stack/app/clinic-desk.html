@@ -279,6 +279,8 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
       <button class="btn small" onclick="fetchVitals()">⌚ 拉取穿戴数据</button>
     </div>
     <div id="vital-display" style="font-size:11px;margin:4px 0"></div>
+    <div style="font-size:10px;color:var(--text3);margin:6px 0 2px">医师脉诊（点选，可复合）</div>
+    <div id="pulse-chips" style="display:flex;flex-wrap:wrap;gap:4px"></div>
 
     <!-- ⑤ 检验旁证 · 西医指标（R773b） -->
     <h4>⑤ 检验旁证 — 西医指标 <span style="font-size:9px;color:var(--text3)">作中医佐证，不作诊断依据</span></h4>
@@ -366,6 +368,7 @@ const session = {
   duration: '',
   evidence: [],            // {type, text, ts}
   vision: {},              // 各部位最新特征 {face:{}, tongue:{}, hand:{}}
+  pulseTypes: [],          // 医师脉诊快选（B3：中医脉象入病历，穿戴只有心率血压给不了脉位脉形）
   labs: [],                // 检验旁证：西医生化指标 [{name,value,ts}]
   faceChecked: false,
   aiResult: null
@@ -495,7 +498,9 @@ function renderFourCover() {
   const qN = TEN_Q.filter(q => q.terms.some(t => allText.includes(t))).length;
   set('fc-wenn', '💬 问 ' + qN + '/10', qN >= 8);
   const v = session.vision.vitals;
-  set('fc-qie', '🫀 切 ' + (v && v.heart_rate ? v.heart_rate + 'bpm' : '未采'), !!(v && v.heart_rate));
+  const qieTxt = [session.pulseTypes.length ? session.pulseTypes.join('') + '脉' : '',
+                  v && v.heart_rate ? v.heart_rate + 'bpm' : ''].filter(Boolean).join('·') || '未采';
+  set('fc-qie', '🫀 切 ' + qieTxt, session.pulseTypes.length > 0 || !!(v && v.heart_rate));
 }
 
 function summarizeFeatures(part, d) {
@@ -933,10 +938,42 @@ function markAsked(key) {
 }
 
 /* ═══════════════════════ ④ 切诊：穿戴（R772 自动轮询 + 实时上行智能体） ═══════════════════════ */
+/* B3 修真：patient_id 不再写死 P001 —— 有姓名时按姓名派生稳定 id（同人同流，换人不串数据） */
+function vitalPid() {
+  const nm = (session.profile.name.v || '').trim();
+  if (!nm) return 'P001';   // 未建档前保留演示流兜底
+  let h = 0; for (let i = 0; i < nm.length; i++) h = (h * 31 + nm.charCodeAt(i)) >>> 0;
+  return 'P' + h.toString(36);
+}
+/* B3：医师脉诊快选——穿戴设备只给心率/血压，中医脉象（脉位脉形）须医师手诊补录 */
+const PULSE_TYPES = ['浮','沉','迟','数','弦','滑','细','洪','紧','缓','涩','弱'];
+function renderPulseChips() {
+  const el = document.getElementById('pulse-chips');
+  if (!el) return;
+  el.innerHTML = PULSE_TYPES.map(function(t) {
+    const on = session.pulseTypes.indexOf(t) >= 0;
+    return '<button class="btn small" style="font-size:10px;padding:2px 8px;' +
+      (on ? 'background:var(--primary,#2b6cb0);color:#fff;border-color:var(--primary,#2b6cb0)' : '') +
+      '" onclick="togglePulse(\'' + t + '\')">' + t + '</button>';
+  }).join('');
+}
+function togglePulse(t) {
+  const i = session.pulseTypes.indexOf(t);
+  if (i >= 0) session.pulseTypes.splice(i, 1); else session.pulseTypes.push(t);
+  if (session.pulseTypes.length) {
+    const txt = '脉诊：' + session.pulseTypes.join('、') + '脉';
+    addEvidence('pulse', txt);
+    agentEvent('pulse', txt, null, null, { pulse: session.pulseTypes.slice() });
+    scheduleAnalyze();
+  }
+  renderPulseChips();
+  renderFourCover();
+}
+renderPulseChips();
 let vitalLastTs = '';
 async function fetchVitals(manual) {
   try {
-    const r = await fetch(API + '/api/vital/latest?patient_id=P001');
+    const r = await fetch(API + '/api/vital/latest?patient_id=' + vitalPid());
     const d = await r.json();
     const v = d.data || {};
     if (d.ok && (v.heart_rate != null || v.systolic != null || v.spo2 != null || v.glucose != null)) {
@@ -1669,7 +1706,9 @@ async function confirmDiagnosis(adoptAI) {
     望: Object.keys(session.vision).filter(k => k !== 'vitals').map(k => CAM_LABEL[k] + '：' + summarizeFeatures(k, session.vision[k])).join('；') || '未采集',
     闻: '对话转写 ' + session.evidence.filter(e => e.type === 'say').length + ' 句 · 症状 ' + [...session.symptoms].join('、'),
     问: complaint || '—',
-    切: session.vision.vitals ? ('血压' + session.vision.vitals.systolic + '/' + session.vision.vitals.diastolic + ' · 心率' + session.vision.vitals.heart_rate) : '未采集'
+    切: [session.pulseTypes.length ? '脉象 ' + session.pulseTypes.join('、') : '',
+         session.vision.vitals ? ('血压' + session.vision.vitals.systolic + '/' + session.vision.vitals.diastolic + ' · 心率' + session.vision.vitals.heart_rate) : ''
+        ].filter(Boolean).join(' · ') || '未采集'
   };
   try {
     const cfR = await authFetch(API + '/api/tcm/case-confirm', { method:'POST', headers:{'Content-Type':'application/json'},
@@ -1682,7 +1721,7 @@ async function confirmDiagnosis(adoptAI) {
         patient: { name: p.name.v || '' },
         symptoms: [...session.symptoms],
         tongue: session.vision.tongue ? [summarizeFeatures('tongue', session.vision.tongue)] : [],
-        pulse: session.vision.vitals ? ['心率' + session.vision.vitals.heart_rate] : [],
+        pulse: [...session.pulseTypes.map(t => t + '脉'), ...(session.vision.vitals ? ['心率' + session.vision.vitals.heart_rate] : [])],
         labs: session.labs.slice(-30),
         safetyReview: presignReview && presignReview.ok ? { verdict: presignReview.verdict, critical: presignReview.criticalCount, warnings: presignReview.warnCount, engine: presignReview.engine, at: new Date().toISOString() } : null,
         aiVersion: 'R774-无感四诊',

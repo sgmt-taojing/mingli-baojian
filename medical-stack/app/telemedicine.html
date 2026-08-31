@@ -89,20 +89,20 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
   <div class="grid2">
     <!-- 视频区 -->
     <div class="card">
-      <h3>🎥 视频诊室</h3>
+      <h3>🎥 视频诊室 <span style="font-size:10px;color:var(--text3);font-weight:normal">本机画面预览</span></h3>
       <div class="video-area" id="video-area">
         <div class="cam-hint">
           <div class="icon">📹</div>
-          <div>点击下方「开始视频」开启摄像头</div>
+          <div>点击下方「开始视频」开启本机摄像头（画面预览，不构成远程视频通道）</div>
         </div>
-        <div class="rec-dot">● REC 会诊中</div>
+        <div class="rec-dot">● 本机预览</div>
       </div>
       <div class="btn-row" style="justify-content:center">
         <button class="btn blue" id="btn-video" onclick="toggleVideo()">▶️ 开始视频</button>
         <button class="btn small" onclick="shareScreen()">🖥 共享病历</button>
         <button class="btn small" onclick="toggleMute()">🎙 静音</button>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">演示环境：真实部署时接入 WebRTC 视频网关</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:6px;text-align:center">定位：异步会诊（病历快照 + 讨论纪要 + 预约协同）；实时视频通道经定案不接入（B1 · 20260831）</div>
     </div>
 
     <!-- 会诊信息 -->
@@ -309,8 +309,8 @@ renderHistory();
 <div id="video-status" style="text-align:center;padding:8px;font-size:12px"></div>
 
 <script>
-// ═══ 远程会诊 WebRTC 就绪标记 ═══
-(function(){var el=document.getElementById('video-status');if(el)el.innerHTML='<span style="color:#22c55e">🟢 会诊通道就绪</span> (WebRTC需对端信令服务)';})();
+// ═══ 会诊定位标记（B1 定案 20260831：异步会诊为正式能力，实时视频通道不接入） ═══
+(function(){var el=document.getElementById('video-status');if(el)el.innerHTML='<span style="color:var(--text3,#94a3b8)">⚪ 异步会诊模式：病历快照 + 讨论纪要 + 预约协同为正式能力；实时视频通道不提供（院内部署定位，不涉及互联网医院音视频诊疗资质边界）</span>';})();
 </script>
 <script src="js/error-interceptor.js"></script>
 <script src="js/common.js"></script>

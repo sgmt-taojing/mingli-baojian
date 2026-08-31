@@ -195,6 +195,17 @@ if [ -n "$DIFF_SLA_OUT" ]; then
     done <<< "$DIFF_SLA_OUT"
 fi
 
+# ===== R-WALF WAL 裂脑检测（2026-08-31 事故守卫）=====
+# 背景：R772 按请求开关写连接触发 SQLite 末连接语义删除/重建 -wal/-shm，
+# 主句柄持续写入失链孤儿 WAL（磁盘不可见、重启即丢）。根修后本规则兜底：
+# 主 API 进程持有的 yidao.db-wal fd inode 与磁盘文件 inode 不一致即告警。
+API_PID=$(pgrep -f 'api-server-v2.js' | head -1)
+if [ -n "$API_PID" ]; then
+  DISK_WAL_INODE=$(stat -f '%i' "$PROJECT_ROOT/server/database/yidao.db-wal" 2>/dev/null || echo MISSING)
+  HELD_BAD=$(lsof -p "$API_PID" 2>/dev/null | awk '/yidao\.db-wal/ && $4 ~ /u$/ {print $8}' | sort -u | grep -v "^${DISK_WAL_INODE}$" | head -1)
+  [ -n "$HELD_BAD" ] && ALERTS+=("WAL裂脑: api-v2(pid=$API_PID) 持有失链 yidao.db-wal inode=$HELD_BAD（磁盘=$DISK_WAL_INODE）→ 写入不落盘，重启即丢！立即排查并按 WAL-F 流程收敛")
+fi
+
 # ===== R111 触发器巡检：kb_formal 关键触发器存在性 + hit_count NULL =====
 TRIG_OK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND tbl_name='kb_formal' AND name='kb_formal_hit_count_default';" 2>/dev/null)
 [ "$TRIG_OK" != "1" ] && ALERTS+=("触发器丢失: kb_formal_hit_count_default（FTS 重建可能吞掉，用 scripts/fix-fts5-unicode61.py 重跑可恢复）")

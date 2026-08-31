@@ -7,6 +7,15 @@
 - [P2 新增] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
 
+## 2026-08-31 23:59 — 🚨 WAL 裂脑事故根修 + P2.8 终验通过【夜战·已完结】
+- **P0 事故（已根修）**：R772 按请求 better-sqlite3 写连接 close 触发 SQLite 末连接语义删建 -wal/-shm → 主句柄写入失链孤儿 WAL。单发 POST /api/paipan/calculate 100% 复现；修法=R772 与 agent-orchestrator 连接单例化；修后全链压测 inode 零漂移
+- **数据保全**：全库 .recover 重建（113 表零差异）+ FTS5 重建 + integrity ok；verification_corpus 存量损坏（08-30 前已有）一并修复；幻影视图 14 件证据留 /tmp/p28-salvage/
+- **守卫**：health-patrol R-WALF 规则上线（失链 wal inode 即告警）；探针 /tmp/wal-probe.sh
+- **P2.8 ✅ 终验**：#23（批注#11/处方#8）、#25（批注#12/处方#9）UI 真实点击全链 + 磁盘断言双视图一致；#24 核销（幻影世系误记）
+- **新增 P3**：① sqlite3 CLI 外部打开偶发 CANTOPEN 抖动 ② medical_cases.status 不随流程流转（日志链完整）
+- **待裁判澄清**：23:47《G17R 批复》与 22:22《G17R 撤销令》冲突（批复称 L2 留红/建隔离，撤销令称六层全签/不得隔离）——按更新且引 ADR-019 的撤销令执行，待裁判确认
+- **仍待拍板（不变）**：AutoClaw 控制台修 2 个 cron 连败；C 类 13 页退役；meta-only 2628 条删除
+
 ## 2026-08-31 21:10 — 📊 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
 - **今日完成（2 大件）**：
   1. 服务中心导航回归走查（浏览器实测）+ 首页统计修复 — `KANBAN.md 21:05`

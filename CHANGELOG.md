@@ -1,5 +1,14 @@
 # mingli-baojian 更新日志
 
+## 2026-08-31 深夜 · P0 事故：WAL 裂脑根修 + P2.8 问诊台双师全链终验通过
+- **事故定性**：8920 主库 yidao.db 发生 WAL 裂脑——主句柄持续写入「失链孤儿 WAL」（磁盘不可见、进程重启即丢），今日 19:34 起全部写入（测试用户/病例 #31-37/处方签名）险遭灭失；并连带挖出 verification_corpus 表存量物理损坏（B-tree 野指针，08-30 备份中已存在，非本次事故造成）
+- **真根因（以治法确诊）**：R772「排盘验证联动」在 /api/paipan/calculate 里按请求 `new better-sqlite3` 写连接 + `close()`——跨库（better-sqlite3 ↔ node:sqlite 主句柄）共存时，close 触发 SQLite 末连接语义删除/重建 -wal/-shm，主句柄沦为孤儿。POST /api/paipan/calculate 单发即可 100% 复现；Node fs 钩子打栈排除 JS 层删除，确认为 SQLite C 层行为
+- **根修**：R772 改走主句柄（顺带修 ppKey 毫秒级撞键）；agent-orchestrator `_persistRun`/`getRunStats` 同病同修（yidao.db 连接单例化，进程期复用不 close）。修后压测：排盘×3 + 编排×1 + 草案/签名/处方/调剂/归档全链，WAL inode 零漂移，写入即时磁盘可见
+- **数据抢救与重建**：幻影视图 14 件证据导出 /tmp/p28-salvage/；全库 `.recover` 重建（113 表行数与原库零差异，lost_and_found 1040 碎片均为失效页残片）；FTS5 双索引重建；integrity_check 转 ok；旧库留档 yidao.db.corrupt-20260831-splitbrain
+- **守卫**：health-patrol 新增 R-WALF 规则——主 API 进程持有失链 wal inode 即告警；/tmp/wal-probe.sh 探针脚本留档
+- **P2.8 终验（磁盘双视图一致）**：浏览器真实点击跑通 病例#23（批注#11 signed·master#29 → 处方#8 signed·doctor#29 → 调剂 → 归档 → emr_archived）与 病例#25（批注#12 → 处方#9 → 全链）。#24 为幻影世系误记，磁盘实际不存在，已核销。报告数据通路（加密草案解密+批注读取）实测正常
+- **遗留观察项**：① sqlite3 CLI 外部打开偶发 CANTOPEN 抖动（重试即过，疑与检查点窗口竞争，记入 KANBAN P3）；② medical_cases.status 字段不随流程流转（日志链完整但状态字段停 pending_master，P3）；③ 裁判 G17R 批复（23:47 到）与 22:22《G17R 撤销令》冲突——撤销令更新且引用 ADR-019 全签结论，本轮按撤销令执行不建隔离，冲突已标记待裁判澄清
+
 ## 2026-08-31 · L2 红牌收口：检索内核移植 R825+R829（裁判拍板方案 A，六层验收转全绿）
 - **真根因**（比原诊断更深一层）：B075 差案并非导出覆盖缺口——金匮截图证据条目双侧语料都在（精确标题查询双侧 top1 一致）；真因是 ms 检索内核滞后 tcm 三块：R829 切词窗口 6→14 + 二级重排逐字加成、R825 症状通道加权。窗口 6 把「板书实操」高区分度尾词丢弃，蒸馏笔记泛泛命中挤位
 - **移植**（TCM-ABSORPTION-SPEC 流程，只适配不训练）：medical-stack/server/api-server.js 检索处理器补齐 R829（cap 14 + top-80 LCS 逐字加成）+ R825（symBoost 加权 + symptom_canon 响应标注）；依赖模块 symptom-index.js/aliases/formula-symptom-index  diff 验证原本就一致，纯接线
