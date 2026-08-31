@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>院内执行台 · 命理宝鉴医疗云</title>
+<style>
+:root{--bg:#f5f2ed;--card:#fff;--border:#ddd6c8;--primary:#6b3a1f;--accent:#c0392b;--green:#16a34a;--blue:#2563eb;--text:#1a1008;--text2:#6b5b4f;--text3:#9b8b7f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.phb{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.phb-back{font-size:22px;color:var(--text2);text-decoration:none;padding:0 8px}
+.phb-dot{width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.phb-title{font-size:15px;font-weight:600;flex:1}
+.phb-link{font-size:12px;color:var(--text2);text-decoration:none;padding:4px 10px;border:1px solid var(--border);border-radius:12px}
+.tabs{display:flex;gap:6px;padding:10px 16px 0;max-width:1040px;margin:0 auto}
+.tab{padding:8px 18px;border-radius:10px 10px 0 0;background:#ece5d8;color:var(--text2);font-size:13px;cursor:pointer;border:1px solid var(--border);border-bottom:none}
+.tab.active{background:var(--card);color:var(--primary);font-weight:700}
+.container{max-width:1040px;margin:0 auto;padding:12px}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border-radius:10px;padding:16px;margin:12px 0;border:1px solid var(--border)}
+.card h3{font-size:15px;color:var(--primary);margin-bottom:8px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat-card{background:var(--card);border-radius:8px;padding:12px;text-align:center;border:1px solid var(--border)}
+.stat-card .val{font-size:22px;font-weight:700;color:var(--primary)}
+.stat-card .lbl{font-size:10px;color:var(--text3)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--text3);font-size:11px;padding:6px 4px}
+td{padding:7px 4px;border-top:1px solid #f0ead0}
+.btn{display:inline-block;padding:6px 12px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;border:none}
+.btn.primary{background:var(--primary);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.blue{background:var(--blue);color:#fff}
+.btn.small{padding:4px 10px;font-size:10px}
+input,select{padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;z-index:999}
+.form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.tag{display:inline-block;font-size:10px;border-radius:8px;padding:1px 8px}
+.tag.warn{background:#fef2f2;color:var(--accent)}.tag.ok{background:#f0fdf4;color:var(--green)}.tag.info{background:#eff6ff;color:var(--blue)}
+</style>
+</head>
+<body>
+
+<div class="phb">
+  <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
+  <span class="phb-dot"></span>
+  <span class="phb-title">🏥 院内执行台</span>
+  <a class="phb-link" href="pharmacy.html">药房台</a>
+  <a class="phb-link" href="integrated-clinic.html">问诊台</a>
+  <a class="phb-link" href="center-org.html">机构中心</a>
+</div>
+
+<div class="tabs">
+  <div class="tab" data-tab="cashier">💰 收费台</div>
+  <div class="tab" data-tab="inventory">📦 库存</div>
+  <div class="tab" data-tab="schedule">🗓 排班</div>
+  <div class="tab" data-tab="followup">📞 随访</div>
+</div>
+
+<div class="container">
+
+<!-- ═══ 收费台 ═══ -->
+<div class="panel" id="panel-cashier">
+  <div class="stats">
+    <div class="stat-card"><div class="val" id="cs-count">–</div><div class="lbl">待收费单</div></div>
+    <div class="stat-card"><div class="val" id="cs-amount">–</div><div class="lbl">待收总额(元)</div></div>
+    <div class="stat-card"><div class="val" id="cs-today">–</div><div class="lbl">今日已收(元)</div></div>
+  </div>
+  <div class="card">
+    <h3>💰 待收费处方 <span style="font-size:11px;color:var(--text3);font-weight:400">（收费后处方进入药房审核流）</span></h3>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>单号</th><th>患者</th><th>金额</th><th>开具时间</th><th>收费方式</th><th></th></tr></thead>
+      <tbody id="cs-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card"><h3>📊 近 7 日收费</h3><div id="cs-week" style="font-size:12px">加载中…</div></div>
+</div>
+
+<!-- ═══ 库存 ═══ -->
+<div class="panel" id="panel-inventory">
+  <div class="card">
+    <h3>📦 药材库存 <span id="inv-note" style="font-size:11px;color:var(--text3);font-weight:400"></span></h3>
+    <div class="form-row">
+      <input id="iv-name" placeholder="药材名" style="width:120px">
+      <select id="iv-op"><option value="in">入库</option><option value="out">出库</option></select>
+      <input id="iv-qty" type="number" placeholder="数量(g)" style="width:90px">
+      <input id="iv-price" type="number" placeholder="单价(可选)" style="width:100px">
+      <button class="btn primary" id="iv-submit">登记</button>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>药材</th><th>库存</th><th>警戒线</th><th>状态</th></tr></thead>
+      <tbody id="iv-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card"><h3>🧭 补货建议</h3><div id="iv-advice" style="font-size:12px">加载中…</div></div>
+</div>
+
+<!-- ═══ 排班 ═══ -->
+<div class="panel" id="panel-schedule">
+  <div class="card">
+    <h3>🗓 医师排班</h3>
+    <div class="form-row">
+      <select id="sc-doctor"></select>
+      <input id="sc-date" type="date">
+      <select id="sc-type"><option value="am">上午班</option><option value="pm">下午班</option><option value="night">晚班</option></select>
+      <button class="btn primary" id="sc-submit">排班</button>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>日期</th><th>医师</th><th>班次</th><th>专长</th></tr></thead>
+      <tbody id="sc-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card"><h3>👨‍⚕️ 医师固定出诊</h3><div id="sc-recurring" style="font-size:12px">加载中…</div></div>
+</div>
+
+<!-- ═══ 随访 ═══ -->
+<div class="panel" id="panel-followup">
+  <div class="stats">
+    <div class="stat-card"><div class="val" id="fu-pending">–</div><div class="lbl">待随访</div></div>
+    <div class="stat-card"><div class="val" id="fu-overdue">–</div><div class="lbl">已逾期</div></div>
+    <div class="stat-card"><div class="val" id="fu-done">–</div><div class="lbl">已完成</div></div>
+  </div>
+  <div class="card">
+    <h3>📞 新建随访</h3>
+    <div class="form-row">
+      <input id="fu-name" placeholder="患者姓名" style="width:110px">
+      <input id="fu-syndrome" placeholder="证型(如 脾胃虚弱)" style="width:150px">
+      <input id="fu-formula" placeholder="方剂(如 四君子汤)" style="width:150px">
+      <input id="fu-days" type="number" placeholder="几天后随访" style="width:110px">
+      <button class="btn primary" id="fu-submit">创建</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📋 随访计划</h3>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>编号</th><th>患者</th><th>证型/方剂</th><th>计划日期</th><th>状态</th><th></th></tr></thead>
+      <tbody id="fu-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<div style="font-size:10px;color:var(--text3);margin:16px 0 24px;text-align:center;border-top:1px solid var(--border);padding-top:10px">
+  ⚠️ 本系统为辅助诊疗工具，最终诊疗决策由执业医师作出；急危重症请按院内急诊流程处置。
+</div>
+</div>
+
+<script>
+'use strict';
+var API = 'http://127.0.0.1:8972';
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toast(m){ var t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(function(){t.remove();},2600); }
+function get(p){ return fetch(API+p).then(function(r){return r.json();}); }
+function post(p,b){ return fetch(API+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(function(r){return r.json();}); }
+
+/* 页签 */
+var tabs = document.querySelectorAll('.tab');
+function activate(name){
+  tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.tab===name); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('active', p.id==='panel-'+name); });
+  location.hash = name;
+}
+tabs.forEach(function(t){ t.onclick = function(){ activate(t.dataset.tab); }; });
+
+/* ── 收费台 ── */
+function loadCashier(){
+  get('/api/prescription/unpaid').then(function(d){
+    var list = d.list || [];
+    document.getElementById('cs-count').textContent = d.total != null ? d.total : list.length;
+    document.getElementById('cs-amount').textContent = (d.amount_total != null ? d.amount_total : 0).toFixed(2);
+    var el = document.getElementById('cs-body');
+    if (!list.length) { el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:18px">✓ 无待收费单</td></tr>'; return; }
+    el.innerHTML = list.map(function(r){
+      var amt = r.amount != null ? r.amount : (r.price && r.price.total) || 0;
+      return '<tr><td>' + esc((r.rx_id||'').slice(-8)) + '</td><td>' + esc(r.patient || r.patient_id || '—') + '</td>' +
+        '<td style="font-weight:700;color:var(--primary)">¥' + Number(amt).toFixed(2) + '</td>' +
+        '<td style="font-size:10px;color:var(--text3)">' + esc((r.created_at||'').slice(0,16).replace('T',' ')) + '</td>' +
+        '<td><select data-pay="' + esc(r.rx_id) + '"><option value="wechat">微信</option><option value="alipay">支付宝</option><option value="cash">现金</option><option value="insurance">医保</option></select></td>' +
+        '<td><button class="btn green small" data-settle="' + esc(r.rx_id) + '" data-amt="' + amt + '">确认收费</button></td></tr>';
+    }).join('');
+  }).catch(function(){ document.getElementById('cs-body').innerHTML = '<tr><td colspan="6">📡 医疗后端离线</td></tr>'; });
+  get('/api/finance/summary').then(function(d){
+    document.getElementById('cs-today').textContent = (d.today || 0).toFixed ? d.today.toFixed(2) : d.today;
+    var days = d.days || [];
+    document.getElementById('cs-week').innerHTML = days.length
+      ? days.map(function(x){ return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ead0"><span>' + esc(x.date) + ' ' + esc(x.weekday||'') + '</span><span style="font-weight:600">¥' + Number(x.amount||0).toFixed(2) + '</span></div>'; }).join('')
+      : '<span style="color:var(--text3)">近 7 日暂无收费记录</span>';
+  }).catch(function(){});
+}
+document.addEventListener('click', function(ev){
+  var b = ev.target.closest && ev.target.closest('button[data-settle]');
+  if (!b) return;
+  var rx = b.dataset.settle;
+  var sel = document.querySelector('select[data-pay="' + CSS.escape(rx) + '"]');
+  b.disabled = true;
+  post('/api/prescription/settle', { rx_id: rx, method: sel ? sel.value : 'cash', amount: Number(b.dataset.amt || 0) }).then(function(d){
+    b.disabled = false;
+    if (d.ok) { toast(d.already ? '该单已收过费' : '✅ 收费成功'); loadCashier(); }
+    else toast('收费失败：' + (d.error || ''));
+  }).catch(function(e){ b.disabled = false; toast('网络错误'); });
+});
+
+/* ── 库存 ── */
+function loadInventory(){
+  get('/api/inventory').then(function(d){
+    var list = d.list || [];
+    document.getElementById('inv-note').textContent = '（共 ' + (d.total||list.length) + ' 味 · 低库存 ' + (d.low_count||0) + ' 味）';
+    var el = document.getElementById('iv-body');
+    if (!list.length) { el.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:18px">库存台账为空——用上方表单登记首批入库</td></tr>'; return; }
+    el.innerHTML = list.map(function(i){
+      var low = i.low || (i.threshold != null && i.qty <= i.threshold);
+      return '<tr><td>' + esc(i.name || i.herb) + '</td><td style="font-weight:600">' + esc(i.qty) + esc(i.unit||'g') + '</td>' +
+        '<td>' + esc(i.threshold != null ? i.threshold : '—') + '</td>' +
+        '<td>' + (low ? '<span class="tag warn">低库存</span>' : '<span class="tag ok">正常</span>') + '</td></tr>';
+    }).join('');
+  }).catch(function(){ document.getElementById('iv-body').innerHTML = '<tr><td colspan="4">📡 离线</td></tr>'; });
+  get('/api/inventory/advice').then(function(d){
+    var el = document.getElementById('iv-advice');
+    var arr = d.advice || d.list || [];
+    el.innerHTML = arr.length ? arr.map(function(a){ return '<div style="padding:4px 0;border-bottom:1px solid #f0ead0">· ' + esc(typeof a === 'string' ? a : (a.text || a.name + ' 建议补 ' + a.suggest)) + '</div>'; }).join('') : '<span style="color:var(--text3)">暂无补货建议</span>';
+  }).catch(function(){});
+}
+document.getElementById('iv-submit').onclick = function(){
+  var name = document.getElementById('iv-name').value.trim();
+  var qty = Number(document.getElementById('iv-qty').value);
+  if (!name || !(qty > 0)) { toast('请填药材名与正数数量'); return; }
+  post('/api/inventory/op', { name: name, op: document.getElementById('iv-op').value, qty: qty, price: Number(document.getElementById('iv-price').value) || undefined }).then(function(d){
+    if (d.ok) { toast('✅ 已登记'); loadInventory(); } else toast('失败：' + (d.error || ''));
+  }).catch(function(){ toast('网络错误'); });
+};
+
+/* ── 排班 ── */
+var _doctors = {};
+function loadSchedule(){
+  get('/api/schedule').then(function(d){
+    _doctors = d.recurring || {};
+    var sel = document.getElementById('sc-doctor');
+    var ids = Object.keys(_doctors);
+    sel.innerHTML = ids.length ? ids.map(function(id){ return '<option value="' + esc(id) + '">' + esc(_doctors[id].name || id) + '</option>'; }).join('') : '<option value="">（无医师档案）</option>';
+    var shifts = (d.shifts || []).slice().sort(function(a,b){ return (a.date + a.type).localeCompare(b.date + b.type); });
+    document.getElementById('sc-body').innerHTML = shifts.length ? shifts.map(function(s){
+      var doc = _doctors[s.doctor_id] || {};
+      return '<tr><td>' + esc(s.date) + '</td><td>' + esc(doc.name || s.doctor_id) + '</td><td>' + ({am:'上午班',pm:'下午班',night:'晚班'}[s.type] || esc(s.type)) + '</td><td style="font-size:11px;color:var(--text2)">' + esc(doc.specialty_name || '—') + '</td></tr>';
+    }).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--text3);padding:18px">暂无排班——用上方表单安排</td></tr>';
+    document.getElementById('sc-recurring').innerHTML = ids.length ? ids.map(function(id){
+      var p = _doctors[id];
+      var sch = Object.entries(p.schedule || {}).map(function(kv){ return kv[0] + ':' + kv[1]; }).join(' ');
+      return '<div style="padding:4px 0;border-bottom:1px solid #f0ead0"><b>' + esc(p.name || id) + '</b> <span style="color:var(--text2)">' + esc(p.specialty_name || '') + '</span> <span style="color:var(--text3);font-size:11px">' + esc(sch || '未设固定出诊') + '</span></div>';
+    }).join('') : '<span style="color:var(--text3)">医师档案为空</span>';
+  }).catch(function(){});
+}
+document.getElementById('sc-submit').onclick = function(){
+  var id = document.getElementById('sc-doctor').value;
+  var date = document.getElementById('sc-date').value;
+  if (!id || !date) { toast('请选择医师与日期'); return; }
+  post('/api/schedule/shift', { doctor_id: id, date: date, type: document.getElementById('sc-type').value }).then(function(d){
+    if (d.ok) { toast('✅ 排班成功'); loadSchedule(); } else toast('失败：' + (d.error || ''));
+  }).catch(function(){ toast('网络错误'); });
+};
+
+/* ── 随访 ── */
+function loadFollowup(){
+  get('/api/followup/list').then(function(d){
+    var st = d.stats || {};
+    document.getElementById('fu-pending').textContent = st.pending != null ? st.pending : '–';
+    document.getElementById('fu-overdue').textContent = st.overdue != null ? st.overdue : '–';
+    document.getElementById('fu-done').textContent = st.completed != null ? st.completed : '–';
+    var list = d.list || [];
+    document.getElementById('fu-body').innerHTML = list.length ? list.map(function(f){
+      var done = f.status === 'completed' || f.completed_at;
+      return '<tr><td>' + esc(f.id) + '</td><td>' + esc(f.patient_name || f.patient_id || '—') + '</td>' +
+        '<td style="font-size:11px">' + esc([f.syndrome, f.formula].filter(Boolean).join(' / ') || '—') + '</td>' +
+        '<td style="font-size:11px">' + esc(f.due_date || f.date || '—') + '</td>' +
+        '<td>' + (done ? '<span class="tag ok">已完成</span>' : '<span class="tag info">待随访</span>') + '</td>' +
+        '<td>' + (done ? '' : '<button class="btn green small" data-fu="' + esc(f.id) + '">标记完成</button>') + '</td></tr>';
+    }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:18px">暂无随访计划</td></tr>';
+  }).catch(function(){});
+}
+document.getElementById('fu-submit').onclick = function(){
+  var b = { patient_name: document.getElementById('fu-name').value.trim(), syndrome: document.getElementById('fu-syndrome').value.trim(), formula: document.getElementById('fu-formula').value.trim(), days: Number(document.getElementById('fu-days').value) || undefined };
+  if (!b.syndrome && !b.formula) { toast('证型/方剂至少填一项'); return; }
+  post('/api/followup/create', b).then(function(d){
+    if (d.ok) { toast('✅ 随访已创建'); loadFollowup(); } else toast('失败：' + (d.error || ''));
+  }).catch(function(){ toast('网络错误'); });
+};
+document.addEventListener('click', function(ev){
+  var b = ev.target.closest && ev.target.closest('button[data-fu]');
+  if (!b) return;
+  post('/api/followup/complete', { id: b.dataset.fu }).then(function(d){
+    if (d.ok) { toast('✅ 已完成'); loadFollowup(); } else toast('失败：' + (d.error || ''));
+  }).catch(function(){ toast('网络错误'); });
+});
+
+/* 启动 */
+var first = (location.hash || '#cashier').slice(1);
+activate(['cashier','inventory','schedule','followup'].includes(first) ? first : 'cashier');
+document.getElementById('sc-date').value = new Date().toISOString().slice(0,10);
+loadCashier(); loadInventory(); loadSchedule(); loadFollowup();
+setInterval(loadCashier, 30000); setInterval(loadFollowup, 30000);
+</script>
+</body>
+</html>

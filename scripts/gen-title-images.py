@@ -52,6 +52,9 @@ SETS = {
     'index-doc-archive': ('患者档案', '档'),
     'index-doc-report': ('报告中心', '报'),
     'index-admin-ops': ('运营后台', '营'),
+    # ── 机构中心（院内执行段）
+    'c-org-pharmacy': ('药房台', '药'),
+    'c-org-ops': ('院内执行台', '行'),
     # ── index（命理师区）
     'index-master-work': ('命理师工作台', '师'),
     'index-master-intake': ('命理采集', '集'),
