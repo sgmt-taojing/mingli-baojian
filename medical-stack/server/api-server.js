@@ -5595,7 +5595,21 @@ app.post('/api/family/revisit/complete', optionalAuth, async (req, res) => {
     list[idx].new_formula = String(new_formula || '').trim().slice(0, 200);
     list[idx].completed_at = new Date().toISOString();
     fs.writeFileSync(REVISIT_FILE, JSON.stringify(list, null, 2));
-    res.json({ ok: true, id, status: 'completed', message: '复诊已闭环' });
+    // G13+revisit（契约扩展）：复诊闭环同步家庭端（经 appointment recall_id 反查手机号；查不到跳过不阻断）
+    let reflux = { pushed: false };
+    try {
+      const apptApi = require('./appointment-api.js');
+      const phone = apptApi.phoneForRecall ? apptApi.phoneForRecall(id) : null;
+      if (phone) {
+        const rp = await require('./family-reflux.js').pushByPhone(phone, {
+          report_type: 'revisit', report_id: id + '-done',
+          title: '复诊已完成',
+          summary: `${list[idx].patient_name || '患者'}：您的复诊已闭环（${list[idx].completed_at.slice(0, 10)}）。${list[idx].outcome || ''}`,
+        });
+        reflux = { pushed: rp.ok, ...(rp.ok ? {} : { note: rp.code || rp.error }) };
+      }
+    } catch (e) { reflux = { pushed: false, note: e.message }; }
+    res.json({ ok: true, id, status: 'completed', message: '复诊已闭环', reflux });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }

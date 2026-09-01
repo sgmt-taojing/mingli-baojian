@@ -27,7 +27,7 @@ const DB_PATH = path.join(__dirname, '..', 'data', 'appointments.db'); // 与 G1
 const INBOX_FILE = path.join(__dirname, '..', 'data', 'patient-inbox.json'); // 本院患者/家属端收件箱（移植 tcm G13 主落点）
 const FAMILY_BASE = process.env.FAMILY_BASE || 'http://127.0.0.1:8970';
 const SOURCE = 'mingli-baojian';
-const REPORT_TYPES = ['emr', 'prescription', 'lab'];
+const REPORT_TYPES = ['emr', 'prescription', 'lab', 'revisit']; // revisit=复诊/召回安排（2026-09-01 契约扩展，双侧同步）
 
 // ── 患者收件箱（只存白名单组装后的医学域载荷，与回流 family 同一份；命理批注从根本不存在）──
 function inboxAppend(phone, payload, pushedFamily) {
@@ -95,6 +95,40 @@ function mingliScan(text) {
   return sms.containsMingli(text);
 }
 
+/**
+ * 按手机号推送（模块内复用助手：from-recall/revisit-complete 等事件直接调用，不走 HTTP 自调）
+ * 与 /api/reflux/push 同一逻辑：绑定核查 → 命理守卫 → 白名单组装 → 推 family + 落本院收件箱
+ */
+async function pushByPhone(phone, { report_type, report_id, title, summary, created_at }) {
+  const link = db.prepare(`SELECT link_token FROM reflux_links WHERE phone=?`).get(String(phone || ''));
+  if (!link) return { ok: false, code: 'NOT_LINKED', error: '该手机号未关联 family 绑定' };
+
+  // 铁律：命理内容不回流——文本守卫（title+summary）
+  const hits = mingliScan(String(title) + ' ' + String(summary || ''));
+  if (hits.length) {
+    return { ok: false, code: 'MINGLI_STRIPPED_BLOCK', error: '命理边界守卫：回流内容命中命理词，已拒发', hits };
+  }
+
+  // 结构性剥离：只组装白名单字段（批注/命理字段从根本不存在于载荷）
+  const payload = {
+    link_token: link.link_token,
+    report_type, report_id: String(report_id).slice(0, 80),
+    title: String(title).slice(0, 200),
+    summary: String(summary || '').slice(0, 2000),
+    created_at: String(created_at || new Date().toISOString()),
+    source: SOURCE,
+  };
+  const r = await postFamily(payload);
+  const accepted = !!(r.body && r.body.ok);
+  // 本院收件箱：无论 family 是否接受，患者凭 token 可在本院自查
+  inboxAppend(phone, payload, accepted);
+  if (accepted) {
+    return { ok: true, member_id: r.body.member_id, duplicated: !!r.body.duplicated };
+  }
+  const famErr = (r.body && (r.body.error || r.body.code)) || r.error || `HTTP ${r.status}`;
+  return { ok: false, code: 'FAMILY_REJECT', error: `family 侧未接受：${famErr}`, family_code: r.body && r.body.code, inbox: true };
+}
+
 function registerRoutes(app) {
   init();
 
@@ -145,33 +179,10 @@ function registerRoutes(app) {
     const { phone, report_type, report_id, title, summary, created_at } = req.body || {};
     if (!REPORT_TYPES.includes(report_type)) return res.status(400).json({ ok: false, error: `report_type 限 ${REPORT_TYPES.join('/')}` });
     if (!report_id || !title) return res.status(400).json({ ok: false, error: 'report_id 与 title 必填' });
-    const link = db.prepare(`SELECT link_token FROM reflux_links WHERE phone=?`).get(String(phone || ''));
-    if (!link) return res.status(404).json({ ok: false, error: '该手机号未关联 family 绑定（先走 /api/reflux/link）' });
-
-    // 铁律：命理内容不回流——文本守卫（title+summary）
-    const hits = mingliScan(String(title) + ' ' + String(summary || ''));
-    if (hits.length) {
-      return res.status(422).json({ ok: false, error: '命理边界守卫：回流内容命中命理词，已拒发', code: 'MINGLI_STRIPPED_BLOCK', hits });
-    }
-
-    // 结构性剥离：只组装白名单字段（批注/命理字段从根本不存在于载荷）
-    const payload = {
-      link_token: link.link_token,
-      report_type, report_id: String(report_id).slice(0, 80),
-      title: String(title).slice(0, 200),
-      summary: String(summary || '').slice(0, 2000),
-      created_at: String(created_at || new Date().toISOString()),
-      source: SOURCE,
-    };
-    const r = await postFamily(payload);
-    const accepted = !!(r.body && r.body.ok);
-    // 本院收件箱（G13 主落点，移植 tcm report-link 语义）：无论 family 是否接受，患者凭 token 可在本院自查
-    inboxAppend(phone, payload, accepted);
-    if (accepted) {
-      return res.json({ ok: true, member_id: r.body.member_id, duplicated: !!r.body.duplicated, family: 'accepted', inbox: true });
-    }
-    const famErr = (r.body && (r.body.error || r.body.code)) || r.error || `HTTP ${r.status}`;
-    res.status(502).json({ ok: false, error: `family 侧未接受：${famErr}`, family_code: r.body && r.body.code, inbox: true, note: '已入本院收件箱，患者可凭 link_token 自查' });
+    const r = await pushByPhone(phone, { report_type, report_id, title, summary, created_at });
+    if (r.ok) return res.json({ ok: true, member_id: r.member_id, duplicated: r.duplicated, family: 'accepted', inbox: true });
+    const status = r.code === 'NOT_LINKED' ? 404 : (r.code === 'MINGLI_STRIPPED_BLOCK' ? 422 : 502);
+    res.status(status).json(r);
   });
 
   // 患者/家属端：凭 lnk_ 令牌读自己的医院报告（移植 tcm /api/my/reports；本院收件箱，仅医学域内容）
@@ -203,4 +214,4 @@ function registerRoutes(app) {
   console.log('🏠 G13 报告回流供给侧已挂载（/api/reflux/* + tcm 同构别名 /api/report-link/{bind,unbind,status,push-queue}，命理批注结构性剥离 + 文本守卫）');
 }
 
-module.exports = { registerRoutes, mingliScan };
+module.exports = { registerRoutes, mingliScan, pushByPhone: (phone, o) => pushByPhone(phone, o) };

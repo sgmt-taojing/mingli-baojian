@@ -49,6 +49,10 @@
 - [P2 已落地 09-01 06:40] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
 
+## 2026-09-01 22:40 — ✅ 复诊安排回流家庭端（G13 revisit 契约扩展）
+- 双侧白名单 +revisit；pushByPhone 助手抽出复用；排期/闭环两事件自动回流；family reports.html 中文标签
+- E2E：绑定→排期→家庭收件箱实收→闭环→二次实收；命理守卫阴性测试 422 拒发；测试数据双侧清零
+
 ## 2026-09-01 22:25 — ✅ R719 随访加重源端到端复验（三源全部实测完毕）
 - 链路：建随访单（EMPI 归集 empi-73e96f835959）→ 加重反馈完成（score=2 → effect=worsened）→ 召回单自动建（RV-MTIR6TMG，priority=high）→ 孪生随访快照落档（followup_worsened 风险因子，未重复建单——幂等设计生效）→ recall-stats 分源含 followup → 面板「随访加重」徽标正常
 - 冒烟数据已清；三源（孪生/随访/爽约）→ 召回单 → 排期 → 统计全链实测完毕

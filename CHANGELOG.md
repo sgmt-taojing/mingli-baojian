@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-09-01 深夜 · 复诊安排回流家庭端（G13 契约扩展 revisit · 双侧同步）
+- **契约扩展**：hospital-report report_type 白名单双侧同步加 `revisit`（复诊/召回安排，医学域流程性内容；命理守卫双侧继续生效）
+- **mingli 供给侧**：family-reflux 抽出 `pushByPhone` 模块内助手（绑定核查→命理守卫→白名单组装→推 family+落本院收件箱，与 HTTP 路由同逻辑）；from-recall 排期成功即推「复诊安排」、revisit/complete 闭环即推「复诊已完成」（手机号经 appointment recall_id 反查，查不到跳过不阻断）
+- **family 消费侧**：hospital_inbox REPORT_TYPES +revisit；reports.html 类型中文标签映射（📋病历/💊处方/🧪检验/📅复诊安排）
+- **端到端实测**：family 绑定流（mock 验证码→link_token）→ mingli 登记关联 → 召回排期 → family 收件箱实收「复诊安排 2026-09-02 14:00」→ 复诊闭环 → 实收「复诊已完成」；阴性测试：载荷带「八字/流年」被守卫 422 拒发（MINGLI_STRIPPED_BLOCK）
+- 测试数据双侧清零（召回单/预约/绑定/收件箱/family 报告行）
+
 ## 2026-09-01 晚 · D7 爽约自动召回链吸收（召回三源闭环收官）
 - 移植 tcm 契约 v1.3.6：爽约懒清扫升级——no_show 标记 + 爽约短信通知 + **自动建召回单进医生待办**（source=noshow，appointment_id 判重幂等）；顺带补齐临诊 1 小时提醒（appointments 表加 reminded_at/noshow_at 列）
 - 新增短信模板 appointment_noshow（机构版话术，零命理词）

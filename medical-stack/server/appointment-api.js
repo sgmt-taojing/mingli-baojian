@@ -265,11 +265,24 @@ function registerRoutes(app, authMw) {
         const d = await sms.sendNotice(phoneStr, 'recall_scheduled', { patient: patientName, date, slot, doctor: docName });
         smsRet = { status: d.ok ? 'sent' : ('blocked: ' + (d.error || 'unknown')), mock: !!d.mock };
       }
+      // G13+revisit（契约扩展 2026-09-01）：复诊安排回流家庭端（医学域流程内容；失败不阻断主链）
+      let reflux = { pushed: false };
+      if (phoneStr.length === 11) {
+        try {
+          const refluxPush = require('./family-reflux.js').pushByPhone;
+          const rp = await refluxPush(phoneStr, {
+            report_type: 'revisit', report_id: revisit_id,
+            title: `复诊安排：${date} ${slot}`,
+            summary: `${patientName}：医师为您安排了复诊，时间 ${date} ${slot}（${docName}）。请提前 10 分钟到院导诊台报到。`,
+          });
+          reflux = { pushed: rp.ok, ...(rp.ok ? {} : { note: rp.code || rp.error }) };
+        } catch (e) { reflux = { pushed: false, note: e.message }; }
+      }
       res.json({
         ok: true,
         appointment: { id, patient_name: patientName, doctor_name: docName, date, slot, status: 'booked', recall_id: revisit_id, source: 'recall' },
         revisit: { id: revisit_id, status: 'scheduled', schedule_at: revisits[idx].schedule_at },
-        sms: smsRet
+        sms: smsRet, reflux
       });
     } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
   });
@@ -324,4 +337,6 @@ function registerRoutes(app, authMw) {
   console.log('📅 G12 轻预约挂号已挂载（/api/appointments/* + tcm 同构别名 /api/clinic/appointment*，爽约自动标记 15min 巡检）');
 }
 
-module.exports = { registerRoutes };
+module.exports = { registerRoutes, phoneForRecall: (rid) => {
+  try { const r = db.prepare(`SELECT phone FROM appointments WHERE recall_id=? AND phone!='' ORDER BY created_at DESC LIMIT 1`).get(String(rid || '')); return r ? r.phone : null; } catch (_) { return null; }
+} };
