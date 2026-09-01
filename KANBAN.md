@@ -35,6 +35,10 @@
 - [P2 已落地 09-01 06:40] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
 
+## 2026-09-01 20:55 — ✅ D7 爽约自动召回链吸收（三源闭环收官）
+- sweepNoShow 升级：no_show+短信+自动建召回单（幂等）+ 临诊提醒；appointment_noshow 模板新增
+- 实测：爽约→建单→幂等→分源统计→面板徽标全过；巡检 clean；冒烟数据已清
+
 ## 2026-09-01 20:45 — ✅ 召回面板全链贯通 + R-ISO 代理隔离根修 + D8 当日吸收
 - R-ISO：medical-static 代理默认指向 tcm 8932（越域依赖，掩盖本栈缺口）→ 修默认 8972 + plist MS_API_PORT 双保险
 - 静默失效根修：common.js 缺 R854 authFetch → 召回面板占号无声失败；共享 js 全量扫描对齐 4 件（efficacy/longitudinal/seed-loader R864/nav），品牌残留 3 处修正

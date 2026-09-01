@@ -50,6 +50,9 @@ function init() {
   // D6 召回闭环（吸收自 tcm 契约 v1.3.5）：召回单↔预约双向链接
   try { db.exec(`ALTER TABLE appointments ADD COLUMN recall_id TEXT`); } catch (_) { /* 已存在 */ }
   try { db.exec(`ALTER TABLE appointments ADD COLUMN source TEXT`); } catch (_) { /* 已存在 */ }
+  // D7（吸收自 tcm 契约 v1.3.6）：临诊提醒标记 + 爽约时间戳
+  try { db.exec(`ALTER TABLE appointments ADD COLUMN reminded_at TEXT`); } catch (_) { /* 已存在 */ }
+  try { db.exec(`ALTER TABLE appointments ADD COLUMN noshow_at TEXT`); } catch (_) { /* 已存在 */ }
 }
 
 function slotEndTs(date, slot) {
@@ -58,17 +61,57 @@ function slotEndTs(date, slot) {
   return t.getTime() + 30 * 60 * 1000; // 时段 30min
 }
 
-/** 爽约懒标记：时段结束+宽限已过 且仍 booked → no_show */
+/** 爽约懒标记 + D7 爽约自动召回建单（吸收自 tcm 契约 v1.3.6）+ 临诊 1 小时提醒
+ *  幂等：同一预约只建一单（source=noshow + appointment_id 判重） */
+const REVISIT_FILE = path.join(__dirname, '..', 'data', 'revisits.json');
 function sweepNoShow() {
-  const rows = db.prepare(`SELECT id, date, slot FROM appointments WHERE status='booked'`).all();
+  const rows = db.prepare(`SELECT id, patient_name, phone, date, slot, doctor_name, status, reminded_at FROM appointments WHERE status='booked'`).all();
   const now = Date.now();
-  const upd = db.prepare(`UPDATE appointments SET status='no_show' WHERE id=?`);
+  const upd = db.prepare(`UPDATE appointments SET status='no_show', noshow_at=? WHERE id=?`);
+  const updRemind = db.prepare(`UPDATE appointments SET reminded_at=? WHERE id=?`);
   let n = 0;
   for (const r of rows) {
-    if (now > slotEndTs(r.date, r.slot) + NO_SHOW_GRACE_MIN * 60 * 1000) { upd.run(r.id); n++; }
+    const slotStart = slotEndTs(r.date, r.slot) - 30 * 60 * 1000;
+    if (now > slotEndTs(r.date, r.slot) + NO_SHOW_GRACE_MIN * 60 * 1000) {
+      upd.run(new Date().toISOString(), r.id);
+      n++;
+      // 爽约通知（mock 先行）
+      if (validPhone(r.phone)) {
+        try { sms.sendNotice(r.phone, 'appointment_noshow', { patient: r.patient_name, date: r.date, slot: r.slot, doctor: r.doctor_name || '当班医师' }); } catch (_) {}
+      }
+      // D7：爽约 → 自动建召回单进医生待办（爽约率是门诊经营关键指标）
+      try {
+        let revisits = [];
+        try { revisits = JSON.parse(fs.readFileSync(REVISIT_FILE, 'utf8') || '[]'); } catch (e) { revisits = []; }
+        if (!revisits.some(x => x.appointment_id === r.id && x.source === 'noshow')) {
+          revisits.push({
+            id: 'RV-NS-' + Date.now().toString(36).toUpperCase() + '-' + r.id.slice(-6).toUpperCase(),
+            followup_id: '', consult_id: '',
+            patient_id: '', patient_name: r.patient_name || '预约患者',
+            appointment_id: r.id,
+            risk_type: 'appointment_noshow', risk_level: 'medium',
+            syndrome: '', formula: '',
+            feedback: '预约 ' + r.date + ' ' + r.slot + '（' + (r.doctor_name || '当班医师') + '）过号未到，按爽约处理',
+            reason: '[爽约召回] ' + r.patient_name + ' 预约 ' + r.date + ' ' + r.slot + ' ' + (r.doctor_name || '当班医师') + ' 门诊未到；建议电话回访确认情况，视情重新预约',
+            source: 'noshow',
+            status: 'pending', priority: 'normal',
+            created_at: new Date().toISOString()
+          });
+          fs.mkdirSync(path.dirname(REVISIT_FILE), { recursive: true });
+          fs.writeFileSync(REVISIT_FILE, JSON.stringify(revisits.slice(-300), null, 2));
+        }
+      } catch (e) { console.error('[appointment] 爽约召回建单失败:', e.message); }
+    } else if (!r.reminded_at && now > slotStart - 3600000 && now < slotStart) {
+      // 临诊 1 小时内未提醒 → 提醒一次
+      updRemind.run(new Date().toISOString(), r.id);
+      if (validPhone(r.phone)) {
+        try { sms.sendNotice(r.phone, 'appointment_remind', { date: r.date, slot: r.slot }); } catch (_) {}
+      }
+    }
   }
   return n;
 }
+function validPhone(p) { return /^1\d{10}$/.test(String(p || '')); }
 
 function registerRoutes(app, authMw) {
   init();

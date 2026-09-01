@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-09-01 晚 · D7 爽约自动召回链吸收（召回三源闭环收官）
+- 移植 tcm 契约 v1.3.6：爽约懒清扫升级——no_show 标记 + 爽约短信通知 + **自动建召回单进医生待办**（source=noshow，appointment_id 判重幂等）；顺带补齐临诊 1 小时提醒（appointments 表加 reminded_at/noshow_at 列）
+- 新增短信模板 appointment_noshow（机构版话术，零命理词）
+- 端到端实测：建今日已过时段预约 → 读路径触发懒清扫 → no_show + mock 短信落 outbox + RV-NS 召回单自动建 → 二次清扫零重复（幂等过）→ recall-stats 三源分源聚合（twin-risk/noshow）→ 医生工作台召回面板「爽约召回」徽标渲染正常
+- 冒烟合成数据已清（预约+召回单），outbox 留证；巡检复跑 clean
+- 至此召回三源全部贯通：**孪生风险（D5）/ 随访加重（R719）/ 爽约提级（D7）** → 统一召回单 → D6 排期占号 → D8 成效统计
+
 ## 2026-09-01 晚 · 召回面板全链贯通 + R-ISO 代理隔离根修 + L4.5 共享js同源监控
 - **召回面板浏览器实测全链过**：医生工作台（8973/doctor-dashboard）召回面板渲染 → 排期 → 选时段占号 → 预约 booked + 召回单 scheduled 双向链接（RV-TWIN-MTI86SPC ↔ appt-3e5832754acb，EMPI 解析患者名）→ pending 面板自动清零
 - **R-ISO 根修（重大隐患）**：medical-static（8973）代理默认曾指向 tcm 8932 上游——内化栈页面一直打供体 API，构成运行时越域依赖且掩盖本栈端点缺口。修为默认 8972（MS_API_PORT 环境变量+文件默认值双保险），重启后 8973/api/tcm/health 报「命理宝鉴·医道」
