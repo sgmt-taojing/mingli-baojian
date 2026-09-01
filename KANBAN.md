@@ -1,5 +1,19 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-09-01 21:00 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
+- **今日完成（2 大件）**：
+  1. tcm twin API 2 端点差集吸收（模块+路由+三钩子+D5/D6 闭环），冒烟+对拍门 PASS，巡检复跑 clean — `KANBAN.md 13:40`
+  2. D7 爽约自动召回链吸收 + D8 当日吸收 + R-ISO 代理隔离根修（medical-static 默认 8972；共享 js authFetch 对齐 4 件；L2.5 检索处理器哈希巡检上线） — `KANBAN.md 20:45 / 20:55`
+- **当前进行中（节点 0/0）**：无未收口开发项
+- **明日计划（09-02）**：① 周报 cron timeoutSeconds 120→300 待用户控制台操作（指引 DELIVERY/cron-console-fix-guide-20260901.md）② patrol 修真如网通复跑可顺势结清
+- **阻塞项**：🟡 周报 cron 调整需 AutoClaw 控制台（文件直改被运行时回写覆盖，已两轮实测）
+- **基线**：health-check EXIT=0（6 端口全 200 + kb-list/paipan-api OK，21:02:29 实探）
+
+## 2026-09-01 21:00 — 💚 心跳 21:00 全绿（cron 30min · 无新 KB/无新开发项）
+- 健康检查全绿（21:02:08 实探）：6 端口全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已记（05:00/18:00/18:30 节点均已覆盖），本日无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② tcm twin API 2 端点差集待吸收（TCM-ABSORPTION-SPEC 流程，主会话执行）
+
 ## 2026-09-01 18:30 — 💚 心跳 18:30 全绿（cron 30min · 无新 KB/无新开发项）
 - 健康检查全绿（18:30:07 实探）：6 端口全 200 + kb-list + paipan-api OK
 - KB 蒸馏延续：今日 02:03 +20 条已记（05:00/18:00 节点均已覆盖），本日无新 distill-*.py 执行
@@ -34,6 +48,10 @@
 - 验收：对拍 PASS（零差异 + Recall Δ=0.0000），六层复跑 6/6 PASS（证据 211202 批次）
 - [P2 已落地 09-01 06:40] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
+
+## 2026-09-01 22:25 — ✅ R719 随访加重源端到端复验（三源全部实测完毕）
+- 链路：建随访单（EMPI 归集 empi-73e96f835959）→ 加重反馈完成（score=2 → effect=worsened）→ 召回单自动建（RV-MTIR6TMG，priority=high）→ 孪生随访快照落档（followup_worsened 风险因子，未重复建单——幂等设计生效）→ recall-stats 分源含 followup → 面板「随访加重」徽标正常
+- 冒烟数据已清；三源（孪生/随访/爽约）→ 召回单 → 排期 → 统计全链实测完毕
 
 ## 2026-09-01 20:55 — ✅ D7 爽约自动召回链吸收（三源闭环收官）
 - sweepNoShow 升级：no_show+短信+自动建召回单（幂等）+ 临诊提醒；appointment_noshow 模板新增
