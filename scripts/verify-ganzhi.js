@@ -16,4 +16,5 @@ const f = g.foldYear(12000);
 const ok2 = g.yearGanzhi(12000) === g.yearGanzhi(f);
 if (!ok2) fail++;
 console.log(`${ok2?'✓':'✗'} 12000 折叠 ${f} 干支等价`);
+console.log(fail ? `验证失败 ${fail} 处` : '全部通过（干支锚点+折叠一致性）');
 process.exit(fail ? 1 : 0);
