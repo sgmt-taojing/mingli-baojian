@@ -1,5 +1,43 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-09-02 07:00 — 💚 心跳 07:00 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（07:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已记（00:30/02:30/05:00/06:30 节点均已覆盖），07:00 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
+## 2026-09-02 06:30 — 💚 心跳 06:30 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（06:32:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已记（00:30/02:30/05:00 节点均已覆盖），06:30 本节点无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
+
+
+## 2026-09-02 05:00 — 💚 心跳 05:00 全绿（cron 30min · 夜间安静期 · 蒸馏无新条）
+- 健康检查全绿（05:02:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（02:30/00:30/00:00/21:00…），本日无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（夜间安静期，晨间等用户动作）
+
+## 2026-09-02 02:30 — 💚 心跳 02:30 全绿（cron 30min · 今日 KB 蒸馏 20 条入库）
+- 健康检查全绿（02:32:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- **KB 蒸馏入库 20 条**（training-data/kb-web-distill/distill-2026-09-02.jsonl，20 行 ≈14.4KB），10 模块各 2：bazi/daliuren/fengshui/huangli/liuyao/meihua/qimen/xingming/xuanxiong/ziwei
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（夜间安静期）
+
+## 2026-09-02 00:30 — 💚 心跳 00:30 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（00:30:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 00:30 无新 distill-2026-09-02*.jsonl 生成，09-01 02:03 +20 条已多次节点覆盖
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（夜间安静期，晨间等用户动作）
+
+## 2026-09-02 00:00 — 💚 心跳 00:00 全绿（cron 30min · 无新 KB/无新开发项）
+- 健康检查全绿（00:00:08 实探）：6 端口全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已记（05:00/18:00/18:30/21:00 节点均已覆盖），本日无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② tcm twin API 2 端点差集已 21:00 销账
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台
+
 ## 2026-09-01 21:00 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
 - **今日完成（2 大件）**：
   1. tcm twin API 2 端点差集吸收（模块+路由+三钩子+D5/D6 闭环），冒烟+对拍门 PASS，巡检复跑 clean — `KANBAN.md 13:40`
@@ -48,6 +86,10 @@
 - 验收：对拍 PASS（零差异 + Recall Δ=0.0000），六层复跑 6/6 PASS（证据 211202 批次）
 - [P2 已落地 09-01 06:40] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
+
+## 2026-09-02 07:05 — 📤 tcm 侧 revisit 回流对齐任务书已起草（待管理体系转发）
+- 落点：`DELIVERY/task-g13-revisit-tcm-20260902.md`——report-link 白名单 +revisit、from-recall/revisit-complete 双事件推送、验收 4 条（E2E 实收×2 + 阴性拒发 + 销账回报）
+- 状态：**待 tcm 会话窗口执行**，回报到达后本项销账
 
 ## 2026-09-01 22:40 — ✅ 复诊安排回流家庭端（G13 revisit 契约扩展）
 - 双侧白名单 +revisit；pushByPhone 助手抽出复用；排期/闭环两事件自动回流；family reports.html 中文标签
