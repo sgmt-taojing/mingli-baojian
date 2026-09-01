@@ -1,5 +1,13 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-09-01 11:00 — 💚 心跳 11:00 全绿（cron 30min · 顶部看板纠偏）
+- 健康检查全绿（11:02:09 实探）：6 端口全 200 + kb-list + paipan-api OK
+- KB 蒸馏：今日 20 条（02:03 入库）已于 05:00 节点记录，此后无新 distill-*.py 执行
+- 【纠偏】05:00 节点「进行中」信息已被当日后续节点取代，以本条为准：
+  - P2.8 病历 #23-#25 UI 端到端 → 已于 08-31 23:59 终验收口，非待办
+  - 待裁判 3 项（G17 L2 / C 类 13 页 / 周报 300s）→ 已随 09-01 06:05 ADR-020 全部销账
+- 当前真实待办：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② tcm twin API 2 端点差集待吸收（TCM-ABSORPTION-SPEC 流程，主会话执行）
+
 ## 2026-09-01 05:00 — 💚 心跳 05:00 全绿（cron 30min）+ 今日 KB 蒸馏 20 条入库（10 模块）
 - 健康检查 EXIT=0：paipan(:8911) / tts(:8912) / face-ocr(:8913) / static(:8900) / api-v2(:8920) / kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - **KB 蒸馏入库 20 条**（training-data/kb-web-distill/distill-2026-09-01.jsonl，20 行 ≈15.4KB），覆盖：
@@ -17,11 +25,16 @@
 - [P2 已落地 09-01 06:40] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
 
+## 2026-09-01 13:40 — ✅ 孪生召回闭环吸收完成（tcm v1.3.4/v1.3.5 · 当日新差集当日清零）
+- 范围：twin-engine 模块 + twin×2 路由 + from-recall + 病历/处方/随访三快照钩子 + 启动回填 + D5 自动召回 + D6 召回排期闭环 + patient-index lookupByName + requireStaffRole 守卫 + recall_scheduled 短信模板
+- 验证：冒烟（快照→召回→排期→短信 mock 全链，幂等/401/409 边界过）+ equiv-dual-run --gate absorb PASS（零差异 + Recall Δ=0.0000）+ capability-diff 复跑 clean
+- 适配点：ms 预约模型 sqlite 化（appointments 表加 recall_id/source 列），容量规则按 ms 每档 3；L2 巡检模块清单增 twin-engine.js
+
 ## 2026-09-01 06:40 — ✅ L2.5 检索处理器特征哈希巡检落地（裁判 G17R 撤销令采纳项）
 - scripts/tcm-capability-diff.py 新增 L2.5 层：/api/tcm/kb/search 与 /api/tcm/kb/formula-recall 两处理器函数体（花括号配平抽取，跳过字符串/注释）规范化（标识符序列+运算符骨架）sha256，双侧不一致即报 DRIFT/MISSING，并入 digest 与 clean 判定
 - 测试：空白/注释扰动不误报 ✅，排序逻辑变更（系数 ×2）检出漂移 ✅；复跑双侧当前一致（R825/R829 已对齐）
 - 挂载：tcm-import.plist → tcm-import-and-follow.sh 链 5 自动生效，无需新增定时项
-- ⚠ 顺带发现新差集（L1）：tcm 新增 `get /api/tcm/twin` + `post /api/tcm/twin/snapshot`（D5 风险信号→主动召回闭环，契约 v1.3.4，HEAD 17dc1ce）→ **列管待吸收**（走 TCM-ABSORPTION-SPEC 流程：移植→适配→冒烟→留证；涉患者召回属医学域，禁止二次训练）
+- [已吸收 09-01 13:40] 顺带发现新差集（L1）：tcm 新增 `get /api/tcm/twin` + `post /api/tcm/twin/snapshot`（+复跑时又检出 `post /api/clinic/appointment/from-recall`，共 3 条）→ 已按 TCM-ABSORPTION-SPEC 全链吸收（模块+路由+三钩子+D5/D6 闭环），冒烟+对拍门 PASS，巡检复跑 clean
 
 ## 2026-09-01 06:35 — ✅ WAL-F 斩草除根：按请求开关连接模式清零【已完结】
 - 9 处残余点全部单例化（wellness/person-hub/feedback/ai-stream/api-server×7/distillation/graph-builder/tiered-matcher）；豁免 mingli.db×5 + Python 子进程×3（自闭合安全，注释说明）
@@ -1527,3 +1540,9 @@
 
 ## 2026-08-30 16:00 — 💚 心跳全绿（EXIT=0）
 - 6 服务健康，无新 distill 入库；进行中/阻塞无变化（服务中心导航回归待主会话浏览器执行；patrol 读数失实、⏭️ P2.8 延续）
+
+## 2026-09-01 12:30 — 💚 心跳 12:30 全绿（EXIT=0 · 6 端口 + KB/排盘 OK）
+- 健康检查 EXIT=0 全绿；KB 蒸馏延续（26.8KB，08-31 02:06），无新 distill-*.py 执行
+- 进行中无未收口开发项；阻塞延续：patrol 读数失实修真 + cron 连败集群 + ⏭️ P2.8 病历 #23-#25（待主会话浏览器冲刺）
+- 待主会话：① 修 health-patrol 读数失实 ② 服务中心导航回归走查（待浏览器） ③ C 类 13 页退役清单拍板
+- 判定：等主会话推进，无需单次心跳越界改动

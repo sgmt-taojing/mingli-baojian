@@ -154,7 +154,7 @@ def main() -> int:
     extra_api = sorted(ms_r - tcm_r)
 
     mod_diffs = {}
-    for mod in ['auth.js', 'sms_adapter.js']:
+    for mod in ['auth.js', 'sms_adapter.js', 'twin-engine.js']:
         t_exp = exports(TCM / 'server' / mod)
         m_exp = exports(MS / 'server' / mod)
         miss = sorted(t_exp - m_exp)

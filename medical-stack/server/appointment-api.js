@@ -17,6 +17,7 @@
  */
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const sms = require('./sms_adapter.js');
 
@@ -46,6 +47,9 @@ function init() {
   db.exec(`CREATE INDEX IF NOT EXISTS idx_appt_date_slot ON appointments(date, slot, status)`);
   db.exec(`CREATE INDEX IF NOT EXISTS idx_appt_phone ON appointments(phone)`);
   try { db.exec(`ALTER TABLE appointments ADD COLUMN doctor_name TEXT`); } catch (_) { /* 已存在 */ }
+  // D6 召回闭环（吸收自 tcm 契约 v1.3.5）：召回单↔预约双向链接
+  try { db.exec(`ALTER TABLE appointments ADD COLUMN recall_id TEXT`); } catch (_) { /* 已存在 */ }
+  try { db.exec(`ALTER TABLE appointments ADD COLUMN source TEXT`); } catch (_) { /* 已存在 */ }
 }
 
 function slotEndTs(date, slot) {
@@ -66,9 +70,16 @@ function sweepNoShow() {
   return n;
 }
 
-function registerRoutes(app) {
+function registerRoutes(app, authMw) {
   init();
   setInterval(sweepNoShow, 15 * 60 * 1000).unref();
+  const auth = authMw || {};
+  const requireAuth = auth.requireAuth || ((req, res, next) => next());
+  const staffRole = auth.requireStaffRole || (() => (req, res, next) => next());
+  // D6：患者名 EMPI 只读解析（孪生召回单只持 patient_id）
+  const patientIndex = (() => {
+    try { return require('./kb-store/patient-index'); } catch (e) { return null; }
+  })();
 
   // 号源查询
   const slotsHandler = (req, res) => {
@@ -159,6 +170,66 @@ function registerRoutes(app) {
   };
   app.get('/api/appointments', listHandler);
   app.get('/api/clinic/appointment/list', listHandler); // tcm 同构别名
+
+  // D6（吸收自 tcm 契约 v1.3.5）：召回单排期 → 直建预约占号（医生侧发起，免患者短信验证码）
+  // 闭环：召回单 pending → 选时段占号 → 召回单 scheduled + appointment booked 双向链接 → 有手机号即发 mock 提醒
+  // 适配：ms 预约模型为 sqlite（appointments.db），容量规则=每档 3（全局，不按医师分列）
+  app.post('/api/clinic/appointment/from-recall', requireAuth, staffRole(['doctor', 'admin']), async (req, res) => {
+    try {
+      const { revisit_id, date, slot, doctor_name, phone } = req.body || {};
+      if (!revisit_id || !date || !slot) return res.status(400).json({ ok: false, error: 'revisit_id/date/slot 必填' });
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !SLOT_TEMPLATE.includes(slot)) {
+        return res.status(400).json({ ok: false, error: `date 须为 YYYY-MM-DD，slot 限 ${SLOT_TEMPLATE.join('/')}` });
+      }
+      const REVISIT_FILE = path.join(__dirname, '..', 'data', 'revisits.json');
+      let revisits = [];
+      try { revisits = JSON.parse(fs.readFileSync(REVISIT_FILE, 'utf8') || '[]'); } catch (e) { revisits = []; }
+      const idx = revisits.findIndex(r => r.id === revisit_id);
+      if (idx < 0) return res.status(404).json({ ok: false, error: '召回单不存在' });
+      const rv = revisits[idx];
+      if (rv.status !== 'pending') return res.status(409).json({ ok: false, error: '召回单当前状态不可排期: ' + rv.status });
+
+      const docName = String(doctor_name || (req.user && req.user.username) || '当班医师').slice(0, 20);
+      const used = db.prepare(`SELECT COUNT(*) AS n FROM appointments WHERE date=? AND slot=? AND status IN ('booked','checked_in')`).get(date, slot).n;
+      if (used >= SLOT_CAPACITY) return res.status(409).json({ ok: false, error: '该时段已约满', capacity: SLOT_CAPACITY });
+
+      // 患者名解析：召回单自带 patient_name；孪生单经 EMPI 只读解析（内部使用，不出库）
+      let patientName = rv.patient_name && rv.patient_name !== rv.patient_id ? rv.patient_name : '';
+      if (!patientName && rv.patient_id && patientIndex && patientIndex.getPatient) {
+        const rec = patientIndex.getPatient(rv.patient_id);
+        if (rec && rec.name_full) patientName = rec.name_full;
+      }
+      if (!patientName) patientName = '召回患者';
+
+      const phoneStr = String(phone || '').replace(/\D/g, '').slice(0, 11);
+      const id = 'appt-' + crypto.randomBytes(6).toString('hex');
+      db.prepare(`INSERT INTO appointments (id, patient_name, phone, date, slot, complaint, doctor_name, recall_id, source) VALUES (?,?,?,?,?,?,?,?,?)`)
+        .run(id, patientName.slice(0, 40), phoneStr.length === 11 ? phoneStr : '',
+             date, slot, String(rv.reason || rv.feedback || '风险召回复诊').slice(0, 500), docName, revisit_id, 'recall');
+
+      // 召回单 → scheduled（双向链接）
+      revisits[idx].status = 'scheduled';
+      revisits[idx].schedule_at = date + ' ' + slot;
+      revisits[idx].appointment_id = id;
+      revisits[idx].doctor_name = docName;
+      revisits[idx].scheduled_at = new Date().toISOString();
+      fs.mkdirSync(path.dirname(REVISIT_FILE), { recursive: true });
+      fs.writeFileSync(REVISIT_FILE, JSON.stringify(revisits, null, 2));
+
+      // 临诊提醒（G10 mock 先行；无手机号如实标注未发）
+      let smsRet = { status: 'no_phone', mock: false };
+      if (phoneStr.length === 11) {
+        const d = await sms.sendNotice(phoneStr, 'recall_scheduled', { patient: patientName, date, slot, doctor: docName });
+        smsRet = { status: d.ok ? 'sent' : ('blocked: ' + (d.error || 'unknown')), mock: !!d.mock };
+      }
+      res.json({
+        ok: true,
+        appointment: { id, patient_name: patientName, doctor_name: docName, date, slot, status: 'booked', recall_id: revisit_id, source: 'recall' },
+        revisit: { id: revisit_id, status: 'scheduled', schedule_at: revisits[idx].schedule_at },
+        sms: smsRet
+      });
+    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
 
   console.log('📅 G12 轻预约挂号已挂载（/api/appointments/* + tcm 同构别名 /api/clinic/appointment*，爽约自动标记 15min 巡检）');
 }

@@ -61,6 +61,8 @@ const TEMPLATES = {
   appointment_created: (v) => `【命理宝鉴】预约成功：${v.date} ${v.slot}，请提前 10 分钟到诊。如需取消请回复或登录小程序操作。`,
   appointment_remind: (v) => `【命理宝鉴】就诊提醒：您预约的 ${v.date} ${v.slot} 时段将至，请准时到诊。`,
   appointment_cancel: (v) => `【命理宝鉴】您的预约（${v.date} ${v.slot}）已取消。`,
+  // D6 召回复诊排期（机构版，流程性通知）
+  recall_scheduled: (v) => `【命理宝鉴】${v.patient}：医师为您安排了复诊，时间 ${v.date} ${v.slot}（${v.doctor}）。请提前 10 分钟到院导诊台报到。如不能到诊请致电医馆改期。`,
   // G14 信众报告
   seeker_report: (v) => `【命理宝鉴】您求测的${v.category || '命理'}报告已完成核对，请登录个人中心「我的报告」查看。内容仅供参考。`,
   // 移植自 tcm：治疗预约提醒（机构版，流程性通知）

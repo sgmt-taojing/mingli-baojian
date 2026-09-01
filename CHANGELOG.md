@@ -1,5 +1,15 @@
 # mingli-baojian 更新日志
 
+## 2026-09-01 · 孪生召回闭环吸收（tcm 契约 v1.3.4/v1.3.5 · D3+D5+D6 全链）
+- **模块**：`twin-engine.js`（417 行原样移植，头部标来源）——真实诊疗事件→快照→健康评分/五脏/体质（ZYYXH/T157-2009 转化分口径）/趋势/风险/证型轨迹；`data/twin/<pid>.json` 原子写
+- **三路由**：`GET /api/tcm/twin`（姓名经 EMPI lookupByName 只读解析——patient-index 补此方法）、`POST /api/tcm/twin/snapshot`（医生补录，requireStaffRole 守卫同步移植）、`POST /api/clinic/appointment/from-recall`（D6：召回单→直建预约占号→双向链接→mock 短信；适配 ms sqlite 预约模型，appointments 表加 recall_id/source 列，容量规则=每档 3）
+- **三钩子**：病历签发（case-confirm setImmediate）/处方签发（records.jsonl 追加后）/随访完成（followup/complete）→ 自动快照（event_id 幂等）；启动回填 backfillTwins 挂入 listen 回调
+- **D5 风险召回**：chronic_condition/declining_health/persistent_tongue_abnormal 高危信号自动建召回单入 revisits.json（14 天去重 + 闭环 7 天静默）；followup_worsened 不重复建（R719 已覆盖）
+- **冒烟全过**：2 枚手工快照（评分 51/C 连续 <60）→ 自动建 2 张召回单 → from-recall 排期 2026-09-02 09:00（booked + 双向链接 + mock 短信「模拟外发」落 outbox）→ 重放 409 / 无令牌 401 / event_id 幂等 added:false；冒烟数据已清（合成虚构）
+- **对拍门**：equiv-dual-run --gate absorb PASS（端点零差异 + Recall@K 双侧 Δ=0.0000），放行令牌已写
+- **巡检收口**：capability-diff 复跑 clean（missing_api=0）；L2 模块比对清单增 twin-engine.js（防后续导出漂移）
+- 纪律：医学域只移植不训练；召回链全程无命理字段（R745/R756/R757 不触及）
+
 ## 2026-09-01 · L2.5 检索处理器特征哈希巡检（G17R 撤销令采纳项落地）
 - `scripts/tcm-capability-diff.py` 新增 L2.5 层：`/api/tcm/kb/search`、`/api/tcm/kb/formula-recall` 两检索处理器函数体规范化哈希双侧比对（花括号配平抽取、跳过字符串/注释；规范化=标识符序列+运算符骨架），漂移/缺失即破坏 clean 态并入 digest
 - 动机：G17 L2 红牌教训——路由/导出级 diff 看不见处理器内部排序逻辑漂移（R825/R829 曾漏移植致 21:15 返工）

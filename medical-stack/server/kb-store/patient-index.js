@@ -148,6 +148,18 @@ function getPatient(patientId) {
   catch { return null; }
 }
 
+/* 只读姓名解析（D4 · 随 twin 吸收自 tcm）：按姓名指纹查最近就诊档，无侧写副作用（不建楼/不计数）。
+ * 供数字孪生等只读场景把「患者姓名」解析为 empi- 主索引号。 */
+function lookupByName(name) {
+  const d = db();
+  if (!d) return null;
+  try {
+    const f = fp(name);
+    if (!f) return null;
+    return d.prepare('SELECT * FROM patients WHERE name_fp=? ORDER BY last_visit DESC LIMIT 1').get(f) || null;
+  } catch { return null; }
+}
+
 /* 列表/检索：q 支持三种形态——
  *   中文子串 → 匹配库内全名；纯拉丁 → 首字母变体逐一同比（前缀即中）；
  *   其余 → patient_id 前缀。脱敏只在输出层做。 */
@@ -180,4 +192,4 @@ function count() {
   try { return d.prepare('SELECT COUNT(*) c FROM patients').get().c; } catch { return 0; }
 }
 
-module.exports = { upsertPatient, resolvePatientId, getPatient, listPatients, count, maskName, fp, DB_PATH };
+module.exports = { upsertPatient, resolvePatientId, getPatient, lookupByName, listPatients, count, maskName, fp, DB_PATH };

@@ -78,7 +78,10 @@ const { registerRoutes: registerInsurance } = require('./insurance-adaptor');
 registerInsurance(app);
 // G12 轻预约挂号（slots/create/checkin/cancel 四 API + 爽约自动标记 + G10 短信）
 const { registerRoutes: registerAppointments } = require('./appointment-api');
-registerAppointments(app);
+registerAppointments(app, {
+  requireAuth: (req, res, next) => requireAuth(req, res, next),
+  requireStaffRole: (allow) => requireStaffRole(allow)
+});
 // G13 医院报告回流家庭端·供给侧（link_token 关联 + 白名单组装 + 命理剥离守卫）
 const { registerRoutes: registerReflux } = require('./family-reflux');
 registerReflux(app);
@@ -86,6 +89,10 @@ registerReflux(app);
 // R789 患者主索引 EMPI（任何异常回退老行为，绝不影响服务）
 const patientIndex = (() => {
   try { return require('./kb-store/patient-index'); } catch (e) { console.error('[patient-index] 加载失败:', e.message); return null; }
+})();
+// 数字孪生引擎（2026-09-01 吸收自 tcm 契约 v1.3.4：评分/五脏/体质/趋势/风险 + D5 风险信号→主动召回）
+const twinEngine = (() => {
+  try { return require('./twin-engine'); } catch (e) { console.error('[twin] 加载失败:', e.message); return null; }
 })();
 // R790 拼音/首字母离线映射（KB 检索与患者检索共用）
 const pinyin = (() => {
@@ -149,6 +156,17 @@ function requireAuth(req, res, next) {
   } catch (e) {
     return res.status(401).json({ ok: false, error: 'Token 验证失败: ' + e.message });
   }
+}
+
+// 岗位角色守卫（随 twin 吸收自 tcm，语义一致：super_admin 恒通，doctor 前缀角色视同 doctor）
+function requireStaffRole(allow) {
+  return function (req, res, next) {
+    const role = (req.user && req.user.role) || '';
+    const pass = role === 'super_admin' || allow.some(a =>
+      a === role || (a === 'doctor' && role.startsWith('doctor')));
+    if (pass) return next();
+    return res.status(403).json({ ok: false, error: '权限不足：该操作需要 ' + allow.join('/') + ' 岗位身份' });
+  };
 }
 
 // R755 修真：服务端输入校验兜底——通用清洗中间件
@@ -954,6 +972,10 @@ app.post('/api/tcm/case-confirm', async (req, res) => {
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(path.join(dir, caseId + '.json'), JSON.stringify(record, null, 2));
       } catch(e) { console.error('[case-confirm] 落盘失败:', e.message); }
+      // D3：病历签发 → 数字孪生快照（event_id=caseId 幂等；无建档号跳过）
+      try {
+        if (empiId && twinEngine) twinEngine.addSnapshot(empiId, twinEngine.snapshotFromCase(record));
+      } catch(e) { console.error('[twin] 病历快照失败:', e.message); }
     });
 
     res.json({ ok: true, caseId, hash: record.hash });
@@ -3244,6 +3266,10 @@ app.post('/api/prescription/create', optionalAuth, async (req, res) => {
     // 原实现裸 appendFileSync 直接 ENOENT，首张处方永远签不出
     fs.mkdirSync(path.dirname(RX_STORE), { recursive: true });
     fs.appendFileSync(RX_STORE, JSON.stringify(record) + '\n');
+    // D3：处方签发 → 数字孪生快照（event_id=rx_id 幂等；anonymous 跳过）
+    try {
+      if (twinEngine && resolvedPid && resolvedPid !== 'anonymous') twinEngine.addSnapshot(resolvedPid, twinEngine.snapshotFromRx(record));
+    } catch(e) { console.error('[twin] 处方快照失败:', e.message); }
 
     res.json({
       ok: true,
@@ -5443,6 +5469,11 @@ app.post('/api/family/followup/complete', optionalAuth, async (req, res) => {
       } catch (e) { /* 转诊失败不影响随访记录 */ }
     }
 
+    // D3：随访完成 → 数字孪生快照（event_id=随访 id 幂等）
+    try {
+      if (twinEngine && list[idx].patient_id) twinEngine.addSnapshot(list[idx].patient_id, twinEngine.snapshotFromFollowup(list[idx]));
+    } catch (e) { console.error('[twin] 随访快照失败:', e.message); }
+
     res.json({ ok: true, id, status: 'completed', effect, needs_revisit: list[idx].needs_revisit, revisit_created: revisitCreated, message: '随访已记录，感谢反馈' });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
@@ -6617,6 +6648,51 @@ app.get('/api/patient/timeline', optionalAuth, (req, res) => {
 });
 
 
+// ───────────────── D3 数字孪生（服务端单一事实源 · 2026-09-01 吸收自 tcm 契约 v1.3.4）─────────────────
+// GET /api/tcm/twin?patient_id= — 聚合模型（评分/五脏/体质/趋势/风险/证型轨迹）
+app.get('/api/tcm/twin', optionalAuth, (req, res) => {
+  try {
+    if (!twinEngine) return res.status(503).json({ ok: false, error: '孪生引擎未加载' });
+    let pid = String(req.query.patient_id || '').trim();
+    const name = String(req.query.name || '').trim();
+    // D4：姓名入参 → EMPI 只读解析为 empi- 主索引号（问诊台场景只有姓名）
+    if (!pid && name && patientIndex && patientIndex.lookupByName) {
+      const rec = patientIndex.lookupByName(name);
+      if (rec) pid = rec.patient_id;
+    }
+    if (!pid) return res.status(400).json({ ok: false, error: '缺少 patient_id 或 name' });
+    const model = twinEngine.computeModel(pid);
+    if (!model) return res.json({ ok: true, patient_id: pid, model: null, note: '该患者暂无孪生档案（经病历签发/处方/随访自动建楼）' });
+    res.json({ ok: true, patient_id: pid, model });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/tcm/twin/snapshot — 手工快照（医生补录；event_id 幂等）
+app.post('/api/tcm/twin/snapshot', requireAuth, requireStaffRole(['doctor', 'admin']), (req, res) => {
+  try {
+    if (!twinEngine) return res.status(503).json({ ok: false, error: '孪生引擎未加载' });
+    const b = req.body || {};
+    const pid = String(b.patient_id || '').trim();
+    if (!pid) return res.status(400).json({ ok: false, error: '缺少 patient_id' });
+    const snap = {
+      event_id: String(b.event_id || 'manual-' + Date.now().toString(36)),
+      source: 'manual',
+      timestamp: b.timestamp || new Date().toISOString(),
+      chief: String(b.chief || '').slice(0, 200), syndrome: String(b.syndrome || '').slice(0, 60),
+      formula: String(b.formula || '').slice(0, 60),
+      symptoms: Array.isArray(b.symptoms) ? b.symptoms.slice(0, 20).map(String) : [],
+      labs_count: Math.max(0, parseInt(b.labs_count, 10) || 0),
+      features: twinEngine.extractFeatures({
+        chief: b.chief || '', symptoms: b.symptoms || [],
+        tongue: b.tongue || [], pulse: b.pulse || [], face: b.face || null,
+        four: b.four || null
+      })
+    };
+    const r = twinEngine.addSnapshot(pid, snap);
+    res.json({ ok: true, added: r.added, snapshot_count: r.count, note: '辅助参考评分，不构成诊断结论' });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
 app.listen(PORT, "127.0.0.1", () => {
   console.warn(`🏥 命理宝鉴·医道 API 启动：http://localhost:${PORT}`);
   console.warn(`   端点: /api/tcm/{health,tongue,inquiry,diagnose,formula/search,acupoint/search,cases,eye-analyze,hand-analyze,wearable-ingest,collect-start,multi-modal-diagnose}`);
@@ -6630,6 +6706,13 @@ app.listen(PORT, "127.0.0.1", () => {
   } catch (e) {
     console.warn(`   KB 预热失败: ${e.message}`);
   }
+  // D3：启动回填——扫描既有真实事件（病历/处方/随访），幂等补建孪生体
+  try {
+    if (twinEngine) {
+      const bf = twinEngine.backfillTwins(path.join(__dirname, '..', 'data'));
+      console.warn(`   孪生回填: ${bf.added} 快照 / ${bf.patients} 患者`);
+    }
+  } catch (e) { console.warn(`   孪生回填失败: ${e.message}`); }
 });
 
 module.exports = app;
