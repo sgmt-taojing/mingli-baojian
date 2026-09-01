@@ -169,6 +169,31 @@ def main() -> int:
     tcm_p, ms_p = pages(TCM), pages(ROOT)
     page_gap = len(tcm_p - ms_p)
 
+    # L4.5 共享 js 哈希比对（盲区封堵：页面同名不代表同源——common.js 缺 authFetch
+    # 曾致召回面板静默失效，代理隔离修复后才暴露）。登记 KNOWN_JS_ADAPT 豁免有意适配。
+    KNOWN_JS_ADAPT = {
+        'nav.js': 'ms 导航为 curated 子集 + 命理宝鉴品牌适配（fhub/consult/insur 已对齐 tcm 增量）',
+        'config-engine.js': '仅系统品牌名适配（SEC-001）；逻辑同源',
+        'i18n.js': '仅 app.name 品牌串适配（SEC-001）；逻辑同源',
+        'seed-loader.js': 'R864 V2.0 已对齐（生产不自动注入假数据）；头部品牌标注差异',
+    }
+    js_rows = []
+    js_drift = []
+    tcm_js_dir, ms_js_dir = TCM / 'app' / 'js', MS / 'app' / 'js'
+    for f in sorted(tcm_js_dir.glob('*.js')):
+        m = ms_js_dir / f.name
+        if not m.exists():
+            js_rows.append((f.name, 'MISSING'))
+            js_drift.append({'file': f.name, 'status': 'MISSING'})
+            continue
+        th = hashlib.sha256(f.read_bytes()).hexdigest()[:12]
+        mh = hashlib.sha256(m.read_bytes()).hexdigest()[:12]
+        if th != mh:
+            st = 'ADAPT' if f.name in KNOWN_JS_ADAPT else 'DRIFT'
+            js_rows.append((f.name, st))
+            if st == 'DRIFT':
+                js_drift.append({'file': f.name, 'status': 'DRIFT'})
+
     # L2.5 处理器特征哈希比对
     proc_rows = []
     proc_drift = []
@@ -188,6 +213,7 @@ def main() -> int:
         'missing_api': missing_api, 'module_diffs': mod_diffs,
         'seed_missing': seed_missing, 'page_gap_count': page_gap,
         'processor_hashes': [[r, th, mh, st] for r, th, mh, st in proc_rows],
+        'js_drift': js_drift,
     }
     digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:16]
 
@@ -198,14 +224,14 @@ def main() -> int:
         pass
 
     changed = prev.get('digest') != digest
-    clean = not missing_api and not mod_diffs and not seed_missing and not proc_drift
+    clean = not missing_api and not mod_diffs and not seed_missing and not proc_drift and not js_drift
 
     summary = {
         'ts': now, 'digest': digest, 'changed': changed, 'clean': clean,
         'missing_api_count': len(missing_api),
         'missing_api': missing_api,  # R-DIFF-SLA：72h SLA 追踪需要条目级键
         'module_diffs': mod_diffs, 'seed_missing': seed_missing,
-        'processor_drift': proc_drift,
+        'processor_drift': proc_drift, 'js_drift': js_drift,
         'page_gap_count': page_gap,
         'extra_api_count': len(extra_api),
         'tcm_head': git_head(TCM),
@@ -257,6 +283,15 @@ def main() -> int:
         lines += [
             f"",
             f"## L4 页面层参考：tcm 比 mingli 多 {page_gap} 个页面（按三分法人工定性：真缺口/已有等价/架构定位）",
+            f"",
+            f"## L4.5 共享 js 哈希比对（页面同源监控）",
+        ]
+        if js_rows:
+            lines += [f"- `{n}`：{'🔴 漂移' if st == 'DRIFT' else ('🔴 缺失' if st == 'MISSING' else '⚪ 有意适配（' + KNOWN_JS_ADAPT[n] + '）')}"
+                      for n, st in js_rows]
+        else:
+            lines += ["- （空 · 全部同源）"]
+        lines += [
             f"",
             f"## medical-stack 独有（命理增量层，勿回流 tcm）：{len(extra_api)} 条",
             f"（批注/预约自建/reflux/短信校验等，属 mingli 特有边界，详见 ADR-007）",

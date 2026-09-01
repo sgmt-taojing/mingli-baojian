@@ -1,7 +1,7 @@
 /**
  * 疗效周期分析 — 前端逻辑
- * 数据源: localStorage tcm_patient_records
- * 引擎: 后端 /api/tcm/efficacy-analysis + /api/tcm/disease-track (降级时本地计算)
+ * 数据源: 服务端 /api/tcm/efficacy-records（真实处方就诊 + 随访疗效评分），离线降级 localStorage
+ * 引擎: 本地聚合引擎（与服务端同构）；评分只用真实随访分，缺失显示「—」不估算
  */
 (function() {
   'use strict';
@@ -29,18 +29,21 @@
     return [];
   }
   
-  // 获取病历数据
-  function getRecords(periodDays) {
+  // 获取病历数据（GAP-P2：服务端真实诊疗记录优先，离线降级 localStorage）
+  async function getRecords(periodDays) {
+    try {
+      const days = periodDays === 'all' ? 'all' : (parseInt(periodDays, 10) || 90);
+      const resp = await fetch((API_BASE || '') + '/api/tcm/efficacy-records?days=' + days);
+      const d = await resp.json();
+      if (d && d.ok && Array.isArray(d.records)) return d.records;
+    } catch (e) { /* 离线降级 */ }
     const raw = localStorage.getItem('tcm_patient_records');
     if (!raw) return [];
     let records;
     try { records = JSON.parse(raw); } catch { return []; }
-    
     if (periodDays === 'all') return records;
-    
     const days = parseInt(periodDays, 10);
     if (isNaN(days)) return records;
-    
     const cutoff = Date.now() - days * 86400000;
     return records.filter(r => {
       const t = new Date(r.created_at || r.visit_date || 0).getTime();
@@ -50,8 +53,8 @@
   
   // 核心分析（本地版，与后端 efficacy-engine 同构）
   function localAnalysis(records) {
-    // 注入疗效评分
-    records = injectScores(records);
+    // 挂上真实疗效评分（GAP-P2：不再虚构评分，缺失为 null 显示「—」）
+    records = attachScores(records);
     
     // 按诊断分组
     const groups = {};
@@ -77,15 +80,16 @@
         if (eps.length < 2) continue;
         eps.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
         
-        const scores = eps.map(e => Number(e.efficacy_score) || 0);
+        const scores = eps.map(e => (typeof e.efficacy_score === 'number' && isFinite(e.efficacy_score)) ? e.efficacy_score : null);
+        const realScores = scores.filter(s => s !== null);
         const first = new Set(extractHerbs(eps[0]));
         const last = new Set(extractHerbs(eps[eps.length - 1]));
         const added = [...last].filter(h => !first.has(h));
         const removed = [...first].filter(h => !last.has(h));
         
-        const direction = scores.length >= 2 && scores[scores.length - 1] > scores[0] ? 'improving' :
-                          scores.length >= 2 && scores[scores.length - 1] < scores[0] ? 'declining' : 'stable';
-        const delta = scores.length >= 2 ? (scores[scores.length - 1] - scores[0]).toFixed(1) : '0';
+        const direction = realScores.length >= 2 && realScores[realScores.length - 1] > realScores[0] ? 'improving' :
+                          realScores.length >= 2 && realScores[realScores.length - 1] < realScores[0] ? 'declining' : 'stable';
+        const delta = realScores.length >= 2 ? (realScores[realScores.length - 1] - realScores[0]).toFixed(1) : '0';
         
         if (direction === 'improving') totalImproved++;
         totalMultiVisit++;
@@ -96,8 +100,10 @@
           if (gap < 30) totalRelapse++;
         }
         
-        // 最优诊次
-        const bestIdx = scores.indexOf(Math.max(...scores));
+        // 最优诊次（只看有真实评分的诊次；都无评分取最后一诊）
+        let bestIdx = -1, bestScore = -Infinity;
+        scores.forEach((s, i) => { if (s !== null && s > bestScore) { bestScore = s; bestIdx = i; } });
+        if (bestIdx === -1) bestIdx = eps.length - 1;
         
         tracks.push({
           patient_id: pid,
@@ -160,28 +166,11 @@
     };
   }
   
-  function injectScores(records) {
-    // 按患者+诊断分组
-    const groups = {};
+  function attachScores(records) {
+    // GAP-P2：只挂真实评分（随访 symptom_score / 记录自带 efficacy_score），缺分不估算
     for (const r of records) {
-      const d = normDx(r.diagnosis || '');
-      const pid = r.patient_id || r.patient_name || '';
-      const key = pid + '|' + d;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(r);
-    }
-    
-    // 注入评分
-    for (const arr of Object.values(groups)) {
-      arr.sort((a, b) => (a.created_at || '').localeCompare(b.created_at || ''));
-      if (arr.length === 1) {
-        arr[0].efficacy_score = 3.5;
-      } else {
-        arr.forEach((r, i) => {
-          // 多次就诊：后续 > 前面（假设在改善），复诊本身代表需要调整
-          r.efficacy_score = 2 + Math.min(2, (arr.length - i) * 0.4);
-        });
-      }
+      const v = Number(r.efficacy_score !== undefined ? r.efficacy_score : r.symptom_score);
+      r.efficacy_score = isFinite(v) && (r.efficacy_score !== undefined || r.symptom_score !== undefined) ? v : null;
     }
     return records;
   }
@@ -213,7 +202,7 @@
     // 病种排名
     const dList = document.getElementById('disease-list');
     if (!report.length) {
-      dList.innerHTML = '<div class="empty"><div class="icon">📊</div>暂无足够的复诊数据<br>建议先注入测试数据：点击顶部"🌱 注入测试数据"</div>';
+      dList.innerHTML = '<div class="empty"><div class="icon">📊</div>暂无足够的复诊数据<br>随门诊开展，真实诊疗与随访数据将自动聚合到这里</div>';
     } else {
       dList.innerHTML = report.map(d => {
         const impRateNum = parseInt(d.improventionRate || d.improvementRate || '0');
@@ -314,84 +303,28 @@
   
   // ═══ 执行分析 ═══
   
-  window.runAnalysis = function() {
+  window.runAnalysis = async function() {
     const periodSel = document.getElementById('range-period');
     const period = periodSel.value;
     const days = period === 'all' ? 'all' : parseInt(period, 10);
     
     setText('kpi-period', period === 'all' ? '全部历史' : '最近 ' + period + ' 天');
     
-    const records = getRecords(days);
+    const records = await getRecords(days);
     
     if (!records.length) {
       render({ report: [], summary: { totalDiseases: 0, totalRecords: 0, totalImproved: 0, totalRelapse: 0, totalMultiVisit: 0, totalHerbs: 0, improvementRate: '—', relapseRate: '—' } });
       return;
     }
     
-    // 优先走后端 API
-    if (API_BASE) {
-      fetch(API_BASE + '/api/tcm/efficacy-analysis', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ records })
-      }).then(r => r.json()).then(data => {
-        if (data.ok && data.report && data.report.length >= 0) {
-          render(adaptApiResult(data, records));
-        } else {
-          render(localAnalysis(records));
-        }
-      }).catch(() => {
-        render(localAnalysis(records));
-      });
-    } else {
-      // 离线模式：本地计算
-      render(localAnalysis(records));
-    }
+    // GAP-P2：本地聚合引擎（与服务端同构）直接分析真实记录
+    render(localAnalysis(records));
   };
   
-  // 适配后端 API 返回结构
-  function adaptApiResult(data, records) {
-    if (!data.report || !data.report.length) {
-      return localAnalysis(records);
-    }
-    // 后端返回的结构略有不同，适配一下
-    const report = data.report.map(d => ({
-      ...d,
-      improvementRate: d.efficacyStats?.improvementRate || '—',
-      tracks: (d.patientTracks || []).map(t => ({
-        ...t,
-        patient_name: t.episodes?.[0]?.patient_name || '',
-        efficacyCurve: t.episodes?.map((ep, i) => ({
-          visit: i + 1, date: (ep.created_at || '').slice(0, 10),
-          herbs: (typeof ep.herbs === 'string' ? ep.herbs.split(/[,，、]/) : ep.herbs || []).map(h => h.trim()).filter(Boolean),
-          score: ep.efficacy_score
-        })) || [],
-        bestRegimen: t.trend?.bestRegimen || { visit: 1, herbs: [], score: 0 },
-        direction: t.trend?.efficacyDirection || 'stable',
-        delta: t.trend?.efficacyDelta?.toString() || '0',
-        herbChanges: t.trend?.herbChanges || { added: [], removed: [], maintained: [] },
-        timeSpan: t.trend?.timeSpan || '—',
-        totalVisits: t.trend?.totalVisits || t.episodes?.length || 0
-      }))
-    }));
-    
-    return {
-      report,
-      summary: {
-        totalDiseases: report.length,
-        totalRecords: records.length,
-        totalImproved: report.reduce((s, d) => s + (d.improved || 0), 0),
-        totalRelapse: 0,
-        totalMultiVisit: report.reduce((s, d) => s + d.multiVisitPatients, 0),
-        totalHerbs: new Set(report.flatMap(d => (d.optimalHerbs || []).map(h => h.name))).size,
-        improvementRate: '—', relapseRate: '—'
-      }
-    };
-  }
-  
   // ═══ 导出 CSV ═══
-  window.exportReport = function() {
+  window.exportReport = async function() {
     const period = document.getElementById('range-period').value;
-    const records = getRecords(period === 'all' ? 'all' : parseInt(period, 10));
+    const records = await getRecords(period === 'all' ? 'all' : parseInt(period, 10));
     const result = localAnalysis(records);
     
     const rows = [['病种', '总病例', '复诊人数', '改善人数', '改善率', '复发率', '平均分变化', '最优方药']];

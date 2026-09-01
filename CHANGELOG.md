@@ -1,5 +1,13 @@
 # mingli-baojian 更新日志
 
+## 2026-09-01 晚 · 召回面板全链贯通 + R-ISO 代理隔离根修 + L4.5 共享js同源监控
+- **召回面板浏览器实测全链过**：医生工作台（8973/doctor-dashboard）召回面板渲染 → 排期 → 选时段占号 → 预约 booked + 召回单 scheduled 双向链接（RV-TWIN-MTI86SPC ↔ appt-3e5832754acb，EMPI 解析患者名）→ pending 面板自动清零
+- **R-ISO 根修（重大隐患）**：medical-static（8973）代理默认曾指向 tcm 8932 上游——内化栈页面一直打供体 API，构成运行时越域依赖且掩盖本栈端点缺口。修为默认 8972（MS_API_PORT 环境变量+文件默认值双保险），重启后 8973/api/tcm/health 报「命理宝鉴·医道」
+- **隔离修复后暴露的静默失效**：召回面板调 `authFetch` 而 ms common.js 缺 R854 定义——页面同名不代表同源。已补 authFetch 并全量扫描共享 js：对齐 efficacy-page.js（GAP-P2 服务端疗效）、longitudinal-page.js（R866 后端患者档案合并）、seed-loader.js（R864 V2.0 生产不自动注入假数据）、nav.js（补 fhub/consult/insur 条目+角色清单，品牌锚文本改「命理宝鉴·医道」），config-engine/i18n 品牌可见串修正
+- **巡检进化 L4.5**：capability-diff 新增共享 js 哈希比对层（KNOWN_JS_ADAPT 登记有意适配），专治「页面重放了、依赖的共享 js 没跟上」类静默失效
+- **当日增量当日清**：tcm 契约 v1.3.7（D8 recall-stats 召回成效统计）随访链到达即吸收——路由适配 ms sqlite 预约域（no_show 口径），冒烟实测响应率/闭环率/爽约率/分源聚合正确；finance.html 面板块此前已重放到位，API 一通即活
+- 巡检复跑 clean（missing_api=0 / 处理器零漂移 / js 零未登记漂移）
+
 ## 2026-09-01 · 孪生召回闭环吸收（tcm 契约 v1.3.4/v1.3.5 · D3+D5+D6 全链）
 - **模块**：`twin-engine.js`（417 行原样移植，头部标来源）——真实诊疗事件→快照→健康评分/五脏/体质（ZYYXH/T157-2009 转化分口径）/趋势/风险/证型轨迹；`data/twin/<pid>.json` 原子写
 - **三路由**：`GET /api/tcm/twin`（姓名经 EMPI lookupByName 只读解析——patient-index 补此方法）、`POST /api/tcm/twin/snapshot`（医生补录，requireStaffRole 守卫同步移植）、`POST /api/clinic/appointment/from-recall`（D6：召回单→直建预约占号→双向链接→mock 短信；适配 ms sqlite 预约模型，appointments 表加 recall_id/source 列，容量规则=每档 3）

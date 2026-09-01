@@ -91,6 +91,14 @@ th{color:var(--text3);font-weight:600;font-size:10px}
   <!-- KPI -->
   <div class="stats-row" id="kpi-row"></div>
 
+  <!-- D8（契约 v1.3.7）：召回成效——召回工作的经营回报可视 -->
+  <div class="card">
+    <h3>📣 召回成效 <span style="font-size:11px;color:var(--text3);font-weight:400">风险/随访/爽约三源召回 → 排期 → 到院闭环</span></h3>
+    <div class="stats-row" id="recall-kpi"></div>
+    <div class="bar-chart" id="recall-source-chart"></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:4px" id="recall-basis"></div>
+  </div>
+
   <!-- 趋势（纯中医诊所无科室维度，R813c 移除科室占比伪图） -->
   <div class="card">
     <h3>📈 近 7 日营收</h3>
@@ -256,9 +264,28 @@ function exportFin() {
   toast('📥 财务流水已导出');
 }
 
+// D8（契约 v1.3.7）：召回成效卡——响应率/闭环率/爽约率/三源分布
+function loadRecallStats() {
+  fetch('/api/clinic/recall-stats').then(function(r){ return r.json(); }).then(function(d) {
+    if (!d || !d.ok) return;
+    var rc = d.recall, ns = d.noshow;
+    document.getElementById('recall-kpi').innerHTML =
+      '<div class="stat"><div class="v">' + rc.total + '</div><div class="l">召回单</div></div>' +
+      '<div class="stat"><div class="v">' + (rc.response_rate == null ? '—' : rc.response_rate + '%') + '</div><div class="l">响应率</div></div>' +
+      '<div class="stat"><div class="v">' + (rc.close_rate == null ? '—' : rc.close_rate + '%') + '</div><div class="l">闭环率</div></div>' +
+      '<div class="stat"><div class="v" style="color:#d97706">' + (ns.rate == null ? '—' : ns.rate + '%') + '</div><div class="l">爽约率</div></div>';
+    var map = {};
+    Object.keys(rc.by_source).forEach(function(k){ map[rc.by_source[k].label] = rc.by_source[k].total; });
+    renderBarChart('recall-source-chart', map, ['blue', 'green', '']);
+    document.getElementById('recall-basis').textContent = d.basis || '';
+  }).catch(function(){});
+}
+
 loadFinance();
-// R813：30 秒自动刷新（处方结算后财务页自动更新）
+loadRecallStats();
+// R813：30 秒自动刷新（处方结算后财务页自动更新）；召回成效 60 秒刷新
 setInterval(loadFinance, 30000);
+setInterval(loadRecallStats, 60000);
 </script>
 <div style="font-size:10px;color:var(--text3);margin-top:8px">⚠️ 本系统内容内容供学习参考，用药请遵医嘱。</div>
 <script src="js/error-interceptor.js"></script>

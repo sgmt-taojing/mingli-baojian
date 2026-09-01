@@ -1,5 +1,5 @@
 /**
- * TCM-Agent 全局导航 + 认证 V1.0
+ * 全局导航 + 认证 V1.0（命理宝鉴·医道 · 2026-09-01 对齐 tcm nav 增量）
  * 所有页面统一引用此脚本，自动注入导航栏和认证状态
  * 使用方式: <script src="js/nav.js"></script>
  */
@@ -48,7 +48,10 @@
     longitudinal: { name: '长程画像', icon: '🧬', roles: ['doctor','admin'] },
     kb_evolution: { name: 'KB进化仪表盘', icon: '🧠', roles: ['doctor','admin'] },
     home: { name: '居家中医助手', icon: '🏠', roles: ['*'] },
-    family: { name: '家庭成员管理', icon: '👨‍👩‍👧', roles: ['*'] }
+    family: { name: '家庭成员管理', icon: '👨‍👩‍👧', roles: ['*'] },
+    fhub:   { name: '家庭中心', icon: '🏡', roles: ['*'] },
+    consult:{ name: '线上会诊', icon: '👥', roles: ['doctor','admin'] },
+    insur:  { name: '医保核验', icon: '🪪', roles: ['admin','doctor','pharmacist'] }
   };
 
   // ─── 读取用户 ───
@@ -57,12 +60,12 @@
 
   // ─── 角色页面权限 ───
   var rolePages = {
-    super_admin: ['admin','dashboard','schedule','doctor','pharmacy','clinical','index','followup','emr','acupuncture','twin','wearable','monitor','flows','rbac','aidx','emerg','mobile','summary','rec','therapy','inv','fin','tele','well','call','msg','archive','hospital','safety','sysmon','efficacy','longitudinal','kb_evolution','home','family','clinic-desk','monitor-dashboard','wuzhen','fconsult','chronic','doctors','dskb','settings'],
-    doctor_internal: ['doctor','clinical','index','followup','report','emr','acupuncture','twin','wearable','flows','aidx','emerg','rec','therapy','tele','well','call','msg','archive','hospital','safety','longitudinal','kb_evolution','clinic-desk','wuzhen','fconsult','chronic','doctors','dskb','settings'],
-    doctor_acupuncture: ['doctor','clinical','index','followup','report','emr','acupuncture','twin','wearable','flows','aidx','emerg','rec','therapy','tele','well','call','msg','archive','hospital','safety','longitudinal','kb_evolution','wuzhen','fconsult','chronic','doctors','dskb','settings'],
-    doctor_gynecology: ['doctor','clinical','index','followup','report','emr','acupuncture','twin','flows','aidx','emerg','rec','therapy','tele','well','call','msg','archive','hospital','safety','longitudinal','kb_evolution','wuzhen','fconsult','chronic','doctors','dskb','settings'],
-    pharmacist: ['pharmacy','index','flows','emerg','rec','wuzhen','fconsult','chronic','doctors','dskb','settings'],
-    patient: ['patient','payment','report','index','twin','flows','emerg','rec','therapy','tele','well','call','msg','archive','hospital','wuzhen','fconsult','chronic','doctors','dskb','settings']
+    super_admin: ['fhub','admin','dashboard','schedule','doctor','pharmacy','clinical','index','followup','emr','acupuncture','twin','wearable','monitor','flows','rbac','aidx','emerg','mobile','summary','rec','therapy','inv','fin','tele','well','call','msg','archive','hospital','safety','sysmon','efficacy','longitudinal','kb_evolution','home','family','clinic-desk','monitor-dashboard','wuzhen','fconsult','chronic','doctors','dskb','settings','consult','insur'],
+    doctor_internal: ['fhub','doctor','clinical','index','followup','report','emr','acupuncture','twin','wearable','flows','aidx','emerg','rec','therapy','tele','well','call','msg','archive','hospital','safety','longitudinal','kb_evolution','clinic-desk','wuzhen','fconsult','chronic','doctors','dskb','settings','consult','insur'],
+    doctor_acupuncture: ['fhub','doctor','clinical','index','followup','report','emr','acupuncture','twin','wearable','flows','aidx','emerg','rec','therapy','tele','well','call','msg','archive','hospital','safety','longitudinal','kb_evolution','wuzhen','fconsult','chronic','doctors','dskb','settings','consult','insur'],
+    doctor_gynecology: ['fhub','doctor','clinical','index','followup','report','emr','acupuncture','twin','flows','aidx','emerg','rec','therapy','tele','well','call','msg','archive','hospital','safety','longitudinal','kb_evolution','wuzhen','fconsult','chronic','doctors','dskb','settings','consult','insur'],
+    pharmacist: ['fhub','pharmacy','index','flows','emerg','rec','wuzhen','fconsult','chronic','doctors','dskb','settings','insur'],
+    patient: ['fhub','patient','payment','report','index','twin','flows','emerg','rec','therapy','tele','well','call','msg','archive','hospital','wuzhen','fconsult','chronic','doctors','dskb','settings']
   };
   var allowedPages = user ? (rolePages[user.role] || []) : ['index','login','settings'];
   if (user && user.role === 'super_admin') allowedPages = rolePages.super_admin;
@@ -81,7 +84,7 @@
 
     var navHTML = '<nav id="tcm-nav" style="background:linear-gradient(135deg,#1a1008,#4a2810);color:#fff;padding:6px 12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:12px;position:sticky;top:0;z-index:100">';
     navHTML += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
-    navHTML += '<a href="index.html" style="color:#fff;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:2px">🏥 TCM-Agent</a>';
+    navHTML += '<a href="index.html" style="color:#fff;text-decoration:none;font-weight:700;font-size:14px;letter-spacing:2px">🏥 命理宝鉴·医道</a>';
 
     // 导航链接
     var navPages = [
@@ -94,6 +97,7 @@
       { id: 'efficacy', href: 'efficacy-analysis.html' },
       { id: 'longitudinal', href: 'longitudinal.html', icon: '🧬', name: '长程画像' },
       { id: 'kb_evolution', href: 'kb-evolution.html', icon: '🧠', name: 'KB进化仪表盘' },
+      { id: 'fhub', href: 'family-hub.html', icon: '🏡', name: '家庭中心' },
       { id: 'home', href: 'home-tcm.html', icon: '🏠', name: '居家助手' },
       { id: 'family', href: 'family-portal.html', icon: '👨‍👩‍👧', name: '家庭成员' },
       { id: 'fconsult', href: 'family-consult.html', icon: '🩺', name: '在线问诊' },
@@ -124,6 +128,8 @@
       { id: 'hospital', href: 'hospital.html' },
       { id: 'doctors', href: 'doctors.html' },
       { id: 'dskb', href: 'disease-kb.html' },
+      { id: 'consult', href: 'consult.html' },
+      { id: 'insur', href: 'insurance-desk.html' },
       { id: 'safety', href: 'safety-check.html' },
       { id: 'sysmon', href: 'server-monitor.html' },
       { id: 'efficacy', href: 'efficacy-analysis.html' },

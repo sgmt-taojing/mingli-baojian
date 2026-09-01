@@ -60,9 +60,20 @@
   
   // ═══ 渲染 ═══
   
-  function renderPatientList() {
+  async function renderPatientList() {
     const sel = document.getElementById('patient-select');
     const patients = listPatients();
+    // R866：合并后端真实患者档案（R864 种子清剿后 localStorage 可能为空，
+    // 长程画像必须能看见后端真实患者，不再是演示数据的镜子）
+    try {
+      const r = await fetch(API_BASE + '/api/patients/list');
+      const d = await r.json();
+      for (const p of (d.patients || [])) {
+        if (p.id && !patients.some(x => x.id === p.id)) {
+          patients.push({ id: p.id, name: p.name || p.id, eventCount: 0, lastDate: '' });
+        }
+      }
+    } catch (e) {}
     if (patients.length === 0) {
       sel.innerHTML = '<option value="">暂无患者数据</option>';
       return;
@@ -197,8 +208,9 @@
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ patientId: pid, sources })
       }).then(r => r.json()).then(data => {
-        if (data.ok) renderProfile(data.profile);
-        else throw new Error(data.error);
+        // R866：只接受真算形状（timelineCount 字段在）；桩/异常形状降级本地引擎
+        if (data.ok && data.profile && data.profile.timelineCount !== undefined) renderProfile(data.profile);
+        else renderProfile(localBuildProfile(pid, sources));
       }).catch(() => {
         // 本地降级
         renderProfile(localBuildProfile(pid, sources));

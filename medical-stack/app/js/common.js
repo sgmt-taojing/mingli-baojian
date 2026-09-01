@@ -143,4 +143,16 @@
   global.confirmModal = confirmModal;
   global.promptModal = promptModal;
 
+  /* R854：签发链统一带令牌——写操作一律走 authFetch，401/403 给岗位引导 */
+  function authFetch(url, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({}, opts.headers, { 'Authorization': 'Bearer ' + (localStorage.getItem('tcm_token') || '') });
+    return fetch(url, opts).then(function (r) {
+      if (r.status === 401) toast('请先登录医护人员账号再执行此操作', 'error');
+      if (r.status === 403) toast('权限不足：该操作需要对应岗位身份', 'error');
+      return r;
+    });
+  }
+  global.authFetch = authFetch;
+
 })(typeof window !== 'undefined' ? window : globalThis);

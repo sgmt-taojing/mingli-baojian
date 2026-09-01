@@ -13,8 +13,10 @@ const path = require('path');
 const http = require('http');
 const app = express();
 
-// ═══ 反向代理 /api/* → 8932 API 服务 ═══
-const API_PORT = process.env.TCM_PORT || 8932;
+// ═══ 反向代理 /api/* → 本栈 medical-api（8972）═══
+// R-ISO 修真（2026-09-01）：内化栈页面必须打本栈 API——默认曾指向 tcm 8932（上游供体），
+// 构成运行时越域依赖：tcm 停机则本栈页面全灭，且页面实测会掩盖本栈端点缺口。
+const API_PORT = process.env.MS_API_PORT || process.env.TCM_PORT || 8972;
 app.use('/api', (req, res) => {
   const proxyReq = http.request({
     hostname: '127.0.0.1',

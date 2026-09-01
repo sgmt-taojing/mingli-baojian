@@ -200,6 +200,7 @@ textarea{min-height:60px;resize:vertical}
       <div class="card">
         <h3>🩺 家庭问诊审核</h3>
         <div id="followup-stats" style="margin-bottom:8px"></div>
+        <div id="recall-panel" style="margin-bottom:8px"></div>
         <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
           <select class="input" id="fc-filter" onchange="loadFamilyConsults()" style="width:auto">
             <option value="pending_review">待审核</option>
@@ -884,6 +885,7 @@ async function loadFamilyConsults() {
   const filter = (document.getElementById('fc-filter') || {}).value || 'pending_review';
   box.innerHTML = '<div style="color:var(--text3);padding:12px">加载中…</div>';
   if (window.loadFollowupStats) loadFollowupStats();
+  if (window.loadRecallPanel) loadRecallPanel();
   try {
     const qs = filter === 'all' ? 'limit=100' : 'status=' + filter + '&limit=100';
     const r = await fetch('/api/family/consults?' + qs);
@@ -1053,6 +1055,88 @@ window.loadFollowupStats = async function() {
     box.innerHTML = '';
   }
 };
+// D5（契约 v1.3.4）：孪生风险主动召回面板——pending 召回单直出，排期/完成走既有复诊单生命周期
+window.loadRecallPanel = async function() {
+  const box = document.getElementById('recall-panel');
+  if (!box) return;
+  try {
+    const r = await fetch('/api/family/revisits?status=pending&limit=50');
+    const d = await r.json().catch(() => null);
+    const list = (d && d.ok && d.revisits) || [];
+    if (!list.length) { box.innerHTML = ''; return; }
+    const typeLabel = { chronic_condition: '同证型不转化', declining_health: '健康值连降', persistent_tongue_abnormal: '舌象持续异常' };
+    box.innerHTML = '<div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 12px;font-size:13px">' +
+      '<div style="font-weight:700;color:#9a3412;margin-bottom:6px">📣 主动召回 ' + list.length + ' 人（孪生风险/爽约自动提级）</div>' +
+      list.slice(0, 8).map(r => {
+        const badge = r.source === 'twin-risk'
+          ? '<span style="background:#4f46e5;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-right:4px">孪生·' + (typeLabel[r.risk_type] || r.risk_type) + '</span>'
+          : r.source === 'noshow'
+          ? '<span style="background:#d97706;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-right:4px">爽约召回</span>'
+          : '<span style="background:#b91c1c;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;margin-right:4px">随访加重</span>';
+        return '<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 0;border-top:1px dotted #fed7aa">' +
+          '<span style="font-size:12px;color:#7c2d12">' + badge + '<b>' + (r.patient_name || r.patient_id) + '</b> · ' + (r.reason || '').slice(0, 46) + '</span>' +
+          '<span style="white-space:nowrap">' +
+          '<button class="btn small" style="background:#ea580c;color:#fff;padding:3px 10px;font-size:11px" onclick="recallAction(\'' + r.id + '\',\'schedule\')">排期</button> ' +
+          '<button class="btn small" style="padding:3px 10px;font-size:11px" onclick="recallAction(\'' + r.id + '\',\'complete\')">闭环</button></span></div>';
+      }).join('') +
+      (list.length > 8 ? '<div style="font-size:10px;color:#9a3412;margin-top:4px">…共 ' + list.length + ' 条</div>' : '') + '</div>';
+  } catch (e) { box.innerHTML = ''; }
+};
+window.recallAction = async function(id, action) {
+  if (action === 'schedule') return openRecallScheduler(id);
+  if (!await confirmModal('确认该召回单已复诊闭环？')) return;
+  const r = await fetch('/api/family/revisit/complete', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, outcome: '医生工作台闭环' }) });
+  const d = await r.json().catch(() => null);
+  toast(d && d.ok ? '✅ ' + (d.message || '已处理') : '❌ ' + ((d && d.error) || '操作失败'));
+  if (d && d.ok) loadRecallPanel();
+};
+
+// D6（契约 v1.3.5）：召回排期 = 选时段直建预约占号（排班/容量同患者面规则，短信 mock 先行）
+window.openRecallScheduler = async function(revisitId) {
+  document.getElementById('recall-scheduler') && document.getElementById('recall-scheduler').remove();
+  const anchor = document.getElementById('recall-panel');
+  const tomorrow = new Date(Date.now() + 86400000).toLocaleDateString('sv-SE');
+  const div = document.createElement('div');
+  div.id = 'recall-scheduler';
+  div.style.cssText = 'background:#fff;border:1px solid #fed7aa;border-radius:8px;padding:10px 12px;margin-top:6px;font-size:12px';
+  div.innerHTML = '<div style="font-weight:700;color:#9a3412;margin-bottom:6px">📅 召回排期 · 选时段占号</div>' +
+    '<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">' +
+    '<input type="date" id="rs-date" class="input" style="width:auto" value="' + tomorrow + '" min="' + new Date().toLocaleDateString('sv-SE') + '">' +
+    '<button class="btn small" onclick="loadRecallSlots(\'' + revisitId + '\')">查号源</button>' +
+    '<button class="btn small" onclick="this.closest(\'#recall-scheduler\').remove()">取消</button></div>' +
+    '<div id="rs-slots" style="display:flex;gap:4px;flex-wrap:wrap"></div>';
+  anchor.appendChild(div);
+  loadRecallSlots(revisitId);
+};
+window.loadRecallSlots = async function(revisitId) {
+  const date = document.getElementById('rs-date').value;
+  const box = document.getElementById('rs-slots');
+  box.innerHTML = '<span style="color:var(--text3)">查询号源…</span>';
+  try {
+    const r = await fetch('/api/clinic/appointment/slots?date=' + date);
+    const d = await r.json().catch(() => null);
+    const slots = (d && d.ok && d.slots) || [];
+    box.innerHTML = slots.map(s => {
+      const dis = s.past || s.off || s.remaining <= 0;
+      const label = s.slot + (s.off ? ' 停诊' : s.past ? ' 已过' : ' 余' + s.remaining);
+      return dis
+        ? '<span style="padding:3px 8px;border-radius:6px;background:#f3f4f6;color:#9ca3af;font-size:11px">' + label + '</span>'
+        : '<span style="padding:3px 8px;border-radius:6px;background:#fff7ed;border:1px solid #ea580c;color:#9a3412;font-size:11px;cursor:pointer" onclick="bookRecallSlot(\'' + revisitId + '\',\'' + date + '\',\'' + s.slot + '\')">' + label + '</span>';
+    }).join('');
+  } catch (e) { box.innerHTML = '<span style="color:#b91c1c">号源服务不可达</span>'; }
+};
+window.bookRecallSlot = async function(revisitId, date, slot) {
+  const r = await authFetch('/api/clinic/appointment/from-recall', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ revisit_id: revisitId, date, slot }) });
+  const d = await r.json().catch(() => null);
+  if (d && d.ok) {
+    toast('✅ 已占号 ' + date + ' ' + slot + '（' + d.appointment.doctor_name + '）' + (d.sms && d.sms.status === 'no_phone' ? ' · 患者无手机号，短信未发' : ' · 提醒短信已发' + (d.sms && d.sms.mock ? '（mock）' : '')));
+    document.getElementById('recall-scheduler') && document.getElementById('recall-scheduler').remove();
+    loadRecallPanel();
+  } else {
+    toast('❌ ' + ((d && d.error) || '占号失败'));
+  }
+};
+
 window.pushOverdueFollowups = async function() {
   const banner = document.getElementById('overdue-banner');
   try {

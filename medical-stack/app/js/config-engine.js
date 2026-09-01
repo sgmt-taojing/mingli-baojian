@@ -21,7 +21,7 @@
 
   var DEFAULT_CONFIG = {
     system: {
-      name: 'TCM-Agent 智能诊疗系统',
+      name: '命理宝鉴·医道 智能诊疗系统',
       version: '1.0',
       environment: 'production',
       maintenance_mode: false,

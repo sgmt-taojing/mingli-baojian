@@ -10,7 +10,7 @@ window.TCM_I18N = {
       'disclaimer':'本系统由AI辅助，仅供执业医师参考，不构成诊断或处方建议。'
     },
     en: {
-      'app.name':'TCM-Agent','clinic':'Clinic Desk','home':'Home Health','diagnosis':'Diagnosis',
+      'app.name':'命理宝鉴·医道','clinic':'Clinic Desk','home':'Home Health','diagnosis':'Diagnosis',
       'patient':'Patient','symptoms':'Symptoms','formula':'Formula','herbs':'Herbs','report':'Report',
       'ai_analyzing':'AI analyzing...','confirm':'Confirm','cancel':'Cancel','save':'Save','print':'Print',
       'risk_low':'Low Risk','risk_medium':'Medium Risk','risk_high':'High Risk',

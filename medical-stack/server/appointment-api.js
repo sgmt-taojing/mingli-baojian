@@ -231,6 +231,53 @@ function registerRoutes(app, authMw) {
     } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
   });
 
+  // D8（吸收自 tcm 契约 v1.3.7）：召回成效统计（门诊经营视角）
+  // 口径：响应率 = (scheduled+completed)/总单；闭环率 = completed/总单；爽约率 = no_show/(非取消预约)
+  // 适配：ms 预约域为 sqlite，爽约态为 no_show（tcm 为 noshow），爽约标记走本模块 sweepNoShow
+  app.get('/api/clinic/recall-stats', async (req, res) => {
+    try {
+      const REVISIT_FILE = path.join(__dirname, '..', 'data', 'revisits.json');
+      let revisits = [];
+      try { revisits = JSON.parse(fs.readFileSync(REVISIT_FILE, 'utf8') || '[]'); } catch (e) { revisits = []; }
+      sweepNoShow();
+
+      const SRC_LABEL = { 'twin-risk': '孪生风险', 'followup': '随访加重', 'noshow': '爽约', 'manual': '手工' };
+      const bySource = {};
+      for (const r of revisits) {
+        const src = r.source || (r.followup_id ? 'followup' : 'manual');
+        if (!bySource[src]) bySource[src] = { label: SRC_LABEL[src] || src, total: 0, pending: 0, scheduled: 0, completed: 0, responded_in_24h: 0 };
+        const b = bySource[src];
+        b.total++;
+        b[r.status] = (b[r.status] || 0) + 1;
+        const acted = r.scheduled_at || r.completed_at;
+        if (acted && r.created_at && (new Date(acted) - new Date(r.created_at)) <= 86400000) b.responded_in_24h++;
+      }
+      const total = revisits.length;
+      const scheduled = revisits.filter(r => r.status === 'scheduled').length;
+      const completed = revisits.filter(r => r.status === 'completed').length;
+
+      const apActive = db.prepare(`SELECT status FROM appointments WHERE status != 'cancelled'`).all();
+      const noshow = apActive.filter(a => a.status === 'no_show').length;
+
+      res.json({
+        ok: true,
+        recall: {
+          total, pending: revisits.filter(r => r.status === 'pending').length,
+          scheduled, completed,
+          response_rate: total ? Math.round((scheduled + completed) / total * 1000) / 10 : null,
+          close_rate: total ? Math.round(completed / total * 1000) / 10 : null,
+          by_source: bySource
+        },
+        noshow: {
+          appointments: apActive.length, noshow,
+          rate: apActive.length ? Math.round(noshow / apActive.length * 1000) / 10 : null
+        },
+        basis: 'revisits.json + appointments 实时聚合；响应率=(排期+闭环)/总单',
+        generated_at: new Date().toISOString()
+      });
+    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+
   console.log('📅 G12 轻预约挂号已挂载（/api/appointments/* + tcm 同构别名 /api/clinic/appointment*，爽约自动标记 15min 巡检）');
 }
 

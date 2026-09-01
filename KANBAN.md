@@ -1,5 +1,15 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-09-01 18:30 — 💚 心跳 18:30 全绿（cron 30min · 无新 KB/无新开发项）
+- 健康检查全绿（18:30:07 实探）：6 端口全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已记（05:00/18:00 节点均已覆盖），本日无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② tcm twin API 2 端点差集待吸收（TCM-ABSORPTION-SPEC 流程，主会话执行）
+
+## 2026-09-01 18:00 — 💚 心跳 18:00 全绿（cron 30min · 顶部看板纠偏）
+- 健康检查全绿（18:00:12 实探）：6 端口全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续（02:03 +20 条已记），此后无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② tcm twin API 2 端点差集待吸收（TCM-ABSORPTION-SPEC 流程，主会话执行）
+
 ## 2026-09-01 11:00 — 💚 心跳 11:00 全绿（cron 30min · 顶部看板纠偏）
 - 健康检查全绿（11:02:09 实探）：6 端口全 200 + kb-list + paipan-api OK
 - KB 蒸馏：今日 20 条（02:03 入库）已于 05:00 节点记录，此后无新 distill-*.py 执行
@@ -24,6 +34,12 @@
 - 验收：对拍 PASS（零差异 + Recall Δ=0.0000），六层复跑 6/6 PASS（证据 211202 批次）
 - [P2 已落地 09-01 06:40] 检索处理器内部逻辑漂移是 L1 巡检盲区 → 提议把 search handler 特征哈希纳入 capability-diff（防同类漂移）
 - 待裁判：G17 签字收口——L2 证据件 DELIVERY/L2-evidence-20260831-211202.json
+
+## 2026-09-01 20:45 — ✅ 召回面板全链贯通 + R-ISO 代理隔离根修 + D8 当日吸收
+- R-ISO：medical-static 代理默认指向 tcm 8932（越域依赖，掩盖本栈缺口）→ 修默认 8972 + plist MS_API_PORT 双保险
+- 静默失效根修：common.js 缺 R854 authFetch → 召回面板占号无声失败；共享 js 全量扫描对齐 4 件（efficacy/longitudinal/seed-loader R864/nav），品牌残留 3 处修正
+- 巡检 L4.5 共享 js 哈希监控上线（KNOWN_JS_ADAPT 豁免登记）；D8 recall-stats 当日到达当日吸收，巡检复跑 clean
+- 浏览器实测：排期→占号→双向链接→面板清零全链过
 
 ## 2026-09-01 13:40 — ✅ 孪生召回闭环吸收完成（tcm v1.3.4/v1.3.5 · 当日新差集当日清零）
 - 范围：twin-engine 模块 + twin×2 路由 + from-recall + 病历/处方/随访三快照钩子 + 启动回填 + D5 自动召回 + D6 召回排期闭环 + patient-index lookupByName + requireStaffRole 守卫 + recall_scheduled 短信模板
@@ -1546,3 +1562,8 @@
 - 进行中无未收口开发项；阻塞延续：patrol 读数失实修真 + cron 连败集群 + ⏭️ P2.8 病历 #23-#25（待主会话浏览器冲刺）
 - 待主会话：① 修 health-patrol 读数失实 ② 服务中心导航回归走查（待浏览器） ③ C 类 13 页退役清单拍板
 - 判定：等主会话推进，无需单次心跳越界改动
+
+## 2026-09-01 19:00 — 💚 心跳 19:00 全绿（cron 30min · 无新 KB/无新开发项）
+- 健康检查全绿（19:00:09 实探）：6 端口全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已记（05:00/11:00/13:40/18:00/18:30 节点均已覆盖），本日无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② tcm twin API 2 端点差集待吸收（TCM-ABSORPTION-SPEC 流程，主会话执行）
