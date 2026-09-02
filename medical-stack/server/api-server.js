@@ -976,6 +976,23 @@ app.post('/api/tcm/case-confirm', async (req, res) => {
       try {
         if (empiId && twinEngine) twinEngine.addSnapshot(empiId, twinEngine.snapshotFromCase(record));
       } catch(e) { console.error('[twin] 病历快照失败:', e.message); }
+      // G13+：病历签发 → 家庭端自动回流（emr；未绑定静默跳过，不阻断主链）
+      try {
+        if (patient && patient.name) {
+          require('./family-reflux.js').pushForName(patient.name, {
+            report_type: 'emr', report_id: caseId,
+            title: `门诊病历 · ${syndrome || chief || '中医诊疗'}`,
+            summary: [
+              '患者：' + patient.name,
+              chief ? '主诉：' + chief : '',
+              syndrome ? '辨证：' + syndrome : '',
+              (symptoms || []).length ? '症状：' + (symptoms || []).slice(0, 10).join('、') : '',
+              formula ? '方剂：' + formula : ''
+            ].filter(Boolean).join('；'),
+          }).then(r => { if (!r.ok && r.skipped !== 'not_bound' && r.skipped !== 'no_name') console.error('[reflux] 病历回流失败:', r.error || r.skipped); })
+            .catch(e => console.error('[reflux] 病历回流异常:', e.message));
+        }
+      } catch(e) { console.error('[reflux] 病历回流接线失败:', e.message); }
     });
 
     res.json({ ok: true, caseId, hash: record.hash });
@@ -1318,6 +1335,17 @@ app.post('/api/lab/result', optionalAuth, (req, res) => {
       linked = true;
     }
     persistLabOrders();
+    // G13+：检验回传 → 家庭端自动回流（lab；未绑定静默跳过）
+    try {
+      if (order.patient_name) {
+        require('./family-reflux.js').pushForName(order.patient_name, {
+          report_type: 'lab', report_id: order.order_id,
+          title: '检验报告 · ' + order.items.slice(0, 3).join('、'),
+          summary: order.results.map(r => r.name + ' ' + (r.raw != null ? r.raw : r.value) + (r.unit ? ' ' + r.unit : '') + (r.ref ? '（参考 ' + r.ref + '）' : '')).join('；'),
+        }).then(r => { if (!r.ok && r.skipped !== 'not_bound' && r.skipped !== 'no_name') console.error('[reflux] 检验回流失败:', r.error || r.skipped); })
+          .catch(e => console.error('[reflux] 检验回流异常:', e.message));
+      }
+    } catch(e) { console.error('[reflux] 检验回流接线失败:', e.message); }
     res.json({ ok: true, order, linked_session: linked });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
@@ -3270,6 +3298,23 @@ app.post('/api/prescription/create', optionalAuth, async (req, res) => {
     try {
       if (twinEngine && resolvedPid && resolvedPid !== 'anonymous') twinEngine.addSnapshot(resolvedPid, twinEngine.snapshotFromRx(record));
     } catch(e) { console.error('[twin] 处方快照失败:', e.message); }
+
+    // G13+：处方签发 → 家庭端自动回流（prescription；未绑定静默跳过）
+    try {
+      if (patient_name) {
+        require('./family-reflux.js').pushForName(patient_name, {
+          report_type: 'prescription', report_id: rxId,
+          title: '中药处方 · ' + (diagnosis.syndrome || '辨证论治'),
+          summary: [
+            diagnosis.syndrome ? '辨证：' + diagnosis.syndrome : '',
+            '组成：' + herbs.map(h => (typeof h === 'string' ? h : h.name) + (h.dose ? h.dose + 'g' : '')).filter(Boolean).slice(0, 20).join('、'),
+            '共 ' + herbs.length + ' 味 ' + doses + ' 剂',
+            advice ? '医嘱：' + advice : ''
+          ].filter(Boolean).join('；'),
+        }).then(r => { if (!r.ok && r.skipped !== 'not_bound' && r.skipped !== 'no_name') console.error('[reflux] 处方回流失败:', r.error || r.skipped); })
+          .catch(e => console.error('[reflux] 处方回流异常:', e.message));
+      }
+    } catch(e) { console.error('[reflux] 处方回流接线失败:', e.message); }
 
     res.json({
       ok: true,

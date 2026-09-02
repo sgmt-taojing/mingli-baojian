@@ -1,5 +1,16 @@
 # mingli-baojian 更新日志
 
+## 2026-09-02 早 · EMR/处方/检验三类自动回流家庭端（G13 自动触发补全）
+- **背景**：家庭端时间线能力覆盖复核发现真缺口——此前仅 revisit 两类事件自动回流，EMR/处方/检验只有 `/api/reflux/push` 手动通道，诊疗主链无任何自动触发
+- **身份桥**：reflux_links 表加 `patient_name` 列；新增 `pushForName(name, report)` 解析链——绑定登记的 patient_name 精确匹配 ∪ appointments 该姓名历史预约手机号（须已绑定）→ 去重逐个 pushByPhone；解析不到静默跳过（`not_bound`/`no_name`），绝不阻断诊疗主流程
+- **三触发点**（均 fire-and-forget，setImmediate 后异步推送）：
+  - 病历定稿（`/api/tcm/case-confirm`）→ `emr`「门诊病历 · {辨证}」（患者/主诉/辨证/症状/方剂组合）
+  - 处方签发（`/api/prescription/create`）→ `prescription`「中药处方 · {辨证}」（组成前 20 味+剂数+医嘱）
+  - 检验回传（`/api/lab/result`）→ `lab`「检验报告 · {项目}」（指标+数值+单位+参考区间）
+- **互操作**：载荷组装全角化尖括号（`＜＞`）——family XSS 清洗拒收半角 `<>`（tcm 移植教训复用）；命理守卫与白名单校验沿用 pushByPhone 既有闸口，医学域内容零命理词
+- **E2E 冒烟 11/11 过**：family 绑定（mock 验证码→link_token）→ reflux/link 登记（带 patient_name）→ case-confirm/prescription/lab 三连触发 → family 收件箱实收 emr/prescription/lab 三类；阴性：未绑定患者同链推送静默跳过且 family 零收到
+- 测试数据双侧清零（confirmed-cases/records.jsonl/lab-orders/reflux_links/family 报告行+绑定/outbox 测试行），8972 重启重载干净状态
+
 ## 2026-09-01 深夜 · 复诊安排回流家庭端（G13 契约扩展 revisit · 双侧同步）
 - **契约扩展**：hospital-report report_type 白名单双侧同步加 `revisit`（复诊/召回安排，医学域流程性内容；命理守卫双侧继续生效）
 - **mingli 供给侧**：family-reflux 抽出 `pushByPhone` 模块内助手（绑定核查→命理守卫→白名单组装→推 family+落本院收件箱，与 HTTP 路由同逻辑）；from-recall 排期成功即推「复诊安排」、revisit/complete 闭环即推「复诊已完成」（手机号经 appointment recall_id 反查，查不到跳过不阻断）

@@ -68,6 +68,8 @@ function init() {
     link_token TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
   )`);
+  // G13+（2026-09-02）：患者姓名→手机号解析链（EMR/处方/检验自动回流的身份桥）
+  try { db.exec(`ALTER TABLE reflux_links ADD COLUMN patient_name TEXT`); } catch (_) { /* 已存在 */ }
 }
 
 function postFamily(payload, timeoutMs = 8000) {
@@ -110,11 +112,13 @@ async function pushByPhone(phone, { report_type, report_id, title, summary, crea
   }
 
   // 结构性剥离：只组装白名单字段（批注/命理字段从根本不存在于载荷）
+  // family 端 XSS 清洗拒收半角尖括号 → 供给侧统一全角化（检验参考区间常见 <5.2 之类，移植 tcm 互操作教训）
+  const clean = s => String(s || '').replace(/</g, '＜').replace(/>/g, '＞');
   const payload = {
     link_token: link.link_token,
     report_type, report_id: String(report_id).slice(0, 80),
-    title: String(title).slice(0, 200),
-    summary: String(summary || '').slice(0, 2000),
+    title: clean(title).slice(0, 200),
+    summary: clean(summary).slice(0, 2000),
     created_at: String(created_at || new Date().toISOString()),
     source: SOURCE,
   };
@@ -129,6 +133,29 @@ async function pushByPhone(phone, { report_type, report_id, title, summary, crea
   return { ok: false, code: 'FAMILY_REJECT', error: `family 侧未接受：${famErr}`, family_code: r.body && r.body.code, inbox: true };
 }
 
+/**
+ * 按患者姓名推送（EMR/处方/检验自动回流身份桥，2026-09-02）
+ * 解析链：reflux_links.patient_name 精确匹配 ∪ appointments 该姓名历史预约手机号 → 去重逐个 pushByPhone
+ * 解析不到 = 患者未绑定，静默跳过（不阻断诊疗主链）
+ */
+async function pushForName(name, report) {
+  const n = String(name || '').trim().slice(0, 20);
+  if (!n) return { ok: false, skipped: 'no_name' };
+  const phones = new Set();
+  try {
+    for (const r of db.prepare(`SELECT phone FROM reflux_links WHERE patient_name=?`).all(n)) phones.add(r.phone);
+  } catch (_) {}
+  try {
+    for (const r of db.prepare(`SELECT DISTINCT phone FROM appointments WHERE patient_name=? AND phone!=''`).all(n)) {
+      if (db.prepare(`SELECT 1 FROM reflux_links WHERE phone=?`).get(r.phone)) phones.add(r.phone);
+    }
+  } catch (_) {}
+  if (!phones.size) return { ok: false, skipped: 'not_bound' };
+  const results = [];
+  for (const ph of phones) results.push(await pushByPhone(ph, report));
+  return { ok: results.some(r => r.ok), pushed_to: results.filter(r => r.ok).length, total_links: phones.size, results };
+}
+
 function registerRoutes(app) {
   init();
 
@@ -137,11 +164,12 @@ function registerRoutes(app) {
     const { phone } = req.body || {};
     // tcm 同构兼容：tcm 侧字段名 family_token，mingli G13 原字段 link_token，两者同义
     const link_token = (req.body || {}).link_token || (req.body || {}).family_token;
+    const patient_name = String((req.body || {}).patient_name || '').slice(0, 20) || null;
     if (!/^1\d{10}$/.test(String(phone || ''))) return res.status(400).json({ ok: false, error: 'phone 须为 11 位手机号' });
     if (!/^lnk_[0-9a-f]{16,}$/.test(String(link_token || ''))) return res.status(400).json({ ok: false, error: 'link_token 格式不合法（应形如 lnk_…，由家庭端绑定流程签发）' });
-    db.prepare(`INSERT INTO reflux_links (phone, link_token) VALUES (?,?)
-      ON CONFLICT(phone) DO UPDATE SET link_token=excluded.link_token, created_at=datetime('now','localtime')`)
-      .run(phone, link_token);
+    db.prepare(`INSERT INTO reflux_links (phone, link_token, patient_name) VALUES (?,?,?)
+      ON CONFLICT(phone) DO UPDATE SET link_token=excluded.link_token, patient_name=COALESCE(excluded.patient_name, reflux_links.patient_name), created_at=datetime('now','localtime')`)
+      .run(phone, link_token, patient_name);
     res.json({ ok: true, phone: phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'), link_token, bound_at: new Date().toISOString(), hint: '已关联。报告出具时可回流家庭端（仅医学域内容）' });
   };
   app.post('/api/reflux/link', linkHandler);
@@ -214,4 +242,4 @@ function registerRoutes(app) {
   console.log('🏠 G13 报告回流供给侧已挂载（/api/reflux/* + tcm 同构别名 /api/report-link/{bind,unbind,status,push-queue}，命理批注结构性剥离 + 文本守卫）');
 }
 
-module.exports = { registerRoutes, mingliScan, pushByPhone: (phone, o) => pushByPhone(phone, o) };
+module.exports = { registerRoutes, mingliScan, pushByPhone: (phone, o) => pushByPhone(phone, o), pushForName: (name, o) => pushForName(name, o) };
