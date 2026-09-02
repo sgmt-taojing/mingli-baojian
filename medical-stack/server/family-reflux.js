@@ -239,6 +239,47 @@ function registerRoutes(app) {
     });
   });
 
+  // G13+ 医生工作台回流状态：签发时一眼可见「是否已绑定家庭端 + 最近送达 + 未绑定给引导二维码」
+  app.get('/api/reflux/patient-status', (req, res) => {
+    try {
+      const name = String(req.query.patient_name || '').trim().slice(0, 20);
+      if (!name) return res.status(400).json({ ok: false, error: 'patient_name 必填' });
+      // 与 pushForName 同一解析链：links.patient_name ∪ appointments 历史手机号（须已绑定）
+      const phones = new Set();
+      for (const r of db.prepare(`SELECT phone, created_at FROM reflux_links WHERE patient_name=?`).all(name)) phones.add(r.phone);
+      for (const r of db.prepare(`SELECT DISTINCT phone FROM appointments WHERE patient_name=? AND phone!=''`).all(name)) {
+        if (db.prepare(`SELECT 1 FROM reflux_links WHERE phone=?`).get(r.phone)) phones.add(r.phone);
+      }
+      const links = [...phones].map(ph => {
+        const row = db.prepare(`SELECT created_at FROM reflux_links WHERE phone=?`).get(ph);
+        return { phone_masked: ph.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2'), bound_at: row ? row.created_at : null };
+      });
+      // 最近送达（本院收件箱，含 pushed_family 送达标记）
+      let deliveries = [];
+      try {
+        if (fs.existsSync(INBOX_FILE)) {
+          const items = JSON.parse(fs.readFileSync(INBOX_FILE, 'utf8') || '[]');
+          deliveries = items.filter(i => phones.has(i.phone))
+            .sort((a, b) => String(b.received_at).localeCompare(String(a.received_at)))
+            .slice(0, 10)
+            .map(i => ({ report_type: i.report_type, title: i.title, created_at: i.created_at, pushed_family: !!i.pushed_family }));
+        }
+      } catch (_) {}
+      // 引导绑定二维码目标：family 绑定页（FAMILY_BASE 主机名替换为本机局域网 IP，患者手机扫码可达）
+      let bindUrl = null;
+      try {
+        const os = require('os');
+        const lan = Object.values(os.networkInterfaces()).flat()
+          .find(i => i && i.family === 'IPv4' && !i.internal);
+        const u = new URL(FAMILY_BASE);
+        u.hostname = lan ? lan.address : u.hostname;
+        u.pathname = '/app/hospital-bind.html'; u.search = ''; u.hash = '';
+        bindUrl = u.toString();
+      } catch (_) { bindUrl = FAMILY_BASE + '/app/hospital-bind.html'; }
+      res.json({ ok: true, patient_name: name, bound: links.length > 0, links, deliveries, bind_url: bindUrl });
+    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+
   console.log('🏠 G13 报告回流供给侧已挂载（/api/reflux/* + tcm 同构别名 /api/report-link/{bind,unbind,status,push-queue}，命理批注结构性剥离 + 文本守卫）');
 }
 

@@ -120,6 +120,8 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 .lab-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-size:10px;margin:2px 3px 2px 0;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af}
 .lab-chip .lab-flag{font-weight:700}
 .lab-flag-H{color:#b91c1c}.lab-flag-L{color:#b45309}
+/* D10：居家解读并入的旁证（绿边区分，🏠前缀） */
+.lab-chip.home{background:#f0fbf4;border-color:#86c9a2;color:#166534}
 
 /* 风险标签 */
 .risk-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
@@ -156,6 +158,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 </style>
 <script src="js/kb-loader.js"></script>
+<script src="js/vendor/qrcode.min.js"></script>
 <script src="js/nav.js" defer></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
@@ -226,6 +229,17 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
       <div><label class="tcm-label">就诊日期</label><input class="tcm-input" id="p-date" type="date" aria-label="p date" data-validate="required"></div>
     </div>
     <div id="patient-archive" style="font-size:11px;color:var(--text3)">📂 确认姓名后自动调阅历史病历（多次就诊延续）</div>
+    <!-- G13+ 家庭端回流状态徽标：签发前一眼可见绑定/送达，未绑定现场扫码引导 -->
+    <div id="reflux-badge" style="font-size:11px;color:var(--text3);margin-top:2px">🏠 家庭端回流：确认姓名后自动核查</div>
+    <div id="reflux-guide-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
+      <div style="background:#fff;border-radius:12px;padding:20px;max-width:300px;text-align:center">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">🏠 引导患者绑定家庭端</div>
+        <div style="font-size:11px;color:#666;margin-bottom:10px">患者用手机扫码 → 填手机号收验证码 → 完成绑定<br>此后病历/处方/检验报告自动推送到家庭端</div>
+        <div id="reflux-qr" style="display:flex;justify-content:center;margin-bottom:8px"></div>
+        <div id="reflux-qr-url" style="font-size:9px;color:#999;word-break:break-all;margin-bottom:10px"></div>
+        <button class="btn small" onclick="document.getElementById('reflux-guide-modal').style.display='none'">关闭</button>
+      </div>
+    </div>
 
     <!-- ① 望诊 · 一帧全诊：无 Tab，面舌手自动识别 -->
     <h4>① 望诊 — 无感全采 · 面舌手自动识别</h4>
@@ -734,7 +748,43 @@ function scheduleArchiveFetch() {
   archiveTimer = setTimeout(() => {
     const n = session.profile.name.v.trim();
     if (n.length >= 2 && n !== archiveLoadedFor) fetchPatientHistory(n);
+    if (n.length >= 2) refreshRefluxBadge(n);
   }, 500);
+}
+
+/* ═══ G13+ 家庭端回流状态徽标（绑定核查 + 最近送达 + 扫码引导绑定） ═══ */
+const REFLUX_TYPE_ICON = { emr:'📋', prescription:'💊', lab:'🧪', revisit:'📅' };
+async function refreshRefluxBadge(name) {
+  const badge = document.getElementById('reflux-badge');
+  if (!badge) return;
+  try {
+    const r = await fetch(API + '/api/reflux/patient-status?patient_name=' + encodeURIComponent(name));
+    const d = await r.json();
+    if (!d.ok) { badge.textContent = '🏠 家庭端回流：状态查询失败'; return; }
+    if (d.bound) {
+      const phones = d.links.map(l => l.phone_masked).join('、');
+      const recent = (d.deliveries || []).slice(0, 3).map(x =>
+        (REFLUX_TYPE_ICON[x.report_type] || '📄') + (x.pushed_family ? '✓' : '⏳')).join(' ');
+      badge.innerHTML = '🏠 家庭端 <b style="color:#059669">已绑定</b> ' + escHtml(phones) +
+        (recent ? ' · 最近送达 ' + recent : ' · 暂无送达记录');
+    } else {
+      badge.innerHTML = '🏠 家庭端 <b style="color:#d97706">未绑定</b> ' +
+        '<span class="follow-chip" style="cursor:pointer" onclick="showRefluxGuide(\'' + escHtml(d.bind_url || '') + '\')">📱 扫码绑定</span>' +
+        ' <span style="color:var(--text3)">绑定后病历/处方/检验自动推送</span>';
+    }
+  } catch(e) { badge.textContent = '🏠 家庭端回流：服务不可用'; }
+}
+function showRefluxGuide(url) {
+  const modal = document.getElementById('reflux-guide-modal');
+  const qrBox = document.getElementById('reflux-qr');
+  qrBox.innerHTML = '';
+  document.getElementById('reflux-qr-url').textContent = url || '';
+  if (url && typeof QRCode !== 'undefined') {
+    new QRCode(qrBox, { text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
+  } else {
+    qrBox.textContent = '二维码组件不可用，请手动访问下方链接';
+  }
+  modal.style.display = 'flex';
 }
 
 async function fetchPatientHistory(name) {
@@ -810,6 +860,16 @@ async function loadTwinPanel(name) {
       html += '<br>🧭 证型轨迹：' + chips.map(c => escHtml(c.s) + (c.n > 1 ? '×' + c.n : '')).join(' → ');
       if (changed) html += ' <span style="color:#1d4ed8">（转化 ' + (chips.length - 1) + ' 次）</span>';
       else html += ' <span style="opacity:.7">（证型稳定）</span>';
+    }
+    // D11（契约 v1.4.0）：居家复查指标轨迹（多次给方向箭头，异常着色）
+    const labT = m.lab_trajectory || [];
+    if (labT.length) {
+      html += '<br>🧪 指标轨迹：' + labT.slice(0, 4).map(t => {
+        const last = t.points[t.points.length - 1];
+        const arrow = t.direction === 'up' ? '↑' : t.direction === 'down' ? '↓' : t.direction === 'flat' ? '→' : '';
+        const color = (t.latest_flag === '高' || t.latest_flag === '阳') ? '#b91c1c' : t.latest_flag === '低' ? '#b45309' : '#166534';
+        return '<span style="color:' + color + '">' + escHtml(t.name) + ' ' + last.value + arrow + (t.points.length > 1 ? '<small>(' + t.points.length + '次)</small>' : '') + '</span>';
+      }).join(' · ');
     }
     if (m.risk_factors && m.risk_factors.length) html += '<br><span style="color:#991b1b">⚠️ ' + escHtml(m.risk_factors[0].detail) + '</span>';
     html += '<br><a href="digital-twin.html" style="font-size:10px;color:#4f46e5">查看完整孪生档案 →</a>';
@@ -1125,13 +1185,15 @@ function renderLabList(analysis) {
   const box = document.getElementById('lab-list');
   if (!box) return;
   if (!session.labs.length) { box.innerHTML = ''; return; }
-  box.innerHTML = session.labs.map(l => {
+  const homeN = session.labs.filter(l => l.source === 'home').length;
+  box.innerHTML = (homeN ? '<div style="font-size:10px;color:#166534;margin:2px 0 4px">🏠 ' + homeN + ' 项来自患者居家报告解读（D9 自动并入，供参考）</div>' : '') +
+    session.labs.map(l => {
     const a = (analysis || []).find(x => x.name === l.name);
     const flag = a ? a.flag : '';
     const cls = (flag === '高' || flag === '阳') ? 'lab-flag-H' : (flag === '低' ? 'lab-flag-L' : '');
     const sev = a && a.severity && a.severity !== '轻' ? '·' + a.severity : '';
     const dispVal = l.raw != null ? l.raw : l.value;
-    return '<span class="lab-chip" title="' + escHtml(a ? a.hint : '待智能体判读') + '">' + escHtml(l.name) + ' ' + dispVal +
+    return '<span class="lab-chip' + (l.source === 'home' ? ' home' : '') + '" title="' + escHtml((l.source === 'home' ? '居家报告解读并入 · ' : '') + (a ? a.hint : '待智能体判读')) + '">' + (l.source === 'home' ? '🏠' : '') + escHtml(l.name) + ' ' + dispVal +
       (a && a.unit ? '<span style="color:var(--text3)">' + a.unit + '</span>' : '') +
       (flag ? ' <b class="lab-flag ' + cls + '">' + flag + sev + '</b>' : '') +
       ' <span style="cursor:pointer;opacity:.5" onclick="removeLab(\'' + l.name + '\')" title="移除">×</span></span>';
@@ -1767,7 +1829,10 @@ async function confirmDiagnosis(adoptAI) {
         confirmMode: adoptAI ? 'adopt' : 'edit'
       }) });
     const cfD = await cfR.json();
-    if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; }
+    if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || '';
+      // G13+：签发后回流推送是异步的，延迟 2.5s 刷新徽标让「最近送达」带上本份病历
+      setTimeout(() => refreshRefluxBadge(p.name.v || ''), 2500);
+    }
   } catch(e) {}
 
   // 3. 随访计划（循证长程推荐 + 落库入随访队列 R779）
@@ -2055,7 +2120,17 @@ async function flushSession() {
     issued: session.issued || null
   };
   try {
-    await fetch(API + '/api/clinic/session/' + clinicSessionId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const r = await fetch(API + '/api/clinic/session/' + clinicSessionId, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const d = await r.json().catch(() => null);
+    // D10：服务端并入的居家解读旁证回传 → 纳管进本地会话（否则下一次全量 PUT 会被抹掉）
+    if (d && d.ok && Array.isArray(d.home_labs) && d.home_labs.length) {
+      d.home_labs.forEach(l => {
+        if (!session.labs.some(x => x.name === l.name)) session.labs.push(l);
+      });
+      renderLabList();
+      if (d.home_evidence) addEvidence('lab', d.home_evidence);
+      toast('🏠 患者居家报告解读 ' + d.home_labs.length + ' 项已自动并入旁证');
+    }
   } catch(e) {}
 }
 

@@ -1,5 +1,12 @@
 # mingli-baojian 更新日志
 
+## 2026-09-02 午 · 医生诊台「家庭端回流状态」可视标识（G13 运营化收口）
+- **后端**：`GET /api/reflux/patient-status?patient_name=`——与 pushForName 同一解析链核绑定（links.patient_name ∪ 历史预约手机号），返回脱敏手机号/绑定时间/最近 10 条送达记录（含 pushed_family 送达标记）/引导绑定 URL（FAMILY_BASE 主机名自动换本机局域网 IP，患者手机扫码可达）
+- **前端**（clinic-desk 诊台）：患者信息卡下新增回流徽标——已绑定显绿「已绑定 138****7777 · 最近送达 📋✓💊✓」，未绑定显橙「未绑定」+「📱 扫码绑定」chip；姓名确认即自动核查（挂 scheduleArchiveFetch 同节奏），签发成功后 2.5s 自刷新带上本份病历
+- **扫码引导模态**：弹层出 family 绑定页二维码（qrcodejs 180px）+ 三步引导文案，医生诊间扫码即绑，绑定后病历/处方/检验自动推送
+- **顺手修真**：`js/vendor/qrcode.min.js` 补齐（qrcodejs 1.0.0 本地 vendor，19.9KB）——patient-portal.html 等 4 页此前引用该路径但文件不存在，我的报告页二维码一直是死引用，一并修复
+- **实测**：浏览器实渲双态徽标（已绑定绿态含送达记录 / 未绑定橙态含扫码 chip）+ 模态 QR canvas 渲染确认；接口双态 curl 过；测试数据双侧清零
+
 ## 2026-09-02 早 · EMR/处方/检验三类自动回流家庭端（G13 自动触发补全）
 - **背景**：家庭端时间线能力覆盖复核发现真缺口——此前仅 revisit 两类事件自动回流，EMR/处方/检验只有 `/api/reflux/push` 手动通道，诊疗主链无任何自动触发
 - **身份桥**：reflux_links 表加 `patient_name` 列；新增 `pushForName(name, report)` 解析链——绑定登记的 patient_name 精确匹配 ∪ appointments 该姓名历史预约手机号（须已绑定）→ 去重逐个 pushByPhone；解析不到静默跳过（`not_bound`/`no_name`），绝不阻断诊疗主流程

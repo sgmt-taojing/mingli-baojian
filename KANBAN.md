@@ -1,5 +1,38 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-09-02 13:15 — ✅ 诊台回流状态可视标识（G13 运营化）
+- patient-status 接口 + clinic-desk 徽标（绑定态/送达记录/扫码引导模态）实渲双态验证过；vendor 补 qrcode.min.js 顺带修复 patient-portal 死引用
+
+## 2026-09-02 13:00 — 💚 心跳 13:00 全绿（cron 30min · 无新 KB）
+- 健康检查全绿（13:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（00:30～11:30），13:00 无新 distill-*.py 执行（distill-2026-09-02.jsonl 仍 20 行）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（等用户动作）
+
+## 2026-09-02 11:30 — 💚 心跳 11:30 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（11:32:03 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（00:30/02:30/05:00/06:30/07:00/08:30/09:30/10:30），11:30 本节点无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
+## 2026-09-02 10:30 — 💚 心跳 10:30 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（10:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（00:30/02:30/05:00/06:30/07:00/08:30/09:30），10:30 本节点无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
+## 2026-09-02 09:30 — 💚 心跳 09:30 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（09:33:18 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（00:30/02:30/05:00/06:30/07:00/08:30），09:30 本节点无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
+## 2026-09-02 08:30 — 💚 心跳 08:30 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（08:32:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（00:30/02:30/05:00/06:30/07:00），08:30 本节点无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
 ## 2026-09-02 08:10 — ✅ EMR/处方/检验自动回流家庭端（G13 自动触发补全）
 - 复核发现缺口：revisit 外三类仅手动 push 通道 → 补身份桥（reflux_links.patient_name + pushForName 姓名→手机号解析链）+ 三触发点（case-confirm/prescription-create/lab-result 均 fire-and-forget）
 - E2E 11/11 过：三类实收 + 未绑定静默跳过阴性；测试数据双侧清零，8972 已重启
