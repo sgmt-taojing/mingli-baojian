@@ -1,5 +1,11 @@
 # mingli-baojian 更新日志
 
+## 2026-09-02 晚 · 诊台徽标补丁化收敛 + R-REPLAY 事故根修（OTA 重放抹掉未注册改动）
+- **事故**：13:21 OTA 补丁重放链按 tcm 基线重放 clinic-desk.html，把 13:15 提交的内联徽标改动整体抹掉（G18 纪律本就不允许手改 tcm 源页面本侧副本——本次属违规直改被机制正确回滚）
+- **正规化收敛**：徽标注册为 mingli-view 补丁 `patches/mingli-view/clinic-desk-reflux.json`（4 ops：组件脚本注入 + 徽标容器注入 + 姓名确认核查钩子 + 签发后 2.5s 延迟刷新），clinic-desk 从内联实现收敛到共享 reflux-badge.js 组件（引导模态改组件懒创建单例，页面零模态 HTML）
+- **重放验证**：reapply-patches.py 全绿（replayed=1, warns=0, smoke ok）；此后任何 tcm 基线增量重放都会自动重挂徽标，不再丢失
+- **实渲回归**：诊台未绑定态徽标+扫码引导模态+QR canvas 全过；patient-portal「我的报告」二维码确认复活（vendor 补齐生效，QRCode function + canvas 渲染）
+
 ## 2026-09-02 午后 · 回流徽标全签发触点推广 + R-G13CORS 根修（跨端口 ACAO 缺失）
 - **共享组件**：新增 `js/reflux-badge.js`（medical-stack 与主栈 app/js 双落位）——attach 单患者徽标 / decorateRows 列表批量装饰 / guide 扫码引导模态（懒创建单例），统一 mini 态（🏠✓ 已绑定 / 🏠○ 未绑定点击出码）
 - **批量接口**：`POST /api/reflux/status-batch`（≤50 名，同 patient-status 口径轻量返回 bound + last_delivery），列表页一次查全

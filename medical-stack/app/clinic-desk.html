@@ -159,6 +159,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 </style>
 <script src="js/kb-loader.js"></script>
 <script src="js/vendor/qrcode.min.js"></script>
+<script src="js/reflux-badge.js"></script>
 <script src="js/nav.js" defer></script>
 <script src="js/global-search.js"></script>
 <script src="js/ai-voice-assistant.js"></script>
@@ -229,17 +230,9 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
       <div><label class="tcm-label">就诊日期</label><input class="tcm-input" id="p-date" type="date" aria-label="p date" data-validate="required"></div>
     </div>
     <div id="patient-archive" style="font-size:11px;color:var(--text3)">📂 确认姓名后自动调阅历史病历（多次就诊延续）</div>
-    <!-- G13+ 家庭端回流状态徽标：签发前一眼可见绑定/送达，未绑定现场扫码引导 -->
+
+    <!-- G13+ 家庭端回流状态徽标（mingli-view 补丁，共享组件渲染） -->
     <div id="reflux-badge" style="font-size:11px;color:var(--text3);margin-top:2px">🏠 家庭端回流：确认姓名后自动核查</div>
-    <div id="reflux-guide-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
-      <div style="background:#fff;border-radius:12px;padding:20px;max-width:300px;text-align:center">
-        <div style="font-weight:700;font-size:14px;margin-bottom:4px">🏠 引导患者绑定家庭端</div>
-        <div style="font-size:11px;color:#666;margin-bottom:10px">患者用手机扫码 → 填手机号收验证码 → 完成绑定<br>此后病历/处方/检验报告自动推送到家庭端</div>
-        <div id="reflux-qr" style="display:flex;justify-content:center;margin-bottom:8px"></div>
-        <div id="reflux-qr-url" style="font-size:9px;color:#999;word-break:break-all;margin-bottom:10px"></div>
-        <button class="btn small" onclick="document.getElementById('reflux-guide-modal').style.display='none'">关闭</button>
-      </div>
-    </div>
 
     <!-- ① 望诊 · 一帧全诊：无 Tab，面舌手自动识别 -->
     <h4>① 望诊 — 无感全采 · 面舌手自动识别</h4>
@@ -748,43 +741,8 @@ function scheduleArchiveFetch() {
   archiveTimer = setTimeout(() => {
     const n = session.profile.name.v.trim();
     if (n.length >= 2 && n !== archiveLoadedFor) fetchPatientHistory(n);
-    if (n.length >= 2) refreshRefluxBadge(n);
+    if (n.length >= 2 && window.RefluxBadge) RefluxBadge.attach(document.getElementById('reflux-badge'), '', n);
   }, 500);
-}
-
-/* ═══ G13+ 家庭端回流状态徽标（绑定核查 + 最近送达 + 扫码引导绑定） ═══ */
-const REFLUX_TYPE_ICON = { emr:'📋', prescription:'💊', lab:'🧪', revisit:'📅' };
-async function refreshRefluxBadge(name) {
-  const badge = document.getElementById('reflux-badge');
-  if (!badge) return;
-  try {
-    const r = await fetch(API + '/api/reflux/patient-status?patient_name=' + encodeURIComponent(name));
-    const d = await r.json();
-    if (!d.ok) { badge.textContent = '🏠 家庭端回流：状态查询失败'; return; }
-    if (d.bound) {
-      const phones = d.links.map(l => l.phone_masked).join('、');
-      const recent = (d.deliveries || []).slice(0, 3).map(x =>
-        (REFLUX_TYPE_ICON[x.report_type] || '📄') + (x.pushed_family ? '✓' : '⏳')).join(' ');
-      badge.innerHTML = '🏠 家庭端 <b style="color:#059669">已绑定</b> ' + escHtml(phones) +
-        (recent ? ' · 最近送达 ' + recent : ' · 暂无送达记录');
-    } else {
-      badge.innerHTML = '🏠 家庭端 <b style="color:#d97706">未绑定</b> ' +
-        '<span class="follow-chip" style="cursor:pointer" onclick="showRefluxGuide(\'' + escHtml(d.bind_url || '') + '\')">📱 扫码绑定</span>' +
-        ' <span style="color:var(--text3)">绑定后病历/处方/检验自动推送</span>';
-    }
-  } catch(e) { badge.textContent = '🏠 家庭端回流：服务不可用'; }
-}
-function showRefluxGuide(url) {
-  const modal = document.getElementById('reflux-guide-modal');
-  const qrBox = document.getElementById('reflux-qr');
-  qrBox.innerHTML = '';
-  document.getElementById('reflux-qr-url').textContent = url || '';
-  if (url && typeof QRCode !== 'undefined') {
-    new QRCode(qrBox, { text: url, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
-  } else {
-    qrBox.textContent = '二维码组件不可用，请手动访问下方链接';
-  }
-  modal.style.display = 'flex';
 }
 
 async function fetchPatientHistory(name) {
@@ -1829,10 +1787,7 @@ async function confirmDiagnosis(adoptAI) {
         confirmMode: adoptAI ? 'adopt' : 'edit'
       }) });
     const cfD = await cfR.json();
-    if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || '';
-      // G13+：签发后回流推送是异步的，延迟 2.5s 刷新徽标让「最近送达」带上本份病历
-      setTimeout(() => refreshRefluxBadge(p.name.v || ''), 2500);
-    }
+    if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; setTimeout(function(){ if (window.RefluxBadge) RefluxBadge.attach(document.getElementById('reflux-badge'), '', p.name.v || ''); }, 2500); }
   } catch(e) {}
 
   // 3. 随访计划（循证长程推荐 + 落库入随访队列 R779）

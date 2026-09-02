@@ -1,0 +1,33 @@
+{
+  "name": "mingli-view-clinic-desk-reflux",
+  "class": "mingli-view",
+  "page": "clinic-desk",
+  "baseline_head": "5a98ecd",
+  "desc": "G13+ 家庭端回流状态徽标（共享 reflux-badge.js 组件）：患者信息卡下徽标 + 姓名确认自动核查 + 病历签发后延迟刷新 + 扫码引导绑定模态（组件懒创建）",
+  "ops": [
+    {
+      "type": "inject",
+      "anchors": [
+        "<script src=\"js/kb-loader.js\"></script>"
+      ],
+      "template": "<script src=\"js/vendor/qrcode.min.js\"></script>\n<script src=\"js/reflux-badge.js\"></script>"
+    },
+    {
+      "type": "inject",
+      "anchors": [
+        "确认姓名后自动调阅历史病历（多次就诊延续）</div>"
+      ],
+      "template": "\n    <!-- G13+ 家庭端回流状态徽标（mingli-view 补丁，共享组件渲染） -->\n    <div id=\"reflux-badge\" style=\"font-size:11px;color:var(--text3);margin-top:2px\">🏠 家庭端回流：确认姓名后自动核查</div>"
+    },
+    {
+      "type": "replace",
+      "from": "if (n.length >= 2 && n !== archiveLoadedFor) fetchPatientHistory(n);",
+      "to": "if (n.length >= 2 && n !== archiveLoadedFor) fetchPatientHistory(n);\n    if (n.length >= 2 && window.RefluxBadge) RefluxBadge.attach(document.getElementById('reflux-badge'), '', n);"
+    },
+    {
+      "type": "replace",
+      "from": "if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; }",
+      "to": "if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; setTimeout(function(){ if (window.RefluxBadge) RefluxBadge.attach(document.getElementById('reflux-badge'), '', p.name.v || ''); }, 2500); }"
+    }
+  ]
+}
