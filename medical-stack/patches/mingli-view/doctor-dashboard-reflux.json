@@ -1,0 +1,26 @@
+{
+  "name": "mingli-view-doctor-dashboard-reflux",
+  "class": "mingli-view",
+  "page": "doctor-dashboard",
+  "baseline_head": "5a98ecd",
+  "desc": "G13+ 候诊队列回流 mini 徽标：患者姓名行挂 data-rb-name 占位 + 渲染后批量核查（共享 reflux-badge.js）",
+  "ops": [
+    {
+      "type": "inject",
+      "anchors": [
+        "<script src=\"js/rx-loop.js\" defer></script>"
+      ],
+      "template": "<script src=\"js/vendor/qrcode.min.js\"></script>\n<script src=\"js/reflux-badge.js\"></script>"
+    },
+    {
+      "type": "replace",
+      "from": "<div class=\"name\">${p.name} · ${p.age}岁 · ${p.gender}</div>",
+      "to": "<div class=\"name\">${p.name} · ${p.age}岁 · ${p.gender}<span data-rb-name=\"${p.name}\"></span></div>"
+    },
+    {
+      "type": "replace",
+      "from": "  document.getElementById('queue-list').innerHTML = html || '暂无候诊患者';",
+      "to": "  document.getElementById('queue-list').innerHTML = html || '暂无候诊患者';\n  if (window.RefluxBadge) RefluxBadge.decorateRows(document.getElementById('queue-list'), '');"
+    }
+  ]
+}

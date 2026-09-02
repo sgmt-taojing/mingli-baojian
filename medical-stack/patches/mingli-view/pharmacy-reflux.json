@@ -1,0 +1,31 @@
+{
+  "name": "mingli-view-pharmacy-reflux",
+  "class": "mingli-view",
+  "page": "pharmacy",
+  "baseline_head": "5a98ecd",
+  "desc": "G13+ 药房处方列表回流徽标：患者列姓名优先 + 行内 mini 徽标（共享 reflux-badge.js，批量核查 decorateRows）",
+  "ops": [
+    {
+      "type": "inject",
+      "anchors": [
+        "<script src=\"js/data-engine.js\"></script>"
+      ],
+      "template": "<script src=\"js/vendor/qrcode.min.js\"></script>\n<script src=\"js/reflux-badge.js\"></script>"
+    },
+    {
+      "type": "replace",
+      "from": "var patient = r.patient_id||r.patient_name||(r.patient&&r.patient.name)||\"—\";",
+      "to": "var patient = r.patient_name||(r.patient&&r.patient.name)||r.patient_id||\"—\";\n    var rbName = (r.patient_name||(r.patient&&r.patient.name)||\"\").replace(/\"/g,\"\");"
+    },
+    {
+      "type": "replace",
+      "from": "\"<td>\"+patient+\"</td>\"+",
+      "to": "\"<td>\"+patient+(rbName?'<span data-rb-name=\"'+rbName+'\"></span>':\"\")+\"</td>\"+"
+    },
+    {
+      "type": "replace",
+      "from": "  el.innerHTML = html;\n}\n\n// viewRx",
+      "to": "  el.innerHTML = html;\n  if (window.RefluxBadge) RefluxBadge.decorateRows(el, '');\n}\n\n// viewRx"
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 # mingli-baojian 更新日志
 
+## 2026-09-02 晚 · pharmacy/doctor-dashboard 徽标补丁化 + 提交窗口期重放吞改动事故补记
+- **排查结论**：三处接线页中 pharmacy.html、doctor-dashboard.html 为 tcm 源页面（必须补丁化，否则重放即抹）；unified-consultation.html 为 mingli 自有页面（tcm 基线无此页），直接维护即可
+- **事故补记（比 13:21 那次更早）**：午后 377a772 提交时，15min OTA 看守在「浏览器验证通过 → git add」的窗口期内重放了 pharmacy/dashboard，提交进去的其实是被抹版本——HEAD 里 pharmacy 只剩脚本标签、dashboard 接线全无。教训：tcm 源页面改动未补丁化之前，任何提交都可能提交到被抹状态
+- **补丁化**：新增 `patches/mingli-view/pharmacy-reflux.json`（4 ops）与 `doctor-dashboard-reflux.json`（3 ops），reapply-patches.py 全绿（replayed=2, warns=0, smoke 2/2），重放产物与手改等价
+- **实渲终验**：pharmacy 重放版带姓名处方行渲染 🏠○ 未绑定徽标（验证数据已清）；至此 G13 徽标四触点（诊台/药房/候诊/医技开单）全部固化——tcm 源页走补丁，自有页直维护
+
 ## 2026-09-02 晚 · 诊台徽标补丁化收敛 + R-REPLAY 事故根修（OTA 重放抹掉未注册改动）
 - **事故**：13:21 OTA 补丁重放链按 tcm 基线重放 clinic-desk.html，把 13:15 提交的内联徽标改动整体抹掉（G18 纪律本就不允许手改 tcm 源页面本侧副本——本次属违规直改被机制正确回滚）
 - **正规化收敛**：徽标注册为 mingli-view 补丁 `patches/mingli-view/clinic-desk-reflux.json`（4 ops：组件脚本注入 + 徽标容器注入 + 姓名确认核查钩子 + 签发后 2.5s 延迟刷新），clinic-desk 从内联实现收敛到共享 reflux-badge.js 组件（引导模态改组件懒创建单例，页面零模态 HTML）
