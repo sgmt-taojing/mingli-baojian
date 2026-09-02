@@ -1,5 +1,21 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-09-02 14:05 — ✅ 回流徽标全签发触点推广 + R-G13CORS 根修
+- 共享组件 reflux-badge.js 双栈落位；status-batch 批量接口；pharmacy/doctor-dashboard/unified-consultation 三页接线实渲全过
+- 根修：reflux 路由注册在 CORS 中间件之前致跨端口无 ACAO（同源代理掩盖至今）；处方记录/列表投影补 patient_name；测试数据双侧清零
+
+## 2026-09-02 14:00 — 💚 心跳 14:00 全绿（cron 30min · 午间安静期 · 无新 KB）
+- 健康检查全绿（14:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（00:30～13:30），14:00 无新 distill-*.py 执行（distill-2026-09-02.jsonl 仍 20 行）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（午间安静期）
+
+## 2026-09-02 13:30 — 💚 心跳 13:30 全绿（cron 30min · 无新 KB）
+- 健康检查全绿（13:30:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：今日 02:03 +20 条已多次节点覆盖（00:30～13:00），13:30 无新 distill-*.py 执行（distill-2026-09-02.jsonl 仍 20 行）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（午间安静期）
+
 ## 2026-09-02 13:15 — ✅ 诊台回流状态可视标识（G13 运营化）
 - patient-status 接口 + clinic-desk 徽标（绑定态/送达记录/扫码引导模态）实渲双态验证过；vendor 补 qrcode.min.js 顺带修复 patient-portal 死引用
 

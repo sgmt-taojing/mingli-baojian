@@ -1,5 +1,13 @@
 # mingli-baojian 更新日志
 
+## 2026-09-02 午后 · 回流徽标全签发触点推广 + R-G13CORS 根修（跨端口 ACAO 缺失）
+- **共享组件**：新增 `js/reflux-badge.js`（medical-stack 与主栈 app/js 双落位）——attach 单患者徽标 / decorateRows 列表批量装饰 / guide 扫码引导模态（懒创建单例），统一 mini 态（🏠✓ 已绑定 / 🏠○ 未绑定点击出码）
+- **批量接口**：`POST /api/reflux/status-batch`（≤50 名，同 patient-status 口径轻量返回 bound + last_delivery），列表页一次查全
+- **三触点接线**：① pharmacy 药房处方列表——患者列改姓名优先（处方记录与列表投影双双补 patient_name 字段，此前列表只带 empi 号人读不友好也核不了绑定）+ 行内 mini 徽标；② doctor-dashboard 候诊队列 10 项全挂 mini 徽标；③ unified-consultation 医技开单——姓名输入/从就诊带入即核查（跨端口直连 8972）
+- **R-G13CORS 根修（潜伏 bug）**：family-reflux 路由注册在 CORS 中间件之前（line 87），跨端口页面永远拿不到 ACAO 头——此前同源代理掩盖，问诊台（8900→8972）一接就 "Failed to fetch"。注册移至 CORS 之后，浏览器实测跨端口徽标出数
+- **实渲验证**：药房「回流状态测→🏠✓」、候诊队列 10×🏠○、医技开单「已绑定 138\*\*\*\*7777 · 最近送达 💊✓」三页全过；测试数据双侧清零（处方/收件箱/绑定/EMPI/孪生/family 报告行），WAL checkpoint 压实
+- 注：clinic-desk 诊台徽标为先行内联版（已验收），后续可收敛到共享组件
+
 ## 2026-09-02 午 · 医生诊台「家庭端回流状态」可视标识（G13 运营化收口）
 - **后端**：`GET /api/reflux/patient-status?patient_name=`——与 pushForName 同一解析链核绑定（links.patient_name ∪ 历史预约手机号），返回脱敏手机号/绑定时间/最近 10 条送达记录（含 pushed_family 送达标记）/引导绑定 URL（FAMILY_BASE 主机名自动换本机局域网 IP，患者手机扫码可达）
 - **前端**（clinic-desk 诊台）：患者信息卡下新增回流徽标——已绑定显绿「已绑定 138****7777 · 最近送达 📋✓💊✓」，未绑定显橙「未绑定」+「📱 扫码绑定」chip；姓名确认即自动核查（挂 scheduleArchiveFetch 同节奏），签发成功后 2.5s 自刷新带上本份病历

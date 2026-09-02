@@ -280,6 +280,32 @@ function registerRoutes(app) {
     } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
   });
 
+  // G13+ 列表页批量核查：药房/候诊列表一次查全（≤50 名，与 patient-status 同口径轻量返回）
+  app.post('/api/reflux/status-batch', (req, res) => {
+    try {
+      const names = Array.isArray((req.body || {}).names) ? req.body.names.slice(0, 50) : [];
+      let inbox = [];
+      try { if (fs.existsSync(INBOX_FILE)) inbox = JSON.parse(fs.readFileSync(INBOX_FILE, 'utf8') || '[]'); } catch (_) {}
+      const statuses = {};
+      for (const raw of names) {
+        const name = String(raw || '').trim().slice(0, 20);
+        if (!name) continue;
+        const phones = new Set();
+        for (const r of db.prepare(`SELECT phone FROM reflux_links WHERE patient_name=?`).all(name)) phones.add(r.phone);
+        for (const r of db.prepare(`SELECT DISTINCT phone FROM appointments WHERE patient_name=? AND phone!=''`).all(name)) {
+          if (db.prepare(`SELECT 1 FROM reflux_links WHERE phone=?`).get(r.phone)) phones.add(r.phone);
+        }
+        const last = inbox.filter(i => phones.has(i.phone))
+          .sort((a, b) => String(b.received_at).localeCompare(String(a.received_at)))[0];
+        statuses[name] = {
+          bound: phones.size > 0,
+          last_delivery: last ? { report_type: last.report_type, title: last.title, created_at: last.created_at, pushed_family: !!last.pushed_family } : null,
+        };
+      }
+      res.json({ ok: true, statuses });
+    } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+  });
+
   console.log('🏠 G13 报告回流供给侧已挂载（/api/reflux/* + tcm 同构别名 /api/report-link/{bind,unbind,status,push-queue}，命理批注结构性剥离 + 文本守卫）');
 }
 

@@ -83,8 +83,8 @@ registerAppointments(app, {
   requireStaffRole: (allow) => requireStaffRole(allow)
 });
 // G13 医院报告回流家庭端·供给侧（link_token 关联 + 白名单组装 + 命理剥离守卫）
+// R-G13CORS 修真：注册移到 CORS 中间件之后（原在 line 87 注册过早，跨端口页面拿不到 ACAO 头）
 const { registerRoutes: registerReflux } = require('./family-reflux');
-registerReflux(app);
 
 // R789 患者主索引 EMPI（任何异常回退老行为，绝不影响服务）
 const patientIndex = (() => {
@@ -111,6 +111,7 @@ app.use((req, res, next) => {
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
+registerReflux(app);   // G13 回流路由：必须在 CORS 中间件之后注册（跨端口页面才能拿到 ACAO）
 
 // tcm 能力移植层（医学能力移植自 tcm-agent，适配不训练；命理合流仅限 8974 批注环节）
 // 挂载点在 CORS 中间件之后，保证跨端口页面调用带 ACAO 响应头
@@ -3266,6 +3267,7 @@ app.post('/api/prescription/create', optionalAuth, async (req, res) => {
     const record = {
       rx_id: rxId,
       patient_id: resolvedPid,
+      patient_name: String(patient_name || '').slice(0, 20) || null,   // G13+：回流徽标按名核查（药房列表展示用）
       doctor_id: doctor_id || req.user?.username || 'unknown',
       session_id: String(req.body.session_id || '').slice(0, 64) || null,   // R777 签发即入流：caseId↔rxId↔sessionId 三联
       diagnosis,
@@ -3564,6 +3566,7 @@ app.get('/api/prescription/review-queue', optionalAuth, async (req, res) => {
     const queue = records.slice(0, parseInt(limit)).map(r => ({
       rx_id: r.rx_id,
       patient_id: r.patient_id,
+      patient_name: r.patient_name || null,   // G13+：药房列表回流徽标按名核查
       syndrome: r.syndrome,
       herbs_count: r.herbs?.length || 0,
       herbs: r.herbs || [],
