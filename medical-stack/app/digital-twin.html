@@ -168,6 +168,13 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     <div class="timeline" id="timeline"></div>
   </div>
 
+  <!-- D11：居家复查指标轨迹 -->
+  <div class="card" id="labtraj-card" style="display:none">
+    <h3>🧪 居家复查指标轨迹</h3>
+    <div id="labtraj-content"></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">来源：患者居家「报告智能解读」自动入档（event_id 幂等）；异常着色，多次复查给方向箭头</div>
+  </div>
+
   <!-- Risks -->
   <div class="card" id="risks-card" style="display:none">
     <h3>⚠️ 风险因素</h3>
@@ -209,13 +216,13 @@ function loadTwin() {
       var box = document.getElementById('real-content');
       if (!d.ok || !d.model) {
         box.innerHTML = '<span style="color:var(--text3)">该患者暂无孪生档案——病历签发 / 处方出具 / 随访完成后自动建楼</span>';
-        ['traj-card','score-card','organ-card','const-card','trends-card','risks-card','plan-card'].forEach(function(id){ document.getElementById(id).style.display='none'; });
+        ['traj-card','score-card','organ-card','const-card','trends-card','risks-card','plan-card','labtraj-card'].forEach(function(id){ document.getElementById(id).style.display='none'; });
         return;
       }
       var m = d.model;
       currentModel = m;
       // 事件流
-      var srcIcon = { emr: '📋 病历', prescription: '💊 处方', followup: '📞 随访', manual: '✍️ 补录' };
+      var srcIcon = { emr: '📋 病历', prescription: '💊 处方', followup: '📞 随访', manual: '✍️ 补录', home_lab: '🏠 居家解读' };
       box.innerHTML = '<div style="margin-bottom:8px">快照 <b>' + m.snapshot_count + '</b> 条 · 更新于 <b>' + new Date(m.updated_at).toLocaleString('zh-CN') + '</b></div>' +
         m.timeline.map(function(e) {
           return '<div style="border-left:3px solid var(--primary);padding:4px 10px;margin-bottom:4px;background:#faf8f2;border-radius:0 6px 6px 0">' +
@@ -227,6 +234,7 @@ function loadTwin() {
       document.getElementById('whatif-banner').style.display = 'none';
       renderAll(m);
       renderTrajectory(m.syndrome_trajectory || []);
+      renderLabTrajectory(m.lab_trajectory || []);
       TCM.toast('📂 孪生档案已载入（' + m.snapshot_count + ' 条快照）');
     })
     .catch(function() { TCM.toast('📡 服务离线'); });
@@ -264,6 +272,39 @@ function renderTrajectory(traj) {
     : '<span style="font-size:12px;color:var(--text3)">证型稳定：' + traj[0].syndrome + '（' + traj.length + ' 次诊疗）</span>';
 }
 
+// D11（契约 v1.4.0）：居家复查指标轨迹——每项一条迷你折线 + 最新值 + 方向 + 判读着色
+function renderLabTrajectory(traj) {
+  var card = document.getElementById('labtraj-card');
+  if (!traj.length) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  document.getElementById('labtraj-content').innerHTML = traj.slice(0, 8).map(function(t) {
+    var W = 200, H = 40, pad = 4;
+    var vals = t.points.map(function(p){ return p.value; });
+    var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals);
+    var span = (max - min) || 1;
+    var pts = t.points.map(function(p, i) {
+      var x = t.points.length === 1 ? W / 2 : pad + i * (W - 2 * pad) / (t.points.length - 1);
+      var y = H - pad - ((p.value - min) / span) * (H - 2 * pad);
+      return x + ',' + y;
+    }).join(' ');
+    var color = (t.latest_flag === '高' || t.latest_flag === '阳') ? '#b91c1c' : t.latest_flag === '低' ? '#b45309' : '#166534';
+    var arrow = t.direction === 'up' ? '↑ 走高' : t.direction === 'down' ? '↓ 回落' : t.direction === 'flat' ? '→ 平稳' : '单次记录';
+    var last = t.points[t.points.length - 1];
+    return '<div style="display:flex;align-items:center;gap:12px;border-bottom:1px dashed var(--border);padding:8px 0">' +
+      '<div style="flex:0 0 130px"><b style="color:' + color + '">' + t.name + '</b><br>' +
+      '<span style="font-size:15px;font-weight:700;color:' + color + '">' + last.value + '</span> ' +
+      '<span style="font-size:10px;color:var(--text3)">' + (last.flag || '') + '</span><br>' +
+      '<span style="font-size:10px;color:var(--text3)">' + arrow + ' · ' + t.points.length + ' 次</span></div>' +
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" style="flex:1;height:40px;background:#faf8f2;border-radius:6px">' +
+      '<polyline points="' + pts + '" fill="none" stroke="' + color + '" stroke-width="2"/>' +
+      t.points.map(function(p, i) {
+        var x = t.points.length === 1 ? W / 2 : pad + i * (W - 2 * pad) / (t.points.length - 1);
+        var y = H - pad - ((p.value - min) / span) * (H - 2 * pad);
+        return '<circle cx="' + x + '" cy="' + y + '" r="3" fill="' + color + '"><title>' + new Date(p.ts).toLocaleDateString('zh-CN') + '：' + p.value + (p.flag ? '（' + p.flag + '）' : '') + '</title></circle>';
+      }).join('') + '</svg></div>';
+  }).join('');
+}
+
 // 假设演算（what-if · 本地预览 · 不入档）
 function addRecord() {
   var pid = 'whatif-' + (document.getElementById('patient-id').value.trim() || 'anon');
@@ -288,8 +329,11 @@ function renderAll(model) {
     document.getElementById(id).style.display = 'block';
   });
 
-  // Health Score
+  // Health Score（D11：纯居家检验快照无评分，守卫生存）
   var hs = model.health_score;
+  if (!hs || !hs.breakdown) {
+    document.getElementById('score-card').style.display = 'none';
+  } else {
   document.getElementById('score-ring').innerHTML = 
     '<div class="score-circle grade-' + hs.grade + '">' + hs.total + '<div style="font-size:10px;font-weight:400;opacity:.6">/100</div></div>';
   
@@ -301,9 +345,13 @@ function renderAll(model) {
     '<div>问诊<br><strong>' + bd.inquiry + '</strong></div>' +
     '<div>穿戴<br><strong>' + bd.wearable + '</strong></div>' +
     '<div>历史<br><strong>' + bd.trend + '</strong></div>';
+  }
 
-  // Organs
+  // Organs（同理守卫）
   var organs = model.organ_scores;
+  if (!organs) {
+    document.getElementById('organ-card').style.display = 'none';
+  } else {
   var emoji = { heart: '❤️', liver: '🌿', spleen: '🍚', lung: '🫁', kidney: '💧' };
   var html = '';
   for (var k in organs) {
@@ -312,6 +360,7 @@ function renderAll(model) {
     html += '<div class="organ-item"><div class="organ-icon">' + (emoji[k]||'') + '</div><div class="organ-name">' + o.label + '</div><div style="font-size:11px;color:var(--text3)">' + o.grade + '</div><div class="organ-bar"><div class="fill ' + barColor + '" style="width:' + o.score + '%"></div></div><div style="font-size:10px;color:var(--text3)">' + o.score + '</div></div>';
   }
   document.getElementById('organ-grid').innerHTML = html;
+  }
 
   // Constitution（服务端：judgement + 转化分；本地 what-if：置信度）
   var con = model.constitution;
@@ -334,7 +383,7 @@ function renderAll(model) {
     var trendLabel = t.trend === 'improving' ? '📈 改善中' : t.trend === 'declining' ? '📉 下降中' : t.trend === 'insufficient' ? '⏳ 数据积累中' : '➡️ 稳定';
     document.getElementById('trends-content').innerHTML =
       '<span class="trend-badge ' + trendClass + '">' + trendLabel + (t.slope != null ? ' · 变化: ' + (t.slope > 0 ? '+' : '') + t.slope + '分' : '') + '</span>' +
-      '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + (t.average_score != null ? '平均分: ' + t.average_score + ' · ' : '') + '数据点: ' + t.data_points + (t.note ? ' · ' + t.note : '') + (t.frequent_symptoms ? ' · 常见症状: ' + t.frequent_symptoms.join(', ') : '') + '</div>';
+      '<div style="font-size:11px;color:var(--text3);margin-top:4px">' + (t.average_score != null ? '平均分: ' + t.average_score + ' · ' : '') + (t.data_points != null ? '数据点: ' + t.data_points + ' · ' : '') + (t.note || '') + (t.frequent_symptoms ? ' · 常见症状: ' + t.frequent_symptoms.join(', ') : '') + '</div>';
 
     // Timeline（服务端快照 ts/chief 与本地 what-if timestamp/chief_complaint 双形态兼容）
     var tlHtml = '';

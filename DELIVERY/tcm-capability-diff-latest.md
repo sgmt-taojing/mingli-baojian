@@ -1,13 +1,11 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-09-03 08:57 ｜ 差集指纹 `9a19aaee7c57afaa`
-- tcm 侧 HEAD：`dc2acb0 【契约 v1.4.3】E4 病历归档三池各保最新20+回填锚定修正+KB基准p95阈值校准`
-- 结论：**⚠ 有待吸收增量**
+- 生成：2026-09-03 14:05 ｜ 差集指纹 `e56436e679c69d12`
+- tcm 侧 HEAD：`bcdf8dd E6 教学池多源扩编：52→160例+病种标签【契约 v1.4.5】`
+- 结论：**✅ 全对齐（无待吸收增量）**
 
-## L1 API 路由差集（tcm 有 · medical-stack 无）：3 条
-- `get /api/lab/panel`
-- `post /api/family/revisits/escalate`
-- `post /api/lab/interpret`
+## L1 API 路由差集（tcm 有 · medical-stack 无）：0 条
+- （空）
 
 ## 已知等价登记（勿重复建设）：0 条
 - （空）

@@ -1387,7 +1387,9 @@ function renderAIPanel() {
   if (simCases.length) {
     html += '<div class="ai-block"><div class="ai-title">🩺 相似医案（' + simCases.length + '）</div>';
     simCases.slice(0, 3).forEach(c => {
-      html += '<div class="ai-row"><span>' + escHtml((c.title||c.case_id||'医案').slice(0,24)) + '</span><span>' + escHtml((c.syndrome||'').slice(0,12)) + '</span></div>';
+      const badge = c.teaching ? '<span style="font-size:10px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:0 3px;margin-left:4px">🎓教学</span>' : '';
+      const srcLabel = c.source === 'confirmed' ? '签发病历' : c.source === 'report' ? 'AI 报告' : c.teaching ? '教学示范' : '';
+      html += '<div class="ai-row"><span>' + escHtml((c.title||c.case_id||'医案').slice(0,24)) + badge + '</span><span>' + escHtml((c.syndrome||'').slice(0,12)) + (srcLabel ? ' · ' + srcLabel : '') + '</span></div>';
     });
     html += '</div>';
   }
