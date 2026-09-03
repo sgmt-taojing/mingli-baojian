@@ -1,0 +1,16 @@
+{
+  "desc": "medical-stack 共享 js 层登记册（单一真源）——capability-diff L4.5 与 check-tcm-page-drift 共同读取。known_adapt=双侧存在但有哈希差异的有意适配；ms_own=tcm 没有的 ms 自有 js（防误判 stray、防未来同步机制误删）",
+  "known_adapt": {
+    "nav.js": "ms 导航为 curated 子集 + 命理宝鉴品牌适配（fhub/consult/insur 已对齐 tcm 增量）",
+    "config-engine.js": "仅系统品牌名适配（SEC-001）；逻辑同源",
+    "i18n.js": "仅 app.name 品牌串适配（SEC-001）；逻辑同源",
+    "seed-loader.js": "R864 V2.0 已对齐（生产不自动注入假数据）；头部品牌标注差异"
+  },
+  "ms_own": {
+    "mingli-annotation-view.js": "命理批注面板视图（G15/G16 命理视图开关，命理域自有）",
+    "reflux-badge.js": "G13+ 家庭端回流状态共享组件（诊台/药房/候诊/医技开单四触点复用）"
+  },
+  "notes": {
+    "vendor/qrcode.min.js": "双侧哈希一致（517b55d3…），tcm 亦有同名文件，不列 ms_own"
+  }
+}

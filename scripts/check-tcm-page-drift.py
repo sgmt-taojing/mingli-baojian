@@ -70,6 +70,49 @@ def staged_ms_pages() -> list[str]:
             if l.startswith("medical-stack/app/") and l.endswith(".html")]
 
 
+# ── js 层（共享 js 登记册单一真源：medical-stack/patches/js-adapt-registry.json）──
+def js_registry() -> tuple[dict, dict]:
+    try:
+        reg = json.loads((PROJ / "medical-stack" / "patches" / "js-adapt-registry.json").read_text(encoding="utf-8"))
+        return dict(reg.get("known_adapt", {})), dict(reg.get("ms_own", {}))
+    except Exception:
+        return {}, {}
+
+
+def staged_ms_js() -> list[str]:
+    """staged 的 medical-stack/app/js/**.js → 相对 app/js 的路径（含 vendor/ 子目录）"""
+    r = subprocess.run(["git", "-C", str(PROJ), "diff", "--cached", "--name-only"],
+                       capture_output=True, text=True, timeout=15)
+    out = []
+    for l in r.stdout.splitlines():
+        l = l.strip()
+        if l.startswith("medical-stack/app/js/") and l.endswith(".js"):
+            out.append(l[len("medical-stack/app/js/"):])
+    return out
+
+
+def check_js_staged() -> list[tuple[str, str]]:
+    """返回 [(rel, 原因)] 违规清单；空=放行"""
+    import hashlib
+    known_adapt, ms_own = js_registry()
+    bad = []
+    for rel in staged_ms_js():
+        if rel in ms_own:
+            continue
+        tcm_f = TCM / "app" / "js" / rel
+        ms_f = PROJ / "medical-stack" / "app" / "js" / rel
+        if not tcm_f.exists():
+            bad.append((rel, "tcm 无此 js（新文件须登记 js-adapt-registry.json ms_own）"))
+            continue
+        th = hashlib.sha256(tcm_f.read_bytes()).hexdigest()
+        mh = hashlib.sha256(ms_f.read_bytes()).hexdigest()
+        if th == mh:
+            continue
+        if rel not in known_adapt:
+            bad.append((rel, "与 tcm 哈希不一致且未登记 known_adapt（有意适配须登记，否则应对齐 tcm）"))
+    return bad
+
+
 def main() -> int:
     staged_mode = "--staged" in sys.argv
     drift = drift_pages()
@@ -77,15 +120,19 @@ def main() -> int:
     if staged_mode:
         staged = set(staged_ms_pages())
         hit = [p for p in drift if p in staged]
-        if not hit:
+        js_bad = check_js_staged()
+        if not hit and not js_bad:
             return 0
-        print("╔══ G18 防线：tcm 源页面漂移拦截 ══", file=sys.stderr)
+        print("╔══ G18 防线：tcm 源页面/共享js 漂移拦截 ══", file=sys.stderr)
         for p in hit:
             kind = "基线增量待重放" if baseline_changed_recently(p) else "本地改动疑似未补丁化"
-            print(f"  ✗ {p}（{kind}）", file=sys.stderr)
-        print("处置：① 本地改动 → 转 patches/{brand,disclaimer,mingli-view}/ 补丁后跑 scripts/reapply-patches.py；", file=sys.stderr)
-        print("      ② 基线待重放 → 先跑 scripts/reapply-patches.py 追平再提交。", file=sys.stderr)
-        print("      （tcm 源页面 = 基线+补丁，禁止直改提交；mingli 自有页不受限）", file=sys.stderr)
+            print(f"  ✗ 页面 {p}（{kind}）", file=sys.stderr)
+        for rel, why in js_bad:
+            print(f"  ✗ js {rel}（{why}）", file=sys.stderr)
+        print("处置：① 页面本地改动 → 转 patches/{brand,disclaimer,mingli-view}/ 补丁后跑 scripts/reapply-patches.py；", file=sys.stderr)
+        print("      ② 基线待重放 → 先跑 scripts/reapply-patches.py 追平再提交；", file=sys.stderr)
+        print("      ③ js 有意适配/自有 → 登记 medical-stack/patches/js-adapt-registry.json。", file=sys.stderr)
+        print("      （tcm 源页面 = 基线+补丁，共享 js = tcm 同源+登记豁免，禁止直改提交）", file=sys.stderr)
         return 1
 
     # 链上审计模式

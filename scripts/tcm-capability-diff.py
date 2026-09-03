@@ -171,28 +171,47 @@ def main() -> int:
 
     # L4.5 共享 js 哈希比对（盲区封堵：页面同名不代表同源——common.js 缺 authFetch
     # 曾致召回面板静默失效，代理隔离修复后才暴露）。登记 KNOWN_JS_ADAPT 豁免有意适配。
-    KNOWN_JS_ADAPT = {
-        'nav.js': 'ms 导航为 curated 子集 + 命理宝鉴品牌适配（fhub/consult/insur 已对齐 tcm 增量）',
-        'config-engine.js': '仅系统品牌名适配（SEC-001）；逻辑同源',
-        'i18n.js': '仅 app.name 品牌串适配（SEC-001）；逻辑同源',
-        'seed-loader.js': 'R864 V2.0 已对齐（生产不自动注入假数据）；头部品牌标注差异',
-    }
+    # 2026-09-03：登记册外置 medical-stack/patches/js-adapt-registry.json（单一真源，
+    # capability-diff 与 check-tcm-page-drift 共读）；扫描范围扩到 vendor/ 子目录；
+    # ms 自有 js（tcm 无此文件）须登记 ms_own，否则列 UNREGISTERED 提示登记。
+    _reg_path = MS / 'patches' / 'js-adapt-registry.json'
+    try:
+        _reg = json.loads(_reg_path.read_text(encoding='utf-8'))
+        KNOWN_JS_ADAPT = dict(_reg.get('known_adapt', {}))
+        MS_OWN_JS = dict(_reg.get('ms_own', {}))
+    except Exception:
+        KNOWN_JS_ADAPT = {
+            'nav.js': 'ms 导航为 curated 子集 + 命理宝鉴品牌适配（fhub/consult/insur 已对齐 tcm 增量）',
+            'config-engine.js': '仅系统品牌名适配（SEC-001）；逻辑同源',
+            'i18n.js': '仅 app.name 品牌串适配（SEC-001）；逻辑同源',
+            'seed-loader.js': 'R864 V2.0 已对齐（生产不自动注入假数据）；头部品牌标注差异',
+        }
+        MS_OWN_JS = {}
     js_rows = []
     js_drift = []
     tcm_js_dir, ms_js_dir = TCM / 'app' / 'js', MS / 'app' / 'js'
-    for f in sorted(tcm_js_dir.glob('*.js')):
-        m = ms_js_dir / f.name
+    tcm_js_files = {str(f.relative_to(tcm_js_dir)) for f in tcm_js_dir.rglob('*.js')}
+    ms_js_files = {str(f.relative_to(ms_js_dir)) for f in ms_js_dir.rglob('*.js')}
+    for rel in sorted(tcm_js_files):
+        f = tcm_js_dir / rel
+        m = ms_js_dir / rel
         if not m.exists():
-            js_rows.append((f.name, 'MISSING'))
-            js_drift.append({'file': f.name, 'status': 'MISSING'})
+            js_rows.append((rel, 'MISSING'))
+            js_drift.append({'file': rel, 'status': 'MISSING'})
             continue
         th = hashlib.sha256(f.read_bytes()).hexdigest()[:12]
         mh = hashlib.sha256(m.read_bytes()).hexdigest()[:12]
         if th != mh:
-            st = 'ADAPT' if f.name in KNOWN_JS_ADAPT else 'DRIFT'
-            js_rows.append((f.name, st))
+            st = 'ADAPT' if rel in KNOWN_JS_ADAPT else 'DRIFT'
+            js_rows.append((rel, st))
             if st == 'DRIFT':
-                js_drift.append({'file': f.name, 'status': 'DRIFT'})
+                js_drift.append({'file': rel, 'status': 'DRIFT'})
+    # ms 自有 js：登记 ms_own → ⚪ 自有；未登记 → ⚠ UNREGISTERED（不破 clean，提示登记防误判）
+    for rel in sorted(ms_js_files - tcm_js_files):
+        if rel in MS_OWN_JS:
+            js_rows.append((rel, 'OWN'))
+        else:
+            js_rows.append((rel, 'UNREGISTERED'))
 
     # L2.5 处理器特征哈希比对
     proc_rows = []
@@ -287,8 +306,17 @@ def main() -> int:
             f"## L4.5 共享 js 哈希比对（页面同源监控）",
         ]
         if js_rows:
-            lines += [f"- `{n}`：{'🔴 漂移' if st == 'DRIFT' else ('🔴 缺失' if st == 'MISSING' else '⚪ 有意适配（' + KNOWN_JS_ADAPT[n] + '）')}"
-                      for n, st in js_rows]
+            def _js_line(n, st):
+                if st == 'DRIFT':
+                    return f"- `{n}`：🔴 漂移"
+                if st == 'MISSING':
+                    return f"- `{n}`：🔴 缺失"
+                if st == 'OWN':
+                    return f"- `{n}`：⚪ ms 自有（{MS_OWN_JS.get(n, '')}）"
+                if st == 'UNREGISTERED':
+                    return f"- `{n}`：⚠ 未登记 ms 侧文件（请登记 js-adapt-registry.json ms_own 或确认删除）"
+                return f"- `{n}`：⚪ 有意适配（{KNOWN_JS_ADAPT.get(n, '')}）"
+            lines += [_js_line(n, st) for n, st in js_rows]
         else:
             lines += ["- （空 · 全部同源）"]
         lines += [

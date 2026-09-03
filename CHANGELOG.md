@@ -1,5 +1,13 @@
 # mingli-baojian 更新日志
 
+## 2026-09-03 早 · 防线扩 js 层：js-adapt-registry 单一真源 + L4.5 升级 + 守卫 --staged 扩 js
+- **登记册外置**：KNOWN_JS_ADAPT 从 capability-diff.py 内嵌字典迁到 `medical-stack/patches/js-adapt-registry.json`（known_adapt 4 项 + 新增 ms_own 2 项：mingli-annotation-view.js / reflux-badge.js），capability-diff 与 check-tcm-page-drift 共读一源，两处口径永不漂移
+- **L4.5 升级**：扫描从顶层 *.js 扩到 rglob（vendor/ 子目录纳管——vendor/qrcode.min.js 双侧哈希一致已备注）；ms 侧多出文件分档：⚪ ms 自有（已登记）/ ⚠ 未登记（提示登记，不破 clean）
+- **守卫 --staged 扩 js**：staged 的 medical-stack/app/js/** 逐一核——ms_own 放行 / 与 tcm 同哈希放行 / 有差异须 known_adapt 登记 / 新文件须 ms_own 登记，违规 rc=1 拦截带指引
+- **事实勘定**：共享 js 无覆盖式重放器（js 不会被抹，与页面层风险模型不同），js 层真实风险是「未登记适配/自有文件无账可查」，本次按此建模
+- **正负向实测**：干净态 rc=0；改 common.js 未登记 → rc=1 拦截；新 js 未登记 ms_own → rc=1；已登记 reflux-badge.js → 放行；capability-diff 复跑报告新口径正确（4 适配+2 自有）
+- 旁出：本次复跑巡检新检出 tcm v1.4.3 增量差集 3 条（get /api/lab/panel、post /api/lab/interpret、post /api/family/revisits/escalate），走 TCM-ABSORPTION-SPEC 待吸收
+
 ## 2026-09-03 早 · G18 防线上线：tcm 源页面漂移守卫（check-tcm-page-drift.py）
 - **动机**：09-02 两起重放吞改动事故（13:21 诊台内联徽标被抹；377a772 提交窗口期 pharmacy/dashboard 被抹成空壳提交）——补丁化解决存量，本守卫解决增量：让「未补丁化本地差异」在提交前和重放前都能被看见
 - **守卫脚本** `scripts/check-tcm-page-drift.py` 双模式：

@@ -1,5 +1,9 @@
 # KANBAN.md — 命理宝鉴 项目看板
 
+## 2026-09-03 09:05 — ✅ 防线扩 js 层（登记册单一真源）
+- js-adapt-registry.json 外置共读（capability-diff L4.5 + 守卫）；L4.5 扫 vendor + ms 自有/未登记分档；守卫 --staged 扩 js（正负向实测全过）
+- 📥 新差集待吸收：tcm v1.4.3 增量 3 条（lab/panel、lab/interpret、family/revisits/escalate）→ 走 TCM-ABSORPTION-SPEC
+
 ## 2026-09-03 09:00 — ✅ G18 防线上线（tcm 源页面漂移守卫）
 - check-tcm-page-drift.py 双模式：链上审计（链 2a，先于重放，疑似未补丁化本地改动 rc=2 告警+台账）+ pre-commit 拦截（staged∩漂移即拒，带处置指引）
 - 正负向实测全过：手改被拦/被记、干净态静默、tcm 未提交基线改动不误报；链上审计是兜底主防线（日常 --no-verify 提交不走钩子）

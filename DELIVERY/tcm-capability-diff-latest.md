@@ -1,11 +1,13 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-09-01 20:43 ｜ 差集指纹 `43daa73c8d9179f1`
-- tcm 侧 HEAD：`e69fa80 【契约 v1.3.7】D8 召回成效统计：响应率/闭环率/爽约率/三源分布进运营财务页`
-- 结论：**✅ 全对齐（无待吸收增量）**
+- 生成：2026-09-03 08:57 ｜ 差集指纹 `9a19aaee7c57afaa`
+- tcm 侧 HEAD：`dc2acb0 【契约 v1.4.3】E4 病历归档三池各保最新20+回填锚定修正+KB基准p95阈值校准`
+- 结论：**⚠ 有待吸收增量**
 
-## L1 API 路由差集（tcm 有 · medical-stack 无）：0 条
-- （空）
+## L1 API 路由差集（tcm 有 · medical-stack 无）：3 条
+- `get /api/lab/panel`
+- `post /api/family/revisits/escalate`
+- `post /api/lab/interpret`
 
 ## 已知等价登记（勿重复建设）：0 条
 - （空）
@@ -25,15 +27,17 @@
 ## L3 种子数据差集：0 项
 - （空）
 
-## L4 页面层参考：tcm 比 mingli 多 52 个页面（按三分法人工定性：真缺口/已有等价/架构定位）
+## L4 页面层参考：tcm 比 mingli 多 53 个页面（按三分法人工定性：真缺口/已有等价/架构定位）
 
 ## L4.5 共享 js 哈希比对（页面同源监控）
 - `config-engine.js`：⚪ 有意适配（仅系统品牌名适配（SEC-001）；逻辑同源）
 - `i18n.js`：⚪ 有意适配（仅 app.name 品牌串适配（SEC-001）；逻辑同源）
 - `nav.js`：⚪ 有意适配（ms 导航为 curated 子集 + 命理宝鉴品牌适配（fhub/consult/insur 已对齐 tcm 增量））
 - `seed-loader.js`：⚪ 有意适配（R864 V2.0 已对齐（生产不自动注入假数据）；头部品牌标注差异）
+- `mingli-annotation-view.js`：⚪ ms 自有（命理批注面板视图（G15/G16 命理视图开关，命理域自有））
+- `reflux-badge.js`：⚪ ms 自有（G13+ 家庭端回流状态共享组件（诊台/药房/候诊/医技开单四触点复用））
 
-## medical-stack 独有（命理增量层，勿回流 tcm）：15 条
+## medical-stack 独有（命理增量层，勿回流 tcm）：17 条
 （批注/预约自建/reflux/短信校验等，属 mingli 特有边界，详见 ADR-007）
 
 ---
