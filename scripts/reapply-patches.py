@@ -132,7 +132,8 @@ def main() -> int:
         ledger_path.write_text(json.dumps(ledger, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(json.dumps({"status": run["status"], "shared": run["shared"],
-                      "replayed": len(run["replayed"]), "warns": run["warns"],
+                      "replayed": len(run["replayed"]), "replayed_pages": run["replayed"],
+                      "warns": run["warns"],
                       "smoke": run.get("smoke")}, ensure_ascii=False))
     return 0 if run["status"] == "ok" else 2  # WARN 以 rc=2 暴露（看守链非零即告警）
 

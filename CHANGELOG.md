@@ -1,5 +1,14 @@
 # mingli-baojian 更新日志
 
+## 2026-09-03 早 · G18 防线上线：tcm 源页面漂移守卫（check-tcm-page-drift.py）
+- **动机**：09-02 两起重放吞改动事故（13:21 诊台内联徽标被抹；377a772 提交窗口期 pharmacy/dashboard 被抹成空壳提交）——补丁化解决存量，本守卫解决增量：让「未补丁化本地差异」在提交前和重放前都能被看见
+- **守卫脚本** `scripts/check-tcm-page-drift.py` 双模式：
+  - 链上审计（挂 tcm-import-and-follow.sh 链 2a，先于重放跑）：全量 --check 漂移逐页判定来源——tcm 基线 24h 有提交**或 tcm 工作区有未提交改动** = 正常追平（rc=0，重放器随后自动抹平）；否则 = 疑似未补丁化本地改动（rc=2 告警转人工），事件落 `DELIVERY/patch-drift-<date>.json`
+  - pre-commit（挂 .husky/pre-commit）：staged 的 medical-stack/app/*.html 与漂移页相交即 rc=1 拦截，打印处置指引（补丁化 or 先 reapply 追平）
+- **配套**：reapply-patches.py --check 输出补 `replayed_pages` 页名清单（守卫依赖）
+- **正负向实测**：干净态双模式 rc=0；手改 acupuncture（未补丁化）→ 链模式 rc=2 + 台账记录、staged 模式 rc=1 带指引拦截；clinic-desk 漂移正确判定为 tcm 未提交基线改动（不误报）；重放自动追平验证
+- 注：本仓日常提交走 `--no-verify`（husky 另有 rules-check L1），钩子守护的是不绕过钩子的提交路径；链上审计是兜底主防线
+
 ## 2026-09-02 晚 · pharmacy/doctor-dashboard 徽标补丁化 + 提交窗口期重放吞改动事故补记
 - **排查结论**：三处接线页中 pharmacy.html、doctor-dashboard.html 为 tcm 源页面（必须补丁化，否则重放即抹）；unified-consultation.html 为 mingli 自有页面（tcm 基线无此页），直接维护即可
 - **事故补记（比 13:21 那次更早）**：午后 377a772 提交时，15min OTA 看守在「浏览器验证通过 → git add」的窗口期内重放了 pharmacy/dashboard，提交进去的其实是被抹版本——HEAD 里 pharmacy 只剩脚本标签、dashboard 接线全无。教训：tcm 源页面改动未补丁化之前，任何提交都可能提交到被抹状态

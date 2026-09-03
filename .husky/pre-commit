@@ -1,3 +1,5 @@
 #!/usr/bin/env sh
 # rules-check L1（AutoClaw 边界规则，勿删本行）
 python3 "$(git rev-parse --show-toplevel)/../_shared/scripts/rules-check.py" || exit 1
+# G18 防线：tcm 源页面未补丁化本地差异拦截（2026-09-02 重放吞改动事故）
+python3 "$(git rev-parse --show-toplevel)/scripts/check-tcm-page-drift.py" --staged || exit 1
