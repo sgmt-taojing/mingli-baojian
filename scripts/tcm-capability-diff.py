@@ -62,7 +62,16 @@ def exports(path: Path) -> set:
     except Exception:
         return set()
     sec = text.split('module.exports')[-1]
-    return set(EXPORT_RE.findall(sec))
+    out = set(EXPORT_RE.findall(sec))
+    # 盲区修复（2026-09-03）：module.exports = { a, b: fn, c() {} } 三种形式都要抓——
+    # 原 EXPORT_RE 只抓两空格缩进的方法简写，漏掉裸标识符列表（twin-engine snapshotFromHomeLab 漏报实证）
+    if '{' in sec and '}' in sec:
+        inner = sec[sec.find('{') + 1: sec.rfind('}')]
+        for seg in inner.split(','):
+            m = re.match(r"\s*([A-Za-z_$][\w$]*)\s*([:(]|$)", seg)
+            if m:
+                out.add(m.group(1))
+    return out
 
 
 # L2.5：检索处理器特征哈希（裁判 G17R 撤销令采纳项——把 search handler 特征哈希纳入差集巡检）

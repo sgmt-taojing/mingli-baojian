@@ -94,6 +94,13 @@ const patientIndex = (() => {
 const twinEngine = (() => {
   try { return require('./twin-engine'); } catch (e) { console.error('[twin] 加载失败:', e.message); return null; }
 })();
+// D9-D12 居家检验解读链（2026-09-03 吸收自 tcm HEAD dc2acb0，按 TCM-ABSORPTION-SPEC：只移植不训练）
+const labInterpreter = (() => {
+  try { return require('./lab-interpreter'); } catch (e) { console.error('[lab-interpreter] 加载失败:', e.message); return null; }
+})();
+const smsAdapter = (() => {
+  try { return require('./sms_adapter'); } catch (e) { console.error('[sms] 加载失败:', e.message); return null; }
+})();
 // R790 拼音/首字母离线映射（KB 检索与患者检索共用）
 const pinyin = (() => {
   try { return require('./kb-store/pinyin'); } catch (e) { console.error('[pinyin] 加载失败:', e.message); return { variants: () => [''], full: () => '', isLatin: () => false }; }
@@ -1067,6 +1074,26 @@ function persistClinicSession(id) {
   });
 }
 
+// D10 居家解读存储：patient_id → 最近 20 份解读（诊室建档自动并入旁证的数据基；移植自 tcm HEAD dc2acb0）
+const HOME_LAB_FILE = path.join(__dirname, '..', 'data', 'lab-interpretations.json');
+function homeLabAdd(patientId, rec) {
+  try {
+    const all = fs.existsSync(HOME_LAB_FILE) ? JSON.parse(fs.readFileSync(HOME_LAB_FILE, 'utf8') || '{}') : {};
+    if (!Array.isArray(all[patientId])) all[patientId] = [];
+    all[patientId].push(rec);
+    all[patientId] = all[patientId].slice(-20);
+    fs.writeFileSync(HOME_LAB_FILE, JSON.stringify(all, null, 2));
+  } catch (e) { console.error('[home-lab] 落盘失败:', e.message); }
+}
+function homeLabLatest(patientId, days) {
+  try {
+    const all = JSON.parse(fs.readFileSync(HOME_LAB_FILE, 'utf8') || '{}');
+    const arr = all[patientId] || [];
+    const cutoff = Date.now() - days * 86400000;
+    return arr.slice().reverse().find(r => new Date(r.created_at).getTime() >= cutoff) || null;
+  } catch (e) { return null; }
+}
+
 // 创建会话
 app.post('/api/clinic/session', optionalAuth, (req, res) => {
   try {
@@ -1091,8 +1118,24 @@ app.post('/api/clinic/session', optionalAuth, (req, res) => {
       evidence: [], vision: {}, issued: null,
       patient_id: patientId
     };
+    // D10：居家报告解读自动并入旁证（90 天内最近一次；带 home 源标记，医生端 🏠 徽标区分；移植自 tcm）
+    let homeMerged = 0;
+    if (patientId) {
+      const home = homeLabLatest(patientId, 90);
+      state.clinicSessions[id].home_lab_merged = true;   // 建档已处理，PUT 不再重复并入
+      if (home && Array.isArray(home.labs) && home.labs.length) {
+        state.clinicSessions[id].labs = home.labs.map(l => ({ name: l.name, value: l.value, raw: l.raw, unit: l.unit, source: 'home' }));
+        state.clinicSessions[id].home_lab_at = home.created_at;
+        state.clinicSessions[id].evidence.push({
+          type: 'lab', ts: home.created_at,
+          text: '🏠 居家报告解读（' + String(home.created_at).slice(0, 10) + '）自动并入：' + (home.headline || '') +
+            (home.patterns && home.patterns.length ? '；模式：' + home.patterns.join('、') : '')
+        });
+        homeMerged = home.labs.length;
+      }
+    }
     persistClinicSession(id);
-    res.json({ ok: true, sessionId: id, patient_id: patientId });
+    res.json({ ok: true, sessionId: id, patient_id: patientId, home_labs: homeMerged });
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
@@ -1662,6 +1705,123 @@ function analyzeLabs(labs, gender) {
     (criticals.length ? '；⚠️ 危急值 ' + criticals.length + ' 项' : '');
   return { items, patterns, criticals, summary };
 }
+
+// ═══ D9 患者体检报告智能解读（server/lab-interpreter.js；2026-09-03 吸收自 tcm HEAD dc2acb0）═══
+// 患者端「看得懂」的报告解读：粘贴文本智能解析/逐项录入 → 白话释义+严重度+调理建议+就诊提示+中医佐证
+// 可选归档：带 link_token（G13 绑定令牌）时解读结果入「我的报告」收件箱
+// 录入辅助目录：56 项指标 + 别名 + 拼音首字母 + 参考区间（前端联想搜索用）
+app.get('/api/lab/panel', (_req, res) => {
+  if (!labInterpreter) return res.status(503).json({ ok: false, error: 'lab-interpreter 未加载' });
+  res.setHeader('Cache-Control', 'no-cache');
+  res.json({ ok: true, total: LAB_PANEL.length, items: labInterpreter.buildCatalog(LAB_PANEL) });
+});
+
+// 解读主端点（患者可匿名使用；带 link_token 且 save!==false 时归档到我的报告）
+app.post('/api/lab/interpret', optionalAuth, async (req, res) => {
+  try {
+    if (!labInterpreter) return res.status(503).json({ ok: false, error: 'lab-interpreter 未加载' });
+    const b = req.body || {};
+    let labs = Array.isArray(b.labs) ? b.labs.slice(0, 60) : [];
+    let parsed_count = 0;
+    if (!labs.length && b.text) {
+      labs = labInterpreter.parseLabText(String(b.text).slice(0, 20000));
+      parsed_count = labs.length;
+      if (!labs.length) return res.status(422).json({ ok: false, error: '未能从文本中识别出指标，请检查格式（支持「名称 数值 单位」逐行粘贴），或改用逐项录入' });
+    }
+    const interp = labInterpreter.interpretForPatient(labs, { gender: String(b.gender || ''), age: b.age }, { panel: LAB_PANEL, analyze: analyzeLabs });
+    if (!interp) return res.status(400).json({ ok: false, error: '至少提供 1 项指标（labs 数组或 text 文本）' });
+
+    // 归档：凭 G13 绑定令牌入患者收件箱（未绑定不持久化，隐私友好）
+    // 适配：tcm reportLink → 本侧 family-reflux（linkByToken 反查绑定，pushByPhone 自带命理守卫+白名单+本院收件箱）
+    let archived = false, archive_hint = '', twinSnapshot = false, recheck = null;
+    const token = String(b.link_token || '');
+    if (token && b.save !== false) {
+      const reflux = require('./family-reflux.js');
+      const link = reflux.linkByToken(token);
+      if (link) {
+        const reportId = 'li-' + Date.now().toString(36) + '-' + crypto.randomBytes(2).toString('hex');
+        const createdAt = new Date().toISOString();
+        // D10：按 patient_id 落库——诊室建档时自动并入检验旁证（labs + 证据时间线）
+        const pid = patientIndex ? patientIndex.resolvePatientId(null, link.patient_name)
+          : ('lnk-' + (smsAdapter ? smsAdapter.hashPhone(link.phone).slice(0, 12) : 'anon'));
+        homeLabAdd(pid, {
+          report_id: reportId,
+          created_at: createdAt,
+          headline: interp.overview.headline,
+          patterns: interp.patterns.map(p => p.name),
+          labs: interp.items.filter(i => i.flag !== '录').map(i => ({
+            name: i.name,
+            value: isNaN(parseFloat(i.value)) ? null : parseFloat(i.value),
+            raw: String(i.value), unit: i.unit || '', flag: i.flag || ''
+          }))
+        });
+        // D11：居家解读写数字孪生 home_lab 快照（event_id 幂等；触发指标轨迹/持续异常风险评估）
+        let twinAdded = false;
+        if (twinEngine) {
+          try {
+            const tr = twinEngine.addSnapshot(pid, twinEngine.snapshotFromHomeLab({
+              report_id: reportId, created_at: createdAt,
+              headline: interp.overview.headline,
+              patterns: interp.patterns.map(p => p.name),
+              labs: interp.items.filter(i => i.flag !== '录')
+            }));
+            twinAdded = !!tr.added;
+          } catch (e) { console.error('[twin] 居家快照失败:', e.message); }
+        }
+        twinSnapshot = twinAdded;
+        const r = await reflux.pushByPhone(link.phone, {
+          report_type: 'lab',
+          report_id: reportId,
+          title: '体检报告智能解读（' + interp.overview.total + ' 项' + (interp.overview.abnormal ? '，异常 ' + interp.overview.abnormal + ' 项' : '，全部正常') + '）',
+          summary: interp.overview.headline + '\n' + interp.overview.urgency_label + '：' + interp.overview.urgency_desc +
+            (interp.patterns.length ? '\n模式识别：' + interp.patterns.map(p => p.name).join('、') : '') +
+            (interp.lifestyle.length ? '\n调理建议：' + interp.lifestyle.slice(0, 3).join('；') : ''),
+          created_at: new Date().toISOString()
+        });
+        archived = !!(r && (r.ok || r.inbox));
+        // D12（契约 v1.4.1）：异常解读 → 自动建复查提醒随访（soon=7 天/routine=42 天；30 天幂等；逾期走既有 overdue 管线）
+        if (['soon', 'routine'].includes(interp.overview.urgency)) {
+          try {
+            const FU_FILE = path.join(__dirname, '..', 'data', 'followups.json');
+            let fus = fs.existsSync(FU_FILE) ? JSON.parse(fs.readFileSync(FU_FILE, 'utf8') || '[]') : [];
+            const dup = fus.some(f => f.patient_id === pid && f.source === 'lab-interpret' && f.status === 'pending'
+              && (Date.now() - new Date(f.created_at).getTime()) < 30 * 86400000);
+            if (!dup) {
+              const days = interp.overview.urgency === 'soon' ? 7 : 42;
+              const abnNames = interp.items.filter(i => i.flag !== '正常' && i.flag !== '录').slice(0, 3).map(i => i.name).join('、');
+              const pRec = patientIndex ? patientIndex.getPatient(pid) : null;
+              const fuRec = {
+                id: 'FU-LAB-' + Date.now().toString(36).toUpperCase(),
+                patient_id: pid,
+                patient_name: (pRec && pRec.name_full) || link.patient_name || '',
+                syndrome: interp.patterns.length ? interp.patterns.map(p => p.name).join('、').slice(0, 40) : '检验异常复查',
+                formula: '',
+                advice: ('居家报告解读：' + abnNames + ' 等 ' + interp.overview.abnormal + ' 项异常，建议复查对比（' + (days === 7 ? '1 周内就诊' : '6 周调理后复查') + '）').slice(0, 200),
+                due_at: new Date(Date.now() + days * 86400000).toISOString(),
+                status: 'pending', created_at: new Date().toISOString(),
+                session_id: null, source: 'lab-interpret'
+              };
+              fus.push(fuRec); fus = fus.slice(-200);
+              fs.writeFileSync(FU_FILE, JSON.stringify(fus, null, 2));
+              recheck = { id: fuRec.id, due_at: fuRec.due_at, days };
+              // 建档即短信确认（G10：mock 模式落 outbox，绝不伪造成功；模板化机构版话术）
+              const phone = smsAdapter ? (smsAdapter.vaultGet(pid) || (link.phone || null)) : null;
+              if (phone && smsAdapter) {
+                const sent = smsAdapter.sendNotice(phone, 'followup_recheck', {
+                  items: abnNames,
+                  when: days === 7 ? ' 1 周内就诊复查' : ' 6 周左右复查'
+                });
+                recheck.sms = sent.ok ? 'sent' : ('blocked: ' + (sent.error || 'unknown'));
+              } else recheck.sms = 'no_phone';
+            }
+          } catch (e) { console.error('[recheck] 建单失败:', e.message); }
+        }
+      } else archive_hint = '令牌无效，未归档';
+    } else archive_hint = '未绑定身份，本次解读不保存；如需留存请先在「我的报告」页绑定';
+
+    res.json({ ok: true, parsed_count, ...interp, archived, archive_hint, twin_snapshot: twinSnapshot, recheck });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
 
 function agentCtxOf(sessionId) {
   if (!state.agentCtx[sessionId]) {
@@ -5577,9 +5737,50 @@ app.post('/api/family/followups/push-overdue', optionalAuth, async (req, res) =>
   }
 });
 
+// 40b. 召回超 48h 未响应 → 自动升级短信派发（移植自 tcm E2，HEAD dc2acb0；escalated_at 幂等，绝不伪造成功）
+// 适配：tcm 自由文本 sendNotice → 本侧模板化 revisit_escalate（机构版话术，命理守卫内置）
+async function escalateStaleRevisits() {
+  const REVISIT_FILE = path.join(__dirname, '..', 'data', 'revisits.json');
+  let list = [];
+  if (fs.existsSync(REVISIT_FILE)) {
+    try { list = JSON.parse(fs.readFileSync(REVISIT_FILE, 'utf8') || '[]'); } catch (e) { list = []; }
+  }
+  const now = Date.now();
+  const stale = list.filter(r => r.status === 'pending' && !r.escalated_at
+    && (now - new Date(r.created_at || 0).getTime()) > 48 * 3600000);
+  const details = [];
+  for (const r of stale) {
+    try {
+      const phone = smsAdapter ? smsAdapter.vaultGet(r.patient_id) : null;
+      if (phone) {
+        const sent = smsAdapter.sendNotice(phone, 'revisit_escalate', { patient: r.patient_name || '您', reason: r.reason || '建议尽快复诊调方' });
+        r.escalate_channel = sent.ok ? 'sms' : ('sms_blocked: ' + (sent.error || 'unknown'));
+      } else {
+        r.escalate_channel = 'no_phone';
+      }
+      r.escalated_at = new Date().toISOString();
+      details.push({ id: r.id, channel: r.escalate_channel });
+    } catch (e) { details.push({ id: r.id, channel: 'error', error: e.message }); }
+  }
+  if (details.length) fs.writeFileSync(REVISIT_FILE, JSON.stringify(list, null, 2));
+  return { escalated: details.length, details };
+}
+
+// 40c. POST /api/family/revisits/escalate — 手动触发 48h 升级派发扫描
+app.post('/api/family/revisits/escalate', optionalAuth, async (req, res) => {
+  try {
+    const r = await escalateStaleRevisits();
+    res.json({ ok: true, ...r, message: r.escalated ? r.escalated + ' 单超时召回已升级派发' : '无超 48h 未响应召回' });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 // 41. GET /api/family/revisits — 复诊队列（医生视角：worsened 自动转诊单）
 app.get('/api/family/revisits', optionalAuth, async (req, res) => {
   try {
+    // 惰性升级扫描（移植自 tcm：队列被查看时顺带把超 48h 未响应召回升级派发，不依赖定时器）
+    try { await escalateStaleRevisits(); } catch (e) { console.error('[revisit-escalate] 惰性扫描失败:', e.message); }
     const { status, limit } = req.query;
     const REVISIT_FILE = path.join(__dirname, '..', 'data', 'revisits.json');
     let list = [];

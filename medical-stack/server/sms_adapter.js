@@ -69,6 +69,10 @@ const TEMPLATES = {
   seeker_report: (v) => `【命理宝鉴】您求测的${v.category || '命理'}报告已完成核对，请登录个人中心「我的报告」查看。内容仅供参考。`,
   // 移植自 tcm：治疗预约提醒（机构版，流程性通知）
   therapy_booked: (v) => `【命理宝鉴】${v.patient}：您已预约 ${v.time || '近日'} ${v.service}（${v.therapist || '治疗师'}）。禁忌提示：${v.contraindication || '无'}。如需取消请致电医馆。`,
+  // 移植自 tcm D12：检验复查提醒建档确认（机构版，流程性通知；tcm 原文案品牌已按 ADR-009 适配）
+  followup_recheck: (v) => `【命理宝鉴·医道】已为您建立复查提醒：${v.items || '相关指标'} 等指标异常，建议${v.when || '择期复查'}，届时将再次提醒您。（AI 随访助手，退订回 T）`,
+  // 移植自 tcm E2：复诊召回超 48h 未响应升级派发（机构版，流程性通知）
+  revisit_escalate: (v) => `【命理宝鉴·医道】${v.patient || '您'}的复诊提醒已超过 48 小时未响应，${v.reason || '建议尽快复诊调方'}。请通过预约入口挂号或联系本院。（AI 随访助手，退订回 T）`,
 };
 
 // ── 出站记录（mock outbox）──
@@ -232,6 +236,14 @@ function vaultGetByHash(phoneHash) {
   return null;
 }
 
+/** 通道配置状态（对拍 tcm smsChannel：是否已配置真实运营商通道；本侧真实通道未接 SDK 时仍诚实报 mock） */
+function smsChannel() {
+  const cfg = loadConfig();
+  return cfg.enabled
+    ? { configured: true, provider: cfg.provider || null, note: 'carrier 配置在案，SDK 未接时外发降级 mock' }
+    : { configured: false };
+}
+
 module.exports = { sendCode, verifyCode, sendNotice, containsMingli, TEMPLATES,
-  hashPhone, maskPhone, vaultSet, vaultGet, vaultGetByHash,
+  hashPhone, maskPhone, vaultSet, vaultGet, vaultGetByHash, smsChannel,
   _paths: { OUTBOX_DIR, VERIFY_FILE, CONFIG_FILE, VAULT_FILE } };

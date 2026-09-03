@@ -1,6 +1,5 @@
-// 数字孪生服务端引擎 V2.0（D3 深化 · 契约 v1.3.2）
-// 【吸收自 tcm-agent 2026-09-01 · HEAD 17dc1ce · 契约 v1.3.4 含 D5 风险召回】
-// 按 TCM-ABSORPTION-SPEC 移植：逻辑原样、仅改头部标注；医学域不二次训练。
+// 数字孪生服务端引擎 V2.0（D3 深化 · 契约 v1.4.0 含 D11 居家检验链）
+// 【吸收自 tcm-agent 2026-09-03 · HEAD dc2acb0 · 按 TCM-ABSORPTION-SPEC 整件移植，逻辑原样仅改标注；医学域不二次训练】
 // 单一事实源：真实诊疗事件（病历签发/处方/随访完成）→ snapshot 落库 data/twin/<patient_id>.json
 // 前端 app/js/digital-twin.js 保留为「假设演算（what-if · 不入档）」本地预览，不产生档案。
 //
@@ -191,7 +190,9 @@ function analyzeTrends(snaps) {
 
 function extractRiskFactors(snaps) {
   const risks = [];
-  const scored = snaps.map(s => (s.health_score && s.health_score.total) || 50);
+  // D11：declining_health 只看临床事件（病历/随访/补录）——纯数据快照（处方/居家检验）不参评，防误召回
+  const clinical = snaps.filter(s => ['emr', 'followup', 'manual'].includes(s.source));
+  const scored = clinical.map(s => (s.health_score && s.health_score.total) || 50);
   if (scored.length >= 2 && scored[scored.length - 1] < 60 && scored[scored.length - 2] < 60)
     risks.push({ type: 'declining_health', level: 'high', detail: '连续两次健康评分低于 60 分', suggestion: '建议全面检查，复辨证治' });
   const tongueAbn = snaps.filter(s => s.features && s.features.tongueColor && s.features.tongueColor !== '淡红').length;
@@ -206,6 +207,20 @@ function extractRiskFactors(snaps) {
   const worsened = snaps.filter(s => s.source === 'followup' && s.effect === 'worsened').length;
   if (worsened >= 1)
     risks.push({ type: 'followup_worsened', level: 'high', detail: '随访反馈加重 ' + worsened + ' 次', suggestion: '建议尽快复诊调方' });
+  // D11：居家复查同一指标持续异常（≥2 次且首尾跨度 ≥7 天）→ 中危召回
+  const labFlag = {};
+  snaps.filter(s => s.source === 'home_lab' && Array.isArray(s.labs)).forEach(s => {
+    s.labs.forEach(l => {
+      if (!l.flag || l.flag === '正常') return;
+      (labFlag[l.name] = labFlag[l.name] || []).push(s.timestamp);
+    });
+  });
+  Object.keys(labFlag).forEach(name => {
+    const ts = labFlag[name].sort();
+    const span = new Date(ts[ts.length - 1]) - new Date(ts[0]);
+    if (ts.length >= 2 && span >= 7 * 86400000)
+      risks.push({ type: 'persistent_lab_abnormal', level: 'medium', detail: '指标「' + name + '」居家复查持续异常（' + ts.length + ' 次，跨度 ' + Math.round(span / 86400000) + ' 天）', suggestion: '建议复查确认，纳入辨证参考' });
+  });
   return risks;
 }
 
@@ -246,6 +261,35 @@ function snapshotFromFollowup(fu) {
   };
 }
 
+// D11（契约 v1.4.0）：居家报告解读 → 孪生 lab 快照（携带指标值与判读标记，供指标轨迹/持续异常风险用）
+function snapshotFromHomeLab(rec) {
+  return {
+    event_id: rec.report_id, source: 'home_lab', timestamp: rec.created_at,
+    chief: rec.headline || '', syndrome: '', formula: '',
+    symptoms: [], labs_count: (rec.labs || []).length,
+    labs: (rec.labs || []).slice(0, 60).map(l => ({ name: l.name, value: l.value, raw: l.raw, unit: l.unit || '', flag: l.flag || '' })),
+    patterns: rec.patterns || [],
+    features: extractFeatures({ chief: rec.headline || '', symptoms: [], tongue: [], pulse: [] })
+  };
+}
+
+// D11 指标轨迹：跨 home_lab 快照按指标聚合时序（≥2 点给方向，单点列出）
+function labTrajectory(snaps) {
+  const series = {};
+  snaps.filter(s => s.source === 'home_lab' && Array.isArray(s.labs)).forEach(s => {
+    s.labs.forEach(l => {
+      if (l.value == null || isNaN(l.value)) return;
+      (series[l.name] = series[l.name] || []).push({ ts: s.timestamp, value: l.value, flag: l.flag || '' });
+    });
+  });
+  return Object.keys(series).map(name => {
+    const pts = series[name].sort((a, b) => String(a.ts).localeCompare(String(b.ts)));
+    const first = pts[0].value, last = pts[pts.length - 1].value;
+    const direction = pts.length < 2 ? 'single' : (last > first * 1.02 ? 'up' : last < first * 0.98 ? 'down' : 'flat');
+    return { name, points: pts, latest_flag: pts[pts.length - 1].flag, direction };
+  }).sort((a, b) => b.points.length - a.points.length);
+}
+
 // ─── 存储：load / addSnapshot（event_id 幂等）/ save ───
 function twinFile(patientId) { return path.join(TWIN_DIR, patientId + '.json'); }
 
@@ -269,7 +313,7 @@ function saveTwin(twin) {
 // 不覆盖 followup_worsened——该信号 R719 已在随访完成链路直接建单，避免双份。
 // 幂等：同患者同风险类型——pending/scheduled 单 14 天内不重复；已闭环单 7 天静默期（防每快照刷屏，逾期风险仍在则合理再召回）。
 const REVISIT_FILE = path.join(__dirname, '..', 'data', 'revisits.json');
-const ESCALATE_TYPES = { chronic_condition: 'high', declining_health: 'high', persistent_tongue_abnormal: 'medium' };
+const ESCALATE_TYPES = { chronic_condition: 'high', declining_health: 'high', persistent_tongue_abnormal: 'medium', persistent_lab_abnormal: 'medium' };
 
 function escalateRisks(patientId, snaps) {
   const risks = extractRiskFactors(snaps).filter(r => ESCALATE_TYPES[r.type]);
@@ -310,26 +354,30 @@ function escalateRisks(patientId, snaps) {
   return { escalated };
 }
 
-function addSnapshot(patientId, snap) {
+function addSnapshot(patientId, snap, opts) {
   if (!patientId || !snap || !snap.event_id) return { ok: false, error: 'missing patient_id/event_id' };
   const twin = loadTwin(patientId) || { patient_id: patientId, created_at: snap.timestamp, snapshots: [] };
   if (twin.snapshots.some(s => s.event_id === snap.event_id)) return { ok: true, added: false, count: twin.snapshots.length };
-  // 评分注入：历史计数用于趋势分
+  // 评分注入：历史计数用于趋势分（D11：home_lab 为纯数据事件，不注入健康分——避免稀释趋势/误触 declining_health）
   const hist = twin.snapshots.length;
-  snap.health_score = calcHealthScore(snap.features, {
-    symptomCount: (snap.symptoms || []).length,
-    labCount: snap.labs_count || 0,
-    historyCount: hist
-  });
-  snap.organ_scores = calcOrganScores(snap.features);
+  if (snap.source !== 'home_lab') {
+    snap.health_score = calcHealthScore(snap.features, {
+      symptomCount: (snap.symptoms || []).length,
+      labCount: snap.labs_count || 0,
+      historyCount: hist
+    });
+    snap.organ_scores = calcOrganScores(snap.features);
+  }
   twin.snapshots.push(snap);
   twin.snapshots.sort((a, b) => String(a.timestamp).localeCompare(String(b.timestamp)));
   if (twin.snapshots.length > MAX_SNAPSHOTS) twin.snapshots = twin.snapshots.slice(-MAX_SNAPSHOTS);
   twin.updated_at = new Date().toISOString();
   saveTwin(twin);
-  // D5：风险信号 → 主动召回（失败不阻断主链）
+  // D5：风险信号 → 主动召回（失败不阻断主链；E2 修正：启动回填 skipEscalate——历史淤积数据不应在每次重启时批量再开召回单，召回只属于实时事件）
   let esc = { escalated: 0 };
-  try { esc = escalateRisks(patientId, twin.snapshots); } catch (e) { console.error('[twin] 风险召回失败:', e.message); }
+  if (!opts || !opts.skipEscalate) {
+    try { esc = escalateRisks(patientId, twin.snapshots); } catch (e) { console.error('[twin] 风险召回失败:', e.message); }
+  }
   return { ok: true, added: true, count: twin.snapshots.length, escalated: esc.escalated };
 }
 
@@ -338,18 +386,21 @@ function computeModel(patientId) {
   const twin = loadTwin(patientId);
   if (!twin || !twin.snapshots.length) return null;
   const latest = twin.snapshots[twin.snapshots.length - 1];
+  // D11：评分/五脏/体质取最近一次「有评分」的快照（居家检验快照不评分，避免最新快照无分导致面板掉分）
+  const latestScored = twin.snapshots.slice().reverse().find(s => s.health_score && s.health_score.total != null) || latest;
   return {
     patient_id: patientId,
     snapshot_count: twin.snapshots.length,
     updated_at: twin.updated_at,
-    health_score: latest.health_score,
-    organ_scores: latest.organ_scores,
-    constitution: inferConstitution(Object.assign({}, latest.features || {}, {
-      complaint: ((latest.features && latest.features.complaint) || '') + ' ' + (latest.syndrome || '')
+    health_score: latestScored.health_score,
+    organ_scores: latestScored.organ_scores,
+    constitution: inferConstitution(Object.assign({}, latestScored.features || {}, {
+      complaint: ((latestScored.features && latestScored.features.complaint) || '') + ' ' + (latestScored.syndrome || '')
     })),
     trends: analyzeTrends(twin.snapshots),
     risk_factors: extractRiskFactors(twin.snapshots),
     syndrome_trajectory: syndromeTrajectory(twin.snapshots),
+    lab_trajectory: labTrajectory(twin.snapshots),
     timeline: twin.snapshots.slice(-30).reverse().map(s => ({
       ts: s.timestamp, source: s.source, chief: s.chief, syndrome: s.syndrome,
       formula: s.formula, effect: s.effect || null,
@@ -373,14 +424,14 @@ function backfillTwins(dataDir) {
           const c = JSON.parse(fs.readFileSync(path.join(ccDir, f), 'utf8'));
           const pid = c.patient && c.patient.patient_id;
           if (!pid) continue;
-          const r = addSnapshot(pid, snapshotFromCase(c));
+          const r = addSnapshot(pid, snapshotFromCase(c), { skipEscalate: true });
           if (r.added) added++;
           seen.add(pid);
         } catch (e) {}
       }
     }
   } catch (e) {}
-  // ② 处方
+  // ② 处方（E4 修正：只为有病历背书或孪生档已存在的患者补快照——处方流不再单独复活已归档/已清理的孪生，止住复活循环）
   try {
     const rxFile = path.join(dataDir, 'prescriptions', 'records.jsonl');
     if (fs.existsSync(rxFile)) {
@@ -388,23 +439,42 @@ function backfillTwins(dataDir) {
         try {
           const rx = JSON.parse(ln);
           if (!rx.patient_id || !rx.rx_id) continue;
-          const r = addSnapshot(rx.patient_id, snapshotFromRx(rx));
+          if (!seen.has(rx.patient_id) && !fs.existsSync(twinFile(rx.patient_id))) continue;
+          const r = addSnapshot(rx.patient_id, snapshotFromRx(rx), { skipEscalate: true });
           if (r.added) added++;
           seen.add(rx.patient_id);
         } catch (e) {}
       }
     }
   } catch (e) {}
-  // ③ 已完成随访
+  // ③ 已完成随访（同 E4 口径：不单独复活孪生）
   try {
     const fuFile = path.join(dataDir, 'followups.json');
     if (fs.existsSync(fuFile)) {
       const list = JSON.parse(fs.readFileSync(fuFile, 'utf8') || '[]');
       for (const fu of list) {
         if (fu.status !== 'completed' || !fu.patient_id || !fu.id) continue;
-        const r = addSnapshot(fu.patient_id, snapshotFromFollowup(fu));
+        if (!seen.has(fu.patient_id) && !fs.existsSync(twinFile(fu.patient_id))) continue;
+        const r = addSnapshot(fu.patient_id, snapshotFromFollowup(fu), { skipEscalate: true });
         if (r.added) added++;
         seen.add(fu.patient_id);
+      }
+    }
+  } catch (e) {}
+  // ④ D11：居家报告解读（lab-interpretations.json → home_lab 快照）
+  try {
+    const hlFile = path.join(dataDir, 'lab-interpretations.json');
+    if (fs.existsSync(hlFile)) {
+      const all = JSON.parse(fs.readFileSync(hlFile, 'utf8') || '{}');
+      for (const pid of Object.keys(all)) {
+        if (!Array.isArray(all[pid])) continue;
+        if (!seen.has(pid) && !fs.existsSync(twinFile(pid))) continue; // E4：不单独复活
+        for (const rec of all[pid]) {
+          if (!rec.report_id && !rec.id) continue;
+          const r = addSnapshot(pid, snapshotFromHomeLab({ report_id: rec.report_id || rec.id, created_at: rec.created_at, labs: rec.labs, headline: rec.headline, patterns: rec.patterns }), { skipEscalate: true });
+          if (r.added) added++;
+        }
+        if (all[pid].length) seen.add(pid);
       }
     }
   } catch (e) {}
@@ -414,6 +484,7 @@ function backfillTwins(dataDir) {
 
 module.exports = {
   addSnapshot, computeModel, backfillTwins,
-  snapshotFromCase, snapshotFromRx, snapshotFromFollowup,
+  snapshotFromCase, snapshotFromRx, snapshotFromFollowup, snapshotFromHomeLab,
+  labTrajectory,
   calcHealthScore, calcOrganScores, inferConstitution, extractFeatures
 };

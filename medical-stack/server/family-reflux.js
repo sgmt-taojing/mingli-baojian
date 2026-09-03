@@ -309,4 +309,11 @@ function registerRoutes(app) {
   console.log('🏠 G13 报告回流供给侧已挂载（/api/reflux/* + tcm 同构别名 /api/report-link/{bind,unbind,status,push-queue}，命理批注结构性剥离 + 文本守卫）');
 }
 
-module.exports = { registerRoutes, mingliScan, pushByPhone: (phone, o) => pushByPhone(phone, o), pushForName: (name, o) => pushForName(name, o) };
+// 凭 lnk_ 令牌反查绑定（phone/patient_name），供 lab/interpret 等内化路由归档用（吸收 tcm reportLink.linkByToken 的等价实现）
+function linkByToken(token) {
+  if (!db || !token) return null;
+  const row = db.prepare(`SELECT phone, patient_name, created_at FROM reflux_links WHERE link_token=?`).get(String(token));
+  return row || null;
+}
+
+module.exports = { registerRoutes, mingliScan, linkByToken, pushByPhone: (phone, o) => pushByPhone(phone, o), pushForName: (name, o) => pushForName(name, o) };

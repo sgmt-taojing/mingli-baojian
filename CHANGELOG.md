@@ -1,5 +1,17 @@
 # mingli-baojian 更新日志
 
+## 2026-09-03 午 · tcm v1.4.3 增量 3 条差集吸收完成（D9-D12 居家检验解读链 + E2 召回升级）
+- **背景**：09-03 早巡检新检出 3 条 API 差集（get /api/lab/panel、post /api/lab/interpret、post /api/family/revisits/escalate），按 TCM-ABSORPTION-SPEC 全流程吸收（移植→适配→冒烟→对拍门→留证），溯源 tcm HEAD dc2acb0
+- **lab-interpreter.js 整件移植**：56 项指标目录/别名/拼音首字母/文本解析/白话判读，无外部依赖，node --check 过
+- **twin-engine.js 整件追平 dc2acb0**（原基线 17dc1ce 滞后）：D11 declining_health 只看临床事件、persistent_lab_abnormal 中危召回、home_lab 快照不注入健康分、latestScored 面板口径、E2 启动回填 skipEscalate、E4 处方/随访不单独复活孪生、回填④居家解读源、lab_trajectory 入 panel——diff 核对仅头部标注差异
+- **api-server.js 四块**：① labInterpreter/smsAdapter 依赖引入；② HOME_LAB_FILE + homeLabAdd/homeLabLatest（每患者 20 份落盘 lab-interpretations.json）；③ /api/clinic/session 建档 D10 居家旁证自动并入（90 天窗口、source:'home' 标记、evidence 时间线 🏠 条目、home_lab_merged 防 PUT 重复、响应带 home_labs）；④ /api/lab/panel + /api/lab/interpret 路由 + escalateStaleRevisits + POST /api/family/revisits/escalate + GET revisits 惰性触发
+- **适配点**（tcm → 本侧）：reportLink.linkByToken/pushForPatient → family-reflux linkByToken（新导出，凭 lnk_ 令牌反查 reflux_links）/ pushByPhone（自带命理守卫+白名单+本院收件箱）；tcm 自由文本短信 → 本侧模板化 sms_adapter（新增 followup_recheck / revisit_escalate 两模板，品牌按 ADR-009 作【命理宝鉴·医道】，命理守卫内置）；patient_id 由 patientIndex.resolvePatientId(null, patient_name) 解析
+- **冒烟全绿**：panel 54 项双侧清单一致；interpret 五入参（labs 数组/text 文本/空 400/不识文本 422/性别年龄）全过；归档链端到端——lnk_ 绑定 → interpret 归档 → lab-interpretations.json 落盘 → twin home_lab 快照（event_id 幂等）→ FU-LAB 复查单（urgency=soon 7 天）→ mock 短信 outbox 落盘 → family hospital_reports 送达；30 天幂等二次不重复建单；命理守卫阴性（八字/日主/排盘标题 MINGLI_STRIPPED_BLOCK 拒发）；escalate 49h 陈旧单升级 channel=sms、二次调用幂等 0；GET revisits 惰性触发验证；D10 建档并入 home_labs 计数正确
+- **对拍门 PASS**：`equiv-dual-run.py --gate absorb` 端点零差异 + Recall@K 双侧 0.8333/0.8333 Δ=0.0000（≤0.02），gate_token 已写（TTL 1800s）
+- **顺手根修 L2 盲区**：capability-diff.py exports() 原正则只抓两空格缩进方法简写，漏 module.exports 裸标识符列表（twin-engine snapshotFromHomeLab 漏报即实证）——补键值对+裸标识符双形式解析
+- **巡检复跑 clean**：missing_api 0、module_diffs 空（smsChannel 已补等价导出）、seed_missing 空、processor_drift 空、js_drift 空；page_gap 53 属 G16 L4 定性表管理范围不阻断
+- **测试数据全清**：reflux_links/lab-interpretations/twin 档/FU-LAB 单/RV-SMOKE 双单/phone-vault/consult-session/outbox 测试行/family hospital_reports 测试行/patients.sqlite 冒烟患者 4 行，WAL checkpoint 已做；全程虚构数据，纪律合规（只移植不训练、命理合流仅限批注层）
+
 ## 2026-09-03 早 · 防线扩 js 层：js-adapt-registry 单一真源 + L4.5 升级 + 守卫 --staged 扩 js
 - **登记册外置**：KNOWN_JS_ADAPT 从 capability-diff.py 内嵌字典迁到 `medical-stack/patches/js-adapt-registry.json`（known_adapt 4 项 + 新增 ms_own 2 项：mingli-annotation-view.js / reflux-badge.js），capability-diff 与 check-tcm-page-drift 共读一源，两处口径永不漂移
 - **L4.5 升级**：扫描从顶层 *.js 扩到 rglob（vendor/ 子目录纳管——vendor/qrcode.min.js 双侧哈希一致已备注）；ms 侧多出文件分档：⚪ ms 自有（已登记）/ ⚠ 未登记（提示登记，不破 clean）

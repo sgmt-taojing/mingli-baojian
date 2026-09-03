@@ -1,8 +1,80 @@
+## 2026-09-03 17:00 — 💚 心跳 17:00 全绿（cron 30min · 傍晚安静期 · 无新 KB）
+- 健康检查全绿（17:01:29 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～16:00）；17:00 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（傍晚等用户动作）
+
+## 2026-09-03 16:00 — 💚 心跳 16:00 全绿（cron 30min · 午后安静期 · 无新 KB）
+- 健康检查全绿（16:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～15:30）；16:00 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（午后等用户动作）
+
+## 2026-09-03 15:30 — 💚 心跳 15:30 全绿（cron 30min · 午后安静期 · 无新 KB）
+- 健康检查全绿（15:30:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～15:00）；15:30 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口（v1.4.3 增量 3 条全链移植）③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（午后等用户动作）
+
+## 2026-09-03 15:00 — 💚 心跳 15:00 全绿（cron 30min · 午后安静期 · 无新 KB）
+- 健康检查全绿（15:01:47 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条（distill-2026-09-03.jsonl 23472B）已多次节点覆盖（05:00～14:00）；15:00 无新 distill-*.py 执行（mtime 复验 02:05）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口（v1.4.3 增量 3 条全链移植）③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（午后等用户动作）
+
+## 2026-09-03 14:00 — 💚 心跳 14:00 全绿（cron 30min · 午间安静期 · 无新 KB）
+- 健康检查全绿（14:01:35 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～13:00）；14:00 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条（lab/panel, lab/interpret, family/revisits/escalate）→ 09:05 登记待走 TCM-ABSORPTION-SPEC ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（午间等用户动作）
+
+## 2026-09-03 13:00 — 💚 心跳 13:00 全绿（cron 30min · 午间安静期 · 无新 KB）
+- 健康检查全绿（13:03:38 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～11:00）；13:00 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条（lab/panel, lab/interpret, family/revisits/escalate）→ 09:05 登记待走 TCM-ABSORPTION-SPEC ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（午间等用户动作）
+
+## 2026-09-03 11:00 — 💚 心跳 11:00 全绿（cron 30min · 上午安静期 · 无新 KB）
+- 健康检查全绿（11:02:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖；11:00 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条（lab/panel, lab/interpret, family/revisits/escalate）→ 09:05 登记待走 TCM-ABSORPTION-SPEC ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（上午等用户动作）
+
 # KANBAN.md — 命理宝鉴 项目看板
+
+## 2026-09-03 10:30 — 💚 心跳 10:30 全绿（cron 30min · 上午安静期 · 无新 KB）
+- 健康检查全绿（10:30:15 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00/05:30/06:00/06:30/07:00/08:00/09:00/09:30/10:00），10:30 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条（lab/panel, lab/interpret, family/revisits/escalate）→ 09:05 登记待走 TCM-ABSORPTION-SPEC ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（上午等用户动作）
+
+## 2026-09-03 10:30 — 💚 心跳 10:30 全绿（cron 30min · 上午安静期 · 无新 KB）
+- 健康检查全绿（10:30:14 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00/05:30/06:00/06:30/07:00/08:00/09:00/09:30/10:00），10:30 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.0KB / 02:05:14 mtime）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条（lab/panel, lab/interpret, family/revisits/escalate）→ 09:05 登记待走 TCM-ABSORPTION-SPEC ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（上午等用户动作）
+
+## 2026-09-03 10:00 — 💚 心跳 10:00 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（09:30:07 实探，与上节点同步）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00/05:30/06:00/06:30/07:00/08:00/09:00/09:30），10:00 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.0KB）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条（lab/panel, lab/interpret, family/revisits/escalate）→ 09:05 登记待走 TCM-ABSORPTION-SPEC ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
+## 2026-09-03 09:30 — 💚 心跳 09:30 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（09:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00/05:30/06:00/06:30/07:00/08:00/09:05），09:00/09:30 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.0KB）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条（lab/panel, lab/interpret, family/revisits/escalate）→ 09:05 登记待走 TCM-ABSORPTION-SPEC ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间等用户动作）
+
+## 2026-09-03 14:10 — ✅ tcm v1.4.3 增量 3 条差集吸收收口（溯源 HEAD dc2acb0）
+- lab/panel + lab/interpret + family/revisits/escalate 全链移植适配：lab-interpreter 整件、twin-engine 追平 dc2acb0（D11/E2/E4）、D10 建档旁证并入、D11 孪生 home_lab 快照、D12 复查提醒（模板化短信【命理宝鉴·医道】）、E2 48h 召回升级
+- 冒烟全绿（五入参/归档链/幂等/守卫阴性/惰性触发）+ 对拍门 PASS（零差异 + Recall Δ=0.0000）+ 巡检复跑 clean（missing_api 0、module_diffs 空）
+- 顺手根修 L2 exports() 裸标识符盲区；smsChannel 等价导出补齐
+- 测试数据全清（reflux/twin/followup/revisit/vault/outbox/family/patients 9 处）；CHANGELOG 已记
 
 ## 2026-09-03 09:05 — ✅ 防线扩 js 层（登记册单一真源）
 - js-adapt-registry.json 外置共读（capability-diff L4.5 + 守卫）；L4.5 扫 vendor + ms 自有/未登记分档；守卫 --staged 扩 js（正负向实测全过）
-- 📥 新差集待吸收：tcm v1.4.3 增量 3 条（lab/panel、lab/interpret、family/revisits/escalate）→ 走 TCM-ABSORPTION-SPEC
+- 📥 新差集待吸收：tcm v1.4.3 增量 3 条（lab/panel、lab/interpret、family/revisits/escalate）→ 走 TCM-ABSORPTION-SPEC —— 14:10 已收口（见上条）
 
 ## 2026-09-03 09:00 — ✅ G18 防线上线（tcm 源页面漂移守卫）
 - check-tcm-page-drift.py 双模式：链上审计（链 2a，先于重放，疑似未补丁化本地改动 rc=2 告警+台账）+ pre-commit 拦截（staged∩漂移即拒，带处置指引）
@@ -1866,3 +1938,9 @@
 - KB 蒸馏新进展：09-03 02:03 起生成 `distill-2026-09-03.jsonl` 20 行（≈与 09-02 同体量），首条为「六爻断卦完整流程与用神旺衰」（liuyao 模块）
 - 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② 节点 0/0 无未收口开发项
 - 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
+## 2026-09-03 14:30 — 💚 心跳 14:30 全绿（cron 30min · 下午安静期 · 无新 KB）
+- 健康检查全绿（14:30:20 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖；14:30 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集 3 条已 14:10 收口
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（下午等用户动作）
