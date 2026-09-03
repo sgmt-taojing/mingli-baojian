@@ -171,7 +171,7 @@ def main() -> int:
             mod_diffs[mod] = miss
 
     seed_missing = []
-    for seed in ['doctor-profiles.json']:
+    for seed in ['doctor-profiles.json', 'teaching-cases.json']:
         if (TCM / 'data' / seed).exists() and not (MS / 'data' / seed).exists():
             seed_missing.append(seed)
 

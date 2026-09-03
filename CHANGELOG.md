@@ -1,5 +1,20 @@
 # mingli-baojian 更新日志
 
+## 2026-09-03 晚 · D9 前端落面 + E5/E6/E7 教学池整链吸收（相似医案空壳修真）
+- **lab-interpret.html 内化**：tcm 体检报告解读页落 medical-stack/app，标题品牌补丁 `brand-lab-interpret-title.json`（命理宝鉴·医道），走 G18 重放器产出（不手改）；home-tcm/my-reports 互链磁贴已随链上重放就位；浏览器实测粘贴→解读→总览/模式识别/逐项白话/就诊话术/中医佐证全渲染
+- **E5/E6/E7 教学池整链吸收**（溯源 tcm HEAD d33f28c/c45bbfd，契约 v1.4.7）：
+  - 数据：`data/teaching-cases.json` 160 例 9 病种（外感36/脾胃48/杂病29/肺系15/神志10/心脑8/肝肾7/妇科5/儿科2）
+  - 加载：loadTcmCases + loadTeachingCases + state 双池（tcmCases/teachingCases）
+  - **POST /api/tcm/cases 桩修真**：原「TODO 写入数据库」空壳 → state.tcmCases 内存 + data/tcm-cases/ 异步落盘（confirmed-cases 同模式）
+  - **GET /api/tcm/cases/similar 桩修真**：原「永远返回空+开发中」空壳 → buildCasePool 三池统一 + scoreCasePool 症状/舌脉/证型重叠评分（Jaccard 归一+证型+3+舌脉各+1）
+  - **GET /api/tcm/teaching-cases 新增**：按病种浏览教学案（area 精确/q 模糊/limit），供 disease-kb 页
+  - **diagnose 第 5 步挂钩**：report.similar_cases top3 带 teaching 徽标下发——clinic-desk 既有渲染路径（教学 chip/来源标签）直接点亮，此前页面徽标逻辑随重放就位但后端无数据，徽标永远不亮，本轮闭环
+- **冒烟全绿**：teaching-cases 全量/病种过滤、similar 症状检索命中教学池、diagnose 相似医案 3 条 teaching=true、POST cases 落盘核验、disease-kb 浏览器端到端渲染 160 池
+- **对拍门 PASS**（零差异 + Recall Δ≤0.02）+ 巡检 clean（missing_api 0）+ 漂移守卫 rc=0
+- **巡检加固**：seed 监控名单补 teaching-cases.json（教学池扩编防漏跟）
+- **口径澄清**：L4 page_gap=53 是「tcm app vs 主栈 app」口径；medical-stack/app 与 tcm 页面层差为 0（66 vs 65，多 1 页为本侧自有）——页面层已全量对齐
+- 测试数据已清（冒烟病例落盘件删除）；纪律合规：只移植不训练，教学池只进检索演示面不进签发/孪生
+
 ## 2026-09-03 午 · tcm v1.4.3 增量 3 条差集吸收完成（D9-D12 居家检验解读链 + E2 召回升级）
 - **背景**：09-03 早巡检新检出 3 条 API 差集（get /api/lab/panel、post /api/lab/interpret、post /api/family/revisits/escalate），按 TCM-ABSORPTION-SPEC 全流程吸收（移植→适配→冒烟→对拍门→留证），溯源 tcm HEAD dc2acb0
 - **lab-interpreter.js 整件移植**：56 项指标目录/别名/拼音首字母/文本解析/白话判读，无外部依赖，node --check 过

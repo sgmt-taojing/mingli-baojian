@@ -1,5 +1,8 @@
-# 运行时状态与大数据（不入库）
-data/
+# 运行时状态与大数据（不入库；**/ 前缀覆盖 server/data 等任意层级，含 phone-vault/sms-outbox 敏感件）
+**/data/*
+# 知识资产例外（蒸馏教学池/医师档案，无患者数据，与 tcm 侧同规入库）
+!data/teaching-cases.json
+!data/doctor-profiles.json
 server/kb-store/tcm-synced-kb.json
 server/kb-store/ota-*.json
 nohup.out

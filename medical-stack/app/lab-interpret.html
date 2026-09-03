@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>体检报告智能解读 · 命理宝鉴·医道</title>
+<meta name="description" content="粘贴或录入体检/化验报告指标，AI 逐项白话解读：这是什么、要不要紧、怎么调理、就诊时跟医生说什么，并给出中医视角佐证">
+<link rel="manifest" href="/pwa/manifest.json"><link rel="apple-touch-icon" href="/pwa/icon-192.png"><meta name="theme-color" content="#6b3a1f"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="报告解读">
+<style>
+:root{--bg:#fff8ee;--card:#fff;--primary:#b8860b;--primary-dark:#8b6914;--accent:#c0392b;--green:#2e8b57;--blue:#2563eb;--orange:#d97706;--text:#2c1810;--text2:#6b5b4f;--border:#e8dfc8}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft YaHei',sans-serif;min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding:14px}
+.topbar{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;border-radius:16px;padding:18px 20px;margin-bottom:14px}
+.topbar h1{font-size:21px;margin-bottom:4px}
+.topbar .sub{font-size:12px;opacity:.92;line-height:1.6}
+.topbar a{color:#ffe9b0}
+.card{background:var(--card);border-radius:14px;border:1px solid var(--border);padding:16px;margin:10px 0}
+.input,select.input,textarea.input{width:100%;padding:13px;border:1px solid var(--border);border-radius:10px;font-size:16px;margin-bottom:10px;background:#fff;color:var(--text)}
+textarea.input{min-height:120px;resize:vertical;font-size:14px;line-height:1.7}
+.btn{width:100%;border:none;border-radius:10px;padding:13px;font-size:16px;font-weight:600;cursor:pointer;background:var(--primary);color:#fff}
+.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn.blue{background:var(--blue)}
+.btn:active{transform:scale(.98)}
+.btn-row{display:flex;gap:8px}.btn-row .btn{flex:1}
+.hint{font-size:12px;color:var(--text2);line-height:1.7}
+.sec-title{font-size:14px;font-weight:700;color:var(--primary-dark);margin:14px 2px 6px}
+.tabs{display:flex;gap:8px;margin-bottom:10px}
+.tab{flex:1;text-align:center;padding:9px;border-radius:9px;border:1px solid var(--border);background:#fdfbf6;font-size:14px;cursor:pointer;color:var(--text2)}
+.tab.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{background:#faf3e0;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:13px;display:flex;align-items:center;gap:6px}
+.chip b{color:var(--primary-dark)}
+.chip .x{cursor:pointer;color:var(--accent);font-weight:700}
+.suggest{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid var(--border);border-radius:10px;max-height:220px;overflow:auto;z-index:30;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.suggest .it{padding:10px 12px;font-size:14px;cursor:pointer;border-bottom:1px solid #f3ecdc}
+.suggest .it:active,.suggest .it:hover{background:#faf3e0}
+.suggest .it small{color:var(--text2);margin-left:6px}
+.urg-ok{border-left:5px solid var(--green)}
+.urg-routine{border-left:5px solid var(--blue)}
+.urg-soon{border-left:5px solid var(--orange)}
+.urg-critical{border-left:5px solid var(--accent);background:#fef2f2}
+.badge{display:inline-block;font-size:11px;border-radius:6px;padding:2px 8px;font-weight:600}
+.b-ok{background:#eaf7ee;color:var(--green)}
+.b-high{background:#fdecea;color:var(--accent)}
+.b-low{background:#e8f0fe;color:var(--blue)}
+.b-rec{background:#f3f4f6;color:#6b7280}
+.b-sev{background:#fff7ed;color:var(--orange);margin-left:4px}
+.lab-item{border:1px solid var(--border);border-radius:12px;padding:12px;margin:8px 0;background:#fffdf8}
+.lab-item.abn{background:#fff}
+.lab-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lab-name{font-size:15px;font-weight:700}
+.lab-val{font-size:17px;font-weight:700;color:var(--primary-dark)}
+.lab-item .what{font-size:12px;color:var(--text2);margin:4px 0;line-height:1.6}
+.lab-item .ref{font-size:11px;color:#a39384}
+.advice-box{margin-top:8px;background:#f0f7ff;border-left:4px solid var(--blue);border-radius:8px;padding:8px 12px;font-size:13px;color:#1e40af;line-height:1.7}
+.ask-box{margin-top:6px;background:#faf3e0;border-left:4px solid var(--primary);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--primary-dark);line-height:1.7}
+.tcm-box{margin-top:6px;background:#f3eef9;border-left:4px solid #7c3aed;border-radius:8px;padding:8px 12px;font-size:13px;color:#5b21b6;line-height:1.7}
+.pattern-card{background:#fff;border:1px solid #e9d8fd;border-radius:12px;padding:12px;margin:8px 0}
+.pattern-card h4{font-size:14px;color:#6d28d9;margin-bottom:4px}
+.pattern-card .plain{font-size:14px;line-height:1.7}
+.pattern-card .tcm{font-size:12px;color:#7c3aed;margin-top:4px}
+.critical-bar{background:var(--accent);color:#fff;border-radius:12px;padding:14px 16px;font-size:15px;font-weight:700;line-height:1.7;margin:10px 0}
+.cat-title{font-size:13px;font-weight:700;color:var(--text2);margin:14px 2px 2px}
+ol.adv{margin:6px 0 0 18px;font-size:14px;line-height:1.9}
+.disclaimer{font-size:11px;color:#a39384;line-height:1.7;margin:14px 4px;padding:10px;background:#fdfbf6;border-radius:10px;border:1px dashed var(--border)}
+.empty-hint{text-align:center;color:var(--text2);font-size:13px;padding:16px 0}
+.demo-link{font-size:12px;color:var(--blue);cursor:pointer;text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <h1>🧪 体检报告智能解读</h1>
+    <div class="sub">把体检/化验单的指标贴进来或逐项录入，AI 逐项用白话讲清楚：<b>这是什么、要不要紧、怎么调理、就诊时跟医生说什么</b>，并给出中医视角佐证。<br>返回 <a href="home-tcm.html">居家患者入口</a> · <a href="my-reports.html">我的医院报告</a></div>
+  </div>
+
+  <!-- ══ 录入区 ══ -->
+  <div class="card" id="input-card">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <select class="input" id="gender" style="flex:1;margin-bottom:0" aria-label="性别">
+        <option value="">性别（影响参考区间）</option><option value="男">男</option><option value="女">女</option>
+      </select>
+      <input class="input" id="age" type="number" min="0" max="120" placeholder="年龄（选填）" style="flex:1;margin-bottom:0" aria-label="年龄">
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" id="tab-paste" onclick="switchTab('paste')">📋 智能粘贴</div>
+      <div class="tab" id="tab-manual" onclick="switchTab('manual')">✍️ 逐项录入</div>
+    </div>
+
+    <div id="pane-paste">
+      <textarea class="input" id="paste-text" placeholder="把报告单上的文字复制粘贴到这里，例如：&#10;白细胞 6.5 ×10⁹/L&#10;血红蛋白 102 g/L ↓&#10;ALT 56 U/L ↑&#10;尿蛋白 阳性&#10;&#10;支持中文名、英文缩写（ALT/Hb/TSH…），自动识别数值、单位与升降箭头"></textarea>
+      <div class="hint">不会整理格式？直接从体检 App/报告单「复制文字」整段粘贴即可，引擎自动识别 54 项常见指标。<span class="demo-link" onclick="fillDemo()">试一段示例</span></div>
+      <button class="btn" style="margin-top:10px" onclick="interpretPaste()">🔍 开始智能解读</button>
+    </div>
+
+    <div id="pane-manual" style="display:none">
+      <div style="position:relative">
+        <input class="input" id="m-search" placeholder="输入指标名 / 缩写 / 拼音首字母（如 xdb、ALT）" autocomplete="off" aria-label="搜索指标">
+        <div class="suggest" id="m-suggest" style="display:none"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input class="input" id="m-value" placeholder="数值（或 阳性/阴性）" style="flex:2;margin-bottom:0" aria-label="结果值">
+        <button class="btn ghost" style="flex:1" onclick="addManual()">＋ 添加</button>
+      </div>
+      <div class="hint" id="m-ref-hint" style="margin:4px 2px"></div>
+      <div class="chips" id="m-chips"></div>
+      <button class="btn" onclick="interpretManual()">🔍 开始智能解读（<span id="m-count">0</span> 项）</button>
+    </div>
+  </div>
+
+  <!-- ══ 结果区 ══ -->
+  <div id="result" style="display:none">
+    <div class="card" id="ov-card">
+      <div class="sec-title" style="margin-top:0">📊 解读总览</div>
+      <div id="ov-headline" style="font-size:15px;font-weight:600;line-height:1.7"></div>
+      <div id="ov-urgency" style="margin-top:8px;font-size:14px;line-height:1.7"></div>
+    </div>
+    <div id="critical-box"></div>
+    <div id="pattern-box"></div>
+    <div class="sec-title">🔬 逐项解读</div>
+    <div id="items-box"></div>
+    <div class="card" id="tcm-card" style="display:none">
+      <div class="sec-title" style="margin-top:0">🀄 中医视角佐证</div>
+      <div id="tcm-text" style="font-size:13px;line-height:1.8;color:#5b21b6"></div>
+    </div>
+    <div class="card" id="life-card" style="display:none">
+      <div class="sec-title" style="margin-top:0">🌿 生活调理建议</div>
+      <ol class="adv" id="life-list"></ol>
+    </div>
+    <div class="card" id="ask-card" style="display:none">
+      <div class="sec-title" style="margin-top:0">🗣️ 就诊时告诉医生</div>
+      <ol class="adv" id="ask-list"></ol>
+    </div>
+    <div class="btn-row" style="margin:12px 0">
+      <button class="btn blue" onclick="location.href='patient-portal.html'">🗓️ 预约挂号</button>
+      <button class="btn" id="btn-save" onclick="saveReport()">💾 存到我的报告</button>
+      <button class="btn ghost" onclick="resetAll()">↺ 重新解读</button>
+    </div>
+    <div class="disclaimer" id="disclaimer"></div>
+  </div>
+
+  <div class="disclaimer">⚠️ 本解读由 AI 辅助生成，帮助您理解报告并为就诊做准备，<b>不构成诊断或治疗建议</b>；最终诊疗决策由执业医师作出。急危重症请立即按急诊流程处置（拨打 120）。<br>未登录绑定的解读不会保存；登录「我的医院报告」后解读结果自动归档。</div>
+</div>
+
+<script>
+var PANEL = [];
+var manualItems = [];   // {name, value, raw}
+var lastInterp = null;
+var TOKEN = localStorage.getItem('my_rpt_token') || '';
+
+fetch('/api/lab/panel').then(function(r){ return r.json(); }).then(function(d){ if (d.ok) PANEL = d.items; });
+
+function switchTab(t) {
+  document.getElementById('tab-paste').className = 'tab' + (t === 'paste' ? ' on' : '');
+  document.getElementById('tab-manual').className = 'tab' + (t === 'manual' ? ' on' : '');
+  document.getElementById('pane-paste').style.display = t === 'paste' ? '' : 'none';
+  document.getElementById('pane-manual').style.display = t === 'manual' ? '' : 'none';
+}
+
+function fillDemo() {
+  document.getElementById('paste-text').value =
+    '白细胞 6.5 ×10⁹/L\n血红蛋白(Hb) 102 g/L ↓\nMCV 75 fL\nMCH 25 pg\nALT 56 U/L ↑\n总胆固醇 6.8 mmol/L ↑\n甘油三酯 2.3 mmol/L ↑\n尿酸 470 μmol/L ↑\n空腹血糖 6.5 mmol/L\n尿蛋白 阴性';
+}
+
+// ── 逐项录入：联想搜索（名称/别名/拼音首字母）──
+var msInput = document.getElementById('m-search');
+var msBox = document.getElementById('m-suggest');
+var msPicked = null;
+msInput.addEventListener('input', function() {
+  var q = msInput.value.trim().toLowerCase();
+  msPicked = null;
+  document.getElementById('m-ref-hint').textContent = '';
+  if (!q) { msBox.style.display = 'none'; return; }
+  var hits = PANEL.filter(function(p) {
+    return p.key.toLowerCase().indexOf(q) >= 0 ||
+      (p.initials && p.initials.indexOf(q) === 0) ||
+      p.aliases.some(function(a){ return a.toLowerCase().indexOf(q) >= 0; });
+  }).slice(0, 8);
+  if (!hits.length) { msBox.style.display = 'none'; return; }
+  msBox.innerHTML = hits.map(function(p, i) {
+    return '<div class="it" data-key="' + p.key + '">' + p.key + '<small>' + p.cat + ' · ' + (p.ref_default || '文本项') + '</small></div>';
+  }).join('');
+  msBox.style.display = '';
+  Array.prototype.forEach.call(msBox.children, function(el) {
+    el.addEventListener('click', function() {
+      var p = PANEL.find(function(x){ return x.key === el.dataset.key; });
+      msPicked = p;
+      msInput.value = p.key;
+      msBox.style.display = 'none';
+      var g = document.getElementById('gender').value;
+      var ref = g === '男' ? p.ref_male : g === '女' ? p.ref_female : p.ref_default;
+      document.getElementById('m-ref-hint').textContent = p.what ? ('💡 ' + p.plain_what + '；参考：' + ref) : ('参考：' + ref);
+      document.getElementById('m-value').focus();
+    });
+  });
+});
+document.addEventListener('click', function(e){ if (e.target !== msInput) msBox.style.display = 'none'; });
+
+function addManual() {
+  if (!msPicked) { alert('请先从下拉建议中选择指标'); return; }
+  var v = document.getElementById('m-value').value.trim();
+  if (!v) { alert('请输入结果数值（文本项填 阳性/阴性）'); return; }
+  if (manualItems.some(function(i){ return i.name === msPicked.key; })) { alert('该指标已添加'); return; }
+  var num = parseFloat(v);
+  manualItems.push({ name: msPicked.key, value: isNaN(num) ? undefined : num, raw: v });
+  msInput.value = ''; document.getElementById('m-value').value = ''; msPicked = null;
+  document.getElementById('m-ref-hint').textContent = '';
+  renderChips();
+}
+function renderChips() {
+  document.getElementById('m-chips').innerHTML = manualItems.map(function(it, i) {
+    return '<span class="chip"><b>' + it.name + '</b> ' + it.raw + ' <span class="x" onclick="manualItems.splice(' + i + ',1);renderChips()">×</span></span>';
+  }).join('');
+  document.getElementById('m-count').textContent = manualItems.length;
+}
+
+// ── 调解读端点 ──
+function profile() {
+  return { gender: document.getElementById('gender').value, age: parseInt(document.getElementById('age').value, 10) || undefined };
+}
+function interpretPaste() {
+  var text = document.getElementById('paste-text').value.trim();
+  if (!text) { alert('请先粘贴报告文字'); return; }
+  doInterpret({ text: text });
+}
+function interpretManual() {
+  if (!manualItems.length) { alert('请先添加至少 1 项指标'); return; }
+  doInterpret({ labs: manualItems });
+}
+function doInterpret(body) {
+  var p = profile(); body.gender = p.gender; body.age = p.age;
+  if (TOKEN) body.link_token = TOKEN;
+  var btns = document.querySelectorAll('#input-card .btn');
+  btns.forEach(function(b){ b.disabled = true; });
+  fetch('/api/lab/interpret', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    .then(function(r){ return r.json(); })
+    .then(function(d) {
+      btns.forEach(function(b){ b.disabled = false; });
+      if (!d.ok) { alert(d.error || '解读失败'); return; }
+      lastInterp = d;
+      renderResult(d);
+    })
+    .catch(function(e){ btns.forEach(function(b){ b.disabled = false; }); alert('网络错误：' + e.message); });
+}
+
+// ── 结果渲染 ──
+var URG_CLASS = { ok: 'urg-ok', routine: 'urg-routine', soon: 'urg-soon', critical: 'urg-critical' };
+var URG_COLOR = { ok: 'var(--green)', routine: 'var(--blue)', soon: 'var(--orange)', critical: 'var(--accent)' };
+
+function flagBadge(it) {
+  if (it.flag === '正常') return '<span class="badge b-ok">正常</span>';
+  if (it.flag === '录') return '<span class="badge b-rec">已记录</span>';
+  var cls = it.flag === '低' ? 'b-low' : 'b-high';
+  var sev = it.severity && it.severity !== '轻' ? '<span class="badge b-sev">' + it.severity + '</span>' : '';
+  return '<span class="badge ' + cls + '">' + it.flag + '</span>' + sev;
+}
+
+function renderResult(d) {
+  document.getElementById('input-card').style.display = 'none';
+  var R = document.getElementById('result'); R.style.display = '';
+  var ov = d.overview;
+  document.getElementById('ov-card').className = 'card ' + URG_CLASS[ov.urgency];
+  document.getElementById('ov-headline').textContent = ov.headline;
+  document.getElementById('ov-urgency').innerHTML = '<b style="color:' + URG_COLOR[ov.urgency] + '">◉ ' + ov.urgency_label + '</b>　' + ov.urgency_desc +
+    (d.archived ? '<br><span style="color:var(--green);font-size:12px">✓ 已自动存入「我的医院报告」</span>' : (d.archive_hint ? '<br><span style="font-size:12px;color:var(--text2)">' + d.archive_hint + '</span>' : '')) +
+    (d.recheck ? '<br><span style="font-size:12px;color:var(--green)">🔔 已建立复查提醒（约 ' + d.recheck.days + ' 天后，' + String(d.recheck.due_at).slice(0, 10) + ' 前后，到点将短信提醒您）</span>' : '');
+
+  document.getElementById('critical-box').innerHTML = (d.criticals && d.criticals.length)
+    ? '<div class="critical-bar">🚨 危急值提醒<br>' + d.criticals.join('<br>') + '<br>请立即前往急诊或拨打 120，并携带本报告。</div>' : '';
+
+  document.getElementById('pattern-box').innerHTML = d.patterns.length
+    ? '<div class="sec-title">🧩 组合模式识别</div>' + d.patterns.map(function(p) {
+        return '<div class="pattern-card"><h4>' + p.name + '</h4><div class="plain">' + (p.plain || '') + '</div>' +
+          '<div class="tcm">中医视角：' + p.tcm + (p.advice ? '　·　' + p.advice : '') + '</div></div>';
+      }).join('') : '';
+
+  // 逐项：按类目分组
+  var byCat = {};
+  d.items.forEach(function(it) { (byCat[it.cat] = byCat[it.cat] || []).push(it); });
+  var html = '';
+  Object.keys(byCat).forEach(function(cat) {
+    html += '<div class="cat-title">▸ ' + cat + '</div>';
+    byCat[cat].forEach(function(it) {
+      var abn = it.flag !== '正常' && it.flag !== '录';
+      html += '<div class="lab-item' + (abn ? ' abn' : '') + '">' +
+        '<div class="lab-head"><span class="lab-name">' + it.name + '</span>' + flagBadge(it) +
+        '<span class="lab-val">' + it.value + (it.unit ? ' <small style="font-size:11px;font-weight:400">' + it.unit + '</small>' : '') + '</span></div>' +
+        (it.what ? '<div class="what">💡 ' + it.what + '</div>' : '') +
+        (it.ref_text ? '<div class="ref">参考区间：' + it.ref_text + '</div>' : '') +
+        (it.advice ? '<div class="advice-box">🌿 ' + it.advice + '</div>' : '') +
+        (it.ask ? '<div class="ask-box">🗣️ 就诊时告诉医生：' + it.ask + '</div>' : '') +
+        (abn && it.tcm_hint ? '<div class="tcm-box">🀄 中医佐证：' + it.tcm_hint + '</div>' : '') +
+        '</div>';
+    });
+  });
+  document.getElementById('items-box').innerHTML = html;
+
+  var tcmCard = document.getElementById('tcm-card');
+  if (d.tcm_corroboration && d.tcm_corroboration.indexOf('未见明显') < 0) {
+    tcmCard.style.display = '';
+    document.getElementById('tcm-text').textContent = d.tcm_corroboration;
+  } else tcmCard.style.display = 'none';
+
+  var lifeCard = document.getElementById('life-card');
+  if (d.lifestyle && d.lifestyle.length) {
+    lifeCard.style.display = '';
+    document.getElementById('life-list').innerHTML = d.lifestyle.map(function(s){ return '<li>' + s + '</li>'; }).join('');
+  } else lifeCard.style.display = 'none';
+
+  var askCard = document.getElementById('ask-card');
+  if (d.doctor_notes && d.doctor_notes.length) {
+    askCard.style.display = '';
+    document.getElementById('ask-list').innerHTML = d.doctor_notes.map(function(s){ return '<li>' + s + '</li>'; }).join('');
+  } else askCard.style.display = 'none';
+
+  document.getElementById('disclaimer').textContent = '⚠️ ' + d.disclaimer;
+  document.getElementById('btn-save').style.display = TOKEN && !d.archived ? '' : (TOKEN ? 'none' : '');
+  if (!TOKEN) document.getElementById('btn-save').textContent = '💾 绑定后自动存档';
+  window.scrollTo(0, 0);
+}
+
+function saveReport() {
+  if (!TOKEN) { location.href = 'my-reports.html'; return; }
+  alert('解读结果已在生成时自动存入「我的医院报告」');
+  location.href = 'my-reports.html';
+}
+
+function resetAll() {
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('input-card').style.display = '';
+  manualItems = []; renderChips();
+  window.scrollTo(0, 0);
+}
+</script>
+<script src="js/error-interceptor.js"></script>
+</body>
+</html>

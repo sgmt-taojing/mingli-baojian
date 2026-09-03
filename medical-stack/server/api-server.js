@@ -65,7 +65,9 @@ function normalizeMethodFeatures(method) {
 // R762 问诊台状态：实时帧计数 + 已确认病例（内存简化）
 const state = {
   inquiryFrames: {},   // caseId -> { count, lastTs, sizeSum }
-  confirmedCases: []   // [{caseId, timestamp, ...}]
+  confirmedCases: [],  // [{caseId, timestamp, ...}]
+  tcmCases: [],        // AI 诊断报告存档（脱敏；E5 三池之一，吸收自 tcm HEAD d33f28c）
+  teachingCases: []    // 教学示范病历池（E5；只进相似检索演示面，不进签发/归档/孪生）
 };
 const app = express();
 // R735 患者身份核验 + 医保人脸核对（face-feature 算法接入医学模块）
@@ -577,6 +579,18 @@ app.post('/api/tcm/diagnose', async (req, res) => {
     report.urgency_level = assessUrgency(report);
     report.urgency = URGENCY_LEVELS[report.urgency_level] || null;
 
+    // 5. E5：相似医案（接活 clinic-desk 既有渲染路径；三池含教学示范，teaching 徽标随结果下发；吸收自 tcm）
+    try {
+      report.similar_cases = scoreCasePool(buildCasePool(), allSymptoms.filter(Boolean),
+        (formulaMatch && formulaMatch.matched_syndrome) || null, null, null)
+        .slice(0, 3)
+        .map(c => ({
+          case_id: c.id, title: c.formula ? c.formula + ' 医案' : '医案 ' + c.id,
+          syndrome: c.syndrome, formula: c.formula, matched: c.matched, score: c.score,
+          source: c.source, teaching: c.teaching === true
+        }));
+    } catch (e) { report.similar_cases = []; }
+
     res.json({ 
       ok: true, 
       data: report,
@@ -819,8 +833,16 @@ app.post('/api/tcm/cases', async (req, res) => {
       hash: crypto.createHash('sha256').update(JSON.stringify(reportData)).digest('hex').slice(0, 16)
     };
 
-    // TODO: 写入数据库
-    // await db.insert('tcm_cases', record);
+    // 内存缓存 + 异步落盘（沿用 confirmed-cases 模式，重启不丢；吸收自 tcm A2 修真）
+    state.tcmCases.unshift(record);
+    if (state.tcmCases.length > 500) state.tcmCases.length = 500;
+    setImmediate(function() {
+      try {
+        const dir = path.join(__dirname, '..', 'data', 'tcm-cases');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(path.join(dir, caseId + '.json'), JSON.stringify(record, null, 2));
+      } catch(e) { console.error('[tcm-cases] 落盘失败:', e.message); }
+    });
 
     res.json({ ok: true, case_id: caseId, hash: record.hash });
   } catch (e) {
@@ -945,6 +967,36 @@ function loadConfirmedCases() {
 }
 state.confirmedCases = loadConfirmedCases();
 
+// 区分：confirmed-cases=医生签发正式病历；tcm-cases=AI 诊断报告存档（脱敏，无原始图）。（吸收自 tcm）
+function loadTcmCases() {
+  try {
+    const dir = path.join(__dirname, '..', 'data', 'tcm-cases');
+    if (!fs.existsSync(dir)) return [];
+    return fs.readdirSync(dir)
+      .filter(f => f.endsWith('.json'))
+      .map(f => {
+        try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); }
+        catch(e) { return null; }
+      })
+      .filter(Boolean)
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+      .slice(0, 500);
+  } catch (e) { return []; }
+}
+state.tcmCases = loadTcmCases();
+
+// E5（契约 v1.4.4）：教学示范病历池——合成自倪师蒸馏方证，物理分池（data/teaching-cases.json），
+// 只进相似病例检索演示面；不进签发/归档指标/孪生回填。teaching=true 贯穿到检索结果供前端徽标。
+function loadTeachingCases() {
+  try {
+    const f = path.join(__dirname, '..', 'data', 'teaching-cases.json');
+    if (!fs.existsSync(f)) return [];
+    const list = JSON.parse(fs.readFileSync(f, 'utf8') || '[]');
+    return Array.isArray(list) ? list.filter(c => c && c.teaching === true) : [];
+  } catch (e) { return []; }
+}
+state.teachingCases = loadTeachingCases();
+
 app.post('/api/tcm/case-confirm', async (req, res) => {
   try {
     const { chief, hpi, four, syndrome, treatment, formula, patient, symptoms, tongue, pulse, aiVersion, confirmMode, labs, safetyReview } = req.body;
@@ -1035,11 +1087,145 @@ app.get('/api/tcm/cases', async (req, res) => {
 });
 
 // ───────────────── 相似病例检索 ─────────────────
+// E5：三池统一构建（confirmed 签发 + report AI 报告 + teaching 教学示范），A2 检索与 diagnose 相似医案共用（吸收自 tcm）
+function buildCasePool() {
+  const pool = [];
+  for (const c of (state.confirmedCases || [])) {
+    pool.push({
+      id: c.caseId, timestamp: c.timestamp, syndrome: c.syndrome || null,
+      formula: c.formula || null, symptoms: c.symptoms || [],
+      tongue: c.tongue || [], pulse: c.pulse || [],
+      source: 'confirmed', hash: c.hash
+    });
+  }
+  for (const c of (state.tcmCases || [])) {
+    const d = c.diagnosis || {};
+    pool.push({
+      id: c.case_id, timestamp: c.timestamp, syndrome: d.syndrome || null,
+      formula: d.formula || d.formula_name || null,
+      symptoms: d.symptoms || [], tongue: d.tongue || [], pulse: d.pulse || [],
+      source: 'report', hash: c.hash
+    });
+  }
+  // 教学示范池（source='teaching'，timestamp 固定蒸馏日不扰新鲜度排序；E6 起带 disease_area 病种标签）
+  for (const c of (state.teachingCases || [])) {
+    pool.push({
+      id: c.case_id, timestamp: c.timestamp, syndrome: c.syndrome || null,
+      formula: c.formula || null, symptoms: c.symptoms || [],
+      tongue: c.tongue || [], pulse: c.pulse || [],
+      source: 'teaching', teaching: true, disease_area: c.disease_area || null, hash: null
+    });
+  }
+  return pool;
+}
+
+// E5：症状/证型重叠评分（A2 同口径），供 diagnose 相似医案与检索端点复用
+function scoreCasePool(pool, querySymptoms, querySyndrome, anchor, excludeId) {
+  const effSet = new Set(querySymptoms || []);
+  const qTongue = anchor ? anchor.tongue : [];
+  const qPulse = anchor ? anchor.pulse : [];
+  return pool
+    .filter(c => !excludeId || c.id !== excludeId)
+    .map(c => {
+      const cSym = new Set(c.symptoms);
+      let inter = 0;
+      for (const s of effSet) if (cSym.has(s)) inter++;
+      const union = new Set([...effSet, ...cSym]).size || 1;
+      let score = effSet.size ? (inter / union) * 2 * effSet.size : 0;
+      if (querySyndrome && c.syndrome === querySyndrome) score += 3;
+      score += (c.tongue || []).filter(t => qTongue.includes(t)).length;
+      score += (c.pulse || []).filter(p => qPulse.includes(p)).length;
+      return { ...c, score: Math.round(score * 100) / 100, matched: inter };
+    })
+    .filter(c => c.score > 0)
+    .sort((a, b) => b.score - a.score || new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+// ───────────────── 相似病例检索 ─────────────────
+// A2（吸收自 tcm 20260831 修真版）：对 confirmed-cases（签发病历）+ tcm-cases（AI 报告存档）+ teaching-cases（教学示范）
+// 做症状/舌脉/证型重叠评分，返回 top N（默认 5）。
+// 参数：symptoms（逗号/顿号分隔）、syndrome、name（按哈希比对）、hash（找同哈希后按其余排序）、limit。
+// 脱敏：不回传 patient 字段，仅回 name 是否匹配的布尔语义由调用方自行用 name 过滤。
 app.get('/api/tcm/cases/similar', async (req, res) => {
   try {
-    const { hash } = req.query;
-    // TODO: 根据哈希从数据库检索相似病例
-    res.json({ ok: true, cases: [], note: '病例检索功能开发中' });
+    const { hash, syndrome, name } = req.query;
+    const limit = Math.min(parseInt(req.query.limit, 10) || 5, 20);
+    const querySymptoms = String(req.query.symptoms || '')
+      .split(/[、,,;；\s]+/).filter(Boolean).map(s => s.trim());
+
+    const pool = buildCasePool();
+
+    // name 过滤（哈希比对，与 GET /api/tcm/cases 同规则）
+    let filtered = pool;
+    if (name) {
+      const h = crypto.createHash('sha256').update(String(name)).digest('hex').slice(0, 16);
+      filtered = filtered.filter(c => {
+        const src = (state.confirmedCases || []).find(x => x.caseId === c.id);
+        return src && src.patient && src.patient.name_hash === h;
+      });
+    }
+
+    // hash 语义：定位同哈希锚点病例，用其症状/证型作为查询条件，结果排除自身
+    let anchor = null;
+    let effSymptoms = querySymptoms, effSyndrome = syndrome || null;
+    if (hash) {
+      anchor = pool.find(c => c.hash === hash) || null;
+      if (anchor) {
+        if (!effSymptoms.length) { effSymptoms = anchor.symptoms; }
+        if (!effSyndrome) effSyndrome = anchor.syndrome;
+      }
+    }
+
+    // 若完全无查询条件且未命中锚点，返回空并说明
+    if (!effSymptoms.length && !effSyndrome && !anchor) {
+      return res.json({ ok: true, cases: [], total: 0, note: '请提供 symptoms / syndrome / hash 之一' });
+    }
+
+    const scored = scoreCasePool(filtered, effSymptoms, effSyndrome, anchor, anchor ? anchor.id : null)
+      .slice(0, limit);
+
+    res.json({
+      ok: true,
+      query: { symptoms: effSymptoms, syndrome: effSyndrome, hash: hash || null, anchor_found: !!anchor },
+      total: scored.length,
+      teaching_pool_size: (state.teachingCases || []).length,
+      cases: scored
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+// ───────────────── 教学示范病历浏览 ─────────────────
+// E6（契约 v1.4.7）：按病种浏览教学案——只读端点，供 disease-kb 页「按病种浏览教学示范案」（吸收自 tcm HEAD d33f28c）
+// 参数：area（病种标签精确匹配）、q（方剂/证型/症状模糊）、limit（默认 50，上限 200）
+app.get('/api/tcm/teaching-cases', (req, res) => {
+  try {
+    const { area, q } = req.query;
+    const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
+    let list = (state.teachingCases || []);
+    if (area) list = list.filter(c => c.disease_area === area);
+    if (q) {
+      const qq = String(q).toLowerCase();
+      list = list.filter(c =>
+        (c.formula || '').toLowerCase().includes(qq) ||
+        (c.syndrome || '').toLowerCase().includes(qq) ||
+        (c.symptoms || []).some(s => s.toLowerCase().includes(qq)));
+    }
+    const areas = {};
+    for (const c of (state.teachingCases || [])) areas[c.disease_area || '杂病'] = (areas[c.disease_area || '杂病'] || 0) + 1;
+    res.json({
+      ok: true,
+      total: list.length,
+      pool_size: (state.teachingCases || []).length,
+      areas,
+      cases: list.slice(0, limit).map(c => ({
+        case_id: c.case_id, formula: c.formula, syndrome: c.syndrome,
+        symptoms: c.symptoms, usage: c.usage || '', disease_area: c.disease_area || '杂病',
+        classic: (c.source_ref && c.source_ref.classic) || '', lu_quote: c.lu_quote || '',
+        note: c.note, teaching: true
+      }))
+    });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
   }

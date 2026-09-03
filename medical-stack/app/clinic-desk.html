@@ -1388,8 +1388,11 @@ function renderAIPanel() {
     html += '<div class="ai-block"><div class="ai-title">🩺 相似医案（' + simCases.length + '）</div>';
     simCases.slice(0, 3).forEach(c => {
       const badge = c.teaching ? '<span style="font-size:10px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:0 3px;margin-left:4px">🎓教学</span>' : '';
+      // E6（契约 v1.4.6）：病种标签 chip + 教学案以方剂名为题（原来只显示 TEACH-NNN 编号）
+      const areaChip = c.disease_area ? '<span style="font-size:10px;color:#fff;background:var(--accent);border-radius:4px;padding:0 4px;margin-right:4px">' + escHtml(c.disease_area) + '</span>' : '';
       const srcLabel = c.source === 'confirmed' ? '签发病历' : c.source === 'report' ? 'AI 报告' : c.teaching ? '教学示范' : '';
-      html += '<div class="ai-row"><span>' + escHtml((c.title||c.case_id||'医案').slice(0,24)) + badge + '</span><span>' + escHtml((c.syndrome||'').slice(0,12)) + (srcLabel ? ' · ' + srcLabel : '') + '</span></div>';
+      const label = (c.teaching && c.formula) ? c.formula : (c.title || c.case_id || '医案');
+      html += '<div class="ai-row"><span>' + areaChip + escHtml(label.slice(0,24)) + badge + '</span><span>' + escHtml((c.syndrome||'').slice(0,12)) + (srcLabel ? ' · ' + srcLabel : '') + '</span></div>';
     });
     html += '</div>';
   }
