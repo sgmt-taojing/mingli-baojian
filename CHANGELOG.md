@@ -1,3 +1,9 @@
+## 2026-09-05 · R-LY5 七模块推广收口
+
+- R-LY3/R-LY4 普查：六模块自动生效，风水专属路径补接 topic 过滤
+- 新增 KB_DENY_CONTENT 内容级守卫（六爻专词泄漏拦截）+ KB_DENY_TITLE 分页符垃圾标题
+- 七模块复测全绿；server 子模块 commit 3c0c624
+
 ## 2026-09-04 · R-LY4 时效意图识别裁剪逐年走势
 
 - paipan-baihua-engine 新增 horizonOf（near/mid/far 三档）；seg3 渲染按档裁剪 forecast/backtest 并加时效说明
