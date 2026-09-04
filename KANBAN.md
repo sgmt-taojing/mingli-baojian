@@ -1,3 +1,21 @@
+## 2026-09-04 02:00 — 💚 心跳 02:00 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（02:01:24 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～01:00）；02:00 无新 distill-2026-09-04*.jsonl 生成（09-04 尚无入库）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
+## 2026-09-04 01:00 — 💚 心跳 01:00 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（01:02:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～00:00）；01:00 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
+## 2026-09-04 00:00 — 💚 心跳 00:00 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（00:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-03 02:05 +20 条（distill-2026-09-03.jsonl 23472B mtime 02:05:14 复验）已多次节点覆盖（05:00～20:30）；00:00 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
 ## 2026-09-03 21:00 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
 - **今日完成（3 大件）**：
   1. G18 防线上线（tcm 源页面漂移守卫）：check-tcm-page-drift.py 双模式（链上审计+pre-commit 拦截），正负向实测全过 — `KANBAN.md 09:00`
@@ -90,6 +108,48 @@
 - 阻塞延续：周报 cron 调整需 AutoClaw 控制台（上午等用户动作）
 
 # KANBAN.md — 命理宝鉴 项目看板
+
+## 2026-09-04 08:00 — 💚 心跳 08:00 全绿（cron 30min · 晨间安静期 · 无新 KB）
+- 健康检查全绿（08:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04:39）已 02:30/03:00/03:30/04:30/05:00/06:30 节点覆盖；08:00 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（晨间安静期，等用户动作）
+
+## 2026-09-04 06:30 — 💚 心跳 06:30 全绿（cron 30min · 黎明安静期 · 无新 KB）
+- 健康检查全绿（06:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04:39）已 02:30/03:00/03:30/04:30/05:00 节点覆盖；06:30 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（黎明安静期，等用户动作）
+
+## 2026-09-04 05:00 — 💚 心跳 05:00 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（05:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04:39）已 02:30/03:00/03:30/04:30 节点覆盖；05:00 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
+## 2026-09-04 04:30 — 💚 心跳 04:30 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（04:32:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04:39）已 02:30/03:00/03:30 节点覆盖；04:30 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
+## 2026-09-04 03:30 — 💚 心跳 03:30 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（03:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04）已 02:30/03:00 节点覆盖；03:30 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
+## 2026-09-04 03:00 — 💚 心跳 03:00 全绿（cron 30min · 深夜安静期 · 无新 KB）
+- 健康检查全绿（03:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04）已 02:30 节点覆盖；03:00 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
+
+## 2026-09-04 02:30 — 💚 心跳 02:30 全绿（cron 30min · 深夜安静期 · 09-04 KB 蒸馏 +29 条入库）
+- 健康检查全绿（02:30:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- **KB 蒸馏新入库 29 条**：`training-data/kb-web-distill/distill-2026-09-04.jsonl`（29 行 ≈16.5KB，02:04 入库）— 09-04 首节点（行数较历史 20 条 +9）
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（深夜安静期，等用户动作）
 
 ## 2026-09-03 10:30 — 💚 心跳 10:30 全绿（cron 30min · 上午安静期 · 无新 KB）
 - 健康检查全绿（10:30:15 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
@@ -2012,3 +2072,8 @@
 - KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～22:00 共 35+ 节点）；22:30 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
 - 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
 - 阻塞延续：周报 cron 调整需 AutoClaw 控制台（夜间等用户动作）
+
+## 2026-09-04 08:50 — ✅ clinic-desk 教学徽标端到端实测通过
+- 真实页面全链：＋新患者建档（徽标实测）→ 确认挂号 → 真实 POST /api/tcm/diagnose（恶寒发热无汗头痛）→ similar_cases 3 条 teaching=true → renderAIPanel 渲染「🎓教学」徽标+「教学示范」来源标签全亮
+- 冒烟数据已清：主索引患者/预约库/问诊会话 cs-mtm8dnkg；页面 tab 已关
+- 结论：E5/E6/E7 教学池链从数据→评分→下发→页面渲染全链闭环，无任何空转环节
