@@ -1,3 +1,10 @@
+## 2026-09-04 10:25 — ✅ 问诊台核心流程全链回归 PASS（similar_cases 新字段兼容确认）
+- g5-smoke-e2e 十节点全绿：命理采集并轨(授权门+仅入批注层)→建档叫号→一帧四诊→EMR→8974批注→SLA48h核验→命理师approve→病历药方→队列流转→合并报告归档，证据 DELIVERY/g5-smoke-evidence-20260904-102014.json
+- 守卫核查：R756 医学内容零命理泄漏 ✅、R757 辨证无命理词降级 ✅、SLA 48h 计时正常 ✅
+- 新字段兼容：similar_cases 唯一消费方是 clinic-desk（昨日已实测徽标渲染），审核台/病历页均不读该字段——零适配风险
+- 浏览器复核：medical-annotation-workbench（批注队列/SLA 计数正常渲染）、unified-consultation（采集端+核对台+机构版话术+叫号队列 API 8920 实测 ok）
+- 遗留观察：批注队列有 3 条 08-30 的 QIUCE 旧件超 48h SLA（历史积压，非本轮产生），建议命理师端清理或驳回
+
 ## 2026-09-04 10:02 — 💚 心跳 10:02 全绿 + 3 个 cron 报错修真收口
 - 服务/KB/GH-Pages 全绿（实探）：静态(:8914) 200 / api-v2(:8920) ok / paipan(:8911) ok / tts(:8912) 200 / face-ocr(:8913) ok；KB 72908 条 / 229 模块；GH-Pages 200
 - ✅ 收口：① 周报 cron timeoutSeconds 120→300（实查 DB 已是 300，待办闭环，无需控制台）② 临床经验蒸馏 连续 5 次错误（旧 payload batch-distill-clinical.py 已弃，现 payload prepare-clinical-export.py 实跑成功导出 39 条，错误计数清零）③ 商用矩阵 KPI 连续 2 次（脚本实跑超时属健康检查累积等待，非致命，计数清零观察下轮）
