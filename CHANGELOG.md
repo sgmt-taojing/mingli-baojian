@@ -1,3 +1,10 @@
+## 2026-09-04 · R-LY3 六爻知识依据用神相关性过滤
+
+- kb-module-filter.js 新增 filterKbHitsByTopic：问事类目↔占书章节类目对齐 + 易经卦名对齐（本/变/互）；失脫章名（附盜賊捕盜捉賊）补入 shiwu 规则
+- norm-report-engine：question→questions 归一修复；源头过滤 kb_hits 与 huajie.关联KB，seg2/3/4 及 raw 快照全链路收口
+- QIUCE-2 同案复测噪声清零；婚姻问/泛问/八字三组对照回归通过
+- server 子模块 commit 3b84316
+
 # mingli-baojian 更新日志
 
 ## 2026-09-03 晚 · D9 前端落面 + E5/E6/E7 教学池整链吸收（相似医案空壳修真）
