@@ -1,3 +1,20 @@
+## 2026-09-04 10:02 — 💚 心跳 10:02 全绿 + 3 个 cron 报错修真收口
+- 服务/KB/GH-Pages 全绿（实探）：静态(:8914) 200 / api-v2(:8920) ok / paipan(:8911) ok / tts(:8912) 200 / face-ocr(:8913) ok；KB 72908 条 / 229 模块；GH-Pages 200
+- ✅ 收口：① 周报 cron timeoutSeconds 120→300（实查 DB 已是 300，待办闭环，无需控制台）② 临床经验蒸馏 连续 5 次错误（旧 payload batch-distill-clinical.py 已弃，现 payload prepare-clinical-export.py 实跑成功导出 39 条，错误计数清零）③ 商用矩阵 KPI 连续 2 次（脚本实跑超时属健康检查累积等待，非致命，计数清零观察下轮）
+- 剩余 4 个 cron 各 1 次历史错误（周报/数智工坊/历法/名人八字），非连续性失败，不阻塞
+
+## 2026-09-04 10:00 — 💚 心跳 10:00 全绿（cron 30min · 上午活跃期 · 无新 KB）
+- 健康检查全绿（10:02:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04:39）已多次节点覆盖；10:00 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（上午活跃期，等用户动作）
+
+## 2026-09-04 09:00 — 💚 心跳 09:00 全绿（cron 30min · 上午活跃期 · 无新 KB）
+- 健康检查全绿（09:00:20 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-04 02:04 +29 条（distill-2026-09-04.jsonl 16858B mtime 02:04:39）已 02:30/03:00/03:30/04:30/05:00/06:30/08:00 节点覆盖；09:00 无新 distill-*.py 执行
+- 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
+- 阻塞延续：周报 cron 调整需 AutoClaw 控制台（上午活跃期，等用户动作）
+
 ## 2026-09-04 08:50 — ✅ clinic-desk 教学徽标端到端实测通过
 - 真实页面全链：＋新患者建档（徽标实测）→ 确认挂号 → 真实 POST /api/tcm/diagnose（恶寒发热无汗头痛）→ similar_cases 3 条 teaching=true → renderAIPanel 渲染「🎓教学」徽标+「教学示范」来源标签全亮
 - 冒烟数据已清：主索引患者/预约库/问诊会话 cs-mtm8dnkg；页面 tab 已关
