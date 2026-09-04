@@ -1,3 +1,9 @@
+## 2026-09-04 · R-LY4 时效意图识别裁剪逐年走势
+
+- paipan-baihua-engine 新增 horizonOf（near/mid/far 三档）；seg3 渲染按档裁剪 forecast/backtest 并加时效说明
+- QIUCE-2 三处硬伤全部闭环（R-LY2 世应爻 / R-LY3 知识相关性 / R-LY4 时效）
+- server 子模块 commit 2840864
+
 ## 2026-09-04 · R-LY3 六爻知识依据用神相关性过滤
 
 - kb-module-filter.js 新增 filterKbHitsByTopic：问事类目↔占书章节类目对齐 + 易经卦名对齐（本/变/互）；失脫章名（附盜賊捕盜捉賊）补入 shiwu 规则
