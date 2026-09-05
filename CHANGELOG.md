@@ -1,3 +1,9 @@
+## 2026-09-05 · 同案重出 diff 升级区段级对照
+
+- qiuceSectionDiff 按报告结构切段逐段比对（same/changed/added/removed+段内明细）；工作台折叠卡展示
+- QIUCE-2 复测：三段修复在 diff 中逐段可见；ann-4da9634aaa21 复核通过，队列清零
+- server 子模块 commit 8a7e88a
+
 ## 2026-09-05 · 同案重出标准动作固化
 
 - 8974 reject 回执 + retest 代理；8920 /api/internal/qiuce/:id/retest（重出+diff+重新入队）；CSRF 白名单放行

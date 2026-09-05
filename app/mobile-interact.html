@@ -47,6 +47,9 @@ button:disabled{opacity:.45}
 .stat{display:flex;gap:10px;font-size:11px;color:var(--muted);margin-bottom:8px}
 .stat b{color:var(--text)}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translateX(-50%);background:#22263a;border:1px solid var(--border);border-radius:10px;padding:9px 16px;font-size:13px;display:none;z-index:99;max-width:88%}
+.diff-sec{margin:4px 0;border:1px solid var(--border);border-radius:8px;padding:4px 8px}
+.diff-sec summary{font-size:12px;cursor:pointer;color:var(--text)}
+.diff-sec .meta{margin-top:4px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -194,9 +197,22 @@ async function retest(aid){
   let html = '<div class="meta" style="color:var(--green)">✅ 新初稿已入队待复核</div>';
   if(r.old_annotation) html += `<div class="meta">对比基准：驳回件 ${esc(r.old_annotation.id||'')}（${esc(r.old_annotation.reviewer||'—')}）${r.old_annotation.reject_reason ? ' · 驳回原因：' + esc(r.old_annotation.reject_reason) : ''}</div>`;
   if(r.diff){
-    html += `<div class="meta">差异：新增 ${r.diff.added_count} 行 / 移除 ${r.diff.removed_count} 行</div>`;
-    if(r.diff.removed && r.diff.removed.length) html += '<div class="meta">移除：<br>' + r.diff.removed.map(l=>'− '+esc(l.slice(0,80))).join('<br>') + '</div>';
-    if(r.diff.added && r.diff.added.length) html += '<div class="meta">新增：<br>' + r.diff.added.map(l=>'＋ '+esc(l.slice(0,80))).join('<br>') + '</div>';
+    html += `<div class="meta">差异总览：新增 ${r.diff.added_count} 行 / 移除 ${r.diff.removed_count} 行</div>`;
+    if(r.diff.sections && r.diff.sections.length){
+      const changed = r.diff.sections.filter(s => s.status !== 'same');
+      const sameN = r.diff.sections.length - changed.length;
+      html += `<div class="meta">区段对照：${changed.length} 段有变化 / ${sameN} 段一致</div>`;
+      for(const s of changed){
+        const badge = s.status === 'added' ? '🆕 新增段' : s.status === 'removed' ? '🗑 移除段' : `✏️ 有变化（＋${s.added_count}／−${s.removed_count}）`;
+        let inner = '';
+        if(s.removed && s.removed.length) inner += s.removed.map(l=>'− '+esc(l.slice(0,80))).join('<br>');
+        if(s.added && s.added.length) inner += (inner?'<br>':'') + s.added.map(l=>'＋ '+esc(l.slice(0,80))).join('<br>');
+        html += `<details class="diff-sec"><summary>${esc(s.name)} · ${badge}</summary><div class="meta">${inner||'（无行级明细）'}</div></details>`;
+      }
+    } else {
+      if(r.diff.removed && r.diff.removed.length) html += '<div class="meta">移除：<br>' + r.diff.removed.map(l=>'− '+esc(l.slice(0,80))).join('<br>') + '</div>';
+      if(r.diff.added && r.diff.added.length) html += '<div class="meta">新增：<br>' + r.diff.added.map(l=>'＋ '+esc(l.slice(0,80))).join('<br>') + '</div>';
+    }
   } else html += '<div class="meta">（未找到驳回原件，跳过差异对比）</div>';
   if(box) box.innerHTML = html;
   toast('同案重出完成，请到队列复核'); loadQueue();
