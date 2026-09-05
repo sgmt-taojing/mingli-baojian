@@ -1,3 +1,9 @@
+## 2026-09-05 · G22 漂移巡检本侧上线
+
+- scripts/capability-drift-check.js（三态判定+状态件）挂入 health-patrol.sh；兼容 family .activated 归档目录
+- 首跑检出 family 侧 --fix 降级事故（1.2.0→1.1.0，已自愈），通报+根修建议发 family handoff
+- 现态 IN_SYNC（1.2.0=1.2.0）
+
 ## 2026-09-05 · G21 能力发版
 
 - 新增 scripts/release-capability.js（三类能力打包→sync-bus outbox→registry 登记，rollback_ref 自动链上版）

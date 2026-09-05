@@ -254,6 +254,15 @@ for _zero_db in "$PROJECT_ROOT"/knowledge/*.db; do
   fi
 done
 
+# G22 能力漂移巡检（mingli→family 能力包：部署版落后告警 WARN / 同版内容漂移告警 ERROR）
+DRIFT_OUT=$(node "$PROJECT_ROOT/scripts/capability-drift-check.js" 2>&1)
+DRIFT_CODE=$?
+if [ $DRIFT_CODE -eq 1 ]; then
+  ALERTS+=("G22 能力漂移: $(echo "$DRIFT_OUT" | grep '❌' | head -2 | tr '\n' ' ')→ 详件 DELIVERY/capability-drift-latest.json")
+elif [ $DRIFT_CODE -eq 2 ]; then
+  echo "[$TS] ⚠️ 能力版本待接收: $(echo "$DRIFT_OUT" | grep '⚠️' | head -1)" >> "$LOG"
+fi
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"

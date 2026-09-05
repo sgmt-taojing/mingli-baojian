@@ -1,3 +1,27 @@
+## 2026-09-05 · G22 漂移巡检本侧半边上线 + 一次真实事故互通
+
+- **巡检脚本**：`scripts/capability-drift-check.js`——outbox 最新定版包 ↔ family 部署目录逐文件 sha256 比对；三态判定 IN_SYNC / NOT_ON_LATEST（WARN）/ DRIFT（ERROR）；状态件落 `DELIVERY/capability-drift-latest.json`；已挂入 health-patrol.sh（漂移进 ALERTS，待接收记 WARN 日志不告警）。兼容 family 激活流水线的 `.activated`（含多重）归档目录。
+- **试跑即立功**：检出 family 侧真实事故——其 --fix 流水线包发现排除归档包，把激活后的 1.2.0 降级重装成 1.1.0（我侧 WARN 如实上报）；family 流水线随后自愈回 1.2.0。事故通报+根修建议已发 `smart-home-family/docs/handoff/mingli-g22-drift-fix-downgrade-incident-20260905.md`（P2）。
+- **教训**：漂移检出验证今后用沙箱副本，不对消费方生产部署做瞬时注入（本次虽已秒级还原，仍触发了对方 --fix 链路）。
+- 当前共识状态：IN_SYNC（部署 1.2.0 = 定版 1.2.0，逐文件一致）。
+
+## 2026-09-05 21:03 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
+- **今日完成（4 大件）**：
+  1. G21 能力发版体系落地 + 基线对齐首单：release-capability.js + 包级资产源头收编 + AGENT.md 触发纪律；paipan v1.2.0 出包（selftest 5/5，server e0c2e6c），接收通知已发 family 侧（family docs/handoff/mingli-paipan-v1.2.0-release-notice-20260905.md）— `scripts/release-capability.js`
+  2. 「驳回→根修→同案重出→复核销案」SOP 全链闭环：reject/retest 端点（889c1ed）+ 区段级 diff 视图（8a7e88a）+ 驳回自动 triage 根修 checklist（DEFECT_PATTERNS 8 类）；QIUCE-2 同案重出复核通过销案 — `app/mobile-interact.html`
+  3. R-LY5 七模块推广收口：六模块时效裁剪自动生效实证 + 梅花/奇门两处新守卫 — server 3c0c624
+  4. KB 蒸馏 +30 条入库（`training-data/kb-web-distill/distill-2026-09-05.jsonl` ≈16.6KB）
+- **当前进行中（节点 0/0）**：无未收口开发项；等 family 侧接收 paipan v1.2.0 并验收（外部依赖，非阻塞）
+- **明日计划（09-06）**：① 跟进 family 侧 v1.2.0 接收验收回报，CHANGELOG 记「paipan v1.2.0 接收」即首单消费闭环 ② 建 G22 漂移巡检双侧对拍点
+- **阻塞项**：✅ 无
+- **基线**：health-check EXIT=0（6 端口全 200 + kb-list/paipan-api OK，21:03:24 实探）
+
+## 2026-09-05 21:00 — 💚 心跳 21:00 全绿（cron 30min · 夜间活跃期 · 无新 KB）
+- 健康检查全绿（21:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-05 02:02 +30 条（distill-2026-09-05.jsonl 16601B mtime 02:02 实查复验）；21:00 无新增（夜间例行窗口已过，无追加）
+- 进行中无变化：① G21 能力发版体系 v1.2.0 接收通知已发 family 侧（等窗口验收，CHANGELOG 记「paipan v1.2.0 接收」即首单消费闭环）② 驳回→根修→同案重出→复核销案 SOP 全链路闭环（QIUCE-2 销案证据留档）③ 同案重出 diff 升级区段级视图（server 8a7e88a）④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（夜间活跃期，用户未下达新指令）
+
 ## 2026-09-05 · paipan v1.2.0 接收通知已发 family 侧
 
 - 对接说明落 family `docs/handoff/mingli-paipan-v1.2.0-release-notice-20260905.md`（遵循其 handoff 收件惯例）：包位置/变更清单/接收步骤（备份→rsync 覆盖→selftest 5/5 验收→抽查 shengxiao）/回滚路径/后续通道纪律；特别提示 bazi 引擎依赖系统 python3 的 lunar_python，bridge 勿切解释器。
