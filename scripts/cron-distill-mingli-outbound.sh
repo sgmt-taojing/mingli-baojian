@@ -54,7 +54,11 @@ with open(EXPORT, 'w', encoding='utf-8') as f:
 print(f"导出 {len(entries)} 条命理 KB")
 for m, n in modules.most_common():
     print(f"  {m}: {n}")
-
+try:
+    conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+except Exception:
+    pass
+conn.close()
 PYEOF
 
 cp "$EXPORT" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json
@@ -112,6 +116,11 @@ with open(EXPORT_FULL, 'w', encoding='utf-8') as f:
 print(f"全量镜像导出 {len(entries)} 条命理 KB（formal+active+published+promoted+approved）")
 for m, n in modules.most_common(10):
     print(f"  {m}: {n}")
+try:
+    conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+except Exception:
+    pass
+conn.close()
 PYEOF
 cp "$EXPORT_FULL" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-full.json
 echo "  ✓ 全量镜像推送到 SHF（mingli-full.json）" >> "$LOG_FILE"

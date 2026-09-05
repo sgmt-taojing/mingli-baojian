@@ -22,6 +22,7 @@ import hashlib
 import json
 import re
 import sqlite3
+from yidao_safe import safe_close  # R-WALF 预防：写完主动 checkpoint 再关闭
 import sys
 import time
 from pathlib import Path
@@ -156,7 +157,7 @@ def main() -> int:
             batch,
         )
         conn.commit()
-    conn.close()
+    safe_close(conn)
 
     report = {
         "ts": now,

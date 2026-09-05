@@ -1,3 +1,36 @@
+## 2026-09-06 07:00 — 💚 心跳 07:00 全绿（cron 30min · 清晨安静期 · 无新 KB）
+- 健康检查全绿（07:02:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-06 02:10 +22 条（distill-2026-09-06.jsonl 22411B mtime 02:10）已 03:00/04:30/06:30 节点覆盖；07:00 无新 distill-*.py 执行（例行窗口已过，无追加）
+- 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案） ③ 同案重出 diff 区段级视图 ④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（清晨安静期，无待用户动作）
+
+## 2026-09-06 07:35 · R-WALF 预防层：直连脚本统一 checkpoint 规范 ✅
+
+- 背景：WAL 裂脑两次复发（08-31/09-05），机理 R772 末连接语义；守卫已升级自动收敛（b082694），本轮上预防层。
+- 新建 `scripts/yidao_safe.py`：`safe_close(conn)` = commit → wal_checkpoint(TRUNCATE) → close，失败降级不抛。
+- 改造 5 处常驻任务直连点：import-tcm-kb.py（15min 轮询）、feedback-aggregator.py、evolution-loop.py、cron-distill-feedback-loop.sh（2 处内联）、cron-distill-mingli-outbound.sh（2 处内联，顺带补上原本缺失的 close）。
+- 验证：AST/sh 语法全过；import-tcm-kb 实跑秒退正常；safe_close 实测 wal 截断为 0 字节；8920 主句柄 inode 与磁盘一致、/api/health 正常。
+- 配套：.gitignore 加 `!scripts/yidao_safe.py` 例外。
+
+## 2026-09-06 06:30 — 💚 心跳 06:30 全绿（cron 30min · 清晨安静期 · 无新 KB）
+- 健康检查全绿（06:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-06 02:10 +22 条（distill-2026-09-06.jsonl 22411B mtime 02:10 复验）已 03:00/04:30 节点覆盖；06:30 无新 distill-*.py 执行（例行窗口已过，无追加）
+- 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案） ③ 同案重出 diff 区段级视图 ④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（清晨安静期，无待用户动作）
+
+## 2026-09-06 04:30 — 💚 心跳 04:30 全绿（cron 30min · 深夜安静期 · 无新 KB）
+
+- 健康检查全绿（04:30:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-06 02:10 +22 条（distill-2026-09-06.jsonl 22411B mtime 02:10 复验）已 03:00 节点覆盖；04:30 无新 distill-*.py 执行（例行窗口 ~02:10 已过且无追加）
+- 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案） ③ 同案重出 diff 区段级视图 ④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-06 03:00 — 💚 心跳 03:00 全绿（cron 30min · 深夜安静期 · 新 KB 入库）
+- 健康检查全绿（03:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏续增：**09-06 02:10 +22 条**（distill-2026-09-06.jsonl 22411B，六爻 21 条+梅花 1 条），较昨日 16.6KB 增量 35%
+- 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案） ③ 同案重出 diff 区段级视图 ④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
 ## 2026-09-05 · A2 registry↔outbox 对账上线 + WAL 裂脑二发收敛（P0）
 
 - **A2 对账并入 capability-drift-check.js**：正向（registry 登记→outbox 实物存在+manifest 版本一致）+ 反向（outbox 实物→登记在案，按 pack_path 能力目录名匹配、不限提供方前缀，含 .activated 多重后缀兼容）；对账异常按 ERROR 级进 health-patrol 告警。首跑即修正一处误报逻辑（tcm-diagnose 登记被误判未登记），现 3 条登记双向全对。
@@ -2394,3 +2427,9 @@
 - KB 蒸馏：无新增（09-05 例行窗口 ~02:04 已过，无新 jsonl）
 - 进行中无变化：① 周报 cron 300s ② TCM 差集收口 ③ 节点 0/0
 - 阻塞：✅ 无
+
+## 2026-09-06 07:30 — 💚 心跳 07:30 全绿（cron 30min · 清晨安静期 · 无新 KB）
+- 健康检查全绿（07:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-06 02:10 +22 条（distill-2026-09-06.jsonl 22411B）已 03:00/04:30/06:30/07:00 节点覆盖；07:30 无新 distill-*.py 执行（例行窗口已过，无追加）
+- 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案） ③ 同案重出 diff 区段级视图 ④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（清晨安静期，无待用户动作）

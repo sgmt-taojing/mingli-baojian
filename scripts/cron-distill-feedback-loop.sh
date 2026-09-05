@@ -77,6 +77,10 @@ for item in items:
     except Exception as e:
         print(f'  [WARN] {q[:30]}: {e}', file=sys.stderr)
 db.commit()
+try:
+    db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+except Exception:
+    pass
 db.close()
 print(f'[distill-loop] 入库 {imported} | 跳过 {skipped}')
 PYEOF
@@ -93,6 +97,10 @@ for r in (rows or []):
     print(f'  {r[0]}: {r[1]}')
 staging = db.execute("SELECT COUNT(*) FROM kb_staging WHERE status='staged'").fetchone()[0]
 print(f'[distill-loop] staging待审核: {staging}条')
+try:
+    db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+except Exception:
+    pass
 db.close()
 PYEOF2
 

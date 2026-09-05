@@ -3,6 +3,10 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-06 07:35 · R-WALF 预防层：5 处直连 yidao.db 脚本统一「写完 checkpoint 再关闭」
+
+- 新增 scripts/yidao_safe.py 规范助手；改造 import-tcm-kb / feedback-aggregator / evolution-loop / 两个 cron 内联脚本。实测 wal 截断、8920 无感。
+
 ## 2026-09-05 22:40 · R-WALF 守卫升级：检出自动收敛 + wal-watch 时间线埋点
 
 - scripts/health-patrol.sh：WAL 裂脑检出即自动 kickstart 收敛 api-v2 并复查，成功不告警、失败才进 ALERTS；每轮巡检落 logs/wal-watch.jsonl 供复发时定位 unlink 方。试跑全绿。
