@@ -77,3 +77,18 @@ bash scripts/agent-selfcheck.sh   # 6/6：api/命理档案/排盘/人脸/KB/档�
 - **训练入口**：`training/`（mlx_train_v8.yaml / v9）
 - **训练数据**：`training-data/`
 - **KB 种子**：`knowledge/`
+
+## 能力发版纪律（G21 · ADR-021，2026-09-05 起生效）
+
+mingli-baojian 是命理能力的**唯一源头与定版方**（family 方向发版；tcm→本侧医学通道 G17/G18 不动）。
+
+- **发版工具**：`node scripts/release-capability.js <capability-id> <semver> "<变更说明>"`
+  - 能力清单：`paipan`（排盘引擎）/ `mingli-annotation-prompt`（批注 prompt 资产）/ `paipan-rules`（历法换算规则）
+  - 产出：`_shared/sync-bus/outbox/capability-packs/<id>/<version>/`（manifest.json + code/ + selftest.js + paipan_bridge.py）
+  - 登记：`_shared/capability-registry.json` releases[]（rollback_ref 自动指向上一版）
+- **触发纪律**：
+  1. CHANGELOG 出现命理能力条目（引擎/规则/prompt 变更）→ **同版本出包**，不得积压；
+  2. 知识条目（命理知识库增量）走 mingli-full.json 镜像通道，**不出能力包**；
+  3. 红线类（涉及家庭成员安全提示的命理话术）**2h 内出包**；常规优化**周窗打包**。
+- **源头完整性**：包级资产（paipan_bridge.py / _runner.js / selftest.js）源头在 `scripts/capability-assets/paipan/`，禁止只在消费方改；消费方契约修复必须回灌本侧（v1.1.0 wrapper 契约已于 G21 回灌，server commit e0c2e6c）。
+- **漂移巡检**：`_shared/sync-bus/outbox/capability-packs/paipan/1.1.0` 为历史基线（G22 对照基准），勿动。

@@ -1,3 +1,9 @@
+## 2026-09-05 · G21 能力发版
+
+- 新增 scripts/release-capability.js（三类能力打包→sync-bus outbox→registry 登记，rollback_ref 自动链上版）
+- 基线对齐首单：paipan v1.2.0 发布（R778 年份 1-9999 + 顶层生肖 + wrapper 契约回灌）；v1.1.0 导入 outbox 作漂移基准；selftest 5/5
+- 触发纪律写入 AGENT.md；server 子模块 commit e0c2e6c
+
 ## 2026-09-05 · 驳回根修 checklist（DEFECT_PATTERNS 8 类缺陷模式库）
 
 - reject 自动 triage 驳回原因 → checklist 持久化 + reject-triage.jsonl 登记 + retest 回执携带

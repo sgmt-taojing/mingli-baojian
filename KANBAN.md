@@ -1,3 +1,10 @@
+## 2026-09-05 · G21 能力发版体系落地 + 基线对齐首单（paipan v1.2.0）
+
+- **任务①发版脚本**：`scripts/release-capability.js`——能力清单 paipan / mingli-annotation-prompt / paipan-rules 三类；产出落 `_shared/sync-bus/outbox/capability-packs/<id>/<version>/`（manifest.json 契约与 family 现有包完全一致 + code/ 快照 + selftest.js + paipan_bridge.py）；自动计算上一版写入 rollback_ref；登记 `_shared/capability-registry.json` releases[]。包级资产源头收编至 `scripts/capability-assets/paipan/`（bridge/_runner/selftest 此前只存于 family 部署侧）。
+- **任务②基线对齐**：对照 family 持有 v1.1.0——有未下发优化 → 出 **v1.2.0**。差集：①R778 排盘年份 1600-2200 → 1-9999 直排 + 超界六十甲子折叠（实测 1500 年直排年柱庚申，v1.1.0 直接报错拒绝）；②八字输出新增顶层 shengxiao 字段（1990→马）；③bazi-engine-wrapper 契约双形态**回灌源头**（v1.1.0 契约修复此前只在 family 包，源头回正，server commit e0c2e6c）；其余五引擎与 v1.1.0 完全一致（diff 实证）。v1.1.0 历史包已导入 outbox 作 G22 漂移巡检指纹基准。selftest 5/5 通过。
+- **任务③触发纪律**：已写入 AGENT.md「能力发版纪律」——CHANGELOG 能力条目同版本出包 / 知识增量走镜像通道不出包 / 红线 2h 出包、常规周窗打包。
+- 提交：server 子模块 e0c2e6c；scripts/release-capability.js + scripts/capability-assets/ + AGENT.md 随父仓提交。
+
 ## 2026-09-05 · 驳回即出「根修 checklist」——驳回意见自动转开发线索（SOP 最后一块）
 
 - **缺陷模式库**（medical-extra.js DEFECT_PATTERNS，8 类）：世应爻口径(R-LY2)/知识错配(R-LY3)/时效错配(R-LY4)/跨模块串味(R-LY5)/排盘内核(ENGINE)/白话层(BAIHUA)/化解层(HUAJIE)/采集层(COLLECT)，每条含根因方向 suspect + 修复路径 hint（精确到文件与函数）；未命中记 NEW 引导补库。
