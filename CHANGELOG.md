@@ -1,3 +1,7 @@
+## 2026-09-05 · 月度互查清单草案 v0.1
+
+- docs/monthly-cross-check-draft-20260905.md（A 能力保鲜 3 项 / B 医学通道 5 项 / C 合规 3 项）；A3 排盘指纹基线 DELIVERY/paipan-fingerprint-202609.json 已生成；已抄送 family 待会签
+
 ## 2026-09-05 · G22 漂移巡检本侧上线
 
 - scripts/capability-drift-check.js（三态判定+状态件）挂入 health-patrol.sh；兼容 family .activated 归档目录

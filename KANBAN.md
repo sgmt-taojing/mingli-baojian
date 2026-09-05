@@ -1,3 +1,9 @@
+## 2026-09-05 · 月度互查清单草案 v0.1 出炉（本侧检查项）
+
+- 草案：`docs/monthly-cross-check-draft-20260905.md`，三分野 11 项——A. mingli→family 能力保鲜（漂移巡检对账/registry 对账/**排盘输出指纹对拍**）；B. tcm→mingli 医学通道（L1 差集/L2.5 检索哈希/L2 同案对拍/L3 知识一致性/排名漂移守护，全部复用 G17 既有资产）；C. 通用合规（话术分层/分域守卫/历法一致性）。
+- 即行动：A3 本侧指纹基线已生成 `DELIVERY/paipan-fingerprint-202609.json`（固定 5 用例全量 JSON，引擎 commit e0c2e6c）——family 侧同跑自证即可完成对拍。
+- 已抄送 family（docs/handoff/mingli-monthly-cross-check-draft-20260905.md），待三方会签升 v1.0 写入 AGENT.md。
+
 ## 2026-09-05 · G22 漂移巡检本侧半边上线 + 一次真实事故互通
 
 - **巡检脚本**：`scripts/capability-drift-check.js`——outbox 最新定版包 ↔ family 部署目录逐文件 sha256 比对；三态判定 IN_SYNC / NOT_ON_LATEST（WARN）/ DRIFT（ERROR）；状态件落 `DELIVERY/capability-drift-latest.json`；已挂入 health-patrol.sh（漂移进 ALERTS，待接收记 WARN 日志不告警）。兼容 family 激活流水线的 `.activated`（含多重）归档目录。
