@@ -197,7 +197,33 @@ app.post('/api/annotations/:aid/reject', (req, res) => {
   found.a.reject_reason = reason;
   const list = readAnns(found.emrId).map(x => (x.id === found.a.id ? found.a : x));
   writeAnns(found.emrId, list);
-  res.json({ ok: true, annotation: found.a });
+  // 驳回标准动作：信众求测件附同案重出回执（修复后一键重出 + 新旧 diff）
+  const qiuceMatch = /^QIUCE-(\d+)$/.exec(found.emrId);
+  const retest = qiuceMatch
+    ? { available: true, qiuce_id: parseInt(qiuceMatch[1]), endpoint: `/api/annotations/${found.a.id}/retest`, hint: '根修完成后调用同案重出，新初稿自动入队复核并与本件 diff' }
+    : { available: false };
+  res.json({ ok: true, annotation: found.a, retest });
+});
+
+// 同案重出（驳回→根修→重出→复核销案 标准动作）
+// 代理 8920 /api/internal/qiuce/:id/retest：重出初稿 + 新旧 diff + 重新入队
+app.post('/api/annotations/:aid/retest', async (req, res) => {
+  const found = findAnn(req.params.aid);
+  if (!found) return res.status(404).json({ ok: false, error: '批注不存在' });
+  if (found.a.status !== 'rejected') return res.status(409).json({ ok: false, error: `仅驳回件可同案重出（当前 ${found.a.status}）` });
+  const qiuceMatch = /^QIUCE-(\d+)$/.exec(found.emrId);
+  if (!qiuceMatch) return res.status(400).json({ ok: false, error: '仅信众求测件（QIUCE-*）支持同案重出' });
+  try {
+    const r = await fetch(`http://127.0.0.1:8920/api/internal/qiuce/${qiuceMatch[1]}/retest`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Skip-Interceptor': '1' },
+      body: '{}', signal: AbortSignal.timeout(15000),
+    });
+    const d = await r.json().catch(() => null);
+    if (!d || d.code !== 0) return res.status(502).json({ ok: false, error: (d && d.message) || '主栈重出失败' });
+    res.json({ ok: true, emr_id: found.emrId, old_annotation: found.a.id, ...d.data });
+  } catch (e) {
+    res.status(502).json({ ok: false, error: '主栈不可达：' + e.message });
+  }
 });
 
 app.listen(PORT, '127.0.0.1', () => {

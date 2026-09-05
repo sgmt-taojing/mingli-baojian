@@ -1,3 +1,13 @@
+## 2026-09-05 · 「驳回→根修→同案重出→复核销案」标准动作固化上线
+
+- **后端**：
+  - 8974 `POST /api/annotations/:aid/reject` 响应新增 `retest` 回执（信众求测件 QIUCE-* 可用，含重出端点与提示）；
+  - 8974 新增 `POST /api/annotations/:aid/retest` 代理端点（仅驳回件、仅 QIUCE-*）；
+  - 8920 新增 `POST /api/internal/qiuce/:id/retest`——复用原求测参数（类目/事项/生辰/性别）重出 AI 初稿，与最近一条驳回件做行级 diff（新增/移除行数+各 12 行示例），新初稿自动重新入 8974 批注队列复核；CSRF 白名单放行 `/api/internal/qiuce/` 服务间回环调用。
+- **前端**（mobile-interact.html 命理师工作台）：历史记录中驳回件（QIUCE-*）挂「🔁 同案重出」按钮，点击后内联展示 diff 对比（基准驳回件/移除行/新增行）并自动刷新队列；驳回操作 toast 引导「修复后可在历史记录点同案重出」。
+- **全链路复测**：对 QIUCE-2 原驳回件（ann-a77c5e8b3fa7）执行同案重出 → 新初稿 ann-c424c49260b1 入队（diff：+33/−30 行，基准件与驳回原因完整带出）→ 新稿质检三项修复在位 → 复核通过 → 短信 mock 通知 → 队列清零（approved 32）。
+- 提交：server 子模块 889c1ed；medical-stack/medical-extra.js 与 app/mobile-interact.html 随父仓提交。
+
 ## 2026-09-05 · QIUCE-2 同案重出 · 业务闭环验证通过（销案）
 
 - **背景**：08-30 驳回件 QIUCE-2（六爻问职称评审）暴露三处硬伤，经 R-LY2/R-LY3/R-LY4 根修后同案重出验证业务闭环。

@@ -161,7 +161,7 @@ async function review(aid, action){
     body.reason = reason;
   }
   const r = await api(`/api/annotations/${aid}/${action}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-  if(r.ok){ toast(action === 'approve' ? '已核对签发（水印解除）' + (r.sms ? '，' + r.sms : '') : '已驳回'); loadAll(); }
+  if(r.ok){ toast(action === 'approve' ? '已核对签发（水印解除）' + (r.sms ? '，' + r.sms : '') : ('已驳回' + (r.retest && r.retest.available ? '，修复后可在历史记录点「同案重出」' : ''))); loadAll(); }
   else toast(r.error || '操作失败');
 }
 
@@ -178,8 +178,28 @@ async function loadHistory(){
         </div>
         <div class="content">${esc((a.content||'').slice(0,200))}</div>
         <div class="meta"><span>核对：${esc(a.reviewer||'—')} · ${esc((a.reviewed_at||'').slice(0,16).replace('T',' '))}${a.reject_reason ? ' · 原因：' + esc(a.reject_reason) : ''}</span></div>
+        ${a.status==='rejected' && /^QIUCE-/.test(a.emr_id||'') ? `<div class="ops"><button class="ok" onclick="retest('${a.id}')">🔁 同案重出（修复后一键重出+对比）</button></div><div class="diff" id="diff-${a.id}"></div>` : ''}
       </div>`).join('');
   } catch(e){ $('history').innerHTML = '<div class="empty">历史加载失败</div>'; }
+}
+
+/* ── 同案重出（驳回→根修→重出→复核销案 标准动作）── */
+async function retest(aid){
+  if(!authed){ toast('请先完成身份验证'); return; }
+  if(!confirm('同案重出：按原求测参数重新生成 AI 初稿，与驳回件对比差异后重新入队复核。确认执行？')) return;
+  const box = $('diff-' + aid);
+  if(box) box.innerHTML = '<div class="meta">重出中，请稍候…</div>';
+  const r = await api(`/api/annotations/${aid}/retest`, { method:'POST', headers:{'Content-Type':'application/json'}, body:'{}' });
+  if(!r.ok){ if(box) box.innerHTML = '<div class="meta" style="color:var(--red)">重出失败：' + esc(r.error||'') + '</div>'; else toast(r.error||'重出失败'); return; }
+  let html = '<div class="meta" style="color:var(--green)">✅ 新初稿已入队待复核</div>';
+  if(r.old_annotation) html += `<div class="meta">对比基准：驳回件 ${esc(r.old_annotation.id||'')}（${esc(r.old_annotation.reviewer||'—')}）${r.old_annotation.reject_reason ? ' · 驳回原因：' + esc(r.old_annotation.reject_reason) : ''}</div>`;
+  if(r.diff){
+    html += `<div class="meta">差异：新增 ${r.diff.added_count} 行 / 移除 ${r.diff.removed_count} 行</div>`;
+    if(r.diff.removed && r.diff.removed.length) html += '<div class="meta">移除：<br>' + r.diff.removed.map(l=>'− '+esc(l.slice(0,80))).join('<br>') + '</div>';
+    if(r.diff.added && r.diff.added.length) html += '<div class="meta">新增：<br>' + r.diff.added.map(l=>'＋ '+esc(l.slice(0,80))).join('<br>') + '</div>';
+  } else html += '<div class="meta">（未找到驳回原件，跳过差异对比）</div>';
+  if(box) box.innerHTML = html;
+  toast('同案重出完成，请到队列复核'); loadQueue();
 }
 
 function loadAll(){ loadQueue(); loadHistory(); }

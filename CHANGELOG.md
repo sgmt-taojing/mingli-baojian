@@ -1,3 +1,9 @@
+## 2026-09-05 · 同案重出标准动作固化
+
+- 8974 reject 回执 + retest 代理；8920 /api/internal/qiuce/:id/retest（重出+diff+重新入队）；CSRF 白名单放行
+- 命理师工作台驳回件挂「同案重出」按钮与 diff 视图；QIUCE-2 原驳回件全链路复测通过（ann-c424c49260b1，diff +33/−30）
+- server 子模块 commit 889c1ed
+
 ## 2026-09-05 · QIUCE-2 同案重出闭环销案
 
 - 同案重新求测→AI 初稿→8974 批注队列→命理师 approve→短信 mock→信众端「命理师已核对」全链路验证通过
