@@ -195,15 +195,32 @@ if [ -n "$DIFF_SLA_OUT" ]; then
     done <<< "$DIFF_SLA_OUT"
 fi
 
-# ===== R-WALF WAL 裂脑检测（2026-08-31 事故守卫）=====
+# ===== R-WALF WAL 裂脑检测（2026-08-31 事故守卫，09-05 升级自动收敛）=====
 # 背景：R772 按请求开关写连接触发 SQLite 末连接语义删除/重建 -wal/-shm，
 # 主句柄持续写入失链孤儿 WAL（磁盘不可见、重启即丢）。根修后本规则兜底：
 # 主 API 进程持有的 yidao.db-wal fd inode 与磁盘文件 inode 不一致即告警。
+# 09-05 升级：检出即自动收敛（kickstart api-v2，R-WALF 既定处置动作）+ 每次巡检记录 wal inode 时间线
+# （logs/wal-watch.jsonl），复发时可按时间戳对撞 launchd 任务日志定位 unlink 方。
 API_PID=$(pgrep -f 'api-server-v2.js' | head -1)
 if [ -n "$API_PID" ]; then
   DISK_WAL_INODE=$(stat -f '%i' "$PROJECT_ROOT/server/database/yidao.db-wal" 2>/dev/null || echo MISSING)
   HELD_BAD=$(lsof -p "$API_PID" 2>/dev/null | awk '/yidao\.db-wal/ && $4 ~ /u$/ {print $8}' | sort -u | grep -v "^${DISK_WAL_INODE}$" | head -1)
-  [ -n "$HELD_BAD" ] && ALERTS+=("WAL裂脑: api-v2(pid=$API_PID) 持有失链 yidao.db-wal inode=$HELD_BAD（磁盘=$DISK_WAL_INODE）→ 写入不落盘，重启即丢！立即排查并按 WAL-F 流程收敛")
+  echo "{\"ts\":\"$TS\",\"pid\":$API_PID,\"disk_wal\":\"$DISK_WAL_INODE\",\"held_bad\":\"${HELD_BAD:-}\"}" >> "$PROJECT_ROOT/logs/wal-watch.jsonl"
+  if [ -n "$HELD_BAD" ]; then
+    echo "[$TS] ⚠️ WAL裂脑检出: pid=$API_PID held=$HELD_BAD disk=$DISK_WAL_INODE → 自动收敛(kickstart api-v2)" >> "$LOG"
+    launchctl kickstart -k "gui/$(id -u)/com.mingli-baojian.api-v2" 2>/dev/null
+    sleep 6
+    NEW_PID=$(pgrep -f 'api-server-v2.js' | head -1)
+    NEW_DISK=$(stat -f '%i' "$PROJECT_ROOT/server/database/yidao.db-wal" 2>/dev/null || echo MISSING)
+    NEW_BAD=""
+    [ -n "$NEW_PID" ] && NEW_BAD=$(lsof -p "$NEW_PID" 2>/dev/null | awk '/yidao\.db-wal/ && $4 ~ /u$/ {print $8}' | sort -u | grep -v "^${NEW_DISK}$" | head -1)
+    if [ -n "$NEW_BAD" ]; then
+      ALERTS+=("WAL裂脑: 自动收敛后仍失链 pid=$NEW_PID held=$NEW_BAD disk=$NEW_DISK → 需人工介入（暂停写入类 launchd 任务排查 unlink 方）")
+    else
+      echo "[$TS] ✅ WAL裂脑自动收敛成功: 新 pid=$NEW_PID wal inode 一致" >> "$LOG"
+      echo "  · WAL裂脑: 已自动收敛（旧 pid=$API_PID → 新 pid=$NEW_PID）"
+    fi
+  fi
 fi
 
 # ===== R111 触发器巡检：kb_formal 关键触发器存在性 + hit_count NULL =====

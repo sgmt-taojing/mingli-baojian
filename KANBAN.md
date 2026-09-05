@@ -4,6 +4,14 @@
 - **WAL 裂脑二发**：health-patrol 报 api-v2（pid 31249，今晨 08:29 启动）持有失链 yidao.db-wal（inode 28733602≠磁盘 30142033，写入不落盘）。按 R-WALF 流程重启收敛，复跑全绿，DB 读验证正常（qiuce 记录在）。**R772 后第二次复发，说明根修只治了连接语义没治失链监控前的窗口期——建议立项查 launchd 重启链路中文描述符继承或 db 文件被替换的时点**。
 - 提交：随父仓。
 
+## 2026-09-05 22:40 · WAL 裂脑守卫升级自动收敛 ✅
+
+- **守卫升级**：health-patrol.sh R-WALF 块从「检出仅告警」升级为「检出即自动收敛」——发现主 API 持有的 yidao.db-wal inode 失链即自动 `launchctl kickstart -k api-v2`，6 秒后复查新进程 wal inode；一致→记日志不打警，仍失链→进 ALERTS 报人工介入。
+- **时间线埋点**：每次巡检追加 logs/wal-watch.jsonl（ts/pid/disk_wal/held_bad），下次复发可按时间戳对撞 launchd 日志锁定 unlink 方。
+- **静态排查结论**（本轮考古到尽头）：已排除——无任何脚本 mv/replace/VACUUM yidao.db；import-tcm-kb.py 仅 sqlite 连接内写库；data1-weekly-backup 显式 exclude yidao.db*；8920 按请求句柄指向 mingli.db 非 yidao.db。机理仍为 R772 末连接语义，unlink 方未锁定（疑点：tcm-import 15min 轮询等直连脚本）。
+- **验证**：bash -n 通过；试跑全绿，wal-watch.jsonl 正常写入（pid=26596, held_bad 空）。
+- 遗留：unlink 方待 wal-watch 时间线下次复发对撞定位；备选方案——直连 yidao.db 的 launchd 脚本统一规范「写完 checkpoint + 不做末连接」。
+
 ## 2026-09-05 · 月度互查清单草案 v0.1 出炉（本侧检查项）
 
 - 草案：`docs/monthly-cross-check-draft-20260905.md`，三分野 11 项——A. mingli→family 能力保鲜（漂移巡检对账/registry 对账/**排盘输出指纹对拍**）；B. tcm→mingli 医学通道（L1 差集/L2.5 检索哈希/L2 同案对拍/L3 知识一致性/排名漂移守护，全部复用 G17 既有资产）；C. 通用合规（话术分层/分域守卫/历法一致性）。

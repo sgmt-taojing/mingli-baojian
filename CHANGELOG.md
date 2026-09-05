@@ -3,6 +3,11 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-05 22:40 · R-WALF 守卫升级：检出自动收敛 + wal-watch 时间线埋点
+
+- scripts/health-patrol.sh：WAL 裂脑检出即自动 kickstart 收敛 api-v2 并复查，成功不告警、失败才进 ALERTS；每轮巡检落 logs/wal-watch.jsonl 供复发时定位 unlink 方。试跑全绿。
+- WAL 裂脑静态排查收口：排除 mv/replace/VACUUM/备份脚本/按请求句柄等嫌疑，机理维持 R772 末连接语义结论，转埋点取证路线。
+
 ## 2026-09-05 · 月度互查清单草案 v0.1
 
 - docs/monthly-cross-check-draft-20260905.md（A 能力保鲜 3 项 / B 医学通道 5 项 / C 合规 3 项）；A3 排盘指纹基线 DELIVERY/paipan-fingerprint-202609.json 已生成；已抄送 family 待会签
