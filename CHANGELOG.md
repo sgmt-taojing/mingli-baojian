@@ -1,3 +1,8 @@
+## 2026-09-05 · A2 对账上线 + WAL 裂脑二发收敛
+
+- capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
+- WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
+
 ## 2026-09-05 · 月度互查清单草案 v0.1
 
 - docs/monthly-cross-check-draft-20260905.md（A 能力保鲜 3 项 / B 医学通道 5 项 / C 合规 3 项）；A3 排盘指纹基线 DELIVERY/paipan-fingerprint-202609.json 已生成；已抄送 family 待会签

@@ -1,3 +1,9 @@
+## 2026-09-05 · A2 registry↔outbox 对账上线 + WAL 裂脑二发收敛（P0）
+
+- **A2 对账并入 capability-drift-check.js**：正向（registry 登记→outbox 实物存在+manifest 版本一致）+ 反向（outbox 实物→登记在案，按 pack_path 能力目录名匹配、不限提供方前缀，含 .activated 多重后缀兼容）；对账异常按 ERROR 级进 health-patrol 告警。首跑即修正一处误报逻辑（tcm-diagnose 登记被误判未登记），现 3 条登记双向全对。
+- **WAL 裂脑二发**：health-patrol 报 api-v2（pid 31249，今晨 08:29 启动）持有失链 yidao.db-wal（inode 28733602≠磁盘 30142033，写入不落盘）。按 R-WALF 流程重启收敛，复跑全绿，DB 读验证正常（qiuce 记录在）。**R772 后第二次复发，说明根修只治了连接语义没治失链监控前的窗口期——建议立项查 launchd 重启链路中文描述符继承或 db 文件被替换的时点**。
+- 提交：随父仓。
+
 ## 2026-09-05 · 月度互查清单草案 v0.1 出炉（本侧检查项）
 
 - 草案：`docs/monthly-cross-check-draft-20260905.md`，三分野 11 项——A. mingli→family 能力保鲜（漂移巡检对账/registry 对账/**排盘输出指纹对拍**）；B. tcm→mingli 医学通道（L1 差集/L2.5 检索哈希/L2 同案对拍/L3 知识一致性/排名漂移守护，全部复用 G17 既有资产）；C. 通用合规（话术分层/分域守卫/历法一致性）。

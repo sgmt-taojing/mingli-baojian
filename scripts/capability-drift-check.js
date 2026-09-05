@@ -96,10 +96,54 @@ function checkCap(capId) {
   return { capability: capId, latest, results };
 }
 
+// A2 · registry.releases ↔ outbox 实物对账（登记但无实物 / 有实物未登记 / manifest 不可解析或版本不符 均告警）
+const REGISTRY = path.join(PROJECTS_ROOT, '_shared', 'capability-registry.json');
+function checkRegistry() {
+  const issues = [];
+  let reg;
+  try { reg = JSON.parse(fs.readFileSync(REGISTRY, 'utf8')); }
+  catch (e) { return { status: 'ERROR', issues: [`registry 不可解析：${e.message}`] }; }
+  const releases = (reg.releases || []).filter(r => r.pack_path);
+  const stripAct = d => d.replace(/(\.activated)+$/, '');
+  for (const r of releases) {
+    // 能力目录名从 pack_path 提取（…/capability-packs/<cap>/<version>）
+    const pm = /capability-packs\/([^/]+)\/([^/]+)$/.exec(String(r.pack_path));
+    if (!pm) { issues.push(`${r.id}@${r.version}：pack_path 不合规（${r.pack_path}）`); continue; }
+    const capId = pm[1];
+    const dir = path.join(OUTBOX, capId);
+    const found = fs.existsSync(dir)
+      ? fs.readdirSync(dir).find(d => stripAct(d) === r.version)
+      : null;
+    if (!found) { issues.push(`${r.id}@${r.version}：registry 已登记但 outbox 无实物`); continue; }
+    try {
+      const m = JSON.parse(fs.readFileSync(path.join(dir, found, 'manifest.json'), 'utf8'));
+      if (m.version !== r.version) issues.push(`${r.id}@${r.version}：实物 manifest 版本为 ${m.version}，与登记不符`);
+    } catch (e) { issues.push(`${r.id}@${r.version}：实物 manifest 不可解析（${e.message}）`); }
+  }
+  // 反向：outbox 有版本实物但未登记（按 pack_path 的能力目录名+版本匹配，不限定提供方前缀）
+  if (fs.existsSync(OUTBOX)) {
+    for (const capId of fs.readdirSync(OUTBOX)) {
+      const dir = path.join(OUTBOX, capId);
+      if (!fs.statSync(dir).isDirectory()) continue;
+      for (const d of fs.readdirSync(dir)) {
+        const v = stripAct(d);
+        if (!/^\d+\.\d+\.\d+$/.test(v)) continue;
+        const hit = (reg.releases || []).some(r => {
+          const pp = String(r.pack_path || '');
+          return r.version === v && (pp.endsWith(`/${capId}/${v}`) || pp.includes(`/${capId}/`));
+        });
+        if (!hit) issues.push(`${capId}@${v}：outbox 有实物但 registry 未登记（${d}）`);
+      }
+    }
+  }
+  return { status: issues.length ? 'MISMATCH' : 'OK', checked: releases.length, issues };
+}
+
 function main() {
   const report = {
     checked_at: new Date().toISOString(),
     capabilities: Object.keys(CONSUMERS).map(checkCap),
+    registry: checkRegistry(),
   };
   let worst = 0;
   for (const cap of report.capabilities) {
@@ -108,6 +152,8 @@ function main() {
       else if (r.status === 'NOT_ON_LATEST') worst = Math.max(worst, 2);
     }
   }
+  // registry 对账异常按 ERROR 级（登记与实物脱节会让 rollback_ref/指纹基准失效）
+  if (report.registry.status !== 'OK') worst = Math.max(worst, 1);
   report.overall = worst === 0 ? 'IN_SYNC' : worst === 1 ? 'DRIFT' : 'NOT_ON_LATEST';
   fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
   fs.writeFileSync(STATE_FILE, JSON.stringify(report, null, 2));
@@ -121,6 +167,12 @@ function main() {
       if (r.missing && r.missing.length) console.log(`   缺失文件: ${r.missing.join(', ')}`);
       if (r.extra && r.extra.length) console.log(`   多出文件: ${r.extra.join(', ')}`);
     }
+  }
+  // A2 对账人读输出
+  if (report.registry.status === 'OK') {
+    console.log(`✅ registry↔outbox 对账: OK（${report.registry.checked} 条登记）`);
+  } else {
+    for (const i of report.registry.issues) console.log(`❌ registry↔outbox 对账: ${i}`);
   }
   process.exit(worst === 0 ? 0 : worst === 1 ? 1 : 2);
 }
