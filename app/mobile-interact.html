@@ -181,6 +181,7 @@ async function loadHistory(){
         </div>
         <div class="content">${esc((a.content||'').slice(0,200))}</div>
         <div class="meta"><span>核对：${esc(a.reviewer||'—')} · ${esc((a.reviewed_at||'').slice(0,16).replace('T',' '))}${a.reject_reason ? ' · 原因：' + esc(a.reject_reason) : ''}</span></div>
+        ${a.status==='rejected' && Array.isArray(a.triage) && a.triage.length ? `<div class="triage"><div class="meta" style="color:var(--gold)">🧭 根修线索（${a.triage.length}）</div>${a.triage.map(t => `<div class="meta">▸ [${esc(t.ref)}] ${esc(t.suspect)}<br>&nbsp;&nbsp;→ ${esc(t.hint)}</div>`).join('')}</div>` : ''}
         ${a.status==='rejected' && /^QIUCE-/.test(a.emr_id||'') ? `<div class="ops"><button class="ok" onclick="retest('${a.id}')">🔁 同案重出（修复后一键重出+对比）</button></div><div class="diff" id="diff-${a.id}"></div>` : ''}
       </div>`).join('');
   } catch(e){ $('history').innerHTML = '<div class="empty">历史加载失败</div>'; }

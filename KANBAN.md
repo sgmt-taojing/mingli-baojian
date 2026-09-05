@@ -1,3 +1,11 @@
+## 2026-09-05 · 驳回即出「根修 checklist」——驳回意见自动转开发线索（SOP 最后一块）
+
+- **缺陷模式库**（medical-extra.js DEFECT_PATTERNS，8 类）：世应爻口径(R-LY2)/知识错配(R-LY3)/时效错配(R-LY4)/跨模块串味(R-LY5)/排盘内核(ENGINE)/白话层(BAIHUA)/化解层(HUAJIE)/采集层(COLLECT)，每条含根因方向 suspect + 修复路径 hint（精确到文件与函数）；未命中记 NEW 引导补库。
+- **reject 联动**：驳回时自动 triage 驳回原因 → checklist 随批注持久化（annotation.triage）+ 追加登记 data/reject-triage.jsonl（开发侧可取）；retest 回执同步携带 triage。
+- **工作台**：驳回件历史卡展示「🧭 根修线索」清单（ref/根因/修复路径），与同案重出按钮同屏——命理师驳回一句话，开发侧拿到可执行的修复指引。
+- **复测**（QIUCE-3 梅花签约案，驳回原因含「知识无关+三年太岁」）：triage 命中 R-LY3+R-LY4 双线索、jsonl 登记、annotation-history 透出 triage 字段；同案重出 ann-97e04a20e49c 15 段 diff 正常，复核通过队列清零（approved 34）。
+- 提交：medical-stack/medical-extra.js 与 app/mobile-interact.html 随父仓提交。
+
 ## 2026-09-05 · 同案重出 diff 升级「区段级对照视图」
 
 - **后端**（api-server-v2.js）：新增 `qiuceSectionDiff`——按报告结构标题（【…】/━━━…━━━）切段，逐段标记 same/changed/added/removed，段内给行级明细（增删各 6 行）；`diff.sections` 随 retest 响应返回，原总量统计保留。
@@ -2268,3 +2276,10 @@
 - KB 蒸馏延续：09-03 02:05 +20 条已多次节点覆盖（05:00～22:00 共 35+ 节点）；22:30 无新 distill-*.py 执行（distill-2026-09-03.jsonl 仍 20 行 ≈23.4KB / 02:05:14 mtime 复验）
 - 进行中无变化：① 周报 cron timeoutSeconds 120→300（等用户控制台操作，指引 DELIVERY/cron-console-fix-guide-20260901.md）② TCM 差集已 14:10 收口 ③ 节点 0/0 无未收口开发项
 - 阻塞延续：周报 cron 调整需 AutoClaw 控制台（夜间等用户动作）
+
+## 2026-09-05 08:30 — ⚠️ 心跳 08:30（static:8900 挂后恢复）
+- 健康检查：static(:8900) 08:24 后停止、08:30 探到 DOWN → bootout+bootstrap 重启恢复（PID 34289）；其余全绿
+- 原因推测：python3 static-gzip.py 进程非正常退出（KeepAlive=false 不自动重拉）
+- KB 蒸馏：无新增（09-05 例行窗口 ~02:04 已过，无新 jsonl）
+- 进行中无变化：① 周报 cron 300s ② TCM 差集收口 ③ 节点 0/0
+- 阻塞：✅ 无

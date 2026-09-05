@@ -48,7 +48,49 @@ app.use((req, res, next) => {
   next();
 });
 
+// ── 缺陷模式库（驳回原因 → 根修线索，R-LY 系列实证沉淀，随新缺陷持续补充）──
+// 每条：match 命中驳回原因关键词；ref 对应根修编号；suspect 根因方向；hint 修复路径
+const DEFECT_PATTERNS = [
+  { match: /世爻|应爻|第\s*0\s*爻|爻位|自相矛盾/,
+    ref: 'R-LY2', suspect: '世应爻 0 基/1 基口径（展示层）',
+    hint: '查 norm-output-template.js / norm-report-engine.js 展示处是否 +1；数据层 huajie-engine 数组下标为 0 基正确口径，勿动' },
+  { match: /知识.{0,4}(错配|无关)|引用.{0,4}(无关|错|乱)|错配|张冠李戴|不相关|噪声/,
+    ref: 'R-LY3', suspect: 'KB 知识依据与问事类目/卦名不对齐（用神相关性）',
+    hint: '查 kb-module-filter.js filterKbHitsByTopic 章节类目规则与卦名对齐；章节名新词补 CHAPTER_TOPIC_RULES' },
+  { match: /时效|太岁|三年|近期|应期|时间.{0,4}(错|偏)/,
+    ref: 'R-LY4', suspect: '逐年走势与问事时效意图错配（近期事项配长线走势）',
+    hint: '查 paipan-baihua-engine.js horizonOf 关键词覆盖；新时效表达补正则' },
+  { match: /跨模块|串味|泄漏|六爻.{0,6}梅花|梅花.{0,6}六爻|他派|混入/,
+    ref: 'R-LY5', suspect: '泛域 KB 条目内容含他模块专有名词穿透域级过滤',
+    hint: '查 kb-module-filter.js KB_DENY_CONTENT；新专词补对应模块正则' },
+  { match: /起卦|排盘|卦名|卦象.{0,4}(错|不对)|干支.{0,4}错/,
+    ref: 'ENGINE', suspect: '排盘内核数据（起卦/干支/星曜）',
+    hint: '查对应 liuyao/qimen/ziwei-engine-node.js 内核与同案 SVG 服务端盘图是否一致；以权威万年历对拍' },
+  { match: /白话|看不懂|术语|生硬|模板|空话/,
+    ref: 'BAIHUA', suspect: '白话解读层（模板空话/术语未翻译）',
+    hint: '查 paipan-baihua-engine.js 对应模块 cards/forecast 文案与 norm-report-engine 模板句' },
+  { match: /化解|建议.{0,4}(空|泛|套话)|调理/,
+    ref: 'HUAJIE', suspect: '化解方案层（泛泛而谈无行动项）',
+    hint: '查 huajie-engine.js 方案生成与行动卡；按姓名工具「评分→针对性建议」范式补齐' },
+  { match: /采集|生辰|信息.{0,4}(缺|错)|入参/,
+    ref: 'COLLECT', suspect: '采集层信息不足或字段错配',
+    hint: '查 validateCollection 一级校验与问事页采集表单字段' },
+];
+const TRIAGE_LOG = path.join(ROOT, 'data', 'reject-triage.jsonl');
+
 // ── 存储（每病历一文件，批注只增不改）──
+
+function triageRejectReason(reason) {
+  const text = String(reason || '');
+  const hits = DEFECT_PATTERNS.filter(p => p.match.test(text))
+    .map(p => ({ ref: p.ref, suspect: p.suspect, hint: p.hint }));
+  if (!hits.length) {
+    hits.push({ ref: 'NEW', suspect: '未命中已知缺陷模式', hint: '登记 KANBAN 待诊断；修复确认后将关键词补入 DEFECT_PATTERNS' });
+  }
+  return hits;
+}
+
+
 function annFile(emrId) {
   const safe = String(emrId).replace(/[^A-Za-z0-9_-]/g, '');
   return path.join(ANN_DIR, `${safe}.json`);
@@ -195,13 +237,22 @@ app.post('/api/annotations/:aid/reject', (req, res) => {
   found.a.reviewed_at = new Date().toISOString();
   found.a.reviewer = reviewer;
   found.a.reject_reason = reason;
+  // 根修 checklist：驳回原因命中已知缺陷库 → 直接转成开发线索（随批注持久化 + jsonl 登记）
+  const triage = triageRejectReason(reason);
+  found.a.triage = triage;
+  try {
+    fs.appendFileSync(TRIAGE_LOG, JSON.stringify({
+      at: found.a.reviewed_at, annotation_id: found.a.id, emr_id: found.emrId,
+      reviewer, reason, triage: triage.map(t => t.ref),
+    }) + '\n');
+  } catch (_) { /* 登记失败不阻塞驳回 */ }
   const list = readAnns(found.emrId).map(x => (x.id === found.a.id ? found.a : x));
   writeAnns(found.emrId, list);
   // 驳回标准动作：信众求测件附同案重出回执（修复后一键重出 + 新旧 diff）
   const qiuceMatch = /^QIUCE-(\d+)$/.exec(found.emrId);
   const retest = qiuceMatch
-    ? { available: true, qiuce_id: parseInt(qiuceMatch[1]), endpoint: `/api/annotations/${found.a.id}/retest`, hint: '根修完成后调用同案重出，新初稿自动入队复核并与本件 diff' }
-    : { available: false };
+    ? { available: true, qiuce_id: parseInt(qiuceMatch[1]), endpoint: `/api/annotations/${found.a.id}/retest`, hint: '根修完成后调用同案重出，新初稿自动入队复核并与本件 diff', triage }
+    : { available: false, triage };
   res.json({ ok: true, annotation: found.a, retest });
 });
 

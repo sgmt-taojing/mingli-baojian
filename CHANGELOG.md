@@ -1,3 +1,8 @@
+## 2026-09-05 · 驳回根修 checklist（DEFECT_PATTERNS 8 类缺陷模式库）
+
+- reject 自动 triage 驳回原因 → checklist 持久化 + reject-triage.jsonl 登记 + retest 回执携带
+- 工作台驳回件展示「根修线索」；QIUCE-3 复测命中 R-LY3+R-LY4 双线索，SOP 全程验证通过
+
 ## 2026-09-05 · 同案重出 diff 升级区段级对照
 
 - qiuceSectionDiff 按报告结构切段逐段比对（same/changed/added/removed+段内明细）；工作台折叠卡展示
