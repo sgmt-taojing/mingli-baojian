@@ -3,6 +3,8 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-06 20:15 · 名人采集半脚本化：celebrity-ingest.py（校验+排盘+反校上下文+入库），agent 只做搜索
+
 ## 2026-09-06 17:00 · health-patrol 新增 R-CHAIN5 规则：tcm 链条退出码非零/差集状态超 1h 未更新即告警（堵「链条哑巴 3 天」盲区）
 
 ## 2026-09-06 15:30 · 链5 修复（3.9 兼容）+ 差集清零（whatif/E12-16/lab-interpret）+ r470 迁 launchd

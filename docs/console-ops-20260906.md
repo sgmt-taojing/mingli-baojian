@@ -7,25 +7,22 @@
 - 原因：该任务是纯脚本（node scripts/staging-auto-promote.js），走 agentTurn 每次白烧模型额度且 20 分钟超时窗必超时（已连败 4 次）。已迁移为 launchd 纯脚本任务 `com.mingli-baojian.staging-auto-promote`（每日 03:00，与原排程一致），今日实跑验证 promoted 829/829、0 错误。
 - 操作：控制台 → cron 任务列表 → 找到「r470-staging-auto-promote」→ **停用（disable）**。不要删，留档备查。
 
-## ② 精简「名人八字采集 · 每日增尸」payload（超时根修）
+## ② 替换「名人八字采集 · 每日增尸」payload（超时根修 · 半脚本化版）
 
-- 原因：20 分钟时限内做不完「2-3 位新名人 + 全维度事件年表 + 排盘 + 反向校验」，连败 3 次全部为超时（lastDurationMs=1200339 顶满）。
+- 原因：20 分钟时限做不完「2-3 人 + 全事件年表 + 排盘 + 反向校验」，连败 4 次全部超时（顶满 1200s）。已把确定性环节脚本化（`scripts/celebrity-ingest.py`：校验/查重/8911 排盘/事件反校上下文/合并入库），agent 只剩搜索筛选——实测 DRY-RUN 全通过。
 - 操作：控制台 → 该任务 → 编辑，把 message 整段替换为：
 
 ```
-执行名人八字校正库每日采集（精简版）：
+执行名人八字校正库每日采集（半脚本化版）：
 
-库：/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/celebrity-corpus/（先读库内 README.md）
-纪律不变：只收公开信息、来源必溯、不编造、不确定标 approximate。
+第一步（搜索筛选，唯一需要判断的环节）：按库内 README.md 规范（只收公开信息、来源必溯、不编造、不确定标 approximate），搜索筛选 2-3 位新名人（历史人物/时辰记载明确者优先），整理成 candidates JSON 写到 /tmp/celebrity-candidates.json，每人含：person_id、slug（拼音）、name、source、source_url、gender、birth{year,month,day,hour,place,approximate}、facts（改名/迁居/婚姻/子女/事业/健康/财富/官非事件年表，事件带 year）。
 
-今日只做 1 位新名人：
-1. 网络搜索采集生辰（时辰记载明确者优先）+ 关键事件年表（改名/换城市/婚姻/事业节点优先，标年份）
-2. 按库内 JSON 结构写入 staging-batch-当日.json（事件存 facts 字段）
-3. 生辰齐全用本地引擎排盘：curl -s -X POST http://127.0.0.1:8911/paipan ...（结果存 paipan 字段）
-4. 反向校验 1 个已知事件（命中/不命中）
-5. 一行纯中文汇报：新增名单+来源+校验结果
+第二步（确定性环节全部交给脚本，禁止手工排盘）：
+cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian && python3 scripts/celebrity-ingest.py /tmp/celebrity-candidates.json
 
-做不完就压缩事件数量，保生辰与来源准确。1200 秒内完成。
+第三步：读脚本输出的 reverse_checks（每事件已预排流年干支十神+所在大运），对每人的 1 个关键事件给一句命中判定（命中/不命中+一句话理由），连同脚本首行摘要作为最终回复（纯中文）。
+
+纪律：排盘/入库/反校上下文一律由脚本完成，不要在对话里手工算；查不到时辰的 birth.hour 留 null。
 ```
 
 ## 无需操作
