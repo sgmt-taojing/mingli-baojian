@@ -34,6 +34,7 @@ bash scripts/agent-selfcheck.sh   # 6/6：api/命理档案/排盘/人脸/KB/档�
 3. 人脸算法 = 本地服务（:8958），业务在 tcm/shf 消费
 4. 反爬：API 有 UA 拦截（R308），内部桥接需自定义 UA
 5. 敏感数据（mingli.db 语音/排盘档案）gitignore 本地保留
+6. **直连 yidao.db 纪律（R-WALF，2026-09-06 起）**：任何脚本/任务直连 yidao.db，关闭前必须走 `scripts/yidao_safe.py` 的 `safe_close(conn)`（commit → wal_checkpoint(TRUNCATE) → close）；禁止裸 `conn.close()` 或不关。违反此条可能触发 R772 末连接语义删建 wal，导致 8920 主句柄裂脑（写入不落盘）
 
 ## 六、修真记录（近）
 - R735：face-embed 修真（raw 输入/SCRFD decode/rec 归一化/主脸筛选）
