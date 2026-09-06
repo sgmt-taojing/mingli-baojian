@@ -3,6 +3,12 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-06 10:50 · 第三次 WAL 裂脑自动收敛成功（防线首实战）+ wal-inode-watch 秒级哨兵上线
+
+- 10:14 检出 pid 26596 wal 失链（磁盘 MISSING），自动 kickstart 收敛成功；窗口内任务全排除，unlink 方待哨兵取证。
+- 新增 launchd com.mingli-baojian.wal-inode-watch（60s）：wal inode/api_pid 变化秒级落 logs/wal-inode-watch.jsonl。
+- 新发现：api-v2 三换 pid（62142→74450→75579）疑似内存压力被杀重生，已纳入哨兵监测。
+
 ## 2026-09-06 09:55 · AGENT.md 建设规范第 6 条：直连 yidao.db 必须走 yidao_safe.safe_close（R-WALF 纪律固化）
 
 ## 2026-09-06 07:35 · R-WALF 预防层：5 处直连 yidao.db 脚本统一「写完 checkpoint 再关闭」

@@ -1,3 +1,28 @@
+## 2026-09-06 10:30 — 💚 心跳 10:30 实探全绿（误报溯源 · R-WALF 重启时序）
+
+- 健康检查脚本 10:30:10 报 `api-v2(:8920) DOWN`（心跳输出 ⚠️ ISSUES(1)）
+- 实探：api-v2 实际**正常服务**（lsof pid 75579 LISTEN / curl /api/health 200 / stdout 10:32:17 正常响应 / launchd enabled）
+- 抖动机理：**R-WALF 自动收敛 `launchctl kickstart -k` → 进程 62142→74450→75579 循环重启**，端口在 1-2s 内短暂不可达，被 2s 探测窗口命中
+- 健康检查脚本（v2，line 24 `--max-time 2`）探测窗口偏短，无法区分「重启中」vs「真 DOWN」；当下次守卫再收敛时仍会再误报
+- KB 蒸馏延续：09-06 02:10 +22 条已 03:00/04:30/06:30/07:00/09:00 节点覆盖；10:30 无新 distill-*.py 执行（例行窗口 ~14:00 未到）
+- 建议（**未执行，等用户确认**）：探测超时从 2s 提到 4s 或加「连续 2 轮 DOWN 才报」防抖；先记录观察 1-2 轮再决定是否修真
+- 阻塞：✅ 无（凌晨无待用户动作，守卫机制本身已起作用，误报可在下一轮自动翻绿）
+
+## 2026-09-06 10:50 · 第三次 WAL 裂脑实况捕获 + 秒级哨兵上线 ⚠️→🔍
+
+- **实况捕获（10:14:37）**：wal-watch 时间线立功——pid 26596 持有的 wal inode 30188125 在 09:59:35–10:14:37 窗口被 unlink（磁盘 MISSING），health-patrol 自动收敛成功（kickstart → 新 pid 62142 inode 一致）。**三层防线首次实战验证通过**：检出→自愈→留证。
+- **对撞排除**：窗口内 tcm-import 链（10:09:26）五个环节均未碰 yidao.db（import 秒退/kb-follow skipped/补丁零重放/对拍纯 HTTP）；vision-distill（10:11）不碰库；medical-stack/knowledge-server 零引用。unlink 方仍未锁定。
+- **新发现 · api-v2 pid 抖动**：10:14 后 62142→74450（<2min）→75579（10:31:17），stderr 无 FATAL、非 patrol 所为、无脚本 kickstart api-v2——疑似内存压力被杀（系统内存 100%、free 仅 85MB）launchd 自动重生。uptime 探针 10:30:10 抓到 DOWN 瞬间。
+- **秒级取证哨兵上线**：scripts/wal-inode-watch.sh + launchd `com.mingli-baojian.wal-inode-watch`（60s），wal inode 变化/api_pid 变化即落 logs/wal-inode-watch.jsonl（秒级 ts）。判读规则：inode 变且 pid 未变→外部 unlink；同时变→api-v2 自身事件。
+- 数据损耗说明：10:14 kickstart 丢弃孤儿 wal，09:59–10:14 窗口内 8920 的未落盘写入已不可考（量级：该时段无已知关键业务写入）。
+- 遗留：内存压力（100%）需专项治理，否则 api-v2 抖动不止。
+
+## 2026-09-06 09:00 — 💚 心跳 09:00 全绿（cron 30min · 上午安静期 · 无新 KB）
+- 健康检查全绿（09:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏延续：09-06 02:10 +22 条（distill-2026-09-06.jsonl 22411B mtime 02:10）已 03:00/04:30/06:30/07:00 节点覆盖；09:00 无新 distill-*.py 执行（例行窗口已过，无追加）
+- 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案） ③ 同案重出 diff 区段级视图 ④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（上午安静期，无待用户动作）
+
 ## 2026-09-06 07:00 — 💚 心跳 07:00 全绿（cron 30min · 清晨安静期 · 无新 KB）
 - 健康检查全绿（07:02:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏延续：09-06 02:10 +22 条（distill-2026-09-06.jsonl 22411B mtime 02:10）已 03:00/04:30/06:30 节点覆盖；07:00 无新 distill-*.py 执行（例行窗口已过，无追加）
