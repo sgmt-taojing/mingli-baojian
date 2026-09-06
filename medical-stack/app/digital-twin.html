@@ -196,7 +196,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
       <select class="input" id="face-complexion"><option value="">面色(选填)</option><option>明润</option><option>晦暗</option><option>潮红</option><option>苍白</option><option>萎黄</option><option>黧黑</option></select>
     </div>
     <button class="btn" onclick="addRecord()">🧪 本地试算</button>
-    <div style="font-size:10px;color:var(--text3);margin-top:6px">数据边界：本区在浏览器本地演算（localStorage），用于方案试算/教学演示，<b>不写入患者档案</b>；真实档案由服务端诊疗事件自动生成。</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">数据边界：本区评分优先由服务端 twin-engine 同源口径试算（/api/tcm/twin/whatif，服务不可达时降级本地沙盒），用于方案试算/教学演示，<b>不写入患者档案</b>；填了建档号时会与真实档案做对比差值。真实档案由服务端诊疗事件自动生成。</div>
   </div>
 </div>
 
@@ -306,21 +306,52 @@ function renderLabTrajectory(traj) {
 }
 
 // 假设演算（what-if · 本地预览 · 不入档）
+// D3 深化：优先走服务端 /api/tcm/twin/whatif（与真实档案同一 twin-engine 评分口径，消除双实现漂移）；
+// 服务不可达时降级本地沙盒引擎。两种路径都不写入患者档案。
 function addRecord() {
-  var pid = 'whatif-' + (document.getElementById('patient-id').value.trim() || 'anon');
+  var realPid = document.getElementById('patient-id').value.trim();
+  var pid = 'whatif-' + (realPid || 'anon');
+  var chief = document.getElementById('complaint').value.trim() || '健康随访';
+  var tongueColor = document.getElementById('tongue-color').value;
+  var complexion = document.getElementById('face-complexion').value;
 
   var record = {
-    chief_complaint: document.getElementById('complaint').value.trim() || '健康随访',
-    tongue: { manual_features: { color: document.getElementById('tongue-color').value } },
-    face: { manual_features: { complexion: document.getElementById('face-complexion').value } }
+    chief_complaint: chief,
+    tongue: { manual_features: { color: tongueColor } },
+    face: { manual_features: { complexion: complexion } }
   };
 
   var result = TCM_DT.addRecord(pid, record);
-  currentModel = result.model;
-  renderAll(result.model);
-  document.getElementById('whatif-banner').style.display = 'block';
-  document.getElementById('traj-card').style.display = 'none';
-  TCM.toast('🧪 假设演算完成（本地预览，未入档）· 健康分: ' + result.model.health_score.total + '分');
+
+  var banner = document.getElementById('whatif-banner');
+  function finish(sourceLabel, delta) {
+    currentModel = result.model;
+    renderAll(result.model);
+    banner.innerHTML = '🧪 当前显示为「假设演算」结果（' + sourceLabel + '，未入档）' +
+      (delta != null ? ' · 对比真实档案健康分: <b>' + (delta > 0 ? '+' : '') + delta + '</b>' : '') +
+      ' ——重新「载入档案」恢复真实数据';
+    banner.style.display = 'block';
+    document.getElementById('traj-card').style.display = 'none';
+    TCM.toast('🧪 假设演算完成（' + sourceLabel + '）· 健康分: ' + result.model.health_score.total + '分');
+  }
+
+  fetch('/api/tcm/twin/whatif', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      patient_id: realPid || undefined, chief: chief,
+      tongue_text: tongueColor, face_text: complexion
+    })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d && d.ok && d.simulated) {
+      // 同源口径覆盖本地评分三件套（趋势/风险/方案卡仍由本地沙盒补全展示）
+      result.model.health_score = d.simulated.health_score;
+      result.model.organ_scores = d.simulated.organ_scores;
+      result.model.constitution = d.simulated.constitution;
+      finish('服务端同源口径', d.delta ? d.delta.total : null);
+    } else {
+      finish('本地预览', null);
+    }
+  }).catch(function() { finish('本地预览', null); });
 }
 
 function renderAll(model) {

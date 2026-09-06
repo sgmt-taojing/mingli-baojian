@@ -1,7 +1,7 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-09-03 22:42 ｜ 差集指纹 `e56436e679c69d12`
-- tcm 侧 HEAD：`c45bbfd E7 按病种浏览教学示范案【契约 v1.4.7】`
+- 生成：2026-09-06 15:17 ｜ 差集指纹 `bd9138d18127494c`
+- tcm 侧 HEAD：`ee9cf29 药房：按 advice 建议量入库（白术+1100g/酸枣仁+700g，batch restock-20260906），预警闭环熄灭`
 - 结论：**✅ 全对齐（无待吸收增量）**
 
 ## L1 API 路由差集（tcm 有 · medical-stack 无）：0 条
@@ -17,7 +17,7 @@
 
 | 处理器 | tcm 哈希 | ms 哈希 | 状态 |
 |---|---|---|---|
-| `/api/tcm/kb/search` | `4bd0daf042912dba` | `4bd0daf042912dba` | ✅ 一致 |
+| `/api/tcm/kb/search` | `cc2825765991dd8a` | `cc2825765991dd8a` | ✅ 一致 |
 | `/api/tcm/kb/formula-recall` | `ac23b246775f610a` | `ac23b246775f610a` | ✅ 一致 |
 
 漂移处置：哈希不一致即排序/打分逻辑单侧变更——按 ADR-016 流程移植对齐或登记豁免，禁止静默放过。
@@ -35,7 +35,7 @@
 - `mingli-annotation-view.js`：⚪ ms 自有（命理批注面板视图（G15/G16 命理视图开关，命理域自有））
 - `reflux-badge.js`：⚪ ms 自有（G13+ 家庭端回流状态共享组件（诊台/药房/候诊/医技开单四触点复用））
 
-## medical-stack 独有（命理增量层，勿回流 tcm）：17 条
+## medical-stack 独有（命理增量层，勿回流 tcm）：18 条
 （批注/预约自建/reflux/短信校验等，属 mingli 特有边界，详见 ADR-007）
 
 ---

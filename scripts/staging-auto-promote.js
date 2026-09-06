@@ -33,6 +33,7 @@ function main() {
       candidates: 0, promoted: 0, errors: 0,
       message: 'no eligible candidates'
     }));
+    try { db.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (_) {}
     db.close();
     return;
   }
@@ -59,7 +60,8 @@ function main() {
     message: `promoted ${promoted}/${candidates.length} (${errors} errors)`
   };
   console.log(JSON.stringify(summary, null, 2));
-  db.close();
+  try { db.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (_) {}
+    db.close();
   process.exit(errors > 0 ? 1 : 0);
 }
 

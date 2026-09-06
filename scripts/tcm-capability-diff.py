@@ -121,7 +121,7 @@ def _extract_handler(text: str, start: int) -> str:
     return ''.join(out)
 
 
-def processor_hash(path: Path, route: str) -> str | None:
+def processor_hash(path: Path, route: str):  # 返回 str 或 None（3.9 兼容：链条以 /usr/bin/python3 运行，禁 str|None）
     try:
         text = path.read_text(encoding='utf-8', errors='ignore')
     except Exception:

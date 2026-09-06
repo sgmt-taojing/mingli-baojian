@@ -371,10 +371,16 @@ app.get('/api/tcm/kb/search', (req, res) => {
     if (!q) return res.status(400).json({ ok: false, error: '缺少 q 参数' });
     const cache = loadKbCache(false);
     // R119 修真：中文长句双字滑动窗口切词（原实现整句匹配，长问句 0 命中）
-    // R829 移植（自 tcm 8932，L2 对拍收口）：窗口上限 6→14——原 cap 只切前 7 字，
-    // 条文/板书类查询的高区分度尾部（如「板书实操」）被静默丢弃，目标条目被泛泛命中挤位
+    // R829 修真：窗口上限 6→14——原 cap 只切前 7 字，条文/板书类查询的高区分度
+    // 尾部（如「便鞕者为阳明」「板书实操」）被静默丢弃，目标条目被泛泛命中挤位；
+    // 离线网格实验（全窗/IDF/LCS 三案对比 53,280 条）全窗案最优且无回归
     const tokens = [];
-    const raw = q.toLowerCase().split(/[\s,，、;；]+/).filter(Boolean);
+    // E12 繁简桥接：查询先规整为简体再切词——馆藏古籍模块为繁体录校文，
+    // hay 侧同步规整（下方 _hayS/_titleS 懒计算），简体查询不再与繁体馆藏断层
+    // （E11 教学池回归集实测：儿科 R@5 8%、骨伤 0% 的根因即繁简不互通）
+    const { t2s } = require('./kb/t2s-map');
+    const qS = t2s(q);
+    const raw = qS.toLowerCase().split(/[\s,，、;；]+/).filter(Boolean);
     for (const t of raw) {
       if (/[\u4e00-\u9fa5]/.test(t) && t.length > 2) {
         for (let i = 0; i + 2 <= t.length && i < 14; i++) tokens.push(t.slice(i, i + 2));
@@ -387,8 +393,8 @@ app.get('/api/tcm/kb/search', (req, res) => {
     // R790：纯拉丁查询（首字母/全拼）走预算列前缀匹配——「sjz」命中「四君子汤」，
     // 多音字变体空格分隔逐一同比；标题级命中给高分（3），全拼次之（2）
     const latinQ = pinyin.isLatin(q) ? q.toLowerCase() : null;
-    // R825 移植（自 tcm 8932）：症状通道——症状别名词典识别规范症状，方剂反向索引
-    // 按重叠数加权（boost>0 的条目即便文本 0 命中也进结果集，独立于文本通道）
+    // R825 症状通道：症状别名词典识别查询中的规范症状，方剂反向索引按重叠数加权
+    // （boost>0 的条目即便文本 0 命中也进结果集——症状语义通道独立于文本通道）
     const symBoost = latinQ ? null : symptomIdx.buildBoostMap(q, _kbFlat);
     // R798 标题反哺：查询若命中 tcm-formula 干净方名（418 首），凡标题含该方名的
     // 长前缀条目加权 3.2（高于子串 2.5、低于完整 4/前缀 3 之外独立通道），让方名命中排最前
@@ -409,6 +415,9 @@ app.get('/api/tcm/kb/search', (req, res) => {
       if (hitNames.length) fxMatch = hitNames;
     }
     // R761 性能优化：hay/titleLc 预计算（缓存时算一次, 查询复用, 免去每次 2.7万条 toLowerCase）
+    // E13 实验记录在案：连续 IDF 案（R@5 -3.1pp）与超高频 0.5× 降权案（-0.7pp）均低于
+    // E12 基线已回滚——低召回根因实为数据侧（儿科症状词典缺口+金鉴方证未入症状索引），
+    // 由 formula-symptom-index-build.py D 源承接，文本通道维持 E12 原样
     for (const it of _kbFlat) {
       let score;
       if (latinQ) {
@@ -436,29 +445,62 @@ app.get('/api/tcm/kb/search', (req, res) => {
       } else {
         const hay = it._hay || (it._hay = (it.title + ' ' + it.content + ' ' + it.keywords).toLowerCase());
         const titleLc = it._titleLc || (it._titleLc = it.title.toLowerCase());
-        score = tokens.reduce((s, t) => s + (hay.includes(t) ? (titleLc.includes(t) ? 2 : 1) : 0), 0);
+        // E12：简体规整 hay/title（懒计算缓存）——繁体馆藏对简体查询可见
+        const hayS = it._hayS || (it._hayS = t2s(hay));
+        const titleS = it._titleS || (it._titleS = t2s(titleLc));
+        score = tokens.reduce((s, t) => s + (hayS.includes(t) ? (titleS.includes(t) ? 2 : 1) : 0), 0);
       }
-      if (symBoost) score += symBoost.get(it.id) || 0;  // R825 移植
+      if (symBoost) score += symBoost.get(it.id) || 0;
       if (score > 0) hits.push({ ...it, score });
     }
-    // R825 移植：症状通道命中方剂的响应标注（医生可见「为何命中」）
+    // R825：症状通道命中方剂的响应标注（医生可见「为何命中」）
     const symCanon = symBoost ? symptomIdx.analyzeQuery(q) : [];
-    // R829 移植：二级重排——粗排 top-80 追加「去标点逐字引用加成」。
-    // 条文/板书类查询是馆藏原文的清洗版，目标条目含最长连续串，却被泛泛命中
-    // 挤出 top10；逐字加成只作用于粗排头部 80 条，成本有界
+    // R829 修真：二级重排——粗排 top-80 追加「去标点逐字引用加成」。
+    // 条文/板书类查询是馆藏原文的清洗版（如「医案七八日大便鞕者为阳明」
+    // 源自「【医案】七八日,大便鞕者,为「阳明」也」），目标条目含最长连续串，
+    // 却被症状通道加权的临床条目（便秘→承气汤类）挤出 top10；逐字加成只
+    // 作用于粗排头部 80 条，成本有界；症状主诉类查询词间本无长连续串，不受影响
+    // E15：门槛 5→4——两症状短查询（「腹满 面黄」qNorm=4）目标条文与常规方剂
+    // 同分 8:8 卡线，旧门槛跳过 LCS 致信心值 tie-break 随机埋掉条文；4 字全串
+    // 命中（如条文「腹滿面黃」）本身是强信号，+8 恰破同分带（教学池实测在案）
     if (!latinQ && hits.length > 1) {
-      const qNorm = q.replace(/[^一-龥a-z0-9]/g, '');
-      if (qNorm.length >= 5) {
+      const qNorm = t2s(q).replace(/[^一-龥a-z0-9]/g, ''); // E12：规整后比对
+      // E16：无序共现加成——外科/骨伤条文常合并表述（「癰疽發背」与查询「痈 疽」
+      // 词序相反），LCS 全串与 qNorm≥4 门槛均够不着；查询词项（整词非二元组）
+      // 在条目 30 字窗内 ≥2 项共现即按共现项数加分，单词查询不触发
+      const qTerms = raw.filter(t => /[一-龥]/.test(t)).slice(0, 6); // 词项上限 6：p95 护栏
+      const doLcs = qNorm.length >= 4, doCo = qTerms.length >= 2;
+      if (doLcs || doCo) {
         hits.sort((a, b) => b.score - a.score);
         for (const h of hits.slice(0, 80)) {
-          const srcNorm = (h.title + ' ' + h.content + ' ' + h.keywords).replace(/[^一-龥a-z0-9]/g, '');
-          let best = 0; // 最长公共子串（查询侧枚举，长→短首个命中即停）
-          for (let L = Math.min(qNorm.length, 12); L >= 5 && !best; L--) {
-            for (let i = 0; i + L <= qNorm.length; i++) {
-              if (srcNorm.includes(qNorm.slice(i, i + L))) { best = L; break; }
+          const srcNorm = t2s(h.title + ' ' + h.content + ' ' + h.keywords).replace(/[^一-龥a-z0-9]/g, '').slice(0, 1500); // 窗长护栏
+          if (doLcs) {
+            let best = 0; // 最长公共子串（查询侧枚举，长→短首个命中即停）
+            for (let L = Math.min(qNorm.length, 12); L >= 4 && !best; L--) {
+              for (let i = 0; i + L <= qNorm.length; i++) {
+                if (srcNorm.includes(qNorm.slice(i, i + L))) { best = L; break; }
+              }
             }
+            if (best >= 4) h.score += best * 2;
           }
-          if (best >= 5) h.score += best * 2;
+          if (doCo) {
+            // 各词项出现位置（每项上限 20 处防扫描爆炸），词对间距 ≤30 字记共现
+            const pos = qTerms.map(t => {
+              const ps = []; let p = srcNorm.indexOf(t);
+              while (p >= 0 && ps.length < 20) { ps.push(p); p = srcNorm.indexOf(t, p + 1); }
+              return ps;
+            });
+            const inPair = new Set();
+            for (let a = 0; a < qTerms.length; a++) {
+              for (let b = a + 1; b < qTerms.length; b++) {
+                if (inPair.has(a) && inPair.has(b)) continue;
+                let near = false;
+                for (const pa of pos[a]) { for (const pb of pos[b]) { if (Math.abs(pa - pb) <= 30) { near = true; break; } } if (near) break; }
+                if (near) { inPair.add(a); inPair.add(b); }
+              }
+            }
+            if (inPair.size >= 2) h.score += Math.min(3 + 2 * (inPair.size - 1), 9); // 2项+5 / 3项+7 / ≥4项+9
+          }
         }
       }
     }
@@ -469,6 +511,7 @@ app.get('/api/tcm/kb/search', (req, res) => {
     res.status(500).json({ ok: false, error: '检索失败: ' + e.message });
   }
 });
+
 
 // ───────────────── 舌诊分析 ─────────────────
 app.post('/api/tcm/tongue', async (req, res) => {
@@ -7113,6 +7156,52 @@ app.get('/api/tcm/twin', optionalAuth, (req, res) => {
     const model = twinEngine.computeModel(pid);
     if (!model) return res.json({ ok: true, patient_id: pid, model: null, note: '该患者暂无孪生档案（经病历签发/处方/随访自动建楼）' });
     res.json({ ok: true, patient_id: pid, model });
+  } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
+});
+
+// POST /api/tcm/twin/whatif — D3 深化：假设演算同源化（服务端口径试算，绝不入档）
+// G16 吸收（2026-09-06 自 tcm-agent api-server.js:6051 同口径移植，引擎导出双侧一致）
+app.post('/api/tcm/twin/whatif', optionalAuth, (req, res) => {
+  try {
+    if (!twinEngine) return res.status(503).json({ ok: false, error: '孪生引擎未加载' });
+    const b = req.body || {};
+    const chief = String(b.chief || b.complaint || '').slice(0, 500);
+    const symptoms = Array.isArray(b.symptoms) ? b.symptoms.slice(0, 20).map(String) : [];
+    if (!chief && !symptoms.length && !b.tongue_text && !b.face_text && !b.pulse_text) {
+      return res.status(400).json({ ok: false, error: '至少提供主诉/症状/舌/面/脉 一项' });
+    }
+    const feat = twinEngine.extractFeatures({
+      chief, symptoms,
+      tongue: b.tongue_text ? [String(b.tongue_text)] : [],
+      face: b.face_text ? [String(b.face_text)] : [],
+      pulse: b.pulse_text ? [String(b.pulse_text)] : [],
+      four: null
+    });
+    const pid = String(b.patient_id || '').trim();
+    const current = pid ? twinEngine.computeModel(pid) : null;
+    const simulated = {
+      health_score: twinEngine.calcHealthScore(feat, {
+        symptomCount: symptoms.length + (chief ? 1 : 0),
+        labCount: 0, labAbnormal: 0,
+        historyCount: current ? current.snapshot_count : 0
+      }),
+      organ_scores: twinEngine.calcOrganScores(feat),
+      constitution: twinEngine.inferConstitution(feat)
+    };
+    const out = {
+      ok: true, simulated, persisted: false,
+      disclaimer: '假设演算结果（服务端同源口径）· 未写入患者档案 · 辅助参考不构成诊断结论'
+    };
+    if (current && current.health_score) {
+      out.current = { health_score: current.health_score, snapshot_count: current.snapshot_count };
+      out.delta = { total: simulated.health_score.total - current.health_score.total, organs: {} };
+      for (const k of Object.keys(simulated.organ_scores)) {
+        if (current.organ_scores && current.organ_scores[k]) {
+          out.delta.organs[k] = simulated.organ_scores[k].score - current.organ_scores[k].score;
+        }
+      }
+    }
+    res.json(out);
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 

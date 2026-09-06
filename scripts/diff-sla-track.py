@@ -41,11 +41,12 @@ def current_items():
         items.append('L2:' + mod)
     for s in last.get('seed_missing') or []:
         items.append('L3:' + s)
-    # L4 页面差集：52 页已有三分法定性表（DELIVERY/l4-page-triage-20260831.md），
-    # 只追踪超出已定性基线的新增部分
+    # L4 页面差集：53 页已有三分法定性（52 页 DELIVERY/l4-page-triage-20260831.md +
+    # lab-interpret.html 2026-09-06 定性「已有等价」：medical-stack 院内版已吸收 +
+    # app/report-interpret.html 大众四维融合版），只追踪超出已定性基线的新增部分
     page_gap = last.get('page_gap_count') or 0
-    if page_gap > 52:
-        items.append(f'L4:page_gap_over_baseline({page_gap - 52})')
+    if page_gap > 53:
+        items.append(f'L4:page_gap_over_baseline({page_gap - 53})')
     return items
 
 

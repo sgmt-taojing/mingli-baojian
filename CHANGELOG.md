@@ -3,6 +3,10 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-06 15:30 · 链5 修复（3.9 兼容）+ 差集清零（whatif/E12-16/lab-interpret）+ r470 迁 launchd
+
+- tcm-capability-diff.py 修 3.9 兼容（str|None 崩退致链条哑巴 3 天）；whatif 端点移植 8972 对拍 MATCH；kb/search E12 繁简桥接+E15+E16 移植，处理器哈希归零；lab-interpret 定性双等价，SLA 基线 53 clean；r470 迁 launchd 日 03:00，试跑晋升 829/829；控制台指引 docs/console-ops-20260906.md。
+
 ## 2026-09-06 10:50 · 第三次 WAL 裂脑自动收敛成功（防线首实战）+ wal-inode-watch 秒级哨兵上线
 
 - 10:14 检出 pid 26596 wal 失链（磁盘 MISSING），自动 kickstart 收敛成功；窗口内任务全排除，unlink 方待哨兵取证。
