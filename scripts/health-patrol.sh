@@ -195,6 +195,15 @@ if [ -n "$DIFF_SLA_OUT" ]; then
     done <<< "$DIFF_SLA_OUT"
 fi
 
+# ===== R-CHAIN5 tcm 链条健康：末次退出码 + 差集状态新鲜度（2026-09-06 新增）=====
+# 背景：09-03 tcm-capability-diff.py 引入 3.10 语法崩退，链条以 /usr/bin/python3(3.9) 运行
+# 每次静默失败，差集停摆 3 天无人知。双保险：退出码非零即警 + 状态超 1h 未更新即警。
+TCM_EXIT=$(launchctl print "gui/$(id -u)/com.mingli-baojian.tcm-import" 2>/dev/null | grep "last exit code" | awk '{print $NF}')
+[ -n "$TCM_EXIT" ] && [ "$TCM_EXIT" != "0" ] && [ "$TCM_EXIT" != "exited)" ] && ALERTS+=("tcm-import 链条末次退出码 $TCM_EXIT（某环节崩退，查 /tmp/tcm-import.log）")
+DIFF_STATE_MTIME=$(stat -f '%m' "$PROJECT_ROOT/medical-stack/capability-diff-state.json" 2>/dev/null || echo 0)
+DIFF_STATE_AGE=$(( $(date +%s) - DIFF_STATE_MTIME ))
+[ "$DIFF_STATE_AGE" -gt 3600 ] && ALERTS+=("差集状态超 1h 未更新（链5 疑似停摆，上轮崩退 3 天无人知）")
+
 # ===== R-WALF WAL 裂脑检测（2026-08-31 事故守卫，09-05 升级自动收敛）=====
 # 背景：R772 按请求开关写连接触发 SQLite 末连接语义删除/重建 -wal/-shm，
 # 主句柄持续写入失链孤儿 WAL（磁盘不可见、重启即丢）。根修后本规则兜底：
