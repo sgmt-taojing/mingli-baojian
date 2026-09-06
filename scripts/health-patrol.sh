@@ -195,6 +195,15 @@ if [ -n "$DIFF_SLA_OUT" ]; then
     done <<< "$DIFF_SLA_OUT"
 fi
 
+# ===== R-VSYNC 视觉模型同步审计（2026-09-06 新增，接 launchd com.mingli-baojian.vision-model-sync）=====
+# 背景：原 cron agentTurn 版 120s 超时连败（agent 开销非脚本开销），已迁 launchd 纯脚本 6h。
+# 本规则承接原 agent 的判定职责：最新 sync 报告 audit_failed>0 即告警。
+VSYNC_REPORT=$(ls -t "$PROJECT_ROOT"/reports/sync-*.json 2>/dev/null | head -1)
+if [ -n "$VSYNC_REPORT" ]; then
+  VSYNC_BAD=$(python3 -c "import json; print(json.load(open('$VSYNC_REPORT')).get('audit_failed', 0))" 2>/dev/null)
+  [ "$VSYNC_BAD" != "0" ] && [ -n "$VSYNC_BAD" ] && ALERTS+=("视觉模型同步审计失败 $VSYNC_BAD 项: $(basename "$VSYNC_REPORT")")
+fi
+
 # ===== R-CHAIN5 tcm 链条健康：末次退出码 + 差集状态新鲜度（2026-09-06 新增）=====
 # 背景：09-03 tcm-capability-diff.py 引入 3.10 语法崩退，链条以 /usr/bin/python3(3.9) 运行
 # 每次静默失败，差集停摆 3 天无人知。双保险：退出码非零即警 + 状态超 1h 未更新即警。

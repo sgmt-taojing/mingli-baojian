@@ -276,7 +276,7 @@ async function main() {
         audit({ event: 'verify_pass', year: TARGET_YEARS.join(','), passLine });
         // commit
         try {
-          execSync(`cd ${PROJECT} && git add shared/ganzhi-60.js && git add -f logs/calibration-audit.jsonl && git commit -m "chore(calibrator): 历法校准 ${TARGET_YEARS.join('/')} — ${totalDiff} 处差异修真 (bmcx+lunar_python 双源)"`, { encoding: 'utf8', timeout: 30000 });
+          execSync(`cd ${PROJECT} && git add -f shared/ganzhi-60.js && git add -f logs/calibration-audit.jsonl && git commit -m "chore(calibrator): 历法校准 ${TARGET_YEARS.join('/')} — ${totalDiff} 处差异修真 (bmcx+lunar_python 双源)"`, { encoding: 'utf8', timeout: 30000 });
           console.log(`✅ commit 完成 (${totalDiff} 处修真)`);
         } catch (e) {
           console.log('ℹ️ commit 跳过或无需提交:', e.message.split('\n')[0]);

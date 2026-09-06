@@ -5,6 +5,13 @@
 - 进行中无变化：① 15:30 节点「链5 修复 + 差集清零 + cron 减负」全面推进轮已闭环 ② G21 能力发版体系 v1.2.0 等 family 侧接收验收 ③ 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案）④ 节点 0/0 无未收口开发项
 - 阻塞：✅ 无（晚间安静期，差集已清零，无待用户动作）
 
+## 2026-09-06 20:30 · cron 池深度大扫除：三个纯脚本任务全部迁/修 ✅
+
+- **历法校准（每月1日）根修**：calendar-calibrator.js 自提交 `git add shared/ganzhi-60.js` 被 gitignore 拦截（需 -f）→ 每月校准修真静默丢失。已修并复跑自提交 bf9ec7e（顺带修真 2026/2027 历法差异 2 处，bmcx+lunar_python 双源）。
+- **视觉算法同步迁 launchd**：原 cron agentTurn 120s 超时连败 3（脚本本体仅 0.04s，开销全在 agent 侧）；原 launchd plist 是残缺 JSON 片段从未装载。已重写 plist（6h+RunAtLoad）装载验证 exit 0，audit_failed 判定由 health-patrol 新增 R-VSYNC 规则承接。
+- **案例回流/临床经验**：均为模型侧偶发或已修待复跑，脚本侧复跑验证健康（回流：新增 0 存量 10）。
+- 控制台操作指引更新为三项（停用 r470/视觉同步 + 替换名人采集 payload）：docs/console-ops-20260906.md。
+
 ## 2026-09-06 20:15 · 名人采集半脚本化（celebrity-ingest.py）✅
 
 - 背景：「名人八字采集」cron 连败 4 次全为 20min 超时——搜索+全事件年表+排盘+反校全压给 agent。

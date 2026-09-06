@@ -25,6 +25,13 @@ cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian && python3 sc
 纪律：排盘/入库/反校上下文一律由脚本完成，不要在对话里手工算；查不到时辰的 birth.hour 留 null。
 ```
 
+## ③ 停用「视觉算法同步 (mingli-baojian)」（已迁 launchd，必做）
+
+- 原因：纯脚本任务走 agentTurn，120s 超时窗被 agent 开销顶满（连败 3 次）；脚本本体实测 0.04 秒跑完。已修复并重装 launchd 任务 `com.mingli-baojian.vision-model-sync`（每 6h，RunAtLoad 首跑 exit 0 验证通过；原 plist 是残缺的 JSON 片段从未装载）。原 agent 的 audit_failed 判定职责已由 health-patrol R-VSYNC 规则承接（>0 即告警）。
+- 操作：控制台 → 该任务 → **停用（disable）**。不要删，留档备查。
+
 ## 无需操作
 
 - 「临床经验蒸馏（周一06:00）」：payload 已是单步版，脚本侧今日复跑验证通过（导出 44 条），周一 06:00 复跑成功后陈旧连败自动清零。
+- 「命理师案例回流（每日 21:30）」：连败 1 次为模型侧偶发（lastError 仅「⏰ Cron failed」），脚本复跑正常（新增 0 存量 10），下次复跑自愈。
+- 「历法校准智能体（每月1日）」：根因已修（calendar-calibrator.js 的 `git add` 未加 `-f` 被 gitignore 拦截致提交失败，已修并自提交 bf9ec7e，顺带修真 2 处历法差异），10-01 复跑自愈。
