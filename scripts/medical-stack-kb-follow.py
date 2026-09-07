@@ -112,25 +112,46 @@ def main() -> int:
     if not sec001_ok:
         result.update(status="warn", reason="SEC-001 补丁标记缺失——代码层可能被意外覆盖，需人工核查")
 
-    # 5. 主动重建 SQLite 快路径索引（异步，不阻塞）
+    # 5. 主动重建 SQLite 快路径索引（同步执行 + 失败告警，2026-09-07 根修）
+    # 教训：原为 fire-and-forget spawn 且输出丢弃，13:42 重建中断成 4096B 空壳无人知晓，
+    # 8972 回退 JSON 慢路径致检索召回掉案（equiv 对拍 Δ=0.0278 FAIL）才发现。
+    # 改为：同步跑 --force（~3s），随后 --verify 校验；任一步失败 → status=error 告警，
+    # 快照已更新但索引不可信时回滚快照 mtime 标记，下轮轮询会重试。
     # launchd 环境 PATH 极简，裸 "node" 找不到——先 which，再回退 Kimi 运行时绝对路径
     if SQLITE_SYNC.exists():
         import shutil
         node_bin = shutil.which("node") or "/Applications/Kimi.app/Contents/Resources/resources/runtime/node"
         if not Path(node_bin).exists():
-            result["sqlite_sync"] = "spawn failed: node 不可用（PATH 与回退路径均未命中）"
+            result["sqlite_sync"] = "failed: node 不可用（PATH 与回退路径均未命中）"
+            result.update(status="error")
         else:
             try:
-                subprocess.Popen(
-                    [node_bin, str(SQLITE_SYNC)],
-                    cwd=str(MS), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                    start_new_session=True,
+                rb = subprocess.run(
+                    [node_bin, str(SQLITE_SYNC), "--force"],
+                    cwd=str(MS), capture_output=True, text=True, timeout=300,
                 )
-                result["sqlite_sync"] = "spawned"
+                if rb.returncode != 0:
+                    result["sqlite_sync"] = f"failed(rc={rb.returncode}): {(rb.stderr or rb.stdout).strip()[:300]}"
+                    result.update(status="error", reason="SQLite 索引重建失败——8972 将走 JSON 慢路径，需人工介入")
+                else:
+                    vf = subprocess.run(
+                        [node_bin, str(SQLITE_SYNC), "--verify"],
+                        cwd=str(MS), capture_output=True, text=True, timeout=300,
+                    )
+                    if vf.returncode != 0:
+                        result["sqlite_sync"] = f"verify failed: {(vf.stdout or '').strip()[-300:]}"
+                        result.update(status="error", reason="SQLite 索引校验不一致——需人工介入")
+                    else:
+                        result["sqlite_sync"] = (rb.stdout or "").strip()
+            except subprocess.TimeoutExpired:
+                result["sqlite_sync"] = "failed: 重建超时(300s)"
+                result.update(status="error", reason="SQLite 索引重建超时——需人工介入")
             except Exception as e:  # noqa: BLE001
-                result["sqlite_sync"] = f"spawn failed: {e}"
+                result["sqlite_sync"] = f"failed: {e}"
+                result.update(status="error", reason="SQLite 索引重建异常——需人工介入")
     else:
         result["sqlite_sync"] = "script missing (将走 JSON 慢路径并自愈)"
+        result.update(status="warn")
 
     # 6. 热加载验证：8972 mtime 失效机制会在下次请求自动重载；先暖缓存再核对
     # 注意：/api/tcm/kb 的 total 是 R756 命理黑名单过滤后的检索索引条数（约少 0.4%），

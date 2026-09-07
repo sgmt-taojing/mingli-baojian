@@ -1,3 +1,10 @@
+## 2026-09-07 14:00 · equiv 对拍 FAIL 根修：G1 索引重建空壳事故 + 钩子守护上线
+
+- 现象：equiv-dual-run 复跑 FAIL——端点零差异但 Recall@K tcm 31/36 vs ms 30/36（Δ=0.0278>0.02），唯一掉案=案30「腹满 面黄」期望《钱天来论理中汤》。
+- 根因：13:42 G1 跟随钩子重打包 KB 层（63k+ 条镜像）时，SQLite 快路径索引用 fire-and-forget spawn 重建（stdout/stderr 丢 DEVNULL），进程中断成 4096B 空壳（残留 tmp-shm 753KB）；8972 静默回退 JSON 慢路径，召回掉案。与 mingli 侧 yidao.db 无关（8972 读 medical-stack 自有存储）。
+- 处置：`kb-sqlite-sync.js --force` 重建（61,628 条/356.6MB，--verify 分区+抽样全一致）→ 重启 8972 → 对拍 PASS（双侧 31/36，Δ=0.0，zero_diff ✓）。
+- 根修：medical-stack-kb-follow.py 第 5 步改同步执行 `--force` + `--verify` 双段，任一步失败 status=error 告警（watchdog 链4 可捕获），禁止再静默跳过；端到端实测通过（touch 镜像触发全流程，63,173 条重建 2.6s，warm_check 62,994 + R756 过滤 179，七能力 caps_ok，status ok）。
+
 ## 2026-09-05 · A2 对账上线 + WAL 裂脑二发收敛
 
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
