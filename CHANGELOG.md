@@ -3,6 +3,11 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 13:40 · 镜像出站根修：参考域+TCMFWD 正室双排除，family 收纯命理 20,832 条
+
+- cron-distill-mingli-outbound.sh 两个导出查询（pure/full）加 `domain!='reference'` + `fingerprint NOT LIKE 'TCMFWD|%'`：模块名 LIKE 黑名单盖不住 huangdi-neijing/bencao-gangmu/qianjin 等经典命名模块，tcm 内化正室 11,003 条此前长期混入 family 镜像（医学双源重复+越界，违 R747）——domain/fingerprint 双字段才是权威边界。
+- 手动复跑验证：family 侧 mingli-full.json 20,832 条纯命理（-11,003 医学），G26 新增 42 条全到达，参考域泄漏 0、TCMFWD 混入 0；distill-registry 回写 total=10,184（pure 线）。
+
 ## 2026-09-07 13:45 · G24d 参考域收尾：nihaisha_pcs/nihaisha-pcs/nihaisha-structured 打标，医学双头全灭
 
 - nihaisha_pcs（1,274，兰台轨范/伤寒论条辨/针灸甲乙经等医典§节）+ nihaisha-pcs（80，梁冬对话倪海厦访谈）+ nihaisha-structured（96，伤寒论/金匮课程蒸馏笔记）→ domain='reference' 共 **1,450 条**，范围内未打标 0。

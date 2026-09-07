@@ -31,7 +31,7 @@ conn.row_factory = sqlite3.Row
 ph = ','.join(['?'] * len(EXCLUDE_MODULES))
 rows = conn.execute(
     f"SELECT entry_id, module, title, content, keywords, trust_score FROM kb_formal "
-    f"WHERE status='formal' AND module NOT IN ({ph}) "
+    f"WHERE status='formal' AND (domain IS NULL OR domain != 'reference') AND (fingerprint IS NULL OR fingerprint NOT LIKE 'TCMFWD|%') AND module NOT IN ({ph}) "  # G24/R747: 参考域+tcm内化正室均不出站
     f"AND module NOT LIKE '%tcm%' AND module NOT LIKE '%shanghan%' AND module NOT LIKE '%nihaisha%' "
     f"AND module NOT LIKE '%acupuncture%' AND module NOT LIKE '%shuhan%' AND module NOT LIKE '%shuihan%' "
     f"AND module NOT LIKE '%jinkui%' AND module NOT LIKE '%wangzhen%' AND module NOT LIKE '%herb%' "
@@ -87,7 +87,7 @@ ph_m = ','.join(['?'] * len(EXCLUDE_MODULES))
 ph_s = ','.join(['?'] * len(STATUSES))
 rows = conn.execute(
     f"SELECT entry_id, module, title, content, keywords, trust_score, status FROM kb_formal "
-    f"WHERE status IN ({ph_s}) AND module NOT IN ({ph_m}) "
+    f"WHERE status IN ({ph_s}) AND (domain IS NULL OR domain != 'reference') AND (fingerprint IS NULL OR fingerprint NOT LIKE 'TCMFWD|%') AND module NOT IN ({ph_m}) "  # G24/R747
     f"AND module NOT LIKE '%tcm%' AND module NOT LIKE '%shanghan%' AND module NOT LIKE '%nihaisha%' "
     f"AND module NOT LIKE '%acupuncture%' AND module NOT LIKE '%shuhan%' AND module NOT LIKE '%shuihan%' "
     f"AND module NOT LIKE '%jinkui%' AND module NOT LIKE '%wangzhen%' AND module NOT LIKE '%herb%' "
