@@ -1,4 +1,7 @@
 
+// R-REALDATA（2026-09-07）：H5 页接真实 API——本地静态服务(8900)不代理 /api，显式指向 8920；生产同源部署走相对路径
+const WX_API = (location.protocol === 'file:' || location.port === '8900') ? 'http://127.0.0.1:8920' : '';
+
 function wxTab(name,btn){
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
   document.getElementById('section-'+name).classList.add('active');
@@ -7,40 +10,47 @@ function wxTab(name,btn){
   window.scrollTo(0,0);
 }
 
-// 今日运势
-function loadDailyFortune(){
-  let now=new Date();
-  let dateHash=(now.getFullYear()*1000+now.getMonth()*31+now.getDate())%360;
-  let fortunes=[
-    {lucky:'鼠',desc:'今日思维敏捷，适合处理需要创意的事务。注意人际关系中的小细节。',color:'青色',num:'3,8'},
-    {lucky:'牛',desc:'稳扎稳打的一天，不宜冒进。耐心处理手头事务，傍晚有好消息。',color:'黄色',num:'5,0'},
-    {lucky:'虎',desc:'精力充沛，适合运动和社交。注意控制脾气，避免口舌之争。',color:'绿色',num:'1,6'},
-    {lucky:'兔',desc:'心情愉悦，人际关系和谐。适合学习新知识，有贵人暗助。',color:'粉色',num:'4,9'},
-    {lucky:'龙',desc:'今日有转折之象，保持开放心态。不宜大额消费，宜守不宜攻。',color:'金色',num:'2,7'},
-    {lucky:'蛇',desc:'直觉敏锐，适合做决策。注意休息，不可过度劳累。',color:'红色',num:'3,8'},
-    {lucky:'马',desc:'行动力强，适合推进停滞的项目。注意与上级的沟通方式。',color:'橙色',num:'1,6'},
-    {lucky:'羊',desc:'平和安稳的一天，适合整理和规划。感情上有小惊喜。',color:'棕色',num:'5,0'},
-    {lucky:'猴',desc:'机灵聪慧，适合谈判和交流。注意保管好随身物品。',color:'白色',num:'4,9'},
-    {lucky:'鸡',desc:'今日宜静不宜动，适合独处思考。健康方面注意呼吸系统。',color:'银色',num:'2,7'},
-    {lucky:'狗',desc:'忠诚有报，付出的努力会得到认可。适合与老朋友联系。',color:'黄色',num:'3,8'},
-    {lucky:'猪',desc:'福气满满，财运不错。注意饮食节制，不可贪杯。',color:'黑色',num:'1,6'}
-  ];
-  let f=fortunes[dateHash%12];
-  let el=document.getElementById('wxDailyFortune');
-  if(el) el.innerHTML='<div style="margin-bottom:8px">🎲 生肖运势：<b style="color:var(--gold)">'+f.lucky+'</b></div>'+f.desc+'<div style="margin-top:8px;font-size:12px">🎨 幸运色：'+f.color+' · 🔢 幸运数字：'+f.num+'</div><div style="margin-top:6px;font-size:11px;color:var(--paper3)">仅供娱乐参考</div>';
+// 今日运势（R-REALDATA：改为真实黄历日课——日干支/值神/冲煞/喜财方位，不再用日期哈希轮转假数据）
+async function loadDailyFortune(){
+  const el=document.getElementById('wxDailyFortune');
+  if(!el) return;
+  try{
+    const now=new Date();
+    const r=await fetch(`${WX_API}/api/minsu/huangli?year=${now.getFullYear()}&month=${now.getMonth()+1}&day=${now.getDate()}`, {signal:AbortSignal.timeout(10000)});
+    const j=await r.json();
+    const c=j&&j.chart;
+    if(!j.ok||!c) throw new Error('黄历数据不可用');
+    const chong=(c.chongsha||'').match(/冲[甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳午未申酉戌亥]?\(?([鼠牛虎兔龙蛇马羊猴鸡狗猪])\)?/);
+    el.innerHTML='<div style="margin-bottom:8px">📜 今日日课：<b style="color:var(--gold)">'+c.dayGanZhi+'日</b>（属'+c.shengxiao+'年·'+(c.jieqi||'')+'）</div>'
+      +(c.jianchu_desc?'<div style="margin-bottom:6px">'+c.jianchu+'日：'+c.jianchu_desc+'</div>':'')
+      +'<div style="font-size:12px">值神 '+(c.zhishen||'—')+' · '+(c.huangdao||'')+'<br>'
+      +(chong?'⚠️ 今日'+c.chongsha+'——属'+chong[1]+'的朋友大事缓行、以稳为主<br>':'')
+      +'🧭 喜神'+(c.posXishen||'—')+' · 财神'+(c.posCaishen||'—')+' · 福神'+(c.posFushen||'—')+'</div>'
+      +'<div style="margin-top:6px;font-size:11px;color:var(--paper3)">传统文化参考</div>';
+  }catch(e){
+    el.innerHTML='<div style="color:var(--paper3);font-size:12px">日课数据暂时不可用，请稍后再试。</div>';
+  }
 }
 
-// 吉日查询
-function loadJiri(){
-  let now=new Date();
-  let weekdays=['日','一','二','三','四','五','六'];
-  let suits=['祭祀','祈福','求嗣','出行','嫁娶','搬家','开市','交易','签约','入学','求职','就医','动土','安葬','修造'];
-  let avoids=['动土','开市','嫁娶','出行','安葬','签约','搬家','诉讼','远行','剃头','针灸','破土'];
-  let dHash=(now.getFullYear()*1000+now.getMonth()*31+now.getDate());
-  let yi=suits[dHash%15]+','+suits[(dHash+3)%15];
-  let ji=avoids[dHash%12]+','+avoids[(dHash+5)%12];
-  let el=document.getElementById('wxJiri');
-  if(el) el.innerHTML='<div style="margin-bottom:6px">📅 '+now.getMonth()+1+'月'+now.getDate()+'日 星期'+weekdays[now.getDay()]+'</div><div style="color:var(--jade2)">✅ 宜：'+yi+'</div><div style="color:var(--cinn2)">⚠️ 忌：'+ji+'</div><div style="margin-top:6px;font-size:11px;color:var(--paper3)">传统文化参考</div>';
+// 吉日查询（R-REALDATA：接真实黄历宜忌，修掉 getMonth 拼接优先级 bug「81月」）
+async function loadJiri(){
+  const el=document.getElementById('wxJiri');
+  if(!el) return;
+  try{
+    const now=new Date();
+    const r=await fetch(`${WX_API}/api/minsu/huangli?year=${now.getFullYear()}&month=${now.getMonth()+1}&day=${now.getDate()}`, {signal:AbortSignal.timeout(10000)});
+    const j=await r.json();
+    const c=j&&j.chart;
+    if(!j.ok||!c||!c.yiji) throw new Error('黄历数据不可用');
+    const weekdays=['日','一','二','三','四','五','六'];
+    const yi=(c.yiji.yi||[]).slice(0,4).join('、'), ji=(c.yiji.ji||[]).slice(0,4).join('、');
+    el.innerHTML='<div style="margin-bottom:6px">📅 '+(now.getMonth()+1)+'月'+now.getDate()+'日 星期'+weekdays[now.getDay()]+'（'+c.dayGanZhi+'日·'+c.jianchu+'日）</div>'
+      +'<div style="color:var(--jade2)">✅ 宜：'+yi+(((c.yiji.yi||[]).length>4)?' 等'+c.yiji.yi.length+'事':'')+'</div>'
+      +'<div style="color:var(--cinn2)">⚠️ 忌：'+ji+(((c.yiji.ji||[]).length>4)?' 等'+c.yiji.ji.length+'事':'')+'</div>'
+      +'<div style="margin-top:6px;font-size:11px;color:var(--paper3)">'+c.chongsha+' · 传统文化参考</div>';
+  }catch(e){
+    el.innerHTML='<div style="color:var(--paper3);font-size:12px">宜忌数据暂时不可用，请稍后再试。</div>';
+  }
 }
 
 // 智慧语录
@@ -113,24 +123,28 @@ function loadJieqi(){
 }
 
 // 八字简化版
-function wxBaziCalc(){
+async function wxBaziCalc(){
   let dateStr=document.getElementById('wxBaziDate').value;
   let hourIdx=parseInt(document.getElementById('wxBaziHour').value);
   if(!dateStr){showToast('请选择出生日期');return}
   let parts=dateStr.split('-');
   let year=parseInt(parts[0]),month=parseInt(parts[1]),day=parseInt(parts[2]);
-  // 简化排盘
-  let stems=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
-  let branches=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
-  let yearGz=stems[(year-4)%10]+branches[(year-4)%12];
-  let monthGz=stems[((year-4)%10*2+month)%10]+branches[(month+1)%12];
-  let dayGzIdx=(year*365+month*30+day)%60;
-  let dayGz=stems[dayGzIdx%10]+branches[dayGzIdx%12];
-  let hourGz=stems[(dayGzIdx%10*2+hourIdx)%10]+branches[hourIdx];
-  let el=document.getElementById('wxBaziResult');
-  if(el){
-    el.style.display='block';
-    el.innerHTML='<div style="font-size:13px;line-height:2"><b style="color:var(--gold)">年柱：</b>'+yearGz+' <b style="color:var(--gold)">月柱：</b>'+monthGz+' <b style="color:var(--gold)">日柱：</b>'+dayGz+' <b style="color:var(--gold)">时柱：</b>'+hourGz+'</div><div style="font-size:11px;color:var(--paper3);margin-top:6px">⚠️ 简化排盘，完整排盘请访问PC端。仅供娱乐参考。</div><a class="btn" href="./divination-hub.html#section-bazi" style="font-size:12px;padding:8px">查看完整排盘 →</a>';
+  // R-REALDATA：废弃本地简化公式（日柱 (year*365+month*30+day)%60 数学上即错误）——改调真排盘引擎
+  const el=document.getElementById('wxBaziResult');
+  if(el){el.style.display='block';el.innerHTML='<div style="font-size:12px;color:var(--paper3)">⏳ 真排盘引擎计算中...</div>';}
+  try{
+    const r=await fetch(WX_API+'/api/paipan/calculate',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},body:JSON.stringify({year,month,day,hour:isNaN(hourIdx)?12:hourIdx}),signal:AbortSignal.timeout(15000)});
+    const c=await r.json();
+    if(!c||!c.pillars) throw new Error('排盘失败');
+    const p=c.pillars;
+    if(el){
+      el.innerHTML='<div style="font-size:13px;line-height:2"><b style="color:var(--gold)">年柱：</b>'+p['年']+' <b style="color:var(--gold)">月柱：</b>'+p['月']+' <b style="color:var(--gold)">日柱：</b>'+p['日']+' <b style="color:var(--gold)">时柱：</b>'+p['时']+'</div>'
+        +'<div style="font-size:12px;margin-top:4px">日主 <b style="color:var(--gold)">'+(c.day_master||'—')+'</b> · 生肖属'+(c.shengxiao||'—')
+        +(c.wuxing_lack&&c.wuxing_lack.length?' · 五行缺'+c.wuxing_lack.join('、'):' · 五行俱全')+'</div>'
+        +'<div style="font-size:11px;color:var(--paper3);margin-top:6px">真排盘引擎（节气校正）。深度白话解读请到「问事服务中心」。仅供学习参考。</div><a class="btn" href="./ask.html?tool=bazi" style="font-size:12px;padding:8px">获取白话解读 →</a>';
+    }
+  }catch(e){
+    if(el) el.innerHTML='<div style="font-size:12px;color:var(--cinn2)">排盘服务暂时不可用，请稍后再试。</div>';
   }
 }
 
@@ -405,7 +419,7 @@ function wxMonthlyReport(){
   out.innerHTML='<div class="card-text" style="text-align:center;color:#999">⏳ 正在排定本月流月...</div>';
   if(btn){btn.setAttribute('aria-busy','true');}
   // 3) 调后端（R96 起 /api/ai/monthly-report 已在 CSRF 白名单，GET 豁免 → 直接 fetch）
-  fetch('/api/ai/monthly-report', { signal: AbortSignal.timeout(15000),
+  fetch(WX_API+'/api/ai/monthly-report', { signal: AbortSignal.timeout(15000),
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({

@@ -56,6 +56,12 @@ CASES = [
     ("手机号命局", "POST", "/api/minsu/mobile/advise", {"number": "13800138000", **BIRTH, "gender": "M"}, "mobile"),
     ("手机号速查", "GET",  "/api/minsu/mobile?number=13800138000", None, "minsu"),
     ("车牌号吉凶", "GET",  "/api/minsu/plate?number=%E7%B2%A4A6688", None, "minsu"),
+    # ── 民俗工具中心内联五件（minsu-center.html showTool 链路，chart 形态）──
+    ("择日建议·个人化", "GET", "/api/minsu/zeri?year=2026&month=9&event=%E5%AB%81%E5%A8%B6&birthYear=1990&birthMonth=5&birthDay=15", None, "zeri"),
+    ("太岁化解·本命", "GET",  "/api/minsu/taisui?year=2026&birthYear=1990", None, "taisui"),
+    ("节气全表",   "GET",  "/api/minsu/jieqi?year=2026", None, "jieqi"),
+    ("节日表",     "GET",  "/api/minsu/holidays?year=2026", None, "holidays"),
+    ("家庭排盘",   "POST", "/api/minsu/family", {"members": [{"role": "爸爸", "year": 1965}, {"role": "妈妈", "year": 1967}, {"role": "孩子", "year": 2018}]}, "family"),
 ]
 
 def extract(j, kind):
@@ -109,6 +115,33 @@ def extract(j, kind):
         yrs = dd.get("yearBreakdown") or []
         y0 = yrs[0] if yrs else {}
         return {"overview": f"{dd.get('startYear','?')}-{dd.get('endYear','?')}十年·{y0.get('year','?')}年{y0.get('ganzhi','')}{y0.get('avgScore','?')}分", "cards": yrs, "tips": [1]} if len(yrs) >= 10 else None
+    if kind == "zeri":
+        c = j.get("chart") or {}
+        gd = c.get("goodDays") or []
+        ok = j.get("ok") and len(gd) >= 3 and all(x.get("day") and x.get("ganZhi") and x.get("chongsha") for x in gd[:5])
+        pers = "personal" in gd[0] if gd else False
+        return {"overview": f"{c.get('year','?')}年{c.get('month','?')}月{c.get('event','?')}·吉日{len(gd)}天·首荐{c['goodDays'][0].get('day','?')}日{c['goodDays'][0].get('ganZhi','')}·个人化={'有' if pers else '无'}", "cards": gd, "tips": ["x"]} if ok else None
+    if kind == "taisui":
+        c = j.get("chart") or {}
+        bm = c.get("benMing") or {}
+        hj = bm.get("huajie") or []
+        ok = j.get("ok") and c.get("taisui") and bm.get("shengxiao") and len(hj) >= 2  # 用户红线：本命须给完整化解方案
+        return {"overview": f"{c.get('yearGanZhi','?')}年·值太岁{c.get('taisui','?')}·本命{bm.get('shengxiao','?')}·化解{len(hj)}项", "cards": hj, "tips": ["x"]} if ok else None
+    if kind == "jieqi":
+        c = j.get("chart") or {}
+        lst = c.get("list") or []
+        ok = j.get("ok") and len(lst) >= 24 and all(x.get("name") and x.get("date") for x in lst[:6])
+        return {"overview": f"{c.get('year','?')}年节气{len(lst)}个·当前「{c.get('current','?')}」", "cards": lst, "tips": ["x"]} if ok else None
+    if kind == "holidays":
+        c = j.get("chart") or {}
+        hs = c.get("holidays") or []
+        ok = j.get("ok") and (c.get("count") or 0) > 0 and len(hs) > 0
+        return {"overview": f"{c.get('year','?')}年节日{c.get('count','?')}个", "cards": hs[:3], "tips": ["x"]} if ok else None
+    if kind == "family":
+        c = j.get("chart") or {}
+        ms = c.get("members") or []
+        ok = j.get("ok") and len(ms) == 3 and all(m.get("ganZhi") and m.get("shengxiao") and m.get("wuxing") for m in ms) and c.get("wuxingDistribution") is not None
+        return {"overview": f"成员{len(ms)}位·五行分布{json.dumps(c.get('wuxingDistribution') or {}, ensure_ascii=False)}", "cards": ms, "tips": ["x"]} if ok else None
     return None
 
 fails = []
