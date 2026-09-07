@@ -1,3 +1,9 @@
+## 2026-09-07 15:35 · 维基补齐纯脚本看守上线（不占模型额度，网络通即自动补跑）
+
+- `scripts/wiki-fill-watch.sh` + launchd `com.mingli-baojian.wiki-fill-watch`（30min）：探活 zh.wikipedia 不通静默 rc 0；通了自动跑 fill-wikidata-events.py（幂等断点续跑，熔断 rc 2=仍未通则下轮继续）；全部补齐后自卸载+桌面通知。落实用户「盯着网络通了自动补跑」指令，替代原 cron 池挂 agent 看守方案（零额度消耗）。
+- 试跑验证：当前链路不通，静默退出 rc 0，不误报不惊扰。补齐后 603 条名人导语事件入库，深度校验有效样本将从 144 涨至 600+。
+- 顺带销账：临床经验蒸馏周一 06:02 复跑 ok、连败自清零（payload 单步化修复生效，KANBAN 观察项关闭）。
+
 ## 2026-09-07 15:25 · 内存压力遗留专项销账：指标失真根修 + 实况盘点结论「非常驻缺陷」
 
 - **指标失真根修**（子模块 de7bce4）：api-v2 /api/health 内存口径 os.freemem→vm_stat——macOS 下 freemem 只算完全空闲页，inactive/可清除页全计已用致常年误报 95-99%（09-06「free 仅 85MB」「内存 100%」判断同源失真），修真后实测 70% vs 旧口径 99%，与 patrol 独立口径吻合。
