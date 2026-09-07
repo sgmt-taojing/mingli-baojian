@@ -1,3 +1,8 @@
+## 2026-09-07 21:20 · R-WALK-API 基址门禁入巡检（制度化防再生）
+
+- health-patrol.sh 新增规则：app/*.html 禁止 ①API 基址空字符串静态赋值 ②裸 `/api/` 相对路径 fetch/XHR（注释行豁免）；白名单 `scripts/.patrol-api-base-allowlist`（当前为空，例外须注明理由）。
+- 阴性测试：植入 `API=''`+裸 fetch 病页 → 巡检立即告警「R-WALK-API 基址同源落空」；移除后恢复全绿。今日走查的 13 页暗病从此有静态门禁，再生即被抓。
+
 ## 2026-09-07 21:05 · 五中心走查：API 基址暗病批量根修（12 页）+ 空壳清零
 
 - **空壳清零**（您已确认）：11 个 0 字节 db 空壳（knowledge/ 8 + data/ 3）归档 archive/empty-db-shells/；2 个失效历史导入脚本（r474/r486 指向已归档路径）归档 scripts-legacy/；feedback-aggregator 候选列表摘除 data/yidao.db。巡检 R120 断链规则持续守护。
