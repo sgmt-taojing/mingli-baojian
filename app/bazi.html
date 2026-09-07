@@ -303,28 +303,28 @@
         <div class="ph-col">时柱</div>
       </div>
       <div class="pillar-row">
-        <div class="pr-col">
+        <div class="pr-col bz-tap" data-pillar="year" style="cursor:pointer" title="点我读年柱白话">
           <p class="pr-label">天干 · 地支</p>
           <p class="pr-gan gan-甲" id="bz0g"></p>
           <p class="pr-zhi zhi-子" id="bz0z"></p>
           <p class="pr-ele" id="bz0e"></p>
           <p class="pr-na" id="bz0n"></p>
         </div>
-        <div class="pr-col">
+        <div class="pr-col bz-tap" data-pillar="month" style="cursor:pointer" title="点我读月柱白话">
           <p class="pr-label">天干 · 地支</p>
           <p class="pr-gan gan-甲" id="bz1g"></p>
           <p class="pr-zhi zhi-子" id="bz1z"></p>
           <p class="pr-ele" id="bz1e"></p>
           <p class="pr-na" id="bz1n"></p>
         </div>
-        <div class="pr-col">
+        <div class="pr-col bz-tap" data-pillar="day" style="cursor:pointer" title="点我读日柱白话">
           <p class="pr-label">天干 · 地支</p>
           <p class="pr-gan gan-甲" id="bz2g"></p>
           <p class="pr-zhi zhi-子" id="bz2z"></p>
           <p class="pr-ele" id="bz2e"></p>
           <p class="pr-na" id="bz2n"></p>
         </div>
-        <div class="pr-col">
+        <div class="pr-col bz-tap" data-pillar="hour" style="cursor:pointer" title="点我读时柱白话">
           <p class="pr-label">天干 · 地支</p>
           <p class="pr-gan gan-甲" id="bz3g"></p>
           <p class="pr-zhi zhi-子" id="bz3z"></p>
@@ -814,9 +814,11 @@ async function generateBaziReport(){
 }
 </script>
 <script src="js/flow-engine.js"></script>
+<script src="js/pro-gate.js" defer></script>
 <script>
 // R474-G: 补漏修真 — bazi.html 独立页 computeBazi：真太阳时(lng) + 流年(targetYear) + SVG 盘图
 (function(){
+  if (typeof window.esc !== 'function') { window.esc = function(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }; }
   var STEMS=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   var GAN_ELE={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};
   var ZHI_ELE={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
@@ -957,9 +959,25 @@ async function generateBaziReport(){
     }
   };
 })();
+// 点读：四柱点击弹出白话解读（绑定静态容器 .pillar-row，不受重渲染影响）
+(function(){
+  function bindBaziTap(){
+    var box = document.querySelector('.pillar-row');
+    if (!box || !window.PaipanTap || box._tapBound) return;
+    box._tapBound = true;
+    PaipanTap.bind(box, '.bz-tap', {
+      module: 'bazi',
+      keyOf: function(el){ return 'bz-' + el.dataset.pillar; },
+      paramOf: function(el){ return { pillar: el.dataset.pillar }; }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindBaziTap);
+  else bindBaziTap();
+})();
 </script>
 <script src="js/paipan-navigator.js" defer></script>
 <script src="js/paipan-baihua-panel.js" defer></script>
+<script src="js/paipan-tap-pop.js" defer></script>
 <script src="js/i18n.js?v=708i18n" defer></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>

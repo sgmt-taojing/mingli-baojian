@@ -219,10 +219,10 @@ function renderChart(c){
       `<div style="font-size:8px;color:var(--paper3)">${KE_NAME[k.course-1]||'第'+k.course+'课'}</div></div>`;
   }
   html+='</div></div>';
-  // 三传（带天将+六亲）
-  html+='<div class="lr-section"><h3>三传（'+c.sanChuan.method+'）</h3><div class="lr-chuan">';
+  // 三传（带天将+六亲；R-TAP-Y：点传看白话解读）
+  html+='<div class="lr-section"><h3>三传（'+c.sanChuan.method+'）</h3><div class="lr-chuan" id="lr-chuan-box">';
   for(const [label,zhi,cls] of [['初传',c.sanChuan.chu,'chu'],['中传',c.sanChuan.zhong,'zhong'],['末传',c.sanChuan.mo,'mo']]){
-    html+=`<div class="lr-chuan-item ${cls}"><div class="label">${label}</div>`+
+    html+=`<div class="lr-chuan-item ${cls} lr-tap" data-chuan="${cls}" style="cursor:pointer" title="点我看${label}解读"><div class="label">${label}</div>`+
       `<div style="font-size:9px;color:var(--blue)">${tianjiangOf(zhi)}</div>`+
       `<div class="zhi">${zhi}</div>`+
       `<div style="font-size:9px;color:var(--jade)">${liuqinOf(zhi)}</div></div>`;
@@ -263,6 +263,13 @@ function renderChart(c){
     html+='</div></div>';
   }
   ct.innerHTML=html;
+  // R-TAP-Y：六壬点传（初/中/末传）——委托绑定在常驻容器上，重渲染不失效
+  if (window.PaipanTap && !ct._tapBound) {
+    ct._tapBound = true;
+    PaipanTap.bind(ct, '.lr-tap', { module: 'liuren',
+      keyOf: el => 'lr-' + el.dataset.chuan,
+      paramOf: el => ({ chuan: el.dataset.chuan }) });
+  }
 }
 
 // 式盘点宫详情：天地盘 + 天将 + 类神
@@ -346,6 +353,7 @@ function renderInterpretation(i){
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/paipan-navigator.js" defer></script>
 <script src="js/paipan-baihua-panel.js" defer></script>
+<script src="js/paipan-tap-pop.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 <script src="js/pro-gate.js" defer></script>
 </body>

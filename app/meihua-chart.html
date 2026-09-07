@@ -189,29 +189,29 @@ function renderChart(c){
   const ct=document.getElementById('mh-content');
   ct.style.display='block';
   let html='<div class="mh-chart">';
-  // 本卦
-  html+=`<div class="mh-gua"><div class="mh-gua-name">本卦：${c.guaName}</div>`;
+  // 本卦（R-TAP-Y：点卦看白话解读）
+  html+=`<div class="mh-gua mh-tap" data-what="ben" style="cursor:pointer" title="点我看本卦解读"><div class="mh-gua-name">本卦：${c.guaName}</div>`;
   let sym='';
   for(let i=c.yaos.length-1;i>=0;i--) sym+=c.yaos[i].yin?'⚋':'⚊';
   html+=`<div class="mh-gua-sym">${sym}</div>`;
   html+=`<div class="mh-gua-label">${c.upper.name}(${c.upper.nature}·${c.upper.wuxing}) / ${c.lower.name}(${c.lower.nature}·${c.lower.wuxing})</div></div>`;
-  // 六爻
+  // 六爻（R-TAP-Y：动爻可点读）
   for(let i=c.yaos.length-1;i>=0;i--){
     const y=c.yaos[i];
-    const cls=y.isDong?'mh-yao dong':'mh-yao';
+    const cls=(y.isDong?'mh-yao dong mh-tap':'mh-yao');
     const line=y.yin?'— —':'———';
     const tag=y.isDong?'<span style="color:var(--red)">○动</span>':'';
     // 体用以卦分：动爻所在之卦为用，另一卦为体（旧版只标动爻为用，误导）
     const yongIsLower = c.dongYao <= 2;
     const inYong = yongIsLower ? i <= 2 : i >= 3;
     const tiTag=inYong?'<span style="color:var(--gold)">用</span>':'<span style="color:var(--jade)">体</span>';
-    html+=`<div class="${cls}"><div class="pos">${y.positionName}</div><div class="line">${line}</div><div class="wx">${y.isUpper?'上卦':'下卦'}</div><div class="tag">${tiTag} ${tag}</div></div>`;
+    html+=`<div class="${cls}"${y.isDong?' data-what="dongyao" style="cursor:pointer" title="点我看动爻解读"':''}><div class="pos">${y.positionName}</div><div class="line">${line}</div><div class="wx">${y.isUpper?'上卦':'下卦'}</div><div class="tag">${tiTag} ${tag}</div></div>`;
   }
   html+='</div>';
-  // 变卦 & 互卦
+  // 变卦 & 互卦（R-TAP-Y：均可点读）
   html+='<div class="mh-chart" style="margin-top:8px">';
-  if(c.bianGua) html+=`<div class="mh-gua"><div class="mh-gua-name">变卦：${c.bianGua.name}</div><div class="mh-gua-label">${c.bianGua.upper.name}(${c.bianGua.upper.wuxing}) / ${c.bianGua.lower.name}(${c.bianGua.lower.wuxing})</div></div>`;
-  if(c.huGua) html+=`<div class="mh-gua"><div class="mh-gua-name">互卦：${c.huGua.name}</div><div class="mh-gua-label">${c.huGua.upper.name}(${c.huGua.upper.wuxing}) / ${c.huGua.lower.name}(${c.huGua.lower.wuxing})</div></div>`;
+  if(c.bianGua) html+=`<div class="mh-gua mh-tap" data-what="bian" style="cursor:pointer" title="点我看变卦（结局）解读"><div class="mh-gua-name">变卦：${c.bianGua.name}</div><div class="mh-gua-label">${c.bianGua.upper.name}(${c.bianGua.upper.wuxing}) / ${c.bianGua.lower.name}(${c.bianGua.lower.wuxing})</div></div>`;
+  if(c.huGua) html+=`<div class="mh-gua mh-tap" data-what="hu" style="cursor:pointer" title="点我看互卦（过程）解读"><div class="mh-gua-name">互卦：${c.huGua.name}</div><div class="mh-gua-label">${c.huGua.upper.name}(${c.huGua.upper.wuxing}) / ${c.huGua.lower.name}(${c.huGua.lower.wuxing})</div></div>`;
   html+='</div>';
   // 体用分析
   const ty=c.tiYong;
@@ -227,6 +227,13 @@ function renderChart(c){
   }
   html+='</div>';
   ct.innerHTML=html;
+  // R-TAP-Y：梅花点读（本卦/互卦/变卦/动爻）——委托绑定在常驻容器上，重渲染不失效
+  if (window.PaipanTap && !ct._tapBound) {
+    ct._tapBound = true;
+    PaipanTap.bind(ct, '.mh-tap', { module: 'meihua',
+      keyOf: el => 'mh-' + el.dataset.what,
+      paramOf: el => ({ tap: el.dataset.what }) });
+  }
 }
 
 function renderSvg(svg){
@@ -297,6 +304,7 @@ function renderInterpretation(i){
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 <script src="js/paipan-navigator.js" defer></script>
 <script src="js/paipan-baihua-panel.js" defer></script>
+<script src="js/paipan-tap-pop.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 <script src="js/pro-gate.js" defer></script>
 </body>
