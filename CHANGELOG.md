@@ -1,3 +1,12 @@
+## 2026-09-07 18:20 · launchd 常驻脚本 yidao.db 写纪律审计：两修一退役 + DB 周期热备从零到一
+
+- **审计范围**：40 个 launchd 常驻任务引用脚本全量过一遍（历史 156 个引用 yidao.db 的脚本中一次性蒸馏脚本不复跑、不列管）。结论：import-tcm-kb / wiki-fill-watch / g24-reference-guard / staging-auto-promote / health-patrol 等主力全部合规（safe_close / mode=ro / busy_timeout 在位）。
+- **修 1 · evolution-loop.py**：连接补 `timeout=30 + PRAGMA busy_timeout=30000`（昨日 824 锁连败同类隐患）。
+- **修 2 · cron-distill-feedback-loop.sh**：写库块（source_index+kb_staging）补 busy_timeout=30000（原仅有 checkpoint，缺等待机制）。
+- **退役 · evolution-loop 定时任务**：审计牵出真问题——该任务 DB_PATH 指向旧库 `knowledge/yidao.db`（8/16 起每次运行 connect 创建 0 字节空壳即崩 `no such table: formal_knowledge`，launchd 状态=1，功能自 8/16 全灭）；其 L4 进化层能力（反馈聚合→staging 入库→自动晋升）与现行 cron-distill-feedback-loop.sh + staging-auto-promote.js 完全重复且指向错误 schema。已 bootout + plist 归档 `archive/launchd-retired/`（可逆）；0 字节空壳 `knowledge/yidao.db` 待用户确认后删除。
+- **补洞 · DB 周期热备从零到一**：data1-weekly-backup.sh 此前排除全部 *.db——主 KB 库无任何周期备份（昨日 freelist 事故零丢失纯靠 VACUUM INTO 侥幸）。新增 3.5 段：sqlite3 `.backup` 在线热备（WAL 活体安全）→ 备份件 integrity_check 自检（不合格即删不留坏备份）→ 保留最近 4 份周备。热备链路实测通过（1.8G，integrity=ok）。
+- 验证：三脚本语法全过；health-patrol 复跑全绿。
+
 ## 2026-09-07 17:40 · 8973 医学栈端口补丁后浏览器全链路走查通过 + 上游词表缺口移交 tcm
 
 - 走查（真实浏览器 + 网络抓包）：8973/index 渲染正常（品牌/话术/表单齐全）；辨证请求确认走 **8972 内化栈**（预检 204 + POST 200）；正向链路实测：快捷卡片「胃不适」→ 主诉「胃不舒服，腹胀，没胃口」→ 提取 腹胀/纳差 → 出方 四君子汤（脾胃气虚，置信度 30%，合规话术齐全）；server-monitor 端口卡已显示 8972/8973 运行。

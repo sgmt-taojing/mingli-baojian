@@ -413,7 +413,8 @@ def main():
     print(f"   回看: {args.days} 天")
     print()
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
+    conn.execute("PRAGMA busy_timeout=30000")  # R-WALF 预防：WAL 单写者被占时等待而非瞬时报错
     conn.row_factory = sqlite3.Row
 
     if args.report_only:

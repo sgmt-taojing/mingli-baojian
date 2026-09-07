@@ -30,7 +30,8 @@ db_path = os.path.join(os.getcwd(), 'server/database/yidao.db')
 src_id = 'SRC-FEEDBACK-' + week
 now = __import__('datetime').datetime.now().isoformat()
 
-db = sqlite3.connect(db_path)
+db = sqlite3.connect(db_path, timeout=30)
+db.execute("PRAGMA busy_timeout=30000")  # R-WALF 预防：WAL 单写者被占时等待而非瞬时报错
 db.execute("INSERT OR IGNORE INTO source_index (src_id,src_type,title,author,trust_score,tags,access_level,created_at,module) VALUES (?,?,?,?,?,?,?,?,?)",
            (src_id, 'SRC-FEEDBACK', '反馈闭环蒸馏 ' + week, 'feedback-loop', 0.78,
             'feedback,distill', 'internal', now, 'feedback-distill'))
