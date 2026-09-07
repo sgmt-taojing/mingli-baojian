@@ -2537,7 +2537,14 @@ async function refreshFormulaRecall(text) {
         : '';
       return;
     }
-    box.innerHTML = head + r.formulas.map((f, i) => {
+    // v1.7.8：方证鉴别卡——顶部候选命中注册鉴别对（如麻黄汤×小青龙汤）时置顶提示鉴别眼目
+    const diffCard = r.differential
+      ? '<div style="margin:4px 0 6px;padding:6px 9px;border-radius:8px;background:#fffbeb;border:1px solid #fcd34d">' +
+        '<div style="font-size:11px;font-weight:700;color:#b45309">⚖️ 方证鉴别 · ' + r.differential.formulas.map(escHtml).join(' × ') + '</div>' +
+        '<div style="font-size:11px;line-height:1.7;color:#92400e;margin-top:2px">' + escHtml(r.differential.gist) + '</div>' +
+        '<div style="font-size:9px;color:#b45309;opacity:.75;margin-top:2px">依据 ' + escHtml(r.differential.basis || '') + ' · KB 条目 ' + escHtml(r.differential.entry_id || '') + '</div></div>'
+      : '';
+    box.innerHTML = head + diffCard + r.formulas.map((f, i) => {
       const rid = 'frp-' + i;
       const refs = (f.refs || []).map(x => x.module + '·' + x.title).join('；');
       return '<div class="cp-chip" id="' + rid + '" style="margin:3px 0;padding:4px 8px;background:#f0fdf4;color:#15803d" ' +
