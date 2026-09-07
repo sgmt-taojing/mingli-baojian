@@ -1,0 +1,48 @@
+{
+ "ts": "2026-09-07T14:57:48",
+ "month": "202609",
+ "checks": {
+  "A1_drift": {
+   "status": "PASS",
+   "note": "rc=0 ✅ registry↔outbox 对账: OK（6 条登记）"
+  },
+  "A3_paipan_fingerprint": {
+   "status": "PASS",
+   "note": "首版基线（无上月对照件）"
+  },
+  "B1_diff_clean": {
+   "status": "PASS",
+   "note": "missing_api=0 age=1min page_gap=53(L4已定性豁免)"
+  },
+  "B2_processor_hash": {
+   "status": "PASS",
+   "note": "processor_drift=0 js_drift=0"
+  },
+  "B3_equiv": {
+   "status": "FAIL",
+   "note": "zero_diff=True recall tcm=0.8333 ms=0.8611 Δ=0.0278",
+   "evidence": "{\"endpoint_diffs\": [], \"equiv_set\": \"/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/testdata/equiv-set-v2/kb-cases-36.json\", \"gate\": null, \"gate_checks\": {\"recall_ok\": false, \"zero_diff\": true}, \"recall\": {\"delta\": 0.0278, \"hits\": {\"ms\": 31, \"tcm\": 30}, \"k_cases\": 36, \"ms\": 0.8611, \"tcm\": 0.8333, \"tolerance\": 0.02}, \"ts\": \"2026-09-07T14:57:49\", \"verdict\": \"FAIL\"}"
+  },
+  "B4_kb_consistency": {
+   "status": "FAIL",
+   "note": "tcm=63662 ms=63646 gap=16（ms 快照滞后属正常时差） recall_equal=False"
+  },
+  "B5_golden_top1": {
+   "status": "PASS",
+   "note": "q=金匮要略课程板书实操板书 top1 tcm=金匮截图证据 · 金匮要略01 ms=金匮截图证据 · 金匮要略01"
+  },
+  "C1_disclaimer_tiers": {
+   "status": "PASS",
+   "note": "integrated-clinic.html ✓; unified-consultation.html ✓"
+  },
+  "C2_r745_guards": {
+   "status": "PASS",
+   "note": "医学零命理词=True 批注不入诊断=True tcm拒收命理字段=True"
+  },
+  "C3_calendar_consistency": {
+   "status": "PASS",
+   "note": "local=195510fa1527… 能力包副本 1 个，全同源"
+  }
+ },
+ "verdict": "FAIL"
+}

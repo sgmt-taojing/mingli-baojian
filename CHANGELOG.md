@@ -1,3 +1,9 @@
+## 2026-09-07 15:15 · 月度互查机制落地（草案 v0.1 → 自动化链路）+ 首跑立功捕获 V201 排名分叉
+
+- `scripts/monthly-cross-check.py`：草案三分野 9 项全自动——A1 漂移对账 / **A3 排盘指纹对拍**（5 固定用例打 8920 原始盘端点，sha256 规范化 JSON，月度环比）/ B1 差集 clean / **B2 检索处理器哈希** / B3 同案对拍复跑 / B4 L3-lite 知识一致性 / **B5 排名漂移守护**（金案 B075 双侧 top1）/ C1 话术分层 / C2 R745 三阴性断言 / C3 历法同源——裁判采纳的三个口头 P2（检索哈希/排名漂移/指纹对拍）全部机制化关闭。
+- launchd `com.mingli-baojian.monthly-cross-check`：每月 2 日 09:17，health-patrol 挂 R-MCC 退出码告警；证据件 `DELIVERY/monthly-cross-check-YYYYMM.json` + `paipan-fingerprint-YYYYMM.json`（A3 首版基线已产出）。
+- **首跑即立功**：捕获 V201「腹满 面黄」排名分叉——《钱天来论理中汤》ms top1(14 分) vs tcm 跌出 top30；逐层排除索引/处理器哈希/条目数据/同步滞后后定性为 tcm 侧 G25 v1.7.3 清账+信任标校准（~14:50）的活体排名演化。不移交不猜因，已发 tcm 移交件 `tcm-agent/docs/handoff/mingli-v201-ranking-drift-20260907.md` 请求确认是否预期副作用；对拍门槛 0.02 不放宽，tcm 回执后镜像追平自收敛。
+
 ## 2026-09-07 14:30 · P0 事故：yidao.db freelist 损坏修复 + G24 边界常驻守卫 + 巡检通知通道开通
 
 - **事故**：tcm-import 链条 exit 1 连警，根因 import-tcm-kb.py 写入报 `database disk image is malformed`——integrity_check 定位 freelist 计数不符（1352 vs 应 1378，WAL 裂脑系列事故残余），插入需分配空闲页即报错。

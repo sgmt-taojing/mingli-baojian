@@ -241,6 +241,10 @@ if [ -n "$API_PID" ]; then
   fi
 fi
 
+# ===== R-MCC 月度互查退出码（2026-09-07 新增，接 launchd monthly-cross-check 每月 2 日 09:17）=====
+MCC_EXIT=$(launchctl print "gui/$(id -u)/com.mingli-baojian.monthly-cross-check" 2>/dev/null | grep "last exit code" | awk '{print $NF}')
+[ -n "$MCC_EXIT" ] && [ "$MCC_EXIT" != "0" ] && [ "$MCC_EXIT" != "exited)" ] && ALERTS+=("月度互查末轮 FAIL（exit $MCC_EXIT，详件 DELIVERY/monthly-cross-check-*.json + logs/monthly-cross-check.log）")
+
 # ===== R111 触发器巡检：kb_formal 关键触发器存在性 + hit_count NULL =====
 TRIG_OK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM sqlite_master WHERE type='trigger' AND tbl_name='kb_formal' AND name='kb_formal_hit_count_default';" 2>/dev/null)
 [ "$TRIG_OK" != "1" ] && ALERTS+=("触发器丢失: kb_formal_hit_count_default（FTS 重建可能吞掉，用 scripts/fix-fts5-unicode61.py 重跑可恢复）")
