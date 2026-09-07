@@ -1,3 +1,11 @@
+## 2026-09-07 19:55 · R-TAP-Y 点读末三盘：梅花/六壬/八字点读上线，七盘点读全覆盖
+
+- **服务端**：`paipan-baihua-engine.js` 新增 buildMeihuaTap（本/互/变/动爻四点读）、buildLiurenChuan（三传点读：天将+阶段+起传法+贵人）、buildBaziPillar（四柱点读：柱位/十神/藏干/纳音/长生/旬空六维）；api-server-v2 白话分发新增 meihua+tap / liuren+chuan / bazi+pillar 三支，契约 {ok,title,level,summary,lines} 与共享弹层组件一致。
+- **前端**：meihua-chart（点本/互/变卦+动爻）、liuren-chart（点三传）、bazi（点四柱）接线 paipan-tap-pop.js，委托绑定常驻容器不受重渲染影响。
+- **顺带根修 bazi.html 两处既有 bug**：①pro-gate.js 从未引入——computeBazi 的 SVG 盘图链路调用 proFetch 必抛（导出模板里那行 `\x3cscript` 是转义文本不算引入），补 `<script src="js/pro-gate.js">` 后盘图渲染恢复；②catch 分支 `esc(e.message)` 全页未定义，任何真实错误都被「esc is not defined」掩盖——补页面级 esc 兜底。
+- **验证**：浏览器实测三盘——八字 1990-05-12 辰时点日柱出「日柱·丁丑」六维白话弹层、梅花点变卦「雷水解」+点动爻体用关系、六壬点初传「寅乘腾蛇」；巡检 410 块 inline 全绿、29 链路冒烟全过。提交 server 7e41027 + 父仓 f4e78758。
+- 至此**七大排盘（八字/紫微/六爻/奇门/风水/梅花/六壬）点读能力全覆盖**。
+
 ## 2026-09-07 19:35 · 民俗中心+缘主中心+移动 H5 走查：H5 三处假数据/错排盘根修
 
 - **民俗工具中心**（浏览器实走）：14 件工具五分组、图片标题落地、太岁卡点阅全链畅通（白话+化解+不恐慌提示）、「我的生辰」个人化机制在位。冒烟扩至 29/29 全绿（新增择日·个人化/太岁本命化解/节气/节日/家庭排盘五链路字段级断言——太岁化解≥2 项为用户红线）。修一处 UX：卡片角标裸 API 路径（GET /api/minsu/xxx）对信众隐藏。
