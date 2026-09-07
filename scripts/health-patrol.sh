@@ -313,6 +313,28 @@ fi
 REF_LEAK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM kb_formal WHERE (module LIKE 'tcm%' OR module IN ('nihaisha-tcm','huangdi-neijing','shanghan-lun','yizong-jinjian','jingyue','bencao-gangmu','shennong-bencao','nihaisha_pcs','nihaisha-pcs','nihaisha-structured')) AND (fingerprint IS NULL OR fingerprint NOT LIKE 'TCMFWD|%') AND (domain IS NULL OR domain != 'reference');" 2>/dev/null)
 [ "$REF_LEAK" != "0" ] && [ -n "$REF_LEAK" ] && ALERTS+=("G24 参考域泄漏: $REF_LEAK 条医学条目未标 reference（跑 python3 scripts/g24-reference-guard.py 补标）")
 
+# ===== R-WALK-API 前端 API 基址门禁（2026-09-07 新增）=====
+# 背景：五中心走查发现 13 页同源落空暗病——`API=''` 或裸 fetch('/api/…') 打 8900 静态口
+# 必 404，页面静默降级为空态（kb-browser 总览全 0、master-workstation 实时通道全灭等均因此）。
+# 规则：app/*.html 禁止 ①API 基址空字符串静态赋值 ②裸 '/api/' 相对路径 fetch/XHR（注释行除外）。
+# 标准基址写法：(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':''
+# 例外：确实需要同源 /api 的页面（如将来反向代理部署），列入 scripts/.patrol-api-base-allowlist 并注明理由。
+API_BASE_ALLOW=""
+[ -f "$PROJECT_ROOT/scripts/.patrol-api-base-allowlist" ] && API_BASE_ALLOW=$(grep -v '^#' "$PROJECT_ROOT/scripts/.patrol-api-base-allowlist" | tr '\n' ' ')
+API_BASE_BAD=""
+while IFS= read -r -d '' f; do
+  rel=$(basename "$f")
+  case " $API_BASE_ALLOW " in *" $rel "*) continue;; esac
+  if grep -qE "(var|const|let) +API *= *['\"]{2} *;?\s*(//.*)?$" "$f"; then
+    API_BASE_BAD="$API_BASE_BAD $rel(空基址)"
+    continue
+  fi
+  if grep -vE "^\s*//" "$f" | grep -qE "(fetch|\.open)\(['\"\`]/api/"; then
+    API_BASE_BAD="$API_BASE_BAD $rel(裸/api)"
+  fi
+done < <(find "$PROJECT_ROOT/app" -maxdepth 1 -name '*.html' -print0 2>/dev/null)
+[ -n "$API_BASE_BAD" ] && ALERTS+=("R-WALK-API 基址同源落空:$API_BASE_BAD → 注入 127.0.0.1→8920 标准基址或加白名单")
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"
