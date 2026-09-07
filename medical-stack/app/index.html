@@ -267,7 +267,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 // ═══════════════════════════════════════
 // 全局状态
 // ═══════════════════════════════════════
-const API_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8932' : '';
+const API_BASE = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8972' : '';
 const KB_SYNCED = null; // 动态加载
 let kbData = null;
 
@@ -497,7 +497,7 @@ async function searchKB() {
   if (!q) return toast('请输入搜索关键词');
 
   // R757 修真：服务端检索（不再客户端拉 85MB 全量遍历，<100ms 线性索引）
-  // 注意: 走同源相对路径(8931 代理到 8932)——apiBase(127.0.0.1:8932)跨源会被 CORS 拦截
+  // 注意: 走同源相对路径(8973 代理到 8972)——apiBase(127.0.0.1:8972)跨源会被 CORS 拦截
   let results = [];
   let j = null;
   try {

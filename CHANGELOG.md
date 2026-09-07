@@ -1,3 +1,10 @@
+## 2026-09-07 15:55 · 8931 端口冲突收口：医学页直连 tcm 活体 API 真 bug 根修
+
+- **真发现**：借收口 8931 归属冲突盘点，发现三个医学页（index/clinic-stats/wuzhen-diagnosis）硬编码 `http://127.0.0.1:8932` **直连 tcm 活体 API**——绕过内化栈 8972，tcm 停机即瘫，且违背"医学服务=内化栈"的架构定位；server-monitor 端口卡也显示旧 8932/8931。
+- **合规修复**：tcm 源页不可手改（G18 纪律），新建补丁 `patches/brand/port-adapt-897x.json`（pages 五页 stem 命名——首跑因误写 .html 后缀零匹配，复算逐补丁追踪定位后修正），重放 5 页、冒烟 5/5、G18 漂移审计 rc=0。8972 CORS 正则本就放通 localhost 任意端口，无需改服务。
+- **监控中心补强**：monitor-hub.html 新增「命理宝鉴·医道（医学内化栈）」8973 条目（总览/医生看板/门诊工作台/批注工作台/服务监控/门诊统计），原「中医智能体」更名标注（上游源头）；语法校验 + 线上 200 通过。
+- 销账：KANBAN「8931 端口归属冲突需跨项目协调」——落定结论：medical-stack 静态层让位 8973（已在产），页面层残留本次清完，无需跨项目动作。
+
 ## 2026-09-07 15:35 · 维基补齐纯脚本看守上线（不占模型额度，网络通即自动补跑）
 
 - `scripts/wiki-fill-watch.sh` + launchd `com.mingli-baojian.wiki-fill-watch`（30min）：探活 zh.wikipedia 不通静默 rc 0；通了自动跑 fill-wikidata-events.py（幂等断点续跑，熔断 rc 2=仍未通则下轮继续）；全部补齐后自卸载+桌面通知。落实用户「盯着网络通了自动补跑」指令，替代原 cron 池挂 agent 看守方案（零额度消耗）。

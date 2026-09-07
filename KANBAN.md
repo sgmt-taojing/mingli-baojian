@@ -1196,7 +1196,7 @@
 - 34 滞后页全部拉齐 tcm HEAD（补丁重放三规则，零品牌残留，ADR-009 扫描通过）
 - 安全净收益：rbac 页面演示口令块移除、emr R848 注入修复到位
 - 新机制脚本 medical-stack-page-follow.py 落 scripts/，状态 page-follow-state.json；冒烟基准 8973
-- 遗留：8931 端口归属冲突（tcm-agent 占用）需跨项目协调；页面层自动跟随可并入 G1 看守（下轮）
+- ~~遗留：8931 端口归属冲突（tcm-agent 占用）需跨项目协调~~ → **09-07 销账**：medical-stack 静态层已让位 8973 在产；页面层 8932 直连 tcm 活体残留经补丁 port-adapt-897x 清完（5 页重放+冒烟 5/5）；monitor-hub 增补 8973 内化栈条目。无需跨项目协调。页面层自动跟随已在 G1 看守链（reapply-patches 15min 轮询）。
 
 ## 2026-08-31 16:30 — ✅ G15 命理视觉采集接线（验收全过）+ G16 差集清零
 - G15：三路命理视觉路由接线完成（三个 fortune onnx 早已被子服务加载，本次接通路由层）；自检 7/7（医学4+命理3，真实 classify 懒加载触发）；授权门负例×2（skipped_no_consent / 403）、R756 泄漏检查 PASS、批注入队 ann-e0d2398a0d35

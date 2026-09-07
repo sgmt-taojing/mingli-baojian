@@ -1,0 +1,16 @@
+{
+  "name": "port-adapt-897x",
+  "class": "brand",
+  "pages": ["index", "clinic-stats", "wuzhen-diagnosis", "server-monitor", "insurance-desk"],
+  "baseline_head": "77da244",
+  "desc": "端口适配：tcm 基线硬编码 8931/8932 → 本侧内化栈 8973/8972。背景：8931 被 tcm-agent 静态服务占用（KANBAN 跨项目冲突项），本侧 medical-static 已让位 8973；三个页面此前直连 tcm 活体 8932，绕过内化栈且 tcm 停机即瘫。",
+  "ops": [
+    { "type": "replace", "from": "http://127.0.0.1:8932", "to": "http://127.0.0.1:8972", "optional": true },
+    { "type": "replace", "from": "http://127.0.0.1:8931", "to": "http://127.0.0.1:8973", "optional": true },
+    { "type": "replace", "from": "{ port: 8932, name: 'API 服务'", "to": "{ port: 8972, name: 'API 服务'", "optional": true },
+    { "type": "replace", "from": "{ port: 8931, name: '静态服务'", "to": "{ port: 8973, name: '静态服务'", "optional": true },
+    { "type": "replace", "from": "8931 代理到 8932", "to": "8973 代理到 8972", "optional": true },
+    { "type": "replace", "from": "apiBase(127.0.0.1:8932)", "to": "apiBase(127.0.0.1:8972)", "optional": true },
+    { "type": "replace", "from": "走 8931 代理", "to": "走 8973 代理", "optional": true }
+  ]
+}
