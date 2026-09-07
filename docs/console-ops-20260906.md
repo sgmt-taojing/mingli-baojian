@@ -5,6 +5,7 @@
 ## ① 停用「r470-staging-auto-promote」（已迁移 launchd，必做）
 
 - 原因：该任务是纯脚本（node scripts/staging-auto-promote.js），走 agentTurn 每次白烧模型额度且 20 分钟超时窗必超时（已连败 4 次）。已迁移为 launchd 纯脚本任务 `com.mingli-baojian.staging-auto-promote`（每日 03:00，与原排程一致），今日实跑验证 promoted 829/829、0 错误。
+- 09-07 更新：当日 03:00 批次 824 条「database is locked」失败已根修（引擎 busy_timeout=15s + 逐条重试，提交 cd98321/子模块 5a71636），手动复跑 829/829 全通过——launchd 路径可靠，控制台停用 agentTurn 版照旧执行。
 - 操作：控制台 → cron 任务列表 → 找到「r470-staging-auto-promote」→ **停用（disable）**。不要删，留档备查。
 
 ## ② 替换「名人八字采集 · 每日增尸」payload（超时根修 · 半脚本化版）
