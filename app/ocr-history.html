@@ -218,6 +218,8 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+
 const MODE_COLORS = {
   face: '#58a6ff', tongue: '#bc8cff', ocr: '#3fb950',
   'ocr-tcm': '#d29922', voice: '#f85149'
@@ -230,7 +232,7 @@ let csrfToken = '';
 
 async function fetchCsrf() {
   try {
-    const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000),  credentials:'same-origin' });
+    const r = await fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000),  credentials:'same-origin' });
     const d = await r.json();
     csrfToken = d.csrfToken || d.data?.csrfToken || '';
   } catch(e) { _devWarn('csrf fetch fail', esc(e.message)); }
@@ -348,7 +350,7 @@ function drawPie(byMode) {
 async function clearAll() {
   if (!confirmInline('确认清空所有 OCR 历史记录？')) return;
   try {
-    const r = await fetch('/api/ocr/history', { signal: AbortSignal.timeout(15000),
+    const r = await fetch(API+'/api/ocr/history', { signal: AbortSignal.timeout(15000),
       method:'DELETE', credentials:'same-origin',
       headers: csrfToken ? {'x-csrf-token':csrfToken} : {}, signal: AbortSignal.timeout(15000) });
     const d = await r.json();

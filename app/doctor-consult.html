@@ -245,7 +245,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--dc-
 (function(){
 'use strict';
 
-const API = '';
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 const FACE_OCR = 'http://127.0.0.1:8913';
 let currentMode = 'auto';
 let streams = { wearable: null, fixed: null };
@@ -266,7 +266,7 @@ async function checkServices() {
       fetch(API + '/api/health', {signal: AbortSignal.timeout(15000)}).then(r => r.json()).catch(() => ({})),
       fetch(FACE_OCR + '/health', {signal: AbortSignal.timeout(15000)}).then(r => r.json()).catch(() => ({}))
     ]);
-    const apiOk = apiR.ok || apiR.status === 'ok';
+    const apiOk = apiR.ok || apiR.status === 'ok' || apiR.code === 0;
     const ocrOk = ocrR.status === 'ok' || ocrR.ok;
     if (apiOk && ocrOk) {
       svcInd.className = 'indicator ok';

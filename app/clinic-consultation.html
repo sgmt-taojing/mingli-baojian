@@ -663,7 +663,7 @@ body.role-master .role-banner.master{display:flex}
 (function(){
 'use strict';
 
-const API = '';
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 const FACE_OCR = 'http://127.0.0.1:8913';
 let scene = 'clinic';
 let camStream = null;

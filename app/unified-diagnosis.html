@@ -503,7 +503,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 
 <script>
 // ═══ State ═══
-const API = '';  // 相对路径
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';  // R-WALK: 同源落空根修(原相对路径打到8900静态口必404)
 const FACE_OCR = 'http://127.0.0.1:8913';
 let state = {
   role: 'patient',

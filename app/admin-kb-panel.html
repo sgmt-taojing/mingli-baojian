@@ -144,6 +144,8 @@
   </div>
 </div>
 <script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+
 function toggleStaging(){
   var p = document.getElementById('staging-panel');
   if(p){ p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display !== 'none') stagingLoad(); }
@@ -156,7 +158,7 @@ function toast(msg,type){
 }
 function stagingLoad(){
   var box = document.getElementById('staging-list');
-  fetch('/api/kb/staging/list?status=staged&limit=100').then(function(r){return r.json()}).then(function(d){
+  fetch(API+'/api/kb/staging/list?status=staged&limit=100').then(function(r){return r.json()}).then(function(d){
     if(!d.ok){ box.innerHTML = '<div class="muted">加载失败</div>'; return; }
     document.getElementById('staging-cnt').textContent = '共 ' + d.total + ' 条待审（每条入库前自动跑引擎审计）';
     STAGING_SEL = {};
@@ -181,7 +183,7 @@ function stagingApprove(){
   var ids = Object.keys(STAGING_SEL);
   if(!ids.length){ toast('请先勾选条目','err'); return; }
   if(!confirm('确认通过 ' + ids.length + ' 条？将执行引擎审计（内容/来源/置信度/医疗声明），通过后进入正式库。')) return;
-  fetch('/api/kb/staging/approve', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids})})
+  fetch(API+'/api/kb/staging/approve', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids})})
     .then(function(r){return r.json()}).then(function(d){
       toast('通过 ' + (d.promoted||0) + ' 条 · 拒绝 ' + (d.rejected||0) + ' 条' + (d.errors&&d.errors.length ? ' · 错误 ' + d.errors.length : ''), d.errors&&d.errors.length?'err':'ok');
       stagingLoad();
@@ -193,7 +195,7 @@ function stagingReject(){
   if(!confirm('确认拒绝 ' + ids.length + ' 条？拒绝后不进正式库（可留审计记录）。')) return;
   var notes = prompt('拒绝原因（留审计）：', 'R735-g10 人工审核拒绝');
   if(notes === null) return;
-  fetch('/api/kb/staging/reject', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids, notes: notes})})
+  fetch(API+'/api/kb/staging/reject', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids, notes: notes})})
     .then(function(r){return r.json()}).then(function(d){
       toast('已拒绝 ' + (d.rejected||0) + ' 条','ok');
       stagingLoad();

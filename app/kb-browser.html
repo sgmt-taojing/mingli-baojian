@@ -318,6 +318,8 @@ tr.graph-row.highlighted{background:rgba(255,180,77,.15)}
 </main>
 
 <script>
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+
 function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"]");if(el)el.click();}
 (async function(){
   const CSRF_KEY = '_csrf_token_cache';
@@ -325,7 +327,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
     let t = sessionStorage.getItem(CSRF_KEY);
     if(t) return t;
     try {
-      const r = await fetch('/api/csrf-token', {signal: AbortSignal.timeout(15000)});
+      const r = await fetch(API+'/api/csrf-token', {signal: AbortSignal.timeout(15000)});
       const d = await r.json();
       t = d.data?.token || d.token;
       if(t) sessionStorage.setItem(CSRF_KEY, t);
@@ -334,7 +336,7 @@ function switchTab(tab){var el=document.querySelector(".tab[data-tab=\""+tab+"\"
   }
   async function api(path){
     try {
-      const r = await fetch(path, {signal: AbortSignal.timeout(15000)});
+      const r = await fetch((typeof API!=='undefined'?API:'')+path, {signal: AbortSignal.timeout(15000)});
       const d = await r.json();
       return d.data || d;
     } catch(e){ return null; }
@@ -1192,7 +1194,7 @@ function pickN(n){ return fileList.slice().sort((a,b) => (a.name||'').localeComp
     const entriesMore = document.getElementById('modalEntriesMore');
     if(entriesSection && entriesEl && window.fetch){
       // 拉取该节点的 KB 条目（最多 8 条预览）
-      fetch('/api/public/kb-query?module=' + encodeURIComponent(nodeId) + '&size=8',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(data=>{
+      fetch(API+'/api/public/kb-query?module=' + encodeURIComponent(nodeId) + '&size=8',{signal:AbortSignal.timeout(15000)}).then(r=>r.json()).then(data=>{
         const raw = data && data.data || data || {};
         const entries = raw.results || raw.entries || raw.items || [];
         window._lastEntryList = entries;
