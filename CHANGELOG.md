@@ -3,6 +3,12 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 13:42 · 镜像→消费全链路验证：G26 知识 family 侧可检索
+
+- 链路：mingli-full.json（13:36 推送 20,832 条纯命理）→ family build-family-kb.py 重建融合层（mingli 20,649 + tcm 59,103 = 79,752，去重 2,471）→ 消费方 triage_router/closed_loop_engine 均为 mtime 缓存自动热载，无需重启。
+- 实测：family 消费方加载 79,752 条，G26 财帛宫系列 13 条可检索（样例「紫微斗数紫微星坐财帛宫各组合含义与吉凶详解」）；mingli 域 TCMFWD 混入 0。
+- family-kb launchd 日 04 点自动重建，日常无需人工。
+
 ## 2026-09-07 13:40 · 镜像出站根修：参考域+TCMFWD 正室双排除，family 收纯命理 20,832 条
 
 - cron-distill-mingli-outbound.sh 两个导出查询（pure/full）加 `domain!='reference'` + `fingerprint NOT LIKE 'TCMFWD|%'`：模块名 LIKE 黑名单盖不住 huangdi-neijing/bencao-gangmu/qianjin 等经典命名模块，tcm 内化正室 11,003 条此前长期混入 family 镜像（医学双源重复+越界，违 R747）——domain/fingerprint 双字段才是权威边界。
