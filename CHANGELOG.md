@@ -3,6 +3,14 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 13:35 · G24c nihaisha 混血模块内容级分拣（参考域边界最后一块闭环）
+
+- nihaisha 主模块 772 条（0 TCMFWD）按标题+内容前300字规则分拣：医学 309 + 不明 182（倪师健康短讲/养生集锦）→ domain='reference' 共 **491 条**；命理 281 条中 266 条按标题归位命理模块（yijing 86/tianji-jiangjie 71/ziwei 68/fengshui 35/liuren 5/bazi 1），15 条留原模块。
+- 配套根修：kb_matcher.py 诊疗四诊白名单（舌/面/目/手）移除 'nihaisha'——命理条目彻底退出诊疗检索域（R756 防泄漏加固）；归位后命理条目脱离报告黑名单模块名，命理链路恢复可达。
+- 误判防线：医学正则剔除单字器官/汤丸散（易经「涣卦=散」「人心」类标题曾被误伤）；不明类就高打标（命理链路可命中参考域，误伤成本低；诊疗混入养生短讲噪音成本高）。
+- 验证：8920 重启后 /api/public/tcm/syndrome-infer 命中 5 条全部 TCMFWD 正室，零泄漏；归位抽样正确。回滚快照 g24c_backup_20260907（772 行）。
+- 全库参考域累计 **35,810 条**（35,319+491）。
+
 ## 2026-09-07 13:16 · G26 命理知识多轮补蒸馏 SOP 首轮闭环（差集收敛）
 
 - 【R1 覆盖审计】命理语料 212 件（A·天纪分类字幕 179 / B·24集字幕 17 / C·天纪系文档 10 / D·项目内抽取 6）× kb_formal 对账：覆盖 205，差集 7（undistilled 5 + partial 2）；证据 DELIVERY/g26-r1-audit-20260907-1226.json。附查：天纪 24 集目录 subs/ 实测为空，字幕实位于 nishi-materials/subs/天纪*.txt。
