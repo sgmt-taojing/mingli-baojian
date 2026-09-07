@@ -1,3 +1,14 @@
+## 2026-09-07 21:05 · 五中心走查：API 基址暗病批量根修（12 页）+ 空壳清零
+
+- **空壳清零**（您已确认）：11 个 0 字节 db 空壳（knowledge/ 8 + data/ 3）归档 archive/empty-db-shells/；2 个失效历史导入脚本（r474/r486 指向已归档路径）归档 scripts-legacy/；feedback-aggregator 候选列表摘除 data/yidao.db。巡检 R120 断链规则持续守护。
+- **五中心死链基线**：doctor/patient/org/admin/yuanzhu 五中心 257 链接零死链、图片标题全部在位。
+- **API 基址暗病批量根修（本轮最大战果）**：同源落空病共 12 页——master-workstation 同款（`API=''` 或裸 `fetch('/api/…')` 打 8900 静态口必 404，页面静默降级为空态）：
+  - 直接基址为空 4 页：admin-tickets / clinic-consultation / doctor-consult / unified-diagnosis
+  - 裸相对路径 8 页：admin-kb-panel / glass-console / health-forecast / kb-browser / kb-quality / naming-portal / ocr-history / tcm-syndromes
+  - 统一注入标准基址（127.0.0.1→8920，线上留同源），逐页浏览器实测全通。
+- **附修三处字段契约错位**：①kb-browser 的 api() 助手不走基址，总览长期全 0——修复后实显 **87,352 条目 / 220 模块 / trust 0.819 / 命中 145,029 / 质量 A+**；②tcm-syndromes 读 d.data 而接口返回 d.stats；③doctor-consult 健康检查只认 ok/status 字段不认 code===0，修后实测「所有服务就绪 · 可以开始采集」。
+- **回归**：409 块 inline 全绿、29 链路冒烟全过。提交 e4b34063（空壳）+ 6d45a2eb（基址批量）。
+
 ## 2026-09-07 20:35 · 知识蒸馏与活化全链诊断：一处真故障根修，其余链路健康
 
 **诊断结论（全链五段）**：
