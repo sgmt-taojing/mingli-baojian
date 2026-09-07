@@ -3,6 +3,12 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 12:20 · G24b 清单外医学经典模块参考域收尾（承接 G24，裁判拍板项落地）
+
+- 29 个医学经典/临床模块存量打 reference **1,513 条**（jinkui-yaolue 582/nihaisha-yian 371/acupuncture 316/wangzhen 115/bencao 72/r45_tcm 45/neijing 41/wenbing 27 等）；qianjin/mingyi-leian/zhubingyuanhou/rumen-shiqin/wenbing-tiaobian/jiayi-jing/nanjing/wenre-lun/piwei-lun/wenyi-lun/yilin-gaicuo/danxi/maijing 13 模块实测 100% 为 TCMFWD 正室（无旧存量，打标 0）。
+- 全库 reference 累计 **35,319 条**；范围内未打标全部 TCMFWD（untagged_all_tcmfwd=true）；回滚快照 g24b_backup_20260907（4,236 行）。
+- 命理域抽样排除不打标：yizhan(焦氏易林)/monthly_cure(运势化解)/yishi(行业运势)；nihaisha 主模块 772 条天纪命理+人纪医学混合，未整体打标，另案内容级分拣。
+
 ## 2026-09-07 11:20 · G24 医学存量参考域标注 + 模块标签规范化（ADR-024 裁判任务书，双项全收）
 
 - 【任务① 参考域标注】kb_formal 新增 domain 列；G24 清单 23 模块 + tcm* 前缀存量打 domain='reference' 共 **33,806 条**（总量 72,908，占 46.4%）；TCMFWD 内化正室 10,904 条全部豁免（范围内未打标=正室，机器校验 untagged_all_tcmfwd=true）；不改内容/不删条目/不动 trust 与 updated_at；回滚快照表 g24_backup_20260907（45,107 行原值）。
