@@ -3,6 +3,11 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 13:47 · G26 SOP 常态化：月度 launchd 上线（每月 1 日 08:43）
+
+- scripts/g26-monthly-sop.sh：R1 审计 → 有差集自动 R2 补蒸（密钥运行时从 api-v2 plist 读取不落盘）→ R3 复扫 → 收敛后自动下发镜像；差集不清非零退出供 health-patrol 捕获。
+- launchd com.mingli-baojian.g26-sop 已装载并试跑通过（R1 差集 0 直过，日志 logs/g26-sop.log）。
+
 ## 2026-09-07 13:42 · 镜像→消费全链路验证：G26 知识 family 侧可检索
 
 - 链路：mingli-full.json（13:36 推送 20,832 条纯命理）→ family build-family-kb.py 重建融合层（mingli 20,649 + tcm 59,103 = 79,752，去重 2,471）→ 消费方 triage_router/closed_loop_engine 均为 mtime 缓存自动热载，无需重启。
