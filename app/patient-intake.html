@@ -201,6 +201,18 @@ s+='<b>病史：</b>'+(get('history')||'无');
 document.getElementById('summary').innerHTML=s;
 }
 function get(id){return document.getElementById(id).value||'未填'}
+var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+var _csrfToken='';
+// R-WALK2: 建档必须真入库——CSRF 门禁 + 过期自动换新重试一次，失败给真实错误可重试，禁假成功
+function refreshCsrf(){return fetch(API+'/api/csrf-token',{signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(d){_csrfToken=d.csrfToken||''}).catch(function(){});}
+refreshCsrf();
+function postCase(payload){
+function attempt(){return fetch(API+'/api/clinic/case',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':_csrfToken},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload)}).then(function(r){return r.json()});}
+return attempt().then(function(d){
+  if(d&&(d.code==='CSRF_TOKEN_EXPIRED'||d.code==='CSRF_TOKEN_MISSING')){return refreshCsrf().then(attempt);}
+  return d;
+});
+}
 function submitForm(){
 var btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='提交中...';
 var syms=[];document.querySelectorAll('#step2 .checkbox-item input:checked').forEach(function(c){syms.push(c.value)});
@@ -208,21 +220,25 @@ var data={
 name:get('name'),sex:get('sex'),age:get('age'),phone:get('phone'),
 birth_date:get('birth_date'),birth_hour:get('birth_hour')?parseInt(get('birth_hour')):null,
 birthplace:get('birthplace'),
-symptoms:syms.join('、')+'。'+get('symptoms_detail'),
+symptoms:(syms.length?syms.join('、')+'。':'')+get('symptoms_detail'),
 duration:get('duration'),severity:get('severity'),prior_treatment:get('prior_treatment'),
 constitution:get('temp_pref')+'; 出汗:'+get('sweat')+'; 食欲:'+get('appetite')+'; 睡眠:'+get('sleep')+'; 大便:'+get('bowel'),
 history:get('history')
 };
-var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
-fetch(API+'/api/clinic/case',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(15000),body:JSON.stringify({patient_id:4,symptoms:data.symptoms,constitution:data.constitution,paipan_summary:'出生:'+data.birth_date+' '+data.birth_hour+'时 '+data.birthplace})}).then(function(r){return r.json()}).then(function(d){
+// 散客锚点 0（medical_cases 主约定，32/41 例同）；姓名入 paipan_summary 供医师识别
+postCase({patient_id:0,symptoms:data.symptoms,constitution:data.constitution,paipan_summary:'姓名:'+data.name+' '+data.sex+' '+data.age+'岁 出生:'+data.birth_date+' '+(data.birth_hour!=null?data.birth_hour+'时':'时辰未填')+' '+data.birthplace}).then(function(d){
+var caseId=d.data&&d.data.case_id;
+if(!caseId){throw new Error((d.data&&d.data.error)||d.error||d.message||'服务未返回编号');}
 document.getElementById('step4').style.display='none';
 document.getElementById('result').style.display='block';
 var c=document.getElementById('result-content');
-c.innerHTML='您的诊疗编号：<b>#'+(d.data&&d.data.case_id||'?')+'</b><br><br>系统正在为您安排：<br>☯ 命理大师 — 分析体质与健康状况<br>注 中医医生 — 综合诊断并开具处方<br><br>请耐心等待，您可以在身份中心查看进度。';
+c.innerHTML='您的诊疗编号：<b>#'+caseId+'</b><br><br>系统正在为您安排：<br>☯ 命理大师 — 分析体质与健康状况<br>注 中医医生 — 综合诊断并开具处方<br><br>请耐心等待，您可以在身份中心查看进度。';
 }).catch(function(e){
+btn.disabled=false;btn.textContent='重新提交';
+var c=document.getElementById('result-content');
 document.getElementById('step4').style.display='none';
 document.getElementById('result').style.display='block';
-document.getElementById('result-content').innerHTML='提交成功（离线模式）<br>您的信息已记录，稍后将有专人与您联系。';
+c.innerHTML='<b style="color:#e74c3c">提交失败</b>：'+(e&&e.message?e.message:'网络或服务暂不可用')+'<br><br>您的信息未丢失，请检查网络后点下方「重新提交」。若多次失败请稍后再试或到院登记。';
 });
 }
 </script>
