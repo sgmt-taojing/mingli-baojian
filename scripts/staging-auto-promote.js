@@ -42,14 +42,27 @@ function main() {
   const details = [];
 
   for (const c of candidates) {
-    try {
-      promoteToFormal(c.entry_id);
+    // 锁竞争重试兜底：busy_timeout(15s，见 kb-management-engine) 之外的第二道防线，
+    // 覆盖超长写锁（备份/大批量蒸馏）；最多 3 次，间隔 2s/5s。
+    let lastErr = null;
+    for (const waitMs of [0, 2000, 5000]) {
+      if (waitMs) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
+      try {
+        promoteToFormal(c.entry_id);
+        lastErr = null;
+        break;
+      } catch (e) {
+        lastErr = e;
+        if (!/database is locked/i.test(e.message)) break; // 非锁错误不重试
+      }
+    }
+    if (lastErr) {
+      errors++;
+      details.push({ entry_id: c.entry_id, error: lastErr.message.slice(0, 120) });
+      console.error(`[r470] ${c.entry_id}: ${lastErr.message}`);
+    } else {
       promoted++;
       details.push({ entry_id: c.entry_id, module: c.module, confidence: c.confidence, days_old: c.days_old });
-    } catch (e) {
-      errors++;
-      details.push({ entry_id: c.entry_id, error: e.message.slice(0, 120) });
-      console.error(`[r470] ${c.entry_id}: ${e.message}`);
     }
   }
 

@@ -1,3 +1,9 @@
+## 2026-09-07 14:15 · staging promote 824 锁连败根修：busy_timeout + 重试双防线
+
+- 凌晨 03:00 例行 promote 824/829 条失败「database is locked」：kb-management-engine 模块级连接 busy_timeout=0（node:sqlite 默认），WAL 单写者被占即瞬时报错，824 条候选整批陪绑。
+- 根修双防线：①引擎连接补 `PRAGMA busy_timeout=15000`（server 子模块 5a71636，api-v2 已重启生效）；②staging-auto-promote.js 逐条 promote 加锁重试（2s/5s 两档，非锁错误不重试）。
+- 复跑验证：promoted **829/829（0 errors）**，积压全消化。
+
 ## 2026-09-07 14:00 · equiv 对拍 FAIL 根修：G1 索引重建空壳事故 + 钩子守护上线
 
 - 现象：equiv-dual-run 复跑 FAIL——端点零差异但 Recall@K tcm 31/36 vs ms 30/36（Δ=0.0278>0.02），唯一掉案=案30「腹满 面黄」期望《钱天来论理中汤》。
