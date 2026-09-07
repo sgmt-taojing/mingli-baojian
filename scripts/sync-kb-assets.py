@@ -29,9 +29,17 @@ ROOT = Path(__file__).resolve().parent.parent
 TCM_KB = ROOT.parent / 'tcm-agent' / 'server' / 'kb'
 MS_KB = ROOT / 'medical-stack' / 'server' / 'kb'
 
-# 与 scripts/tcm-capability-diff.py L2.6 KB_ASSETS 保持一致（单一清单两处维护，变更须同步）
-KB_ASSETS = ['formula-symptom-index.json', 'symptom-aliases.json', 'recall-demotions.json',
-             't2s-map.js', 'symptom-index.js', 'tcm-classics.json', 'syndrome-supplement.json']
+# 单一真源：medical-stack/patches/kb-assets.json（tcm-capability-diff.py L2.6 同读）
+def load_assets():
+    reg = ROOT / 'medical-stack' / 'patches' / 'kb-assets.json'
+    try:
+        d = json.loads(reg.read_text(encoding='utf-8'))
+        return [a['file'] for a in d.get('assets', [])]
+    except Exception:
+        return ['formula-symptom-index.json', 'symptom-aliases.json', 'recall-demotions.json',
+                't2s-map.js', 'symptom-index.js', 'tcm-classics.json', 'syndrome-supplement.json']
+
+KB_ASSETS = load_assets()
 
 SMOKE_QUERY = '痈 疽'           # E16 金案：症状通道+共现加成双重依赖资产新鲜度
 SMOKE_EXPECT = '医宗金鉴'        # top5 须含金鉴外科条目

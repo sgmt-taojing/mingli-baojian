@@ -239,8 +239,12 @@ def main() -> int:
 
     # L2.6 KB 数据资产哈希比对（2026-09-07 新增：症状通道索引/别名词典/驳回降级名单
     # 等数据资产漂移曾致检索双侧系统性分叉——处理器哈希相同但结果不同，「痈 疽」案在案）
-    KB_ASSETS = ['formula-symptom-index.json', 'symptom-aliases.json', 'recall-demotions.json',
-                 't2s-map.js', 'symptom-index.js', 'tcm-classics.json', 'syndrome-supplement.json']
+    try:  # 单一真源 medical-stack/patches/kb-assets.json（sync-kb-assets.py 同读）
+        _kb_reg = json.loads((MS / 'patches' / 'kb-assets.json').read_text(encoding='utf-8'))
+        KB_ASSETS = [a['file'] for a in _kb_reg.get('assets', [])]
+    except Exception:
+        KB_ASSETS = ['formula-symptom-index.json', 'symptom-aliases.json', 'recall-demotions.json',
+                     't2s-map.js', 'symptom-index.js', 'tcm-classics.json', 'syndrome-supplement.json']
     asset_rows = []
     asset_drift = []
     for a in KB_ASSETS:
