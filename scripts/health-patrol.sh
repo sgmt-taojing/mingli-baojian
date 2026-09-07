@@ -14,10 +14,15 @@ for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8
     lsof -i :$PORT >/dev/null 2>&1 || ALERTS+=("$NAME(:$PORT) 未在监听")
 done
 
-# 1a. 医学权威库在线（R119：8932 搜索端点存活验证）
+# 1a. 医学权威库在线（R119：8932 搜索端点存活验证；R-DEBOUNCE：冷索引期 5s 超时曾 40min 内两次误报——失败时隔 8s 重试一次再告警）
 if lsof -i :8932 >/dev/null 2>&1; then
-    AUTH_CHECK=$(curl -s -m 5 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('ok','') and d.get('total_hits',0))" 2>/dev/null)
-    [ -z "$AUTH_CHECK" ] || [ "$AUTH_CHECK" = "0" ] && ALERTS+=("医学权威库 8932 搜索异常（total_hits=0）")
+    AUTH_PROBE='import sys,json; d=json.load(sys.stdin); print(d.get("ok","") and d.get("total_hits",0))'
+    AUTH_CHECK=$(curl -s -m 5 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "$AUTH_PROBE" 2>/dev/null)
+    if [ -z "$AUTH_CHECK" ] || [ "$AUTH_CHECK" = "0" ]; then
+        sleep 8
+        AUTH_CHECK=$(curl -s -m 8 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "$AUTH_PROBE" 2>/dev/null)
+    fi
+    [ -z "$AUTH_CHECK" ] || [ "$AUTH_CHECK" = "0" ] && ALERTS+=("医学权威库 8932 搜索异常（重试后仍 total_hits=${AUTH_CHECK:-空}）")
 fi
 
 # 1b. 端口绑定安全扫描（R-2026-08-15：修真 8941-8945/8787/8931-8933 共 9 服务 0.0.0.0→127.0.0.1）

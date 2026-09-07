@@ -270,10 +270,13 @@ TOOLS.forEach(t => {
     _gHtml += `<div class="grp"><b>${GROUPS[g][0]}</b><i>${GROUPS[g][1]}</i></div><div class="tools">`;
     _lastG = g;
   }
-  _gHtml += `<div class="tool" data-id="${t.id}"><span class="ico">${t.ico}</span><img class="nm-img" src="assets/titles/ask-${t.id}.png" alt="${t.nm}"><div class="ds">${t.ds}</div></div>`;
+  _gHtml += `<div class="tool" data-id="${t.id}" role="button" tabindex="0" aria-label="${t.nm}：${t.ds}"><span class="ico">${t.ico}</span><img class="nm-img" src="assets/titles/ask-${t.id}.png" alt="${t.nm}"><div class="ds">${t.ds}</div></div>`;
 });
 $('toolGrid').innerHTML = _gHtml + '</div>';
-document.querySelectorAll('.tool').forEach(el => el.onclick = () => selectTool(el.dataset.id, el));
+document.querySelectorAll('.tool').forEach(el => {
+  el.onclick = () => selectTool(el.dataset.id, el);
+  el.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectTool(el.dataset.id, el); } }; // R-A11Y：键盘可达
+});
 
 // R-DEEPLINK: ?tool=xxx 直达（首页/民俗中心等入口跳转自选工具）
 (function(){
