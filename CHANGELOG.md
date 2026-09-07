@@ -1,3 +1,10 @@
+## 2026-09-07 20:10 · 命理师中心走查：两处真问题根修
+
+- **死链/图片/排盘渲染基线**：47 链接零死链、20 张图片标题全载、paipan-center 七盘入口全通、kb-insights/master-intake API 配置正确。
+- **修复①：复核签发链路指向真审核台**。master-review.html（大师端·批八字）是遗留演示页——硬编码 `/api/patient/profile/4` 而该患者已 NOT_FOUND，页面只会优雅空转。归档至 archive/app-legacy/，三处入口改指：center-master 复核签发卡 + index 复核卡 → review-studio.html（真双师审核台，Bearer+CSRF 门禁正常，浏览器实测 AUTH 拦截在位）；practice-portal 复习精要卡（学习门户错配到批八字演示）→ koujue-gallery.html（口诀速查）。**同步清源三处**：生成器 gen-service-centers.py（防重生成回退）、sitemap.xml（删死条目）、site-index.json（改指审核台）。
+- **修复②：命理大师工作台活体数据从未工作**。`const API=''` + WS 拼 `location.host`(8900 静态口)——所有 fetch/SSE/WS 全部落空，页面只显示降级空态（「SSE 推送失败」「尚未接收到患者诊断同步」）。API 与 WS 双双改指 8920，浏览器实测：推送失败标志消失、SSE 通道恢复。这意味着问诊室→大师工作台的病例实时同步链路（R505 WS→SSE→轮询三级降级）首次真正可用。
+- **回归**：409 块 inline 全绿（归档一页减 1 块）、29 链路冒烟全过。提交 97ef9355。
+
 ## 2026-09-07 19:55 · R-TAP-Y 点读末三盘：梅花/六壬/八字点读上线，七盘点读全覆盖
 
 - **服务端**：`paipan-baihua-engine.js` 新增 buildMeihuaTap（本/互/变/动爻四点读）、buildLiurenChuan（三传点读：天将+阶段+起传法+贵人）、buildBaziPillar（四柱点读：柱位/十神/藏干/纳音/长生/旬空六维）；api-server-v2 白话分发新增 meihua+tap / liuren+chuan / bazi+pillar 三支，契约 {ok,title,level,summary,lines} 与共享弹层组件一致。
