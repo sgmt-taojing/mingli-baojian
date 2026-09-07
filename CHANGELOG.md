@@ -1,3 +1,13 @@
+## 2026-09-07 21:35 · R-WALK2 患者建档闭环根修（红线级假成功清除）
+
+- **patient-intake 三重症**（患者中心「首次就诊·建档登记」）：
+  1. **红线级假成功**：POST /api/clinic/case 有 CSRF 门禁而页面从未取 token——建档提交 100% 失败，catch 却显示「提交成功（离线模式）」。改为：预取 CSRF + 过期自动换新重试一次 + 失败给真实原因与「重新提交」（表单不丢）。
+  2. **幽灵患者锚点**：硬编码 patient_id=4（查无此人）改为散客锚点 0（medical_cases 主约定 32/41 例），姓名/性别/年龄/生辰写入 paipan_summary 供医师识别。
+  3. **服务端 falsy 误判**：`!patient_id` 把合法的 0 也拒了，改 undefined/null 精确判定（server 718fb7e）。
+- **浏览器实测全链**：填表→提交→真实诊疗编号 **#49** 入库，状态 pending_master 进大师复核队列。
+- **顺带**：症状前缀空「。」瑕疵修复；报告回流两接口（my-reports 登录门禁/signed-report 404 空态）行为正确无需修。
+- **回归**：409 块全绿 + 29 链路冒烟全过。提交 80b240a4。
+
 ## 2026-09-07 21:20 · R-WALK-API 基址门禁入巡检（制度化防再生）
 
 - health-patrol.sh 新增规则：app/*.html 禁止 ①API 基址空字符串静态赋值 ②裸 `/api/` 相对路径 fetch/XHR（注释行豁免）；白名单 `scripts/.patrol-api-base-allowlist`（当前为空，例外须注明理由）。
