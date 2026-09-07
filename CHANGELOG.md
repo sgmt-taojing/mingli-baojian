@@ -3,6 +3,12 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 13:45 · G24d 参考域收尾：nihaisha_pcs/nihaisha-pcs/nihaisha-structured 打标，医学双头全灭
+
+- nihaisha_pcs（1,274，兰台轨范/伤寒论条辨/针灸甲乙经等医典§节）+ nihaisha-pcs（80，梁冬对话倪海厦访谈）+ nihaisha-structured（96，伤寒论/金匮课程蒸馏笔记）→ domain='reference' 共 **1,450 条**，范围内未打标 0。
+- 全库 reference 累计 **37,260 条**（占 72,908+ 增量的 ~48%）；命理域模块（authoritative/classics/kb-store 用神八宅/mingli-cross-moved/yizhan 焦氏易林等）逐一经内容抽样确认命理归属，不打标。
+- 回滚快照 g24d_backup_20260907；至此 G24 系（G24/G24b/G24c/G24d）参考域边界全闭环：医学存量全标、正室全豁免、命理全可达、诊疗检索域零泄漏。
+
 ## 2026-09-07 13:35 · G24c nihaisha 混血模块内容级分拣（参考域边界最后一块闭环）
 
 - nihaisha 主模块 772 条（0 TCMFWD）按标题+内容前300字规则分拣：医学 309 + 不明 182（倪师健康短讲/养生集锦）→ domain='reference' 共 **491 条**；命理 281 条中 266 条按标题归位命理模块（yijing 86/tianji-jiangjie 71/ziwei 68/fengshui 35/liuren 5/bazi 1），15 条留原模块。
