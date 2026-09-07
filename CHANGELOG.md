@@ -3,6 +3,15 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 11:20 · G24 医学存量参考域标注 + 模块标签规范化（ADR-024 裁判任务书，双项全收）
+
+- 【任务① 参考域标注】kb_formal 新增 domain 列；G24 清单 23 模块 + tcm* 前缀存量打 domain='reference' 共 **33,806 条**（总量 72,908，占 46.4%）；TCMFWD 内化正室 10,904 条全部豁免（范围内未打标=正室，机器校验 untagged_all_tcmfwd=true）；不改内容/不删条目/不动 trust 与 updated_at；回滚快照表 g24_backup_20260907（45,107 行原值）。
+- 【诊疗排除验证】补丁点 2 处：kb_matcher.py 3 条 SQL + collab-diagnosis.js liveKbMatch 3 条 SQL 加 `domain != 'reference'` 排除（覆盖 /api/tcm/syndrome-infer、/api/public/tcm/syndrome-infer、/api/doctor/consult-capture、问诊台 collab 实时链路、vision-gateway KB 联动）。端到端验证：POST /api/public/tcm/syndrome-infer（舌红苔黄腻/面色红/掌色红）命中 4 条全部 fingerprint=TCMFWD 正室，参考域 0 泄漏；对照 SQL：同关键词加排除条件后 tcm 模块 reference 条目全部滤除。
+- 【命理链路阳性】命理报告/批注/AI 助手/通用检索链路不加排除（kb-module-filter 按 module 过滤不受影响）：同「桂枝汤」查询命理链路命中 tcm|reference 条目 3 条——参考域只读保留供命理批注与人文参考，符合规则。
+- 【任务② 标签归并】12 条映射 573 行（只改标签不改内容）：qimen/shuihan-tcm→qimen(79)、shuihan-tcm→qimen(3)、shuhan-tcm→tianji-jiangjie(51)、tcm,shanghan-lun,jinkui→jinkui-yaolue(78,补 reference)、tcm.clinical→tcm-clinical(8,补)、tcm/wangzhen→tcm-wangzhen(24,补)、tcm,fengshui→fengshui(2,保留参考标)、梅花→meihua(80)、nihaixia→nihaisha(34)、nihaixia-yian→nihaisha-yian(150)、jingui→huangdi-neijing(14,补)、jinkui→jinkui-yaolue(50,补)。归并前全部抽样核实内容归属。
+- 【提请裁判定性】①nihaisha_pcs(1,274, 医典§节) vs nihaisha-pcs(80, 梁冬访谈) 同族不同内容未归并；②G24 清单外的医学经典模块存量（qianjin/jinkui-yaolue/mingyi-leian/zhubingyuanhou/rumen-shiqin/wenbing-tiaobian/jiayi-jing/nanjing/wenre-lun/piwei-lun/wenyi-lun/yilin-gaicuo/danxi/maijing/wangzhen 等约 3.2k 非 TCMFWD 条目）未打标，是否纳入参考域请拍板。
+- 脚本：scripts/g24-reference-domain.py（幂等，可复跑审计）。
+
 ## 2026-09-07 09:10 · KB 资产清单单一真源化：medical-stack/patches/kb-assets.json（sync-kb-assets 与 capability-diff L2.6 同读，新增资产只改一处）
 
 ## 2026-09-07 09:05 · 链条周报表上线：chain-weekly-report.py 七环节周报（launchd 周一 06:43），首期对拍 629 PASS/0 FAIL
