@@ -3,6 +3,8 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 09:05 · 链条周报表上线：chain-weekly-report.py 七环节周报（launchd 周一 06:43），首期对拍 629 PASS/0 FAIL
+
 ## 2026-09-07 08:50 · 链 2d 上线：sync-kb-assets.py 七资产哈希幂等自动吸收+8972 重启+金案冒烟，全链 rc=0
 
 ## 2026-09-07 08:50 · 检索分叉根修（症状通道资产同步）+ L2.6 KB 资产哈希巡检层 + equiv-set-v2 冻结（36 案 PASS）

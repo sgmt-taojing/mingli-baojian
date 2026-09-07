@@ -5,6 +5,13 @@
 - 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发对撞 ③ 节点 0/0 无未收口开发项
 - 阻塞：✅ 无（清晨活跃期，无待用户动作）
 
+## 2026-09-07 09:05 · 链条周报表上线（周一 06:43 launchd）✅
+
+- scripts/chain-weekly-report.py：解析 /tmp/tcm-import.log 近 7 天 + wal-watch，汇总链3/链4/2d/2c/2a2b/链5/R-WALF 七环节成 reports/chain-weekly-YYYYMMDD.md。
+- 解析两个坑已修：无 ts 行归属上一条时间戳；多行 JSON 块闭合判定改列 0（strip 后 '  }' 误闭合）。
+- 首期实测：链3 934 次（全秒退幂等）｜链4 672 次 lag 0｜2c 对拍 629 PASS / 0 FAIL｜补丁重放 27 页 0 WARN｜链5 131 次 3 变最新 clean｜裂脑 1 次已自愈。
+- launchd com.mingli-baojian.chain-weekly-report 周一 06:43（临床经验蒸馏后同窗晨读）。
+
 ## 2026-09-07 08:50 · L2.6 资产自动吸收链 2d 上线 ✅
 
 - 新建 scripts/sync-kb-assets.py 挂入 tcm-import 链条 2d 位（reapply-patches 之后、parity 之前）：
