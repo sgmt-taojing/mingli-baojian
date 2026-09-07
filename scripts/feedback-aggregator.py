@@ -25,7 +25,7 @@ DB_CANDIDATES = [
     'server/database/yidao.db',
     'data/mingli.db',
     'server/data/mingli.db',
-    'data/yidao.db',
+
 ]
 OUT_DIR = PROJECT_DIR / 'training-data' / 'feedback-weekly'
 

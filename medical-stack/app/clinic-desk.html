@@ -2509,6 +2509,16 @@ function frDiffHide(rid) {
   if (el) el.style.display = 'none';
 }
 
+/* v1.7.9：鉴别卡反馈回流（ack=已鉴别定方 / dismiss=不适用）→ data/feedback/diff-feedback.jsonl */
+function diffFeedback(pairId, action) {
+  toast(action === 'ack' ? '✓ 已记录：鉴别定方' : '已记录：鉴别不适用（回流复核）');
+  apiCall('/api/tcm/kb/diff-feedback', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+    pair_id: pairId, action: action,
+    symptoms: [...session.symptoms],
+    doctor_id: (document.getElementById('dr-id') || {}).value || 'D001'
+  })}, 5000).catch(() => {});
+}
+
 async function refreshFormulaRecall(text) {
   const box = document.getElementById('formula-recall-panel');
   if (!box) return;
@@ -2542,7 +2552,9 @@ async function refreshFormulaRecall(text) {
       ? '<div style="margin:4px 0 6px;padding:6px 9px;border-radius:8px;background:#fffbeb;border:1px solid #fcd34d">' +
         '<div style="font-size:11px;font-weight:700;color:#b45309">⚖️ 方证鉴别 · ' + r.differential.formulas.map(escHtml).join(' × ') + '</div>' +
         '<div style="font-size:11px;line-height:1.7;color:#92400e;margin-top:2px">' + escHtml(r.differential.gist) + '</div>' +
-        '<div style="font-size:9px;color:#b45309;opacity:.75;margin-top:2px">依据 ' + escHtml(r.differential.basis || '') + ' · KB 条目 ' + escHtml(r.differential.entry_id || '') + '</div></div>'
+        '<div style="font-size:9px;color:#b45309;opacity:.75;margin-top:2px">依据 ' + escHtml(r.differential.basis || '') + ' · KB 条目 ' + escHtml(r.differential.entry_id || '') +
+        ' <span style="margin-left:6px"><span class="cp-btn yes" style="font-size:9px" onclick="diffFeedback(\'' + escHtml(r.differential.id) + '\',\'ack\')">已鉴别定方</span>' +
+        '<span class="cp-btn no" style="font-size:9px" onclick="diffFeedback(\'' + escHtml(r.differential.id) + '\',\'dismiss\')">不适用</span></span></div></div>'
       : '';
     box.innerHTML = head + diffCard + r.formulas.map((f, i) => {
       const rid = 'frp-' + i;
