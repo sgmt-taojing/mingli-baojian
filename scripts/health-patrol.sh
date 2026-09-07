@@ -298,6 +298,12 @@ elif [ $DRIFT_CODE -eq 2 ]; then
   echo "[$TS] ⚠️ 能力版本待接收: $(echo "$DRIFT_OUT" | grep '⚠️' | head -1)" >> "$LOG"
 fi
 
+# ===== R-G24GUARD 参考域泄漏巡检（2026-09-07 新增，防线本体=g24-reference-guard.py 触发器）=====
+# 背景：staging→formal promote（INSERT OR REPLACE）绕过 G24 一次性打标，63 条医学条目漏标。
+# 触发器已自动补标，本规则兜底：泄漏 >0 即告警（触发器被 FTS 重建吞掉等意外时能发现）。
+REF_LEAK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM kb_formal WHERE (module LIKE 'tcm%' OR module IN ('nihaisha-tcm','huangdi-neijing','shanghan-lun','yizong-jinjian','jingyue','bencao-gangmu','shennong-bencao','nihaisha_pcs','nihaisha-pcs','nihaisha-structured')) AND (fingerprint IS NULL OR fingerprint NOT LIKE 'TCMFWD|%') AND (domain IS NULL OR domain != 'reference');" 2>/dev/null)
+[ "$REF_LEAK" != "0" ] && [ -n "$REF_LEAK" ] && ALERTS+=("G24 参考域泄漏: $REF_LEAK 条医学条目未标 reference（跑 python3 scripts/g24-reference-guard.py 补标）")
+
 # 输出
 if [ ${#ALERTS[@]} -eq 0 ]; then
     echo "[$TS] ✅ 全部健康 · 内存 ${MEM_USED}% · v6 PID ${V6_PID:-N/A} (${V6_STAT:-N/A})" >> "$LOG"
@@ -315,5 +321,17 @@ else
         echo "  ❌ $a"
     done
     echo "  · 内联 script 校验: ${SCRIPT_STATUS}"
+    # R-NOTIFY 桌面通知（2026-09-07 新增）：告警只落文件=无人看（health-alerts.jsonl 积压 9,067 行的教训）
+    # 去抖：告警集合指纹不变且 6h 内已通知 → 不重复打扰；指纹变化（新增/消失异常）立即通知
+    NOTIFY_STATE="$ALERTS_DIR/.notify-state"
+    ALERT_FP=$(printf '%s\n' "${ALERTS[@]}" | shasum | awk '{print $1}')
+    NOW_EPOCH=$(date +%s)
+    LAST_FP=""; LAST_TS=0
+    [ -f "$NOTIFY_STATE" ] && { LAST_FP=$(awk '{print $1}' "$NOTIFY_STATE"); LAST_TS=$(awk '{print $2}' "$NOTIFY_STATE"); }
+    if [ "$ALERT_FP" != "$LAST_FP" ] || [ $((NOW_EPOCH - LAST_TS)) -gt 21600 ]; then
+        NOTIFY_BODY=$(printf '%s；' "${ALERTS[@]}" | tr '"' "'" | head -c 180)
+        osascript -e "display notification \"$NOTIFY_BODY\" with title \"命理宝鉴巡检 · ${#ALERTS[@]} 项异常\" sound name \"Frog\"" 2>/dev/null
+        echo "$ALERT_FP $NOW_EPOCH" > "$NOTIFY_STATE"
+    fi
     exit 1
 fi

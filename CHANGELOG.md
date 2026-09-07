@@ -1,3 +1,10 @@
+## 2026-09-07 14:30 · P0 事故：yidao.db freelist 损坏修复 + G24 边界常驻守卫 + 巡检通知通道开通
+
+- **事故**：tcm-import 链条 exit 1 连警，根因 import-tcm-kb.py 写入报 `database disk image is malformed`——integrity_check 定位 freelist 计数不符（1352 vs 应 1378，WAL 裂脑系列事故残余），插入需分配空闲页即报错。
+- **修复**：停 api-v2 → `VACUUM INTO` 重建新文件（integrity_check=ok，kb_formal 76,206 / kb_staging 4,054 / 触发器 4 全一致）→ 原子置换 → 重启。旧库按 ADR-010 迁 `/Volumes/模型训练数据/mingli-db-coldstore/` 冷存。链条手动 kickstart 复跑 **exit 0**，diff clean。
+- **G24 边界漏洞顺带根修**：修复中发现参考域 37,260→37,197 差额 63 条——staging→formal promote（INSERT OR REPLACE）绕过 G24 一次性打标。`scripts/g24-reference-guard.py`：补标 63 条（回到 37,260 与 G24d 账目吻合）+ 建常驻触发器 `kb_formal_reference_guard`（AFTER INSERT 自动补标，覆盖 promote/蒸馏/手工全路径，TCMFWD 正室豁免）+ 事务内实弹自检 pass + 泄漏 0。
+- **巡检通知通道**：health-patrol 告警此前只落 `data/alerts/health-alerts.jsonl`（积压 9,067 行无任何消费方），今接 macOS 桌面通知（osascript，告警指纹 6h 去抖，指纹变化立即通知）；同步加 R-G24GUARD 泄漏巡检规则兜底触发器。
+
 ## 2026-09-07 14:15 · staging promote 824 锁连败根修：busy_timeout + 重试双防线
 
 - 凌晨 03:00 例行 promote 824/829 条失败「database is locked」：kb-management-engine 模块级连接 busy_timeout=0（node:sqlite 默认），WAL 单写者被占即瞬时报错，824 条候选整批陪绑。
