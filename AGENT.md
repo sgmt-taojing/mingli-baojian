@@ -35,6 +35,7 @@ bash scripts/agent-selfcheck.sh   # 6/6：api/命理档案/排盘/人脸/KB/档�
 4. 反爬：API 有 UA 拦截（R308），内部桥接需自定义 UA
 5. 敏感数据（mingli.db 语音/排盘档案）gitignore 本地保留
 6. **直连 yidao.db 纪律（R-WALF，2026-09-06 起）**：任何脚本/任务直连 yidao.db，关闭前必须走 `scripts/yidao_safe.py` 的 `safe_close(conn)`（commit → wal_checkpoint(TRUNCATE) → close）；禁止裸 `conn.close()` 或不关。违反此条可能触发 R772 末连接语义删建 wal，导致 8920 主句柄裂脑（写入不落盘）
+7. **定时任务选型纪律（2026-09-07 起）**：定时任务默认 launchd 纯脚本（零模型额度、无超时窗、日志可查）；只有真正需要模型判断的环节才走 AutoClaw agentTurn，且其中的确定性环节（入库/排盘/校验/对拍）必须脚本化（参照 scripts/celebrity-ingest.py 半脚本化模式）。反例在案：r470/视觉同步两个纯脚本走 agentTurn 白烧额度且连败超时
 
 ## 六、修真记录（近）
 - R735：face-embed 修真（raw 输入/SCRFD decode/rec 归一化/主脸筛选）

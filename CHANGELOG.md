@@ -3,6 +3,8 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 08:20 · AGENT.md 第 7 条：定时任务默认 launchd 纯脚本，agentTurn 仅限需模型判断环节
+
 ## 2026-09-06 20:30 · cron 大扫除：历法校准 git add -f 根修（自提交 bf9ec7e）+ 视觉同步迁 launchd+R-VSYNC 巡检规则
 
 ## 2026-09-06 20:15 · 名人采集半脚本化：celebrity-ingest.py（校验+排盘+反校上下文+入库），agent 只做搜索
