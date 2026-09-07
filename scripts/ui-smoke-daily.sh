@@ -15,6 +15,10 @@ mkdir -p "$PROJ/logs"
   "$NODE" "$PROJ/scripts/text-icon-scan.js"
   SCAN_RC=$?
   [ $SCAN_RC -ne 0 ] && RC=$SCAN_RC
+  echo "--- 问事服务中心 21 工具 24 链路冒烟 ---"
+  /usr/bin/python3 "$PROJ/scripts/ask-flow-smoke.py"
+  ASK_RC=$?
+  [ $ASK_RC -ne 0 ] && RC=$ASK_RC
   echo "===== 退出码 $RC ====="
 } >> "$LOG" 2>&1
 # 日志保留最近 500 行
