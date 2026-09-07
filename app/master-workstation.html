@@ -228,7 +228,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 </div>
 
 <script>
-const API = '';
+const API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
 function showToast(msg, type='info') {
   const t = document.createElement('div');
   t.className = 'toast toast-'+type;
@@ -263,7 +263,8 @@ let state = {
 function setupRealtimeClient() {
   try {
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${location.host}/ws/xianzhi`;
+    const wsHost = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? '127.0.0.1:8920' : location.host;
+    const wsUrl = `${protocol}//${wsHost}/ws/xianzhi`;
     const ws = new WebSocket(wsUrl);
     let connected = false;
     ws.onopen = () => {
