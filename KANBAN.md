@@ -5,6 +5,13 @@
 - 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发对撞 ③ 节点 0/0 无未收口开发项
 - 阻塞：✅ 无（清晨活跃期，无待用户动作）
 
+## 2026-09-07 08:50 · L2.6 资产自动吸收链 2d 上线 ✅
+
+- 新建 scripts/sync-kb-assets.py 挂入 tcm-import 链条 2d 位（reapply-patches 之后、parity 之前）：
+  七资产哈希幂等比对 → 不一致即复制对齐 → 自动 kickstart 8972 → 金案冒烟（痈 疽 须含金鉴 top5），冒烟失败非零退出进链条告警。
+- 3.9 兼容（链条 /usr/bin/python3）；资产清单与 tcm-capability-diff.py L2.6 双处维护（注释互指）。
+- 验证：空跑幂等 skipped；全链实跑 rc=0；昨日三资产漂移类事故今后 15 分钟内自动对齐，不再等人发现。
+
 ## 2026-09-07 08:50 · 检索分叉真根因根修 + L2.6 巡检层 + equiv-set-v2 ✅
 
 - **真根因**：「痈 疽」「发背 痈疽」等 E16 型查询双侧分叉（tcm 金鉴 top10 霸榜 / ms 全无）——非处理器逻辑（哈希一致）、非条目数据（逐字节一致），而是 **KB 数据资产漂移**：formula-symptom-index.json（ms 08-30 vs tcm 09-05）、symptom-aliases.json 漂移 + recall-demotions.json（R827 医生驳回降级名单）ms 缺失。症状通道索引旧→金鉴外科方无加权。
