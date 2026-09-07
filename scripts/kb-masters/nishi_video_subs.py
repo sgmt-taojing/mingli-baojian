@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """倪师 106 视频字幕全量提取管线（4 并行）
-- 输入: /Volumes/data2/倪师智慧结晶/*/**.mp4
-- 输出: /Volumes/data2/nishi-materials/subs/*.txt
+- 输入: /Volumes/模型训练数据/training-corpus/倪师智慧结晶/*/**.mp4
+- 输出: /Volumes/模型训练数据/training-corpus/nishi-materials/subs/*.txt
 - 断点续跑
 """
 import os, subprocess, json, time, sys, glob
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-ROOT = "/Volumes/data2/倪师智慧结晶"
-OUT = "/Volumes/data2/nishi-materials/subs"
+ROOT = "/Volumes/模型训练数据/training-corpus/倪师智慧结晶"
+OUT = "/Volumes/模型训练数据/training-corpus/nishi-materials/subs"
 BIN = "/tmp/video_subtitle_extract"
 WORKERS = 4
 INTERVAL = 3  # 秒

@@ -8,7 +8,7 @@ import os, re, sqlite3, hashlib, sys
 
 # 路径 fallback list：按序尝试，首个存在且含 .txt 字幕的目录生效（R812 修真：data2 卷可能未挂载）
 SUBS_CANDIDATES = [
-    "/Volumes/data2/nishi-materials/subs",
+    "/Volumes/模型训练数据/training-corpus/nishi-materials/subs",
     "/Volumes/模型训练数据/cold-storage/nishi-materials/subs",
     "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.data/nishi-subs",
 ]

@@ -2,7 +2,7 @@
 """天纪分类版字幕 → KB 蒸馏（按主题模块: 紫微/易经/堪舆/四柱/六壬/开篇）"""
 import os, re, sqlite3, hashlib
 
-SUBS = "/Volumes/data2/nishi-materials/subs-tianji-classified"
+SUBS = "/Volumes/模型训练数据/training-corpus/nishi-materials/subs-tianji-classified"
 DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
 
 def detect_module(fname):

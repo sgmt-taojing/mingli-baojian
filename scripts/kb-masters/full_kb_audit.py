@@ -13,9 +13,9 @@ import os, re, json, sqlite3, time, glob, sys
 
 PROJ = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
 DB = f"{PROJ}/server/database/yidao.db"
-SUBS = "/Volumes/data2/nishi-materials/subs"
+SUBS = "/Volumes/模型训练数据/training-corpus/nishi-materials/subs"
 DESKTOP = "/Users/tom/Desktop/周易-中医"
-DATA2 = "/Volumes/data2/nishi-materials"
+DATA2 = "/Volumes/模型训练数据/training-corpus/nishi-materials"
 OUT_HTML = f"{PROJ}/DELIVERY/KB全量诊断审计-2026-08-03.html"
 
 def log(msg):
@@ -142,8 +142,8 @@ def main():
         report["subs_chars"] = sub_chars
         # 视频总数
         video_count = 0
-        for d in os.listdir("/Volumes/data2/倪师智慧结晶"):
-            full = os.path.join("/Volumes/data2/倪师智慧结晶", d)
+        for d in os.listdir("/Volumes/模型训练数据/training-corpus/倪师智慧结晶"):
+            full = os.path.join("/Volumes/模型训练数据/training-corpus/倪师智慧结晶", d)
             if os.path.isdir(full):
                 video_count += len(glob.glob(os.path.join(full, "*.mp4")))
         report["videos_total"] = video_count

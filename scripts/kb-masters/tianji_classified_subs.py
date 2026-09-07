@@ -3,8 +3,8 @@
 import os, subprocess, json, time, sys, glob
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-ROOT = "/Volumes/data2/倪师智慧结晶/7.天纪裁剪切割分类版（有广告，不建议看）"
-OUT = "/Volumes/data2/nishi-materials/subs-tianji-classified"
+ROOT = "/Volumes/模型训练数据/training-corpus/倪师智慧结晶/7.天纪裁剪切割分类版（有广告，不建议看）"
+OUT = "/Volumes/模型训练数据/training-corpus/nishi-materials/subs-tianji-classified"
 BIN = "/tmp/video_subtitle_extract"
 WORKERS = 4
 INTERVAL = 3
