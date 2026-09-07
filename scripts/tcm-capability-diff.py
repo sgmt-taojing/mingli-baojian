@@ -237,11 +237,34 @@ def main() -> int:
         else:
             proc_rows.append((p, th, mh, 'OK'))
 
+    # L2.6 KB 数据资产哈希比对（2026-09-07 新增：症状通道索引/别名词典/驳回降级名单
+    # 等数据资产漂移曾致检索双侧系统性分叉——处理器哈希相同但结果不同，「痈 疽」案在案）
+    KB_ASSETS = ['formula-symptom-index.json', 'symptom-aliases.json', 'recall-demotions.json',
+                 't2s-map.js', 'symptom-index.js', 'tcm-classics.json', 'syndrome-supplement.json']
+    asset_rows = []
+    asset_drift = []
+    for a in KB_ASSETS:
+        tf, mf = TCM / 'server' / 'kb' / a, MS / 'server' / 'kb' / a
+        if not tf.exists():
+            continue
+        if not mf.exists():
+            asset_rows.append((a, '-', '-', 'MISSING'))
+            asset_drift.append({'file': a, 'status': 'MISSING'})
+            continue
+        th = hashlib.sha256(tf.read_bytes()).hexdigest()[:12]
+        mh = hashlib.sha256(mf.read_bytes()).hexdigest()[:12]
+        if th != mh:
+            asset_rows.append((a, th, mh, 'DRIFT'))
+            asset_drift.append({'file': a, 'status': 'DRIFT'})
+        else:
+            asset_rows.append((a, th, mh, 'OK'))
+
     payload = {
         'missing_api': missing_api, 'module_diffs': mod_diffs,
         'seed_missing': seed_missing, 'page_gap_count': page_gap,
         'processor_hashes': [[r, th, mh, st] for r, th, mh, st in proc_rows],
         'js_drift': js_drift,
+        'asset_hashes': [[a, th, mh, st] for a, th, mh, st in asset_rows],
     }
     digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:16]
 
@@ -252,7 +275,7 @@ def main() -> int:
         pass
 
     changed = prev.get('digest') != digest
-    clean = not missing_api and not mod_diffs and not seed_missing and not proc_drift and not js_drift
+    clean = not missing_api and not mod_diffs and not seed_missing and not proc_drift and not js_drift and not asset_drift
 
     summary = {
         'ts': now, 'digest': digest, 'changed': changed, 'clean': clean,
@@ -260,6 +283,7 @@ def main() -> int:
         'missing_api': missing_api,  # R-DIFF-SLA：72h SLA 追踪需要条目级键
         'module_diffs': mod_diffs, 'seed_missing': seed_missing,
         'processor_drift': proc_drift, 'js_drift': js_drift,
+        'asset_drift': asset_drift,
         'page_gap_count': page_gap,
         'extra_api_count': len(extra_api),
         'tcm_head': git_head(TCM),
@@ -302,6 +326,17 @@ def main() -> int:
         lines += [
             f"",
             f"漂移处置：哈希不一致即排序/打分逻辑单侧变更——按 ADR-016 流程移植对齐或登记豁免，禁止静默放过。",
+            f"",
+            f"## L2.6 KB 数据资产哈希（症状通道/词典/降级名单漂移监控，2026-09-07 新增）",
+            f"",
+            f"| 资产 | tcm 哈希 | ms 哈希 | 状态 |",
+            f"|---|---|---|---|",
+        ]
+        lines += [f"| `{a}` | `{th}` | `{mh}` | {'✅ 一致' if st == 'OK' else ('🔴 漂移 DRIFT' if st == 'DRIFT' else '🔴 缺失 MISSING')} |"
+                  for a, th, mh, st in asset_rows]
+        lines += [
+            f"",
+            f"漂移处置：数据资产不一致即检索行为分叉（处理器同哈希也可能结果不同），直接同步文件对齐。",
         ]
         lines += [
             f"",

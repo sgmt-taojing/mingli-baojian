@@ -32,7 +32,7 @@ from pathlib import Path
 TCM = "http://127.0.0.1:8932"
 MS = "http://127.0.0.1:8972"
 ROOT = Path(__file__).resolve().parent.parent
-EQUIV_SET = ROOT / "testdata" / "equiv-set-v1" / "kb-cases-30.json"
+EQUIV_SET_DEFAULT = ROOT / "testdata" / "equiv-set-v2" / "kb-cases-36.json"  # 最新冻结集（v2 = v1 30 例 + E11/E12/E15/E16 防回归 6 例）
 TOKEN_FILE = ROOT / "medical-stack" / "data" / "equiv-gate-token.json"
 TOKEN_TTL_S = 1800
 RECALL_TOLERANCE = 0.02
@@ -99,6 +99,8 @@ def recall_at_k(base: str, cases: list[dict]) -> tuple[float, int]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gate", choices=["absorb", "ota"], default=None)
+    ap.add_argument("--set", dest="equiv_set", default=str(EQUIV_SET_DEFAULT),
+                    help="冻结对照集 kb-cases JSON 路径（默认最新 v2；可指回 v1 做历史对照）")
     args = ap.parse_args()
 
     out = {"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "gate": args.gate,
@@ -119,7 +121,8 @@ def main() -> int:
                                           "ms_head": json.dumps(strip_volatile(md), ensure_ascii=False)[:200]})
 
     # B. Recall@K 双侧对跑
-    cases = json.loads(EQUIV_SET.read_text(encoding="utf-8"))["cases"]
+    cases = json.loads(Path(args.equiv_set).read_text(encoding="utf-8"))["cases"]
+    out["equiv_set"] = str(args.equiv_set)
     rt, ht = recall_at_k(TCM, cases)
     rm, hm = recall_at_k(MS, cases)
     out["recall"] = {"k_cases": len(cases), "tcm": round(rt, 4), "ms": round(rm, 4),

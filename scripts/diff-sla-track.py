@@ -41,6 +41,8 @@ def current_items():
         items.append('L2:' + mod)
     for s in last.get('seed_missing') or []:
         items.append('L3:' + s)
+    for a in last.get('asset_drift') or []:
+        items.append('L2.6:' + (a.get('file') if isinstance(a, dict) else str(a)))
     # L4 页面差集：53 页已有三分法定性（52 页 DELIVERY/l4-page-triage-20260831.md +
     # lab-interpret.html 2026-09-06 定性「已有等价」：medical-stack 院内版已吸收 +
     # app/report-interpret.html 大众四维融合版），只追踪超出已定性基线的新增部分
