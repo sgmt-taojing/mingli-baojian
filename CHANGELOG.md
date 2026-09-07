@@ -3,6 +3,14 @@
 - capability-drift-check.js 增 registry↔outbox 双向对账（ERROR 级入 health-patrol）；3 条登记双向全对
 - WAL 裂脑二发（api-v2 持失链 wal）按 R-WALF 重启收敛，巡检全绿；R772 根修未覆盖失链窗口期，建议立项
 
+## 2026-09-07 13:16 · G26 命理知识多轮补蒸馏 SOP 首轮闭环（差集收敛）
+
+- 【R1 覆盖审计】命理语料 212 件（A·天纪分类字幕 179 / B·24集字幕 17 / C·天纪系文档 10 / D·项目内抽取 6）× kb_formal 对账：覆盖 205，差集 7（undistilled 5 + partial 2）；证据 DELIVERY/g26-r1-audit-20260907-1226.json。附查：天纪 24 集目录 subs/ 实测为空，字幕实位于 nishi-materials/subs/天纪*.txt。
+- 【R2 补蒸馏】真实差集 3 件（财帛宫星耀含义→ziwei、倪海厦地纪日记 8 篇→fengshui、八字基础→bazi）切块 18 块全量过 AI 蒸馏管线+质量门（≥300字/命理锚点/医学诊疗口径剔除），入库 **42 条**（bazi 18 / fengshui 10 / ziwei 14，共 23,557 字），fingerprint='G26|md5' 幂等；途中根修三处：OLE2 二进制改名假 txt（换 93KB 抽取版源）、推理模型 max_tokens 截断（8192+尾逗号修复）、entry_id 撞车（改指纹派生）；语料台账 distilled-files.json 同步登记 3 件。
+- 【R3 复扫】差集 0；合理排除 3 项书面在案（四柱命卦14/19 源文件 <700B 近空占位；八字基础 505KB 为 .doc 二进制改名以抽取版覆盖）；证据 DELIVERY/g26-r1-audit-20260907-1314.json。
+- 【R4 收敛判定】13:15 复扫差集 0，连续两轮无新增 → **差集收敛**，转常态（新语料到达即跑 g26-r1-coverage-audit.py，差集进 g26-r2-gap-distill.py）。
+- 边界遵守：人纪五篇与医学 PDF 全程不蒸（医学归 tcm 通道内化）；蒸馏入 KB≠模型训练；未越界。
+
 ## 2026-09-07 12:20 · G24b 清单外医学经典模块参考域收尾（承接 G24，裁判拍板项落地）
 
 - 29 个医学经典/临床模块存量打 reference **1,513 条**（jinkui-yaolue 582/nihaisha-yian 371/acupuncture 316/wangzhen 115/bencao 72/r45_tcm 45/neijing 41/wenbing 27 等）；qianjin/mingyi-leian/zhubingyuanhou/rumen-shiqin/wenbing-tiaobian/jiayi-jing/nanjing/wenre-lun/piwei-lun/wenyi-lun/yilin-gaicuo/danxi/maijing 13 模块实测 100% 为 TCMFWD 正室（无旧存量，打标 0）。
