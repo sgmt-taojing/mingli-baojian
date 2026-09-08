@@ -1,3 +1,9 @@
+## 2026-09-08 12:50 · R-WALK3 机构中心走查：入驻申请假闭环根修
+
+- **基线**：19 卡零死链零破图；shop 套餐下单实测走通共享订单服务 8963（真实创建 ORD 单）；merchant-dashboard 本地账与 serverId 同步兼容。
+- **假闭环根修（SaaS 红线）**：merchant-apply 机构入驻申请原只写 localStorage——机构填完申请，平台侧永远看不到。新增服务端 `org_applications` 表 + 三接口：POST /api/public/org-apply（CSRF 全局覆盖、电话格式校验）、GET /api/org/applications 与 POST …/review（adminAuth 门禁，实测未登录 401）。前端先送服务端、localStorage 降级为明示「未送达平台」的诚实副本。浏览器实测：申请提交→**申请编号 #2 真实入库**。
+- **回归**：409 块全绿 + 29 链路冒烟全过。提交 server 侧 + 父仓。
+
 ## 2026-09-07 21:35 · R-WALK2 患者建档闭环根修（红线级假成功清除）
 
 - **patient-intake 三重症**（患者中心「首次就诊·建档登记」）：
