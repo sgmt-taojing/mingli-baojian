@@ -1,3 +1,107 @@
+## 2026-09-08 12:30 — 💚 心跳 12:30 全绿（cron 30min · 午间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（12:32:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（今日 02:07 +31 条已登记）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（待用户控制台窗口软待办 2 项维持）
+
+## 2026-09-08 11:00 — 💚 心跳 11:00 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（11:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（今日 02:07 +31 条已登记）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（待用户控制台窗口软待办 2 项维持）
+
+## 2026-09-08 10:30 — 💚 心跳 10:30 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（10:30:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（今日 02:07 +31 条已登记，mmin -180 无新文件）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（待用户控制台窗口软待办 2 项维持）
+
+## 2026-09-08 08:00 — 💚 心跳 08:00 全绿（cron 30min · 晨间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（08:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（今日 02:07 +31 条已于 02:30 登记）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（待用户控制台窗口软待办 2 项维持）
+
+## 2026-09-08 05:00 — 💚 心跳 05:00 全绿（cron 30min · 深夜安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（05:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（最后仍是 09-08 02:07 +31 条，10 模块全谱已覆盖）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-08 04:00 — 💚 心跳 04:00 全绿（cron 30min · 深夜安静期 · 今日 KB 蒸馏 31 条已在库 · 无待办推进）
+
+- 健康检查全绿（04:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：今日 distill-2026-09-08.jsonl（02:07 落盘，16432B / 31 条 / 10 模块全谱）已登记，资产状态无新漂移，无额外动作；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-08 02:30 — 💚 心跳 02:30 全绿（cron 30min · 深夜安静期 · ⚠️ 今日 KB 蒸馏已到）
+
+- 健康检查全绿（02:30:04 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- ⚠️ KB 蒸馏今日有产出：02:07 distill-2026-09-08.jsonl 16432B / 31 条（10 模块全谱：meihua 4 / liuren 4 / bazi 4 / liuyao 3 / qimen 3 / xuankong 3 / ziwei 3 / fengshui 3 / namexue 2 / huangli 2）；样例：六爻纳甲起卦与装卦流程、梅花易数三大断卦体系 等
+- 状态：distill-*.py 落盘成功，待 tcm-import 链条 2d 资产对齐 → kickstart 8972→金案冒烟 自动覆盖
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ 节点 0/8 无未收口开发项
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+# 2026-09-07 21:05 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
+
+
+## 2026-09-08 02:00 — 💚 心跳 02:00 全绿（cron 30min · 深夜安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（02:00:16 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（最后仍是 09-07 02:05 +40 条；今日 02:05 例行窗口未到）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-08 00:00 — 💚 心跳 00:00 全绿（cron 30min · 深夜安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（00:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（最后仍是 09-07 02:05 +40 条，各节点已覆盖）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-07 22:30 — 💚 心跳 22:30 全绿（cron 30min · 深夜安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（22:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（最后仍是 09-07 02:05 +40 条，各节点已覆盖）；W37 feedback-loop 例行已跑（入库 0/跳过 341，staging 待审核 3 条维持）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ 节点 0/8 无未收口开发项
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-07 22:00 — 💚 心跳 22:00 全绿（cron 30min · 深夜安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（22:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行；W37 feedback-loop 例行已跑（入库 0/跳过 341，staging 待审核 3 条维持）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## ✅ 已完结（2026-09-07）
+1. **检索分叉真根因根修 + L2.6 巡检层 + equiv-set-v2 冻结**（完成日 09-07 08:50）：KB 数据资产漂移根修（formula-symptom-index/symptom-aliases/recall-demotions 三资产对齐，MISS→HIT 与 tcm 全同）、tcm-capability-diff.py 新增 7 资产哈希比对、equiv-set-v2 36 例全跑 PASS 后冻结 — `scripts/tcm-capability-diff.py`
+2. **L2.6 资产自动吸收链 2d 上线**（完成日 09-07 08:50）：scripts/sync-kb-assets.py 挂入 tcm-import 链条 2d 位（哈希幂等对齐→自动 kickstart 8972→金案冒烟），资产漂移今后 15 分钟内自动对齐 — `scripts/sync-kb-assets.py`
+3. **链条周报表上线**（完成日 09-07 09:05）：chain-weekly-report.py 解析近 7 天 import 日志汇总链3/链4/2d/2c/2a2b/链5/R-WALF 七环节，launchd 周一 06:43，首期实测产出正常 — `scripts/chain-weekly-report.py` → `reports/chain-weekly-YYYYMMDD.md`
+4. **镜像时效核查 + 权威对拍 PASS**（完成日 09-07 08:30）：ms 53,559 条 = tcm 全量镜像精确一致；equiv-dual-run 冻结集 PASS（zero_diff=true），「腹满 面黄」分差定性测量残留不构成缺陷
+5. **内存压力专项销账**（完成日 09-07）：/api/health os.freemem 失真根修（de7bce4 改 vm_stat 口径 99%→70%），mingli 侧 30+ 常驻合计仅 524MB，非常驻缺陷转观察项 — server `de7bce4`
+6. **AGENT.md 第 7 条定时任务选型纪律**（完成日 09-07 08:20）：默认 launchd 纯脚本，需模型判断才走 agentTurn 且确定性环节必须脚本化；晨检两自愈确认（临床蒸馏连败 5→0、r470 转 ok）— `AGENT.md`
+7. **KB 蒸馏 +40 条入库**（完成日 09-07 02:05）：六爻断卦八步法/用神两现等 — `training-data/kb-web-distill/distill-2026-09-07.jsonl`（25855B）
+
+## 🔄 进行中（节点 0/8 — 无未收口开发项，今日无节点推进）
+- G21 能力发版体系 v1.2.0：等 family 侧接收验收（外部依赖，CHANGELOG 记「paipan v1.2.0 接收」即闭环）
+- wal-inode-watch 哨兵观察期：今日 24h+ 零事件（wal inode 稳定、api-v2 pid 无抖动），等 WAL 裂脑复发以对撞定位 unlink 方
+- **下一步动作**：跟进 family 侧 paipan v1.2.0 接收验收回报，收到后在 CHANGELOG 记「paipan v1.2.0 接收」闭环首单
+
+## 🚫 阻塞
+- ✅ 无硬阻塞。软待办（等用户控制台窗口）：停用 r470/视觉同步 2 个 cron + 替换名人采集 payload（指引 docs/console-ops-20260906.md）
+- 基线：health-check EXIT=0（6 端口全 200 + kb-list/paipan-api OK，21:04:23 实探）
+
+---
+## 2026-09-07 21:30 — 💚 心跳 21:30 全绿（cron 30min · 晚间安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（21:32:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行；W37 feedback-loop 例行已跑（入库 0/跳过 341，staging 待审核 3 条维持）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（晚间安静期，无待用户动作）
+
+
+## 2026-09-07 21:00 — 💚 心跳 21:00 全绿（cron 30min · 晚间安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（21:03:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行；进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发对撞 ③ 节点 0/0 无未收口开发项
+- 阻塞：✅ 无（晚间安静期，无待用户动作）
+
 ## 2026-09-07 19:30 — 💚 心跳 19:30 全绿（cron 30min · 晚间安静期 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（19:30:36 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
@@ -2693,3 +2797,22 @@
 - KB 蒸馏延续：09-06 02:10 +22 条（distill-2026-09-06.jsonl 22411B mtime 02:10 复验）已 03:00/04:30/06:30/07:00/10:30/12:00/13:00/13:30 节点覆盖；15:00 无新 distill-*.py 执行（例行窗口 ~14:00 已过且无追加）
 - 进行中无变化：① G21 能力发版体系 v1.2.0 等 family 侧接收验收 ② 驳回→根修→同案重出 SOP 全链闭环（QIUCE-2 销案）③ 同案重出 diff 区段级视图 ④ R-LY5 七模块推广收口 ⑤ 节点 0/0 无未收口开发项
 - 阻塞：✅ 无（午后活跃期，无待用户动作）
+
+## 2026-09-07 23:00 — 💚 心跳 23:00 全绿（cron 30min · 深夜安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（23:00:12 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（最后仍是 09-07 02:05 +40 条 distill-2026-09-07.jsonl 25855B，各节点已覆盖）；W37 feedback-loop 例行已跑（入库 0/跳过 341，staging 待审核 3 条维持）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ 节点 0/8 无未收口开发项
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-08 03:00 — 💚 心跳 03:00 全绿（cron 30min · 深夜安静期 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（03:00:13 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（今日 02:07 +31 条已在 02:30 心跳登记），进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（深夜安静期，无待用户动作）
+
+## 2026-09-08 09:00 — 💚 心跳 09:00 全绿（cron 30min · 晨间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（09:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-*.py 执行（最后仍是 09-08 02:07 +31 条 / 10 模块全谱已覆盖）；进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（晨间，无待用户动作）
