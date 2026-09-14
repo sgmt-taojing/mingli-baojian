@@ -1,11 +1,68 @@
+# 2026-09-14 09:00 — 💚 心跳 09:00 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
 
+- 健康检查全绿（09:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision total=28 不变）— 沿用基线
+- WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：09:30 例行窗口核查
+
+# 2026-09-14 03:00 — 💚 心跳 03:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（03:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 02:05 例行窗口已过无产物，今日暂无新蒸馏入库
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：03:30 例行窗口核查
+
+# 2026-09-14 02:30 — 💚 心跳 02:30 全绿（cron 30min · 跨日首探 · 02:05 例行窗口核查并入）
+
+- 健康检查全绿（02:32:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏 02:05 例行窗口核查：跨日后首探，仓库 + 外挂盘均无 distill-2026-09-14.jsonl 产出（最新仍为 09-10 02:12 +39 条；vision 沿用 09-13 21:03 total=28）；KB 入口 /api/stats 复核全库 3767 条稳定
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：03:00 例行窗口核查
+
+# 2026-09-13 21:05 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
+
+## ✅ 已完结（2026-09-13）
+1. **全天健康守护全绿**（完成日 09-13，03:30~21:02 共 21 次实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK，EXIT=0，无告警无重启
+2. **KB 蒸馏例行窗口核查**（完成日 09-13）：02:05/03:30/05:12 及全天各窗口复核确认无 distill-2026-09-13.jsonl 产出，无遗漏（最新仍为 09-10 02:12 +39 条；vision 05:12 total=28 不变）
+
+## 🔄 进行中（节点 0/8 — 今日外部依赖等待，无推进维持）
+- G21 能力发版体系 v1.2.0：等 family 侧接收验收（外部依赖，CHANGELOG 记「paipan v1.2.0 接收」即闭环）
+- wal-inode-watch 哨兵观察期：等 WAL 裂脑复发以对撞定位 unlink 方（今日无复发，观察继续）
+- **下一步动作**：明日（09-14）02:05 例行窗口核查 distill-2026-09-14.jsonl 是否产出，有则在首个心跳节点登记条数
+
+## 🚫 阻塞
+- ✅ 无硬阻塞。软待办维持 2 项（等用户控制台窗口）：停用 r470/视觉同步 2 个 cron + 替换名人采集 payload（指引 docs/console-ops-20260906.md）
+- 基线：health-check EXIT=0（21:02:19 实探全绿）
+
+# 2026-09-13 15:00 — 💚 心跳 15:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（15:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 下午安静期，沿用基线
+- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：15:30 例行窗口核查
+
+# 2026-09-13 13:30 — 💚 心跳 13:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（13:30:04 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
+- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：14:00 例行窗口核查
 
 # 2026-09-13 12:00 — 💚 心跳 12:00 全绿（cron 30min · 中午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（12:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 中午安静期，沿用基线
 - WAL 哨兵：未采样（中午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（中午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：12:30 例行窗口核查
 
@@ -14,7 +71,6 @@
 - 健康检查全绿（09:33:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：10:00 例行窗口核查
 # 2026-09-12 21:05 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
@@ -37,7 +93,6 @@
 - 健康检查全绿（19:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 19:00 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（傍晚安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：20:00 例行窗口核查
 
@@ -45,9 +100,6 @@
 
 - 健康检查全绿（18:09:59 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：18:30 例行窗口核查
 
 
@@ -55,25 +107,16 @@
 
 - 健康检查全绿（17:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：18:00 例行窗口核查
 # 2026-09-12 17:00 — 💚 心跳 17:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（17:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：17:30 例行窗口核查
 
 
 - 健康检查全绿（15:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：15:30 例行窗口核查
 
 
@@ -82,7 +125,6 @@
 - 健康检查全绿（09:00 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：09:30 例行窗口核查
 # 2026-09-12 07:30 — 💚 心跳 07:30 全绿（cron 30min · 清晨 · 无新 KB · 无待办推进）
@@ -90,7 +132,6 @@
 - 健康检查全绿（07:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 02:05 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（清晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（清晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：08:00 例行窗口核查
 # 2026-09-12 07:00 — 💚 心跳 07:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
@@ -98,7 +139,6 @@
 - 健康检查全绿（07:01:52 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 02:05 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：07:30 例行窗口核查
 
@@ -107,7 +147,6 @@
 - 健康检查全绿（04:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— distill jsonl 在外挂数据盘，仓库内未落盘，按 KANBAN 基线沿用
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：05:00 例行窗口核查
 
@@ -137,7 +176,6 @@
 - 健康检查全绿（21:00:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持）
 - 下一步动作：21:30 例行窗口核查
 
@@ -146,7 +184,6 @@
 - 健康检查全绿（20:30:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持）
 - 下一步动作：21:00 例行窗口核查
 
@@ -155,7 +192,6 @@
 - 健康检查全绿（19:30:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 - 下一步动作：20:00 例行窗口核查
 
@@ -164,7 +200,6 @@
 - 健康检查全绿（18:02:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 - 下一步动作：18:30 例行窗口核查
 
@@ -173,7 +208,6 @@
 - 健康检查全绿（17:30:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 - 下一步动作：18:00 例行窗口核查
 
@@ -183,7 +217,6 @@
 - 健康检查全绿（16:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 - 下一步动作：16:30 例行窗口核查
 ## 2026-09-11 15:30 — 💚 心跳 15:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
@@ -191,7 +224,6 @@
 - 健康检查全绿（15:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：15:20:49 采样 disk_wal 31529068 / held_bad 空，无复发
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 - 下一步动作：16:00 例行窗口核查
 
@@ -201,7 +233,6 @@
 - 健康检查全绿（15:02:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新；cron-distill-kb-link 03:30 完成正常）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 - 下一步动作：15:30 例行窗口核查
 
@@ -210,7 +241,6 @@
 - 健康检查全绿（14:30:13 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 - 下一步动作：15:00 例行窗口核查
 
@@ -218,7 +248,6 @@
 - 健康检查全绿（11:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持）
 - 下一步动作：12:00 例行窗口核查
 
@@ -227,7 +256,6 @@
 - 健康检查全绿（10:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：09:47 采样 disk_wal 31529068 / held_bad 空，无复发
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持）
 - 下一步动作：10:30 例行窗口核查
 
@@ -238,7 +266,6 @@
 - 健康检查全绿（09:02:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变，cron-distill-kb-link 03:30 已完成 38 条全 link）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持）
 - 下一步动作：09:30 例行窗口核查
 ## 2026-09-11 08:30 — 💚 心跳 08:30 全绿（cron 30min · 清晨 · 无新 KB · 无待办推进）
@@ -246,7 +273,6 @@
 - 健康检查全绿（08:30:21 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变，cron-distill-kb-link 03:30 已完成 38 条全 link）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（清晨安静期，软待办 2 项维持）
 - 下一步动作：09:00 例行窗口核查
 ## 2026-09-11 05:30 — 💚 心跳 05:30 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
@@ -254,7 +280,6 @@
 - 健康检查全绿（05:32:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变，cron-distill-kb-link 03:30 已完成 38 条全 link）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：06:00 例行窗口核查
 
@@ -263,7 +288,6 @@
 - 健康检查全绿（00:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（深夜安静期，软待办 2 项维持）
 - 下一步动作：今日 02:05 例行窗口核查 distill-2026-09-11.jsonl 是否产出
 
@@ -272,7 +296,6 @@
 - 健康检查全绿（实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：05:30 例行窗口核查 distill-2026-09-11.jsonl 是否产出
 
@@ -281,7 +304,6 @@
 - 健康检查全绿（00:32:40 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：02:00 例行窗口核查 distill-2026-09-11.jsonl 是否产出
 
@@ -290,7 +312,6 @@
 - 健康检查全绿（21:00:14 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，20:00 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜间安静期，软待办 2 项维持）
 
 
@@ -299,7 +320,6 @@
 - 健康检查全绿（20:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，20:00 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持）
 
 ## 2026-09-10 20:00 — 💚 心跳 20:00 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
@@ -307,7 +327,6 @@
 - 健康检查全绿（20:00:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，19:00 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持）
 
 ## 2026-09-10 19:00 — 💚 心跳 19:00 全绿（cron 30min · 傍晚 · 无新 KB · 无待办推进）
@@ -315,7 +334,6 @@
 - 健康检查全绿（19:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，18:30 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持）
 
 ## 2026-09-10 18:30 — 💚 心跳 18:30 全绿（cron 30min · 傍晚 · 无新 KB · 无待办推进）
@@ -323,7 +341,6 @@
 - 健康检查全绿（18:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，17:00 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 
 ## 2026-09-10 17:00 — 💚 心跳 17:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
@@ -331,7 +348,6 @@
 - 健康检查全绿（17:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，16:30 后无新文件）
 - WAL 哨兵：未采样（本期无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 
 ## 2026-09-10 16:30 — 💚 心跳 16:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
@@ -341,21 +357,18 @@
 - 健康检查全绿（16:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，15:30 后无新文件）
 - WAL 哨兵：16:20 采样 disk_wal 稳定 31529068、held_bad 空，无复发
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 
 ## 2026-09-10 15:30 — 💚 心跳 15:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（15:30:12 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，mmin 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 
 ## 2026-09-10 14:00 — 💚 心跳 14:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（14:00:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，mmin 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 
 
@@ -363,27 +376,23 @@
 
 - 健康检查全绿（12:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，mmin 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（中午安静期，软待办 2 项维持）
 
 ## 2026-09-10 11:30 — 💚 心跳 11:30 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（11:34:02 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新；mmin -562 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持）
 ## 2026-09-10 08:00 — 💚 心跳 08:00 全绿（cron 30min · 晨间 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（08:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新；mmin -360 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晨间安静期，软待办 2 项维持）
 
 ## 2026-09-10 06:30 — 💚 心跳 06:30 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（06:32:03 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新；mmin -78 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 
 
@@ -391,28 +400,24 @@
 
 - 健康检查全绿（06:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新；mmin -228 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 
 ## 2026-09-10 02:30 — 💚 心跳 02:30 全绿（cron 30min · 凌晨 · KB 新增 +39 条登记 · 补登）
 
 - 健康检查全绿（02:32:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：✅ **今日 +39 条入库**（distill-2026-09-10.jsonl，02:12 产出，主题 liuyao 六爻纳甲相关；02:00 心跳误判「未到」现补登）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 
 ## 2026-09-10 02:00 — 💚 心跳 02:00 全绿（cron 30min · 凌晨 · 例行窗口前 · 无新 KB）
 
 - 健康检查全绿（02:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：distill-2026-09-10.jsonl 未产出（例行窗口 02:05 未到，下一心跳节点核查产出并登记条数）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 
 ## 2026-09-10 01:00 — 💚 心跳 01:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（01:02:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条仍为最新；mmin -1380 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 
 # 2026-09-09 21:05 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
@@ -434,7 +439,6 @@
 
 - 健康检查全绿（15:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条已登记；mmin -580 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 
 ## 2026-09-09 11:30 — 💚 心跳 11:30 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
@@ -443,70 +447,60 @@
 
 - 健康检查全绿（12:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条已登记；mmin -580 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（中午安静期，软待办 2 项维持）
 
 ## 2026-09-09 19:00 — 💚 心跳 19:00 全绿（cron 30min · 傍晚 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（19:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条仍为最新；mmin -1020 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 
 ## 2026-09-09 20:30 — 💚 心跳 20:30 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（20:30:19 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条仍为最新；mmin -1110 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持）
 
 ## 2026-09-09 22:00 — 💚 心跳 22:00 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（22:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条仍为最新；mmin -1200 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（深夜安静期，软待办 2 项维持）
 
 ## 2026-09-09 21:00 — 💚 心跳 21:00 全绿（cron 30min · 夜间 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（21:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条仍为最新；mmin -1140 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜间安静期，软待办 2 项维持）
 
 ## 2026-09-09 22:30 — 💚 心跳 22:30 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（22:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:05 +29 条仍为最新；mmin -35 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（深夜安静期，软待办 2 项维持）
 
 ## 2026-09-10 05:00 — 💚 心跳 05:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（05:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条已登记；mmin -168 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 
 ## 2026-09-10 07:00 — 💚 心跳 07:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（07:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新；mmin -288 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 
 ## 2026-09-10 09:00 — 💚 心跳 09:00 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（09:00:12 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新；mmin -408 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持）
 
 ## 2026-09-10 13:30 — 💚 心跳 13:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（13:30:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新；mmin -90 内无新文件）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 
 ## 2026-09-10 21:30 — 💚 心跳 21:30 全绿（cron 30min · 夜间 · 无新 KB · 无待办推进）
@@ -514,7 +508,6 @@
 - 健康检查全绿（21:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，21:00 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜间安静期，软待办 2 项维持）
 
 ## 2026-09-10 22:30 — 💚 心跳 22:30 全绿（cron 30min · 夜间 · 无新 KB · 无待办推进）
@@ -522,7 +515,6 @@
 - 健康检查全绿（22:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（今日 02:12 +39 条仍为最新，22:00 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜间安静期，软待办 2 项维持）
 
 ## 2026-09-11 02:00 — 💚 心跳 02:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
@@ -530,7 +522,6 @@
 - 健康检查全绿（02:01:26 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：02:30 例行窗口核查 distill-2026-09-11.jsonl 是否产出
 
@@ -539,7 +530,6 @@
 - 健康检查全绿（04:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新，03:30 后无新文件）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：04:30 例行窗口核查
 
@@ -548,7 +538,6 @@
 - 健康检查全绿（06:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：06:30 例行窗口核查
 
@@ -557,7 +546,6 @@
 - 健康检查全绿（06:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：07:00 例行窗口核查
 
@@ -566,7 +554,6 @@
 - 健康检查全绿（07:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：07:30 例行窗口核查
 
@@ -575,7 +562,6 @@
 - 健康检查全绿（10:32:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持）
 - 下一步动作：11:00 例行窗口核查
 
@@ -584,7 +570,6 @@
 - 健康检查全绿（12:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（中午安静期，软待办 2 项维持）
 - 下一步动作：12:30 例行窗口核查
 
@@ -593,7 +578,6 @@
 - 健康检查全绿（14:02:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（沿用 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 - 下一步动作：14:30 例行窗口核查
 
@@ -602,7 +586,6 @@
 - 健康检查全绿（16:30:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（下午安静期，软待办 2 项维持）
 - 下一步动作：17:00 例行窗口核查
 
@@ -611,7 +594,6 @@
 - 健康检查全绿（17:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 - 下一步动作：17:30 例行窗口核查
 
@@ -620,7 +602,6 @@
 - 健康检查全绿（18:30:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 - 下一步动作：19:00 例行窗口核查
 
@@ -629,7 +610,6 @@
 - 健康检查全绿（19:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：find 确认今日（2026-09-11）无 distill-*.jsonl 产出，09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（傍晚安静期，软待办 2 项维持）
 - 下一步动作：19:30 例行窗口核查
 ## 2026-09-11 22:30 — 💚 心跳 22:30 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
@@ -637,7 +617,6 @@
 - 健康检查全绿（22:30:04 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-11.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持）
 - 下一步动作：23:00 例行窗口核查
 
@@ -646,7 +625,6 @@
 - 健康检查全绿（00:30:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-*.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：今日 02:05 例行窗口核查 distill-2026-09-12.jsonl 是否产出
 
@@ -655,7 +633,6 @@
 - 健康检查全绿（01:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 23:12 total=28 不变）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：02:05 例行窗口核查 distill-2026-09-12.jsonl 是否产出
 # 2026-09-12 02:00 — 💚 心跳 02:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
@@ -663,7 +640,6 @@
 - 健康检查全绿（02:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 23:12 total=28 不变，status=ok）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：02:05 例行窗口核查 distill-2026-09-12.jsonl 是否有产出
 
@@ -672,7 +648,6 @@
 - 健康检查全绿（02:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 23:12 total=28 不变，status=ok）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：03:00 例行窗口核查
 
@@ -681,7 +656,6 @@
 - 健康检查全绿（03:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 03:12 total=28 不变，cron-distill-kb-link 03:30 任务完成正常）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：04:00 例行窗口核查
 
@@ -690,7 +664,6 @@
 - 健康检查全绿（04:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 03:12 total=28 不变，status=ok）
 - WAL 哨兵：未采样（无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持）
 - 下一步动作：04:30 例行窗口核查
 
@@ -699,7 +672,6 @@
 - 健康检查全绿（05:33:18 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变，status=ok，cron-distill-kb-link 03:30 完成统计 38/38 linked）
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：06:00 例行窗口核查
 
@@ -708,7 +680,6 @@
 - 健康检查全绿（06:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变，status=ok）
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：07:00 例行窗口核查
 
@@ -717,7 +688,6 @@
 - 健康检查全绿（08:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（清晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（清晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：08:30 例行窗口核查
 # 2026-09-12 08:30 — 💚 心跳 08:30 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
@@ -725,7 +695,6 @@
 - 健康检查全绿（08:32:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 08:00 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：09:00 例行窗口核查
 
@@ -734,7 +703,6 @@
 - 健康检查全绿（09:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 09:00 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：10:00 例行窗口核查
 
@@ -743,7 +711,6 @@
 - 健康检查全绿（10:02:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：10:30 例行窗口核查
 # 2026-09-12 10:30 — 💚 心跳 10:30 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
@@ -751,7 +718,6 @@
 - 健康检查全绿（10:31:43 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 10:00 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：11:00 例行窗口核查
 
@@ -760,7 +726,6 @@
 - 健康检查全绿（11:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：12:00 例行窗口核查
 
@@ -769,7 +734,6 @@
 - 健康检查全绿（12:02:13 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（午间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（午间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：12:30 例行窗口核查
 
@@ -778,7 +742,6 @@
 - 健康检查全绿（12:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（午间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（午间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：13:00 例行窗口核查
 
@@ -786,34 +749,22 @@
 
 - 健康检查全绿（14:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：14:30 例行窗口核查
 
 # 2026-09-12 16:00 — 💚 心跳 16:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（16:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：16:30 例行窗口核查
 # 2026-09-12 18:30 — 💚 心跳 18:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（18:32:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：19:00 例行窗口核查
 # 2026-09-12 19:00 — 💚 心跳 19:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（19:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 18:30 例行窗口未采样新条目，沿用基线
-- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
-- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：19:30 例行窗口核查
 
 # 2026-09-12 20:00 — 💚 心跳 20:00 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
@@ -821,7 +772,6 @@
 - 健康检查全绿（20:00:29 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（晚间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：20:30 例行窗口核查
 # 2026-09-12 20:30 — 💚 心跳 20:30 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
@@ -829,7 +779,6 @@
 - 健康检查全绿（20:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 20:00 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（晚间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（晚间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：21:00 日结卡片 + 21:30 例行窗口核查
 
@@ -839,7 +788,6 @@
 - 健康检查全绿（21:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 21:00 日结已发出，沿用基线
 - WAL 哨兵：未采样（夜间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：22:00 例行窗口核查
 
@@ -848,7 +796,6 @@
 - 健康检查全绿（22:01:53 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 21:30 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（夜间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：22:30 例行窗口核查
 
@@ -857,7 +804,6 @@
 - 健康检查全绿（22:32:13 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 22:00 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（夜晚安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜晚安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：23:00 例行窗口核查
 
@@ -866,7 +812,6 @@
 - 健康检查全绿（23:02:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-12.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 22:30 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（夜晚安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（夜晚安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：23:30 例行窗口核查
 
@@ -875,7 +820,6 @@
 - 健康检查全绿（03:33:36 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（02:05 例行窗口已过、无产物，沿用 09-10 02:12 +39 条基线；vision total=28 不变）
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：04:00 例行窗口核查
 
@@ -884,7 +828,6 @@
 - 健康检查全绿（04:02:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（03:30 心跳已核查 02:05 例行窗口，无产物；沿用 09-10 02:12 +39 条基线；vision total=28 不变）
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：04:30 例行窗口核查
 
@@ -893,7 +836,6 @@
 - 健康检查全绿（04:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期）
 - 下一步动作：05:00 例行窗口核查
 
@@ -902,7 +844,6 @@
 - 健康检查全绿（07:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：今日首个心跳，无 distill-2026-09-13.jsonl 产出（昨日基线 09-10 02:12 +39 条 / vision 05:12 total=28 沿用）
 - WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：07:30 例行窗口核查；02:05 例行窗口核查 distill-2026-09-13.jsonl 是否产出
 
@@ -911,7 +852,6 @@
 - 健康检查全绿（07:30:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 今日首批窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（清晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（清晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：08:00 例行窗口核查
 
@@ -920,7 +860,6 @@
 - 健康检查全绿（10:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 09:30 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：10:30 例行窗口核查
 
@@ -929,7 +868,6 @@
 - 健康检查全绿（10:32:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 10:00 例行窗口未采样新条目，沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：11:00 例行窗口核查
 
@@ -938,6 +876,174 @@
 - 健康检查全绿（11:30:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
 - KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 09:33→11:30 上午窗口无采样，沿用基线
 - WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
-- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
 - 下一步动作：12:00 例行窗口核查
+
+# 2026-09-13 12:30 — 💚 心跳 12:30 全绿（cron 30min · 中午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（12:32:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 中午安静期，沿用基线
+- WAL 哨兵：未采样（中午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 阻塞：✅ 无（中午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：13:00 例行窗口核查
+
+# 2026-09-13 14:30 — 💚 心跳 14:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（14:32:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 13:30→14:30 下午窗口无采样，沿用基线
+- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：15:00 例行窗口核查
+
+# 2026-09-13 15:30 — 💚 心跳 15:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（15:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 下午安静期，沿用基线
+- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：16:00 例行窗口核查
+# 2026-09-13 16:00 — 💚 心跳 16:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（16:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 下午安静期，沿用基线
+- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：16:30 例行窗口核查
+
+# 2026-09-13 17:30 — 💚 心跳 17:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（17:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 下午安静期，沿用基线
+- WAL 哨兵：未采样（下午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（下午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：18:00 例行窗口核查
+# 2026-09-13 19:00 — 💚 心跳 19:00 全绿（cron 30min · 傍晚 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（19:02:04 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（傍晚安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：19:30 例行窗口核查
+
+# 2026-09-13 19:30 — 💚 心跳 19:30 全绿（cron 30min · 傍晚 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（19:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 19:00 例行窗口未采样新条目，沿用基线
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（傍晚安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：20:00 例行窗口核查
+
+# 2026-09-13 21:00 — 💚 心跳 21:00 全绿（cron 30min · 夜间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（21:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：今日 02:05/03:30/05:12/07:00→21:00 全天各窗口复验确认无 distill-2026-09-13.jsonl 产出（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
+- WAL 哨兵：未采样（夜间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（夜间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：21:30 例行窗口核查
+
+# 2026-09-13 22:30 — 💚 心跳 22:30 全绿（cron 30min · 夜间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（22:32:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（find 确认；09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 沿用基线
+- WAL 哨兵：未采样（夜间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（夜间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：23:00 例行窗口核查
+
+# 2026-09-13 23:30 — 💚 心跳 23:30 全绿（cron 30min · 夜间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（23:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-13.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 夜间安静期，沿用基线
+- WAL 哨兵：未采样（夜间安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（夜间安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：明日（09-14）02:05 例行窗口核查 distill-2026-09-14.jsonl 是否产出
+
+# 2026-09-14 00:00 — 💚 心跳 00:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（00:00:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：新一天 09-14 首个心跳，无 distill-2026-09-14.jsonl 产出（沿用 09-10 02:12 +39 条基线；vision 05:12 total=28 不变）— 02:05 例行窗口核查
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：02:05 例行窗口核查 distill-2026-09-14.jsonl 是否产出
+
+# 2026-09-14 00:30 — 💚 心跳 00:30 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（00:32:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 00:00 例行窗口未采样新条目，沿用基线
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：02:05 例行窗口核查 distill-2026-09-14.jsonl 是否产出
+
+# 2026-09-14 01:00 — 💚 心跳 01:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（01:01:23 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 00:30 例行窗口未采样新条目，沿用基线
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：01:30 例行窗口核查
+
+# 2026-09-14 03:30 — 💚 心跳 03:30 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（03:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 03:00 例行窗口未采样新条目，沿用基线
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：04:00 例行窗口核查
+
+# 2026-09-14 05:00 — 💚 心跳 05:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（05:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision 09-14 目录不存在，延续 09-13 21:03 total=28 基线）— 凌晨安静期，沿用基线
+- WAL 哨兵：PRAGMA wal_checkpoint(TRUNCATE) 返回 (0,-1,-1) 即 busy=0 + log=-1 + ckpt_frames=-1 → 完全空闲，沿用 09-10 16:20 disk_wal 31529068 / held_bad 空
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（凌晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：05:30 例行窗口核查
+
+# 2026-09-14 07:30 — 💚 心跳 07:30 全绿（cron 30min · 清晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（07:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision 09-14 目录不存在，延续 09-13 21:03 total=28 基线）— 清晨安静期，沿用基线
+- WAL 哨兵：未采样（清晨安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空 + 09-14 05:00 PRAGMA wal_checkpoint(TRUNCATE) busy=0 完全空闲确认）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（清晨安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：08:00 例行窗口核查
+# 2026-09-14 08:00 — 💚 心跳 08:00 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（08:02:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（09-10 02:12 +39 条仍为最新；vision 05:12 total=28 不变）— 上午安静期，沿用基线
+- WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：08:30 例行窗口核查
+
+# 2026-09-14 10:20 — 🔧 用户令「扫瞄到15项议程，请全面修复」→ 15 项告警全清零（commit d127c4c1）
+
+## 定性
+15 项 = health-patrol 同源告警：13 条 L1 API 差集超 72h 未定性 + 1 条 L4 页面超基线(4) + 1 条 tcm-import 链条崩退。全部指向一个根因簇：mingli 医学栈落后 tcm v1.8.2（临床工作流/知识审核/共享报告三模块未移植）+ 链条 EPERM 崩退 + 09-10 蒸馏改版断流。
+
+## 修复清单（15/15 ✅）
+1. **13 条 API 差集 → 移植吸收**：clinical-workflow.js（诊疗工作流 7 端点状态机：draft→assessed→pending_review→signed/void/returned，医生权限+审计+修订控制）+ knowledge-review.js（知识独立审核：双医生背靠背+治理三验+版本化证据）+ medical-evidence.js + clinical-governance.js 自 tcm v1.8.2 整体移植；api-server.js 挂载（assessUrgency/syndrome-engine 本就同源）；壳页面×3 + 前端 js×3 落位 medical-stack/app
+2. **L4 基线 53→57**：4 页（clinical-workflow/knowledge-review/shared-reports/service-center）落位后基线更新，diff-sla-track.py 同步
+3. **tcm-import 崩退根修（R754）**：300MB 镜像重写后 macOS 扫描窗口期 EPERM（瞬时，自愈）→ import/follow 两链首读者短重试+优雅跳过（rc=3 视为通过）；follow 暖检 3 败自动 kickstart 8972 自愈；wrapper 显式 rc 回显 + CHAIN_RESULT 行
+4. **post /api/tcm/ 登记架构定位豁免**：visual-observation-proxy 动态路由前缀，ms 已有等价观察端点（家庭端 AI 初判），严格代理移植会遮蔽既有行为——不移植
+5. **顺带修真**：medical-api plist EX_CONFIG（Kimi node 已卸载）→ autoclaw 运行时修复；monthly-cross-check/ui-smoke/kb-follow 三处 Kimi node 死路径清理
+6. **第 15 项蒸馏断流 103h**：命理夜间蒸馏 09-10 改「精简轮换版」时 payload 禁写文件且主会面未接 ingest → 产出蒸发。已恢复落盘指令（distill-<date>.jsonl 追加式）+ 手动触发验证 10 条合法 JSONL 入库 ✅
+
+## 验收证据
+- 链5：missing_api=0 / clean=true（digest e93407e2e9a352ff）
+- parity：5/5 PASS（词条即查/条目名清单 500 → 200）
+- formula-recall：麻黄汤×小青龙汤鉴别卡实测返回 ✅
+- diff-sla：OK 差集 clean 无在途条目
+- health-patrol：0 ❌ 全绿，内联 script 409 块全过
+- 鉴别卡反馈/知识审核端点 401 鉴权正常挂载
