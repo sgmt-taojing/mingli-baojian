@@ -39,6 +39,22 @@ fi
 LAUNCHD_BAD=$(launchctl list 2>/dev/null | grep "mingli-baojian" | awk '$1 ~ /^-[0-9]+/' | awk '{print $3}')
 [ -n "$LAUNCHD_BAD" ] && ALERTS+=("launchd 异常: $LAUNCHD_BAD")
 
+# 2a. 备份快照健康（R-2026-09-14：快照/周备连报 Operation not permitted 一个月，失败静默跳过无人发现）
+# 检查两类痕迹：backup-guard.log 近 48h 内的 TCC-LOCKED / VOLUME-MISSING，以及快照日志连续失败
+GUARD_LOG="$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
+if [ -f "$GUARD_LOG" ]; then
+    GUARD_HIT=$(find "$GUARD_LOG" -mtime -2 2>/dev/null | wc -l | tr -d ' ')
+    [ "$GUARD_HIT" -gt 0 ] && ALERTS+=("备份守卫告警: $(tail -2 "$GUARD_LOG" | tr '\n' '；')")
+fi
+SNAP_LOG="$HOME/.openclaw-autoclaw/workspace/memory/snapshot-cron.log"
+if [ -f "$SNAP_LOG" ]; then
+    SNAP_MTIME=$(stat -f %m "$SNAP_LOG" 2>/dev/null || echo 0)
+    NOW_EPOCH=$(date +%s)
+    if [ $((NOW_EPOCH - SNAP_MTIME)) -gt 172800 ]; then
+        ALERTS+=("源码快照日志 48h 未更新（快照任务可能未跑或静默失败）")
+    fi
+fi
+
 # 3. MLX v6 训练
 V6_PID=$(ps aux | grep "mlx_lm lora" | grep "mingli-sft-v6" | grep -v grep | awk '{print $2}')
 V6_STAT=""
