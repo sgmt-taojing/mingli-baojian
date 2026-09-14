@@ -14,13 +14,14 @@ for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8
     lsof -i :$PORT >/dev/null 2>&1 || ALERTS+=("$NAME(:$PORT) 未在监听")
 done
 
-# 1a. 医学权威库在线（R119：8932 搜索端点存活验证；R-DEBOUNCE：冷索引期 5s 超时曾 40min 内两次误报——失败时隔 8s 重试一次再告警）
+# 1a. 医学权威库在线（R119：8932 搜索端点存活验证；R-DEBOUNCE：冷索引期 5s 超时曾 40min 内两次误报——失败时隔 8s 重试一次再告警；
+# R-DEBOUNCE2：09-14 I/O 尖峰期 5s/8s 超时再抖误报（实测服务 198ms 健康返回 103484 条）——超时加固至 12s/15s）
 if lsof -i :8932 >/dev/null 2>&1; then
     AUTH_PROBE='import sys,json; d=json.load(sys.stdin); print(d.get("ok","") and d.get("total_hits",0))'
-    AUTH_CHECK=$(curl -s -m 5 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "$AUTH_PROBE" 2>/dev/null)
+    AUTH_CHECK=$(curl -s -m 12 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "$AUTH_PROBE" 2>/dev/null)
     if [ -z "$AUTH_CHECK" ] || [ "$AUTH_CHECK" = "0" ]; then
         sleep 8
-        AUTH_CHECK=$(curl -s -m 8 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "$AUTH_PROBE" 2>/dev/null)
+        AUTH_CHECK=$(curl -s -m 15 "http://127.0.0.1:8932/api/tcm/kb/search?q=%E4%B8%AD%E5%8C%BB&limit=1" 2>/dev/null | python3 -c "$AUTH_PROBE" 2>/dev/null)
     fi
     [ -z "$AUTH_CHECK" ] || [ "$AUTH_CHECK" = "0" ] && ALERTS+=("医学权威库 8932 搜索异常（重试后仍 total_hits=${AUTH_CHECK:-空}）")
 fi
@@ -90,9 +91,12 @@ fi
 # R111 更新：distill-mingli-outbound.log 已废弃（旧 cron）；
 # R-PATROL-FIX2 再更新：mingli-tcm-daily-distill 已停用（jobs.json enabled=false），
 # 其产物 server/kb/mingli-log.jsonl 自 08-26 停更——监控死写入方导致静默误报 137h。
-# 现行权威日频产出为 training-data/kb-web-distill/distill-*.jsonl（每日滚动，08-31 已验证在写），
+# R-PATROL-FIX3 三更新：kb-web-distill.py 系僵尸脚本（指向 0 字节归档库、无任何任务引用，
+# 09-14 已归档 scripts-legacy/），其旧产物监控再次制造 103h 静默误报。
+# 现行权威日频产出为 exports/distill-outbound/mingli-full-*.json
+# （distill-mingli-outbound launchd 任务每日 03:00 产出，family 知识通道真产出，09-14 已验证），
 # 改监控该目录最新文件 mtime。
-LATEST_DISTILL=$(ls -t "$PROJECT_ROOT"/training-data/kb-web-distill/distill-*.jsonl 2>/dev/null | head -1)
+LATEST_DISTILL=$(ls -t "$PROJECT_ROOT"/exports/distill-outbound/mingli-full-*.json 2>/dev/null | head -1)
 for LOG_PATH in \
     "/tmp/distill-tcm-outbound.log" \
     "/tmp/vision-distill.log" \

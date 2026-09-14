@@ -9,8 +9,8 @@ echo "[$TS] === mingli-baojian 命理 KB 蒸馏开始 ===" >> "$LOG_FILE"
 cd "$PROJECT_DIR"
 
 DATE=$(date +%Y%m%d)
-EXPORT="training-data/distill-outbound/mingli-pure-${DATE}.json"
-mkdir -p training-data/distill-outbound
+EXPORT="exports/distill-outbound/mingli-pure-${DATE}.json"
+mkdir -p exports/distill-outbound  # R-TCC: 外接盘对 launchd 上下文 EPERM，落本地
 
 python3 - <<PYEOF >> "$LOG_FILE" 2>&1
 import sqlite3, json, os
@@ -25,7 +25,7 @@ def safe_str(v):
 # R747 修真（2026-08-26）：出站改纯命理——tcm-agent 是医学知识唯一源头，
 # 命理宝鉴不再出口医学知识（断 tcm→mingli→tcm-aux 回流环路）
 EXCLUDE_MODULES = ('engine_compare', 'ai-prompt', 'mingli-cross-moved')
-EXPORT = "training-data/distill-outbound/mingli-pure-${DATE}.json"
+EXPORT = "exports/distill-outbound/mingli-pure-${DATE}.json"
 conn = sqlite3.connect("server/database/yidao.db")
 conn.row_factory = sqlite3.Row
 ph = ','.join(['?'] * len(EXCLUDE_MODULES))
@@ -69,7 +69,7 @@ echo "  ✓ 推送到 SHF + TCM-aux" >> "$LOG_FILE"
 # 口径：status IN (formal/active/published/promoted/approved)，排除内部模块 + TCM 类模块
 # （TCM 语料由 tcm-agent 自己的 tcm-authoritative-full.json 全量镜像负责，避免双源重复）
 # 仅推送 SHF（家庭能体融合层 family-kb.json 的原料），不推 TCM-aux
-EXPORT_FULL="training-data/distill-outbound/mingli-full-${DATE}.json"
+EXPORT_FULL="exports/distill-outbound/mingli-full-${DATE}.json"
 python3 - <<PYEOF >> "$LOG_FILE" 2>&1
 import sqlite3, json
 from datetime import datetime
@@ -80,7 +80,7 @@ def safe_str(v):
     return str(v)
 EXCLUDE_MODULES = ('engine_compare', 'ai-prompt', 'mingli-cross-moved')
 STATUSES = ('formal', 'active', 'published', 'promoted', 'approved')
-EXPORT_FULL = "training-data/distill-outbound/mingli-full-${DATE}.json"
+EXPORT_FULL = "exports/distill-outbound/mingli-full-${DATE}.json"
 conn = sqlite3.connect("server/database/yidao.db")
 conn.row_factory = sqlite3.Row
 ph_m = ','.join(['?'] * len(EXCLUDE_MODULES))
@@ -124,8 +124,8 @@ conn.close()
 PYEOF
 cp "$EXPORT_FULL" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-full.json
 echo "  ✓ 全量镜像推送到 SHF（mingli-full.json）" >> "$LOG_FILE"
-find training-data/distill-outbound -name "mingli-pure-*.json" -mtime +7 -delete
-find training-data/distill-outbound -name "mingli-full-*.json" -mtime +7 -delete
+find exports/distill-outbound -name "mingli-pure-*.json" -mtime +7 -delete
+find exports/distill-outbound -name "mingli-full-*.json" -mtime +7 -delete
 echo "[$TS] === 完成 ===" >> "$LOG_FILE"
 # R104-W1.2: 更新蒸馏注册表
 python3 - <<'PYEOF'
@@ -186,7 +186,7 @@ def count_json(path):
 
 try:
     # 本轮导出文件（与 distill-status 同源：mingli-pure.json → shf / aux-mingli.json → tcm）
-    exports = sorted(glob.glob("/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training-data/distill-outbound/mingli-pure-*.json"))
+    exports = sorted(glob.glob("/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/exports/distill-outbound/mingli-pure-*.json"))
     total = count_json(exports[-1]) if exports else -1
     if total < 0:
         total = count_json("/Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json")

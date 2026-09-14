@@ -1,3 +1,12 @@
+## 2026-09-14 10:30 · 告警治理四源根修 + 项目全面梳理清理
+
+- **告警源 1 · distill-mingli-outbound EPERM（已修实测）**：09-11 training-data 软链至外接盘后，launchd 上下文对可移动宗卷 EPERM 致该任务 09-12 起连败。EXPORT/retention 等 5 处改落本地 `exports/distill-outbound/`，kickstart 实测跑通（全量镜像推送 SHF 成功，registry total=10182）。
+- **告警源 2 · kb-web-distill 静默 103h（已修）**：脚本系僵尸（指向 0 字节归档库、无任何任务引用），已归档 `archive/scripts-legacy/`；巡检 5c 段监控目标改指 family 知识通道真产出 `exports/distill-outbound/mingli-full-*.json`（日频，09-14 已验证在写）。
+- **告警源 3 · 8932 探针误报（已修）**：实测服务 198ms 健康返回 103,484 条，I/O 尖峰致 5s/8s 超时抖动误报，超时加固至 12s/15s（R-DEBOUNCE2）。
+- **告警源 4 · tcm-import 退出码 1**：10:01 轮 rc=0 自愈，无需修。
+- **全面梳理清理**：`.openclaw/tmp` 两周以上陈旧文件 1,722 个 311MB 迁外接盘冷存 `cold-storage/mingli-baojian/tmp-stale-20260914/`（tmp 372M→44M）；git 卫生——server/kb-store、medical-stack kb-store、training-data 等已迁外接盘软链的目录停止跟踪，.gitignore 补软链条目（server 5cbb516）。
+- **回归**：巡检全绿（409 块过、端口全活）+ 29 链路冒烟复跑。
+
 ## 2026-09-08 12:50 · R-WALK3 机构中心走查：入驻申请假闭环根修
 
 - **基线**：19 卡零死链零破图；shop 套餐下单实测走通共享订单服务 8963（真实创建 ORD 单）；merchant-dashboard 本地账与 serverId 同步兼容。
