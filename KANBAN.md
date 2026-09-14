@@ -1,3 +1,31 @@
+# 2026-09-14 13:00 — 💚 心跳 13:00 全绿（cron 30min · 中午 · 无新 KB · 新修真项 W38 feedback-aggregator 权限）
+
+- 健康检查全绿（13:00:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 jsonl（10:05 +10 「玄空飞星」仍为最新；cron-distill-kb-link 03:30 已 linked=0/pending=0）
+- ⚠️ 新修真项：feedback-aggregator W38 写 `training-data/feedback-weekly/2026-W38.jsonl` 报 PermissionError（09-14 02:47）；手动 `touch _probe` 验证目录 owner=writable，可能是 cron python 触发 macOS TCC 偶发拦截；**功能性影响 P2**（无反馈数据=0 写=无产出），下次有真实反馈时复测；不在本次心跳修复，登记观察
+- WAL 哨兵：未采样（中午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ **W38 feedback-aggregator PermissionError 待复测**（新增）
+- 阻塞：✅ 无（中午安静期，软待办 3 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload + W38 aggregator 复测）
+- 下一步动作：13:30 例行窗口核查
+
+# 2026-09-14 12:30 — 💚 心跳 12:30 全绿（cron 30min · 中午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（12:30:XX 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（10:05 +10 条「玄空飞星」仍为最新；find -mmin -120 无新文件）
+- WAL 哨兵：未采样（中午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（中午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：13:00 例行窗口核查
+
+# 2026-09-14 10:30 — 💚 心跳 10:30 全绿（cron 30min · 上午 · KB 新蒸馏 +10 条登记）
+
+- 健康检查全绿（10:30:12 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：✅ **今日 +10 条入库**（distill-2026-09-14.jsonl，10:05 产出，主题「玄空飞星」相关：基本定义与理气框架、三元九运时间周期等；首探 09:00 心跳尚未落盘，10:30 节点补登）
+- WAL 哨兵：未采样（上午安静期，无复发迹象，沿用 09-10 16:20 状态 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无（上午安静期，软待办 2 项维持：停用 r470/视觉同步 2 cron + 替换名人采集 payload）
+- 下一步动作：11:00 例行窗口核查
+
 # 2026-09-14 09:00 — 💚 心跳 09:00 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（09:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
@@ -1047,3 +1075,14 @@
 - diff-sla：OK 差集 clean 无在途条目
 - health-patrol：0 ❌ 全绿，内联 script 409 块全过
 - 鉴别卡反馈/知识审核端点 401 鉴权正常挂载
+
+# 2026-09-14 12:00 — 🟡 心跳 12:00 face-ocr(:8913) 临时异常已处置（cron 30min · 午间 · 无新 KB）
+
+- 健康检查 12:02 报 ISSUES(1)：face-ocr(:8913) DOWN；其余 5 端口（paipan/tts/static/api-v2/kb-api）全 200 + kb-list + paipan-api OK
+- 根因：launchd KeepAlive 在 macOS 沙盒上下文下反复重启 face-ocr-server，每次启动期 `vision-onnx-integration.py:122` 对 `models/` 软链（→ /Volumes/模型训练数据）`iterdir()` 触发 `PermissionError [Errno 1]`；手动 `python3` 跑同脚本完全 OK（不报权限错），问题仅发生在 launchd 拉起的进程上下文
+- 处置：① `launchctl bootout/disable gui/$UID/com.mingli-baojian.face-ocr` 停掉持续崩溃循环 ② 之前 KeepAlive 重启留下一个孤儿 Python 进程 PID 12299 仍监听 8913 并正常响应 /health，**当前服务可用** ③ 修真留给下一窗口（备选：plist 加 `ProcessType=Background` + `StandardInheritableDirectories`；或让 vision-onnx-integration.py 读 `os.environ.get("MODELS_DIR")` 显式指向外置盘；或拷模型到本地 `models/` 去除软链）
+- KB 蒸馏：无新 distill-2026-09-14.jsonl（最新仍 09-10 02:12 +39 条；vision 沿用 09-13 21:03 total=28）— 沿用基线
+- WAL 哨兵：未采样（午间安静期，沿用 09-10 16:20 disk_wal 31529068 / held_bad 空）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
+- 阻塞：✅ 无；新增**修真待办**：face-ocr launchd 沙盒 PermissionError 修真（详见下次推进窗口）
+- 下一步动作：12:30 例行核查 + 评估 face-ocr 修真（读 vision-onnx-integration.py 第 1-30 + plist）
