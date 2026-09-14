@@ -45,7 +45,7 @@ MS = "http://127.0.0.1:8972"
 API2 = "http://127.0.0.1:8920"
 HDRS = {"X-Skip-Interceptor": "1", "User-Agent": "Mozilla/5.0",
         "Content-Type": "application/json"}
-NODE = "/Applications/Kimi.app/Contents/Resources/resources/runtime/node"
+NODE = "/Users/tom/Library/Application Support/autoclaw/embedded-gateway-runtime/fead26bb436d5687/node/node"
 
 MINGLI_KW = ['日主', '天干', '地支', '八字', '紫微', '命宫', '财帛宫', '大运', '流年',
              '四柱', '纳音', '食神', '伤官', '七杀', '正官', '偏财', '比肩', '劫财',

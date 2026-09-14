@@ -43,12 +43,13 @@ def current_items():
         items.append('L3:' + s)
     for a in last.get('asset_drift') or []:
         items.append('L2.6:' + (a.get('file') if isinstance(a, dict) else str(a)))
-    # L4 页面差集：53 页已有三分法定性（52 页 DELIVERY/l4-page-triage-20260831.md +
-    # lab-interpret.html 2026-09-06 定性「已有等价」：medical-stack 院内版已吸收 +
-    # app/report-interpret.html 大众四维融合版），只追踪超出已定性基线的新增部分
+    # L4 页面差集：57 页已有三分法定性（52 页 DELIVERY/l4-page-triage-20260831.md +
+    # lab-interpret.html 2026-09-06 定性「已有等价」；2026-09-14 移植 clinical-workflow/
+    # knowledge-review/shared-reports/service-center 四页至 medical-stack/app 后基线升为 57），
+    # 只追踪超出已定性基线的新增部分
     page_gap = last.get('page_gap_count') or 0
-    if page_gap > 53:
-        items.append(f'L4:page_gap_over_baseline({page_gap - 53})')
+    if page_gap > 57:
+        items.append(f'L4:page_gap_over_baseline({page_gap - 57})')
     return items
 
 

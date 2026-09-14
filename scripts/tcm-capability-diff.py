@@ -36,6 +36,11 @@ KNOWN_EQUIV = {
     'get /manifest.json': 'mingli 8900 静态直挂 app/manifest.json',
     'get /pwa-inject.js': 'mingli 等价物 /pwa/pwa-inject.js（8900 静态）',
     'get /sw.js': 'mingli 等价物 /service-worker.js（8900 静态直挂 app/service-worker.js）',
+    # 2026-09-14 定性：visual-observation-proxy 动态路由注册的静态前缀（app.post('/api/tcm/'+route)），
+    # 并非真实独立端点。ms 侧已自有等价观察端点（tongue/face/eye/hand/lip-analyze，家庭端 AI 初判
+    # optionalAuth+启发式兑底）；tcm 严格代理（requireAuth+fail-closed）为院内形态，按 ADR-007
+    # 架构定位豁免不移植——移植会遮蔽家庭端行为，属回归风险。
+    'post /api/tcm/': 'visual-observation-proxy 动态路由前缀（非独立端点）；ms 已有等价观察端点，严格代理按 ADR-007 架构定位豁免',
 }
 
 ROUTE_RE = re.compile(r"(?:app|router)\.(get|post|put|delete|patch)\(['\"]([^'\"]+)")

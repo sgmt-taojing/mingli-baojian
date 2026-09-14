@@ -78,8 +78,23 @@ def main() -> int:
         return 0
 
     t0 = time.time()
-    with open(MIRROR, encoding="utf-8") as f:
-        mirror = json.load(f)
+    mirror = None
+    # R754 修真（2026-09-14）：镜像 300MB 被 tcm 侧重写后，写入者句柄关闭初期 macOS 后台扫描
+    # 会对新 inode 短暂返回 EPERM（Operation not permitted），15min 轮询周期性撞上窗口崩退。
+    # 处置：短退避重试 3 次；仍不可读则本轮优雅跳过（exit 3），下轮 mtime 幂等自动补。
+    for attempt in range(3):
+        try:
+            with open(MIRROR, encoding="utf-8") as f:
+                mirror = json.load(f)
+            break
+        except PermissionError as e:
+            if attempt < 2:
+                time.sleep(5 * (attempt + 1))
+                continue
+            print(json.dumps({"status": "skipped_eperm", "reason": f"镜像写入后扫描窗口期不可读，本轮跳过待下轮重试: {e}"}))
+            return 3
+        except Exception:
+            raise
     data = mirror.get("data") if isinstance(mirror, dict) else None
     if not isinstance(data, dict):
         print("⚠ 镜像结构异常", file=sys.stderr)

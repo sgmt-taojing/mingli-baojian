@@ -78,8 +78,22 @@ def main() -> int:
     result["lag_min_before"] = lag_min
 
     # 2. 解包内化（与 deploy-medical-stack.py L96-106 同逻辑：信封 → 裸模块映射）
-    with open(MIRROR, encoding="utf-8") as f:
-        env = json.load(f)
+    # R754 修真（2026-09-14）：镜像重写后扫描窗口期 EPERM 短重试 + 优雅跳过（exit 3，下轮 mtime 幂等自动补）
+    env = None
+    for attempt in range(3):
+        try:
+            with open(MIRROR, encoding="utf-8") as f:
+                env = json.load(f)
+            break
+        except PermissionError as e:
+            if attempt < 2:
+                time.sleep(5 * (attempt + 1))
+                continue
+            result.update(status="skipped_eperm", reason=f"镜像写入后扫描窗口期不可读，本轮跳过待下轮重试: {e}")
+            print(json.dumps(result, ensure_ascii=False))
+            return 3
+        except Exception:
+            raise
     data = env.get("data", env)
     if not isinstance(data, dict):
         result.update(status="error", reason="镜像结构异常：data 非模块映射")
@@ -120,7 +134,7 @@ def main() -> int:
     # launchd 环境 PATH 极简，裸 "node" 找不到——先 which，再回退 Kimi 运行时绝对路径
     if SQLITE_SYNC.exists():
         import shutil
-        node_bin = shutil.which("node") or "/Applications/Kimi.app/Contents/Resources/resources/runtime/node"
+        node_bin = shutil.which("node") or "/Users/tom/Library/Application Support/autoclaw/embedded-gateway-runtime/fead26bb436d5687/node/node"
         if not Path(node_bin).exists():
             result["sqlite_sync"] = "failed: node 不可用（PATH 与回退路径均未命中）"
             result.update(status="error")
@@ -174,6 +188,27 @@ def main() -> int:
         except Exception as e:  # noqa: BLE001
             warm_detail = f"attempt{attempt}: {e}"
     result["warm_check"] = warm_detail
+
+    # R754 补充（2026-09-14）：暖检 3 轮全失败 = 8972 持有旧镜像句柄/上下文失效（EPERM 事件实
+    # 证：文件被重写后旧进程读快照 500，parity 同案对拍连坐 FAIL）→ 自动 kickstart 重启自愈，
+    # 复用 R-WALF「检出即收敛」模式；重启后仍失败才置 error 上告警。
+    if not warm_ok:
+        import subprocess as _sp
+        _ks = _sp.run(["launchctl", "kickstart", "-k", f"gui/{_sp.run(['id','-u'],capture_output=True,text=True).stdout.strip()}/com.mingli-baojian.medical-api"],
+                      capture_output=True, text=True, timeout=30)
+        if _ks.returncode == 0:
+            time.sleep(20)  # 300MB 预热 + 63850 条 KB 缓存，20s 足够首请求
+            try:
+                kb = http_json(KB_URL, timeout=120)
+                kb_total = (kb.get("total") or kb.get("data", {}).get("total")
+                            or (kb.get("stats") or {}).get("total"))
+                if isinstance(kb_total, int) and kb_total >= int(written_total * 0.95):
+                    warm_ok = True
+                    result["warm_check"] = warm_detail + f" → kickstart 自愈成功(total={kb_total})"
+            except Exception as e:  # noqa: BLE001
+                result["warm_check"] = warm_detail + f" → kickstart 后仍失败: {e}"
+        else:
+            result["warm_check"] = warm_detail + f" → kickstart 失败 rc={_ks.returncode}"
 
     # 7. 七能力健康验证
     try:

@@ -4,7 +4,7 @@
 # 通过静默；失败写日志 + macOS 通知提醒。
 set -uo pipefail
 PROJ="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
-NODE="/Applications/Kimi.app/Contents/Resources/resources/runtime/node"
+NODE="/Users/tom/Library/Application Support/autoclaw/embedded-gateway-runtime/fead26bb436d5687/node/node"
 LOG="$PROJ/logs/ui-smoke-daily.log"
 mkdir -p "$PROJ/logs"
 {

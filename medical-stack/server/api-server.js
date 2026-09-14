@@ -209,6 +209,15 @@ app.use((req, res, next) => {
 
 app.use(optionalAuth);
 
+// ───────────────── 诊疗工作流 + 知识独立审核（2026-09-14 自 tcm v1.8.2 移植，链5 差集吸收）─────────────────
+// Versioned clinical workflow; this module never writes to the knowledge library.
+require('./clinical-workflow').registerClinicalWorkflow(app, {
+  requireAuth,
+  urgency: assessUrgency,
+  search: require('./medical-evidence').search
+});
+require('./knowledge-review').registerKnowledgeReview(app, {requireAuth});
+
 // ───────────────── 健康检查 ─────────────────
 app.get('/api/health', (req, res) => {
   res.json({
@@ -6793,6 +6802,23 @@ app.get('/api/tcm/entry/names', (req, res) => {
   } catch (e) { res.status(500).json({ ok: false, error: e.message }); }
 });
 
+// v1.7.8：方证鉴别对注册表（formula-diff-pairs.json）——顶部候选命中成对方时附鉴别卡（2026-09-14 自 tcm 移植）
+let _diffPairs = null;
+function loadDiffPairs() {
+  if (_diffPairs) return _diffPairs;
+  try {
+    _diffPairs = JSON.parse(require('fs').readFileSync(require('path').join(__dirname, 'kb', 'formula-diff-pairs.json'), 'utf8')).pairs || [];
+  } catch (e) { _diffPairs = []; }
+  return _diffPairs;
+}
+function findDifferential(formulas) {
+  const top = new Set((formulas || []).map(f => f.name));
+  for (const p of loadDiffPairs()) {
+    if (p.formulas.every(f => top.has(f))) return { id: p.id, formulas: p.formulas, gist: p.gist, basis: p.basis, entry_id: p.entry_id };
+  }
+  return null;
+}
+
 // R860c 症状→候选方召回（症状反向索引，R825 移植）
 app.get('/api/tcm/kb/formula-recall', (req, res) => {
   try {
@@ -6802,9 +6828,36 @@ app.get('/api/tcm/kb/formula-recall', (req, res) => {
     if (!q) return res.status(400).json({ ok: false, error: '缺少 q 参数' });
     const exclude = String(req.query.exclude || '').split(/[,，、]/).map(s => s.trim()).filter(Boolean);
     const recall = symptomIdx.formulaRecall(q, limit, exclude.length ? exclude : null);
-    res.json({ ok: true, query: q, canon: recall.canon, excluded: exclude, formulas: recall.formulas, took_ms: Date.now() - _t0 });
+    // v1.7.8：顶部候选成对（如麻黄汤×小青龙汤）→ 附鉴别要点卡，医生追问一两个鉴别问题即可定方
+    // 判定窗取完整召回列表（默认 8 条）：麻黄汤类低频症状覆盖率方常被挤到 6-8 位，6 条窗会漏对
+    const differential = findDifferential(recall.formulas);
+    res.json({ ok: true, query: q, canon: recall.canon, excluded: exclude, formulas: recall.formulas, ...(differential ? { differential } : {}), took_ms: Date.now() - _t0 });
   } catch (e) {
     res.status(500).json({ ok: false, error: '候选方召回失败: ' + e.message });
+  }
+});
+
+// v1.7.9：鉴别卡反馈落库（data/feedback/diff-feedback.jsonl）
+// action: ack=已鉴别定方 / dismiss=不适用——ack 率高的对是优质资产；dismiss 率高说明配对不当进复核队列
+const DIFF_FEEDBACK_PATH = require('path').join(__dirname, '..', 'data', 'feedback', 'diff-feedback.jsonl');
+app.post('/api/tcm/kb/diff-feedback', (req, res) => {
+  try {
+    const b = req.body || {};
+    const pairId = String(b.pair_id || '').trim().slice(0, 40);
+    const action = String(b.action || '').trim();
+    if (!pairId || !['ack', 'dismiss'].includes(action)) return res.status(400).json({ ok: false, error: 'pair_id/action(ack|dismiss) 必填' });
+    const row = {
+      ts: new Date().toISOString(),
+      pair_id: pairId,
+      action,
+      symptoms: (Array.isArray(b.symptoms) ? b.symptoms : []).slice(0, 12).map(s => String(s).slice(0, 20)),
+      doctor_id: String(b.doctor_id || 'D001').slice(0, 20),
+    };
+    require('fs').mkdirSync(require('path').dirname(DIFF_FEEDBACK_PATH), { recursive: true });
+    require('fs').appendFileSync(DIFF_FEEDBACK_PATH, JSON.stringify(row) + '\n');
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: '鉴别反馈落库失败: ' + e.message });
   }
 });
 
