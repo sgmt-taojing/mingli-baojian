@@ -39,10 +39,13 @@ CASES = [
 ]
 
 
-def http(method: str, url: str, body=None, timeout=30):
+def http(method: str, url: str, body=None, timeout=30, token=None):
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
     req = urllib.request.Request(url, method=method,
         data=json.dumps(body).encode() if body else None,
-        headers={"Content-Type": "application/json"})
+        headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return r.status, json.loads(r.read().decode("utf-8", "replace"))
@@ -59,13 +62,32 @@ def pick(d: dict, keys: list[str]):
     return {k: d.get(k) for k in keys if k in d}
 
 
+def _login_token(base: str) -> str:
+    """登录拿 token（2026-09-15 修真：tcm 侧 clinical-auth-boundary 对非白名单 GET 也 401，
+    裸探针会把「鉴权正常」误判为「移植保真破窗」→ parity 探针必须带凭据对拍）
+    凭据从环境变量读：PARITY_USER / PARITY_PASS（默认 admin/admin123 仅限本机对拍）"""
+    import os
+    user = os.environ.get("PARITY_USER", "admin")
+    pwd = os.environ.get("PARITY_PASS", "admin123")
+    try:
+        st, d = http("POST", base + "/api/auth/login", {"username": user, "password": pwd})
+        if st == 200:
+            tok = d.get("token") or (d.get("data") or {}).get("token") or ""
+            return tok if isinstance(tok, str) else ""
+    except Exception:
+        pass
+    return ""
+
+
 def main() -> int:
     write_state = "--write-state" in sys.argv
+    tcm_token = _login_token(TCM)
+    ms_token = _login_token(MS)
     rows = []
     passed = failed = skipped = 0
     for c in CASES:
-        ts, td = http(c["method"], TCM + c["path"], c.get("body"))
-        ms, md = http(c["method"], MS + c["path"], c.get("body"))
+        ts, td = http(c["method"], TCM + c["path"], c.get("body"), token=tcm_token)
+        ms, md = http(c["method"], MS + c["path"], c.get("body"), token=ms_token)
         row = {"case": c["name"], "tcm_status": ts, "ms_status": ms}
         if ts == 0 or ms == 0:
             row.update(result="skip", note=f"服务不可达 tcm={td.get('_error','-')} ms={md.get('_error','-')}")

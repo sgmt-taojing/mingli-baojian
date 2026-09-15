@@ -45,7 +45,13 @@ LAUNCHD_BAD=$(launchctl list 2>/dev/null | grep "mingli-baojian" | awk '$1 ~ /^-
 GUARD_LOG="$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
 if [ -f "$GUARD_LOG" ]; then
     GUARD_HIT=$(find "$GUARD_LOG" -mtime -2 2>/dev/null | wc -l | tr -d ' ')
-    [ "$GUARD_HIT" -gt 0 ] && ALERTS+=("备份守卫告警: $(tail -2 "$GUARD_LOG" | tr '\n' '；')")
+    # 2026-09-15 修真：只统计真实的 TCC-LOCKED / VOLUME-MISSING 行，
+    # RECOVERED 行是自愈痕迹不算告警；且只在存在新鲜失败行时才报
+    GUARD_FAILS=$(grep -c "TCC-LOCKED\|VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null || echo 0)
+    GUARD_LAST_FAIL=$(grep "TCC-LOCKED\|VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null | tail -1)
+    if [ "$GUARD_FAILS" -gt 0 ] && [ "$GUARD_HIT" -gt 0 ]; then
+        ALERTS+=("备份守卫告警: $GUARD_LAST_FAIL")
+    fi
 fi
 SNAP_LOG="$HOME/.openclaw-autoclaw/workspace/memory/snapshot-cron.log"
 if [ -f "$SNAP_LOG" ]; then
