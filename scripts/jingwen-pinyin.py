@@ -66,11 +66,15 @@ def annotate(text):
     return ''.join(out)
 
 def normalize_nums(line):
-    # R782：修持段数字中文化
-    return line.replace('(建议21遍)', '（建议二十一遍）').replace('(建议 21 遍)', '（建议二十一遍）')
+    # R782：修持段数字中文化；R786：半角括号+空格变体也统一
+    for pat in ['(建议21遍)', '(建议 21 遍)', '(建议 21遍)', '(建议21 遍)', '（建议21遍）', '(建议二十一遍)']:
+        line = line.replace(pat, '（建议二十一遍）')
+    return line
 
 def is_jingwen(line):
-    return line.startswith('📿') or ('遍）' in line and '：' in line) or ('遍:' in line and '：' in line)
+    # R786：半角括号/冒号变体兼容
+    return (line.startswith('📿') or ('遍）' in line and '：' in line) or ('遍)' in line and '：' in line)
+            or ('遍:' in line and '：' in line) or ('遍：' in line))
 
 def main():
     src, dst = sys.argv[1], sys.argv[2]
