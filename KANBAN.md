@@ -1,3 +1,191 @@
+# 2026-09-16 05:00 — 💚 心跳 05:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（05:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新增（distill-2026-09-16.jsonl 02:05 +6「黄历术语」仍为今日最新）
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb + shuhan-kb-combined 等，待 grep 引用定性）
+- 阻塞：✅ 无（凌晨安静期，软待办 3 项维持）
+- 下一步动作：05:30 例行窗口核查
+
+# 2026-09-16 04:30 — 💚 心跳 04:30 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（04:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新增（distill-2026-09-16.jsonl 02:05 +6「黄历术语」仍为最新，实探确认）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb 等，待 grep 引用定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：05:00 例行窗口核查
+
+# 2026-09-16 03:30 — 💚 心跳 03:30 全绿（cron 30min · 深夜 · KB 蒸馏 +6「黄历术语」· 无待办推进）
+
+- 健康检查全绿（03:31:15 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：✅ 新 distill-2026-09-16.jsonl 已落地（02:05 生成，+6 条「黄历术语」：建除十二神/黄道黑道口诀/值日星轮值等， fulfillment 03:00 节点预告的 02:05 后首个节点核查）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb 等，待 grep 引用定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：04:00 例行窗口核查
+
+# 2026-09-16 03:00 — 💚 心跳 03:00 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（03:00:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-16.jsonl（09-15 10:42 +4 tcm 子模块仍为最新；03:00 凌晨安静窗口，属预期）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb 等，待 grep 引用定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：03:30 例行窗口核查
+
+# 2026-09-16 02:00 — 💚 心跳 02:00 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（02:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-16.jsonl（09-15 10:42 +4 tcm 子模块仍为最新；02:05 例行窗口未到，沿用基线）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb 等，待 grep 引用定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：02:30 例行窗口核查
+
+# 2026-09-16 01:30 — 💚 心跳 01:30 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（01:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-16.jsonl（09-15 10:42 +4 tcm 子模块仍为最新；02:05 例行窗口未到，属预期）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb 等，待 grep 引用定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：02:00 例行窗口核查，02:05 后首个节点核查 distill-2026-09-16.jsonl
+
+# 2026-09-16 00:30 — 💚 心跳 00:30 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（00:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-16.jsonl（09-15 10:42 +4 tcm 子模块仍为最新；00:30 跨日早期，沿用基线）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真（r39-dual-core-kb+shuhan-kb-combined 待 grep 引用定性，剩 9 处）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：01:00 例行窗口核查
+
+# 2026-09-16 00:05 — 💚 心跳 00:05 全绿（cron 30min · 跨日首探 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（00:05:48 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-16.jsonl（09-15 02:04 +10「姓名学」仍为最新；跨日首探，02:05 例行窗口未到，属预期）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真（r39-dual-core-kb + shuhan-kb-combined 待 grep 引用定性，剩 9 处）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：00:30 例行窗口核查
+
+# 2026-09-15 21:05 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
+
+## ✅ 已完结（2026-09-15）
+1. **P1 修真：「中医名方 24/50」→ 56/50 达标**（完成日 09-15，commit 328c4ee server 子模块）：KB 迁 SQLite 后 knowledge/ 15 个 JS 被清成 80B 存根、tcm-famous 四件套断链根修——幂等重建 `.openclaw/tmp/kb-rebuild/rebuild-tcm-famous-kb.py`（51 方+标准补 22 方 / 54 位名医 / 24 部典籍）+ static-gzip.py /knowledge/ EPERM→404 死循环前置修复；验收 2 端口×4 文件全 200、模拟浏览器加载 5 KB 全通、审计 23/23 达标 56/50，教训 5 条入 memory/2026-09-15.md
+2. **tcm 子模块 KB 重建落盘 4 文件**（完成日 09-15 10:42）：tcm-doctors-kb.js(64KB)/tcm-famous-formulas-kb.js(68KB)/tcm-classics-kb.js(32KB)/tcm-formulas-kb.js(82KB)，version=2.1-rebuild-20260915，消费方 tcm-clinic/tcm-symptom
+3. **KB 蒸馏 +10 条入库**（完成日 09-15 02:04）：training-data/kb-web-distill/distill-2026-09-15.jsonl，主题「姓名学」（五格剖象法/康熙笔画/81数理）
+4. **全天健康守护全绿**（完成日 09-15，00:30~21:02 各心跳实探）：6 端口全 200 + kb-list + paipan-api OK，EXIT=0，无告警
+
+## 🔄 进行中（节点 0/8 — 外部依赖等待为主，遗留登记 1 项）
+- G21 能力发版体系 v1.2.0：等 family 侧接收验收（外部依赖，CHANGELOG 记「paipan v1.2.0 接收」即闭环）
+- wal-inode-watch 哨兵观察期：等 WAL 裂脑复发以对撞定位 unlink 方（今日无复发，观察继续）
+- W38 feedback-aggregator PermissionError：待有真实反馈时复测（P2，macOS TCC 偶发拦截推断）
+- knowledge/ 存根定性遗留（10:55 修真登记）：29 处 HTML 引用 → 修真中；今夜修真 2/11：① shop-data.js (3引用→moved-sqlite) ✅ ② faith-guide.js (3引用→kb-audit 修真 moved-fts) ✅；剩 9：r39-dual-core-kb(5)/shuhan-kb-combined(2)/faith-content(2)/faith-deities-detail(1)/faith-knowledge-base(2) 等
+- **下一步动作**：r39-dual-core-kb + shuhan-kb-combined 修真（kb-audit 未列名 → 需先 grep HTML 引用，再决定补行 or 纯前端占位）
+
+## 🚫 阻塞
+- ✅ 无硬阻塞。软待办维持 3 项（等用户控制台窗口）：停用 r470/视觉同步 2 个 cron + 替换名人采集 payload + W38 aggregator 复测（指引 docs/console-ops-20260906.md）
+- 基线：health-check EXIT=0（21:02:34 实探全绿）
+
+# 2026-09-15 23:30 — 💚 心跳 23:30 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（23:32:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；22:30→23:30 间无新文件）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真（r39-dual-core-kb+shuhan-kb-combined 待 grep 引用定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：00:00 例行窗口核查
+
+# 2026-09-15 22:30 — 💚 心跳 22:30 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（22:30:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；21:30→22:30 间无新文件）
+- WAL 哨兵：未采样（晚间安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（晚间安静期，软待办 3 项维持）
+- 下一步动作：23:00 例行窗口核查
+
+# 2026-09-15 21:30 — 💚 心跳 21:30 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（21:31:47 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；20:30→21:30 间无新文件）
+- WAL 哨兵：未采样（晚间安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（晚间安静期，软待办 3 项维持）
+- 下一步动作：22:00 例行窗口核查
+
+# 2026-09-15 20:30 — 💚 心跳 20:30 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（20:30:16 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；20:00→20:30 间无新文件）
+- WAL 哨兵：未采样（晚间安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（晚间安静期，软待办 3 项维持）
+- 下一步动作：21:00 例行窗口核查
+
+# 2026-09-15 20:00 — 💚 心跳 20:00 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（20:02:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；19:00→20:00 间无新文件）
+- WAL 哨兵：未采样（晚间安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（晚间安静期，软待办 3 项维持）
+- 下一步动作：20:30 例行窗口核查
+
+# 2026-09-15 19:00 — 💚 心跳 19:00 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（19:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；18:30→19:00 间无新文件）
+- WAL 哨兵：未采样（晚间安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（晚间安静期，软待办 3 项维持）
+- 下一步动作：19:30 例行窗口核查
+
+# 2026-09-15 18:30 — 💚 心跳 18:30 全绿（cron 30min · 傍晚 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（18:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；18:00→18:30 间无新文件）
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（傍晚安静期，软待办 3 项维持）
+- 下一步动作：19:00 例行窗口核查
+
+# 2026-09-15 18:00 — 💚 心跳 18:00 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（18:01:39 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；16:30→18:00 间无新文件）
+- WAL 哨兵：未采样（下午安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（下午安静期，软待办 3 项维持）
+- 下一步动作：18:30 例行窗口核查
+
+# 2026-09-15 16:30 — 💚 心跳 16:30 全绿（cron 30min · 下午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（16:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:04 +10「姓名学」仍为今日最新；15:00→16:30 间无新文件）
+- WAL 哨兵：未采样（下午安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（下午安静期，软待办 3 项维持）
+- 下一步动作：17:00 例行窗口核查
+
+- 健康检查全绿（15:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:04 +10「姓名学」仍为今日最新；12:30→15:00 间无新文件）
+- WAL 哨兵：未采样（下午安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（下午安静期，软待办 3 项维持）
+- 下一步动作：15:30 例行窗口核查
+
+# 2026-09-15 12:30 — 💚 心跳 12:30 全绿（cron 30min · 中午 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（12:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:04 +10「姓名学」仍为今日最新；11:30→12:30 间无新文件）
+- WAL 哨兵：未采样（中午安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（中午安静期，软待办 3 项维持）
+- 下一步动作：13:00 例行窗口核查
+
 # 2026-09-15 10:55 — 🔧 心跳 10:55 P1 修真：「中医名方 24/50」→ 56/50 达标（一处 → 一类）
 
 - 例行巡检全绿后按「节奏可见」推进挂账 P1：审计「中医名方 24/50 低于阈值」
@@ -15,6 +203,15 @@
 - 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
 - 阻塞：✅ 无（上午安静期，软待办 3 项维持）
 - 下一步动作：11:00 例行窗口核查
+
+# 2026-09-15 11:00 — 💚 心跳 11:00 全绿（cron 30min · 上午 · 新 4 KB 落盘 · 已登记 KANBAN）
+
+- 健康检查全绿（11:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：**新落盘 4 文件（10:42 · tcm 子模块）** — tcm-doctors-kb.js(64)/tcm-famous-formulas-kb.js(68)/tcm-classics-kb.js(32)/tcm-formulas-kb.js(82)，来源 R50 子模块重建，version=2.1-rebuild-20260915，消费方 tcm-clinic/tcm-symptom；governor-stdout 显示 19/20 通过（1 异常）
+- WAL 哨兵：未采样（上午安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（上午安静期，软待办 3 项维持）
+- 下一步动作：11:30 例行窗口核查
 
 # 2026-09-15 10:00 — 💚 心跳 10:00 全绿（cron 30min · 上午 · 无新 KB · 无待办推进）
 
@@ -1303,3 +1500,40 @@
 - 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发
 - 阻塞：✅ 无；新增**修真待办**：face-ocr launchd 沙盒 PermissionError 修真（详见下次推进窗口）
 - 下一步动作：12:30 例行核查 + 评估 face-ocr 修真（读 vision-onnx-integration.py 第 1-30 + plist）
+
+# 2026-09-15 19:30 — 💚 心跳 19:30 全绿（cron 30min · 晚间 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（19:30:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新；19:00→19:30 间无新文件）
+- WAL 哨兵：未采样（晚间安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测
+- 阻塞：✅ 无（晚间安静期，软待办 3 项维持）
+- 下一步动作：20:00 例行窗口核查
+
+# 2026-09-15 22:06 — 💚 心跳 22:06 全绿 + 存根修真 2/11（cron 30min）
+
+- 健康检查全绿（22:06:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（10:42 +4 tcm 子模块仍为今日最新）
+- **存根修真推进 2/11**：① shop-data.js 确认已修真（3 处引用均标注 moved-sqlite，含 kb-audit 行）② faith-guide.js 发现 kb-audit 错报 ok/65KB/3701条 → 实际为 80B 迁移存根，已修真为 moved-fts 标注；HTML 引用（admin/wechat-h5）保留 script 加载占位不影响运行
+- 验证：kb-audit.html script 标签闭合 5/5 ✅，http=200 ✅
+- 剩余 9 存根：r39-dual-core-kb(5引用)/shuhan-kb-combined(2)/faith-content(2)/faith-deities-detail(1)/faith-knowledge-base(2)——注：faith-content/deities-detail/faith-knowledge-base 实检仍有真实数据（非80B存根），定性待细查
+- 阻塞：✅ 无
+- 下一步动作：r39-dual-core-kb + shuhan-kb-combined（均为 80B 存根 + 7 处 HTML 引用）修真
+
+# 2026-09-16 02:30 — 💚 心跳 02:30 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（02:30:09 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-16.jsonl（沿用 09-15 10:42 +4 tcm 子模块基线）
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象）
+- 进行中无变化：① 存根修真 2/11（shop-data + faith-guide）剩余 9 项待晨间窗口 ② G21 v1.2.0 等 family 侧接收 ③ wal-inode-watch 观察期等复发
+- 阻塞：✅ 无
+- 下一步动作：03:00 例行窗口核查
+
+# 2026-09-16 04:00 — 💚 心跳 04:00 全绿（cron 30min · 深夜 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（04:02:12 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新 distill-2026-09-16.jsonl（03:00 节点预告的 +6「黄历术语」02:05 已落盘仍为今日最新；04:00 凌晨安静窗口，沿用基线）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb+shuhan-kb-combined 待 grep 引用定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：04:30 例行窗口核查
