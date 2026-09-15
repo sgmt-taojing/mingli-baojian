@@ -424,34 +424,8 @@ function lookup(today) {
       wish: '明日' + tomorrowFestival.name + '。' + tomorrowFestival.wish,
       img: tomorrowFestival.img
     };
-  }  // 非节气非法定假日 → 检查是否周末
-  var dow = today.getDay();
-  if (dow === 6 || dow === 0) {
-    // 周六或周日:从周末祝福池轮换选取
-    var dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-    var weekendIdx = (dayOfYear + (dow === 6 ? 0 : 3)) % WEEKEND_WISHES.length;
-    var weekendWish = WEEKEND_WISHES[weekendIdx];
-    return {
-      name: dow === 6 ? '周六吉日' : '周日吉日',
-      kind: 'weekend',
-      theme: weekendWish.theme,
-      wish: weekendWish.wish,
-      img: weekendWish.img
-    };
-  }
-  // 非周末:检查是否儒道佛修心日(每周三固定推送修心祝福)
-  if (dow === 3) {
-    var weekOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 1)) / (7 * 86400000));
-    var ruDaoFoIdx = weekOfYear % RU_DAO_FO_WISHES.length;
-    var rdfWish = RU_DAO_FO_WISHES[ruDaoFoIdx];
-    return {
-      name: '修心吉日',
-      kind: rdfWish.kind,
-      theme: rdfWish.theme,
-      wish: rdfWish.wish,
-      img: rdfWish.img
-    };
-  }
+  }  // R791 校正（2026-09-16）：非节气非法定假日 → 不再硬推自造主题（周末吉日/修心吉日与推送体系定稿冲突）。
+  // 用户体系四版：缘主版/大众版/节气版/节日版——普通日子由早推/暮推承担，本任务只在真节日/节气触发。
   return null;
 }
 
@@ -533,10 +507,10 @@ function render(today) {
                   f.kind === 'ethnic' ? '【民族佳节】' :
                   f.kind === 'weekend' ? '【周末吉日】' : '【吉日】';
   var text = '';
-  // 称呼随机轮换,让客户/领导收到不重样(兄弟/首长/朋友/老友/挚友/兄台/仁兄等)
-  var salutations = ['兄弟,', '首长,', '朋友,', '老友,', '挚友,', '兄台,', '仁兄,', '同志,', '老兄,', '朋友您好,'];
-  // 落款柔和版:不用"君""敬上"这种偏文雅的,用"您朋友""益友"之类
-  var closings    = ['您的朋友。', '您朋友。', '你的朋友。', '你的老友。', '您的老友。', '益友。', '老友敬上。', '友。'];
+  // 称呼自然亲近（R791 校正：禁「兄弟/首长/同志/老兄」等生硬称呼——用户 08-23 明令；统一「缘主」）
+  var salutations = ['缘主，', '缘主，'];
+  // 落款柔和自然（禁「老友敬上」文雅腔；统一「—— 易道智鉴」落款已含，此处留空尾）
+  var closings    = ['愿您顺时安康。', '愿您日日从容。'];
   // 按月偏移 + 节日名长度,让每月节气落款不同
   var sal = salutations[(today.getMonth() * 7 + f.name.length) % salutations.length];
   var clo = closings[(today.getMonth() * 11 + today.getDate() + f.name.length) % closings.length];
