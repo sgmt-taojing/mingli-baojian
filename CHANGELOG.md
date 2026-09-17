@@ -609,3 +609,8 @@
 - 新增 COMPLIANCE.md（第三方依赖合规清单）
 - 新增 DISCLAIMER.md（服务边界免责声明）
 - 商用就绪度评分卡首评（详见 check-commercial-readiness.py）
+
+## 2026-09-17 10:20 · R795 AutoClaw 正式接管 + 养生域 KB 建设启动
+- 【接管】用户令确认定位边界后接管 Kimi 侧开发（其 G10-G26 任务书全链留证已核验，无未同步产出），接管宣言 docs/AGENT-TAKEOVER-20260917.md（含双智能体对照机制）
+- 【养生域启动】夜间蒸馏主题池置入节气养生（module=yangsheng），今日蒸馏 20 条走 R793 五红线入库 9 条（yangsheng 5 + huangli 4，SRC-WEB-DISTILL / trust 0.6 / 指纹幂等跳重 11），fts5 守卫同步对齐（251,237）
+- 【待办闭环】G21 验收实查早已闭环（family 9/5、9/7 三次验包留证）；WAL 哨兵收敛；feedback-aggregator 复测通过；faith-deities-detail 核实为结构性消费不删
