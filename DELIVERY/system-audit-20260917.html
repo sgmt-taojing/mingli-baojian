@@ -1,0 +1,82 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>三体系全面盘点 · 2026-09-17</title><style>
+body{font:15px/1.75 system-ui,-apple-system; color:#22303c; background:#f5f7f6; max-width:1080px; margin:0 auto; padding:32px 20px}
+h1{font-size:26px; margin:0 0 4px} h2{font-size:19px; margin:36px 0 10px; border-left:4px solid #176856; padding-left:10px}
+.sub{color:#5a7167; font-size:13px; margin-bottom:24px}
+.metrics{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:14px 0}
+.metric{background:#fff; border:1px solid #dde6e0; border-radius:10px; padding:12px 14px}
+.metric b{display:block; font-size:22px; color:#176856}
+.metric span{font-size:12px; color:#5a7167}
+table{width:100%; border-collapse:collapse; background:#fff; margin:10px 0; font-size:13.5px}
+th,td{border:1px solid #e2eae5; padding:8px 10px; text-align:left; vertical-align:top}
+th{background:#eaf2ee; font-weight:600}
+.ok{color:#176856; font-weight:600} .warn{color:#a8681c; font-weight:600} .bad{color:#9b381e; font-weight:600}
+.panel{background:#fff; border:1px solid #dde6e0; border-radius:10px; padding:14px 18px; margin:10px 0}
+.small{font-size:12px; color:#5a7167}
+</style></head><body>
+<h1>命理宝鉴 · 三体系全面盘点</h1>
+<div class="sub">盘点时间 2026-09-17 15:20 · 执行 AutoClaw（WO-001 轮值内）· 数据全部实查</div>
+
+<h2>一、知识库（251,224 条 / 220 模块）</h2>
+<div class="metrics">
+<div class="metric"><b>251,224</b><span>正式条目</span></div>
+<div class="metric"><b>220</b><span>知识模块</span></div>
+<div class="metric"><b>215,479</b><span>命理正室域</span></div>
+<div class="metric"><b>35,745</b><span>医学参考域（不可诊疗输出）</span></div>
+<div class="metric"><b>0</b><span>真无出处</span></div>
+</div>
+<table>
+<tr><th>域</th><th>代表模块（条数）</th><th>评估</th></tr>
+<tr><td>命理核心</td><td>ziwei 2,003 · qimen 940 · fengshui 745 · bazi 599 · yijing 583 · mantra 548 · liuren 463</td><td class="ok">主域扎实</td></tr>
+<tr><td>辅助民俗</td><td>meihua 282 · zeri 253 · liuyao 235 · wuxing 95 · xingming 62 · huajie 60</td><td class="warn">中等，hinge 够用</td></tr>
+<tr><td>养生（新开）</td><td>yangsheng 5（今日起步）· huangli 37</td><td class="warn">最薄，蒸馏池已置首</td></tr>
+<tr><td>医学参考域</td><td>tcm 系 + 内经/伤寒/本草等（35,745）</td><td class="ok">G24 标注+触发器守卫</td></tr>
+</table>
+<table>
+<tr><th>质量分层</th><th>条数</th><th>说明</th></tr>
+<tr><td class="ok">trust ≥0.8（权威）</td><td>77,957</td><td>原典直录+高置信蒸馏</td></tr>
+<tr><td>trust 0.5-0.8（可用）</td><td>170,702</td><td>主力服务层，命理问答靠此层</td></tr>
+<tr><td class="bad">trust ≤0.5（降权）</td><td>2,562</td><td>乱码/OCR垃圾/伪托引用，已打标不删</td></tr>
+<tr><td class="ok">真无出处</td><td>0</td><td>R792/R793 治理后清零</td></tr>
+</table>
+<div class="panel"><b>今日新治理（R798）：</b>揪出伪托古籍《素问·木行论》等五篇（内经无此篇目），r39 系 828 条 AI 模板生成条目全部 pseudo-citation 标记降权，红线6 固化进每日巡检（未标记伪托>0 即告警）。<span class="small">教训：书名貌似合理的引用必须验证篇目真实性。</span></div>
+<div class="panel"><b>增量通道：</b>夜间蒸馏（每日 02:00，10-20 条/日落盘 staging）+ G26 月度 SOP（launchd，天纪字幕 212 文件已收敛）+ 命理夜间主题池已置入「节气养生」（补最薄域）。今日蒸馏 20 条 → 五红线入库 14 条。</div>
+
+<h2>二、报告体系（3 引擎 + 20+ 端点）</h2>
+<table>
+<tr><th>引擎</th><th>规模</th><th>职责</th><th>实态</th></tr>
+<tr><td>unified-report-engine</td><td>676 行</td><td>七术统一报告（bazi/ziwei/qimen/liuyao/meihua/liuren/fengshui）</td><td class="ok">在岗</td></tr>
+<tr><td>norm-report-engine</td><td>2,575 行</td><td>规范版五段式输出 + 30+ 术语白话词典 + 三级校验 + 禁用词 + 免责声明强制</td><td class="ok">在岗（R791 迭代中）</td></tr>
+<tr><td>tcm-report-engine</td><td>390 行</td><td>中医报告（参考域，供家庭端）</td><td class="ok">在岗</td></tr>
+</table>
+<table>
+<tr><th>报告端点</th><th>实测</th><th>说明</th></tr>
+<tr><td>POST /api/ai/lifeplan-report</td><td class="ok">200 · 22 字段 · KB命中5</td><td>人生规划报告（含真实命盘 chartBased）</td></tr>
+<tr><td>POST /api/ai/lifeindex-report / monthly-report / music-report</td><td class="ok">注册在位</td><td>人生指数/月度/五行音乐</td></tr>
+<tr><td>/api/paipan/{family,hehun,lifeplan}/report</td><td class="ok">注册在位</td><td>家庭/合婚/规划（排盘引擎直出）</td></tr>
+<tr><td>H5：lifeplan-detail.html / report-interpret.html</td><td class="ok">200</td><td>可分享报告页</td></tr>
+<tr><td>周报产出</td><td class="ok">weekly-2026-W38.html 在库</td><td>命理周报（周五 18:00，已接微信直达）</td></tr>
+</table>
+<div class="panel"><b>KB 支撑力实证：</b>AI 助手问答 KB 命中统计 4,820 次，top 查询「用神」428 /「格局」306 /「日主」287——命理问答主力需求正落在 0.5-0.8 trust 主力层，供需匹配。</div>
+
+<h2>三、推送体系（8 任务 + 双守卫自愈）</h2>
+<table>
+<tr><th>链路</th><th>排程</th><th>状态</th><th>备注</th></tr>
+<tr><td>早推（缘主版·九段制）</td><td>06:30</td><td class="ok">ok/delivered</td><td>messageId 回执制 · R786-R790 七段速览迭代</td></tr>
+<tr><td>暮推（明日版）</td><td>18:00</td><td class="warn">9/16 error</td><td>主任务工具链中断</td></tr>
+<tr><td class="ok">暮推守卫（补发）</td><td>18:45</td><td class="ok">实战成功</td><td>43 分钟内补发到位 messageId 回执 ✓</td></tr>
+<tr><td>早推守卫</td><td>07:15</td><td class="ok">ok</td><td>同机制</td></tr>
+<tr><td>节气节日推送</td><td>06:05</td><td class="ok">ok</td><td>R791 校正：普通日子静默，只推真节气节日</td></tr>
+<tr><td>家庭报告推送</td><td>19:05</td><td class="ok">ok</td><td>report_id 内部闭环</td></tr>
+<tr><td>命理周报 / 家庭健康周报</td><td>周五/周日</td><td class="ok">ok</td><td>已接微信直达（messageId 制）</td></tr>
+</table>
+<div class="panel"><b>自愈闭环首战告捷：</b>9/16 暮推主任务 18:03 工具链中断 → 守卫 18:46 检出并补发 → 微信 messageId 回执确认。三层防线（主任务回执 → 守卫 45 分钟窗口 → 次日早推）验证有效。</div>
+
+<h2>四、风险与下一步</h2>
+<table>
+<tr><th>级别</th><th>事项</th><th>建议</th></tr>
+<tr><td class="warn">中</td><td>养生域仅 5 条起步</td><td>蒸馏池已置首，预计两周 60-80 条；典籍源（《遵生八笺》《老老恒言》）待入库</td></tr>
+<tr><td class="warn">中</td><td>r39 伪托 828 条待重蒸</td><td>已降权不可见；将来按真实典籍（《素问·阴阳二十五人》等）重写</td></tr>
+<tr><td class="warn">低</td><td>暮推主任务 9/16 单次中断</td><td>守卫已兜底；连发 2 次则升级排查</td></tr>
+<tr><td class="ok">低</td><td>公众号采集（周一 09:00）</td><td>上轮手动触发进行中，定时轮兜底</td></tr>
+</table>
+</body></html>
