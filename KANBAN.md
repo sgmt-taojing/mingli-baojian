@@ -1965,3 +1965,18 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 
 - `~/Documents/Codex/` 全域只读（mingli-core / mingli-workbench / knowledge-library / ai-vision-platform / smart-home-family-v2 及备份）——不修改/不删除/不写入/不入管线
 - 已写入 ROTATING-DEV-PROTOCOL.md 第七节 + MEMORY.md 永久规则；轮值 WO 涉这些路径即无效重新划界
+
+# 2026-09-17 14:52 — 🔧 R798 伪托引用治理（深度优化续）
+
+## 发现与定性
+「古籍依据：《素问·木行论》」等五篇为**伪托古籍**（《素问》无此篇目，原典库 0 命中）——r39 系模板生成条目（「木行人+八段锦」公式拼接），共 262 条含伪托引用；r39 系总量 828 条全部为 AI 模板产物。
+
+## 处置（打标降权不删除）
+- r39 系 828 条全部 tags+=pseudo-citation-r39、trust≤0.3（其中历史低置信 720 + 本轮补标 108）
+- knowledge-raw 镜像 4 条同规格
+- 红线6 固化进 kb-quality-patrol.py：未标记伪托「素问·X行论」>0 即告警——首跑检出 200 条漏网，补标后全绿
+- fts5 全量同步对齐（251224）
+
+## 旁证
+- mingli.db 命理档案健康：378 条 pending_review 为正常工作流（等命理师修订），空文本仅 1 条
+- 《紫微斗数全集》为真实古籍但 r39 引用处是模板拼接非原文，一并降权
