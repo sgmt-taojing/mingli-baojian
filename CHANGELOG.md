@@ -1,3 +1,12 @@
+## 2026-09-17 11:00 · R797 双智能体轮番机制落地 + Kimi 遗产全量诊断（接管第二单）
+
+- **边界与机制复核**：AGENT-TAKEOVER-20260917 定位/红线复核无误；ROTATING-DEV-PROTOCOL 补 R797 复核时限条款（reviewer 24h 未复核视为通过+可后补抽验，杜绝双向等待死锁）。
+- **Kimi 遗产诊断（git 法证）**：训练盘克隆（/Volumes/模型训练数据/projects/mingli-baojian）最后提交 c8f35962（R-WALK3, 09-08）经 merge-base 确认为主仓祖先——**无未同步代码**；其未提交改动均为 09-08 工具状态产物（能力差集报告/KANBAN 精简/训练数据清理），非新产出。09-14 后任务书通道空壳，接管结论二次印证。已落 ARCHIVED-README.md 归档标记，无任何 launchd 服务指向该克隆（grep 实证）。
+- **全量诊断（本轮实测）**：health-patrol 全绿（端口 8900/8901/8911/8912/8913/8920/8960/8941-8945 + 410 内联块）；kb-quality-patrol 五红线全绿（主表=fts5=251,242）；tcm 差集 clean=true / 缺失 API 0（Kimi 时代 13 条 L1 差集已吸收闭环）。
+- **缺口定案**：KB 域分布 tcm 系 19 万+、命理核心（紫微 2856/classic 11034/nihaisha 5478/shanghan 3434）、**yangsheng 仅 5 条=最大缺口**；v9.2-full488.log 实为无效评估（模型答案 483/488 空值，0.6% 不可用，疑脚本与 8960 参数不匹配），非真实成绩。
+- **WO-002 派单（轮值周期 #2，driver=Kimi）**：v9.2 BaziQA 重评定案（三选一：热切上产/归档定版/开审计单）+ 四路大师蒸馏恢复（路径去硬编码+至少一路可跑）；任务单已投递主仓 docs/rotating-tasks/ 与 Kimi 工作副本双侧。
+- **后续开发（AutoClaw 本轮继续 driver）**：养生域 KB 第二批推进（夜间蒸馏主题池节气养生扩容已置首），维持五红线唯一通道。
+
 ## 2026-09-14 10:30 · 告警治理四源根修 + 项目全面梳理清理
 
 - **告警源 1 · distill-mingli-outbound EPERM（已修实测）**：09-11 training-data 软链至外接盘后，launchd 上下文对可移动宗卷 EPERM 致该任务 09-12 起连败。EXPORT/retention 等 5 处改落本地 `exports/distill-outbound/`，kickstart 实测跑通（全量镜像推送 SHF 成功，registry total=10182）。
