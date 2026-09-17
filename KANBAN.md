@@ -1920,3 +1920,18 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 
 ## 终态
 主表=fts5=251242 五红线全绿 | wechat-platform 同步干净 | 轮值台账 #1 交付待复核
+
+# 2026-09-17 10:30 — 💚 心跳 10:30 全绿·无推进（cron 30min · 上午 · 无新 KB · 待办维持）
+
+- 健康检查全绿（10:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6「八字格局」仍为昨日最新；10:00→10:32 间无新文件）
+- WAL 哨兵：未采样（上午安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（上午安静期，软待办 3 项维持）
+- 下一步动作：11:00 例行窗口核查
+
+# 2026-09-17 10:50 — 🛡️ R797 禁触边界：ChatGPT 独立项目（用户令）
+
+- `~/Documents/Codex/` 全域只读（mingli-core / mingli-workbench / knowledge-library / ai-vision-platform / smart-home-family-v2 及备份）——不修改/不删除/不写入/不入管线
+- 已写入 ROTATING-DEV-PROTOCOL.md 第七节 + MEMORY.md 永久规则；轮值 WO 涉这些路径即无效重新划界

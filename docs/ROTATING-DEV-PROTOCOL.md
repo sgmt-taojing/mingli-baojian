@@ -59,3 +59,21 @@
 | WO | driver | 内容 | 一次通过 | 打回 | 复核 |
 |---|---|---|---|---|---|
 | WO-001 | AutoClaw | 养生域KB起步14条+STALE快照清欠+接管基线 | Y | 0 | （待 Kimi/用户抽验） |
+
+
+## 七、禁触边界（R797 · 2026-09-17 用户令）
+
+**ChatGPT（Codex）开发的独立项目——禁止触碰**。无论轮值到哪一方、无论任何任务，以下目录一律只读：
+
+- `~/Documents/Codex/2026-09-08/new-chat/outputs/mingli-core/`（命理核心独立实现，含 knowledge.sqlite）
+- `~/Documents/Codex/2026-09-08/new-chat/outputs/mingli-workbench/`
+- `~/Documents/Codex/2026-09-08/new-chat/outputs/knowledge-library/`
+- `~/Documents/Codex/2026-09-08/ai-vision-platform/`
+- `~/Documents/Codex/2026-09-08/new-chat-3/outputs/smart-home-family-v2/`
+- 及 `~/Documents/Codex/` 全域（含 2026-09-08.local-backup 等备份）
+
+规则：
+1. 不修改、不删除、不移动、不重命名其中任何文件；不向其写入任何产物
+2. 允许只读参考（如架构对照、能力盘点），但引用须注明路径与只读性质
+3. 与本项目的蒸馏/同步/巡检通道无关——不得将 Codex 项目纳入 mingli-baojian 的任何自动化管线的写入目标
+4. 轮值 WO 任务单中若出现涉以上路径的范围，该条无效需重新划界
