@@ -1906,3 +1906,17 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 
 ## 终态
 主表=fts5=251228 零差异｜重复 0｜真无出处 0｜检索回归全过（害太岁 26/麻黄汤 2091/五行相生 305/紫微 4088）｜API 公开检索 8 命中
+
+# 2026-09-17 10:35 — 🔄 R796 轮番开发机制建立 + 深度优化两刀
+
+## 轮番机制（docs/ROTATING-DEV-PROTOCOL.md）
+交替推进制：每周期一方 driver 开发、另一方 reviewer 复核；WO 任务单制（docs/rotating-tasks/）；轮值台账唯一记账；KB 写入不因轮值放宽五红线；复核通过才轮转，48h 未交付自动轮转。
+- WO-001（AutoClaw driver）已交付：养生域 KB 起批 + STALE 清欠，等 Kimi/用户复核
+- WO-002（建议 Kimi driver）：从其旧 backlog 提取（四路大师 cron 恢复 / v9.2 BaziQA 重评）
+
+## 深度优化两刀
+1. **R796 规则校准**：KB 长度门槛分域（通用≥100 字；蒸馏短知识域 yangsheng/huangli/mantra ≥60 字）——消除规格冲突，养生域 0→5 条
+2. **wechat-platform 清欠**（Kimi backlog P2-1）：8/16 的 46 条 STALE yidao 快照归档（主库 25.1 万条为准），selfcheck 引号规整，两 commit 已 push
+
+## 终态
+主表=fts5=251242 五红线全绿 | wechat-platform 同步干净 | 轮值台账 #1 交付待复核
