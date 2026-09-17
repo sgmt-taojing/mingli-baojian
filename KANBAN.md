@@ -2006,3 +2006,18 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 - models 符号链接退役 → 56 个模型文件（197MB）实体拷回项目内（主盘余 53G 充裕；外挂盘原件保留双份）
 - launchd kickstart 后 8913=200 常驻；models.symlink-disabled-20260917 留档
 - R799 扫尾：kb-sync-guard --normalize（summary NULL 18874 行规整）；KB 251230 五红线全绿
+
+# 2026-09-17 17:20 — 🔧 R800 全面修复推进（六 cron error 全定性+医学口径现代化）
+
+## 报错清查（近48h 六条 error 逐项定性修复）
+1. 心跳检查 11:03 inline failed → 单次瞬态，后续连续 6 次 ok ✅ 自愈
+2. 公众号采集超时（3600s 打满）→ timeout 4200s（常态 50min 任务）✅
+3. 心跳守门员 Message failed → payload 里发 webchat（cron 上下文不可用）→ 改微信直发+messageId 回执 ✅
+4. 倪师字幕审计 R117 超时 → /Volumes/data2 路径已失效（卷改名），改「模型训练数据」新路径 + timeout 90→240s ✅
+5. daily-patrol tcm-lip-diag search failed → 旧已知项 YELLOW 常态，rc=0 ✅
+6. 桌面 PDF 蒸馏 → 源目录已清空，任务书加 no_files→NO_REPLY 静默判定 ✅
+
+## 建设推进：医学迁移口径现代化（陈旧 Top1 告警退役）
+- 「医学待迁移 247,943 条」告警的架构前提已被 G24/R747 新架构取代——医学正室（TCMFWD 225,154 条）常驻 mingli 库供诊疗链路，旧存量 22,787 条隔离为参考域
+- daily-patrol.py 口径改版：由「催物理迁移」改为「校验参考域隔离完整性」（漏标>50 告警）——实测漏标仅 2 条，隔离完整
+- 顺带：ai-vision-toolkit 域门禁品牌词净化（models-status.html 历史存档页改中文名，governor 下轮全绿）
