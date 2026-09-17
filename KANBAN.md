@@ -1995,6 +1995,15 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 ## 教训
 推送链路中 LLM 的职责是「组装与投递」，不是「再创作」——数据以脚本产物为唯一真源，模型改写即引入幻觉风险。
 
+# 2026-09-17 17:02 — 🔍 R800 全量体检：uptime 127 修复 + 16:43 十四项异常定性（宿主重启涟漪）
+
+## 发现与修复
+1. **uptime 定时任务 exit 127（已修）**：com.mingli-baojian.uptime 指向 .openclaw/tmp/uptime-monitor.sh，9/14 tmp 清理迁冷存时脚本被带走 → 每天 9:00/18:00 必 127。修复：从 cold-storage/tmp-stale-20260914/ 找回 + 探测加重试（单次探测遇 API 冷启动误报：kb-search 冷态 000/3.4s vs 热态 0.48s——失败/慢时隔 4s 重试再定性）。重跑 rc=0，18:00 恢复常态。
+2. **16:43 十四项异常定性 = 宿主重启涟漪**：last 实证今日 13:41/13:55/16:38 三次重启（14:09 会话 crash 标记），重启前 AutoClaw/QClaw hang 132s+（DiagnosticReports）。16:43:01 launchd "on-demand-only mode" gui 域切换 → 全服务 pending spawn → 16:43:07 批量重生（进程 lstart 实证）→ 16:58 自愈。根因在 AutoClaw 主进程假死触发重启，非本项目服务故障，标记观察。
+
+## 回归
+- health-patrol 全绿（12 端口 + 411 块）；kb-quality-patrol 全绿（主表=fts5=316,441）；uptime-monitor 手动跑 20/22→重试机制生效
+
 # 2026-09-17 16:10 — 🔧 face-ocr 8913 修复（TCC 符号链接根因）+ R799 扫尾
 
 ## 用户报「报错」→ 定性：face-ocr(:8913) 离线（health-patrol 双 ❌）
