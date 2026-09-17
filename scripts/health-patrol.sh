@@ -64,6 +64,15 @@ if [ -f "$SNAP_LOG" ]; then
     fi
 fi
 
+# 2b. Codex 红线漂移检测（R797 · 用户令 2026-09-17：ChatGPT 独立项目 ~/Documents/Codex/ 禁触）
+# 扫描定时任务与项目脚本对 Codex 目录的引用；白名单：Codex 自带清理任务 com.tom.codex-cleanup
+CODEX_HITS=$( { 
+    crontab -l 2>/dev/null | grep -i "Documents/Codex"; \
+    grep -il "Documents/Codex" "$HOME"/Library/LaunchAgents/*.plist 2>/dev/null | grep -v "codex-cleanup"; \
+    grep -rln "Documents/Codex" "$HOME/.openclaw-autoclaw/workspace/projects/"*/scripts/ 2>/dev/null | grep -v "health-patrol.sh"; \
+} | sort -u)
+[ -n "$CODEX_HITS" ] && ALERTS+=("Codex 红线漂移——新自动化引用 Codex 目录（仅 Codex 自带清理任务豁免）: $(echo "$CODEX_HITS" | tr '\n' '；' | head -c 160)")
+
 # 3. MLX v6 训练
 V6_PID=$(ps aux | grep "mlx_lm lora" | grep "mingli-sft-v6" | grep -v grep | awk '{print $2}')
 V6_STAT=""
