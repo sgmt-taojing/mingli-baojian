@@ -1995,6 +1995,26 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 ## 教训
 推送链路中 LLM 的职责是「组装与投递」，不是「再创作」——数据以脚本产物为唯一真源，模型改写即引入幻觉风险。
 
+# 2026-09-17 17:39 — 🔬 R801 深度盘点+深度优化（备份体系重构 + 定时任务全量法证）
+
+## 定时任务全量法证（57 个 launchd + cron）
+- 僵尸确认 2 处修复：①com.mingli-baojian.uptime 脚本找回（R800）②com.qianyuan.http exit 127（qianyuan 域，标记待处置）
+- plist 解析异常 2（vision-model-audit / vision-server Invalid file——转义问题非功能故障）；Google keystone×2 系统级不动
+- test-ext-write.sh（/tmp 测试遗留）标记清理待办
+
+## 备份体系重构（R801 核心）
+- **TCC 全景定性**（17:44 实弹测试）：launchd 用户域写外置盘 = DENIED——cron/launchd 全域被拒，交互上下文独活。9/14 后外置盘备份流断流根因坐实
+- **新建主通道**：com.autoclaw.daily-local-cold-backup（每日 04:30）→ 系统盘冷区 backups/local-cold/：15 项目 git bundle + yidao.db gzip（实测 1.9G/3.2G），滚动保留 7 天
+- **试跑全绿**：17 bundle ✅ + KB 压缩 ✅ + 滚动清理 ✅（3.6G/日）
+- **外置盘冷存同步**：由交互窗口定期推送（巡检时顺带），补充说明外置盘原件仍在（8/14 全量基线）
+- **巡检接入**：health-patrol 2b+ 本地冷备 48h 未更新告警
+
+## 其他维度盘点结论
+- KB 性能：fts5 trigram 查询 0.005s、LIKE 1.4s、sqlite_stat1 有统计（97 行）——库层健康；慢查询在 node api 层（另案）
+- 磁盘：系统盘 51G 余 / 训练盘 1.3T 余——充裕
+- 内存：free 49%——健康
+- 推送链路：今晨 final 日期=9/17 正确（R799 鲜活度修复生效实证）；模板双轨现象（raw=宜忌版/final=晨间版）记录待定性
+
 # 2026-09-17 17:02 — 🔍 R800 全量体检：uptime 127 修复 + 16:43 十四项异常定性（宿主重启涟漪）
 
 ## 发现与修复

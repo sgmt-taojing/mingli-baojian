@@ -64,6 +64,13 @@ if [ -f "$SNAP_LOG" ]; then
     fi
 fi
 
+# 2b+. 本地冷备健康（R801：外置盘被 TCC 全拒后备份主通道迁本地冷区，48h 未更新告警）
+LCB_DIR="$HOME/.openclaw-autoclaw/backups/local-cold"
+if [ -d "$LCB_DIR" ]; then
+    LCB_MTIME=$(find "$LCB_DIR" -maxdepth 1 -name "20*" -type d -mtime -2 2>/dev/null | wc -l | tr -d ' ')
+    [ "$LCB_MTIME" -eq 0 ] && ALERTS+=("本地冷备 48h 未更新（com.autoclaw.daily-local-cold-backup 未跑或失败）")
+fi
+
 # 2b. Codex 红线漂移检测（R797 · 用户令 2026-09-17：ChatGPT 独立项目 ~/Documents/Codex/ 禁触）
 # 扫描定时任务与项目脚本对 Codex 目录的引用；白名单：Codex 自带清理任务 com.tom.codex-cleanup
 CODEX_HITS=$( { 
