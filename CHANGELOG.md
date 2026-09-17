@@ -1,3 +1,13 @@
+## 2026-09-17 16:35 · R797b 优化提升：养生域第二批+KB质量三修+faith孤品归档（WO-001 续）
+
+- **养生域 KB 第二批 +20 条（yangsheng 5→25）**：从库内经典源（素问四气调神/上古天真/藏气法时等 8 部经文义理）再蒸馏 20 条 50-150 字口语化条目（scripts/yangsheng-batch2.py，SRC-CLASSIC-RE-DISTILL-20260917 / trust 0.6 / 五红线全检+指纹幂等），kb-sync-guard --sync 对齐。
+- **KB 质量三修**：①乱码 30 条修复（--fix-mojibake，latin1→gbk 链还原）②红线4 真无出处 34 条补 src_id（tcmfwd 镜像可溯源映射 SRC-TCM-MIRROR-REMAP）③同文重复 30 冗余行清除（--dedup）——五红线复验全绿。
+- **faith-deities-detail.js 孤品归档（KANBAN 软待办④定性收口）**：全站零 script 引用（grep 实证，头注所述 divination-hub.html 实为跳转壳页），数据已被 KB faith 域收编（260 条）；归档 archive/knowledge-orphan-20260917/，kb-config 登记 level=archived，kb-audit.html 假登记行同步删除（防审计页假数据）。
+- **tcm-import 链 EPERM 复发处置**：G25 OCR 批次镜像（09-16 重写）触发 mtime 幂等导入，手动复跑遇扫描窗口 EPERM（R754 已知窗口期），重试后 CHAIN_RESULT rc=0、parity 归零；批次 65,210 条全为 g25-ocr 可溯源（trust 0.55 tcm 侧已降权）、域门禁核验零越界，主表=fts5=316,441。
+- **W38 feedback-aggregator 复测通过**（KANBAN 软待办③收口）：W38 聚合 1 条输出正常，无 PermissionError。
+- **主表数差额 -13 定性**：今晨 251242 → purge-empty 18 条（10:59 审计留证 logs/kb-purge-empty-audit.jsonl）所致，非数据异常。
+- 回归：health-patrol 全绿（411 块）+ kb-quality-patrol 五红线全绿。
+
 ## 2026-09-17 11:20 · R798 轮值协议 Kimi 会签 + 边界实测核实（WO-002 领单）
 
 - **项目边界盘点**：launchd 归属清晰（com.mingli-baojian.* 53 项在管 / com.tcm-agent.*、com.smart-home-family.* 兄弟项目各自独立 / com.autoclaw.* 为运行时与共享订单服务 8963，本项目只调用不改动）；端口段 8900-8999 无越界。
