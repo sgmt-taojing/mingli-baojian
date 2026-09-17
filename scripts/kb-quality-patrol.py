@@ -5,6 +5,7 @@
 五红线检测（对应 docs/KB-QUALITY-RULES.md）：
   1. fts5/主表行数差（>0 = 索引冗余或未同步）
   2. 同文重复组（module+content）
+  2b. 空壳行（title/content 为空，R797 补盲区）
   3. 乱码残留（未打标的 mojibake 特征）
   4. 真无出处（未打标且无 src_id）
   5. staging 待审积压（pending+staged > 10）
@@ -44,6 +45,13 @@ def main() -> int:
           GROUP BY module, content HAVING COUNT(*) > 1)""").fetchone()[0]
     if dup:
         issues.append(f'红线2 同文重复组 {dup}——跑 kb-sync-guard.py --dedup')
+
+    # 红线2b：空壳行（R797 补盲区：title 或 content 为空的 PDF 首页残渣行，原五红线均不覆盖）
+    empty = conn.execute("""
+        SELECT COUNT(*) FROM kb_formal
+        WHERE (title IS NULL OR title='') OR (content IS NULL OR content='')""").fetchone()[0]
+    if empty:
+        issues.append(f'红线2b 空壳行 {empty} 条——跑 kb-sync-guard.py --purge-empty')
 
     # 红线3：未标记乱码
     moji = conn.execute("""

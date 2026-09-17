@@ -1,3 +1,13 @@
+# 2026-09-17 11:00 — 💚 心跳 11:00 全绿·KB 蒸馏 +20 入库（cron 30min · 上午 · 4 模块 20 条）
+
+- 健康检查全绿（11:02:16 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- **✅ KB 蒸馏 +20 条入库**：`training-data/kb-web-distill/distill-2026-09-17.jsonl`（10:04 生成，20 行=4 模块×5 条）：huangli 黄历术语 / bazi 八字格局 / yangsheng 养生 / xingming 姓名学（10:04 → 今日最新蒸馏落盘，09:53 心跳漏记，本轮补登记）
+- WAL 哨兵：未采样（上午安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）⑤ ✅ 今日 KB 蒸馏基线已刷新为 09-17 +20
+- 阻塞：✅ 无（上午安静期，软待办 3 项维持）
+- 下一步动作：11:30 例行窗口核查
+
 # 2026-09-17 09:53 — 🚀 用户令「核查 Kimi 开发部分 + 全面推进」→ 待办全面核实闭环（R794）
 
 ## Kimi 开发部分核查（~/Documents/kimi/tasks/...）
@@ -1906,6 +1916,26 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 
 ## 终态
 主表=fts5=251228 零差异｜重复 0｜真无出处 0｜检索回归全过（害太岁 26/麻黄汤 2091/五行相生 305/紫微 4088）｜API 公开检索 8 命中
+
+# 2026-09-17 10:42 — 🔍 R797 用户令「检查项目边界+建立轮番机制+在 Kimi 基础上诊断与后续开发」→ 独立诊断一盲区已修 + 轮值周期 #2 就绪
+
+## 项目边界检查（全绿）
+- 跨项目品牌扫描 cross-project-scan.py：0 命中
+- 排盘边界回归 paipan-boundary-regression.js：21/21 过
+- G24 参考域：35,763 条 + 常驻守卫触发器 kb_formal_reference_guard 在岗；mingli 域零 TCMFWD 混入
+- 服务 7 端口实探 200；KB 检索链路（8901 /api/search 害太岁）正常命中
+
+## 独立诊断发现（巡检盲区）
+- kb-quality-patrol 五红线全绿，但抽查发现 **18 条空标题 PDF 残渣行**（nihaisha-tcm/伤寒论/黄帝内经扫描件首页残渣）逃过全部红线检测
+- 修一类：①巡检新增红线 2b（空壳行检测）②守卫新增 --purge-empty（主表+fts5 双删 + logs/kb-purge-empty-audit.jsonl 审计留证）③执行清除：251242→251224，主表=fts5 对齐，巡检复验全绿 rc=0
+- 附带定性：server/database/yidao.db.bak-mojibake-20260917（3.4G，9/17 07:52）为今晨 R792 mojibake 校正回滚点，与 CHANGELOG 吻合，非异常
+
+## WO-001 独立复验（AutoClaw 自查，reviewer 仍待 Kimi/用户签）
+四项验收全部实测通过：yangsheng 域 5 条 ✓ 蒸馏入库全链路 ✓ wechat STALE 归档 c16102d ✓ 双巡检全绿 ✓
+
+## 轮番机制运转
+- 轮值周期 #2（WO-002 driver=Kimi）任务单已在岗：v9.2 BaziQA 重评 + 四路大师蒸馏恢复；本轮新增探明证据已并入任务单（素材新址 46 文件 + nishi_subs 路径失效详情），Kimi 可直接领单执行
+- 本会话曾重复立四路采集恢复单，按协议「台账唯一记账」已合并入 WO-002 主单并删除重复文件，无撞号残留
 
 # 2026-09-17 10:35 — 🔄 R796 轮番开发机制建立 + 深度优化两刀
 

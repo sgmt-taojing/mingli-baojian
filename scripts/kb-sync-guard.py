@@ -8,6 +8,7 @@
   --dedup        同文去重：删 (module, content) 冗余行（每组保留有 entry_id 的最老行）
   --fix-mojibake 尝试修复未标记乱码（latin1→gbk 链），失败打标降权
   --normalize    NULL 键规整（entry_id 空=删除待审、tags/summary NULL→''）
+  --purge-empty  空壳行清除（title/content 为空的 PDF 残渣行，主表+fts5 双删，审计留证 logs/kb-purge-empty-audit.jsonl）
 
 红线（docs/KB-QUALITY-RULES.md 一）：除本脚本外，任何代码不得写 kb_fts5。
 """
@@ -15,6 +16,7 @@ import sqlite3
 import sys
 import time
 import re
+import json
 from pathlib import Path
 
 DB = Path(__file__).resolve().parent.parent / 'server' / 'database' / 'yidao.db'
@@ -157,6 +159,36 @@ def normalize():
     conn.close()
 
 
+def purge_empty():
+    """R797：空壳行清除——title 或 content 为空的 PDF 首页残渣行（巡检红线2b 捕获后走本通道，主表+fts5 双删并留证）"""
+    conn = connect()
+    rows = conn.execute("""SELECT entry_id, module, promoted_from FROM kb_formal
+        WHERE (title IS NULL OR title='') OR (content IS NULL OR content='')""").fetchall()
+    if not rows:
+        print('空壳行：0，无需清除')
+        conn.close()
+        return
+    log = []
+    for eid, mod, src in rows:
+        log.append({'entry_id': eid, 'module': mod, 'promoted_from': src})
+        conn.execute('DELETE FROM kb_formal WHERE entry_id=?', (eid,))
+        conn.execute('DELETE FROM kb_fts5 WHERE entry_id=?', (eid,))
+    conn.commit()
+    # 处置留证：写 JSONL 审计文件（与蒸馏留证同风格，可追溯）
+    from datetime import datetime
+    audit_path = Path(__file__).resolve().parent.parent / 'logs' / 'kb-purge-empty-audit.jsonl'
+    with open(audit_path, 'a', encoding='utf-8') as f:
+        for item in log:
+            item['purged_at'] = datetime.now().isoformat(timespec='seconds')
+            f.write(json.dumps(item, ensure_ascii=False) + '\n')
+    m = conn.execute('SELECT COUNT(*) FROM kb_formal').fetchone()[0]
+    f = conn.execute('SELECT COUNT(*) FROM kb_fts5').fetchone()[0]
+    conn.close()
+    print(f'空壳行清除：{len(rows)} 条（审计留证 logs/kb-purge-empty-audit.jsonl）；主表 {m} / fts5 {f}')
+    if m != f:
+        print('⚠️ 主表与 fts5 不一致，请跑 --full 对齐')
+
+
 if __name__ == '__main__':
     args = sys.argv[1:]
     if '--sync' in args:
@@ -170,6 +202,8 @@ if __name__ == '__main__':
         fix_mojibake()
     elif '--normalize' in args:
         normalize()
+    elif '--purge-empty' in args:
+        purge_empty()
     else:
         print(__doc__)
         sys.exit(2)
