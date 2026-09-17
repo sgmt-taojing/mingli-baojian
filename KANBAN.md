@@ -1,3 +1,308 @@
+# 2026-09-17 07:00 — 💚 心跳 07:00 全绿·无推进（cron 30min · 清晨 · 无新 KB · 待办维持）
+
+- 健康检查全绿（07:01:19 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6「黄历术语」仍为昨日最新；06:00→07:00 间无新文件）
+- WAL 哨兵：未采样（清晨安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（清晨安静期，软待办 3 项维持）
+- 下一步动作：07:30 例行窗口核查
+
+# 2026-09-17 06:00 — 💚 心跳 06:00 全绿·无推进（cron 30min · 凌晨安静期 · 无新 KB · 待办维持）
+
+- 健康检查全绿（06:02:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6 仍为昨日最新；05:30→06:00 间无新文件）
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（凌晨安静期，软待办 3 项维持）
+- 下一步动作：06:30 例行窗口核查
+
+# 2026-09-17 05:30 — 💚 心跳 05:30 全绿·无推进（cron 30min · 凌晨安静期 · 无新 KB · 待办维持）
+
+- 健康检查全绿（05:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6 仍为昨日最新；05:00→05:30 间无新文件）
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（凌晨安静期，软待办 3 项维持）
+- 下一步动作：06:00 例行窗口核查
+
+# 2026-09-17 05:00 — 💚 心跳 05:00 全绿·无推进（cron 30min · 凌晨安静期 · 无新 KB · 待办维持）
+
+- 健康检查全绿（05:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6 仍为昨日最新；03:30→05:00 间无新文件）
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（凌晨安静期，软待办 3 项维持）
+- 下一步动作：05:30 例行窗口核查
+
+# 2026-09-17 03:30 — 💚 心跳 03:30 全绿·无推进（cron 30min · 跨日·深夜 · 无新 KB · 待办维持）
+
+- 健康检查全绿（03:31:54 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6 仍为昨日最新；02:30→03:31 间无新文件）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：04:00 例行窗口核查
+
+# 2026-09-17 02:30 — 💚 心跳 02:30 全绿·无推进（cron 30min · 跨日·深夜 · 无新 KB · 待办维持）
+
+- 健康检查全绿（02:32:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6 仍为昨日最新；02:00→02:32 间无新文件）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：03:00 例行窗口核查
+
+# 2026-09-17 02:00 — 💚 心跳 02:00 全绿·无推进（cron 30min · 跨日·深夜 · 无新 KB · 待办维持）
+
+- 健康检查全绿（02:02:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6「黄历术语」仍为昨日最新；01:30→02:00 间无新文件；02:05 例行窗口未到）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：02:30 例行窗口核查
+
+# 2026-09-17 01:30 — 💚 心跳 01:30 全绿·无推进（cron 30min · 跨日·深夜 · 无新 KB · 待办维持）
+
+- 健康检查全绿（01:32:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6「黄历术语」仍为昨日最新；01:30→01:32 间无新文件）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：02:00 例行窗口核查
+
+# 2026-09-17 00:30 — 💚 心跳 00:30 全绿·无推进（cron 30min · 跨日·深夜 · 无新 KB · 待办维持）
+
+- 健康检查全绿（00:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6「黄历术语」仍为昨日最新；00:00→00:30 间无新文件）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：01:00 例行窗口核查
+
+# 2026-09-17 00:00 — 💚 心跳 00:00 全绿·无推进（cron 30min · 跨日首探 · 无新 KB · 待办维持）
+
+- 健康检查全绿（00:00:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（09-16 02:05 +6「黄历术语」仍为昨日最新；00:00 跨日首探，02:05 例行窗口未到，沿用基线）
+- WAL 哨兵：未采样（深夜安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
+- 下一步动作：00:30 例行窗口核查
+
+# 2026-09-16 21:05 — 📋 日结卡片（cron 21:00 · 健康 EXIT=0 全绿）
+
+## ✅ 已完结（2026-09-16）
+1. **r39+shuhan 两大 KB 重建落地，6 页断链修复**（完成日 09-16 09:41）：08:00 定性纠错（r39-dual-core-kb.js/shuhan-kb-combined.js 80B 存根致 6 页 KB 断链）→ 08:30 预检（yidao.db kb_formal 表数据完整）→ `.openclaw/tmp/kb-rebuild/rebuild-r39-shuhan-kb.py` 幂等重建（r39-dual-core-kb.js 80B→440KB 828 条 / shuhan-kb-combined.js 80B→385KB 389 条）；验收 2 端口 2 文件全 200 + 6 消费页（ai-assistant/divination-almanac/divination-membership/shuhan-knowledge/yijing-oracle/yijing-qimen）全 200 + 全局变量导出确认；knowledge/ 在 .gitignore 不进 git，脚本可重跑
+2. **faith 系 3 文件定性完成（修真 11→8）**（完成日 09-16 10:30）：faith-content.js(48KB) + faith-knowledge-base.js(118KB) 确认真数据有消费方（divination-almanac/admin 桥接）非存根不修真；faith-deities-detail.js(67KB) 确认真数据零消费（仅 kb-audit 静态登记），处置方案①删文件+kb-audit 删行 vs ②保留找挂消费方 留待用户决策
+3. **KB 蒸馏 +6 条入库**（完成日 09-16 02:05）：training-data/kb-web-distill/distill-2026-09-16.jsonl，主题「八字格局」
+4. **全天健康守护全绿**（完成日 09-16，00:30~21:00 各心跳实探）：6 端口全 200 + kb-list + paipan-api OK，EXIT=0，无告警无重启
+
+## 🔄 进行中（节点 0/8 — 外部依赖等待为主，遗留登记 1 项）
+- G21 能力发版体系 v1.2.0：等 family 侧接收验收（外部依赖，CHANGELOG 记「paipan v1.2.0 接收」即闭环）
+- wal-inode-watch 哨兵观察期：等 WAL 裂脑复发以对撞定位 unlink 方（今日无复发，观察继续）
+- W38 feedback-aggregator PermissionError：待有真实反馈时复测（P2，macOS TCC 偶发拦截推断）
+- knowledge/ 存根修真剩 8 处：faith-deities-detail.js 处置方案待用户决策 + shop-data.js 等其余 4 处待定性
+- **下一步动作**：faith-deities-detail.js 处置方案（删 vs 挂消费方）待用户决策；工作窗口推进 shop-data.js 等 4 处存根定性
+
+## 🚫 阻塞
+- ✅ 无硬阻塞。软待办维持 3 项（等用户控制台窗口）：停用 r470/视觉同步 2 个 cron + 替换名人采集 payload + W38 aggregator 复测（指引 docs/console-ops-20260906.md）
+- 基线：health-check EXIT=0（21:00:24 实探全绿）
+
+# 2026-09-16 20:30 — 💚 心跳 20:30 全绿·无推进（cron 30min · 晚间 · 无新 KB · 待办维持）
+
+- 健康检查全绿（20:32:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；20:00→20:30 间无新文件）
+- WAL 哨兵：未采样（晚间安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：21:00 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 20:00 — 💚 心跳 20:00 全绿·无推进（cron 30min · 傍晚 · 无新 KB · 待办维持）
+
+- 健康检查全绿（20:00:15 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；19:30→20:00 间无新文件）
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：20:30 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 19:30 — 💚 心跳 19:30 全绿·无推进（cron 30min · 傍晚 · 无新 KB · 待办维持）
+
+- 健康检查全绿（19:30:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；19:00→19:30 间无新文件）
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：20:00 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 19:00 — 💚 心跳 19:00 全绿·无推进（cron 30min · 傍晚 · 无新 KB · 待办维持）
+
+- 健康检查全绿（19:01:11 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；18:30→19:00 间无新文件）
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：19:30 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 18:30 — 💚 心跳 18:30 全绿·无推进（cron 30min · 傍晚 · 无新 KB · 待办维持）
+
+- 健康检查全绿（18:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；18:00→18:30 间无新文件）
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：19:00 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 17:30 — 💚 心跳 17:30 全绿·无推进（cron 30min · 傍晚 · 无新 KB · 待办维持）
+
+- 健康检查全绿（17:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；17:00→17:30 间无新文件）
+- WAL 哨兵：未采样（傍晚安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：18:00 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 17:00 — 💚 心跳 17:00 全绿·无推进（cron 30min · 下午 · 无新 KB · 待办维持）
+
+- 健康检查全绿（17:00:08 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；15:30→17:00 间无新文件）
+- WAL 哨兵：未采样（下午安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：17:30 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 15:30 — 💚 心跳 15:30 全绿·无推进（cron 30min · 下午 · 无新 KB · 待办维持）
+
+- 健康检查全绿（15:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；15:00→15:30 间无新文件）
+- WAL 哨兵：未采样（下午安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：16:00 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 12:00 — 💚 心跳 12:00 全绿·无推进（cron 30min · 中午 · 无新 KB · 待办维持）
+
+- 健康检查全绿（12:00:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；11:30→12:00 间无新文件）
+- WAL 哨兵：未采样（中午安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：12:30 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 11:30 — 💚 心跳 11:30 全绿·无推进（cron 30min · 上午 · 无新 KB · 待办维持）
+
+- 健康检查全绿（11:30:10 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；11:00→11:30 间无新文件）
+- WAL 哨兵：未采样（上午安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：12:00 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 11:00 — 💚 心跳 11:00 全绿·无推进（cron 30min · 上午 · faith-deities-detail 修真方案留待工作窗口）
+
+- 健康检查全绿（11:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；10:30→11:00 间无新文件）
+- WAL 哨兵：未采样（上午安静期，无复发迹象）
+- 本轮不推进：faith-deities-detail.js(67KB, FAITH_DEITIES_DETAIL) 真数据零消费修真方案（①删文件+kb-audit 删 1 行 vs ②保留+找挂消费方）需用户决策/更大窗口，不在 cron 心跳里动结构
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + shop-data.js 等其余 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：11:30 例行窗口核查；faith-deities-detail 修真方案待用户决策或工作窗口
+
+# 2026-09-16 10:30 — 💚 心跳 10:30 全绿·faith 系 3 文件定性（cron 30min · 上午 · 修真 11→8 推进）
+
+- 健康检查全绿（10:30:06 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；09:41→10:30 间无新文件）
+- **✅ faith 系 3 文件定性完成（修真剩 9→8 处）**：吸取 07:30+08:00 双次教训**同时 grep HTML+内联 JS+KB 文件导出**，结论：
+  - `faith-content.js` (48KB, 1132 行) — 真数据 `window.FAITH_CONTENT = {...}`，divination-almanac.html:166 `<script defer>` + divination-almanac-inline.js:716/743/765 三处 `let FC = window.FAITH_CONTENT || {}` 真实消费养生功法/修行指南/斋戒方法 → **非存根、不修真**
+  - `faith-knowledge-base.js` (118KB, 真数据 `FAITH_KNOWLEDGE`) — admin.html:529 加载 + admin-inline.js:2-37 多处 `window.FAITH_KNOWLEDGE` 桥接 dailyPractices/worshipManual → **非存根、不修真**
+  - `faith-deities-detail.js` (67KB, 真数据 `FAITH_DEITIES_DETAIL`？需复核) — 全项目 grep `FAITH_DEITIES|faith-deities-detail` 引用 = **仅 kb-audit.html 静态登记**（686 行 admin.html 无 JS 引用、divination-hub.html 无引用注释提及）→ **真数据零消费**，修真选项：① 删 67KB 文件 + kb-audit 删 1 行 ② 保留并找消费方挂载。**本轮不修真，留待下个工作窗口定性方案**
+- 修真进展：知识库存根修真剩 11→8（r39+shuhan 2 ✅ + faith-content 1 ✅ + faith-knowledge-base 1 ✅ = 4 处非存根剔除；剩 faith-deities-detail 1 处真数据零消费 + shop-data.js/其他 4 处）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 8 处（faith-deities-detail 真数据零消费待处置方案 + 另 4 处待定性）
+- 阻塞：✅ 无
+- 下一步动作：11:00 例行窗口核查；faith-deities-detail 修真方案（删 vs 挂消费方）留待工作窗口
+
+# 2026-09-16 09:41 — 💚 心跳 09:41 全绿·修真实施完成验收（cron 30min · 上午 · r39+shuhan 重建落地 6 页断链修复）
+
+- 健康检查全绿（09:41:35 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；09:00→09:41 间无新文件）
+- **✅ 修真实施完成并验收（08:30 决策 → 09:40 落地）**：rebuild-r39-shuhan-kb.py（幂等，仿 tcm-famous 范式）已执行——`knowledge/r39-dual-core-kb.js` 80B→440KB（R39_DUAL_CORE_KB 828 条：r39_dual_core 320+career 200+health 200+lifeplan 48+palace12 60）+ `knowledge/shuhan-kb-combined.js` 80B→385KB（SHUHAN_KB 389 条对象结构）。验收全通：2 KB 文件 :8900 全 200（440507B/385317B）+ 6 消费页（ai-assistant/divination-almanac/divination-membership/shuhan-knowledge/yijing-oracle/yijing-qimen）全 200 + 文件尾部 console.log 确认全局变量导出（R39_DUAL_CORE_KB.length/r39SearchKB/SHUHAN_KB）✅。**08:00 定性的 6 页 KB 断链修复**。注：knowledge/ 在 .gitignore（同 tcm-famous 修真先例），产物不进 git、脚本留 `.openclaw/tmp/kb-rebuild/` 可重跑
+- 进行中变更：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ **knowledge/ 存根修真剩 7 处**：faith-content(2)/faith-deities-detail(1)/faith-knowledge-base(2) 待定性 + shop-data.js 等其余（r39+shuhan 2/11 ✅完成）
+- 阻塞：✅ 无
+- 下一步动作：10:00 心跳例行核查；faith 系 3 文件定性（grep 页面+内联 JS 双查，吸取 07:30 教训）留待下个工作窗口
+
+# 2026-09-16 08:30 — 💚 心跳 08:30 全绿·修真路径①预检通过（cron 30min · 清晨 · SQLite 数据充足，数据恢复可行）
+
+- 健康检查全绿（08:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；08:00→08:30 间无新文件）
+- WAL 哨兵：未采样（清晨安静期，无复发迹象）
+- **✅ 修真路径①预检通过（kb-audit 前置数据核查）**：kb_store 不存在，真实库为 `server/database/yidao.db` 的 `kb_formal` 表——`r39_dual_core`=320 / `r39_career_core`=200 / `r39_health_core`=200 / `r39_lifeplan_stage`=48 / `r39_palace_12`=60 / `shuhan`=504 / `qimen`=940 条全在。**08:00 定性的 6 页 KB 断链数据源未丢**，仿 tcm-famous 范式（commit 328c4ee）从 SQLite 重建 r39-dual-core-kb.js + shuhan-kb-combined.js 可行，无需切接口（路径②作备选）
+- 修真实施仍按 08:00 决策留待 09:00+ 工作窗口：重建 2 个 KB JS（字段映射 kb_formal→全局变量结构需对 ai-assistant-inline.js:5290 迭代格式 + shuhan-knowledge-inline.js:2 BASIC 结构）+ 6 页回归测试，不在 cron 心跳动生产页面
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39+shuhan 已定性+预检完成；faith-content(2)/faith-deities-detail(1)/faith-knowledge-base(2) 待定性）
+- 阻塞：✅ 无
+- 下一步动作：09:00+ 工作窗口执行 r39-dual-core-kb + shuhan-kb-combined 重建（写 rebuild 脚本→生成→2 端口验收→6 页回归）；09:00 心跳例行核查
+
+# 2026-09-16 08:00 — 🔴 心跳 08:00 全绿·修真定性重大纠错（cron 30min · 清晨 · r39+shuhan 7 处引用=实际断链非零消费）
+
+- 健康检查全绿（08:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；07:30→08:00 间无新文件）
+- WAL 哨兵：未采样（清晨安静期，无复发迹象）
+- **🚨 修真定性重大纠错（07:30 心跳判错）**：r39-dual-core-kb.js(80B) + shuhan-kb-combined.js(80B) 7 处 HTML 引用——上一轮只 grep 页面未 grep 内联 JS，实际 grep `app/js/*.js` 找到 **真实消费点 8 处**：
+  - `js/ai-assistant-inline.js:5290-5296` 迭代 `R39_DUAL_CORE_KB` 数组 + 5335-5336 消费 `window.SHUHAN_KB`
+  - `js/divination-almanac-inline.js:1490-1492` + `divination-membership-inline.js:190-192` + `yijing-oracle-inline.js:656-658` + `yijing-qimen-inline.js:1022-1024` 均消费 `window.R39_DUAL_CORE_KB`
+  - `js/shuhan-knowledge-inline.js:2` `let BASIC = window.SHUHAN_KB || {}`
+  - 影响：ai-assistant / divination-almanac / divination-membership / shuhan-knowledge / yijing-oracle / yijing-qimen **6 个页面 KB 实际断链**（依赖空全局+兜底碎片，舒氏奇门/格局/运势/姻缘查询等命理数据无知识库支撑）
+- **修真决策升级（待窗口落地）**：二选一——① **数据恢复**：仿 tcm-famous 修真范式（commit 328c4ee），用 rebuild 脚本从 SQLite 提取 R39_DUAL + SHUHAN 全量数据重建 JS（kb-audit 状态缺口径，需先跑 kb-audit 确认字段映射） ② **接口切换**：8 处内联 JS 改调 `/api/kb-search` 后端接口（不依赖前端 KB 全局变量，需新增 R39/SHUHAN 模块识别）。**本轮不修真实质代码**——修真决策+实施需更大窗口+多页面回归测试，避免在 cron 心跳里动生产页面
+- 进行中变更：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ **knowledge/ 存根修真 修真方向升级**：r39-dual-core-kb + shuhan-kb-combined 非"移除引用"修真，而是"恢复数据/切换接口"修真（剩 9 处中已定性 2/11 修真范式升级）；faith-content(2)/faith-deities-detail(1)/faith-knowledge-base(2) 待定性（务必同时 grep 页面+内联 JS，吸取 07:30 教训）
+- 阻塞：✅ 无（清晨安静期，软待办 3 项维持）
+- 下一步动作：08:30 例行窗口核查；修真方向决策留待工作时段（09:00+）启动窗口推 kb-audit 评估 R39/SHUHAN 数据恢复可行性
+
+# 2026-09-16 07:30 — 💚 心跳 07:30 全绿（cron 30min · 清晨 · knowledge/ 存根定性推进：r39+shuhan 7 处引用=零消费）
+
+- 健康检查全绿（07:30:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；07:00→07:30 间无新文件）
+- WAL 哨兵：未采样（清晨安静期，无复发迹象）
+- **存根定性突破（剩 9 处之一类）**：r39-dual-core-kb.js + shuhan-kb-combined.js 实查——两存根均 80B 仅迁移注释、不定义任何全局变量；被 6 页 7 处 `<script>` 引用（ai-assistant×2 / divination-almanac / divination-membership / shuhan-knowledge / yijing-oracle / yijing-qimen），页面内 grep R39_DUAL/SHUHAN_KB/dualCoreKb 等全局消费点全空 → **零消费非断链**，无需补数据；修真动作=下轮移除 7 处无效引用（每页减 2 个死请求）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（本轮定性 2 个文件 → 剩 faith-content(2)/faith-deities-detail(1)/faith-knowledge-base(2) 待定性）
+- 阻塞：✅ 无（清晨安静期，软待办 3 项维持）
+- 下一步动作：08:00 窗口执行 7 处引用移除（6 文件批量 edit + 页面加载验证）
+
+# 2026-09-16 07:00 — 💚 心跳 07:00 全绿（cron 30min · 清晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（07:00:05 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新落盘（02:05 +6「八字格局」仍为今日最新；06:00→07:00 间无新文件）
+- WAL 哨兵：未采样（清晨安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb + shuhan-kb-combined 等，待 grep 引用定性）
+- 阻塞：✅ 无（清晨安静期，软待办 3 项维持）
+- 下一步动作：07:30 例行窗口核查
+
+# 2026-09-16 06:30 — 💚 心跳 06:30 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
+
+- 健康检查全绿（06:30:04 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
+- KB 蒸馏：无新增（distill-2026-09-16.jsonl 02:05 +6「八字格局」仍为今日最新，实探确认）
+- WAL 哨兵：未采样（凌晨安静期，无复发迹象）
+- 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb + shuhan-kb-combined 等，待 grep 引用定性）
+- 阻塞：✅ 无（凌晨安静期，软待办 3 项维持）
+- 下一步动作：07:00 例行窗口核查
+
 # 2026-09-16 05:00 — 💚 心跳 05:00 全绿（cron 30min · 凌晨 · 无新 KB · 无待办推进）
 
 - 健康检查全绿（05:00:07 实探）：paipan(:8911)/tts(:8912)/face-ocr(:8913)/static(:8900)/api-v2(:8920)/kb-api(:8901) 全 200 + kb-list + paipan-api OK
@@ -1537,3 +1842,19 @@
 - 进行中无变化：① G21 v1.2.0 等 family 侧接收验收 ② wal-inode-watch 哨兵观察期等复发 ③ W38 feedback-aggregator PermissionError 待复测 ④ knowledge/ 存根修真剩 9 处（r39-dual-core-kb+shuhan-kb-combined 待 grep 引用定性）
 - 阻塞：✅ 无（深夜安静期，软待办 3 项维持）
 - 下一步动作：04:30 例行窗口核查
+
+# 2026-09-17 08:30 — 🔧 用户令「知识库深度优化和校正」→ R792 六刀全完成
+
+## 体检发现
+fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗余行（664 组）｜乱码 286+ 条（GBK mojibake + PDF 控制符残渣）｜真无出处 3195｜staging 4 条待审（含测试占位垃圾）
+
+## 校正执行
+1. fts5 清理对齐：272607→251228 = 主表精确一致
+2. mojibake：latin1→gbk 修复链救回 59 条内经原文；不可逆 256+121 条标记降权（保留溯源）
+3. 同文去重：删 1729 冗余，重复组清零
+4. 出处补全 4811 条（五类规则映射），真无出处清零
+5. OCR 乱文本 152 条降权 0.3
+6. staging 4 条驳回（假数据红线 + 样本不足），待审清零
+
+## 终态
+主表=fts5=251228 零差异｜重复 0｜真无出处 0｜检索回归全过（害太岁 26/麻黄汤 2091/五行相生 305/紫微 4088）｜API 公开检索 8 命中
