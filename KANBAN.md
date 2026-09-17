@@ -1994,3 +1994,15 @@ fts5 冗余 19882 行（830 entry×25 次重复索引）｜同文重复 1065 冗
 
 ## 教训
 推送链路中 LLM 的职责是「组装与投递」，不是「再创作」——数据以脚本产物为唯一真源，模型改写即引入幻觉风险。
+
+# 2026-09-17 16:10 — 🔧 face-ocr 8913 修复（TCC 符号链接根因）+ R799 扫尾
+
+## 用户报「报错」→ 定性：face-ocr(:8913) 离线（health-patrol 双 ❌）
+- 时间线：心跳 11:02 还绿；15:00 发现时服务已从 launchd 消失且处于 disabled
+- 崩溃链：launchd 上下文（新 spawn）读 models 符号链接→外挂卷 被 TCC 拒（EPERM）→ 启动即崩 → KeepAlive 循环崩退
+- 为什么 11:02 绿：旧实例是老上下文进程一直活着；15 点诊断时被 bootout/bootstrap 触发重建才暴露 TCC 失效
+
+## 修复（模型实体化，一次根断）
+- models 符号链接退役 → 56 个模型文件（197MB）实体拷回项目内（主盘余 53G 充裕；外挂盘原件保留双份）
+- launchd kickstart 后 8913=200 常驻；models.symlink-disabled-20260917 留档
+- R799 扫尾：kb-sync-guard --normalize（summary NULL 18874 行规整）；KB 251230 五红线全绿
