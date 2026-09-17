@@ -47,7 +47,9 @@ if [ -f "$GUARD_LOG" ]; then
     GUARD_HIT=$(find "$GUARD_LOG" -mtime -2 2>/dev/null | wc -l | tr -d ' ')
     # 2026-09-15 修真：只统计真实的 TCC-LOCKED / VOLUME-MISSING 行，
     # RECOVERED 行是自愈痕迹不算告警；且只在存在新鲜失败行时才报
-    GUARD_FAILS=$(grep -c "TCC-LOCKED\|VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null || echo 0)
+    # 2026-09-17 修真：grep -c 无匹配时输出 0 且退出码 1，`|| echo 0` 会追加第二个 0
+    # 导致 GUARD_FAILS="0\n0" 触发 integer expression error——改为固定输出单值
+    GUARD_FAILS=$(grep -c "TCC-LOCKED\|VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null; true)
     GUARD_LAST_FAIL=$(grep "TCC-LOCKED\|VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null | tail -1)
     if [ "$GUARD_FAILS" -gt 0 ] && [ "$GUARD_HIT" -gt 0 ]; then
         ALERTS+=("备份守卫告警: $GUARD_LAST_FAIL")
