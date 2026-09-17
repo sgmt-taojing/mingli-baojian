@@ -80,6 +80,17 @@ def main() -> int:
     if junk:
         issues.append(f'红线5 staging 垃圾候选 {junk} 条（占位/过短/无id）——直接 rejected')
 
+    # 红线6（R798）：未打标的伪托古籍引用——「古籍依据：《伪造书名》」模板生成条目
+    # 已知伪托：「素问·X行论」（内经无此五篇）；pseudo-citation 标记库为准
+    fake = conn.execute("""
+        SELECT COUNT(*) FROM kb_formal
+        WHERE (content LIKE '%素问·木行论%' OR content LIKE '%素问·火行论%'
+            OR content LIKE '%素问·土行论%' OR content LIKE '%素问·金行论%'
+            OR content LIKE '%素问·水行论%')
+        AND tags NOT LIKE '%pseudo-citation%'""").fetchone()[0]
+    if fake:
+        issues.append(f'红线6 未标记伪托引用 {fake} 条（素问·X行论）——打 pseudo-citation 标记降权')
+
     # NULL 键残留
     nulls = conn.execute("SELECT COUNT(*) FROM kb_formal WHERE entry_id IS NULL OR entry_id='' OR tags IS NULL").fetchone()[0]
     if nulls:
