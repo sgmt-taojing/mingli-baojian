@@ -1,3 +1,10 @@
+## 2026-09-17 11:15 · R797 补充：patrol 修真 + WO-002 训练侧证据补强（AutoClaw）
+
+- **health-patrol.sh 修真**：备份守卫段 `grep -c ... || echo 0` 在无匹配时输出 "0\n0"（grep 退出码 1 触发 echo 追加），导致 `[ ... -gt 0 ]` 报 integer expression error——改为固定单值输出；复跑 rc=0 全绿验证。
+- **v9.2 训练侧新证据（补入 WO-002）**：training/logs/v92-train.log 停在 iter 10（0.106 it/s，序列 1208+ tokens 截断警告），mlx-models/ 下仅有 v9.0 adapter，**无任何 v9.2 adapter/融合产物**——WO-002 driver 领单后先确认可评对象是否存在，不存在则二选一：按 BAZIQA_PIPELINE 重训（增量 base=v9.0）或归档定版 v9.2 线。
+- **历法校准 cron 复跑**：手动触发 rc=0 自愈（上次为瞬时故障），顺带完成 2027 年节气表修真（bmcx+lunar_python 双源差异 2 处）。
+- commit 8fec02f7。
+
 ## 2026-09-17 11:00 · R797 双智能体轮番机制落地 + Kimi 遗产全量诊断（接管第二单）
 
 - **边界与机制复核**：AGENT-TAKEOVER-20260917 定位/红线复核无误；ROTATING-DEV-PROTOCOL 补 R797 复核时限条款（reviewer 24h 未复核视为通过+可后补抽验，杜绝双向等待死锁）。
