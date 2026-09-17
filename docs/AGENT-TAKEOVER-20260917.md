@@ -19,6 +19,7 @@
 4. **蒸馏入库 ≠ 模型训练**：staging→trust 复核→kb_formal，指纹幂等
 5. **排盘/命理 = 本地核心引擎**不依赖下游；人脸算法 = 本地服务，业务由 tcm/shf 消费
 6. **KB 写入五红线**（R793，docs/KB-QUALITY-RULES.md）：禁直插 fts5 / 禁 NULL 壳键 / 禁同文重复 / 禁无出处 / 禁垃圾入库
+7. **禁触边界（R797 · 用户令 2026-09-17）**：用户用 ChatGPT 开发的独立项目不许动——`~/Documents/Codex/` 全域只读（mingli-core / mingli-workbench / knowledge-library / ai-vision-platform / smart-home-family-v2 及备份），不修改/不删除/不移动/不写入；轮值 WO 涉这些路径的范围无效需重新划界（详见 ROTATING-DEV-PROTOCOL.md 第七节）
 
 ## 三、接管基线（2026-09-17 实测）
 
