@@ -29,6 +29,7 @@ DICT = {
     '隳':'huī','黩':'dú','悫':'què','懋':'mào','戢':'jí','翕':'xī',
     '赜':'zé','赀':'zī','窾':'kuǎn','导':'dǎo','竫':'jìng','讷':'nè',
     '蘧':'qú','璆':'qiú','磬':'qìng','硁':'kēng','蒉':'kuì','涸':'hé',
+    '巇':'xī','罅':'xià','涧':'jiàn','隙':'xì','萌':'méng','揣':'chuǎi','摩':'mó','忤':'wǔ','隙':'xì',
 }
 
 # 词组读音（优先匹配）
@@ -38,7 +39,7 @@ WORDS = {'南无':'nā mó','般若':'bō rě','涅槃':'niè pán','菩提':'p�
          '偈':'jì','昙花':'tán huā','琉璃':'liú lí','摩尼':'mó ní',
          '真言':'zhēn yán','明王':'míng wáng','忉利':'dāo lì','兜率':'dōu shuài',
          '阿耨多罗':'ā nòu duō luó','三藐三菩提':'sān miǎo sān pú tí',
-         '捭阖':'bǎi hé','翕张':'xī zhāng','窾理':'kuǎn lǐ'}
+         '捭阖':'bǎi hé','翕张':'xī zhāng','窾理':'kuǎn lǐ','抵巇':'dǐ xī','罅隙':'xià xì'}
 
 # 常用字不注音
 COMMON = set('的一是了我不人在他有这上们来到时大地为子中你说生国年着就那和要她出也得里后自以会家可下而过天去能对小多然于心学么之都好看起发当没成只如事把还用第样道想作种开美总从无情己面最女但现前些所同日手又行意动方期它头经长儿回位分爱老因很给名法间斯知世什两次使身者被高已亲其进此话常与活正感见音字文说金刚诵念持修戒定慧慈悲喜舍观音菩萨佛门禅止观心病医方术息气用廿一遍建议日主信义礼智')
@@ -46,12 +47,17 @@ COMMON = set('的一是了我不人在他有这上们来到时大地为子中你
 def annotate(text):
     out = []
     i, n = 0, len(text)
+    noted = set()  # R802：同字只注首次
     while i < n:
         # 词组优先
         matched = False
         for w, py in WORDS.items():
             if text.startswith(w, i):
-                out.append(f'{w}（{py}）')
+                if w not in noted:
+                    out.append(f'{w}（{py}）')
+                    noted.add(w)
+                else:
+                    out.append(w)
                 i += len(w)
                 matched = True
                 break
@@ -59,7 +65,11 @@ def annotate(text):
             continue
         ch = text[i]
         if '\u4e00' <= ch <= '\u9fff' and ch in DICT and ch not in COMMON:
-            out.append(f'{ch}（{DICT[ch]}）')
+            if ch not in noted:
+                out.append(f'{ch}（{DICT[ch]}）')
+                noted.add(ch)
+            else:
+                out.append(ch)
         else:
             out.append(ch)
         i += 1
