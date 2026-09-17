@@ -9,6 +9,7 @@
 2. **禁止 NULL/空壳键**：entry_id/tags/summary 写入时一律 COALESCE 规整（entry_id 必填非空；tags/summary 空值写 `''` 不写 NULL——IS NOT 比较陷阱实证）。
 3. **禁止同文重复**：入库前 (module, content) 指纹查重，命中即跳过或更新，不新增。
 4. **禁止无出处入库**：每条必须带 src_id（五类映射见下表）；确实无源的进 staging 而非 formal。
+5. **长度门槛分域**（R796 校准）：通用域 ≥100 字；蒸馏规格 50-150 字的短知识域（yangsheng/huangli/mantra 等口诀养生类）≥60 字且主题锚点明确。
 5. **禁止垃圾入库**：OCR 乱文本（拉丁高位字符密度>15%）、控制符残渣（\x00-\x08\x0e-\x1f 密度>3%）、测试占位（x/y/test/TODO）、单次差评蒸馏候选——一律拒收。
 
 ## 二、出处五类映射（src_id 规范）
