@@ -218,6 +218,14 @@ except Exception:
     fi
 fi
 
+# ===== R793 KB 质量红线巡检（2026-09-17）：五红线检测，详 docs/KB-QUALITY-RULES.md =====
+KBQ_OUT=$(python3 "$PROJECT_ROOT/scripts/kb-quality-patrol.py" 2>/dev/null)
+if [ $? -ne 0 ] && [ -n "$KBQ_OUT" ]; then
+    while IFS= read -r line; do
+        echo "$line" | grep -q '^WARN' && ALERTS+=("$(echo "$line" | sed 's/^WARN //')")
+    done <<< "$KBQ_OUT"
+fi
+
 # ===== R-DIFF-SLA 差集吸收 72h SLA：链5 新差集 72h 内须定性，超时告警上盘 =====
 DIFF_SLA_OUT=$(python3 "$PROJECT_ROOT/scripts/diff-sla-track.py" 2>/dev/null)
 if [ -n "$DIFF_SLA_OUT" ]; then
