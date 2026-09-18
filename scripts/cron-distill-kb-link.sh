@@ -48,3 +48,8 @@ console.log('[stats]', JSON.stringify(l.getLinkStats()));
 " >> "$LOG_FILE" 2>&1 || echo "[$(date '+%F %T')] linker error" >> "$LOG_FILE"
 
 echo "[$(date '+%F %T')] 任务完成" >> "$LOG_FILE"
+
+# R804（2026-09-18）：蒸馏落盘→主表入库断链防再发——夜间蒸馏 jsonl 补账入主表（五红线通道）
+echo "[$(date '+%F %T')] [R804] 蒸馏补账检查..." >> "$LOG_FILE"
+python3 "$PROJECT_DIR/scripts/distill-backlog-ingest.py" --days 2 >> "$LOG_FILE" 2>&1 || echo "[$(date '+%F %T')] [R804] 补账失败(非阻塞)" >> "$LOG_FILE"
+python3 "$PROJECT_DIR/scripts/kb-sync-guard.py" --sync 48 >> "$LOG_FILE" 2>&1 || true

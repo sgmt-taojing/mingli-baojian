@@ -1,3 +1,11 @@
+## 2026-09-18 18:20 · R804 蒸馏断链排查+补账 13 条 + 断链防再发钩子
+
+- **排查发现**：夜间蒸馏落盘（kb-web-distill/distill-*.jsonl）与主表入库存在断链——09-17/09-18 两批 28 条蒸馏中 14 条从未入库（指纹法逐条比对实证）：09-17 xingming 整批 5 条 + bazi「子平取格以月令为纲」、09-18 全批 8 条滞留盘上。R795/R797b 记录的入库数只覆盖当时工作集，落盘→入库无自动衔接。
+- **补账 13 条入库**（scripts/distill-backlog-ingest.py，五红线全检：分域长度门槛 60/100、主题锚点、全库指纹幂等、entry_id=KB-WD+module|content 哈希、SRC-WEB-DISTILL/trust 0.6）：xingming 9 条（五格剖象/三才/81 数理体系，域 62→71）、yangsheng 4 条（白露/秋分养生，域 25→29）。另 1 条与 09-17 同文重合按红线3 幂等跳过（标题同、内容同）。
+- **误杀复核**：6 条 huangli「无锚点」跳过经逐条复核为锚点词表覆盖不足（黄道/建除/择日/时辰为正宗黄历术语）——词表已扩；该 6 条实为 09-17 10:16 早已入库（Kimi 时代批次），指纹幂等正确拦截，无实际遗漏。
+- **断链防再发**：cron-distill-kb-link.sh 增 R804 尾钩——每日 03:30 蒸馏后自动跑 distill-backlog-ingest --days 2 + kb-sync-guard --sync 48，落盘 jsonl 不再滞留。
+- **终态**：主表=fts5=316,454；kb-quality-patrol 五红线全绿；health-patrol 全绿（411 块）。构建期 2 次 database locked（busy_timeout 8s→30s 加固）+UNIQUE 幂等拦截均自愈，无脏数据。
+
 ## 2026-09-17 16:35 · R797b 优化提升：养生域第二批+KB质量三修+faith孤品归档（WO-001 续）
 
 - **养生域 KB 第二批 +20 条（yangsheng 5→25）**：从库内经典源（素问四气调神/上古天真/藏气法时等 8 部经文义理）再蒸馏 20 条 50-150 字口语化条目（scripts/yangsheng-batch2.py，SRC-CLASSIC-RE-DISTILL-20260917 / trust 0.6 / 五红线全检+指纹幂等），kb-sync-guard --sync 对齐。
