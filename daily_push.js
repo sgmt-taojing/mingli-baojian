@@ -275,8 +275,18 @@ try {
     output = buildPublic(getBridgeData(isTomorrow));
   } else if (mode === 'simple') {
     output = buildSimple(getBridgeData(isTomorrow));
+  } else if (mode === 'monthly') {
+    // R808 月度指导（真实月干支+节气+命盘推演）
+    output = require('child_process').execSync(
+      'python3 -c "import importlib.util; spec=importlib.util.spec_from_file_location(\'dr\', \'server/daily-recommendation.py\'); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m); print(m.build_monthly_guide())"',
+      { encoding: 'utf8', timeout: 30000, cwd: ROOT });
+  } else if (mode === 'yearly') {
+    // R808 年度指导（流年+大运+命局三层推演）
+    output = require('child_process').execSync(
+      'python3 -c "import importlib.util; spec=importlib.util.spec_from_file_location(\'dr\', \'server/daily-recommendation.py\'); m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m); print(m.build_yearly_guide())"',
+      { encoding: 'utf8', timeout: 30000, cwd: ROOT });
   } else {
-    console.error('用法: node daily_push.js <full|public|simple|verify> [--tomorrow]');
+    console.error('用法: node daily_push.js <full|public|simple|verify|monthly|yearly> [--tomorrow]');
     process.exit(1);
   }
 } catch (e) {
