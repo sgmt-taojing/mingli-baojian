@@ -40,19 +40,20 @@ fi
 LAUNCHD_BAD=$(launchctl list 2>/dev/null | grep "mingli-baojian" | awk '$1 ~ /^-[0-9]+/' | awk '{print $3}')
 [ -n "$LAUNCHD_BAD" ] && ALERTS+=("launchd 异常: $LAUNCHD_BAD")
 
-# 2a. 备份快照健康（R-2026-09-14：快照/周备连报 Operation not permitted 一个月，失败静默跳过无人发现）
-# 检查两类痕迹：backup-guard.log 近 48h 内的 TCC-LOCKED / VOLUME-MISSING，以及快照日志连续失败
+# 2a. 备份快照健康（R-2026-09-14 引入；R802 语义分级）
+# TCC-LOCKED 已定性为架构事实（cron/launchd 写外盘被系统拒，R801 实弹定案）：
+# 本地冷备主通道（04:30 daily-local-cold-backup）正常时不再告警，只在主通道也断或盘真丢时报
 GUARD_LOG="$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
+LCB_DIR="$HOME/.openclaw-autoclaw/backups/local-cold"
+LCB_FRESH=$(find "$LCB_DIR" -maxdepth 1 -name "20*" -type d -mtime -2 2>/dev/null | wc -l | tr -d ' ')
 if [ -f "$GUARD_LOG" ]; then
-    GUARD_HIT=$(find "$GUARD_LOG" -mtime -2 2>/dev/null | wc -l | tr -d ' ')
-    # 2026-09-15 修真：只统计真实的 TCC-LOCKED / VOLUME-MISSING 行，
-    # RECOVERED 行是自愈痕迹不算告警；且只在存在新鲜失败行时才报
-    # 2026-09-17 修真：grep -c 无匹配时输出 0 且退出码 1，`|| echo 0` 会追加第二个 0
-    # 导致 GUARD_FAILS="0\n0" 触发 integer expression error——改为固定输出单值
-    GUARD_FAILS=$(grep -c "TCC-LOCKED\|VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null; true)
-    GUARD_LAST_FAIL=$(grep "TCC-LOCKED\|VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null | tail -1)
-    if [ "$GUARD_FAILS" -gt 0 ] && [ "$GUARD_HIT" -gt 0 ]; then
-        ALERTS+=("备份守卫告警: $GUARD_LAST_FAIL")
+    VMISS=$(grep -c "VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null; true)
+    VMISS_FRESH=$(grep "VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null | tail -1)
+    if [ "$VMISS" -gt 0 ]; then
+        ALERTS+=("备份守卫告警: $VMISS_FRESH")
+    fi
+    if [ "$LCB_FRESH" -eq 0 ]; then
+        ALERTS+=("备份双通道全断：本地冷备 48h 未更新且外盘定时备份被 TCC 拒——需人工干预")
     fi
 fi
 SNAP_LOG="$HOME/.openclaw-autoclaw/workspace/memory/snapshot-cron.log"
