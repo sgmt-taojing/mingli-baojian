@@ -62,6 +62,35 @@ def fetch_api_stats():
         return {"error": str(e)}
 
 
+def fetch_orch_stats_db(conn, days):
+    """R824: API 内存统计被重启清零时，回退查 orchestration_log（2026-08-17 起持久化）
+    返回字段与 /api/agent/stats 对齐（source=db）；查询失败/无表返回空 dict"""
+    try:
+        c = conn.cursor()
+        since_utc = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M")
+        c.execute(
+            "SELECT COUNT(*), AVG(duration_ms), AVG(degraded), AVG(timeout), AVG(ok), "
+            "AVG(need_clarification), AVG(avg_score) FROM orchestration_log WHERE ts >= ?",
+            (since_utc,),
+        )
+        row = c.fetchone()
+        runs = row[0] or 0
+        if not runs:
+            return {"runs": 0, "source": "db", "window_empty": True}
+        return {
+            "runs": runs,
+            "avgDurationMs": round(row[1] or 0),
+            "degradedRate": round(row[2] or 0, 4),
+            "timeoutRate": round(row[3] or 0, 4),
+            "successRate": round(row[4] or 0, 4),
+            "clarifyRate": round(row[5] or 0, 4),
+            "avgScore": round(row[6] or 0, 2),
+            "source": "db",
+        }
+    except Exception:
+        return {}  # 表不存在/DB 异常 → 交回 uptime 探测路径
+
+
 def fetch_db(conn, days):
     c = conn.cursor()
     since = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
@@ -107,14 +136,28 @@ def build_report(api_stats, kb_hits, fb, repair, days):
     if api_stats.get("error"):
         lines.append(f"⚠️ API 统计不可用：{api_stats['error']}")
     elif api_stats.get("runs", 0) == 0:
-        # 2026-08-17 R: 区分「进程刚启动/窗口不完整」与「无人调用」，避免误导
-        up_days = _probe_uptime_days()
-        if up_days is None:
-            lines.append(f"⚠️ 暂无编排运行数据（无法探测服务 uptime；编排记录自 2026-08-17 起已落库 orchestration_log）")
-        elif up_days < days:
-            lines.append(f"⚠️ 暂无编排运行数据（api-server 进程仅运行 {up_days:.1f} 天，统计窗口不足 {days} 天；编排记录自 2026-08-17 起已持久化 orchestration_log，下期可完整回溯）")
+        if api_stats.get("source") == "db" and api_stats.get("window_empty"):
+            # R824: orchestration_log 近窗口 0 条 → 真实无调用，非统计窗口不足
+            lines.append(f"⚠️ 近 {days} 天编排入口零调用（orchestration_log 落库核实）：KB 命中率高时属正常（弱命中走 KB 直答）；若 AI 助手弱命中链路异常请检查 ai-assistant → /api/agent/orchestrate 触发条件")
+        elif api_stats.get("source") == "db":
+            lines.append(f"| 指标 | 数值 | 评价 |")
+            lines.append(f"|---|---|---|")
+            s = api_stats
+            lines.append(f"| 调用次数（库） | {s['runs']} | - |")
+            lines.append(f"| 平均耗时 | {s['avgDurationMs']}ms | {'✅ P95达标(<500ms)' if s['avgDurationMs'] < 500 else '⚠️ 超时风险'} |")
+            lines.append(f"| 降级率 | {s['degradedRate']*100:.1f}% | {'✅' if s['degradedRate'] < 0.05 else '⚠️ 需排查'} |")
+            lines.append(f"| 超时率 | {s['timeoutRate']*100:.1f}% | {'✅' if s['timeoutRate'] < 0.05 else '⚠️ 需排查'} |")
+            lines.append(f"| 成功率 | {s['successRate']*100:.1f}% | {'✅' if s['successRate'] > 0.8 else '⚠️ 需改进'} |")
+            lines.append(f"| 澄清率 | {s['clarifyRate']*100:.1f}% | {'✅ 引导兜底正常' if s['clarifyRate'] < 0.3 else 'ℹ️ 较多需澄清'} |")
+            lines.append(f"| 平均分 | {s['avgScore']} | {'✅' if s['avgScore'] > 0.6 else '⚠️ 内容质量偏低'} |")
         else:
-            lines.append(f"⚠️ 暂无编排运行数据（服务运行 {up_days:.1f} 天且无调用 → 编排入口未被前端触发，检查 ai-assistant 弱命中兑底链路）")
+            up_days = _probe_uptime_days()
+            if up_days is None:
+                lines.append(f"⚠️ 暂无编排运行数据（无法探测服务 uptime，且 orchestration_log 不可查；记录自 2026-08-17 起应已落库）")
+            elif up_days < days:
+                lines.append(f"⚠️ 暂无编排运行数据且 orchestration_log 窗口内无记录（api-server 进程仅运行 {up_days:.1f} 天 → 近期服务重启；结合落库核实：近 {days} 天确无编排调用，非统计缺口）")
+            else:
+                lines.append(f"⚠️ 暂无编排运行数据（服务运行 {up_days:.1f} 天且无调用 → 编排入口未被前端触发，检查 ai-assistant 弱命中兜底链路）")
     else:
         lines.append(f"| 指标 | 数值 | 评价 |")
         lines.append(f"|---|---|---|")
@@ -200,6 +243,11 @@ def main():
 
     api_stats = fetch_api_stats()
     conn = sqlite3.connect(DB_PATH) if os.path.exists(DB_PATH) else None
+    # R824: 内存统计被重启清零（runs=0）时回退 orchestration_log，消除「窗口不足」误报
+    if conn and not api_stats.get("error") and api_stats.get("runs", 0) == 0:
+        db_stats = fetch_orch_stats_db(conn, days)
+        if db_stats:
+            api_stats = db_stats
     if conn:
         kb_hits, fb, repair = fetch_db(conn, days)
         conn.close()
