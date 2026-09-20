@@ -83,10 +83,10 @@ def main():
                 cur.execute("""INSERT INTO kb_formal
                     (entry_id, module, title, content, src_id, category, keywords, summary,
                      trust_score, version, promoted_at, promoted_from)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                     (entry_id, module, title, content, SRC_ID, module,
                      json.dumps([module], ensure_ascii=False), title[:80],
-                     0.6, 1, now, 'web-distill-backlog'))
+                     0.6, 1, now, 'web-distill-backlog', 'formal'))
                 inserted.append((entry_id, module, title[:28]))
                 lib_fps.add(f)
             except sqlite3.Error as e:

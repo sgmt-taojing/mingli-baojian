@@ -106,10 +106,10 @@ def main():
         try:
             cur.execute("""INSERT INTO kb_formal (entry_id, module, title, content, src_id, category,
                 keywords, summary, trust_score, version, promoted_at, promoted_from)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (f'KB-BZ1-{h}', 'bazi', title, full, SRC, 'bazi',
                  json.dumps(['bazi','子平真诠','格局','用神'], ensure_ascii=False),
-                 title[:80], 0.85, 1, now, 't1-batch1'))
+                 title[:80], 0.85, 1, now, 't1-batch1', 'formal'))
             inserted += 1; lib_fps.add(fp)
         except sqlite3.Error as e:
             skipped.append((title[:20], f'DB:{e}'))
