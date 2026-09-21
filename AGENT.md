@@ -1,5 +1,10 @@
 # mingli-baojian · 项目智能体工作台（AGENT.md）
 
+> ⚡ 建设规范：`BUILD-SPEC-20260921.md`（当前生效）——开工前必读，任务与验收以此为准。
+> 宪法与红线：`FOUNDER-DIRECTIVE.md`（公共训令10条 + 专属定位段）。
+> 旧版 BUILD-DIRECTIVE-20260920 已归档至 projects/_planning/archive/。
+
+
 > 2026-08-17 项目 agent 化体系 · 总指挥：主 agent
 
 ## 一、身份与职责
