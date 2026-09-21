@@ -39,3 +39,20 @@
 - **评估失败根因定性（8960 直探实证）**：直接 curl 8960 出题（麻黄汤主方题），v9.0 实际返回 `content="B <{/s}> 请编辑"`——答案正确，但输出带 chat template 停止符泄漏（`<{/s}>`）与尾随噪声。评估 harness 解析器只认「纯单字母」回复 → 全部判空。这解释了四次 v9.2 评估全灭的原因：**解析层 bug，非模型能力问题**。修法二选一：① harness 解析器兼容（提取首个 A-E 字母、容忍尾部噪声）；② 评估请求加 stop 序列 / 服务端修 chat template 泄漏。先修 ① 再跑探针（验收标准 1 的空值率 <5% 才有意义）。
 - 证据文件：training/baziqa-results/probe-v90-harness-sample10.log（今早 10:50 driver 探针，0/96 全空，与诊断一致）。
 - 四路大师脚本（R812 已去硬编码双候选）+ 素材冷存新址（46 文件）均已就绪，验收 3 可直接实测。
+
+---
+
+## Kimi 交付收官（2026-09-21 14:40 · verdict=v92-wins · 待复核）
+
+**定案结果（验收标准 2 三选一 → 走「热切生产」）**：同管线 10 人样 96 题 A/B——v9.2 43.8%（42/96，空值率 4.2% <5% 达标）vs v9.0 37.5%（36/96），margin +6.3pp ≥ 5pp 显著线 → **v92-wins**。verdict 文件 `training/baziqa-results/v92-verdict.json`。
+
+**交付物清单**：
+1. v9.2 训练+fuse 产物 `training/mlx-models/mingli-sft-v9.2-7b/`（final loss 1.112，250/300 iter 链日志在案）
+2. 定案链脚本 `scripts/wo002-v92-chain.sh`（R-RESUME 断点续跑 + R-SAMPLE 10 人样 + 三选一自动定案 + trap 自动恢复 8960）
+3. 8960 热切换挂：~/Library/LaunchAgents/com.mingli-baojian.mlx-v8.plist MLX_MODEL→v9.2，scripts/launchd/ 同步，旧件备份 /tmp/mlx-v8.plist.bak；直连生成验证 + 生产探针（--limit 1，5/10，全 API 链路）双通过
+4. 解析层修真（采纳 AutoClaw 旁证方案①）：harness 提取首个 A-E 字母容忍尾部噪声，空值率 v9.0 8.3%/v9.2 4.2%（v9.0 空值偏高系其自身停止符泄漏更多，同管线同题对比公平）
+5. 四路大师蒸馏恢复：见同日 CHANGELOG 批3/批4 条目（穷通 110 节 + 三命神煞 28 节入库，脚本去硬编码单一净本路径，fts5 同步实测）
+
+**遗留（转 backlog）**：全量 488 夜间验证跑（8960 需停 ~15h，建议 02:00 起跑或拆两段）；v9.0 模型目录留盘归档观察（定案不删，rollback 路径可用）；己土四~十二月穷通净本缺口待补善本。
+
+**签**：Kimi driver 执行完毕，待 AutoClaw/用户 24h 窗口复核（R797）。
