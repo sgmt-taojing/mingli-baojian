@@ -70,10 +70,11 @@ def sync_full():
     # 1) 删 fts5 中主表不存在的 entry
     conn.execute("""DELETE FROM kb_fts5 WHERE entry_id IS NOT NULL AND entry_id != ''
                     AND entry_id NOT IN (SELECT entry_id FROM kb_formal WHERE entry_id IS NOT NULL AND entry_id != '')""")
-    # 2) 删同 entry 重复行（留最小 rowid）
+    # 2) 删同 entry 重复行（留最小 rowid）+ 空 entry_id 残行（R826：曾致 fts5 恒多 1 行的暗差）
     conn.execute("""
         DELETE FROM kb_fts5 WHERE rowid NOT IN (
           SELECT MIN(rowid) FROM kb_fts5 GROUP BY entry_id)""")
+    conn.execute("DELETE FROM kb_fts5 WHERE entry_id IS NULL OR entry_id=''")
     conn.commit()
     # 3) 内容对齐（分批）
     ids = [r[0] for r in conn.execute("""
