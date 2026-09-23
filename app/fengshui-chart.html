@@ -177,6 +177,7 @@ async function doPaipan(){
   renderSvg(svg);
   renderFlow(data.flow, targetYear);
   if(data.interpretation) renderInterpretation(data.interpretation);
+  if(data.canon) renderCanonCard(data.canon);   // R-CANON-EXT：风水经典依据层
 }
 function renderChart(c){
   document.getElementById('fs-meta').innerHTML=`${c.year}年 · ${c.yunName} · 坐${c.sittingMountain}向${c.facingMountain}<br>`+
@@ -305,6 +306,29 @@ function renderInterpretation(i){
   if(i.summary) h+='<div style="font-size:13px;line-height:1.7;opacity:.9;margin-bottom:8px">'+i.summary+'</div>';
   if(i.advice) h+='<div style="font-size:13px;line-height:1.7;opacity:.75">'+i.advice+'</div>';
   if(i.guaJi) h+='<div style="font-size:12px;opacity:.6;margin-top:6px">卦象：'+i.guaJi+'</div>';
+  el.innerHTML=h;
+  el.style.display='block';
+}
+
+// R-CANON-EXT：风水经典依据卡（天玉经/青囊奥语/宅经等原典摘录 + 白话导读，置于断盘解读之下）
+function renderCanonCard(cn){
+  if(!cn || !cn.items || !cn.items.length) return;
+  const escC=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  const el=document.getElementById('paipan-canon')||(()=>{
+    const d=document.createElement('div');
+    d.id='paipan-canon';
+    d.style.cssText='margin:0 0 16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.2);border-left:3px solid var(--gold,#c9a84c);border-radius:12px';
+    const ref=document.getElementById('paipan-interpretation');
+    (ref&&ref.parentNode?ref.parentNode:(document.querySelector('.fs-grid')||document.body)).appendChild(d);
+    return d;
+  })();
+  let h='<div style="font-size:15px;font-weight:600;color:var(--gold,#c9a84c);margin-bottom:8px">📚 经典依据</div>';
+  if(cn.note) h+='<div style="font-size:12px;line-height:1.8;color:var(--jade,#4ec9b0);margin-bottom:8px">'+escC(cn.note)+'</div>';
+  for(const it of cn.items){
+    h+='<div style="margin-top:8px"><div style="font-size:12px;color:var(--gold,#c9a84c)">《'+escC(it.book||'')+'》<span style="opacity:.55;font-size:11px">　'+escC(it.title||'')+'</span></div>';
+    h+='<div style="font-size:12px;line-height:1.9;opacity:.85">'+escC(it.excerpt||'')+'</div></div>';
+  }
+  h+='<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录自公有领域典籍（四库全书本），未作改写。</div>';
   el.innerHTML=h;
   el.style.display='block';
 }
