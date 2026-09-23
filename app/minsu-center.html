@@ -236,6 +236,22 @@ function renderBaihua(b){
   h+='</div>';
   return h;
 }
+// 择日经典依据渲染（R-ZERI-CANON：原典原文摘录 + 白话导读，置于白话解读之下）
+function renderCanon(cn){
+  if(!cn || !cn.items || !cn.items.length) return '';
+  let h='<div style="border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;padding:12px 14px;margin-bottom:12px;background:rgba(255,255,255,.02)">';
+  h+='<div style="font-size:13px;color:var(--gold);font-weight:bold;margin-bottom:6px">📜 经典依据</div>';
+  if(cn.note) h+='<div style="font-size:12px;line-height:1.8;color:var(--jade);margin-bottom:8px">'+esc(cn.note)+'</div>';
+  for(const it of cn.items){
+    h+='<div style="margin-top:8px">';
+    h+='<div style="font-size:12px;color:var(--gold)">《'+esc(it.book||'')+'》<span style="color:var(--paper3);font-size:11px">　'+esc(it.title||'')+'</span></div>';
+    h+='<div style="font-size:12px;line-height:1.9;color:var(--paper);opacity:.85">'+esc(it.excerpt||'')+'</div>';
+    h+='</div>';
+  }
+  h+='<div style="margin-top:8px;font-size:11px;color:var(--paper3)">原文照录自公有领域典籍（四库全书本），未作改写。</div>';
+  h+='</div>';
+  return h;
+}
 /* R-PERSONAL：我的生辰（localStorage 记忆） */
 function saveMyBirth(){ const y=+document.getElementById('mbY').value, m=+document.getElementById('mbM').value||null, d=+document.getElementById('mbD').value||null;
   if(!y||y<1900||y>2100){document.getElementById('mbHint').textContent='年份填 4 位（如 1990）';return;}
@@ -448,7 +464,7 @@ async function execTool(tool, url, postBody){
     if(list.length>40) html+=`<span style="color:var(--paper3)">…共 ${list.length} 个，以上前 40 个</span>`;
     html+='</div>';
   }
-  result.innerHTML=renderBaihua(data.baihua)+html;
+  result.innerHTML=renderBaihua(data.baihua)+renderCanon(data.canon)+html;
   } catch(e) {
     console.warn('[showTool]', esc(e.message));
     result.innerHTML='<div style="text-align:center;color:var(--paper3);padding:20px">网络异常，请稍后重试</div>';
