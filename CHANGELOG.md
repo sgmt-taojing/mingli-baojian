@@ -1,3 +1,10 @@
+## 2026-09-23 22:25 · R-CANON-EXT 续：八字报告经典层（动态主题取词）（Kimi）
+
+- **getBaziCanon(question)**：问事主题→原典检索词映射（婚姻/財官/科甲/疾病/子息，繁体）+ 默认三纲（用神/格局/旺衰），bazi 模块 835 条原典（渊海 113/三命 267/千里命稿 306/滴天髓阐微 62/子平真诠 89/五行精纪 97/神峰 114 等 14 部）canonOnly 定向。
+- **接线**：POST `/api/paipan/bazi/report` 挂 result.canon；报告落地页 `report-interpret.html` 的 renderPaipanReport 新增经典依据卡（各段之后、化解之前，中英双语标题，照录标注）——所有走 report-interpret 的模块报告页共用此渲染位，后续模块接 canon 零前端成本。
+- **实测**：1990-05-15 辰时男命 + 问「婚姻和财运」→ 动态命中 婚姻+財官 主题词，出星命总括/五行精纪婚姻原典 3 条，贴题。
+- **紫微留账（如实）**：ziwei 模块原典仅 4 条（批13 紫微斗数全书残本 stub），全书净本四库未收/维基 stub/ctext 被拦——紫微报告暂不挂 canon，免得残本提要冒充经典依据，与梅花同列待源清单。
+
 ## 2026-09-23 22:10 · R-CANON-EXT 续：六爻经典层落地 + 梅花/相术留账（Kimi）
 
 - **六爻经典依据**：`getLiuyaoCanon()`——占法核心三问（用神/世應/納甲），POST/GET `/api/paipan/liuyao` 双路由挂 canon；前端 `liuyao-chart.html` 复刻 renderCanonCard。实测 2026-09-23 辰时起卦：命中《增删卜易》用神三论连读（元神旺相/用神逢生/忌仇逢克），恰为占法核心章。

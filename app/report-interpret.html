@@ -321,6 +321,19 @@ function renderPaipanReport(report){
       html += '<div style="margin-bottom:10px;padding:10px;background:'+bg+';border:'+border+';border-radius:8px"><div style="color:#ffb44d;font-weight:600;margin-bottom:6px">'+s.title+'</div><div style="font-size:13px;line-height:1.7;color:#e4e8ee;white-space:pre-wrap">'+sContent+'</div></div>';
     });
   }
+  // R-CANON-EXT：经典依据卡（原典摘录 + 白话导读，置各段之后、化解之前）
+  if(report.canon && report.canon.items && report.canon.items.length){
+    var cn = report.canon;
+    var escC = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); };
+    html += '<div style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,180,77,.25);border-left:3px solid #ffb44d;border-radius:8px">';
+    html += '<div style="color:#ffb44d;font-weight:600;margin-bottom:6px">📚 '+(isEn?'Classical Basis':'经典依据')+'</div>';
+    if(cn.note) html += '<div style="font-size:12px;line-height:1.8;color:#7dd3c0;margin-bottom:8px">'+escC(cn.note)+'</div>';
+    cn.items.forEach(function(it){
+      html += '<div style="margin-top:8px"><div style="font-size:12px;color:#ffb44d">《'+escC(it.book||'')+'》<span style="opacity:.55;font-size:11px">　'+escC(it.title||'')+'</span></div>'+
+              '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85">'+escC(it.excerpt||'')+'</div></div>';
+    });
+    html += '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts from public-domain classics.':'原文照录自公有领域典籍，未作改写。')+'</div></div>';
+  }
   // 化解板块独立渲染
   var tRC = function(text){ return (typeof i18n !== 'undefined' && i18n.translateReportContent) ? i18n.translateReportContent(text || '') : (text || ''); };
     if(report.huajie){
