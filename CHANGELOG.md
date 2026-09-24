@@ -868,3 +868,11 @@
 - send-wecom.py 升级为双通道：企业微信机器人 + PushPlus（推个人微信），配置 wecom-webhook.local.json 支持 {"webhook":...} / {"pushplus":...} 或双通道并发；环境变量 WECOM_WEBHOOK/PUSHPLUS_TOKEN 亦可。
 - 企业微信三次 key 均 93000 invalid（curl 直连复核，排除我方因素）；该 key 在 PushPlus/Server酱 同样无效。已删无效凭据恢复 mock 模式，今晚 18:00 暮推不受影响（落 outbox 留痕）。
 - 待用户：二选一提供有效凭据（PushPlus token 32 位 / 企业微信内部群机器人完整地址）。
+
+## 2026-09-24 · 智谱（AutoClaw）+ Qclaw 彻底清理（用户令「执行」）
+
+**迁移保护**：com.tom.* 四维护脚本（disk-guardian/ensure-external-disk/post-reboot-check/vpn-autoconnect）迁至 workspace/scripts/maintenance/ 并修正脚本内日志硬编码路径，plist 重指+重载验证；Qclaw 有价值文档 638 件（巡检报告/数字化转型报告/任务表终态）归档 archive/qclaw-legacy-20260924/（5.2MB）；api-proxy-server.py 的 ~/.qclaw 兜底引用移除。
+**停用旧服务**：com.athena.labelstudio / com.dt-system.http / com.qianyuan.http（Qclaw 时代旧项目）bootout 停用，plist 备于 /tmp/*.removed-20260924。
+**删除**：/Applications/AutoClaw.app(1.7G)+QClaw.app(1.1G)、~/.qclaw(8.6G)、~/Library/Application Support/autoclaw、Caches/HTTPStorages/Logs/Preferences 双侧残留 7 项；进程全终结。
+**核对**：磁盘可用 13Gi→24Gi（+11G）；端口 8920/8960/8972(七能力健康)/8973/8974/8900 全通；launchd 无 qclaw/zhipuai 残留（com.autoclaw.* 三项为本工作区脚本服务，按方案保留）；/Applications 零残留。
+**保留红线**：~/.openclaw-autoclaw（61GB 全项目）未动；com.openclaw.*/com.autoclaw.* launchd 服务未动。
