@@ -876,3 +876,10 @@
 **删除**：/Applications/AutoClaw.app(1.7G)+QClaw.app(1.1G)、~/.qclaw(8.6G)、~/Library/Application Support/autoclaw、Caches/HTTPStorages/Logs/Preferences 双侧残留 7 项；进程全终结。
 **核对**：磁盘可用 13Gi→24Gi（+11G）；端口 8920/8960/8972(七能力健康)/8973/8974/8900 全通；launchd 无 qclaw/zhipuai 残留（com.autoclaw.* 三项为本工作区脚本服务，按方案保留）；/Applications 零残留。
 **保留红线**：~/.openclaw-autoclaw（61GB 全项目）未动；com.openclaw.*/com.autoclaw.* launchd 服务未动。
+
+## 2026-09-24 · 全项目健康巡检 + 重大隐患连根拔三枚
+
+**① node 运行时断链抢救（巡检挖出）**：dt-mall 重启失败暴露 /Users/tom/.local/bin/node 是指向智谱内嵌运行时的软链（清理后悬空，全 node 服务重启即死）。处置：下载官方 node v22.23.3 独立安装至 ~/.local/node-dist/ 并重指软链（附 npm/npx）；清除下载文件的 com.apple.provenance 标记（macOS 15 对下载二进制在 launchd 上下文的闸门拦截，曾致 medical-api 卡死在 node bootstrap 阶段——sample 采样定位）；medical 三服务/tcm-agent/dt-mall/family/8920 全部重启验收。
+**② KB 五红线复绿**：kb-sync-guard --normalize/--dedup/--full 全套——同文重复 401 组清零、NULL 键 401 行清零、fts5 与主表对齐 318251=318251、重复组 0/0；health-patrol.sh 52 行多行值整数比较 bug 修复。巡检从 6 红降到 1 红（仅 tcm-import 页面差集 57 页+3 API 的既有 backlog，非运行故障）。
+**③ 488 题全量回测收官（v92-fixed）**：50 人 488 题，总命中率 36.7%（179/488）——对照 v9.0 基线 37.5%、WO-002 采样 43.8%，如实记录：全量口径下与基线持平、低于采样预期。五维：健康 44.0% > 其他 40.4% > 事业 37.8% > 六亲 37.6% > 财富 32.4% > 感情 20.9%（最弱）。明细 v92-fixed-summary.json / v92-fixed-dimensions.json。
+**端口全景**：8900/8920/8960/8972/8973/8974/8970/8898/8787/8911-8914/8930/8941/8946/8950/8963/18999 全通。

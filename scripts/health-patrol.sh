@@ -51,7 +51,8 @@ GUARD_LOG="$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
 LCB_DIR="$HOME/.openclaw-autoclaw/backups/local-cold"
 LCB_FRESH=$(find "$LCB_DIR" -maxdepth 1 -name "20*" -type d -mtime -2 2>/dev/null | wc -l | tr -d ' ')
 if [ -f "$GUARD_LOG" ]; then
-    VMISS=$(grep -c "VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null; true)
+    VMISS=$(grep -c "VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null | tail -1; true)
+    VMISS=${VMISS:-0}
     VMISS_FRESH=$(grep "VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null | tail -1)
     if [ "$VMISS" -gt 0 ]; then
         ALERTS+=("备份守卫告警: $VMISS_FRESH")
