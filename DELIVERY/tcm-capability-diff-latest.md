@@ -1,11 +1,13 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-09-14 09:51 ｜ 差集指纹 `e93407e2e9a352ff`
-- tcm 侧 HEAD：`992ac47 v1.8.2：症状索引A源扩充47→238（分段解析器+方名归一防杜撰），路氏临证案例活化，bench/彩排全绿`
-- 结论：**✅ 全对齐（无待吸收增量）**
+- 生成：2026-09-23 13:59 ｜ 差集指纹 `1804763a1b121221`
+- tcm 侧 HEAD：`23ba37f feat(presign): 处方终审第六层「方证参校」（契约 v2.6.0，WO-008）`
+- 结论：**⚠ 有待吸收增量**
 
-## L1 API 路由差集（tcm 有 · medical-stack 无）：0 条
-- （空）
+## L1 API 路由差集（tcm 有 · medical-stack 无）：3 条
+- `get /api/insurance/herb-map`
+- `get /api/insurance/tcd-code`
+- `post /api/insurance/rx-check`
 
 ## 已知等价登记（勿重复建设）：1 条
 - `post /api/tcm/` → visual-observation-proxy 动态路由前缀（非独立端点）；ms 已有等价观察端点，严格代理按 ADR-007 架构定位豁免
@@ -29,7 +31,7 @@
 | `formula-symptom-index.json` | `63984d5e8134` | `63984d5e8134` | ✅ 一致 |
 | `symptom-aliases.json` | `2623d7f6927d` | `2623d7f6927d` | ✅ 一致 |
 | `recall-demotions.json` | `44136fa355b3` | `44136fa355b3` | ✅ 一致 |
-| `t2s-map.js` | `4695476f3921` | `4695476f3921` | ✅ 一致 |
+| `t2s-map.js` | `4f3a8aa939a1` | `4f3a8aa939a1` | ✅ 一致 |
 | `symptom-index.js` | `53ecb21bd3bf` | `53ecb21bd3bf` | ✅ 一致 |
 | `tcm-classics.json` | `47effa3917b3` | `47effa3917b3` | ✅ 一致 |
 | `syndrome-supplement.json` | `6ff617f0267b` | `6ff617f0267b` | ✅ 一致 |

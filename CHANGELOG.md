@@ -836,3 +836,9 @@
 - mock 全链路验收：public/koujue/qianyuan 三模式生成+分片+outbox 落盘全通。
 - 待办：拿到企业微信 webhook 后写配置→真实外发首测；数字化转型政策推送×3（9/15/18 点）转 Kimi 定时任务（待用户确认额度）。
 - 卸载 Qclaw 影响面复核：Kimi 运行时、AutoClaw、命理宝鉴项目文件与 launchd 服务与 ~/.qclaw 全分离，零依赖。
+
+## 2026-09-24 · 推送接管范围修正（用户拍板）
+
+- 用户确认：Qclaw 侧「每日口诀推送 07:00」「乾元每日推荐 07:00」「数字化转型政策推送 9/15/18 点」三条线从未实际生效，**全部废弃不迁移**。
+- 已撤销：launchd push-koujue / push-qianyuan 两任务（bootout+plist 删除）、scripts/push-koujue.js 删除、push-run.sh 精简为 public/simple 两模式；数字化转型×3 不建 Kimi 定时任务（不耗额度）。
+- 最终接管范围收口为：命理早晚推送 06:00/18:00 两条（一直在正常生成），接企业微信机器人外发。git 历史保留被删脚本备查。

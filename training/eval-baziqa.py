@@ -97,13 +97,19 @@ def main():
     ap.add_argument('--api', default='http://127.0.0.1:8960/v1/chat/completions')
     ap.add_argument('--tag', default=None, help='版本标签（如 v9.2），用于结果文件名')
     ap.add_argument('--limit', type=int, default=0, help='限制人数（0=全量 50 人）')
+    ap.add_argument('--offset', type=int, default=0, help='起始人序号（分段跑用，0 起）')
     args = ap.parse_args()
 
     people = json.load(open(DATA))
+    if args.offset > 0:
+        people = people[args.offset:]
     if args.limit > 0:
         people = people[:args.limit]
     tag = args.tag or ('eval-' + datetime.now().strftime('%m%d%H%M'))
-    out_path = os.path.join(RESULTS_DIR, f'{tag}-full488.log' if not args.limit else f'{tag}-sample{len(people)}.log')
+    if not args.limit and not args.offset:
+        out_path = os.path.join(RESULTS_DIR, f'{tag}-full488.log')
+    else:
+        out_path = os.path.join(RESULTS_DIR, f'{tag}-p{args.offset + 1}-{args.offset + len(people)}.log')
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
     total = correct = 0

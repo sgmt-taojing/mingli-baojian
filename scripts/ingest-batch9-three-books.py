@@ -59,9 +59,9 @@ def parse_qianli(path):
         flush()
     return entries
 
-def parse_ziping(path, tag):
+def parse_ziping(path):
     lines = [l.strip() for l in path.read_text(encoding='utf-8').split('\n')]
-    chap_re = re.compile(r'^[一二三四五六七八九十]{1,3}[、．．]\s*([\u4e00-\u9fa5]{1,14})$')
+    chap_re = re.compile(r'^[一二三四五六七八九十]{1,3}[、．\uFF0E.]\s*([\u4e00-\u9fa5]{1,14})$')
     entries, cur_t, cur_b, started = [], None, [], False
     def flush():
         nonlocal cur_t, cur_b

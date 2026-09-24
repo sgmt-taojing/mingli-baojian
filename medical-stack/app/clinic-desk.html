@@ -2287,6 +2287,23 @@ function renderCopilot(d) {
           '<span class="cp-btn no" onclick="rejectRecall(\'' + rid + '\',\'' + escHtml(f.name) + '\')">✗</span></span></div>';
       }).join('') + '</div></div>';
   }
+  // ①c 同症医案召回卡（2026-09-23：倪师08年医案/名医类案/历代医案，繁简规整匹配，多键去重）
+  if (d.caseRecall && d.caseRecall.length) {
+    const CASE_BADGE = { '倪师08年医案': '#0e7490', '名医类案': '#7c3aed', '历代医案': '#b45309' };
+    html += '<div class="cp-card" style="border-left:3px solid #0e7490">' +
+      '<div class="cp-title">📋 同症医案 <span class="cp-ms">命中 ' + d.caseRecall.length + ' 案 · 历史个案参考</span></div>' +
+      '<div style="margin-top:3px">' + d.caseRecall.map(c => {
+        const badge = CASE_BADGE[c.source] || '#64748b';
+        let inner = '<div style="margin:4px 0;padding:5px 8px;background:#f0fdfa;border-radius:4px;border-left:2px solid ' + badge + '">' +
+          '<div style="font-size:11px"><span style="display:inline-block;font-size:9px;padding:0 5px;border-radius:3px;background:' + badge + ';color:#fff;margin-right:5px">' + escHtml(c.source) + '</span><b>' + escHtml(c.title) + '</b></div>';
+        if (c.matched_symptoms && c.matched_symptoms.length) inner += '<div style="font-size:9px;color:var(--text3);margin-top:2px">命中：' + escHtml(c.matched_symptoms.join('、')) + '</div>';
+        if (c.diagnosis) inner += '<div style="font-size:11px;margin-top:2px"><span style="color:var(--text3)">診斷：</span>' + escHtml(c.diagnosis) + '</div>';
+        if (c.prescription) inner += '<div style="font-size:11px;margin-top:2px"><span style="color:var(--text3)">處方：</span>' + escHtml(c.prescription) + '</div>';
+        if (!c.diagnosis && !c.prescription && c.chief) inner += '<div style="font-size:10px;color:var(--text2);margin-top:2px">' + escHtml(c.chief.length > 60 ? c.chief.slice(0, 60) + '…' : c.chief) + '</div>';
+        return inner + '</div>';
+      }).join('') + '</div>' +
+      '<div style="font-size:9px;color:var(--text3);margin-top:3px">⚠️ 历史个案参考，须结合当下四诊辨证</div></div>';
+  }
   // ② 问诊导航卡（R780：五级优先级 + 追问理由，点击标记已问）
   if (d.followups && d.followups.length) {
     const QSTYLE = { red:['🚩','#fef2f2','#b91c1c','#fca5a5'], diff:['🔀','#fffbeb','#92400e','#fcd34d'], formula:['📜','#eff6ff','#1d4ed8','#93c5fd'], deep:['🔍','#f0f9ff','#075985','#7dd3fc'], tenq:['📋','#f8fafc','#475569','#cbd5e1'] };

@@ -21,34 +21,32 @@ def fp(p, s): return p + '|' + hashlib.sha1(s.encode('utf-8')).hexdigest()[:16]
 def parse_lantai(path):
     lines = [l.strip() for l in path.read_text(encoding='utf-8').split('\n')]
     META = re.compile(r'^来源章节：|^整理说明：|^来源：https?://|^抓取范围：|^ctext|^作者：|^##')
-    pian_re = re.compile(r'^[上中下]篇$')
     ge_re = re.compile(r'^[\u4e00-\u9fa5]{2,6}$')
-    entries, pian, cur_t, cur_b, started = [], None, None, [], False
+    entries, cur_t, cur_b, started = [], None, [], False
     def flush():
         nonlocal cur_t, cur_b
         if cur_t and cur_b:
             c = '\n'.join(cur_b).strip()
             if len(c) >= 40:
-                entries.append((f'{pian}·{cur_t}' if pian else cur_t, c))
+                entries.append((cur_t, c))
         cur_t, cur_b = None, []
     for l in lines:
         if META.match(l) or not l:
             continue
-        if pian_re.match(l):
-            flush()
-            pian = l
+        if l in ('《兰台妙选》', '兰台妙选'):
             started = True
             continue
         if not started:
             continue
-        if ge_re.match(l) and not pian_re.match(l):
+        # 格局名短行成节（上/中/下篇标记也作为节名保留语义）
+        if ge_re.match(l):
             flush()
             cur_t = l
             continue
         if cur_t:
             cur_b.append(l)
         else:
-            cur_t, cur_b = '总起', [l]
+            cur_t, cur_b = '卷首总起', [l]
     flush()
     return entries
 

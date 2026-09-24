@@ -8,9 +8,13 @@ MEM_MAX=96
 ALERTS=()
 
 # 1. 核心服务端口
+# R-MAINT-WINDOW：定案链/训练评估窗口内（mlx_lm 或 eval-baziqa 进程在跑）8960 是计划内停机，不告警
+MAINT_WINDOW=0
+pgrep -f 'mlx_lm lora|eval-baziqa-local|wo002-v92-chain' >/dev/null 2>&1 && MAINT_WINDOW=1
 for p in "8900:静态" "8911:排盘" "8912:TTS" "8913:face-ocr" "8920:api-v2" "8960:MLX-v5" "8941:face-diag" "8942:tongue-diag" "8943:eye-diag" "8944:hand-diag" "8945:vision-gw" "8932:tcm-agent" "8930:tcm-diagnosis"; do
     PORT=${p%%:*}
     NAME=${p##*:}
+    [ "$PORT" = "8960" ] && [ "$MAINT_WINDOW" = "1" ] && continue
     lsof -i :$PORT >/dev/null 2>&1 || ALERTS+=("$NAME(:$PORT) 未在监听")
 done
 
@@ -98,8 +102,11 @@ MEM_USED=$(vm_stat | awk '/Pages active/ {a=$3} /Pages wired/ {w=$3} /Pages occu
 
 # 5. MLX 推理响应
 # R713: 超时 5s→15s + 重试（模型冷启动/compile 首次可达 20s，避免启动窗口误报）
+# R-MAINT-WINDOW：维护窗口跳过（见第 1 段）
+if [ "${MAINT_WINDOW:-0}" != "1" ]; then
 MLX_RC=$(curl -s -o /dev/null -w "%{http_code}" -m 15 --retry 1 --retry-delay 2 http://localhost:8960/health)
 [ "$MLX_RC" != "200" ] && ALERTS+=("MLX v5 HTTP $MLX_RC")
+fi
 
 # 5b. 视觉推理微服务详情（face-ocr-server 8913）
 # R713: 超时 3s→8s（重启后 Spotlight 索引 I/O 风暴下偶发 >3s，误报离线）
