@@ -825,3 +825,14 @@
 - **推送内容核验**：今早补发版主日期 9月20日 ✅、中秋预告 1 处 ✅（9/24 月光菩萨诞倒计时已挂）。
 - **WO-002 轮值推进**：Kimi 活跃执行中（今早 10:50 probe-v90 探针日志），未弃单、48h 时限顺延口径按 R797 24h 复核条款处理；AutoClaw 补根因旁证入 WO 文件（8960 直探实证：v9.0 返回 `B <{/s}> 请编辑`，chat template 停止符泄漏致 harness 解析全空——解析层 bug 非模型问题），修法与证据已写明，driver 可直接落手。
 - **主仓 push**：积压 13 commit 本轮补推（含 R800-R813 submodule 指针与 R802 巡检语义分级）。
+
+## 2026-09-24 · 接管微信每日推送（方案C · 企业微信机器人）
+
+- 背景：用户拟卸载 Qclaw；查明微信通道 openclaw-weixin 网关为 QClaw 子进程，卸载即断。项目内容侧早已内化（daily_push.js + server/daily-recommendation.py + server/daily-push-bridge.py + knowledge/koujue-database-full.js 198 条），缺的只是发送最后一公里。
+- 新增 scripts/send-wecom.py：企业微信群机器人发送器。markdown ≤4000B 自动分片、限频间隔 1s、失败重试 1 次；凭据读 server/config/wecom-webhook.local.json 或 WECOM_WEBHOOK（凭据不进 git）；未配置时 mock 落盘 data/push-outbox/*.jsonl 标「模拟外发」。
+- 新增 scripts/push-run.sh：生成→日志→外发统一执行器（public/simple/koujue/qianyuan 四模式；生成失败不外发；PATH 钉死防解释器歧义）。
+- 新增 scripts/push-koujue.js：每日口诀生成器，年内日序确定性轮换 198 条口诀库，含出处/功效/修持/场景/提示+合规免责。
+- launchd 四任务全部接管并上线：push-morning 06:00 / push-evening 18:00（改造接发送器）/ push-koujue 07:00（新增，接替 Qclaw「每日口诀推送」）/ push-qianyuan 22:00（新增，接替 Qclaw「乾元每日推荐」07:00 洛杉矶时区）。
+- mock 全链路验收：public/koujue/qianyuan 三模式生成+分片+outbox 落盘全通。
+- 待办：拿到企业微信 webhook 后写配置→真实外发首测；数字化转型政策推送×3（9/15/18 点）转 Kimi 定时任务（待用户确认额度）。
+- 卸载 Qclaw 影响面复核：Kimi 运行时、AutoClaw、命理宝鉴项目文件与 launchd 服务与 ~/.qclaw 全分离，零依赖。
