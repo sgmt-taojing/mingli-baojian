@@ -842,3 +842,10 @@
 - 用户确认：Qclaw 侧「每日口诀推送 07:00」「乾元每日推荐 07:00」「数字化转型政策推送 9/15/18 点」三条线从未实际生效，**全部废弃不迁移**。
 - 已撤销：launchd push-koujue / push-qianyuan 两任务（bootout+plist 删除）、scripts/push-koujue.js 删除、push-run.sh 精简为 public/simple 两模式；数字化转型×3 不建 Kimi 定时任务（不耗额度）。
 - 最终接管范围收口为：命理早晚推送 06:00/18:00 两条（一直在正常生成），接企业微信机器人外发。git 历史保留被删脚本备查。
+
+## 2026-09-24 · 去智谱（AutoClaw）运行时依赖改造
+
+- 背景：用户拟卸载智谱 AutoClaw；审计发现 5 个 launchd 服务的 node 解释器指向其内嵌运行时（~/Library/Application Support/autoclaw/embedded-gateway-runtime/fead26bb…/node），卸载即服务全挂。
+- 改造：com.mingli-baojian.medical-api(8972)/medical-extra(8974)/medical-static(8973) + com.smart-home-family.capability-drift-redline/regular 共 5 个 plist，node 路径统一换为系统 /Users/tom/.local/bin/node（版本与内嵌一致 v22.22.3，零兼容风险）；原件备份 /tmp/*.bak-autoclaw。
+- 验收：5 服务全部重载成功；8972 /api/tcm/health 七能力（tongue/face/hand/inquiry/syndrome/formula/acupoint）正常、进程确认跑在系统 node；8973 静态 200、8974 存活。服务层对智谱依赖清零。
+- 遗留提醒：项目本体在 ~/.openclaw-autoclaw/workspace（61GB），卸载智谱后**该目录不得手动删除**（含全部项目与数据）；路径未迁，无需改动任何配置。
