@@ -31,15 +31,26 @@ OUTBOX_DIR = os.path.join(ROOT, 'data', 'push-outbox')
 MAX_BYTES = 4000  # 留 96 字节余量（上限 4096）
 
 
-def load_webhook():
-    url = os.environ.get('WECOM_WEBHOOK', '').strip()
-    if url:
-        return url
+def load_channels():
+    """返回通道列表 [('wecom', url)] / [('pushplus', token)]，可多通道并发。
+    配置 server/config/wecom-webhook.local.json：
+      {"webhook": "https://qyapi.weixin.qq.com/..."}   企业微信机器人
+      {"pushplus": "32位token"}                         PushPlus（推个人微信）
+    环境变量 WECOM_WEBHOOK / PUSHPLUS_TOKEN 亦可。"""
+    chans = []
+    cfg = {}
     try:
         with open(CONFIG_FILE, encoding='utf-8') as f:
-            return json.load(f).get('webhook', '').strip()
+            cfg = json.load(f)
     except Exception:
-        return ''
+        pass
+    w = (os.environ.get('WECOM_WEBHOOK') or cfg.get('webhook') or '').strip()
+    p = (os.environ.get('PUSHPLUS_TOKEN') or cfg.get('pushplus') or '').strip()
+    if w:
+        chans.append(('wecom', w))
+    if p:
+        chans.append(('pushplus', p))
+    return chans
 
 
 def chunk_text(text, max_bytes=MAX_BYTES):
@@ -82,14 +93,25 @@ def mock_outbox(title, chunks):
     return True
 
 
-def send_one(webhook, content):
-    body = json.dumps({'msgtype': 'markdown', 'markdown': {'content': content}},
-                      ensure_ascii=False).encode('utf-8')
-    req = urllib.request.Request(webhook, data=body,
-                                 headers={'Content-Type': 'application/json'})
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        r = json.loads(resp.read().decode('utf-8'))
-    return r.get('errcode') == 0, r
+def send_one(kind, cred, title, content):
+    if kind == 'wecom':
+        body = json.dumps({'msgtype': 'markdown', 'markdown': {'content': content}},
+                          ensure_ascii=False).encode('utf-8')
+        req = urllib.request.Request(cred, data=body,
+                                     headers={'Content-Type': 'application/json'})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            r = json.loads(resp.read().decode('utf-8'))
+        return r.get('errcode') == 0, r
+    if kind == 'pushplus':
+        # PushPlus：推到个人微信（公众号消息），template=markdown
+        body = json.dumps({'token': cred, 'title': title, 'content': content,
+                           'template': 'markdown'}, ensure_ascii=False).encode('utf-8')
+        req = urllib.request.Request('https://www.pushplus.plus/send', data=body,
+                                     headers={'Content-Type': 'application/json'})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            r = json.loads(resp.read().decode('utf-8'))
+        return r.get('code') == 200, r
+    return False, {'err': 'unknown channel ' + kind}
 
 
 def main():
@@ -105,22 +127,23 @@ def main():
         return 0
 
     chunks = chunk_text(text)
-    webhook = load_webhook()
-    if not webhook:
+    chans = load_channels()
+    if not chans:
         mock_outbox(args.title, chunks)
         return 0
 
     ok_all = True
-    for i, c in enumerate(chunks):
-        payload = c if len(chunks) == 1 else f'**{args.title}（{i+1}/{len(chunks)}）**\n\n{c}'
-        ok, r = send_one(webhook, payload)
-        if not ok:  # 重试 1 次
-            time.sleep(2)
-            ok, r = send_one(webhook, payload)
-        print(f'[send-wecom] 第 {i+1}/{len(chunks)} 条: {"OK" if ok else "FAIL " + json.dumps(r, ensure_ascii=False)}')
-        ok_all = ok_all and ok
-        if i < len(chunks) - 1:
-            time.sleep(1)
+    for kind, cred in chans:
+        for i, c in enumerate(chunks):
+            payload = c if len(chunks) == 1 else f'**{args.title}（{i+1}/{len(chunks)}）**\n\n{c}'
+            ok, r = send_one(kind, cred, args.title, payload)
+            if not ok:  # 重试 1 次
+                time.sleep(2)
+                ok, r = send_one(kind, cred, args.title, payload)
+            print(f'[send-wecom][{kind}] 第 {i+1}/{len(chunks)} 条: {"OK" if ok else "FAIL " + json.dumps(r, ensure_ascii=False)}')
+            ok_all = ok_all and ok
+            if i < len(chunks) - 1:
+                time.sleep(1)
     return 0 if ok_all else 1
 
 
