@@ -855,3 +855,10 @@
 - 背景：g2claw 500→mlx-v5 挂起事故后，超时（R710/R712）已修但熔断一直挂账；回测占 8960 期间正是真实风险场景。
 - 修真（server/api-server-v2.js callAIWithFallback）：①按 provider 熔断——连续失败 3 次开路 5 分钟，开路期间直接跳过不等 70s，冷却后半开试探、成功即闭合；②超时分级——云端 45s（CLOUD_TIMEOUT_MS）/ 本地 mlx 70s（MLX_TIMEOUT_MS），云端慢尽快降级。
 - 验收：node --check 通过；8920 重启健康；/api/ai/knowledge-qa 实测 KB 直答正常无回归；熔断仅作用于 fallback 链。
+
+## 2026-09-24 · G26-R1 天纪字幕覆盖审计（KANBAN 挂账「待工作窗口」启动）
+
+- 语料：subs-tianji-classified 179 字幕文件（六壬/四柱命卦/易经/紫微/堪舆/天纪开篇六系列）× kb_formal 318,652 条对账。
+- 方法：粗扫（文件主题词 LIKE）+ 精查（子主题逐词 FTS5/LIKE 混合，增量可续传）。
+- 结论：硬缺口 0；薄弱带 50 文件（易经卦解/紫微案例密度 1-4 条/集）列 R2 补蒸馏目标；审计产物 DELIVERY/g26-r1-tianji-coverage-20260924.{md,json}。
+- 方法学：FTS5 trigram <3 字漏召+索引滞后，覆盖审计以 LIKE 为准。
