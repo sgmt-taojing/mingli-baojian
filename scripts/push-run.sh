@@ -10,11 +10,12 @@ NODE="/Users/tom/.local/bin/node"
 PY="/usr/bin/python3"
 MODE="${1:-public}"
 TITLE="${2:-命理宝鉴每日推送}"
+EXTRA="${3:-}"  # R-PUSH-EVE：透传 --tomorrow 等附加参数（暮推=明日预告）
 cd "$ROOT" || exit 1
 
 case "$MODE" in
   public|simple)
-    OUT=$("$NODE" daily_push.js "$MODE" 2>&1) ;;
+    OUT=$("$NODE" daily_push.js "$MODE" $EXTRA 2>&1) ;;
   *)
     echo "[push-run] 未知模式: $MODE"; exit 1 ;;
 esac

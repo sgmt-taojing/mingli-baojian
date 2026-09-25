@@ -374,6 +374,10 @@ fi
 REF_LEAK=$(sqlite3 "file:$PROJECT_ROOT/server/database/yidao.db?mode=ro" "SELECT COUNT(*) FROM kb_formal WHERE (module LIKE 'tcm%' OR module IN ('nihaisha-tcm','huangdi-neijing','shanghan-lun','yizong-jinjian','jingyue','bencao-gangmu','shennong-bencao','nihaisha_pcs','nihaisha-pcs','nihaisha-structured')) AND (fingerprint IS NULL OR fingerprint NOT LIKE 'TCMFWD|%') AND (domain IS NULL OR domain != 'reference');" 2>/dev/null)
 [ "$REF_LEAK" != "0" ] && [ -n "$REF_LEAK" ] && ALERTS+=("G24 参考域泄漏: $REF_LEAK 条医学条目未标 reference（跑 python3 scripts/g24-reference-guard.py 补标）")
 
+# R-PUSH-WATCH 推送积压巡检（2026-09-25）：push-queue 滞留 >15min 说明 daemon 掉线或未登记会话
+_PUSH_STALE=$(find "$PROJECT_ROOT/data/push-queue" -maxdepth 1 -name '*.json' -mmin +15 2>/dev/null | wc -l | tr -d ' ')
+[ "$_PUSH_STALE" != "0" ] && ALERTS+=("推送积压: push-queue 滞留 $_PUSH_STALE 条超 15 分钟未外发（查 wecom-aibot daemon 与会话登记）")
+
 # ===== R-WALK-API 前端 API 基址门禁（2026-09-07 新增）=====
 # 背景：五中心走查发现 13 页同源落空暗病——`API=''` 或裸 fetch('/api/…') 打 8900 静态口
 # 必 404，页面静默降级为空态（kb-browser 总览全 0、master-workstation 实时通道全灭等均因此）。

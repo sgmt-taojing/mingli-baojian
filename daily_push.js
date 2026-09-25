@@ -176,7 +176,8 @@ function buildPublic(d) {
 
   if (d.holiday) {
     msg += `
-🎉 ${d.holiday}${d.festival_guide ? '｜' + d.festival_guide : ''}
+━━━ 节日特辑 ━━━
+🎉 ${d.holiday}${d.festival_lore ? '\n📜 ' + d.festival_lore : ''}${d.festival_guide ? '\n🎯 ' + d.festival_guide : ''}
 `;
   }
 
