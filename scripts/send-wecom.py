@@ -50,6 +50,9 @@ def load_channels():
         chans.append(('wecom', w))
     if p:
         chans.append(('pushplus', p))
+    # 智能机器人长连接通道：凭据文件存在即启用，消息落队列由守护进程外发
+    if os.path.exists(os.path.join(ROOT, 'server', 'config', 'wecom-aibot.local.json')):
+        chans.append(('aibot', ''))
     return chans
 
 
@@ -94,6 +97,17 @@ def mock_outbox(title, chunks):
 
 
 def send_one(kind, cred, title, content):
+    if kind == 'aibot':
+        # 智能机器人长连接：落队列，daemon 负责外发（单连接纪律，不自己连）
+        qdir = os.path.join(ROOT, 'data', 'push-queue')
+        os.makedirs(qdir, exist_ok=True)
+        ts = datetime.datetime.now().strftime('%Y%m%d-%H%M%S-%f')
+        path = os.path.join(qdir, f'{ts}.json')
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump({'title': title, 'content': content,
+                       'enqueued': datetime.datetime.now().isoformat(timespec='seconds')},
+                      f, ensure_ascii=False)
+        return True, {'queued': path}
     if kind == 'wecom':
         body = json.dumps({'msgtype': 'markdown', 'markdown': {'content': content}},
                           ensure_ascii=False).encode('utf-8')
