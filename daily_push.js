@@ -22,10 +22,12 @@ const FULL_SCRIPT = path.join(ROOT, 'server', 'daily-recommendation.py');
 const LINE = '━━━━━━━━━━━━━━━━━━';
 const SEP = '════════════════════════';
 
-/** 运行 python 脚本并取回 stdout（去尾部空白） */
+/** 运行 python 脚本并取回 stdout（去尾部空白）
+ *  R-PUSH-PY：钉死 /usr/bin/python3（系统 Python 才有 lunar_python），
+ *  防止不同 shell 下裸 `python3` 解析到无 lunar_python 的解释器导致推送哑炮 */
 function runPython(script, env) {
   try {
-    return execFileSync('python3', [script], {
+    return execFileSync('/usr/bin/python3', [script], {
       encoding: 'utf8',
       timeout: 60000,
       maxBuffer: 10 * 1024 * 1024,
@@ -33,7 +35,7 @@ function runPython(script, env) {
     }).trim();
   } catch (e) {
     const stderr = (e.stderr || '').toString().trim();
-    console.error(`[daily_push] python3 ${script} 执行失败: ${stderr || e.message}`);
+    console.error(`[daily_push] /usr/bin/python3 ${script} 执行失败: ${stderr || e.message}`);
     process.exit(1);
   }
 }
@@ -134,26 +136,36 @@ const KOUJUE_TIPS = [
   '今日宜睡前放下手机，读10页书，再安稳入睡。',
 ];
 
-/** 公开版：黄历核心直给（R125 极致版：去废话高密度） */
+/** 公开版：黄历核心直给（R-PUSH-PLAIN 2026-09-25：古词全配白话，神煞带注解，吉时带钟点） */
 function buildPublic(d) {
   const gz = d.gz;
   const yiJi = d.yi_ji;
-  const shichenLine = d.shichen.map(([s, j]) => `${s}${j}`).join(' ');
   const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）`;
   // R142 知识服务当下当天：KB 按日期检索古籍口诀优先，本地列表降级
   const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
+  // 建除去重（"执日(执日宜坚持推进)" → "执日（宜坚持推进）"）
+  const jianchu = (yiJi.jianchu || '').replace(/^(.日)\(\1/, '$1（').replace(')', '）');
+  // 冲煞白话
+  const chongPlain = `属${d.chong_shengxiao}的朋友今日大事缓一缓；煞在${d.sha}方，${d.sha}方不宜动土修造`;
+  // 吉时带钟点（白天 7-21 点优先展示，夜间吉时殿后）
+  const jishiList = d.jishi_plain || [];
+  const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
+  const nightJishi = jishiList.filter(s => !/辰|巳|午|未|申|酉|戌/.test(s[0]));
+  const jishiLine = [...dayJishi, ...nightJishi].join('、');
 
   let msg = `📅 乾元命理宝鉴 · ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
 
-━━━ 黄历 ━━━
-✅ 宜：${yiJi.yi}
-🚫 忌：${yiJi.ji}
-📌 ${yiJi.jianchu}｜⭐ ${yiJi.xingxiu}｜☀️ ${d.huanghei}
-⚔️ ${chong}·煞${d.sha}｜📜 ${d.pengzu}
-✨ ${d.shensha}
-🧭 喜${d.xishen}·财${d.caishen}·福${d.fushen}｜求财面朝${d.caishen}坐
-⏰ 吉凶：${shichenLine}
+━━━ 今日宜忌 ━━━
+✅ 宜：${yiJi.yi_plain || yiJi.yi}
+🚫 忌：${yiJi.ji_plain || yiJi.ji}
+📌 ${jianchu}｜⭐ ${yiJi.xingxiu}｜☀️ ${d.huanghei}
+⚔️ ${chong}·煞${d.sha}
+   ${chongPlain}
+📜 彭祖百忌：${d.pengzu}
+✨ ${d.shensha_plain || d.shensha}
+🧭 喜神${d.xishen}·财神${d.caishen}·福神${d.fushen}｜求财面朝${d.caishen}坐
+⏰ 吉时：${jishiLine}
 `;
 
   if (d.jieqi_info) {
@@ -164,7 +176,7 @@ function buildPublic(d) {
 
   if (d.holiday) {
     msg += `
-🎉 ${d.holiday}
+🎉 ${d.holiday}${d.festival_guide ? '｜' + d.festival_guide : ''}
 `;
   }
 
@@ -172,6 +184,7 @@ function buildPublic(d) {
     msg += `
 🙏 ${d.deities.map(de => de.name + '诞辰').join('·')}
 `;
+    (d.deity_guides || []).forEach(g => { msg += `   ${g}\n`; });
   }
 
   msg += `
@@ -203,12 +216,11 @@ function buildSimple(d) {
   const yiJi = d.yi_ji;
   const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}`;
   const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
-  // 吉时提取（白天 7-19 点实用时段）
+  // 吉时提取（白天 7-19 点实用时段，带钟点）
   let jishi = '';
   try {
-    const DAY_HOURS = ['辰', '巳', '午', '未', '申', '酉'];
-    const gt = (d.shichen || []).filter(([s, j]) => j === '吉' && DAY_HOURS.includes(s));
-    if (gt.length) jishi = '⏰ 吉时 ' + gt.map(([s]) => s + '时').join('/');
+    const gt = (d.jishi_plain || []).filter(s => /^[辰巳午未申酉]/.test(s));
+    if (gt.length) jishi = '⏰ 吉时 ' + gt.map(s => s.replace(/(\d{2}:\d{2})-(\d{2}:\d{2})/, '$1-$2')).join('/');
   } catch (e) { /* ignore */ }
 
   return `📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}

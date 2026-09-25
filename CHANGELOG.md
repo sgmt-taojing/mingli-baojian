@@ -919,3 +919,11 @@
 - **协议要点**：智能机器人须用户先发消息才可主动推送——daemon 收到回调自动登记 chatid（server/config/wecom-aibot-chats.local.json），enter_chat 回欢迎语。
 - **send-wecom.py 增 aibot 通道**：消息落 data/push-queue/ 由 daemon 统一外发（markdown，20480 字节上限远高于 webhook 的 4096），晨推暮推 launchd 任务零改动自动受益。
 - mock 兜底不变：凭据缺失时仍落 push-outbox 不丢内容。
+
+## 2026-09-25 15:42 · 推送链全面诊断校正 + 白话层升级（Kimi）
+
+- **哑炮根修**：daily_push.js 裸 `python3` 依赖 PATH 漂移（Kimi 托管 Python 无 lunar_python → get_ganzhi 返回 None → 静默哑炮），钉死 `/usr/bin/python3`。此类故障在 launchd 下不发作、交互 shell 下必炸，属隐形定时炸弹。
+- **知识校正**：彭祖百忌「壬不泱水」→「壬不汲水」（上游 lunar_python 字形讹误，桥接层 PENGZU_FIX 校正表，以《钦定协纪辨方书》传世本为准）；纳音 60 表/建除 12 释义/儒道佛语录抽查全对。
+- **白话层四件套**（daily-push-bridge.py）：①宜忌白话映射 ~90 词（古词保留+括号现代场景）；②常见神煞注解 38 条（吉神 18+凶煞 20）；③节日/神诞行动指引 33 条（中秋拜月老等场景激活）；④纳音 30 条「今日宜向」行动建议。
+- **模板重排**：冲煞白话指导（属 X 的朋友大事缓一缓/煞方不宜动土）、吉时带钟点（白天优先殿后夜间）、建除显示去重（"执日(执日)"→"执日（宜坚持推进）"）。
+- **验收**：--verify 11/11 通过；真实推送 977 字符已送达企业微信。
