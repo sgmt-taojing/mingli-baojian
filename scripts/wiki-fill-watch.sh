@@ -11,8 +11,15 @@ LOG="$PROJ/logs/wiki-fill-watch.log"
 TS=$(date "+%Y-%m-%d %H:%M:%S")
 LABEL="com.mingli-baojian.wiki-fill-watch"
 
-# 1. 探活（8s 超时，只探不跑）
-if ! curl -s -m 8 -o /dev/null "https://zh.wikipedia.org/w/api.php?action=query&meta=siteinfo&format=json"; then
+# 1. 探活（8s 超时，只探不跑）：先直连，不通则试本机系统代理 7890（Clash 在册，2026-09-26 实测通）
+PROBE_URL="https://zh.wikipedia.org/w/api.php?action=query&meta=siteinfo&format=json"
+PROXY="http://127.0.0.1:7890"
+if curl -s -m 8 -o /dev/null "$PROBE_URL"; then
+    :  # 直连可用，无需代理
+elif curl -s -m 8 -x "$PROXY" -o /dev/null "$PROBE_URL"; then
+    export http_proxy="$PROXY" https_proxy="$PROXY" HTTP_PROXY="$PROXY" HTTPS_PROXY="$PROXY"
+    echo "[$TS] 直连不通，走本机代理 $PROXY" >> "$LOG"
+else
     exit 0  # 静默等下一轮
 fi
 

@@ -95,7 +95,7 @@ def main():
         print(f"  进度 {min(i + BATCH, total)}/{total} 本批带事件累计={filled}")
         sys.stdout.flush()
         db.commit()
-        time.sleep(0.4)
+        time.sleep(2)  # 代理出口共享 IP，限速防 429（2026-09-26 实测 0.4s 触发限流）
 
     db.commit()
     db.close()
