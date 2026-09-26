@@ -1,3 +1,13 @@
+## 2026-09-26 14:10 · 8920 检索性能根修：报告全链 33s→2.2s（Kimi）
+
+- **现象解剖**：八字报告 33s = KB 检索八词串行（「日主」冷 10-15s +「十神」4s+）+ 事件循环阻塞放大——服务端打点仅 ~2s，其余为 Node 单线程排队（慢查询阻塞所有并发）。
+- **三根因三药**：
+  1. **短词 LIKE 全表扫**：trigram FTS 不覆盖 <3 字词，短词快路径 `title/keywords LIKE '%x%'` 读 GB 级大字段行。药：覆盖索引 `idx_kb_short_lookup(title,keywords,trust_score,hit_count,entry_id)` + 两阶段内层过滤，**注意 ORDER BY 在子查询会让主表变驱动表（1.9s），必须 CROSS JOIN 钉死驱动序（47ms）**。
+  2. **attachRelatedByFingerprint 无索引**：`fingerprint IN (...)` 全表扫。药：`idx_kb_fingerprint`（IN 查询 0ms）。
+  3. **LIKE fallback 带 content LIKE**：单查询 10s+ 且阻塞事件循环。药：摘掉 content LIKE（FTS trigram 已覆盖 ≥3 字内容召回），fallback 同走两阶段覆盖索引。代价如实记录：<3 字词仅在 content 出现时召回减少。
+- **战果**：八字八词冷查 7/8 ≤ 50ms；八字报告全链 **33s→2.17s（15×）**；馆长端到端 3.98s 出报告（rpt_20260926_b0c6c971，confidence:high）。
+- **认知留账**：8920 重启后首请求 ~14s 为连接/计划预热（非业务慢查询），压测须先打一发预热弹。
+
 ## 2026-09-26 13:30 · KB 五红线复绿：乱码修复 30 + 无出处补标 839 + 同文去重 30（Kimi）
 
 - **结论先行（推翻任务前提）**：所谓「mingli 251 组同题重复」经解剖**不是冗余**——同名异文（倪师 PDF 分块共享通用标题，内容各异），删除会丢知识；巡检红线2 口径本是 (module, content) 同文，mingli 域实为 0。真问题在红线3/4。
