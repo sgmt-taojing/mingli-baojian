@@ -1,3 +1,13 @@
+## 2026-09-26 12:12 · S2.1 馆长 curator-api :8980 骨架上线（Kimi）
+
+- **新建** `server/curator-api.js`（express + node:sqlite，8980 端口）：四端点落地——`POST /session`（身份+年龄声明，信众 <18 拒入）、`POST /message`（规则版意图路由 14 类+医学转介+unknown 引导）、`GET /report/:id`（登记处）、`GET /health`（四探针：模型 8960 / 引擎 7 加载 / KB 总数 / FTS5 命中）。
+- **自测全过**：未成年拒入 403、八字意图 fate.chart+槽位 birth/gender、「胃疼看中医」正确转介问诊台（R745 红线）、闲聊引导话术、report 404 语义正确。
+- **FTS5 探针修正**：unicode61 分词下连续 CJK 成单 token，「奇门」永不单独成词（命中 0）——探针词改「奇门遁甲」（命中 704）。此为 FTS 检索通用知识，后续检索接口设计须注意。
+- **过程坑**：探活后台进程未杀净致旧码占位 8980，新实例 EADDRINUSE——以后临时探活统一 `kill $(lsof -ti:PORT)`。
+- **常驻**：`com.mingli-baojian.curator-api.plist`（node v22.23.3，KeepAlive），四探针全绿：model v9.2-7b ready、engines 7/7、KB 319,653、FTS5 704。
+- **Prompt 资产锚点**：`server/prompts/curator/system.md` v0.1（人格+四条红线+三段契约）。
+- **下一步**：S2.3 八字+姓名两工具端到端（引擎调用→KB 检索→三段报告组装）。
+
 ## 2026-09-26 12:10 · S0.2 奇门统宗取回入库（残本七卷 8 条）（Kimi）
 
 - **取回**：xuanxuecenter.com 直下 `files/qi_men_dun_jia_tong_zong.pdf`（64 页 620KB，真实路径探测 1/4 命中），pypdf 提取净文本 48,374 字落 `corpus/qimen-tongzong/`。
