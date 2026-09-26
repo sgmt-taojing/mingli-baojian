@@ -1,3 +1,11 @@
+## 2026-09-26 12:10 · S0.2 奇门统宗取回入库（残本七卷 8 条）（Kimi）
+
+- **取回**：xuanxuecenter.com 直下 `files/qi_men_dun_jia_tong_zong.pdf`（64 页 620KB，真实路径探测 1/4 命中），pypdf 提取净文本 48,374 字落 `corpus/qimen-tongzong/`。
+- **版本认定（如实）**：白下醉鹤老人鉴定本，**卷四至卷九原书阙略**——实收卷首（序/源流/凡例）+ 卷一二三（秘诀总赋/起例/超接置闰/四十格/八卦天干类神）+ 卷十至十二（玄机赋上中下）。玄机赋为奇门占断核心歌赋，与烟波钓叟歌并称，占断魂已入库；卷四至九（分门占法）列入待源清单。
+- **入库**：`scripts/ingest-qimen-tongzong-local.py`（KB-QM- 前缀，module=qimen，trust 0.95，指纹幂等），8 条全入、跳过 0；FTS5 对齐差 0，「玄机赋」命中 12、「龙回首」命中 9。
+- **背景流量（如实）**：入库窗口内 tcm-agent-forward 通道并发内化 900 条医学条目（G24 正室通道常态），与本批无涉。
+- **KB 体检留账**：同题重复组 2,069（mingli 251，主因倪师多轮蒸馏同名条；reference 720 属 tcm 侧；空域 443 属 forward 通道）——命理域 251 组列 backlog 专项收敛，不混本批。
+
 ## 2026-09-26 11:58 · S1.3 收官：8960 推理服务回退 v9.2-fixed（Kimi）
 
 - **动作**：`com.mingli-baojian.mlx-v8` plist 环境变量 `MLX_MODEL` 由 v9.4-7b 指回 `training/mlx-models/mingli-sft-v9.2-7b`（备份 `....plist.bak-v94-rejected-20260926`）。
