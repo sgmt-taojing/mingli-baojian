@@ -4,7 +4,7 @@
 # 通过静默；失败写日志 + macOS 通知提醒。
 set -uo pipefail
 PROJ="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
-NODE="/Users/tom/Library/Application Support/autoclaw/embedded-gateway-runtime/fead26bb436d5687/node/node"
+NODE="/Users/tom/.local/bin/node"  # P2-A 2026-09-26：AutoClaw 已卸载，内嵌 node 路径失效（127 根因）→ 标准 node
 LOG="$PROJ/logs/ui-smoke-daily.log"
 mkdir -p "$PROJ/logs"
 {

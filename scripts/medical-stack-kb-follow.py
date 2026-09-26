@@ -134,7 +134,7 @@ def main() -> int:
     # launchd 环境 PATH 极简，裸 "node" 找不到——先 which，再回退 Kimi 运行时绝对路径
     if SQLITE_SYNC.exists():
         import shutil
-        node_bin = shutil.which("node") or "/Users/tom/Library/Application Support/autoclaw/embedded-gateway-runtime/fead26bb436d5687/node/node"
+        node_bin = shutil.which("node") or "/Users/tom/.local/bin/node"  # P2-A 2026-09-26: AutoClaw已卸载
         if not Path(node_bin).exists():
             result["sqlite_sync"] = "failed: node 不可用（PATH 与回退路径均未命中）"
             result.update(status="error")

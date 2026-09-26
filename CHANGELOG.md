@@ -1110,3 +1110,10 @@
 - 8974=命理批注层（medical-stack/medical-extra.js）在线健康：/health ok，/api/annotation-queue SLA 48h 正常，pending 0 / approved 78 / rejected 6。
 - 路由实为连字符 /api/annotation-queue，前端 5 处引用（mobile-interact/unified-consultation/sla-tier-badge/annotation-workbench 等）全部一致——审计探测路径笔误，非缺陷。audit-plan-20260926.md 第 7 项已核销。
 - **P1 三切片至此全收官**：P1-A 推送实发✓ / P1-B 检索加速✓ / P1-C 路由核销✓。
+
+## 2026-09-26 18:10 · P2-A launchd 大扫除（Kimi）
+
+- **ui-smoke-daily exit:127 根修**：NODE 指向已卸载的 AutoClaw 内嵌 node（embedded-gateway-runtime）→ 换 /Users/tom/.local/bin/node；实跑复测 29/29 全过、exit:0。同路径污染连带修 2 处：monthly-cross-check.py（硬编码）、medical-stack-kb-follow.py（兜底）。全 scripts/ 复扫清净。
+- **僵尸任务下线 5 项**（bootout + plist 归档 ~/Library/LaunchAgents/_archived-20260926/，可回滚）：v94-chain / v92-chain / v94-train / baziqa-full-v92（v9.4 否决后评测链即死）、test-ext-write（/tmp 临时测试）。
+- **排雷**：mlx-v8（pid 90791）实为 8960 生产模型服务（v9.2-fixed），仅标签名陈旧，保留；messiah（pid 1162）为跨八项目知识网关常驻，保留；health-patrol exit:1 为设计语义（有告警即非零），当前告警=差集超期×3+tcm-import，属 P2-B 靶子，不消音。
+- **health-patrol L52 整数比较错**：当前版本实跑无此错（旧版残留日志），核销。
