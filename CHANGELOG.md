@@ -1,3 +1,10 @@
+## 2026-09-26 12:45 · S2.3 馆长八字+姓名端到端贯通 + 化解匹配器 436 倍提速（Kimi）
+
+- **P0 根修·huajie-matcher**：`_kb()` 每查一次全表扫 319K 大字段行（SQLite LIKE 默认大小写不敏感，BINARY 索引失效），单次 match 3.3s、8920 `/api/paipan/calculate` 累计 14s 打爆报告引擎 8s 超时——这是八字报告长期「总是显示失败」的真根因之一。修复：进程级缓存 r45_huajie 子集（1,300 条一次性读入）+ **区间比较代 LIKE 前缀**（`entry_id >= 'r45-r45_huajie' AND < 'r45-r45_huajif'` 吃唯一索引）。效果：首查 11,332ms→26ms（436×），calculate 14.1s→0.22s（64×），报告端点由稳定 TIMEOUT 转 200 全量出报告。
+- **馆长 S2.3**：`POST /message` 八字/姓名两工具端到端——生辰解析（公历/时辰地支/性别，「1990年5月15日8点，男」直出；缺参给格式追问）、姓名解析；调 8920 规范报告/民俗姓名引擎，组装 §1.5 三段契约（professional=格局+大运段、plainfolk=白话总览≤800字、actions=优化建议+化解风险迹、sources=canon 原典出处、confidence/disclaimer/feedback_points），报告落内存登记处，`GET /report/:id` 全量可取。
+- **实测**：八字「庚金日主缺木水」直出报告（canon 命中三命指迷赋/星命总括，confidence:high）；「张三」五格 2/5 吉+改名笔画方案（人格 14 画凶→改 2/4/5 画字变 13/15/16 吉数）；缺参追问、未知意图引导、医学转介均保持正确。
+- **留账**：八字报告全链 ~33s（8920 norm-report 内部 KB 检索仍有慢查询），列性能 backlog；报告存取内存态，S2.4 落 SQLite。
+
 ## 2026-09-26 12:12 · S2.1 馆长 curator-api :8980 骨架上线（Kimi）
 
 - **新建** `server/curator-api.js`（express + node:sqlite，8980 端口）：四端点落地——`POST /session`（身份+年龄声明，信众 <18 拒入）、`POST /message`（规则版意图路由 14 类+医学转介+unknown 引导）、`GET /report/:id`（登记处）、`GET /health`（四探针：模型 8960 / 引擎 7 加载 / KB 总数 / FTS5 命中）。
