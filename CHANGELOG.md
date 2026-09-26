@@ -1161,3 +1161,14 @@
 - **僵尸任务下线 5 项**（bootout + plist 归档 ~/Library/LaunchAgents/_archived-20260926/，可回滚）：v94-chain / v92-chain / v94-train / baziqa-full-v92（v9.4 否决后评测链即死）、test-ext-write（/tmp 临时测试）。
 - **排雷**：mlx-v8（pid 90791）实为 8960 生产模型服务（v9.2-fixed），仅标签名陈旧，保留；messiah（pid 1162）为跨八项目知识网关常驻，保留；health-patrol exit:1 为设计语义（有告警即非零），当前告警=差集超期×3+tcm-import，属 P2-B 靶子，不消音。
 - **health-patrol L52 整数比较错**：当前版本实跑无此错（旧版残留日志），核销。
+
+## 2026-09-26 20:50 · P1 整改三连 + 全项目诊断报告（Kimi）
+
+- **诊断报告**落 DELIVERY/full-diagnosis-20260926.md：无 P0 阻断；服务 8900/8920/8972/8974/8960 全绿；冷备今日已跑；唯一外部阻塞=G2CLAW 额度耗尽（已两次提醒充值）。
+- **health-patrol.sh:52 根修**：`grep -c` 多文件输出 "0\n0" 致整数比较崩溃每次 exit 1 → 取 tail -1 并去空白。bash -n 过。
+- **乱码清零（红线1）**：kb_formal 60 条 U+FFFD + 3 条 U+FFFF（￿，instr 查不到须 LIKE）→ 全 0。注：kb-sync-guard --fix-mojibake 对此两类码点无效（修 0），本次直接 SQL 修复，guard 乱码定义缺口记 backlog。
+- **指纹补齐（红线2）**：12,855 条空指纹补 `BF1|md5(module+content)`（新前缀避开 MS|/TCMF|/R111| 命名空间），残留 0。
+- **去重（红线3）**：406 个 content 完全相同组（全在医学/空域，命理域 0）删 406 条留 rowid 最小者；kb_formal 319,851→319,445，重复组 0。
+- **FTS 重同步**：kb-sync-now 重跑后 kb_fts5 / kb_formal_fts / kb_formal 三方 319,445 全对齐。
+- **P3-D 评估模型修正**：p3d-eval-after-ocr.sh 由已否决的 v9.4 改为生产 v9.2-fixed，tag=v92prod-new60-full（v9.4 三判据全败 11:45 在案）。
+- 剩余 P1：真无出处 839 条按 KB-QUALITY-RULES 五类映射补 src_id；P2/P3 按计划续。
