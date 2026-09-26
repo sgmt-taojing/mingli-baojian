@@ -1172,3 +1172,9 @@
 - **FTS 重同步**：kb-sync-now 重跑后 kb_fts5 / kb_formal_fts / kb_formal 三方 319,445 全对齐。
 - **P3-D 评估模型修正**：p3d-eval-after-ocr.sh 由已否决的 v9.4 改为生产 v9.2-fixed，tag=v92prod-new60-full（v9.4 三判据全败 11:45 在案）。
 - 剩余 P1：真无出处 839 条按 KB-QUALITY-RULES 五类映射补 src_id；P2/P3 按计划续。
+
+## 2026-09-26 21:15 · P2 状态归一/域补标排队 + 诊疗域排除验证 + P3 大扫除（Kimi）
+
+- **检索盲区实锤**：api-server-v2.js:3136/2272 检索与命中计数均过滤 `status='formal'`，但库内 41,228 条为 active/published/raw/promoted/approved——在 formal 表却永不被检索（12.9% 死重）。修复脚本 kb-p2-fixes.py 已链入 kb-src-backfill 排队任务（等 OCR/kb-sync 释放写锁后自动执行）：status 五值归一 formal + 命理 20 模块空 domain 1,466 条补标 mingli，完成后自动触发 FTS 重同步。
+- **命理域 27 条诊疗词复核销账**：medical-stack 全栈零引用 yidao.db/kb_formal（grep 实证），诊疗检索为栈级物理隔离，27 条讲稿引用按 ADR-024 保留不删，排除机制验证方式=架构隔离。
+- **P3 launchd 大扫除**：wiki-fill-watch.plist（未加载残留）+ 16 个 .bak plist 归档 _archived-20260926-p3/（18 件可回滚）；server 内仓 config/ 企微凭据目录补忽略（原规则漏网致 untracked 悬示），内仓 6b9d211、主仓 f18c5027。
