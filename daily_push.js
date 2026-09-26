@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 /**
- * 乾元命理宝鉴 · 每日晨间推送生成器 (2026-08-11 重建)
+ * 易道智鉴 · 命理宝鉴 · 每日推送生成器 (2026-08-11 重建 / 2026-09-26 MB-M1 v2 校正)
  *
- * 用法：node daily_push.js <full|public|simple>
+ * 内容规范：docs/PUSH-SPEC.md（MB-M1 v2 固化：E1 日柱闸口 / E2 三级矛盾裁决 /
+ *   E3 分数定调 / E5 落款唯一 / E6 五行口径 / 早推七板块·暮推五板块 / ━━━SPLIT━━━ 分段标记）
+ *
+ * 用法：node daily_push.js <full|public|simple|verify|monthly|yearly> [--tomorrow]
  *   - full   ：完整版（数据源 server/daily-recommendation.py 原文，含化解咒语全文+拼音注解）
- *   - public ：公开版（数据源 server/daily-push-bridge.py JSON，精简得体，可公开转发）
+ *   - public ：公开版（数据源 server/daily-push-bridge.py JSON；--tomorrow=暮推明日预告）
  *   - simple ：极简版（数据源同上，一句话速览）
  *
  * 依赖：python3 + server/daily-push-bridge.py + server/daily-recommendation.py
@@ -136,78 +139,150 @@ const KOUJUE_TIPS = [
   '今日宜睡前放下手机，读10页书，再安稳入睡。',
 ];
 
-/** 公开版：黄历核心直给（R-PUSH-PLAIN 2026-09-25：古词全配白话，神煞带注解，吉时带钟点） */
-function buildPublic(d) {
+/** MB-M1 E5 落款唯一（早/暮/简三版同一落款，禁止重复 slogan） */
+const SIGN_OFF = `—— 🪷 易道智鉴 · 节气养生 ——
+⚠️ 本内容仅命局趋势参考，重大决策由本人自行负责；医疗、投资、法律问题请咨询专业人士。`;
+
+/** MB-M1 E3 分数定调：<60「守」/60-80「稳进」/>80「进取」；E2：吉神数<凶神数压档 */
+function toneOf(d) {
+  const score = d.score || 0;
+  let tone = score > 80 ? '进取' : score >= 60 ? '稳进' : '守';
+  if ((d.js_count || 0) < (d.xs_count || 0) && tone !== '守') tone = '守';
+  return tone;
+}
+
+/** MB-M1 E2 三级矛盾裁决：黄道黑道 > 建除十二神 > 古籍口诀 */
+function verdictLine(d) {
+  const hh = d.huanghei || '';
+  const isHuang = hh.includes('黄道');
+  const jcName = (((d.yi_ji || {}).jianchu || '').match(/^(.日)/) || [])[1] || '';
+  const JC_LUCK = { 建: '吉', 除: '吉', 满: '吉', 平: '平', 定: '吉', 执: '吉', 破: '凶', 危: '凶', 成: '吉', 收: '吉', 开: '吉', 闭: '凶' };
+  const jl = JC_LUCK[jcName.replace('日', '')] || '平';
+  if (isHuang && jl === '凶') return `虽逢${jcName}（建除凶），总体从黄道之吉，可做但留余量`;
+  if (!isHuang && jl === '吉') return `虽逢${jcName}（建除吉），总体从黑道，宜守不宜攻`;
+  if (isHuang && jl === '吉') return `黄道${jcName}同参为吉，可放手推进`;
+  if (!isHuang && jl === '凶') return `黑道${jcName}同参为凶，今日以守为主`;
+  return isHuang ? `黄道日，${jcName}平稳，日常事务皆宜` : `黑道日，${jcName}平平，宜处理日常事务`;
+}
+
+/** MB-M1 时辰剧本：起手（05-11)/开展（11-17)/收尾（17-23) 三段 */
+function buildTimeScript(d, tone) {
+  const jishi = d.jishi_plain || [];
+  const yi0raw = ((d.yi_ji || {}).yi || '').split('、')[0] || '要事';
+  // 动作白话化：破旧类宜事转「除旧布新」，避免「利破屋」这类生硬表述
+  const yi0 = /破屋|坏垣|拆卸/.test(yi0raw) ? '除旧布新' : yi0raw;
+  const SEGS = [
+    ['🌅 起手', '05-11点', '卯辰巳'],
+    ['☀️ 开展', '11-17点', '午未申'],
+    ['🌙 收尾', '17-23点', '酉戌亥'],
+  ];
+  return SEGS.map(([name, span, zhis]) => {
+    const hits = jishi.filter(s => zhis.includes(s[0]));
+    if (!hits.length) return `${name}（${span}）：无吉时，收整复盘，不启新事`;
+    const act = tone === '守' ? `${yi0}可小步试，不大动` : `利${yi0}`;
+    return `${name}（${span}）：黄金段 ${hits.map(s => s.slice(2)).join('、')}｜${act}`;
+  }).join('\n');
+}
+
+/** 公开版：MB-M1 v2 新结构（2026-09-26）
+ *  早推七板块：今日三要→时辰剧本｜运势量化→命主联动｜速查→修身→落款（━━━SPLIT━━━ 三段）
+ *  暮推五板块：明日三要→明日黄金窗口→今夜收整→修身一句→落款 */
+function buildPublic(d, isTomorrow) {
+  if (isTomorrow) return buildEvening(d);
   const gz = d.gz;
   const yiJi = d.yi_ji;
-  const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）`;
-  // R142 知识服务当下当天：KB 按日期检索古籍口诀优先，本地列表降级
+  const tone = toneOf(d);
   const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
-  // 建除去重（"执日(执日宜坚持推进)" → "执日（宜坚持推进）"）
   const jianchu = (yiJi.jianchu || '').replace(/^(.日)\(\1/, '$1（').replace(')', '）');
-  // 冲煞白话
   const chongPlain = `属${d.chong_shengxiao}的朋友今日大事缓一缓；煞在${d.sha}方，${d.sha}方不宜动土修造`;
-  // 吉时带钟点（白天 7-21 点优先展示，夜间吉时殿后）
   const jishiList = d.jishi_plain || [];
   const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
   const nightJishi = jishiList.filter(s => !/辰|巳|午|未|申|酉|戌/.test(s[0]));
   const jishiLine = [...dayJishi, ...nightJishi].join('、');
+  const yiTop = (yiJi.yi_plain || yiJi.yi).split('、').slice(0, 3).join('、');
+  const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
+  const gold = dayJishi[0] || jishiList[0] || '全天平和';
+  const TONE_LINE = { 守: '今日主守：稳住基本盘，不开新局', 稳进: '今日稳进：按节奏推进，不冒进', 进取: '今日进取：窗口难得，主动出击' }[tone];
 
-  let msg = `📅 乾元命理宝鉴 · ${d.year}年${d.month}月${d.day}日 ${d.weekday}
+  let msg = `📅 易道智鉴 · 晨推 ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
 
-━━━ 今日宜忌 ━━━
-✅ 宜：${yiJi.yi_plain || yiJi.yi}
-🚫 忌：${yiJi.ji_plain || yiJi.ji}
+━━━ ① 今日三要 ━━━
+✅ 宜：${yiTop}
+🚫 忌：${jiTop}
+⏰ 黄金窗口：${gold}（${tone === '守' ? '做熟不做生' : '要事排这里'}）
+
+━━━ ② 时辰剧本 ━━━
+${buildTimeScript(d, tone)}
+━━━SPLIT━━━
+━━━ ③ 运势量化 ━━━
+📊 ${d.score}分 ${d.score_stars}（${d.score_desc}）｜基调「${tone}」：${TONE_LINE}
+
+━━━ ④ 命主联动 ━━━
+👤 今日${gz.day}日：日干${gz.day_gan}对缘主癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}），日支${gz.day_zhi}本气为${d.day_zhi_ss.ss}（${d.day_zhi_ss.plain}）。
+📈 流年丙午（正财透干·火为你的喜用，求财窗口）｜流月${gz.month}同参。
+🌀 大运乙丑（乙木食神高透，才华变现正当时）——${d.day_gan_ss.xi_ji === '喜' ? '今日天干助喜，该出手就出手' : d.day_gan_ss.xi_ji === '忌' ? '今日天干为忌，守成为上、少做大决定' : '今日天干中平，照计划推进即可'}。
+━━━SPLIT━━━
+━━━ ⑤ 速查区 ━━━
 📌 ${jianchu}｜⭐ ${yiJi.xingxiu}｜☀️ ${d.huanghei}
-⚔️ ${chong}·煞${d.sha}
-   ${chongPlain}
-📜 彭祖百忌：${d.pengzu}
+⚖️ 裁决：${verdictLine(d)}
+⚔️ 冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}：${chongPlain}
 ✨ ${d.shensha_plain || d.shensha}
-🧭 喜神${d.xishen}·财神${d.caishen}·福神${d.fushen}｜求财面朝${d.caishen}坐
+🧭 喜神${d.xishen}·财神${d.caishen}·福神${d.fushen}｜🌤️ ${d.weather.condition} ${d.weather.temp}°C（${d.weather.city || '本地'}）
 ⏰ 吉时：${jishiLine}
 `;
 
-  if (d.jieqi_info) {
-    msg += `
-🌿 ${d.jieqi}｜${d.jieqi_info}
-`;
-  }
-
-  if (d.holiday) {
-    msg += `
-━━━ 节日特辑 ━━━
-🎉 ${d.holiday}${d.festival_lore ? '\n📜 ' + d.festival_lore : ''}${d.festival_guide ? '\n🎯 ' + d.festival_guide : ''}
-`;
-  }
-
+  if (d.jieqi_info) msg += `\n🌿 ${d.jieqi}｜${d.jieqi_info}\n`;
+  if (d.holiday) msg += `\n🎉 ${d.holiday}${d.festival_lore ? '\n📜 ' + d.festival_lore : ''}${d.festival_guide ? '\n🎯 ' + d.festival_guide : ''}\n`;
   if (d.deities && d.deities.length) {
-    msg += `
-🙏 ${d.deities.map(de => de.name + '诞辰').join('·')}
-`;
+    msg += `\n🙏 ${d.deities.map(de => de.name + '诞辰').join('·')}\n`;
     (d.deity_guides || []).forEach(g => { msg += `   ${g}\n`; });
   }
+  if (d.daily_knowledge) msg += `\n📚 ${d.daily_knowledge.title}\n${d.daily_knowledge.summary}\n`;
 
   msg += `
-🌤️ ${d.weather.condition} ${d.weather.temp}°C（${d.weather.city || '本地'}）
+━━━ ⑥ 修身一句 ━━━
+🧘 ${koujue}
 
+${SIGN_OFF}`;
+  return msg;
+}
+
+/** MB-M1 暮推（--tomorrow）：明日预告 + 今夜收整，五板块 */
+function buildEvening(d) {
+  const gz = d.gz;
+  const yiJi = d.yi_ji;
+  const tone = toneOf(d);
+  const jianchu = (yiJi.jianchu || '').replace(/^(.日)\(\1/, '$1（').replace(')', '）');
+  const jishiList = d.jishi_plain || [];
+  const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
+  const yiTop = (yiJi.yi_plain || yiJi.yi).split('、').slice(0, 3).join('、');
+  const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
+
+  let msg = `🌙 易道智鉴 · 暮推（明日预告）
+📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}
+🏮 ${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
+
+━━━ ① 明日三要 ━━━
+✅ 宜：${yiTop}
+🚫 忌：${jiTop}
+📌 ${jianchu}｜☀️ ${d.huanghei}｜基调「${tone}」（${d.score}分 ${d.score_stars}）
+⚖️ 裁决：${verdictLine(d)}
+
+━━━ ② 明日黄金窗口 ━━━
+⏰ ${dayJishi.length ? dayJishi.join('、') : (jishiList.join('、') || '全天平和，按节奏即可')}
+⚔️ 冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}｜✨ ${d.shensha_plain || d.shensha}
+
+━━━ ③ 今夜收整三件事 ━━━
+1️⃣ 复盘今日一件做成的事，给自己记一功
+2️⃣ 列好明日三件要事，对齐上面的宜忌与黄金窗口
+3️⃣ 23点前放下手机，安稳入睡养气
+
+━━━ ④ 修身一句 ━━━
 📖 「${d.wisdom.text}」—— ${d.wisdom.source}
 ${d.wisdom.meaning ? '💡 ' + d.wisdom.meaning : ''}
 
-🧘 ${koujue}
-`;
-
-  if (d.daily_knowledge) {
-    msg += `
-📚 ${d.daily_knowledge.title}
-${d.daily_knowledge.summary}
-`;
-  }
-
-  msg += `
-⚠️ 本内容仅命局趋势参考，重大决策由本人自行负责；医疗、投资、法律问题请咨询专业人士。
-🙏 愿缘主今日顺遂安康！`;
-
+${SIGN_OFF}`;
   return msg;
 }
 
@@ -236,8 +311,7 @@ function buildSimple(d) {
 
 ${koujue}
 
-⚠️ 本内容仅命局趋势参考，重大决策由本人自行负责；医疗、投资、法律问题请咨询专业人士。
-🙏 愿缘主今日顺遂安康！`;
+${SIGN_OFF}`;
 }
 
 // === 入口 ===
@@ -251,7 +325,7 @@ try {
     // R119：全量校验模式（三模式 + 数据一致性）
     const targetDate = getTargetDate(isTomorrow);
     const full = buildFull(isTomorrow);
-    const pub = buildPublic(getBridgeData(isTomorrow));
+    const pub = buildPublic(getBridgeData(isTomorrow), isTomorrow);
     const sim = buildSimple(getBridgeData(isTomorrow));
     // 修真补丁（2026-08-17）：--tomorrow 时三版必须含目标日期（防止 full 版漏透传日期覆盖）
     let dateStr = '';
@@ -271,7 +345,7 @@ try {
       // 新逻辑：锚定 buildFull 的黄历结论行模板「📌 宜X（…）；忌Y…」（daily-recommendation.py
       // L1507），宜侧匹配五类归目/「无特别适宜」，忌侧仅要求非空词（开放字符集，
       // 兼容 lunar_python getDayJi() 全部词条，不再枚举白名单）。
-      ['full 含宜忌', /📌 宜(白事|基建|婚嫁|日常|财事)（[^）]+）(，兼宜[^；]*)?；忌(无|[^\s；]{1,12})/.test(full)],
+      ['full 含宜忌', /📌 宜(白事|基建|婚嫁|日常|财事)（[^）]+）(，兼宜[^；]*)?；忌(无|[^\s；]{1,12})|📌 无特别适宜事项[，,]宜[^；]{0,20}；忌[^\s；]{1,12}/.test(full)],
       ['public 含干支', /丙午|乙巳|甲辰|癸卯|壬寅|辛丑|庚子|己亥|戊戌|丁酉|丙申|乙未|甲午|癸巳|壬辰|辛卯|庚寅|己丑|戊子|丁亥|丙戌|乙酉|甲申|癸未|壬午|辛巳|庚辰|己卯|戊寅|丁丑|丙子|乙亥|甲戌|癸酉|壬申|辛未|庚午|己巳|戊辰|丁卯|丙寅|乙丑|甲子/.test(pub)],
       ['public 含黄历', /宜：/.test(pub) && /忌：/.test(pub)],
       ['含建除/神煞', /定日|满日|司命|冲戊|冲己|冲庚|冲辛|冲壬|冲癸|冲甲|冲乙|冲丙|冲丁|冲.{1,2}（|吉神|凶煞/.test(pub)],
@@ -285,7 +359,7 @@ try {
   } else if (mode === 'full') {
     output = buildFull(isTomorrow);
   } else if (mode === 'public') {
-    output = buildPublic(getBridgeData(isTomorrow));
+    output = buildPublic(getBridgeData(isTomorrow), isTomorrow);
   } else if (mode === 'simple') {
     output = buildSimple(getBridgeData(isTomorrow));
   } else if (mode === 'monthly') {
