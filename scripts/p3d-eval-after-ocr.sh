@@ -16,5 +16,5 @@ PY="$(cd "$(dirname "$0")/.." && pwd)/.venv-mlx/bin/python"
 BAZIQA_DATA="$PWD/training/baziqa/data/celebrity-new60_zh.json" \
   "$PY" training/eval-baziqa-local.py \
   --model training/mlx-models/mingli-sft-v9.2-7b \
-  --tag v92prod-new60-full --max-tokens 512 >> "$LOG" 2>&1
+  --tag v92prod-masked --max-tokens 512 >> "$LOG" 2>&1
 echo "[$(date '+%F %T')] 评估结束 rc=$?" >> "$LOG"
