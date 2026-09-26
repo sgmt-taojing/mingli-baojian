@@ -1063,3 +1063,14 @@
 - **规矩载体**：新建 docs/PUSH-SPEC.md（本规范即推送内容规矩唯一载体，今后修订=改此文件+CHANGELOG）。
 - **verify 修复**：「full 含宜忌」正则补「无特别适宜事项」变体（破日合法输出，原正则只认五类归目模板，为既有盲区非本次引入）。
 - **验收**：node daily_push.js verify 当日/明日双模式 11/11 全绿；当日完整演示输出（分段标记版全文+各段字节数）已在会话贴出，待裁判核销后放行 full 版。
+
+## 2026-09-26 16:10 · S2.5 馆长五盘接线收官：紫微/六爻/六壬/奇门/梅花全通（Kimi）
+
+- **接线**：curator-api.js 新增通用 computeDivination()（照 computeBazi 模式，三段契约组装）+ message 五盘分支。参数形态实测定案：ziwei 需生辰；liuyao/liuren/meihua 用 question+divinationTime（liuren publicOrPrivate 路由层自动补「私事」）；qimen 排盘层不认 divinationTime，须拆 year/month/day/hour（问事时刻）+scenario。
+- **顺藤修掉两个性能根因**（ziwei-palace-reader.js，5.3G KB 库全表扫描）：
+  ① queryHuajie 双 LIKE '%…%' 单次 ≈10.3s（且 huajie 库为风水化解向、宫位×星曜永零命中）→ 改 FTS5（毫秒级，语义等价）；
+  ② queryPalaceStarSihua 前导通配 '%-化-%' 在 better-sqlite3 新规划器全表扫 9.5s/次 → 两步法（entry_id 覆盖索引取候选+JS 滤四化+唯一索引点查正文）。紫微裸端点 21.9s→0.45s，全盘 72 查询 285ms。
+- **引擎超时对齐**：norm-report-engine.js×5 + unified-report-engine.js×1 内部自调环回 8s→30s——重负载下同步 KB 查询阻塞事件循环，环回请求排队超 8s 被误杀（奇门/梅花 TIMEOUT 根因）。
+- **端到端实测**（8980 馆长全会话）：六爻 17s✓ / 紫微 27s✓（报告含十二宫深读）/ 六壬✓ / 奇门 17s✓ / 梅花 5s✓，报告落 curator.db 可 GET 取回，免责声明随行。
+- **修正**：8920 的 launchd 标签实为 com.mingli-baojian.api-v2（此前误用 com.mingli-baojian.paipan 未生效）。
+- **观察项**：报告 KB 合并检索链（12 路 FTS on 5.3G）重负载下 18-55s 波动，liuyao 曾 50s——记 backlog（KB 检索加速/缓存）。
