@@ -79,14 +79,17 @@ def main():
             src_note = r.get('source') or r.get('src') or ''
             if src_note and src_note not in content:
                 content = f"{content}（来源：{src_note}）"
+            # R805 修真(2026-09-26 裁判)：INSERT 列/值错位（12列13值）导致补账全败；
+            # 补 status 列接原第13值，并按惯例落 domain（yangsheng 归空域，其余归 mingli）
+            domain = '' if module == 'yangsheng' else 'mingli'
             try:
                 cur.execute("""INSERT INTO kb_formal
                     (entry_id, module, title, content, src_id, category, keywords, summary,
-                     trust_score, version, promoted_at, promoted_from)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                     trust_score, version, promoted_at, promoted_from, status, domain)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                     (entry_id, module, title, content, SRC_ID, module,
                      json.dumps([module], ensure_ascii=False), title[:80],
-                     0.6, 1, now, 'web-distill-backlog', 'formal'))
+                     0.6, 1, now, 'web-distill-backlog', 'formal', domain))
                 inserted.append((entry_id, module, title[:28]))
                 lib_fps.add(f)
             except sqlite3.Error as e:

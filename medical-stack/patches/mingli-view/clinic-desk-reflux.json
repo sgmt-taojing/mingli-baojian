@@ -2,7 +2,7 @@
   "name": "mingli-view-clinic-desk-reflux",
   "class": "mingli-view",
   "page": "clinic-desk",
-  "baseline_head": "5a98ecd",
+  "baseline_head": "bf0782f",
   "desc": "G13+ 家庭端回流状态徽标（共享 reflux-badge.js 组件）：患者信息卡下徽标 + 姓名确认自动核查 + 病历签发后延迟刷新 + 扫码引导绑定模态（组件懒创建）",
   "ops": [
     {
@@ -26,8 +26,8 @@
     },
     {
       "type": "replace",
-      "from": "if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; }",
-      "to": "if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; setTimeout(function(){ if (window.RefluxBadge) RefluxBadge.attach(document.getElementById('reflux-badge'), '', p.name.v || ''); }, 2500); }"
+      "from": "if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; caseRefs = Array.isArray(cfD.caseReferences) ? cfD.caseReferences : []; }",
+      "to": "if (cfD.ok) { caseId = cfD.caseId || ''; caseHash = cfD.hash || ''; caseRefs = Array.isArray(cfD.caseReferences) ? cfD.caseReferences : []; setTimeout(function(){ if (window.RefluxBadge) RefluxBadge.attach(document.getElementById('reflux-badge'), '', p.name.v || ''); }, 2500); }"
     }
   ]
 }

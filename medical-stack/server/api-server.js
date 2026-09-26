@@ -121,6 +121,10 @@ app.use((req, res, next) => {
   next();
 });
 registerReflux(app);   // G13 回流路由：必须在 CORS 中间件之后注册（跨端口页面才能拿到 ACAO）
+// 知识图谱只读 API（2026-09-26 吸收自 tcm HEAD 8a63f43，按 TCM-ABSORPTION-SPEC：只移植不训练；
+// 必须在 CORS 中间件之后挂载，加载失败不影响主服务）
+try { require('./graph-service').registerGraph(app); }
+catch (e) { console.error('[graph] 挂载失败（不影响主服务）:', e.message); }
 
 // tcm 能力移植层（医学能力移植自 tcm-agent，适配不训练；命理合流仅限 8974 批注环节）
 // 挂载点在 CORS 中间件之后，保证跨端口页面调用带 ACAO 响应头

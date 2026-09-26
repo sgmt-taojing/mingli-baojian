@@ -145,7 +145,10 @@
         </div>
       `).join('')}</div>`;
     }
-    
+
+    // 愿景2026·切片9：证型演变视图（历次就诊证型沿时间轴演变，联动图谱）
+    renderSyndromeEvolution(profile);
+
     // 时间轴
     const tml = document.getElementById('timeline-list');
     if (!profile.timeline?.length) {
@@ -172,6 +175,60 @@
     }
   }
   
+  /* ── 愿景2026·切片9：证型演变视图——连续同证折叠，转变点标注，证型名跳图谱推理链，命中图谱加徽标 ── */
+  async function renderSyndromeEvolution(profile) {
+    const box = document.getElementById('syndrome-evolution');
+    if (!box) return;
+    const seq = (profile.timeline || [])
+      .filter(e => (e.diagnosis || '').trim())
+      .map(e => ({ date: e.date, dx: (e.diagnosis || '').trim(), effect: e.effect }));
+    if (!seq.length) {
+      box.innerHTML = '<div class="empty"><div class="icon">🧭</div>暂无带证型的就诊记录</div>';
+      return;
+    }
+    // 连续同证折叠为一段（保留首末日期与诊次数、平均疗效）
+    const segs = [];
+    for (const e of seq) {
+      const last = segs[segs.length - 1];
+      if (last && last.dx === e.dx) {
+        last.to = e.date; last.count++;
+        if (e.effect > 0) { last.effSum += e.effect; last.effN++; }
+      } else {
+        segs.push({ dx: e.dx, from: e.date, to: e.date, count: 1, effSum: e.effect > 0 ? e.effect : 0, effN: e.effect > 0 ? 1 : 0 });
+      }
+    }
+    const chainHtml = segs.map((s, i) => {
+      const avg = s.effN ? (s.effSum / s.effN).toFixed(1) : null;
+      const span = s.from === s.to ? s.from : s.from + ' ~ ' + s.to;
+      const arrow = i < segs.length - 1
+        ? '<div style="display:flex;flex-direction:column;align-items:center;padding:0 4px;color:#b9770e;">' +
+          '<span style="font-size:16px;">→</span><span style="font-size:10px;">转变</span></div>'
+        : '';
+      return '<div style="display:flex;align-items:center;">' +
+        '<div class="evo-seg" data-dx="' + esc(s.dx) + '" style="background:#fafbfc;border:1px solid #ecf0f1;border-radius:8px;padding:10px 14px;text-align:center;min-width:130px;">' +
+          '<a href="graph-explorer.html?q=' + encodeURIComponent(s.dx) + '" target="_blank" style="font-weight:700;color:#2c3e50;font-size:13px;text-decoration:none;border-bottom:1px dashed #2c3e50;" title="跳图谱推理链">' + esc(s.dx) + '</a>' +
+          ' <span class="evo-graph-badge" data-dx="' + esc(s.dx) + '" style="display:none;font-size:10px;" title="图谱已收录">🕸️</span>' +
+          '<div style="font-size:11px;color:#8b8579;margin-top:4px;">' + esc(span) + '</div>' +
+          '<div style="font-size:11px;color:#8b8579;">' + s.count + ' 诊' + (avg ? ' · 疗效 ' + avg : '') + '</div>' +
+        '</div>' + arrow + '</div>';
+    }).join('');
+    box.innerHTML =
+      '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 0;">' + chainHtml + '</div>' +
+      '<div style="font-size:11px;color:#8b8579;margin-top:8px;">共 ' + segs.length + ' 个证型阶段 · ' + seq.length + ' 次就诊 · 证型名可点开图谱推理链（🕸️=图谱已收录该证）</div>';
+    // 图谱命中徽标：每个唯一证型查一次，失败静默
+    const uniq = [...new Set(segs.map(s => s.dx))];
+    for (const dx of uniq) {
+      try {
+        const r = await fetch('/api/graph/query?q=' + encodeURIComponent(dx));
+        const d = await r.json();
+        if (d.ok && d.count && d.hits.some(h => h.type === 'pattern' || h.type === 'disease')) {
+          document.querySelectorAll('.evo-graph-badge[data-dx="' + CSS.escape(dx) + '"]')
+            .forEach(b => { b.style.display = 'inline'; });
+        }
+      } catch (e) { /* 图谱不可达静默 */ }
+    }
+  }
+
   function renderRecommendations(recs) {
     const el = document.getElementById('recommendation-list');
     if (!recs || !recs.length) {
@@ -456,4 +513,6 @@
   
   // 初始化
   document.addEventListener('DOMContentLoaded', renderPatientList);
+  // 切片9：暴露证型演变渲染器（走查/复用）
+  window.renderSyndromeEvolution = renderSyndromeEvolution;
 })();

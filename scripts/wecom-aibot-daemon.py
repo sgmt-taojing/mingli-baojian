@@ -37,6 +37,54 @@ def save_chats(d):
         json.dump(d, f, ensure_ascii=False, indent=2)
     os.replace(tmp, CHATS)
 
+
+# ── 企微指令桥 v1（2026-09-26 · 裁判 · ADR-027）──
+# 白名单指令直答（读状态文件，纯本地）；其余指令落 cmd-inbox 由 Kimi Work 异步处理。
+CMD_INBOX = os.path.join(ROOT, 'data', 'cmd-inbox')
+SYNC_LATEST = os.path.expanduser('~/.openclaw-autoclaw/workspace/sync-reports/latest.json')
+os.makedirs(CMD_INBOX, exist_ok=True)
+
+
+def _status_digest():
+    try:
+        d = json.load(open(SYNC_LATEST, encoding='utf-8'))
+        bad = [c for c in d.get('checks', []) if c.get('status') != 'OK']
+        head = f"链路巡检 {d.get('ts', '?')}｜{d.get('level', '?')}（{len(d.get('checks', []))} 链）"
+        if not bad:
+            return head + '，全部正常。'
+        return head + '，异常：' + '；'.join(f"{c.get('chain')}" for c in bad[:4])
+    except Exception as e:
+        return f'状态文件暂不可读（{e}），请稍后再试。'
+
+
+def bridge_reply(text):
+    t = (text or '').strip()
+    if t in ('状态', '状态查询', '巡检', '健康'):
+        return _status_digest()
+    if t in ('补发', '补发今日', '重发'):
+        # 触发一次简版推送生成入队（full 版待 MB-M1 核销后恢复）
+        try:
+            import subprocess
+            r = subprocess.run(
+                ['/Users/tom/.local/bin/node', 'daily_push.js', 'simple'],
+                cwd=ROOT, capture_output=True, text=True, timeout=120)
+            if r.returncode == 0 and r.stdout.strip():
+                item = {'title': '命理宝鉴·补发', 'content': r.stdout.strip(),
+                        'enqueued_at': time.strftime('%F %T')}
+                path = os.path.join(QUEUE, time.strftime('resend-%Y%m%d-%H%M%S') + '.json')
+                with open(path, 'w', encoding='utf-8') as f:
+                    json.dump(item, f, ensure_ascii=False)
+                return '补发已入队，稍候送达。'
+            return f"补发生成失败（rc={r.returncode}），已记录，请稍后由 Kimi 排查。"
+        except Exception as e:
+            return f'补发执行异常（{e}），已记录。'
+    # 非白名单 → 落指令收件箱，Kimi Work 异步接管
+    path = os.path.join(CMD_INBOX, time.strftime('%Y%m%d-%H%M%S-') + uuid.uuid4().hex[:6] + '.json')
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump({'text': t, 'received_at': time.strftime('%F %T')}, f, ensure_ascii=False)
+    return '已收到，已转交 Kimi 助手异步处理（复杂指令会在下一个巡检周期响应）。支持指令：状态 / 补发。'
+
+
 class Daemon:
     def __init__(self):
         cfg = json.load(open(CFG, encoding='utf-8'))
@@ -119,8 +167,9 @@ class Daemon:
             elif cmd == 'aibot_msg_callback':
                 text = (body.get('text') or {}).get('content', '')
                 log(f"收到消息: {text[:50]}")
+                reply = bridge_reply(text)
                 self.send('aibot_respond_msg',
-                          {'msgtype': 'text', 'text': {'content': '通道正常。每日推送将自动送达，无需回复。'}},
+                          {'msgtype': 'text', 'text': {'content': reply}},
                           req_id=msg['headers']['req_id'])
             elif ev == 'disconnected_event':
                 log('收到断开事件（新连接踢旧连接）')

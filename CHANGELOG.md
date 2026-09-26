@@ -1,4 +1,21 @@
-## 2026-09-26 14:35 · S2.4 馆长会话/报告落 SQLite（Kimi）
+## 2026-09-26 18:10 · P2-B tcm 差集吸收收官：9 API 移植 + 3 js 对齐 + 差集清零（Kimi）
+
+- **起因**：health-patrol 四告警——insurance 三端点差集超 72h 未定性 + tcm-import 链 page rc=2（补丁锚点失配 WARN）。
+- **锚点追平（G18 纪律转人工处置）**：tcm 上游 17:07 改版 clinic-desk.html L1872 增 caseRefs 段，`clinic-desk-reflux.json` 第 4 个 replace 锚点零命中。补丁 from/to 追平新基线、baseline_head 5a98ecd→bf0782f，重放器复跑 status ok / warns 空 / smoke 1/1。
+- **定性推翻预设**：9 条差集 API 全部「真缺口」而非等价/架构项——本侧页面（clinic-desk/pharmacy，随 tcm 页同步而来）已在调用 `/api/graph/*` 与 `/api/insurance/tcd-code`，后端断头。
+- **移植（按 TCM-ABSORPTION-SPEC 只适配不训练）**：
+  1. `graph-service.js` 整文件移植 + 数据 `graph-store.json`（实体 5,999 / 关系 16,340）+ 四依赖 kb 图（herb-insurance-code-map/tcd-code-map/fangzheng-map/case-compilation-map）；api-server.js 在 CORS 中间件后挂载（与 tcm 同位，失败不阻主服务）。
+  2. `insurance-adaptor.js` 整文件追平（tcm 版=本侧版+WO-004/005 超集，零冲突）：herb-map 单味药医保映射、rx-check 处方合规预检（含负面清单/889 目录）、tcd-code GB/T 15657-2021 病证代码（含方证通道/组合证拆解/否定形态）。
+  3. `drug-safety-engine.js` 同步 R862 安全修复（川乌/草乌同乌头类入十八反，曾漏检放行——差异仅此一处）。
+  4. js 三件：`auth-shim.js` 补齐（10+ 页引用 404）+ `common.js`（fetch 自动附院内令牌包装）+ `longitudinal-page.js`（证型演变视图）；两文件本侧零独有行，整拷无冲突。
+- **冒烟（8972 实测）**：graph 6 端点 + insurance 3 端点全通（小柴胡汤图谱查询/组成/路径/肝郁气滞证推理链；半夏映射可报销、柴胡+半夏+川乌预检 2 可付 1 未知、肝郁气滞证 B 码命中）；旧端点 face-check/status、tcm/health 七能力回归无损。
+- **排障留账**：8972 被 09-24 手工裸启的 api-server 孤儿进程（pid 6004）占用，launchd 的 medical-api（KeepAlive）反复 EADDRINUSE 僵死——kill 孤儿后 launchd 正常接管；排查中一度误把 8932（tcm-agent 本家服务，16:59 起）当本侧探测，graph 通/insurance 401（tcm 鉴权墙）的诡异组合即由此来，端口归属以 equiv-dual-run 约定为准：tcm=8932，ms=8972。
+- **复跑**：`tcm-capability-diff-latest.md` 结论转 **✅ 全对齐（无待吸收增量）**，L1=0、L2.5/L2.6 哈希全一致、L4.5 无红；health-patrol 四条相关告警全消。
+- **KB 质量连带**：--fix-mojibake 修 30 / --normalize 规整 23 / 连锁 --dedup 删 30，复跑全绿。
+- **冷备根修**：`daily-local-cold-backup.sh` L43 `[ "$name" < ... ]` 未转义 `<` 被解析成重定向致日清崩（bash 内须 `[[ ]]` 或 `\<`）；修复 + 手动全量跑通（11 项目 bundle + KB 2.3G gzip），备份双告警消。外盘 TCC 拒为架构事实（R801 已定案），外盘迁移由 Kimi Work 周任务在交互上下文执行，无需用户操作。
+- **附带入库**：企微指令桥 v1（ADR-027，wecom-aibot-daemon.py 白名单指令直答+cmd-inbox 异步）、KANBAN 心跳、53 页 tcm 新基线同步（补丁重放产物）。
+
+
 
 - **持久化**：`server/database/curator.db`（curator_sessions/curator_reports 两表），内存+SQLite 双层——写双落、读先内存后 DB 回填，持久化失败不阻塞会话。
 - **验证**：建会话→姓名报告（rpt_20260926_cc233f2d）→ kickstart 重启→报告完整可取、同 session_id 续聊正常。

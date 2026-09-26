@@ -43,4 +43,16 @@ ok $ASSETS_RC || { echo "[chain] FAIL assets rc=$ASSETS_RC"; FINAL=1; }
 ok $PARITY_RC || { echo "[chain] FAIL parity rc=$PARITY_RC（移植保真破窗，当日处置）"; FINAL=1; }
 ok $DIFF_RC  || { echo "[chain] FAIL diff rc=$DIFF_RC"; FINAL=1; }
 echo "CHAIN_RESULT rc=$FINAL import=$IMPORT_RC follow=$FOLLOW_RC drift=$DRIFT_RC page=$PAGE_RC assets=$ASSETS_RC parity=$PARITY_RC diff=$DIFF_RC"
+
+# 2026-09-26 裁判补（ADR-027）：rc=3（EPERM 优雅跳过）连续累计告警——R754 把 rc=3 当通过，
+# 导致 launchd 环境下 9/15–9/26 静默断链 9 天。连续 ≥12 次（15min 轮询 ≈3h）即落 WARN 标记，巡检可读。
+RC3_STATE="/tmp/tcm-import-rc3-count"
+if [ "$IMPORT_RC" -eq 3 ] || [ "$FOLLOW_RC" -eq 3 ]; then
+  c=$(( $(cat "$RC3_STATE" 2>/dev/null || echo 0) + 1 )); echo "$c" > "$RC3_STATE"
+  if [ "$c" -ge 12 ]; then
+    echo "[chain] 🚨 WARN: rc=3 连续 $c 次，内化链疑似静默断链（EPERM），需交互环境手动追跑" | tee /tmp/tcm-import-STALL.warn
+  fi
+else
+  echo 0 > "$RC3_STATE"; rm -f /tmp/tcm-import-STALL.warn
+fi
 exit $FINAL

@@ -1,0 +1,74 @@
+{
+  "contract": "tcm-agent 医学能力契约（四项目规则界定 v2.0 · ADR-016/017）",
+  "contract_version": "1.1.0",
+  "released_at": "2026-08-31T20:05:00+08:00",
+  "role": "医学知识与能力唯一源头、唯一生产方；mingli 与 family 只适配不训练",
+  "rules": [
+    "新增即契约：新增/变更医学 API、页面、引擎能力必须同步更新本契约并递增版本号；契约不更新视同未发布",
+    "核心 20 页为 mingli 补丁机制锚点基线，显式列于 core_pages",
+    "质量门禁 /api/ops/quality-gates 结果随每次契约版本可查（quality_gate_snapshot 为发布时快照，实时值以端点为准）",
+    "CHANGELOG 能力变更条目必须携带契约版本号，供 mingli 差集巡检对账",
+    "页面改动保持既有 DOM 锚点稳定；锚点必变时在契约 dom_anchor_notes 注明",
+    "红线：命理内容拒收（R745）；mingli 命理批注不回流；视觉调用走 ai-vision API"
+  ],
+  "endpoints": {
+    "contract": "/api/ops/contract",
+    "quality_gates": "/api/ops/quality-gates",
+    "kb_baseline": "/api/ops/kb-baseline",
+    "capability_map_doc": "docs/mingli-medical-capability-map.md"
+  },
+  "kb_baseline": {
+    "kb_entries": 53579,
+    "bench_version": "R824",
+    "bench_cases": 101,
+    "bench_kb_entries_at_build": 53277,
+    "bench_latest": {
+      "recall_at_1": 88.1,
+      "recall_at_5": 99.0,
+      "recall_at_10": 100.0,
+      "mrr": 0.924,
+      "p95_ms": 249,
+      "per_case_pass": "101/101",
+      "measured_at": "2026-08-31"
+    },
+    "export_endpoint": "/api/ops/kb-baseline（只读，供 mingli G17/G18 同案对拍）"
+  },
+  "quality_gate_snapshot": {
+    "as_of": "2026-08-31T19:30+08:00",
+    "gold_standard": { "total": 200, "primary_pct": 88.5, "threshold": 88, "top4_pct": 99, "formula_pct": 85.5 },
+    "safety_adversarial": { "total": 16, "pass": 16 },
+    "walkthrough_steps": 7,
+    "browser_smoke_pages": 64,
+    "rehearsal_assertions": 30,
+    "selfcheck_items": 16
+  },
+  "core_pages": [
+    { "page": "index.html", "role": "门户首页" },
+    { "page": "clinic-desk.html", "role": "问诊台（核心：实时采集+AI草案+签发）" },
+    { "page": "doctor-dashboard.html", "role": "医师工作台" },
+    { "page": "clinical.html", "role": "临床诊疗页" },
+    { "page": "mobile-interact.html", "role": "医师移动工作台（G11 四 Tab）" },
+    { "page": "patient-portal.html", "role": "患者门户（预约挂号入口）" },
+    { "page": "my-reports.html", "role": "我的医院报告（G13 患者收件箱）" },
+    { "page": "family-hub.html", "role": "家庭中心" },
+    { "page": "home-tcm.html", "role": "居家患者入口" },
+    { "page": "pharmacy.html", "role": "药房台（调配发药扣库存）" },
+    { "page": "payment.html", "role": "收费支付台" },
+    { "page": "report-print.html", "role": "报告打印（离院二维码）" },
+    { "page": "efficacy-analysis.html", "role": "疗效分析" },
+    { "page": "longitudinal.html", "role": "纵向病程" },
+    { "page": "chronic-disease.html", "role": "慢病管理四维" },
+    { "page": "disease-kb.html", "role": "病种知识库" },
+    { "page": "treatment-center.html", "role": "治疗中心（针灸推拿工单）" },
+    { "page": "telemedicine.html", "role": "远程会诊" },
+    { "page": "rbac.html", "role": "RBAC 权限页" },
+    { "page": "emergency.html", "role": "急救分诊（院前引导）" }
+  ],
+  "dom_anchor_notes": [
+    "2026-08-31 v1.1.0 建立基线：核心 20 页现行 DOM 锚点为 mingli 补丁机制对照基线；此后锚点变更须在此追加条目"
+  ],
+  "boundary": {
+    "mingli": "命理宝鉴为独立体系；医学能力经 medical-stack 镜像解包内化，8972 系端点输入契约不变",
+    "family": "家庭生活助手为独立体系；G13 报告回流仅健康域，外发连接器默认关闭"
+  }
+}

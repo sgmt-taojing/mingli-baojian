@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<script src="js/auth-shim.js"></script>
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/pharmacy.html">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
@@ -146,6 +147,7 @@ async function showPhEntryByName(name, x, y) {
   var d = _phEntryCache[name];
   if (!d || !d.ok) {
     card.innerHTML = '<b>' + name + '</b><div style="opacity:.6;margin-top:6px">知识库暂无该条目</div>';
+    appendPhGraphEvidence(card, name);  // 切片8：KB 无条目时图谱依据仍可出
     return;
   }
   var modName = { 'tcm-herb': '药材', 'tcm-acupuncture': '腧穴', 'tcm-formula': '方剂', 'tcm-syndrome': '证型' }[d.module] || d.module;
@@ -160,6 +162,54 @@ async function showPhEntryByName(name, x, y) {
     lines +
     (diffs ? '<div style="margin-top:8px;border-top:1px dashed var(--border);padding-top:6px"><b style="color:var(--primary)">鉴别诊断</b>' + diffs + '</div>' : '') +
     '<div style="margin-top:8px;font-size:10px;opacity:.45">R849 条目卡片 · 审方辅助，临证裁定</div>';
+  appendPhGraphEvidence(card, name);  // 愿景2026·切片8：图谱依据异步追加，失败静默
+}
+
+/* ── 切片8：图谱依据（移植问诊台切片3，ES5 适配）——药→⚠️十八反十九畏+见于方；方→组成/主治；证→主治方 ── */
+async function appendPhGraphEvidence(card, name) {
+  try {
+    var qr = await fetch('/api/graph/query?q=' + encodeURIComponent(name));
+    var qd = await qr.json();
+    if (!qd.ok || !qd.count) return;
+    var hit = qd.hits.filter(function(h){ return (h.type === 'pattern' || h.type === 'disease') && h.match_kind !== 'contains'; })[0] || qd.hits[0];
+    var nr = await fetch('/api/graph/neighbors/' + encodeURIComponent(hit.id));
+    var nd = await nr.json();
+    if (!nd.ok || !nd.neighbors.length) return;
+    var esc = _phEsc;
+    var html = '';
+    if (hit.type === 'herb') {
+      // 药：相反/相畏（双向存储按目标去重）+ 被组成——药师审方安全核心
+      var seenContra = {};
+      var contra = nd.neighbors.filter(function(n){
+        if (n.r !== 'contraindicated' || seenContra[n.target]) return false;
+        seenContra[n.target] = true; return true;
+      });
+      var usedIn = nd.neighbors.filter(function(n){ return n.r === 'composed_of' && n.dir === 'in'; }).slice(0, 5);
+      if (!contra.length && !usedIn.length) return;
+      html = '<b style="color:var(--primary)">图谱依据</b> <span style="font-size:10px;opacity:.5">药材一跳 · 证据图谱</span>' +
+        (contra.length ? '<div style="margin-top:3px;color:#991b1b;font-weight:600">⚠️ ' + contra.map(function(c){ return esc((c.attrs && c.attrs.kind) || '禁忌') + '：' + esc(c.target_name); }).join('；') + '</div>' : '') +
+        (usedIn.length ? '<div style="margin-top:3px">见于方：' + usedIn.map(function(u){ return esc(u.target_name); }).join('、') + '</div>' : '');
+    } else if (hit.type === 'formula') {
+      var herbs = nd.neighbors.filter(function(n){ return n.r === 'composed_of' && n.dir === 'out'; }).slice(0, 10);
+      var syms = nd.neighbors.filter(function(n){ return n.r === 'indicated_symptom' && n.dir === 'out'; }).slice(0, 8);
+      if (!herbs.length && !syms.length) return;
+      html = '<b style="color:var(--primary)">图谱依据</b> <span style="font-size:10px;opacity:.5">方剂一跳</span>' +
+        (herbs.length ? '<div style="margin-top:3px">组成：' + herbs.map(function(h){ return esc(h.target_name); }).join('、') + '</div>' : '') +
+        (syms.length ? '<div style="margin-top:3px">主治症状：' + syms.map(function(s){ return esc(s.target_name); }).join('、') + '</div>' : '');
+    } else if (hit.type === 'pattern' || hit.type === 'disease') {
+      var formulas = nd.neighbors.filter(function(n){ return n.r === 'treats' && n.dir === 'in'; }).slice(0, 5);
+      if (!formulas.length) return;
+      html = '<b style="color:var(--primary)">图谱依据</b> <span style="font-size:10px;opacity:.5">主治方一跳</span>' +
+        formulas.map(function(f){ return '<div style="margin-top:3px">· <span class="entry-link" data-entry="' + esc(f.target_name) + '">' + esc(f.target_name) + '</span></div>'; }).join('');
+    } else {
+      return;
+    }
+    var div = document.createElement('div');
+    div.style.cssText = 'margin-top:8px;border-top:1px dashed var(--border);padding-top:6px';
+    div.innerHTML = html +
+      '<div style="margin-top:4px;font-size:10px;opacity:.5"><a href="graph-explorer.html" target="_blank" style="color:var(--primary)">🕸️ 在知识图谱中展开</a></div>';
+    card.appendChild(div);
+  } catch (e) { /* 图谱不可达静默降级 */ }
 }
 var _phEntryNames = null;
 function loadPhEntryNames() {

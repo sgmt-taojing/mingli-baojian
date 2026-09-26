@@ -58,6 +58,10 @@ def apply_patch(text: str, patch: dict, page: str, warns: list[str]) -> str:
         if op["type"] == "replace":
             cnt = text.count(op["from"])
             if cnt == 0:
+                # P2-B（2026-09-26）replace 幂等：from 零命中但 to 已在 → 此前已应用，静默跳过。
+                # 否则按 G18 纪律 WARN 转人工（clinic-desk 每 15min 空转告警 9 天事件根因）。
+                if op.get("to") and op["to"] in text:
+                    continue
                 if not op.get("optional"):
                     warns.append(f"{page}: {patch['_file']} replace 零命中「{op['from'][:30]}」")
                 continue

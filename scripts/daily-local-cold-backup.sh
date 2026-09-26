@@ -32,6 +32,14 @@ if [ -f "$KB_SRC" ]; then
   fi
 fi
 
-# 3) 滚动清理：保留 7 天
-find "$DEST" -maxdepth 1 -type d -name "20*" -mtime +7 -exec rm -rf {} \; 2>/dev/null
-log "=== 完成（滚动保留 7 天）==="
+# 3) 日清纪律（2026-09-26 用户指令「每天用完后要么删除要么迁移，别无限增加」）：
+#    本地只留今天+昨天（约 10G 封顶）；TCC 禁止 launchd 写外置盘（09-26 两次实测，含符号链接穿透），
+#    更老档由 Kimi Work 每周迁移任务推外置盘「归档/autoclaw-cold」后清源。
+#    ⚠️ 禁止把 DEST 符号链接到外置盘——launchd 写不进去，备份会全败（09-26 已演习）。
+KEEP_FROM=$(date -v-1d +%Y-%m-%d)  # 昨天 00:00 起保留
+for d in "$DEST"/20*; do
+  [ -d "$d" ] || continue
+  name=$(basename "$d")
+  [[ "$name" < "$KEEP_FROM" ]] && rm -rf "$d" && log "🧹 日清删除老档: $name"
+done
+log "=== 完成（本地只留今天+昨天）==="

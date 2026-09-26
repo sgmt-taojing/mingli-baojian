@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<script src="js/auth-shim.js"></script>
 <link rel="canonical" href="https://sgmt-taojing.github.io/mingli-medical/patient-portal.html">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
@@ -95,6 +96,10 @@ textarea{min-height:80px;resize:vertical}
       <select class="input" id="patient-gender" style="flex:1"><option value="">性别</option><option>男</option><option>女</option></select>
     </div>
     <input  class="input" id="patient-phone" placeholder="手机号" aria-label="手机号" data-validate="required|phone">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input  class="input" id="reg-code" placeholder="短信验证码" style="flex:1" aria-label="短信验证码" inputmode="numeric" maxlength="6">
+      <button class="btn outline" id="reg-code-btn" onclick="regSendCode()">获取验证码</button>
+    </div>
     <div id="doctor-picker" style="display:grid;gap:6px;margin-bottom:8px">加载医生中…</div>
     <input  class="input" id="complaint" placeholder="主诉（简单描述症状）" aria-label="主诉（简单描述症状）">
     <button class="btn outline block" onclick="aiTriage()" style="margin-bottom:8px">🤖 AI 预分诊（分析症状推荐医生）</button>
@@ -125,6 +130,17 @@ textarea{min-height:80px;resize:vertical}
     <div style="font-size:12px;color:var(--text2);margin-bottom:10px">就诊后病历/处方/检验报告出具即回流<br>扫码或点击进入，验证手机号即可随时查阅</div>
     <div id="myrpt-qr" style="display:flex;justify-content:center;margin:6px 0"></div>
     <a class="btn outline" style="display:inline-block;margin-top:8px;text-decoration:none;padding:8px 18px" href="my-reports.html">进入「我的医院报告」→</a>
+  </div>
+
+  <!-- 愿景2026·切片10：今日中医科普（图谱证据静态生成，科普不诊断） -->
+  <div class="card" id="daily-tip-card" style="display:none">
+    <h3>💡 今日中医科普</h3>
+    <div id="daily-tip" style="font-size:13px;line-height:1.8">加载中…</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+      <a id="daily-tip-graph" href="#" target="_blank" style="font-size:11px;color:var(--primary);text-decoration:none">🕸️ 在知识图谱中了解 →</a>
+      <button class="btn outline" style="padding:4px 12px;font-size:11px" onclick="dailyTipNext()">换一条</button>
+    </div>
+    <div style="font-size:10px;color:var(--text3);margin-top:8px">科普内容仅供参考，具体诊疗请遵医嘱。</div>
   </div>
 
   <!-- 排班查看 -->
@@ -209,6 +225,17 @@ function apptPick(slot) {
     b.style.borderColor = b.dataset.slot === slot ? 'var(--primary)' : 'var(--border)';
     b.style.background = b.dataset.slot === slot ? 'var(--gold-bg)' : 'var(--card)';
   });
+}
+function regSendCode() {
+  var phone = document.getElementById('patient-phone').value.trim();
+  var btn = document.getElementById('reg-code-btn');
+  if (!/^1\d{10}$/.test(phone)) { toast('请先填写正确手机号'); return; }
+  btn.disabled = true;
+  fetch('/api/sms/send-code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phone, scene: 'checkin' }) })
+    .then(function(r){ return r.json(); }).then(function(d) {
+      toast(d.ok ? '验证码已发送（5 分钟内有效）' + (d.mock ? '【模拟外发】' : '') : (d.error || '发送失败'), d.ok ? undefined : 'warn');
+      btn.disabled = false;
+    }).catch(function() { toast('📡 服务离线'); btn.disabled = false; });
 }
 function apptSendCode() {
   var phone = document.getElementById('patient-phone').value.trim();
@@ -364,17 +391,20 @@ function register() {
   const age = document.getElementById('patient-age').value;
   const gender = document.getElementById('patient-gender').value;
   const phone = document.getElementById('patient-phone').value.trim();
+  const smsCode = (document.getElementById('reg-code')||{}).value.trim();
   const complaint = document.getElementById('complaint').value.trim();
   if (!name) return toast('请填写姓名');
   if (!selectedDoctor) return toast('请选择医生');
+  if (!/^1\d{10}$/.test(phone)) return toast('请填写正确手机号');
+  if (!smsCode) return toast('请先获取并填写短信验证码');
 
   const doc = DOCTORS.find(function(p){ return p.doctor_id === selectedDoctor; });
-  // R814：真挂号——入服务端叫号队列（联动建档问诊会话 + 患者主索引）
+  // R814：真挂号——入服务端叫号队列（联动建档问诊会话 + 患者主索引）；匿名患者须短信验证码（走查抓获修复）
   fetch('/api/clinic/queue/checkin', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ patient_name: name, complaint: complaint, gender: gender, doctor_id: selectedDoctor })
+    body: JSON.stringify({ patient_name: name, complaint: complaint, gender: gender, doctor_id: selectedDoctor, phone: phone, sms_code: smsCode })
   }).then(function(r){ return r.json(); }).then(function(j) {
-    if (!j.ok) { toast('挂号失败：' + (j.error || ''), 'warn'); return; }
+    if (!j.ok) { toast('挂号失败：' + (j.message || j.error || ''), 'warn'); return; }
     const entry = j.entry;
     const reg = {
       id: entry.id,
@@ -599,6 +629,29 @@ try {
     new QRCode(document.getElementById('myrpt-qr'), { text: location.origin + '/my-reports.html', width: 132, height: 132, correctLevel: QRCode.CorrectLevel.M });
   }
 } catch (e) {}
+</script>
+<script>
+// ═══ 愿景2026·切片10：今日中医科普（图谱静态生成，按日轮换，科普不诊断） ═══
+(function(){
+  var _tips = null, _idx = 0;
+  function dayOfYear() { var n = new Date(), s = new Date(n.getFullYear(), 0, 0); return Math.floor((n - s) / 86400000); }
+  function renderTip() {
+    var t = _tips[_idx % _tips.length];
+    var box = document.getElementById('daily-tip');
+    if (!box) return;
+    box.innerHTML = '<b style="color:var(--primary)">' + t.title + '</b><div style="margin-top:4px">' + t.body + '</div>';
+    var link = document.getElementById('daily-tip-graph');
+    if (link) link.href = 'graph-explorer.html?q=' + encodeURIComponent(t.graph_q);
+  }
+  window.dailyTipNext = function() { if (_tips) { _idx++; renderTip(); } };
+  fetch('data/daily-tip.json').then(function(r){ return r.json(); }).then(function(d) {
+    if (!d || !d.tips || !d.tips.length) return;
+    _tips = d.tips; _idx = dayOfYear();
+    var card = document.getElementById('daily-tip-card');
+    if (card) card.style.display = '';
+    renderTip();
+  }).catch(function(){ /* 科普不可用静默隐藏 */ });
+})();
 </script>
 <script src="/pwa-inject.js"></script>
 <div data-mingli-entry style="max-width:760px;margin:0 auto;padding:0 12px"></div>
