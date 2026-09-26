@@ -1,3 +1,10 @@
+## 2026-09-26 11:58 · S1.3 收官：8960 推理服务回退 v9.2-fixed（Kimi）
+
+- **动作**：`com.mingli-baojian.mlx-v8` plist 环境变量 `MLX_MODEL` 由 v9.4-7b 指回 `training/mlx-models/mingli-sft-v9.2-7b`（备份 `....plist.bak-v94-rejected-20260926`）。
+- **坑与解法**：`launchctl kickstart -k` 只重启进程不重读 plist（新进程仍带 v9.4 环境变量），须 `bootout + bootstrap` 重装方生效。
+- **验证**：`/health` 报 `mingli-sft-v9.2-7b`、ready:true；冒烟推理「甲子日柱」应答正确（chatcmpl-1790394682007）。
+- **背景**：v9.4 复测 157/488=32.2%，三判据全败不转正（健康 33.3%<40%、总分<36.7% 基线、感情 22.0%<23.9%），8960 回退 v9.2 作为生产基线；v9.4 模型目录保留备查，题库 v2 选项洗牌记 backlog S1.2。
+
 ## 2026-09-24 06:20 · 经典依据层六链路浏览器端到端验收（Kimi）
 
 - **验收方式**：InAppBrowser 真实页面驱动（非纯 API 断言）——minsu-center 点卡交互、liuyao/fengshui 盘面页表单提交、bazi 报告全链（生成→sessionStorage→report-interpret 落地页渲染），逐页 DOM 断言经典卡。
