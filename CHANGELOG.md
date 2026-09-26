@@ -1104,3 +1104,9 @@
 - **实测**（8920 重启后）：liuyao 冷 2.9s（原 18-50s）/ 热 0.03s；ziwei 0.89s（原 21s）；qimen 0.3s；meihua kb_hits 8 条模块相关（质量零降级）。
 - **排雷记录**：排查中一度误判 FTS 端点对 ≥3 字词零命中——实为该端点 fts5 路径直出裸 JSON、其余路径走 apiResp 包裹，两种响应壳不一致导致解析误读（该端点响应壳不一致问题记 backlog，不改行为）。
 - **验收对照**：P1-B 目标「同案 P95 < 15s」超额达成（全部 < 3s）。
+
+## 2026-09-26 17:55 · P1-C 8974 批注路由核销：非缺陷（Kimi）
+
+- 8974=命理批注层（medical-stack/medical-extra.js）在线健康：/health ok，/api/annotation-queue SLA 48h 正常，pending 0 / approved 78 / rejected 6。
+- 路由实为连字符 /api/annotation-queue，前端 5 处引用（mobile-interact/unified-consultation/sla-tier-badge/annotation-workbench 等）全部一致——审计探测路径笔误，非缺陷。audit-plan-20260926.md 第 7 项已核销。
+- **P1 三切片至此全收官**：P1-A 推送实发✓ / P1-B 检索加速✓ / P1-C 路由核销✓。

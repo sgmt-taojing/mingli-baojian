@@ -75,7 +75,7 @@
 4. **health-patrol.sh line 52**——`[: 0\n0: integer expression expected`，多行返回值未收窄，每次运行报错
 5. **tcm-import exit:1**——差集同步最后一次失败，err 日志为空（/tmp 被清理），需实跑定位
 6. **launchd 僵尸任务**——v94-chain/v92-chain/v94-train/baziqa-full-v92/g26-sop/messiah 等已收官任务仍在册；mlx-v8（pid 90791）疑似旧模型服务常驻占内存
-7. **8974 批注路由待核**——服务在线但 /api/annotation/queue 404，路由名与文档不一致
+7. ~~8974 批注路由待核~~ **已核销（09-26 17:50）**——真实路由 `/api/annotation-queue`（连字符），前端 5 处引用全部一致；服务健康：SLA 48h 正常，pending 0 / approved 78 / rejected 6。404 系审计探测路径笔误，非缺陷
 
 ### 🔵 蓝牌（战略待定）
 8. **v9.4 训练路线**——488 题复测否决后挂起；题库 B 偏斜 62% + 模型 A 偏叠加，下轮需先洗牌重建题库再谈特化训练
