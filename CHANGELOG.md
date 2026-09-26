@@ -1178,3 +1178,12 @@
 - **检索盲区实锤**：api-server-v2.js:3136/2272 检索与命中计数均过滤 `status='formal'`，但库内 41,228 条为 active/published/raw/promoted/approved——在 formal 表却永不被检索（12.9% 死重）。修复脚本 kb-p2-fixes.py 已链入 kb-src-backfill 排队任务（等 OCR/kb-sync 释放写锁后自动执行）：status 五值归一 formal + 命理 20 模块空 domain 1,466 条补标 mingli，完成后自动触发 FTS 重同步。
 - **命理域 27 条诊疗词复核销账**：medical-stack 全栈零引用 yidao.db/kb_formal（grep 实证），诊疗检索为栈级物理隔离，27 条讲稿引用按 ADR-024 保留不删，排除机制验证方式=架构隔离。
 - **P3 launchd 大扫除**：wiki-fill-watch.plist（未加载残留）+ 16 个 .bak plist 归档 _archived-20260926-p3/（18 件可回滚）；server 内仓 config/ 企微凭据目录补忽略（原规则漏网致 untracked 悬示），内仓 6b9d211、主仓 f18c5027。
+
+## 2026-09-27 05:20 · 夜间链验收 + 出处红线清零 + OCR 三修（Kimi）
+
+- **夜间写库链全成**：src_id 一轮回填 2,466 条（五类映射+同书名近邻复用）；status 归一 40,880 条（active/published/raw/promoted/approved→formal，检索盲区 12.9% 死重活化，残留 0）；命理空 domain 1,466 条补标 mingli（残留 0）。
+- **红线 4 清零**：二轮回补 760 条（人纪班案例→SRC-AUTHOR-ANNOTATED 190、古籍§/卷→SRC-CLASSIC-ORIGINAL 550、distill_*→SRC-INTERNAL-AUTHORED 20），空 src_id=0。
+- **FTS 对齐**：kb_fts5 重复行 +621（增量同步只插不重的结构性缺陷）→ --full 全量对齐后 kb_fts5=kb_formal=319,651。kb-full-align 一次性任务已挂 launchd 留档。
+- **OCR 三修**：① psm6 零字页自动 psm11 稀疏模式兜底——流年班思维导图 8 份从 0 字救回 1,448-4,997 字/份；② 零产出回执漏洞封堵（rules 链 0 条也曾误写回执致永久封盘）→ 零产出一律留队；③ 今晨误写的 8 份零产出回执已在《管理/提取回执.json》作废（accepted=false+voided 留痕，备份 .bak-20260927-zerofix），8 份流年班留队待 G2CLAW 恢复后 AI 链复提。
+- **评估复活**：p3d-eval-after-ocr.sh 解释器从托管 python（无 mlx）根修为项目 .venv-mlx，v9.2-fixed × 新题库 111 题评估进行中（tag=v92prod-new60-full）。
+- 紫微斗数·下卷（579 页）OCR 续跑中；流年班看盘步骤.pdf 触发 MuPDF Overly large image 限流，留队待专项大图路径。
