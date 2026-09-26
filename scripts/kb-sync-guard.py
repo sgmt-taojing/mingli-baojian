@@ -121,7 +121,9 @@ def dedup():
 def fix_mojibake():
     conn = connect()
     rows = conn.execute("""SELECT rowid, title, content FROM kb_formal
-        WHERE (title GLOB '*ÿ*' OR title GLOB '*Ã*' OR content GLOB '*ÿÿ*')
+        WHERE (title GLOB '*ÿ*' OR title GLOB '*Ã*' OR content GLOB '*ÿÿ*'
+               OR title LIKE '%�%' OR content LIKE '%�%'
+               OR title LIKE '%￿%' OR content LIKE '%￿%')
         AND (tags IS NULL OR tags NOT LIKE '%mojibake%')""").fetchall()
     fixed, marked = 0, 0
     for rowid, title, content in rows:
@@ -190,21 +192,35 @@ def purge_empty():
         print('⚠️ 主表与 fts5 不一致，请跑 --full 对齐')
 
 
+def _run_with_lock_retry(fn, *a, retries=10, wait=30):
+    """写锁竞争重试（OCR 批/回填任务持锁时不再一次崩溃 exit 1）"""
+    import time as _t
+    for i in range(retries):
+        try:
+            return fn(*a)
+        except sqlite3.OperationalError as e:
+            if 'locked' not in str(e).lower():
+                raise
+            print(f'写锁被占（{e}），{wait}s 后第 {i+2}/{retries} 次重试…', flush=True)
+            _t.sleep(wait)
+    raise SystemExit('FATAL: 重试耗尽仍被锁')
+
+
 if __name__ == '__main__':
     args = sys.argv[1:]
     if '--sync' in args:
         h = int(args[args.index('--sync') + 1]) if len(args) > args.index('--sync') + 1 and args[args.index('--sync') + 1].isdigit() else 24
-        sync_incremental(h)
+        _run_with_lock_retry(sync_incremental, h)
     elif '--full' in args:
-        sync_full()
+        _run_with_lock_retry(sync_full)
     elif '--dedup' in args:
-        dedup()
+        _run_with_lock_retry(dedup)
     elif '--fix-mojibake' in args:
         fix_mojibake()
     elif '--normalize' in args:
-        normalize()
+        _run_with_lock_retry(normalize)
     elif '--purge-empty' in args:
-        purge_empty()
+        _run_with_lock_retry(purge_empty)
     else:
         print(__doc__)
         sys.exit(2)
