@@ -1,3 +1,14 @@
+## 2026-09-26 20:15 · MB-K1 稿件提取管线收官 + OCR v2 上线 + staging 清零 + 题库重建（Kimi）
+
+- **67 份老板稿件批处理收官**：48 份回执、712+ 条入 kb_staging（rules 引擎降级链）。**G2 熔断器根修**：`_g2_dead` 只读不增（从未计数）致每块白等 2×4s，补计数/复位/三连断熔断；批处理多实例清场重启（锁纪律）。
+- **OCR 管线 v2-ocr 上线**（manuscript-ocr.py）：横竖排探测（26 份全横排，含「繁体竖版」名义件，实证为准）→ PyMuPDF 自适应 dpi（长边≤12000px，巨页流年班根修）→ tesseract chi_sim+chi_tra → 同一五红线门 → staging+回执 v2-ocr。回执双纪律保留：全灭留队、薄产物可重提（<10 条）。**教训**：tesseract 在本环境读不了 /tmp，缓存必须落项目目录。
+- **staging_knowledge 265 条滞留清零**（08-14 起挂账）：23 条命理（舒晗奇门 11+路总紫微 12）晋升 kb_formal；242 条拒（226 同 ID 重复、13 医学归 tcm 栈 G24、2 域外、1 格式损坏），逐条 audit_notes。
+- **P3-B 收口**：紫微卷七「批命活套」净本——维基文库仅卷一至三（实证），底本定位明南阳堂刊本（archive.org 20260506_20260506_1217，IA OCR 不可用）→ 南北山人《明版今注》1975 本自抓 OCR（chi_tra_vert，/tmp 坑已避），净本 21,141 字落 knowledge/classics/，18 条入 staging（SRC-CLASSICS-WEB）。
+- **P3-C 古籍侧**：同本法取卷四「论妻妾诀」（婚姻/再婚/丧偶专题）净本 14,852 字、14 条入 staging；流年班婚姻专题件随 OCR 批收口。
+- **P3-D**：题库洗牌重建——新库 34 人 111 题（事件年份+出生年+干支反推，答案全部来自 verification_corpus 结构化字段，与旧 50 人库零交集，seed=20260927 可复现）；eval-baziqa-local.py 参数化 BAZIQA_DATA；v9.4×新库基线评估已挂 launchd 接力（OCR 批完自动开跑）。
+- **机制**：docs/SOURCE-REGISTRY.md 源注册表（含晋升 SLA：48h 一审/7d 自动晋升/14d 红灯）+ kb-activation-weekly.py 活化周报（launchd 周一 06:41）+ docs/CLASSICS-COLLECTION.md 古籍清单 22 部（首选源已核 15 部）。
+- **阻塞提醒**：G2CLAW 额度耗尽（HTTP 500/1003），AI 蒸馏主链停摆，rules 降级链撑着——**待充值后切回**。
+
 ## 2026-09-26 18:40 · MB-K1 P0-夜 夜间蒸馏断更根修 + 断档补蒸 + 锚点门校准（Kimi）
 
 - **断更根因（双断点）**：①原夜间蒸馏是 AutoClaw agent cron，09-24 卸载 Qclaw 后随之死亡（jsonl 落盘停在 09-24 02:02 实证）；②Kimi Work 侧同名自动化「命理知识·夜间蒸馏」cron 02:17——桌面运行时深夜不存活，**零运行记录**（对照：同为 agent 型的黄昏推送 18:03 档连续成功，证明晚间档可靠）。
