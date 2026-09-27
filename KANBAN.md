@@ -15,6 +15,7 @@
 1. ~~今晚 21:40 暮推实发后核验~~ ✅ 17:18 已实发核验两段送达（含③板块+边界句，CHANGELOG 17:18 条销账）；21:40 正式发后复查回执即可
 2. Y5 续：体质×命格薄带（91 条）从三命/滴天髓定向提取（排期）
 3. G2CLAW 充值后：staging 1,660 份留队 AI 复提（外部依赖）
+4. 稀薄模块真缺口补蒸馏（定性表 docs/THIN-MODULE-TRIAGE-20260927.md D 类）：P1 = jieqi《月令七十二候集解》/ yishi 焦氏易林 / yunqi 运气七篇 / huangli 协纪辨方书；P2 = taiyi / taixuan / taisui / mingxiang / yangzhai / xingming
 
 # 2026-09-27 14:35 — ✅ yunqi 暮推接入收官 + v9.5 终判归档 + 快照纠偏（人工会话）
 
