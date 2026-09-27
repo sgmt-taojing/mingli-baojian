@@ -1,3 +1,11 @@
+## 2026-09-27 23:35 · G2CLAW 正式退役 ✅ 云端 AI 通道关闭，定版本地 MLX 方案（Kimi · 用户指令：「这个g2claw也不用了」）
+
+- **密钥摘除**：`com.mingli-baojian.api-v2.plist` EnvironmentVariables 中的 G2CLAW_API_KEY 已删除（备份 `_archived-20260926-p3/...bak-20260927-g2claw-retire`）；unload/load 重载后进程环境核验无残留（kickstart 不重读 plist，必须 unload/load——已踩实）。
+- **AI 链路定版**：三轨代码（g2claw > zai > mlx/ollama）无需改动——env 无 key 自动落到本地轨；8920 重启后 health 200，MLX 8960 在线，8972/8974 正常监听。云端熔断逻辑保留作历史包袱，不再有外部调用发生。
+- **staging 留队处置**：kb_staging 1,660 份 `pending` → `cancelled`（理由：云端蒸馏通道关闭）。**数据全保留未删除**，未来接入新云端平台可直接 `UPDATE status='pending'` 复活重提。现分布：promoted 3,640 / cancelled 1,660 / rejected 655。
+- **代码残留说明**：server/scripts 中 g2claw 字样（distill-engine/api-server-v2/api-proxy/g26 系列/contest-answer-g2 等）为惰性引用——无 env key 时全部自动降级或报「未配置」，不产生外呼，暂不清理以免误伤降级链；docs/超智体设计文档中的 g2claw 提法属历史规划文本，保留备查。
+- **后续口径**：深度蒸馏/白话生成全部走本地 MLX（8960）；若未来引入新云端 provider，只需在 plist 注入对应 env key，三轨代码即自动接管，无需改代码。
+
 ## 2026-09-27 23:05 · AutoClaw/QClaw 卸载后接管审计 ✅ 零中断（Kimi · 用户指令：openclaw 目录保留，Kimi 修复接管全部依赖）
 
 - **服务层**：8920/8900/8972/8974/paipan/tts/tcm_server/wecom-aibot 全部 launchd 直管（ppid=1），与 AutoClaw 应用零进程依赖，卸载后全程在线。
