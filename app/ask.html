@@ -88,7 +88,7 @@ input[type=text],input[type=number],select{background:var(--card);border:1px sol
     <div class="hero-seal">🙋</div>
   </div>
   <div class="svc-strip">
-    <span>🎙️ 语音输入</span><span>📷 拍照辅助</span><span>📜 全程白话报告</span><span>🔮 21 件工具</span><span>👤 命理师人工兜底</span>
+    <span>🎙️ 语音输入</span><span>📷 拍照辅助</span><span>📜 全程白话报告</span><span>🔮 22 件工具</span><span>👤 命理师人工兜底</span>
   </div>
 
   <!-- 第一步：选工具（分组导航） -->
@@ -220,6 +220,8 @@ const TOOLS = [
   { id:'bazi',    ico:'📜', nm:'八字命理', ds:'一生格局 性格天赋', need:'birth' },
   { id:'ziwei',   ico:'🌌', nm:'紫微斗数', ds:'十二宫全观 人生地图', need:'birth' },
   { id:'lifeindex',ico:'📊', nm:'命格指数', ds:'真命盘十二维 优势短板', need:'birth' },
+  // 医命同参：五行禀赋×脏腑倾向×时令调养（Y4 信众面，2026-09-27）
+  { id:'tizhi',   ico:'🌿', nm:'体质禀赋', ds:'五行体质 时令调养', need:'birth' },
   // 运势走势：今年到十年
   { id:'liunian', ico:'📅', nm:'流年运势', ds:'今年运气 逐月走势', need:'birthYear' },
   { id:'lifeflow', ico:'🌊', nm:'流年报告', ds:'本月大运 明年预览', need:'birth' },
@@ -259,7 +261,7 @@ const GROUPS = [
   ['人生规划', '命局定位 · 五年路径'],
   ['日历幸运', '黄历择日 · 幸运数色'],
 ];
-const G_OF = { liuyao:0, meihua:0, qimen:0, liuren:0, bazi:1, ziwei:1, lifeindex:1,
+const G_OF = { liuyao:0, meihua:0, qimen:0, liuren:0, bazi:1, ziwei:1, lifeindex:1, tizhi:1,
   liunian:2, lifeflow:2, lifetimeline:2, hehun:3, qiming:4, gaiming:4, gongsi:4, xingming:4,
   mobile:5, chepai:5, fengshui:6, lifeplan:7, huangli:8, lucky:8 };
 let _gHtml = '', _lastG = -1;
@@ -885,6 +887,39 @@ async function fetchToolResult() {
     if (state.birth.buildYear) body.buildYear = state.birth.buildYear;
     delete body.year; delete body.month; delete body.day; delete body.hour;
     body.year = now.getFullYear();
+  }
+  // 医命同参·体质禀赋（Y4）：调八字报告取 segYT 禀赋体质 + segYQ 时令运气两段，白话卡呈现
+  if (t === 'tizhi') {
+    const bb = state.birth;
+    const r = await fetch(`${API}/api/paipan/bazi/report`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+      body: JSON.stringify({ year: bb.year, month: bb.month, day: bb.day, hour: bb.hour != null ? bb.hour : 12, gender: bb.sex === 'female' ? 'female' : 'male' }),
+      signal: AbortSignal.timeout(60000)
+    });
+    const j = await r.json();
+    const rep = j && j.data && j.data.segments ? j.data : (j && j.segments ? j : (j && j.report && j.report.segments ? j.report : null));
+    if (!rep) throw new Error((j && (j.message || j.error)) || '排盘失败');
+    const seg = id => (rep.segments || []).find(s => s.id === id);
+    const yt = seg('segYT'), yq = seg('segYQ');
+    if (!yt || !yt.content) throw new Error('禀赋体质段生成失败，请改用八字命理查看完整报告');
+    const cards = [];
+    // segYT 按行拆卡：五行格局/偏盛/偏弱/病药说/运气/时令
+    const ytLines = yt.content.split('\n').filter(Boolean);
+    for (const ln of ytLines) {
+      if (ln.startsWith('说明：')) continue;
+      const m = ln.match(/^(五行格局|偏盛在[^：:]*|偏弱在[^：:]*|病药说视角|出生年运气|当下时令)[：:]([\s\S]*)$/);
+      if (m) cards.push({ title: m[1].replace(/偏盛在.|偏弱在./, s => s), plain: m[2].trim(), level: m[1].startsWith('偏弱') ? 'bad' : m[1].startsWith('偏盛') ? 'neutral' : 'good' });
+      else cards.push({ title: '禀赋', plain: ln, level: 'neutral' });
+    }
+    if (yq && yq.content) {
+      const yqPlain = yq.content.split('\n').filter(l => l && !l.startsWith('说明：')).join('\n');
+      cards.push({ title: '时令运气 · 天时底色', plain: yqPlain, level: 'neutral' });
+    }
+    return { kind:'paipan', toolName:'体质禀赋 · 医命同参', baihua: {
+      overview: '自古医命同源——您的出生时间藏着一幅「五行体质地图」：哪行偏盛、哪行偏弱，对应着脏腑禀赋的倾向。下面是按《黄帝内经》藏象学说与子平病药说的白话解读。',
+      cards,
+      tips: ['以上为命理视角的禀赋倾向参考，不构成医学诊断；具体健康调养请咨询医师', '「药」在日常：偏弱一行对应的方位、时令、味道就是顺养方向', '想看完整命盘格局，可再用「八字命理」出全维报告']
+    }};
   }
   const r = await fetch(`${API}/api/paipan/${t}/baihua`, {
     method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
