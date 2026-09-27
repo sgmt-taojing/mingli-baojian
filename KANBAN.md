@@ -1,3 +1,21 @@
+# 2026-09-27 15:56 — 📌 午后大会话收官快照（人工会话）
+
+## 今日下午落地（14:35 后追加）
+- **KB 红线复绿**：401 条 NULL 键空壳行清除（用户批准，100% 重复零损失，留证 logs/kb-purge-empty-audit.jsonl），三方对齐 320,568；元凶 tcm-daily-scan 违规 INSERT 根修（fc6d29a5，兼消 ADR-024 边界违规）
+- **医命同参规划六切片全清零**（用户 14:35 战略指令：医命同参·地道传承·通俗服务）：
+  - Y1 禀赋体质引擎（yiming-tongcan-engine.js，五行偏性→脏腑倾向→病药说）
+  - Y2 批注层 yimingReference 参考区块（问诊台🌿）
+  - Y3 报告 segYT 段（实测 9 段渲染）
+  - Y4 信众面「体质禀赋」问项（问事中心第 22 件工具，浏览器全流程实测）
+  - Y5 相术部 353 条原典入库（古今图书集成艺术典卷631-650，XST| 指纹，xiangshu 45→398）
+  - Y6 命相同参引擎（mingxiang-tongcan-engine.js）+ 批注层 xiangReference（问诊台👁️）
+- 规划文档：docs/YIMING-TONGCAN-PLAN.md；古籍清单 docs/CLASSICS-COLLECTION.md 已更新
+
+## 待办（按序）
+1. **今晚 21:40 暮推实发后**：核验五运六气段送达记录（push-queue 回执），明早心跳收口入 CHANGELOG ← 用户已确认
+2. Y5 续：体质×命格薄带（91 条）从三命/滴天髓定向提取（排期）
+3. G2CLAW 充值后：staging 1,660 份留队 AI 复提（外部依赖）
+
 # 2026-09-27 14:35 — ✅ yunqi 暮推接入收官 + v9.5 终判归档 + 快照纠偏（人工会话）
 
 ## 本轮回合落地
