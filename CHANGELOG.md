@@ -1,3 +1,10 @@
+## 2026-09-28 00:40 · new100 题库深度校验开跑（launchd 托管 · Kimi）
+
+- **任务**：`com.mingli-baojian.baziqa-new100`（RunAtLoad 一次性）→ `scripts/run-baziqa-new100.sh`，6 段×10 人分段跑 new100 题库（58 人 181 题），逐人增量写盘+断点续跑，尾段自动汇总正确率。
+- **为何托管**：MLX 8960 本地推理实测 ~50s/题（v9.2 起输出带完整选项辨析，max_tokens=512 是提取必需不可砍），全量约 2.5h——前台会话装不下，launchd 是项目惯例通道（不占 Kimi Automation 额度）。
+- **评测器小改**：`training/eval-baziqa.py` 加 `--data` 参数（原硬编码 celebrity50）。
+- **进度观察**：日志 `training/baziqa-results/v92-new100-runner.log`；首段已验证在跑（手塚治虫 2/3）。预计 03:10 前后完跑，心跳巡检盯汇总行。
+
 ## 2026-09-28 00:25 · 命理验证库扩充 ✅ new100 题库落地（Kimi）
 
 - **事件扩容**（`scripts/wiki-events-expand.py`，双阶段幂等）：702 维基名人中 527 人无可用事件——根因是事件正则太窄（只有结婚/获奖/就任，漏演艺体育高频的主演/饰演/签约/夺冠等 21 个动词）。阶段1 离线二次提取 86 人原文留存 → +18 人；阶段2 在线重抓 zh.wikipedia 导语 441 人 → +43 人（途中两批撞 sqlite 锁，断点续跑清零）。**有可用事件者 175 → 236 人**。
