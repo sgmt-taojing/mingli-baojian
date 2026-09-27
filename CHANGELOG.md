@@ -1,3 +1,14 @@
+## 2026-09-27 18:05 · 全面诊断审计：稀薄模块 41→29 整改 + 空摘要 6,630 清零（Kimi）
+
+- **审计结论**：服务面全绿（8920/8900/8972 七能力/8974 批注队列 backlog 0）；磁盘 53Gi 余量；KB 320,568 三方对齐、NULL 键 0。图谱页「41 个稀薄模块」告警定性：**多数是标签卫生问题而非知识缺口**（bazi 主模块已厚覆盖十神75/神煞50/纳音111/合冲32，FTS 全库三角检索不受标签薄厚影响）。
+- **整改执行**（scripts/kb-thin-module-remediate.py + 分批回填，审计 logs/kb-thin-module-remediate-audit.jsonl）：
+  - 混拼/拆分标签归并 26 条：bazi-teaching→bazi、liuyao-basics→liuyao、wuhou→jieqi、qimen/fengshui→yangzhai、ziwei/* 4 个→ziwei、fengshui/zexu→zeri、古籍信息 2 条→classics、天纪总论→tianji-jiangjie、地脉道→yijing；
+  - xianzhi-lens 4 条（先知智镜 SDK 工程文档混入命理域）移出 domain='tech'；
+  - 空摘要回填 6,630 条（正文首 80 字，500/批 × 7 批，FTS 触发器自动同步，分批提交避开守卫锁窗）。
+- **定性表落盘** docs/THIN-MODULE-TRIAGE-20260927.md：A 已整改 13 项 / B 冗余保留 6 模块（主题索引）/ C 蒸馏暂存 6 模块不动 / **D 真缺口仅 9 个**（jieqi/yishi/yunqi/huangli 列 P1，taiyi/taixuan/taisui/mingxiang/yangzhai/xingming 列 P2）。
+- **复验**：formal=fts=320,568、NULL=0、空摘要=0、mingli 18,930 条/58 模块；图谱页陈数与告警行同步刷新。
+- **纪律备忘**：大批量 UPDATE 会触发 kb-sync-guard 长事务（本次 3000+ 行触发 10min 同步），批量操作须分批提交并避开守卫窗口；trigram FTS 重建 ~140s/500 行。
+
 ## 2026-09-27 17:18 · 暮推链路实发核验 ✅ 两段真实送达（Kimi）
 
 - **实发核验**（用户指令「核验」，提前实测不等 21:40）：push-run.sh 实发今晚同款暮推内容（明日预告+③五运六气板块），2 段入队（1768B+249B）→ daemon 17:18:31 外发成功 → sent/ 回执留档（20260927-171829-1of2/2of2）。
