@@ -1227,6 +1227,11 @@ async function aiMingliDraft(){
       showTxt = '<b>⚙️ 规则引擎草案（云端' + (ai && ai.error ? '超时/失败已降级' : '未启用') + '）</b>\n' + escapeHtml((r.draft || '').slice(0, 800));
       toast('云端未响应，已用规则引擎草案');
     }
+    // R-YT-ANNO（医命同参 Y2）：禀赋体质参考区块——供命理师同参借鉴，不自动入断语
+    if(r.yimingReference){
+      showTxt += '\n\n<b>🌿 医命同参 · 禀赋体质参考（倾向参考·非诊断，可借鉴改写）</b>\n' + escapeHtml(r.yimingReference);
+      showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【禀赋体质参考】' + r.yimingReference.replace(/说明：[\s\S]*$/, '').trim()) + '">🌿 借鉴写入审核意见</button>';
+    }
     aiShow(showTxt);
   } catch(e){
     toast(e.name === 'AbortError' ? 'AI 生成超时（95s），请重试或稍后再试' : 'AI 服务不可用：' + e.message);
