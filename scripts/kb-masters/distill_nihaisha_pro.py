@@ -1,3 +1,14 @@
+
+# ═══ LEGACY-INGEST-GUARD (R-INGEST-SPEC-20260927) ═══
+# 本脚本为一次性历史批次脚本，入库口径已过时（无 fingerprint幂等/status='formal'/domain 新规范）。
+# 新入库请使用 scripts/lib/kb_ingest.py；抓取请用改造后的 fetch-classics-kanripo.py / fetch-classics-wikisource.py。
+# 确需原样重跑（极少数修复场景）：ALLOW_LEGACY_INGEST=1 python3 <本脚本>
+import os as _lg_os, sys as _lg_sys
+if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
+    _lg_sys.stderr.write('⛔ 旧口径入库脚本已禁用（R-INGEST-SPEC-20260927 防 KB 污染）。新口径见 scripts/lib/kb_ingest.py；确需重跑请设 ALLOW_LEGACY_INGEST=1\n')
+    _lg_sys.exit(2)
+# ═══ END GUARD ═══
+
 # -*- coding: utf-8 -*-
 """nihaisha professional 系列全量蒸馏（tcm-kb 3MB + batch1-4 + classics + nishan）
 43+ 模块完整内容 → KB"""

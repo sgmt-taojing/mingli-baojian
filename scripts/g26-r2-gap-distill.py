@@ -152,8 +152,10 @@ def main():
                 conn.execute("""
                     INSERT INTO kb_formal (entry_id, module, title, content, summary, keywords,
                         src_id, trust_score, confidence, status, access_level, fingerprint,
-                        promoted_at, created_at, updated_at, hit_count, category, audit_status)
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,'g26-distill','approved')
+                        promoted_at, created_at, updated_at, hit_count, category, audit_status,
+                        domain)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,'g26-distill','approved',
+                        'mingli')
                 """, (eid, doc['module'], title, content, (e.get('summary') or '')[:300],
                       e.get('keywords') or '', 'SRC-G26-20260907', 0.8, 0.8, 'formal',
                       'public', fp, NOW, NOW, NOW))
