@@ -1232,6 +1232,11 @@ async function aiMingliDraft(){
       showTxt += '\n\n<b>🌿 医命同参 · 禀赋体质参考（倾向参考·非诊断，可借鉴改写）</b>\n' + escapeHtml(r.yimingReference);
       showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【禀赋体质参考】' + r.yimingReference.replace(/说明：[\s\S]*$/, '').trim()) + '">🌿 借鉴写入审核意见</button>';
     }
+    // R-XT-ANNO（医命同参 Y6）：命相同参参考区块——相不独论，互证命局
+    if(r.xiangReference){
+      showTxt += '\n\n<b>👁️ 命相同参 · 相学参考（相不独论·须与命局互证）</b>\n' + escapeHtml(r.xiangReference);
+      showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【命相同参参考】' + r.xiangReference.replace(/说明：[\s\S]*$/, '').trim()) + '">👁️ 借鉴写入审核意见</button>';
+    }
     aiShow(showTxt);
   } catch(e){
     toast(e.name === 'AbortError' ? 'AI 生成超时（95s），请重试或稍后再试' : 'AI 服务不可用：' + e.message);
