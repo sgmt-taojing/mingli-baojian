@@ -158,21 +158,24 @@ def scan():
     report["summary"]["tcm_total_entries"] = total_tcm
     report["summary"]["tcm_pass_rate"] = f"{total_pass}/{sum(len(v) for v in TCM_STANDARD.values())}"
 
-    # ─── 1.1 额外补充：将辨证知识同步到 tcm-syndrome（如果没有直接条目）───
+    # ─── 1.1 辨证知识别名同步：已停用（2026-09-27 根修）───
+    # 停用理由一（红线）：旧实现 INSERT 不带 entry_id/status/summary，每次触发即产
+    #   NULL entry_id 空壳行（09-26 20:22 一批 201 条，KB 五红线 NULL 键违规）。
+    # 停用理由二（边界纪律 ADR-024/G24）：tcm* 模块在命理宝鉴 KB 为参考域存量，
+    #   医学能力一律经 tcm 15min 通道内化（medical-stack），本脚本禁止直写医学条目
+    #   （只适配不训练）。别名覆盖情况改为仅报告不写入。
     if not any(m["ok"] for m in report["modules"].values() if "tcm-syndrome" in str(m)):
-        # 检查是否有别名模块可用，有则写入 tcm-syndrome 供下次扫描使用
         syn_alias = MODULE_ALIAS.get("tcm-syndrome", [])
         if syn_alias:
             cur.execute(f"""
-                INSERT OR IGNORE INTO kb_formal (module, title, content, confidence, src_id, created_at)
-                SELECT 'tcm-syndrome', title, content, confidence, src_id, created_at
-                FROM kb_formal 
+                SELECT COUNT(*) FROM kb_formal
                 WHERE module IN ({','.join(['?'] * len(syn_alias))})
-                AND entry_id NOT IN (SELECT entry_id FROM kb_formal WHERE module='tcm-syndrome')
             """, syn_alias)
-            if cur.rowcount > 0:
-                db.commit()
-                print(f"   ↳ 同步 {cur.rowcount} 条辨证知识到 tcm-syndrome")
+            alias_cnt = cur.fetchone()[0]
+            report["recommendations"].append(
+                f"tcm-syndrome 无直接条目，别名模块合计 {alias_cnt} 条（参考域存量，不直写；"
+                f"医学增量请走 tcm 内化通道）")
+            print(f"   ↳ tcm-syndrome 别名覆盖 {alias_cnt} 条（仅报告，不写入）")
 
     # ─── 2. 方剂覆盖 ───
     formula_hits = 0
