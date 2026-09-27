@@ -1,3 +1,12 @@
+## 2026-09-27 23:55 · KB 入库口径统一（R-INGEST-SPEC-20260927）✅ 旧账清零（Kimi · 用户指令「抓紧完成」）
+
+- **新共享库**：`scripts/lib/kb_ingest.py`（KBIngestor）——指纹幂等（SHA256[:16]，entry_id/指纹双查重）、status='formal'、domain 必填且白名单（mingli/reference/folk/tech，**拒写 tcm-authoritative**，医学权威只走 tcm 内化通道）、trust 分层、localtime 时间戳、300 行/批自动提交（kb-sync-guard 长事务教训）。
+- **可复用抓取器改造**：`fetch-classics-kanripo.py` / `fetch-classics-wikisource.py` 全部切到共享库——废除旧 title 查重+status='active'+UTC 口径；entry_id 新格式 `KR|module|书名|卷|指纹8位`（含全 category 防截断撞键）。
+- **现役管线修真**：`g26-r2-gap-distill.py`（G26 SOP 月跑）INSERT 补 `domain='mingli'` 列（原缺域字段）。
+- **护栏防污染**：29 个一次性历史脚本（import-*/bazi-t1/r47x-r49x/kb-masters×10/fix-kb-quality×3/seed×2 等）统一加装 LEGACY-INGEST-GUARD——无 `ALLOW_LEGACY_INGEST=1` 直接 exit 2 并指向新库；确需重跑设环境变量即可。**排程误伤排查**：tcm 15min 链的 `import-tcm-kb.py`（ADR-007 链3，自有口径不受本规范约束）和每日 03:30 的 `distill-backlog-ingest.py`（R805 已自带指纹+formal+domain）误装护栏后已摘除并验证语法。
+- **验证**：29+2 脚本 py_compile/node --check 全过；护栏拦截（exit 2）与放行分支实测通过；KBIngestor 内存库自测——入库/幂等拦截/异指纹通过/越域 tcm-authoritative 拦截 四项全中。
+- **commit**：`899718df`（36 文件：新增 lib+护栏 29、改造 3、摘除复原 2）。
+
 ## 2026-09-27 23:35 · G2CLAW 正式退役 ✅ 云端 AI 通道关闭，定版本地 MLX 方案（Kimi · 用户指令：「这个g2claw也不用了」）
 
 - **密钥摘除**：`com.mingli-baojian.api-v2.plist` EnvironmentVariables 中的 G2CLAW_API_KEY 已删除（备份 `_archived-20260926-p3/...bak-20260927-g2claw-retire`）；unload/load 重载后进程环境核验无残留（kickstart 不重读 plist，必须 unload/load——已踩实）。
