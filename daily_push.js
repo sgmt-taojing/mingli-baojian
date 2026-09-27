@@ -220,9 +220,42 @@ function buildTimeScript(d, tone) {
   }).join('\n');
 }
 
-/** 公开版：MB-M1 v2 新结构（2026-09-26）
- *  早推七板块：今日三要→时辰剧本｜运势量化→命主联动｜速查→修身→落款（━━━SPLIT━━━ 三段）
- *  暮推五板块：明日三要→明日黄金窗口→今夜收整→修身一句→落款 */
+// R-SLIM（2026-09-27）：推送精简改版——轻重缓急排序、只留缘主/信众相关内容、
+// 分析判断全白话。砍掉：时辰剧本三行（折进黄金窗口）、运势量化独立板块（并入定调）、
+// 速查区（星宿/方位/天气与命理决策无关）、神煞长串（只留 2 吉 2 凶带注解）。
+const YUAN_ZODIAC = '羊'; // 缘主 1979 己未
+
+/** 凶煞白话注解（常见煞的通俗影响，推送只用一档提醒） */
+const XIONGSHA_GLOSS = {
+  朱雀: '慎言语，防口舌争执', 重日: '事易反复，重要决定缓一天', 白虎: '防磕碰外伤，出行当心',
+  天牢: '易生纠葛，签约谨慎', 玄武: '防失窃破财，看管财物', 勾陈: '事多拖延，预留余量',
+  天刑: '慎防官非纠纷', 五虚: '忌开仓出货', 九空: '求财不宜', 大耗: '防大笔破财',
+  劫煞: '防意外损失', 灾煞: '防灾祸，平安为上', 月煞: '小事不顺，心态放平',
+  河魁: '防口舌', 死神: '宜静不宜动', 月刑: '防小人是非', 小耗: '小额破费，无伤大雅',
+};
+
+/** 神煞精选：吉神取前 2（沿用 bridge 自带注解），凶煞取前 2 配白话 */
+function plainShensha(d) {
+  const raw = d.shensha_plain || d.shensha || '';
+  const m = raw.match(/吉神[:：]([^;；]+)[;；]\s*凶煞[:：](.+)/);
+  if (!m) return raw ? `✨ ${raw.slice(0, 60)}` : '';
+  const js = m[1].split('、').map(s => s.trim()).filter(Boolean).slice(0, 2).join('、');
+  const xs = m[2].split('、').map(s => s.trim()).filter(Boolean).slice(0, 2)
+    .map(x => XIONGSHA_GLOSS[x] ? `${x}（${XIONGSHA_GLOSS[x]}）` : x).join('、');
+  return `✨ 吉神眷顾：${js}\n⚠️ 凶煞提醒：${xs}`;
+}
+
+/** 冲煞分级提醒：正冲缘主生肖→重提醒；否则一句带过 */
+function chongLine(d) {
+  if (d.chong_shengxiao === YUAN_ZODIAC) {
+    return `🔔 冲${d.chong_zhi}（${d.chong_shengxiao}）——正冲您的生肖：大事缓办、重要决定改期，平安即是赢`;
+  }
+  return `⚔️ 冲${d.chong_zhi}（属${d.chong_shengxiao}的亲友大事缓一缓）；煞${d.sha}方不宜动土`;
+}
+
+/** 公开版：R-SLIM 精简结构（2026-09-27）
+ *  晨推五板块：今日定调→跟您有关｜宜忌速办→节气节日（有则出）→修身一句→落款（━━━SPLIT━━━ 两段）
+ *  暮推五板块：明日定调（含宜忌窗口）→跟您有关→五运六气→今夜收整→修身一句→落款 */
 function buildPublic(d, isTomorrow) {
   if (isTomorrow) return buildEvening(d);
   const gz = d.gz;
@@ -230,43 +263,31 @@ function buildPublic(d, isTomorrow) {
   const tone = toneOf(d);
   const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
   const jianchu = (yiJi.jianchu || '').replace(/^(.日)\(\1/, '$1（').replace(')', '）');
-  const chongPlain = `属${d.chong_shengxiao}的朋友今日大事缓一缓；煞在${d.sha}方，${d.sha}方不宜动土修造`;
   const jishiList = d.jishi_plain || [];
   const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
-  const nightJishi = jishiList.filter(s => !/辰|巳|午|未|申|酉|戌/.test(s[0]));
-  const jishiLine = [...dayJishi, ...nightJishi].join('、');
   const yiTop = (yiJi.yi_plain || yiJi.yi).split('、').slice(0, 3).join('、');
   const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
-  const gold = dayJishi[0] || jishiList[0] || '全天平和';
-  const TONE_LINE = { 守: '今日主守：稳住基本盘，不开新局', 稳进: '今日稳进：按节奏推进，不冒进', 进取: '今日进取：窗口难得，主动出击' }[tone];
+  const gold = dayJishi.slice(0, 3).join('、') || jishiList[0] || '全天平和';
+  const TONE_LINE = { 守: '稳住基本盘，不开新局', 稳进: '按节奏推进，不冒进', 进取: '窗口难得，主动出击' }[tone];
+  const xiJiAct = d.day_gan_ss.xi_ji === '喜' ? '今日天干助喜，该出手就出手' : d.day_gan_ss.xi_ji === '忌' ? '今日天干为忌，守成为上、少做大决定' : '今日天干中平，照计划推进即可';
 
   let msg = `📅 易道智鉴 · 晨推 ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
 
-━━━ ① 今日三要 ━━━
-✅ 宜：${yiTop}
-🚫 忌：${jiTop}
-⏰ 黄金窗口：${gold}（${tone === '守' ? '做熟不做生' : '要事排这里'}）
+━━━ ① 今日定调 ━━━
+🎯 ${tone}（${d.score}分 ${d.score_stars}）：${verdictLine(d)}——${TONE_LINE}。
+⏰ 黄金窗口：${gold}（要事排这里）
 
-━━━ ② 时辰剧本 ━━━
-${buildTimeScript(d, tone)}
-━━━SPLIT━━━
-━━━ ③ 运势量化 ━━━
-📊 ${d.score}分 ${d.score_stars}（${d.score_desc}）｜基调「${tone}」：${TONE_LINE}
-
-━━━ ④ 命主联动 ━━━
-👤 今日${gz.day}日：日干${gz.day_gan}对缘主癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}），日支${gz.day_zhi}本气为${d.day_zhi_ss.ss}（${d.day_zhi_ss.plain}）。
-📈 流年丙午（正财透干·火为你的喜用，求财窗口）｜流月${gz.month}同参。
-🌀 大运乙丑（乙木食神高透，才华变现正当时）——${d.day_gan_ss.xi_ji === '喜' ? '今日天干助喜，该出手就出手' : d.day_gan_ss.xi_ji === '忌' ? '今日天干为忌，守成为上、少做大决定' : '今日天干中平，照计划推进即可'}。
+━━━ ② 跟您有关 ━━━
+👤 今日${gz.day}日：日干${gz.day_gan}对您的癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}）——${xiJiAct}。
+${chongLine(d)}
 ${buildYunqiLine(d.year)}
 ━━━SPLIT━━━
-━━━ ⑤ 速查区 ━━━
-📌 ${jianchu}｜⭐ ${yiJi.xingxiu}｜☀️ ${d.huanghei}
-⚖️ 裁决：${verdictLine(d)}
-⚔️ 冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}：${chongPlain}
-✨ ${d.shensha_plain || d.shensha}
-🧭 喜神${d.xishen}·财神${d.caishen}·福神${d.fushen}｜🌤️ ${d.weather.condition} ${d.weather.temp}°C（${d.weather.city || '本地'}）
-⏰ 吉时：${jishiLine}
+━━━ ③ 宜忌速办 ━━━
+✅ 宜：${yiTop}
+🚫 忌：${jiTop}
+📌 ${jianchu}｜☀️ ${d.huanghei}
+${plainShensha(d)}
 `;
 
   if (d.jieqi_info) msg += `\n🌿 ${d.jieqi}｜${d.jieqi_info}\n`;
@@ -278,14 +299,14 @@ ${buildYunqiLine(d.year)}
   if (d.daily_knowledge) msg += `\n📚 ${d.daily_knowledge.title}\n${d.daily_knowledge.summary}\n`;
 
   msg += `
-━━━ ⑥ 修身一句 ━━━
+━━━ ④ 修身一句 ━━━
 🧘 ${koujue}
 
 ${SIGN_OFF}`;
   return msg;
 }
 
-/** MB-M1 暮推（--tomorrow）：明日预告 + 今夜收整，五板块 */
+/** R-SLIM 暮推（--tomorrow）：定调先行、缘主相关优先、五运六气保留 */
 function buildEvening(d) {
   const gz = d.gz;
   const yiJi = d.yi_ji;
@@ -295,6 +316,7 @@ function buildEvening(d) {
   const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
   const yiTop = (yiJi.yi_plain || yiJi.yi).split('、').slice(0, 3).join('、');
   const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
+  const TONE_LINE = { 守: '稳住基本盘，不开新局', 稳进: '按节奏推进，不冒进', 进取: '窗口难得，主动出击' }[tone];
 
   const yunqiBlock = buildYunqiBlock(d.year);
 
@@ -302,15 +324,16 @@ function buildEvening(d) {
 📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}
 🏮 ${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
 
-━━━ ① 明日三要 ━━━
+━━━ ① 明日定调 ━━━
+🎯 ${tone}（${d.score}分 ${d.score_stars}）：${verdictLine(d)}——${TONE_LINE}。
 ✅ 宜：${yiTop}
 🚫 忌：${jiTop}
-📌 ${jianchu}｜☀️ ${d.huanghei}｜基调「${tone}」（${d.score}分 ${d.score_stars}）
-⚖️ 裁决：${verdictLine(d)}
+⏰ 黄金窗口：${dayJishi.slice(0, 3).join('、') || jishiList[0] || '全天平和，按节奏即可'}
+📌 ${jianchu}｜☀️ ${d.huanghei}
 
-━━━ ② 明日黄金窗口 ━━━
-⏰ ${dayJishi.length ? dayJishi.join('、') : (jishiList.join('、') || '全天平和，按节奏即可')}
-⚔️ 冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}｜✨ ${d.shensha_plain || d.shensha}
+━━━ ② 跟您有关 ━━━
+${chongLine(d)}
+${plainShensha(d)}
 ${yunqiBlock ? `
 ━━━ ③ 五运六气 · 天赋底色 ━━━
 ${yunqiBlock}
