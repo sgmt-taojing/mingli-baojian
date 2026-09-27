@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>命理宝鉴 · 全项目知识图谱 2026-09-26</title>
+<title>命理宝鉴 · 全项目知识图谱 2026-09-27</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:-apple-system,"PingFang SC",sans-serif; background:#0d1117; color:#e6edf3; overflow:hidden; }
@@ -24,7 +24,7 @@
 <body>
 <canvas id="graph"></canvas>
 <div id="legend">
-  <b style="color:#f0b429">命理宝鉴 · 知识图谱</b> <span style="color:#6e7681">2026-09-26</span><br>
+  <b style="color:#f0b429">命理宝鉴 · 知识图谱</b> <span style="color:#6e7681">2026-09-27</span><br>
   <span class="dot" style="background:#f0b429"></span>平台核心
   <span class="dot" style="background:#58a6ff"></span>服务中心（五端）
   <span class="dot" style="background:#3fb950"></span>排盘引擎 ×8
@@ -66,9 +66,17 @@ const DATA = {
     {id:'m-wenshi', label:'问事服务中心', cat:'folk', parent:'c-yuanzhu', desc:'16 域问事：八字/紫微/六爻/风水等。\n问答式采集，语音输入+拍照上传，\n全维度白话报告。'},
     {id:'m-minsu', label:'民俗工具中心', cat:'folk', parent:'c-yuanzhu', desc:'姓名测评/取名改名/公司取名、\n手机号测+荐号、合婚 v2、太岁化解、\n黄历择日、节气节日、家庭关系。'},
     {id:'m-life', label:'生命周期报告', cat:'folk', parent:'c-yuanzhu', desc:'生命流报告/时间轴/命格指数/人生规划。\n⚠️ 命格指数已接真排盘（P0 修复）。'},
-    {id:'m-push', label:'每日推送', cat:'folk', parent:'c-yuanzhu', desc:'晨推 06:00 / 暮推 18:00 / 节日加推。\n企业微信智能机器人长连接通道。\n白话层：宜忌/神煞/吉时全配通俗解读。'},
+    {id:'m-push', label:'每日推送', cat:'folk', parent:'c-yuanzhu', desc:'晨推 06:00 / 暮推 21:40 / 节日加推。\n企业微信智能机器人长连接通道。\n暮推新增③五运六气天赋底色板块（09-27）。\n白话层：宜忌/神煞/吉时全配通俗解读。'},
+    // 医命同参传承层（2026-09-27 Y1-Y6 清零）
+    {id:'ym-root', label:'医命同参', cat:'engine', parent:'root', desc:'自古医命不分家——医命同参传承层（Y1-Y6 全清零）。\n古制：内经藏象×子平病药×相法命相同参。\n红线：只进批注/报告/信众层，诊疗链路零进入；\n倾向参考话术，边界句必现，签名权在人。', metric:'桥接原典: <b>498 条</b><br>相术部新入: <b>353 条</b><br>切片: <b>Y1-Y6 ✅</b>'},
+    {id:'ym-engine', label:'禀赋体质引擎', cat:'engine', parent:'ym-root', desc:'yiming-tongcan-engine.js（Y1）\n五行偏盛/偏弱→脏腑倾向→病药说调养方向。\n白话+「倾向参考·非诊断」边界句必现。\n复用 yunqi-engine 出生年运气禀赋。'},
+    {id:'ym-report', label:'报告 segYT 段', cat:'engine', parent:'ym-root', desc:'norm-report-engine 新增「禀赋体质」段（Y3）。\n八字/紫微报告 9 段渲染实测通过。'},
+    {id:'ym-anno', label:'批注参考区块', cat:'engine', parent:'ym-root', desc:'Y2：yimingReference 挂问诊台🌿区块。\nY6：xiangReference 挂👁️命相同参区块。\n借鉴写入不自动入断语，命理师签名定稿。'},
+    {id:'ym-ask', label:'体质禀赋问项', cat:'folk', parent:'ym-root', desc:'问事服务中心第 22 件工具（Y4）。\n生辰→白话体质卡，浏览器全流程实测。'},
+    {id:'ym-xiang', label:'命相同参引擎', cat:'engine', parent:'ym-root', desc:'mingxiang-tongcan-engine.js（Y6）\n十二宫位×十神域互证、五色×喜用×时令气色、\n形局宜忌。相不独论，须与命局互证。'},
+    {id:'kb-xiangshu', label:'相术部原典', cat:'kb', parent:'ym-root', desc:'古今图书集成·艺术典·相术部卷631-650（Y5）。\n维基文库 37 万字净本→353 条（XST| 指纹）。\n含神相全编/人伦大统赋/神异赋/许负相法。\nxiangshu 模块 45→398 条。', metric:'入库: <b>353 条</b><br>净本: <b>37 万字</b>'},
     // 知识库
-    {id:'kb-mingli', label:'命理知识域', cat:'kb', parent:'root', desc:'mingli 域 16,612 条 / 63 模块：\nr45_palace 2,688 / 紫微 1,993 / 八字 1,851\nr45_huajie 1,260 / classics 1,031 / 奇门 954\n风水 778 / 咒语 548 / 六壬 494 / 六爻 366\n⚠️ 41 个模块 <100 条（稀薄清单 P0/P1）', metric:'命理域合计: <b>16,612 条</b><br>KB 全量: <b>319,653 条</b><br>命理占比: <b>5.2%</b>（医学居大头）'},
+    {id:'kb-mingli', label:'命理知识域', cat:'kb', parent:'root', desc:'mingli 域 16,612 条 / 63 模块：\nr45_palace 2,688 / 紫微 1,993 / 八字 1,851\nr45_huajie 1,260 / classics 1,031 / 奇门 954\n风水 778 / 咒语 548 / 六壬 494 / 六爻 366\n⚠️ 41 个模块 <100 条（稀薄清单 P0/P1）', metric:'命理域合计: <b>18,581 条</b><br>KB 全量: <b>320,568 条</b><br>命理占比: <b>5.8%</b>（医学居大头）'},
     {id:'kb-tcm', label:'医学知识域', cat:'kb', parent:'root', desc:'tcm 207,743 + 伤寒 20,218 + 方剂 14,014\n+ 倪师人纪 10,500 + 诊断 9,303 + 内经 5,279…\nG24 后存量 36,121 条标 reference 参考域，\n诊疗链路只命中 tcm 移植栈。', metric:'医学域合计: <b>~283,000 条</b><br>参考域隔离: <b>36,121 条</b>'},
     {id:'kb-canon', label:'经典依据层', cat:'kb', parent:'kb-mingli', desc:'渊海子平/三命通会/滴天髓/子平真诠/\n星历考原/天玉经/增删卜易等原典实时命中。\n新增：六壬双璧（指南注解+断案222案）、\n奇门统宗（玄机赋全）、象数占候六部 82 条\n（太玄经/洪范皇极/天原发微/大衍索隐/易象图说/三易洞玑）。'},
     {id:'kb-verify', label:'真人校正库', cat:'kb', parent:'kb-mingli', desc:'名人八字反校：BaziQA 50 人 488 题。\n目标 10,000 真人校正库（进行中）。\n⚠️ wiki 702 名人事件待网络恢复补抓。'},
