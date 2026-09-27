@@ -1,3 +1,9 @@
+## 2026-09-27 16:25 · 暮推排程真改 21:40：launchd 残留 18:00 已修正重载（Kimi）
+
+- **收口核验发现落差**：KANBAN/图谱页均已记「暮推 21:40」，但 launchd 排程 `com.mingli-baojian.push-evening.plist` 仍停在 18:00（守护 `push-guard-evening` 18:47）——若不修，今晚 18:00 就提前发出，21:40 验收点落空。
+- **处置**：两 plist 改为 21:40 / 21:47（守护保持 +7min 尾随），bootout→bootstrap 重载生效，bak-20260927 备份留底。launchctl print 确认 calendarinterval 触发器已注册。
+- **教训**：改推送时刻必须「内容层+排程层」双改双验，单改文档不算数。今晚 21:40 实发后核验五运六气③板块送达回执（KANBAN 待办 #1 不变）。
+
 ## 2026-09-27 16:20 · 传承层挂账：知识图谱页挂「医命同参」子树 + 陈数刷新（Kimi）
 
 - **图谱挂账**：`app/project-knowledge-graph.html` 新增医命同参子树 7 节点——ym-root（医命同参传承层，红线句写明）/ym-engine（禀赋体质引擎 Y1）/ym-report（报告 segYT 段 Y3）/ym-anno（批注参考区块 Y2+Y6）/ym-ask（体质禀赋问项 Y4）/ym-xiang（命相同参引擎 Y6）/kb-xiangshu（相术部原典 353 条 Y5）。41 节点结构 node 校验通过，浏览器截图确认渲染正常。
