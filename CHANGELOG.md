@@ -1,3 +1,10 @@
+## 2026-09-27 22:45 · 全天收官终验 + G2CLAW 探测新发现（Kimi）
+
+- **终验全绿**：api8920/static8900/tcm8972 全 200；KB formal=fts=321,375、NULL 键 0、空摘要 0；WAL 107MB 待守卫例行 checkpoint（无风险）。
+- **今日总账**：推送 R-SLIM 改版+首发验收闭环；D 类稀薄模块九项清零（新入库 598 条：协纪402/月令10/易林162/阳宅15/太玄139/太乙55/太岁24+序；桥接 970 条：体质498/命相258/姓名214；摘要回填 6,630；标签归并 26；域纠偏 4）。
+- **G2CLAW 探测**：额度错误码已从「对话额度已用完」变为「不支持的模型」——**额度大概率已恢复，但模型目录变了**：glm-4-flash/glm-4.5-flash/glm-4-air/glm-4-plus/kimi-k2/moonshot-v1-8k/gpt-4o-mini/deepseek-v3/qwen-plus/zhipu前缀 等 12 个候选全被拒（model_not_supported，auth 是通过的）。/v1/models 404 无目录可查。
+- **待用户**：到 g2claw 控制台看一眼当前可用模型名（08-28 轮换密钥时控制台或有清单），发我即可立刻复提 staging 1,660 份留队 + distill-engine 模型名同步修正。
+
 ## 2026-09-27 22:35 · D类清零：mingxiang/xingming 存量桥接 258+214 条（Kimi）
 
 - **mingxiang 命相互证**：双向桥 258 条——相术侧 91（xiangshu/mingxiang 中论及八字/命局/五行的原典）+ 命理侧 167（各术数域中论及相法/气色/面相/骨相的条目），tags 追加「命相同参」（幂等，审计 logs/kb-tag-bridge-audit.jsonl）。mingxiang-tongcan-engine 检索底子从 18 条扩到 276 条可达。
