@@ -1203,3 +1203,10 @@
 - **配方**（沿 v9.2 纪律）：base=v9.2-fixed fused；数据=v9.2 原样 1150 + 干支 drills 分层 300（序查表60/年份100/反查60/相邻80）尾挂不 shuffle（v9.1 教训）；LoRA rank4×20层 300iters lr5e-6 grad-checkpoint。
 - **drills 自验**：741 条生成池零误差（公式复核），训练集 training/mlx-r105-data-v95/（1450/127）。
 - **启动**：launchd com.mingli-baojian.v95-train（activate 在 launchd 沙箱被拒，改直调 .venv-mlx 解释器）。验收门：masked ≥53.2% 且 488 库 ≥36.7% 且干支顺推显著提升，方准融合换产；不达标不换（v9.4 判据同规）。
+
+## 2026-09-27 09:25 · v9.5 训练完成进验收门 + staging 链路真相 + 分诊（Kimi）
+
+- **v9.5 训练完成**：300 轮 20 分钟（0.253 it/s，峰值 6.4GB），train loss 0.525。适配器归档纠偏（run-v95.sh 的 sed 漏改 ADAPTER_DIR，产物落 v92 目录已移正）+ 融合 mingli-sft-v9.5-cand-7b（4.0GB）→ 双库验收门评估中（v95-gate launchd）。
+- **staging 链路真相**：r470 晋升 cron 每晚"promoted 828/828"实为对 08-16 前旧记录的幂等空转（条件 status IN promoted/staging + audit approved + conf≥0.85），pending 新条永不进队列；冗余 kimiwork-r470 任务（exit 127 PATH 无 node）已归档下线。
+- **pending 1,901 分诊**（非晋升）：抽样示 rules 降级链产物多为 OCR 碎片/字幕渣，盲升=污染 KB（红线5）。三规则分诊（剥时间戳防误伤讲稿：35-41% 密度带实为 [6430s] 标记膨胀）：**拒 241**（GBK 错码/采集站水印/乱码码点，audit 留痕 [triage-20260927]）/ **留 1,660** 待 G2CLAW 恢复后 AI 复提，原样 pending 不污染 formal。
+- **纪律记录**：rules 链产物默认不入 formal——晋升 SLA 维持 conf≥0.85 门槛不动，AI 复提后才够格。
