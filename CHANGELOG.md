@@ -1,3 +1,14 @@
+## 2026-09-27 14:50 · KB 红线复绿收官 + 医命同参 Y1/Y3 上线（Kimi）
+
+- **KB 空壳行清除（用户批准）**：401 条 NULL entry_id 壳行（100% 内容重复零独有）删除留证 `logs/kb-purge-empty-audit.jsonl`；kb_formal=kb_fts5=320,215 三方对齐，NULL 键红线复绿。
+- **根修 `fc6d29a5`**：tcm-daily-scan 别名同步 INSERT 不带 entry_id 直写 kb_formal（09-26 夜产 201 条壳行的元凶）→ 改仅报告不写入；同时消除 ADR-024 边界违规（医学增量只走 tcm 内化通道）。
+- **医命同参建设启动（用户 09-27 指令：自古医命不分家，全面蒸馏+活化传承+通俗服务）**：
+  - 规划落盘 `docs/YIMING-TONGCAN-PLAN.md`（法脉/红线/审计/切片 Y1-Y6/验收口径）；
+  - KB 主题审计：五运六气 1,628·五行脏腑 1,684·气色诊 1,029·疾厄宫 886（厚）；病药说 360·寿元 202（中）；**体质×命格 91·命相同参 41（薄，列补蒸馏 P1）**；
+  - **Y1 引擎** `server/yiming-tongcan-engine.js`：五行偏盛/偏弱→脏腑倾向→病药说调养方向，白话+「倾向参考·非诊断」边界句必现，纯规则不训练，复用 yunqi-engine；
+  - **Y3 报告层**：norm-report-engine 新增 segYT「禀赋体质」段（八字/紫微），实测 `/api/paipan/bazi/report` 9 段渲染正常（内仓已提交）；
+  - 待续：Y2 批注层参考区块（8974）、Y4 信众面问项、Y5 命相同参/体质×命格补蒸馏。
+
 ## 2026-09-27 14:35 · yunqi 暮推接入收官（R-YQ-PUSH）+ v9.5 终判归档（Kimi）
 
 - **R-YQ-PUSH 五运六气段接入推送渲染层**：daily_push.js require server/yunqi-engine.js（与 norm-report-engine 报告侧同源复用），暮推新增 ③「五运六气·天赋底色」（出生年禀赋+流年互动+「体质倾向参考·非医学诊断，调养请咨询医师」边界），晨推 ④ 命主联动挂一行运气底色；缘主年柱己未=1979 与 server/daily-recommendation.py YONGHU 同源。实测 verify 11/11、分段 ≤1800 字节（1763+244）。commit 08075f5。KANBAN 挂账 3 天的「待用户确认文案」解卡——成品直接上线，今晚暮推实发验收。
