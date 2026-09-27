@@ -1,3 +1,9 @@
+## 2026-09-27 22:55 · G2CLAW 探测定性：额度仍耗尽，模型目录摸清 + distill 模型名修正（Kimi）
+
+- **探测结论**（用户指令「直接操作」，16 个候选实测）：网关 auth 正常；**有效模型名 = glm-5.2 / glm-5 / auto**（这三个报 code 1003「对话额度已用完」——额度确实仍耗尽）；glm-4-flash 及 4.x 全系已不在网关目录（model_not_supported）。/v1/models 404，无目录端点。
+- **真修正**：`server/distill-engine.js` 默认模型 glm-4-flash → glm-5.2（可被 G2CLAW_MODEL env 覆盖）——否则额度恢复后主流（api-server-v2 用 glm-5.2）能跑、蒸馏链仍会撞模型名错误。
+- **当前状态**：云端 AI 链待充值；熔断+MLX 降级链照常兜底，产品面无感。充值后无需改代码即可全链恢复。
+
 ## 2026-09-27 22:45 · 全天收官终验 + G2CLAW 探测新发现（Kimi）
 
 - **终验全绿**：api8920/static8900/tcm8972 全 200；KB formal=fts=321,375、NULL 键 0、空摘要 0；WAL 107MB 待守卫例行 checkpoint（无风险）。
