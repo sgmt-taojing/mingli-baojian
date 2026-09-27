@@ -25,6 +25,42 @@ const FULL_SCRIPT = path.join(ROOT, 'server', 'daily-recommendation.py');
 const LINE = '━━━━━━━━━━━━━━━━━━';
 const SEP = '════════════════════════';
 
+// R-YQ-PUSH（2026-09-27）：五运六气段接入推送渲染层（暮推主挂载，晨推一行点缀）
+// 引擎 server/yunqi-engine.js 已挂报告侧（norm-report-engine），推送侧同源复用。
+// 缘主年柱己未=1979（server/daily-recommendation.py YONGHU.bazhi_year，与推送命盘同源）。
+const YQ_ENGINE = require('./server/yunqi-engine.js');
+const YUAN_BIRTH_YEAR = 1979;
+
+/** 暮推运气段（三行：出生年禀赋 / 流年互动 / 边界说明） */
+function buildYunqiBlock(targetYear) {
+  try {
+    const lines = YQ_ENGINE.buildSection({ year: YUAN_BIRTH_YEAR, targetYear });
+    if (!lines.length) return '';
+    const birth = lines[0].replace(/^【出生年运气】/, '');
+    const base = (lines[1] || '').replace(/^先天底色：/, '');
+    const flow = (lines[2] || '').replace(/^【\d+ 流年运气】/, '');
+    const interact = (lines[3] || '').replace(/^今年与您：/, '');
+    let s = `🌱 先天 ${birth}\n    ${base}\n`;
+    if (flow && interact) s += `🔄 流年 ${flow}\n    ${interact}\n`;
+    s += `ℹ️ 五运六气是天时五行背景，以上为体质倾向参考、非医学诊断；调养请咨询医师。`;
+    return s;
+  } catch (e) {
+    console.error(`[daily_push] 五运六气段生成失败（降级跳过）: ${e.message}`);
+    return '';
+  }
+}
+
+/** 晨推运气一行（挂 ④ 命主联动） */
+function buildYunqiLine(targetYear) {
+  try {
+    const b = YQ_ENGINE.yunqiOfYear(YUAN_BIRTH_YEAR);
+    const f = YQ_ENGINE.yunqiOfYear(targetYear);
+    return `☸ 运气底色：先天${b.yun}运${b.guo} × ${targetYear}流年${f.yun}运${f.guo}——${YQ_ENGINE.interact(b.yun, f.yun)}`;
+  } catch (e) {
+    return '';
+  }
+}
+
 /** 运行 python 脚本并取回 stdout（去尾部空白）
  *  R-PUSH-PY：钉死 /usr/bin/python3（系统 Python 才有 lunar_python），
  *  防止不同 shell 下裸 `python3` 解析到无 lunar_python 的解释器导致推送哑炮 */
@@ -222,6 +258,7 @@ ${buildTimeScript(d, tone)}
 👤 今日${gz.day}日：日干${gz.day_gan}对缘主癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}），日支${gz.day_zhi}本气为${d.day_zhi_ss.ss}（${d.day_zhi_ss.plain}）。
 📈 流年丙午（正财透干·火为你的喜用，求财窗口）｜流月${gz.month}同参。
 🌀 大运乙丑（乙木食神高透，才华变现正当时）——${d.day_gan_ss.xi_ji === '喜' ? '今日天干助喜，该出手就出手' : d.day_gan_ss.xi_ji === '忌' ? '今日天干为忌，守成为上、少做大决定' : '今日天干中平，照计划推进即可'}。
+${buildYunqiLine(d.year)}
 ━━━SPLIT━━━
 ━━━ ⑤ 速查区 ━━━
 📌 ${jianchu}｜⭐ ${yiJi.xingxiu}｜☀️ ${d.huanghei}
@@ -259,6 +296,8 @@ function buildEvening(d) {
   const yiTop = (yiJi.yi_plain || yiJi.yi).split('、').slice(0, 3).join('、');
   const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
 
+  const yunqiBlock = buildYunqiBlock(d.year);
+
   let msg = `🌙 易道智鉴 · 暮推（明日预告）
 📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}
 🏮 ${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
@@ -272,13 +311,16 @@ function buildEvening(d) {
 ━━━ ② 明日黄金窗口 ━━━
 ⏰ ${dayJishi.length ? dayJishi.join('、') : (jishiList.join('、') || '全天平和，按节奏即可')}
 ⚔️ 冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}｜✨ ${d.shensha_plain || d.shensha}
-
-━━━ ③ 今夜收整三件事 ━━━
+${yunqiBlock ? `
+━━━ ③ 五运六气 · 天赋底色 ━━━
+${yunqiBlock}
+` : ''}
+━━━ ${yunqiBlock ? '④' : '③'} 今夜收整三件事 ━━━
 1️⃣ 复盘今日一件做成的事，给自己记一功
 2️⃣ 列好明日三件要事，对齐上面的宜忌与黄金窗口
 3️⃣ 23点前放下手机，安稳入睡养气
 
-━━━ ④ 修身一句 ━━━
+━━━ ${yunqiBlock ? '⑤' : '④'} 修身一句 ━━━
 📖 「${d.wisdom.text}」—— ${d.wisdom.source}
 ${d.wisdom.meaning ? '💡 ' + d.wisdom.meaning : ''}
 
