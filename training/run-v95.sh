@@ -4,7 +4,7 @@
 # 教训：v9.1 shuffle 破坏关联 45.1%；v9.2 恢复 v9.0 数据 + 推理强化
 cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
 
-ADAPTER_DIR=training/mlx-checkpoints/mingli-sft-v92
+ADAPTER_DIR=training/mlx-checkpoints/mingli-sft-v95
 rm -rf $ADAPTER_DIR
 mkdir -p $ADAPTER_DIR
 
