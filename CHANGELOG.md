@@ -1,3 +1,12 @@
+## 2026-09-27 23:05 · AutoClaw/QClaw 卸载后接管审计 ✅ 零中断（Kimi · 用户指令：openclaw 目录保留，Kimi 修复接管全部依赖）
+
+- **服务层**：8920/8900/8972/8974/paipan/tts/tcm_server/wecom-aibot 全部 launchd 直管（ppid=1），与 AutoClaw 应用零进程依赖，卸载后全程在线。
+- **密钥层**：G2CLAW_API_KEY 在 plist EnvironmentVariables 自持，不依赖 AutoClaw 运行时注入。
+- **任务层**：60 个 com.mingli-baojian/com.kimiwork-* launchd 任务全部已加载（仅 vision-model-audit 未加载，查属旧归档件）；推送双时刻（06:00/21:40+守护尾随）今日全部实发成功。
+- **Agent 层**：心跳巡检（2h）/每日日结/晚间 KB 审计/线上监控（6h）四条节律早已是 Kimi 侧 Automation（今日全部 succeeded）——AutoClaw 的 agent 班次此前已是冗余备份，卸载零影响。
+- **双发风险排查**：Kimi 侧「晨间作战图/黄昏明日预告」两条自动化只产出会话卡片（prompt 明示"不调用任何推送工具"），真实企微外发只有 launchd→push-run.sh→wecom-aibot 一条链——单通道无重复。
+- **结论**：本项目对 AutoClaw/QClaw 的运行时依赖为零残留；openclaw 目录按用户指示保留原址，所有权与运维权归 Kimi。G2CLAW 云端链只欠充值（代码已就绪 glm-5.2）。
+
 ## 2026-09-27 22:55 · G2CLAW 探测定性：额度仍耗尽，模型目录摸清 + distill 模型名修正（Kimi）
 
 - **探测结论**（用户指令「直接操作」，16 个候选实测）：网关 auth 正常；**有效模型名 = glm-5.2 / glm-5 / auto**（这三个报 code 1003「对话额度已用完」——额度确实仍耗尽）；glm-4-flash 及 4.x 全系已不在网关目录（model_not_supported）。/v1/models 404，无目录端点。
