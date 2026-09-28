@@ -19,7 +19,8 @@ typeof window.escapeHtml === "function" || (window.escapeHtml = function(s) { if
 // ════════════════════════════════════════════════════════════════
 
 /**
- * 统一调用 g2claw API
+ * 统一调用 AI 网关（8920 /api/ai/public-chat，模型 auto → 本地 MLX 8960）
+ * 历史名 callG2ClawAPI：G2CLAW 2026-09-28 退役，本函数实际走自有网关，名称保留兼容。
  * @param {Array} messages - OpenAI格式消息数组
  * @param {Object} options - 可选参数 {max_tokens, temperature}
  * @returns {Promise<string>} AI回复文本

@@ -156,7 +156,7 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
 .review-panel textarea:focus{outline:none;border-color:var(--gold)}
 .review-panel .review-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
 
-/* ═══ R-AI-ASSIST: AI 草稿助手（G2CLAW 云端增强 + MLX 降级） ═══ */
+/* ═══ R-AI-ASSIST: AI 草稿助手（本地 MLX 8960） ═══ */
 .ai-assist{background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.25);border-radius:8px;padding:10px 12px;margin-bottom:10px}
 .ai-assist .ai-title{font-size:12px;color:var(--violet,#b8a6e8);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .ai-assist .ai-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
@@ -435,9 +435,9 @@ body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg)
   <div class="review-panel" id="reviewPanel">
     <h3>🔍 审核签字 <span style="font-size:10px;color:var(--muted);margin-left:6px">仅医生/命理师可见</span></h3>
 
-    <!-- R-AI-ASSIST: AI 草稿助手（规则引擎保底 + G2CLAW 云端增强可选） -->
+    <!-- R-AI-ASSIST: AI 草稿助手（规则引擎保底 + 本地 MLX 增强） -->
     <div class="ai-assist">
-      <div class="ai-title">🤖 AI 草稿助手 <span style="font-size:10px;color:var(--muted);font-weight:normal">云端 G2CLAW 增强 · 失败自动降级本地 · 生成后仍需人工审核</span></div>
+      <div class="ai-title">🤖 AI 草稿助手 <span style="font-size:10px;color:var(--muted);font-weight:normal">本地 MLX 增强 · 失败自动降级规则引擎 · 生成后仍需人工审核</span></div>
       <div class="ai-row" id="aiTokenRow" style="display:none">
         <input type="password" id="aiToken" class="wide" style="width:220px" placeholder="Bearer Token（医生/命理师账号）">
         <button class="ai-btn" onclick="saveAiToken()">记住</button>

@@ -64,14 +64,14 @@
 
   <div class="wrap">
     <h1>设 AI 视觉引擎配置</h1>
-    <p class="sub">face-ocr-server (8913) · 4 AI 引擎 · 当前全部离线</p>
+    <p class="sub">face-ocr-server (8913) · 本地 Vision OCR 内置 + 云端可选</p>
 
     <div class="grid" id="summaryGrid"></div>
 
     <div class="steps">
       <h3 style="color:var(--gold2);margin-bottom:10px">📊 配置步骤</h3>
       <ol>
-        <li>选择要启用的 AI 引擎（推荐：智谱 GLM-4V）</li>
+        <li>本地 Vision OCR 已内置，开箱即用（推荐）；云端可选 OpenAI/豆包增强</li>
         <li>复制对应的环境变量到 launchd plist</li>
         <li>重启 face-ocr-server：<code style="color:var(--cyan)">launchctl unload ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist && launchctl load ~/Library/LaunchAgents/com.mingli-baojian.face-ocr.plist</code></li>
         <li>刷新此页面验证引擎状态</li>
@@ -82,8 +82,8 @@
 
     <div class="engine" style="margin-top:16px">
       <h3>示 推荐配置</h3>
-      <p class="note">推荐使用<strong style="color:var(--gold)">智谱 GLM-4V</strong>：性价比高、国内访问快、支持图文多模态。需要前往 <a href="https://open.bigmodel.cn/"  target="_blank" rel="noopener noreferrer">智谱开放平台</a> 注册并获取 API Key。</p>
-      <div class="cmd" id="recCmd">export ZHIPU_API_KEY="your-api-key-here"</div>
+      <p class="note">推荐<strong style="color:var(--gold)">本地 Vision OCR</strong>：零成本、零外网、隐私安全，已内置无需配置。云端多模态增强可选 OpenAI（需自备网络）：</p>
+      <div class="cmd" id="recCmd">export OPENAI_API_KEY="your-api-key-here"</div>
       <button class="btn btn-primary" onclick="copyRec()" aria-label="复制配置命令">复制配置命令</button>
       <p class="note" id="copyStatus"></p>
     </div>
@@ -105,19 +105,18 @@
 
   var engines = [
     {
-      id: 'zhipu',
-      name: '智谱 GLM-4V',
-      icon: '🧠',
-      envVar: 'ZHIPU_API_KEY',
-      endpoint: 'https://open.bigmodel.cn/api/paas/v4/chat/completions',
-      model: 'glm-4v-plus',
-      cost: '中等（约 ¥0.01/张）',
-      pros: '国内访问快、图文多模态、中文理解好',
+      id: 'local_vision_ocr',
+      name: '本地 Vision OCR（内置）',
+      icon: '⚡',
+      envVar: '（无需配置）',
+      endpoint: '本机 scripts/ocr/ocr-vision-batch',
+      model: 'macOS Vision',
+      cost: '零成本 · 零外网',
+      pros: '项目自有链路、隐私安全、毫秒级响应；G2CLAW/智谱退役后接管 OCR 职责',
       steps: [
-        '前往 <a href="https://open.bigmodel.cn/"  target="_blank" rel="noopener noreferrer">open.bigmodel.cn</a> 注册',
-        '创建 API Key（付费额度 ¥18 起步）',
-        '复制 API Key，替换下方的 your-api-key-here',
-        '重启 face-ocr-server 服务'
+        '已随服务内置，无需任何配置',
+        '体检报告/病历等横排文字识别首选',
+        '竖排古籍由 scripts/ocr/ocr-page.py 管线处理'
       ]
     },
     {
@@ -128,26 +127,11 @@
       endpoint: 'https://api.openai.com/v1/chat/completions',
       model: 'gpt-4o',
       cost: '较高（约 $0.01/张）',
-      pros: '多模态能力强、识别精度高',
+      pros: '多模态能力强、识别精度高（云端可选增强）',
       steps: [
         '前往 platform.openai.com 注册',
         '生成 API Key',
         '需科学上网（API 直连）',
-        '重启 face-ocr-server 服务'
-      ]
-    },
-    {
-      id: 'g2claw',
-      name: 'G2Claw（项目代理）',
-      icon: '🐾',
-      envVar: 'G2CLAW_API_KEY',
-      endpoint: 'http://localhost:11434/v1/chat/completions',
-      model: 'auto',
-      cost: '本地（零成本）',
-      pros: '本地推理、无需外网、隐私安全',
-      steps: [
-        '启动项目内 G2Claw 代理服务',
-        '在环境变量中配置 G2CLAW_API_KEY',
         '重启 face-ocr-server 服务'
       ]
     },
@@ -159,7 +143,7 @@
       endpoint: 'https://ark.cn-beijing.volces.com/api/v3/chat/completions',
       model: 'doubao-vision',
       cost: '免费额度 + 按量',
-      pros: '免费额度大、字节生态',
+      pros: '免费额度大、字节生态（云端可选增强）',
       steps: [
         '前往火山引擎火山方舟',
         '接入豆包模型',
@@ -198,7 +182,7 @@
   function renderSummary(){
     var grid = document.getElementById('summaryGrid');
     var items = [
-      {lbl:'AI 引擎',val:'4',sub:'智谱/OpenAI/G2Claw/豆包',cls:'val-cyan'},
+      {lbl:'AI 引擎',val:'3',sub:'本地Vision/OpenAI/豆包',cls:'val-cyan'},
       {lbl:'当前在线',val:'0',sub:'需配置 API Key',cls:'fail'},
       {lbl:'离线兜底',val:'PIL',sub:'Pillow 几何分析',cls:'pass'},
       {lbl:'8913 服务',val:'200',sub:'face-ocr-server',cls:'pass'}
@@ -231,7 +215,7 @@
   }
 
   function copyRec(){
-    var text = 'export ZHIPU_API_KEY="your-api-key-here"';
+    var text = 'export OPENAI_API_KEY="your-api-key-here"';
     if(navigator.clipboard){
       navigator.clipboard.writeText(text).then(function(){
         document.getElementById('copyStatus').textContent = '✅ 已复制到剪贴板，替换 your-api-key-here 为实际 Key';

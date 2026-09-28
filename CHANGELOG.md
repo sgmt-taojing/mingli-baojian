@@ -1,3 +1,12 @@
+## 2026-09-28 16:05 · 三供应商退役清理 ✅ 资产全面接管（Kimi）
+
+- **系统级零残留实证**：智谱/QClaw/G2CLAW 进程、LaunchAgents、/Applications 全无；`~/.qclaw` 仅剩空目录壳（0B，root 所有，待用户确认后删）。
+- **face-ocr 活服务（8913）引擎链收口**（server/ f5490e4）：摘除 g2claw/zhipu 双引擎（配置/调用函数/健康检查 ping 共 ~40 点位），新链 = **本地 macOS Vision OCR（首选，自有资产接管）→ OpenAI/豆包（可选）→ 离线 PIL 兜底**；实测横排体检报告图 `engine=local-vision` 203ms 识别正确，/health 出 `local_vision_ocr:true`。
+- **死文件归档**：medical-stack 旧版 face-ocr-server.py（与活版双轨冗余）+ glm4v-stub.js（零引用死桩）→ `archive/vendor-retired-20260928/`。
+- **前端清退役厂商**：ai-engine-config.html 引擎清单改本地 Vision 领衔（3 引擎）；vision-engine-health 配置指南摘 g2claw/智谱方案；monitor-portal/report-ocr/unified-consultation 文案同步；wechat-hub-inline 摘除 `Bearer sk-g2claw-default` 死请求头（网关本不校验）；ai-interpreter.js 函数注释正名（实际走自有网关 8920→MLX 8960）。
+- **密钥卫生**：归档 plist 备份×3 的 G2CLAW_API_KEY 值脱敏为 RETIRED 标记（密钥本身 08-26 已轮换、09-27 已摘）。
+- **服务健康**：8900/8920/8913/8960 全 200。
+
 ## 2026-09-28 15:35 · 影像 OCR 管线建成 ✅ 批命活套+古今命图双双到手（Kimi）
 
 - **管线**（scripts/ocr/，3 commit）：macOS Vision 竖排不支持（4 参数实测 0 行）→ 切列→切字→逐字 Vision 方案，正文识别率 ~85-90%；句读圈点自动归位；双页摊开切分+版框剥离适配明版本；MLX（v9.2-7b）后校正两模式均不达标（幻觉/失控）默认关闭，原典不改写红线优先。

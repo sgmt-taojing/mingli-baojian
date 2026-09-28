@@ -5,7 +5,7 @@
  * 纯 Node 实现，零外部依赖（不调用 PIL/OpenCV）
  * 接收 base64 图片 → 启发式判断舌色/舌苔/湿润度
  *
- * 实际部署可替换为 g2claw/智谱 GLM-4V/OpenAI vision
+ * 部署说明：G2CLAW/智谱 2026-09-28 退役；现链=本地 Vision OCR → OpenAI/Doubao(可选) → 离线 PIL
  *
  * 接口：
  *   analyzeTongue(base64) → { tongue_color, coating, moisture, geometry, confidence, advice, kb_match }
