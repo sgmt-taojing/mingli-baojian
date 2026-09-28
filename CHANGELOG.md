@@ -1593,3 +1593,11 @@
 - **审计扩展**：qimen/liuyao/meihua/liuren/fengshui 五个排盘页全部走服务端 API——ziwei.html 是唯一本地引擎分歧点，全域已唯一源头。
 - **实测**：同输入双页局名一致（火六局），同参卡随之对齐；BACKLOG 三·补引擎分歧项销账。
 - **落账**：父仓本轮 commit。
+
+## 2026-09-28 21:40 · KB 指纹红线审计收口（命理域收敛）
+
+- **定性**：巡检报的「指纹重复 513 组」非真实重复——32.1 万条中 320,844 条是旧入库脚本的粗粒度结构指纹（形如 `SR|0|24|…`，同指纹不同内容），仅 848 条走 KBIngestor 的 sha256[:16] 新锚点。真实内容重复全库仅 208 组/416 条。
+- **命理域处置**（本侧权责内）：真实重复 2 组——①宅经全文双 ID（Kanripo 新旧两代脚本各入一条，留新 `KR|fengshui|宅經|宅經|7ac60ab8`，删旧 `KB-KR-f741a38b75`）；②公有领域版权声明样板误入 taiyi 模块（留 yangzhai 正条，删 `kb-taiyi-卷07-005`）。引用面核查 0 引用（knowledge_trace/kb_feedback/user_favorites），删前全行留证 `DELIVERY/kb-dedup-audit-20260928.jsonl`。
+- **指纹回填**：命理域 19,650 条旧粗指纹全部回填 sha256[:16] 新锚点（脚本 `scripts/kb_dedup_mingli_20260928.py`，BLOB 误存 1 行已兼容），回填后命理域 0 重复 / 0 旧指纹 / 0 碰撞，KBIngestor 幂等锚点对命理域恢复完整效力。kb_formal_fts 旧索引已 rebuild。
+- **域外挂账**（不动，报裁判）：reference 域真实重复 205 组/410 条（tcm 内化通道同文跨模块双收，如 tcm-diagnosis↔tcm-wangzhen、tcm-syndrome↔distill 对）；domain 空标 264,593 条待归口。两项涉医学边界，入 KANBAN 待裁判通道处置。
+- **自检**：agent-selfcheck 7/7 全绿（库变更后复跑）。
