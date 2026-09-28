@@ -29,12 +29,12 @@ const SEP = '══════════════════════�
 // 引擎 server/yunqi-engine.js 已挂报告侧（norm-report-engine），推送侧同源复用。
 // 缘主年柱己未=1979（server/daily-recommendation.py YONGHU.bazhi_year，与推送命盘同源）。
 const YQ_ENGINE = require('./server/yunqi-engine.js');
-const YUAN_BIRTH_YEAR = 1979;
+const YUAN_BIRTH_YEAR = 1979; // 缺省回退（信众画像缺 birth 时用）
 
-/** 暮推运气段（三行：出生年禀赋 / 流年互动 / 边界说明） */
-function buildYunqiBlock(targetYear) {
+/** 暮推运气段（三行：出生年禀赋 / 流年互动 / 边界说明）；birthYear 缺省回退缘主 */
+function buildYunqiBlock(targetYear, birthYear) {
   try {
-    const lines = YQ_ENGINE.buildSection({ year: YUAN_BIRTH_YEAR, targetYear });
+    const lines = YQ_ENGINE.buildSection({ year: birthYear || YUAN_BIRTH_YEAR, targetYear });
     if (!lines.length) return '';
     const birth = lines[0].replace(/^【出生年运气】/, '');
     const base = (lines[1] || '').replace(/^先天底色：/, '');
@@ -50,10 +50,10 @@ function buildYunqiBlock(targetYear) {
   }
 }
 
-/** 晨推运气一行（挂 ④ 命主联动） */
-function buildYunqiLine(targetYear) {
+/** 晨推运气一行（挂 ② 跟您有关）；birthYear 缺省回退缘主 */
+function buildYunqiLine(targetYear, birthYear) {
   try {
-    const b = YQ_ENGINE.yunqiOfYear(YUAN_BIRTH_YEAR);
+    const b = YQ_ENGINE.yunqiOfYear(birthYear || YUAN_BIRTH_YEAR);
     const f = YQ_ENGINE.yunqiOfYear(targetYear);
     return `☸ 运气底色：先天${b.yun}运${b.guo} × ${targetYear}流年${f.yun}运${f.guo}——${YQ_ENGINE.interact(b.yun, f.yun)}`;
   } catch (e) {
@@ -237,8 +237,7 @@ const XIONGSHA_GLOSS = {
   厌对: '忌嫁娶争辩', 血忌: '防见血，远离利器', 天吏: '忌与官方争执', 致死: '宜静养忌冒险',
 };
 
-/** 神煞精选：吉神取前 2（沿用 bridge 自带注解），凶煞取前 2 配白话 */
-function plainShensha(d) {
+/** 神煞精选：吉神取前 2（沿用 bridge 自带注解），凶煞取前 2 配白话 */function plainShensha(d) {
   const raw = d.shensha_plain || d.shensha || '';
   const m = raw.match(/吉神[:：]([^;；]+)[;；]\s*凶煞[:：](.+)/);
   if (!m) return raw ? `✨ ${raw.slice(0, 60)}` : '';
@@ -248,9 +247,10 @@ function plainShensha(d) {
   return `✨ 吉神眷顾：${js}\n⚠️ 凶煞提醒：${xs}`;
 }
 
-/** 冲煞分级提醒：正冲缘主生肖→重提醒；否则一句带过 */
+/** 冲煞分级提醒：正冲受众生肖→重提醒；否则一句带过 */
 function chongLine(d) {
-  if (d.chong_shengxiao === YUAN_ZODIAC) {
+  const zodiac = (ACTIVE_PROFILE && ACTIVE_PROFILE.zodiac) || YUAN_ZODIAC;
+  if (d.chong_shengxiao === zodiac) {
     return `🔔 冲${d.chong_zhi}（${d.chong_shengxiao}）——正冲您的生肖：大事缓办、重要决定改期，平安即是赢`;
   }
   return `⚔️ 冲${d.chong_zhi}（属${d.chong_shengxiao}的亲友大事缓一缓）；煞${d.sha}方不宜动土`;
@@ -296,11 +296,173 @@ function toneLineFrom(verdict, tone) {
   return positive ? '吉日可成小事，大局面不铺开' : '稳住基本盘，不开新局';
 }
 
+// ═══ R-PUSH-P2（2026-09-28）信众个性化：画像 / 十神 / 三件事·短板·化解 ═══
+const SUBS_PATH = path.join(ROOT, 'data', 'subscribers.json');
+const LIFESTAGE_PATH = path.join(ROOT, 'data', 'lifestage-model.json');
+const DEFAULT_PROFILE = { chatid: 'LiuTao', name: '缘主', birth: '1979-08-16', day_gan: '癸', zodiac: '羊', stage: '守成期', themes: ['健康', '财富', '家庭'] };
+// 当前受众画像（入口按 --profile 赋值，缺省缘主向后兼容）
+let ACTIVE_PROFILE = DEFAULT_PROFILE;
+
+function loadProfile(chatid) {
+  try {
+    const subs = JSON.parse(require('fs').readFileSync(SUBS_PATH, 'utf8')).subscribers || [];
+    return subs.find(s => s.chatid === chatid) || DEFAULT_PROFILE;
+  } catch (e) { return DEFAULT_PROFILE; }
+}
+function loadLifestage() {
+  try { return JSON.parse(require('fs').readFileSync(LIFESTAGE_PATH, 'utf8')); }
+  catch (e) { return { stages: [], theme_meta: {} }; }
+}
+function stageOf(profile) {
+  const m = loadLifestage();
+  if (profile.stage) {
+    const hit = m.stages.find(s => s.id === profile.stage);
+    if (hit) return hit;
+  }
+  const age = new Date().getFullYear() - parseInt((profile.birth || '1979').slice(0, 4), 10);
+  return m.stages.find(s => {
+    const [lo, hi] = s.age.replace('+', '-99').split('-').map(x => parseInt(x, 10));
+    return age >= lo && age <= (isNaN(hi) ? 200 : hi);
+  }) || m.stages[3] || { id: '守成期', themes: ['健康', '财富', '家庭'], tone: '', focus: '' };
+}
+
+// 十神本地推算（非缘主信众无服务端喜忌，用本地十神+白话，喜忌缺省不判）
+const GAN_WX = { 甲: '木', 乙: '木', 丙: '火', 丁: '火', 戊: '土', 己: '土', 庚: '金', 辛: '金', 壬: '水', 癸: '水' };
+const GAN_YANG = '甲丙戊庚壬';
+const WX_SHENG = { 木: '火', 火: '土', 土: '金', 金: '水', 水: '木' };
+const WX_KE = { 木: '土', 土: '水', 水: '火', 火: '金', 金: '木' };
+function shishenOf(me, other) {
+  const a = GAN_WX[me], b = GAN_WX[other];
+  if (!a || !b) return null;
+  const same = GAN_YANG.includes(me) === GAN_YANG.includes(other);
+  if (a === b) return same ? ['比肩', '平辈助力，利合作共事'] : ['劫财', '有竞争分财之象，守财为上'];
+  if (WX_SHENG[a] === b) return same ? ['食神', '温和泄秀，利作品产出'] : ['伤官', '才华外露，慎言防口舌'];
+  if (WX_KE[a] === b) return same ? ['偏财', '偏财机缘，利意外进账'] : ['正财', '我克为财，利求财谈价'];
+  if (WX_KE[b] === a) return same ? ['七杀', '压力挑战，宜稳不宜冲'] : ['正官', '规则护身，利按部就班'];
+  return same ? ['偏印', '灵感独辟，利研究学习'] : ['正印', '贵人滋养，利学习充电'];
+}
+// 十神 → 主题（用于三件事排序）
+const SS_THEME = { 正财: '财富', 偏财: '财富', 正官: '事业', 七杀: '事业', 正印: '学业', 偏印: '学业', 食神: '事业', 伤官: '人际', 比肩: '人际', 劫财: '财富' };
+
+/** 三件事/短板共用的主题工具 */
+function themeMeta() { return loadLifestage().theme_meta || {}; }
+function themeEmoji(t) { return ((themeMeta()[t] || {}).emoji) || '•'; }
+/** 宜事词条 → 主题（命中 lifestage 模型的 yi_keys 前缀） */
+function themeOfYi(yiWord) {
+  const meta = themeMeta();
+  for (const [theme, cfg] of Object.entries(meta)) {
+    if ((cfg.yi_keys || []).some(k => yiWord.startsWith(k))) return theme;
+  }
+  return null;
+}
+function themeOfSha(shaName) {
+  const meta = themeMeta();
+  for (const [theme, cfg] of Object.entries(meta)) {
+    if ((cfg.sha_themes || []).includes(shaName)) return theme;
+  }
+  return '心境';
+}
+
+/** ③ 今日最有利三件事：十神联动 + 宜事（按人生阶段主题优先）+ 黄金窗口 */
+function buildThreeWins(d, prof, label) {
+  const dayWord = label || '今日';
+  const stage = stageOf(prof);
+  const stageThemes = stage.themes || [];
+  const out = [];
+  // 1. 十神联动（缘主用服务端喜忌，其他信众本地十神白话）
+  const gz = d.gz;
+  let ssLine = '';
+  if (prof.chatid === 'LiuTao' && d.day_gan_ss) {
+    const ss = d.day_gan_ss;
+    ssLine = `${themeEmoji(SS_THEME[ss.ss])} ${ss.ss}日：${ss.plain}——${ss.xi_ji === '喜' ? `这类事${dayWord}放心做` : ss.xi_ji === '忌' ? `这类事${dayWord}缓一缓` : '正常推进即可'}`;
+  } else {
+    const r = shishenOf(prof.day_gan, gz.day_gan);
+    if (r) ssLine = `${themeEmoji(SS_THEME[r[0]])} ${r[0]}日：${r[1]}`;
+  }
+  if (ssLine) out.push(ssLine);
+  // 2. 宜事按阶段主题优先挑 2 条
+  const yiList = (d.yi_ji.yi_plain || d.yi_ji.yi || '').split('、').map(s => s.trim()).filter(Boolean);
+  const scored = yiList.map(w => {
+    const t = themeOfYi(w.replace(/（.*$/, ''));
+    return { w, t, rank: t ? (stageThemes.indexOf(t) === -1 ? 9 : stageThemes.indexOf(t)) : 9 };
+  }).filter(x => x.t).sort((a, b) => a.rank - b.rank);
+  scored.slice(0, 2).forEach(x => out.push(`${themeEmoji(x.t)} 宜${x.w}——正合您${stage.id}「${x.t}」头等大事`));
+  // 3. 黄金窗口
+  const jishiList = d.jishi_plain || [];
+  const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
+  const gold = dayJishi.slice(0, 2).join('、');
+  if (gold) out.push(`⏰ 把最重要的一件事排进 ${gold}，借吉时成事`);
+  return out.slice(0, 3).map((l, i) => `${['1️⃣', '2️⃣', '3️⃣'][i]} ${l}`).join('\n');
+}
+
+/** ④ 三个短板提醒：凶煞×2（挂主题）+ 忌事/冲煞 */
+function buildThreeRisks(d, prof, label) {
+  const dayWord = label || '今日';
+  const out = [];
+  const raw = d.shensha_plain || d.shensha || '';
+  const m = raw.match(/凶煞[:：](.+)/);
+  const xsList = m ? m[1].split('、').map(s => s.trim()).filter(Boolean) : [];
+  xsList.slice(0, 2).forEach(x => {
+    const gloss = XIONGSHA_GLOSS[x] || '多加留心';
+    out.push(`${themeEmoji(themeOfSha(x))} ${x}（${gloss}）——${themeOfSha(x)}上别硬扛`);
+  });
+  const jiTop = (d.yi_ji.ji_plain || d.yi_ji.ji || '').split('、')[0];
+  if (jiTop) out.push(`🚫 忌${jiTop}——逆黄历行事，事倍功半`);
+  if (d.chong_shengxiao === prof.zodiac) out.push(`🔔 正冲您的生肖（${prof.zodiac}）：${dayWord}低调是最大的化解`);
+  return out.slice(0, 3).map((l, i) => `${['⚠️', '⚠️', '⚠️'][i]} ${l}`).join('\n');
+}
+
+/** ⑤ 化解三招：穿衣色 + 方位 + 时辰行为（全部白话可执行） */
+function buildRemedies(d, prof, label) {
+  const dayWord = label || '今日';
+  const out = [];
+  const color = WUXING_COLOR[d.day_gan_ele];
+  if (color) out.push(`穿衣选${color}（${dayWord}${d.day_gan_ele}气当令，顺气则顺事）`);
+  if (d.xishen || d.caishen) {
+    const dirs = [d.xishen && `喜神${d.xishen}`, d.caishen && `财神${d.caishen}`].filter(Boolean).join('、');
+    out.push(`办事洽谈面向 ${dirs} 方；${d.sha}方煞位少去少动`);
+  }
+  if (d.chong_shengxiao === prof.zodiac) {
+    out.push(`正冲日大事改期到后天，非改不可就排在黄金窗口内办`);
+  } else if ((d.huanghei || '').includes('黑道')) {
+    out.push(`黑道日要事挪进黄金窗口办，说话留三分、合同多看一遍`);
+  } else {
+    out.push(`黄道吉日无需避讳，放手但要稳——成事后记得复盘记一功`);
+  }
+  return out.map((l, i) => `${['🌿', '🧭', '⏳'][i]} ${l}`).join('\n');
+}
+
+/** 生僻字注音（硬性规范：推送里出现的生僻字必须带拼音） */
+const PINYIN_MAP = { 罥: 'juàn', 薏: 'yì', 苡: 'yǐ', 莼: 'chún', 鲈: 'lú', 裀: 'yīn', 彀: 'gòu', 蓍: 'shī', 筮: 'shì', 爻: 'yáo', 禳: 'ráng', 醮: 'jiào', 偈: 'jì', 诃: 'hē', 敕: 'chì', 罡: 'gāng', 鸾: 'luán', 蛰: 'zhé', 刍: 'chú', 飧: 'sūn' };
+function annotatePinyin(text) {
+  if (!text) return text;
+  let out = text;
+  for (const [c, p] of Object.entries(PINYIN_MAP)) {
+    if (out.includes(c) && !out.includes(`${c}(${p})`)) out = out.replace(c, `${c}(${p})`);
+  }
+  return out;
+}
+
 /** 公开版：R-SLIM 精简结构（2026-09-27）
  *  晨推五板块：今日定调→跟您有关｜宜忌速办→节气节日（有则出）→修身一句→落款（━━━SPLIT━━━ 两段）
  *  暮推五板块：明日定调（含宜忌窗口）→跟您有关→五运六气→今夜收整→修身一句→落款 */
+/** 日主联动行：缘主用服务端喜忌精算；其他信众本地十神白话（喜忌缺省不判） */
+function dayGanLine(d, prof, label) {
+  const dayWord = label || '今日';
+  const gz = d.gz;
+  if (prof.chatid === 'LiuTao' && d.day_gan_ss) {
+    const ss = d.day_gan_ss;
+    const act = ss.xi_ji === '喜' ? `${dayWord}天干助喜，该出手就出手` : ss.xi_ji === '忌' ? `${dayWord}天干为忌，守成为上、少做大决定` : `${dayWord}天干中平，照计划推进即可`;
+    return `👤 ${dayWord}${gz.day}日：日干${gz.day_gan}对您的${prof.day_gan}水为${ss.ss}（${ss.plain}）——${act}。`;
+  }
+  const r = shishenOf(prof.day_gan, gz.day_gan);
+  if (!r) return '';
+  return `👤 ${dayWord}${gz.day}日：日干${gz.day_gan}对您的${prof.day_gan}为${r[0]}（${r[1]}）。`;
+}
+
 function buildPublic(d, isTomorrow) {
   if (isTomorrow) return buildEvening(d);
+  const prof = ACTIVE_PROFILE;
   const gz = d.gz;
   const yiJi = d.yi_ji;
   const tone = toneOf(d);
@@ -313,7 +475,6 @@ function buildPublic(d, isTomorrow) {
   const gold = dayJishi.slice(0, 3).join('、') || jishiList[0] || '全天平和';
   const verdict = verdictLine(d);
   const TONE_LINE = toneLineFrom(verdict, tone);
-  const xiJiAct = d.day_gan_ss.xi_ji === '喜' ? '今日天干助喜，该出手就出手' : d.day_gan_ss.xi_ji === '忌' ? '今日天干为忌，守成为上、少做大决定' : '今日天干中平，照计划推进即可';
 
   let msg = `📅 易道智鉴 · 晨推 ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
@@ -323,12 +484,20 @@ function buildPublic(d, isTomorrow) {
 ⏰ 黄金窗口：${gold}（要事排这里）
 
 ━━━ ② 跟您有关 ━━━
-👤 今日${gz.day}日：日干${gz.day_gan}对您的癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}）——${xiJiAct}。
+${dayGanLine(d, prof)}
 ${chongLine(d)}
-${buildActionLine(d)}
-${buildYunqiLine(d.year)}
+${buildYunqiLine(d.year, parseInt((prof.birth || '').slice(0, 4), 10))}
+
+━━━ ③ 今日最有利三件事 ━━━
+${buildThreeWins(d, prof)}
+
+━━━ ④ 三个短板提醒 ━━━
+${buildThreeRisks(d, prof)}
+
+━━━ ⑤ 化解三招 ━━━
+${buildRemedies(d, prof)}
 ━━━SPLIT━━━
-━━━ ③ 宜忌速办 ━━━
+━━━ ⑥ 宜忌速办 ━━━
 ✅ 宜：${yiTop}
 🚫 忌：${jiTop}
 📌 ${jianchu}｜☀️ ${d.huanghei}
@@ -341,18 +510,19 @@ ${plainShensha(d)}
     msg += `\n🙏 ${d.deities.map(de => de.name + '诞辰').join('·')}\n`;
     (d.deity_guides || []).forEach(g => { msg += `   ${g}\n`; });
   }
-  if (d.daily_knowledge) msg += `\n📚 ${d.daily_knowledge.title}\n${d.daily_knowledge.summary}\n`;
+  if (d.daily_knowledge) msg += `\n📚 ${d.daily_knowledge.title}\n${annotatePinyin(d.daily_knowledge.summary)}\n`;
 
   msg += `
-━━━ ④ 修身一句 ━━━
-🧘 ${koujue}
+━━━ ⑦ 修身一句 ━━━
+🧘 ${annotatePinyin(koujue)}
 
 ${SIGN_OFF}`;
   return msg;
 }
 
-/** R-SLIM 暮推（--tomorrow）：定调先行、缘主相关优先、五运六气保留 */
+/** R-PUSH-P2 暮推（--tomorrow）：①明日定调 ②跟您有关 ③明日最有利三件事 ④短板 ⑤化解 ⑥五运六气 ⑦今夜收整 ⑧修身一句 */
 function buildEvening(d) {
+  const prof = ACTIVE_PROFILE;
   const gz = d.gz;
   const yiJi = d.yi_ji;
   const tone = toneOf(d);
@@ -363,8 +533,9 @@ function buildEvening(d) {
   const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
   const verdict = verdictLine(d);
   const TONE_LINE = toneLineFrom(verdict, tone);
+  const birthYear = parseInt((prof.birth || '').slice(0, 4), 10);
 
-  const yunqiBlock = buildYunqiBlock(d.year);
+  const yunqiBlock = buildYunqiBlock(d.year, birthYear);
 
   let msg = `🌙 易道智鉴 · 暮推（明日预告）
 📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}
@@ -378,22 +549,30 @@ function buildEvening(d) {
 📌 ${jianchu}｜☀️ ${d.huanghei}
 
 ━━━ ② 跟您有关 ━━━
-👤 明日${gz.day}日：日干${gz.day_gan}对您的癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}）——${d.day_gan_ss.xi_ji === '喜' ? '明日天干助喜，可安排要事' : d.day_gan_ss.xi_ji === '忌' ? '明日天干为忌，守成为上' : '明日天干中平，照计划推进'}。
+${dayGanLine(d, prof, '明日')}
 ${chongLine(d)}
-${buildActionLine(d, '明日')}
 ${plainShensha(d)}
+━━━SPLIT━━━
+━━━ ③ 明日最有利三件事 ━━━
+${buildThreeWins(d, prof, '明日')}
+
+━━━ ④ 三个短板提醒 ━━━
+${buildThreeRisks(d, prof, '明日')}
+
+━━━ ⑤ 化解三招 ━━━
+${buildRemedies(d, prof, '明日')}
 ${yunqiBlock ? `
-━━━ ③ 五运六气 · 天赋底色 ━━━
+━━━ ⑥ 五运六气 · 天赋底色 ━━━
 ${yunqiBlock}
 ` : ''}
-━━━ ${yunqiBlock ? '④' : '③'} 今夜收整三件事 ━━━
+━━━ ${yunqiBlock ? '⑦' : '⑥'} 今夜收整三件事 ━━━
 1️⃣ 复盘今日一件做成的事，给自己记一功
 2️⃣ 列好明日三件要事，对齐上面的宜忌与黄金窗口
 3️⃣ 23点前放下手机，安稳入睡养气
 
-━━━ ${yunqiBlock ? '⑤' : '④'} 修身一句 ━━━
-📖 「${d.wisdom.text}」—— ${d.wisdom.source}
-${d.wisdom.meaning ? '💡 ' + d.wisdom.meaning : ''}
+━━━ ${yunqiBlock ? '⑧' : '⑦'} 修身一句 ━━━
+📖 「${annotatePinyin(d.wisdom.text)}」—— ${d.wisdom.source}
+${d.wisdom.meaning ? '💡 ' + annotatePinyin(d.wisdom.meaning) : ''}
 
 ${SIGN_OFF}`;
   return msg;
@@ -428,7 +607,13 @@ ${SIGN_OFF}`;
 }
 
 // === 入口 ===
-const args = process.argv.slice(2).map(a => a.toLowerCase());
+const rawArgs = process.argv.slice(2);
+// --profile <chatid>：按信众画像生成个性化推送（缺省缘主，向后兼容）
+const pIdx = rawArgs.findIndex(a => a.toLowerCase() === '--profile');
+if (pIdx !== -1 && rawArgs[pIdx + 1]) {
+  ACTIVE_PROFILE = loadProfile(rawArgs[pIdx + 1]);
+}
+const args = rawArgs.map(a => a.toLowerCase());
 const mode = args[0] || '';
 const isTomorrow = args.includes('--tomorrow');
 const isVerify = args.includes('--verify');
