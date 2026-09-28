@@ -281,8 +281,40 @@ function runZiweiPaipan(){
       }
     }, 400);
     html += '<div style="margin-top:8px"><a href="bazi.html" style="color:var(--zw-gold);font-size:12px">→ 去排八字命盘做比对</a></div>';
+    html += '<div id="zw-gujin-slot"></div>';
     compareEl.innerHTML = html;
+    renderGujinHere(result);
   }
+}
+
+// ═══ 古今同参：康节本卷四古命例（五行局+命宫主星，2026-09-28） ═══
+var ZW_GJ_STAR_NAMES = {ziwei:'紫微',tianji:'天机',taiyang:'太阳',wuqu:'武曲',lianzhen:'廉贞',tianfu:'天府',taiyin:'太阴',tanlang:'贪狼',jumen:'巨门',tianxiang:'天相',tianliang:'天梁',qisha:'七杀',pojun:'破军'};
+async function renderGujinHere(result){
+  var slot = document.getElementById('zw-gujin-slot');
+  if(!slot || !result || !result.wuxingJu) return;
+  var escH = window.escHtml || window.escapeHtml || function(s){return String(s);};
+  var mg = (result.palaces||[])[0] || {};
+  var stars = (mg.stars||[]).map(function(k){return ZW_GJ_STAR_NAMES[k]||'';}).filter(Boolean);
+  var data;
+  try {
+    var r = await fetch(API_BASE+'/api/mingtu/match',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(8000),body:JSON.stringify({mingju:result.wuxingJu,stars:stars,limit:3})});
+    data = await r.json();
+  } catch(e){ return; }
+  if(!data || !data.ok || !data.matches || !data.matches.length) return;
+  var items = '';
+  data.matches.forEach(function(m){
+    var sameBadge = (m.sameStars && m.sameStars.length) ? ' <span style="font-size:10px;background:rgba(78,201,176,.15);color:#4ec9b0;border-radius:8px;padding:0 6px;margin-left:6px">同星曜 '+escH(m.sameStars.join('、'))+'</span>' : '';
+    items += '<div style="border-left:3px solid var(--zw-gold,#c9a84c);padding:6px 10px;margin:8px 0;background:rgba(201,168,76,.05);border-radius:0 6px 6px 0">'+
+      '<div style="color:var(--zw-gold,#c9a84c);font-weight:600">'+escH(m.name)+(m.category?' <span style="font-size:10px;border:1px solid var(--zw-gold,#c9a84c);border-radius:8px;padding:0 6px;margin-left:6px">'+escH(m.category)+'</span>':'')+sameBadge+'</div>'+
+      '<div style="color:var(--zw-paper3,#8b93a7);font-size:11px;margin:3px 0">'+escH(m.birth)+'</div>'+
+      '<div style="line-height:1.7;font-size:12px">'+escH(m.duanyu)+'</div>'+
+      '<div style="color:#4ec9b0;font-size:11px;margin-top:4px">💡 '+escH(m.lead)+'</div>'+
+      '</div>';
+  });
+  slot.innerHTML = '<div style="margin-top:10px;padding:10px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.15);border-radius:8px">'+
+    '<div style="color:var(--zw-gold,#c9a84c);font-weight:600;margin-bottom:6px">📖 古今同参 · '+escH(data.mingju)+'（古人同局命例 '+data.total+' 则）</div>'+
+    items+
+    '<div style="color:var(--zw-paper3,#8b93a7);font-size:10px;margin-top:8px">出自 '+escH(data.matches[0].source)+'　'+escH(data.disclaimer)+'</div></div>';
 }
 
 async function generateZiweiReport(){

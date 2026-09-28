@@ -159,6 +159,13 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
     <div class="pp-desc">玄空飞星 · 三元九运 · 24山 · 八宅法 · 太岁三煞</div>
     <div class="pp-classic">《沈氏玄空学》《八宅明镜》</div>
   </a>
+
+  <a class="pp-card" href="#tongcan-quick" style="border-left:3px solid #4ec9b0">
+    <span class="pp-icon">📖</span>
+    <div class="pp-name" style="color:var(--paper2)">古今同参 · 速览</div>
+    <div class="pp-desc">紫微同局古命例 · 八字同柱名人命造 · 填一次生辰双参</div>
+    <div class="pp-classic">《紫微斗数全书》卷四 · 《千里命稿·应运篇》</div>
+  </a>
   
   <a class="pp-card" href="index.html" style="border-left:3px solid var(--paper3)">
     <span class="pp-icon">🏛️</span>
@@ -173,6 +180,20 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   </a>
 </div>
 
+<div class="pp-quick" id="tongcan-quick" style="max-width:960px;margin:20px auto 0;padding:16px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:10px">
+  <div style="color:var(--gold,#c9a84c);font-weight:700;font-size:15px">📖 古今同参 · 速览</div>
+  <div style="color:var(--paper3,#8b93a7);font-size:12px;margin:4px 0 10px">填一次生辰，同参紫微同局古命例（康节本卷四 114 盘）与八字同柱名人命造（千里命稿 46 造）</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <input type="date" id="tc-date" value="1990-06-15" style="background:rgba(255,255,255,.05);border:1px solid var(--border,#2a3450);color:var(--paper,#e8dcc8);border-radius:6px;padding:8px;font-size:13px">
+    <select id="tc-hour" style="background:rgba(255,255,255,.05);border:1px solid var(--border,#2a3450);color:var(--paper,#e8dcc8);border-radius:6px;padding:8px;font-size:13px">
+      <option value="0">子时 23-01</option><option value="2">丑时 01-03</option><option value="4">寅时 03-05</option><option value="6">卯时 05-07</option><option value="8">辰时 07-09</option><option value="10" selected>巳时 09-11</option><option value="12">午时 11-13</option><option value="14">未时 13-15</option><option value="16">申时 15-17</option><option value="18">酉时 17-19</option><option value="20">戌时 19-21</option><option value="22">亥时 21-23</option>
+    </select>
+    <select id="tc-sex" style="background:rgba(255,255,255,.05);border:1px solid var(--border,#2a3450);color:var(--paper,#e8dcc8);border-radius:6px;padding:8px;font-size:13px"><option value="male">男</option><option value="female">女</option></select>
+    <button onclick="tcRun()" style="background:linear-gradient(135deg,rgba(201,168,76,.25),rgba(201,168,76,.1));border:1px solid rgba(201,168,76,.4);color:var(--gold,#c9a84c);font-weight:700;border-radius:6px;padding:8px 22px;cursor:pointer;font-size:13px">同 参</button>
+  </div>
+  <div id="tc-result" style="margin-top:10px"></div>
+</div>
+
 <div class="pp-footer">
   命理宝鉴 · 排盘中心 · 7模块古制排盘引擎 v2.2<br>
   <a href="index.html"><span data-i18n="common.backHome">← 返回首页</span></a>
@@ -184,6 +205,55 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
 <script>document.addEventListener('DOMContentLoaded',function(){try{I18N.init();}catch(e){}});</script>
+<script>
+// ═══ 古今同参·速览（2026-09-28）：紫微同局古例 + 八字同柱命造 双引擎联动 ═══
+var TC_API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+function tcEsc(s){var f=window.escHtml||window.escapeHtml;return f?f(String(s)):String(s);}
+function tcPost(path,body){
+  return fetch(TC_API+path,{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(12000),body:JSON.stringify(body)}).then(function(r){return r.json();});
+}
+async function tcRun(){
+  var dateStr=document.getElementById('tc-date').value;
+  if(!dateStr){document.getElementById('tc-result').innerHTML='<div style="color:#e07070;font-size:12px">请先选择出生日期</div>';return;}
+  var parts=dateStr.split('-').map(Number);
+  var hour=+document.getElementById('tc-hour').value;
+  var sex=document.getElementById('tc-sex').value;
+  var out=document.getElementById('tc-result');
+  out.innerHTML='<div style="color:var(--paper3,#8b93a7);font-size:12px">排盘同参中…</div>';
+  var zw=null,bz=null;
+  try{ zw=await tcPost('/api/paipan/ziwei',{year:parts[0],month:parts[1],day:parts[2],hour:hour,sex:sex,deepRead:false}); }catch(e){}
+  try{ bz=await tcPost('/api/paipan/calculate',{year:parts[0],month:parts[1],day:parts[2],hour:hour,minute:0,sex:sex}); }catch(e){}
+  var jobs=[];
+  if(zw&&zw.ok&&zw.chart&&zw.chart.wuxingJu){
+    var mg=(zw.chart.palaces||[]).find(function(p){return p.isMingGong;})||{};
+    var stars=(mg.mainStars||[]).map(function(s){return typeof s==='string'?s:(s&&(s.name||s.star))||'';}).filter(Boolean);
+    jobs.push(tcPost('/api/mingtu/match',{mingju:zw.chart.wuxingJu,stars:stars,limit:2}).then(function(d){return {kind:'ziwei',d:d,meta:zw.chart.wuxingJu+(stars.length?' · 命宫 '+stars.join('、'):'')};}).catch(function(){return null;}));
+  }
+  var rizhu=bz&&(bz.pillars&&(bz.pillars['日']||bz.pillars.Day))||(bz.chart&&bz.chart.pillars&&(bz.chart.pillars['日']||''))||'';
+  if(bz&&bz.ok!==false&&rizhu&&/^[\u4e00-\u9fa5]{2}$/.test(rizhu)){
+    jobs.push(tcPost('/api/bazi/match',{rizhu:rizhu,limit:2}).then(function(d){return {kind:'bazi',d:d,meta:rizhu+' 日柱'};}).catch(function(){return null;}));
+  }
+  var res=(await Promise.all(jobs)).filter(function(x){return x&&x.d&&x.d.ok&&x.d.matches&&x.d.matches.length;});
+  if(!res.length){out.innerHTML='<div style="color:var(--paper3,#8b93a7);font-size:12px">暂无同参结果，可进入具体排盘模块查看完整命盘。</div>';return;}
+  var html='';
+  res.forEach(function(x){
+    var icon=x.kind==='ziwei'?'⭐':'📅';
+    var title=x.kind==='ziwei'?'紫微同局古例':'八字同柱命造';
+    html+='<div style="margin-top:10px"><div style="color:var(--gold,#c9a84c);font-size:13px;font-weight:600">'+icon+' '+title+' · '+tcEsc(x.meta)+'</div>';
+    x.d.matches.forEach(function(m){
+      var who=m.name||(m.rizhu+(m.person?' · '+m.person:''));
+      var text=m.duanyu||m.narrative||'';
+      if(text.length>110)text=text.slice(0,110)+'…';
+      html+='<div style="border-left:3px solid var(--gold,#c9a84c);padding:6px 10px;margin:6px 0;background:rgba(201,168,76,.05);border-radius:0 6px 6px 0;font-size:12px">'+
+        '<div style="color:var(--gold,#c9a84c);font-weight:600">'+tcEsc(who)+(m.sameStars&&m.sameStars.length?' <span style="font-size:10px;color:#4ec9b0">同星曜 '+tcEsc(m.sameStars.join('、'))+'</span>':'')+(m.exact?' <span style="font-size:10px;color:#4ec9b0">同日柱</span>':'')+'</div>'+
+        '<div style="line-height:1.7;color:var(--paper,#e8dcc8)">'+tcEsc(text)+'</div></div>';
+    });
+    html+='</div>';
+  });
+  html+='<div style="color:var(--paper3,#8b93a7);font-size:10px;margin-top:8px">出自《康节说易全书·紫微斗数全书》卷四 / 《千里命稿·应运篇》　古今同参仅为文化参考：命由己造，古例不预断今人。</div>';
+  out.innerHTML=html;
+}
+</script>
 <script src="js/pro-gate.js" defer></script>
 </body>
 </html>
