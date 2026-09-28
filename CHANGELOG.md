@@ -1607,3 +1607,9 @@
 - 盘点：domain 空标 264,874 条构成摸清——医学典籍/课程 ≈26.1 万、诊疗引擎 ≈200、命理归队 ≈3,470（含 authoritative 1,462 实为 premium 命理内容）、乱码/暂存垃圾 ≈565
 - 风险定性：G24 诊疗检索排除按 domain='reference' 过滤，空标医学条目处于规则真空
 - 产出：`DELIVERY/adr-request-domain-backfill-20260928.md` 一页裁决申请（四桶映射 + reference 域 205 组去重建议 + 分工验收口径），随 KANBAN 挂账条目一并待批复
+
+## 2026-09-28 22:05 · mingli 桶归队脚本备妥（dry-run 通过，apply 待批复）
+
+- `scripts/kb_domain_rehome_mingli.py`：空域标→mingli 归队 + 旧粗指纹回填，两字段动作不改内容/trust/模块名，逐行 jsonl 留证
+- dry-run：命中 3,517 条 / 55 模块 / 需回填指纹 3,499；逐模块抽样核对全部为真命理内容（含 wechat-cases 信众求测案例补入清单，yanzhi 定性为命理咨询话术归队）
+- 纪律：--apply 锁在裁判批复后执行；脚本默认 dry-run 不误触
