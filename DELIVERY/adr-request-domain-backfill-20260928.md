@@ -39,3 +39,11 @@
 ## 五、不做的事
 
 不改内容、不删知识、不动 trust 标、不触碰 tcm-authoritative 正室条目、不重新训练。
+
+## 附：quarantine 桶抽检结论修正（09-28 22:10）
+
+原估 565 条的隔离桶经逐模块抽检改判：
+
+- **kb-store / knowledge-raw / knowledge-supplement / kb-supplement 共 305 条改归 mingli 桶**——内容为八字源流、姓氏康熙笔画、八卦类象等真命理知识（标题混入 JS/JSON 碎片属标题卫生问题，另立 P3 项，不动内容）；归队脚本已扩清单（59 模块 / 3,822 条 dry-run 通过）
+- **general 260 条确为乱码**，且 entry_id 暴露来源：`KB-nihaixia-r48-*`——倪海厦批次 r48 的坏导入（二进制碎片），隔离脚本 `scripts/kb_quarantine_general.py` 备妥（dry-run 通过，走 kb_quarantine 表既有先例）
+

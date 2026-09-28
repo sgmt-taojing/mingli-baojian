@@ -44,6 +44,8 @@ MINGLI_MODULES = [
     # 案例系
     "case_bazi", "case_fengshui", "case_liuren", "case_liuyao",
     "case_meihua", "case_qimen", "case_ziwei",
+    # 09-28 抽检改判：原拟隔离桶四模块实为命理内容（标题混入 JS/JSON 碎片，内容正）
+    "kb-store", "knowledge-raw", "knowledge-supplement", "kb-supplement",
 ]
 
 def sha16(content):

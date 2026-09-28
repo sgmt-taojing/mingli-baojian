@@ -1613,3 +1613,9 @@
 - `scripts/kb_domain_rehome_mingli.py`：空域标→mingli 归队 + 旧粗指纹回填，两字段动作不改内容/trust/模块名，逐行 jsonl 留证
 - dry-run：命中 3,517 条 / 55 模块 / 需回填指纹 3,499；逐模块抽样核对全部为真命理内容（含 wechat-cases 信众求测案例补入清单，yanzhi 定性为命理咨询话术归队）
 - 纪律：--apply 锁在裁判批复后执行；脚本默认 dry-run 不误触
+
+## 2026-09-28 22:10 · quarantine 桶抽检改判 + 隔离脚本备妥
+
+- 抽检改判：kb-store/knowledge-raw/knowledge-supplement/kb-supplement 305 条非垃圾——真命理内容（八字源流/康熙笔画/八卦类象），标题混 JS 碎片属标题卫生（另立 P3），改归 mingli 桶；归队脚本扩至 59 模块 / 3,822 条，dry-run 通过
+- general 260 条确诊乱码且定位来源：entry_id `KB-nihaixia-r48-*` = 倪海厦 r48 坏批次；`scripts/kb_quarantine_general.py` 备妥（走 kb_quarantine 既有先例，全行留证），dry-run 通过
+- 裁决申请文档已附修正节；两脚本 --apply 均锁待批复
