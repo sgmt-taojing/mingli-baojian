@@ -250,10 +250,11 @@ const XIONGSHA_GLOSS = {
 /** 冲煞分级提醒：正冲受众生肖→重提醒；否则一句带过 */
 function chongLine(d) {
   const zodiac = (ACTIVE_PROFILE && ACTIVE_PROFILE.zodiac) || YUAN_ZODIAC;
+  const famNote = ACTIVE_PROFILE ? familyChongNote(d, ACTIVE_PROFILE) : '';
   if (d.chong_shengxiao === zodiac) {
-    return `🔔 冲${d.chong_zhi}（${d.chong_shengxiao}）——正冲您的生肖：大事缓办、重要决定改期，平安即是赢`;
+    return `🔔 冲${d.chong_zhi}（${d.chong_shengxiao}）——正冲您的生肖：大事缓办、重要决定改期，平安即是赢${famNote ? '\n' + famNote : ''}`;
   }
-  return `⚔️ 冲${d.chong_zhi}（属${d.chong_shengxiao}的亲友大事缓一缓）；煞${d.sha}方不宜动土`;
+  return `⚔️ 冲${d.chong_zhi}（属${d.chong_shengxiao}的亲友大事缓一缓）；煞${d.sha}方不宜动土${famNote ? '\n' + famNote : ''}`;
 }
 
 // ─── R-PUSH-PLUS（2026-09-28）：调性红线 + 化解行动 ───
@@ -433,7 +434,7 @@ function buildRemedies(d, prof, label) {
 }
 
 /** 生僻字注音（硬性规范：推送里出现的生僻字必须带拼音） */
-const PINYIN_MAP = { 罥: 'juàn', 薏: 'yì', 苡: 'yǐ', 莼: 'chún', 鲈: 'lú', 裀: 'yīn', 彀: 'gòu', 蓍: 'shī', 筮: 'shì', 爻: 'yáo', 禳: 'ráng', 醮: 'jiào', 偈: 'jì', 诃: 'hē', 敕: 'chì', 罡: 'gāng', 鸾: 'luán', 蛰: 'zhé', 刍: 'chú', 飧: 'sūn' };
+const PINYIN_MAP = { 罥: 'juàn', 薏: 'yì', 苡: 'yǐ', 莼: 'chún', 鲈: 'lú', 裀: 'yīn', 彀: 'gòu', 蓍: 'shī', 筮: 'shì', 爻: 'yáo', 禳: 'ráng', 醮: 'jiào', 偈: 'jì', 诃: 'hē', 敕: 'chì', 罡: 'gāng', 鸾: 'luán', 蛰: 'zhé', 刍: 'chú', 飧: 'sūn', 萸: 'yú', 茱: 'zhū', 艾: 'ài', 灶: 'zào', 腊: 'là', 祠: 'cí', 嫘: 'léi' };
 function annotatePinyin(text) {
   if (!text) return text;
   let out = text;
@@ -441,6 +442,184 @@ function annotatePinyin(text) {
     if (out.includes(c) && !out.includes(`${c}(${p})`)) out = out.replace(c, `${c}(${p})`);
   }
   return out;
+}
+
+// ═══ R-PUSH-P3（2026-09-28）专项推送：节气 / 节日 / 化太岁 / 家庭 ═══
+// 原则：信仰向内容给足仪轨与提前量；只推跟受众有关的（犯太岁才推太岁专题）；
+// 全部白话可执行，生僻字注音。
+
+/** 二十四节气专题库：hou=物候 ys=养生 act=今日行动 */
+const JIEQI_SPECIAL = {
+  立春: { hou: '东风解冻，万物起始', ys: '护住初生阳气：早睡早起，别急着减衣', act: '立春日太岁交接，宜静心、立新年之志，不争吵不搬家' },
+  雨水: { hou: '獭(tǎ)祭鱼，鸿雁来', ys: '防倒春寒，护脾胃少酸多甘', act: '宜规划全年农事与事业开局，润物细无声' },
+  惊蛰: { hou: '春雷响，蛰(zhé)虫醒', ys: '肝气升发，宜舒展筋骨、疏肝解郁', act: '民俗「打小人」泄郁气；宜启动搁置的计划' },
+  春分: { hou: '昼夜均，寒暑平', ys: '阴阳平衡日，饮食寒热均衡', act: '宜调和关系、盘点收支，取「中」之道' },
+  清明: { hou: '气清景明，万物皆显', ys: '踏青疏肝，饮食清淡', act: '祭祖扫墓正日：提前备好祭品鲜花，心怀敬意、宜早不宜晚；踏青放风筝疏解心情' },
+  谷雨: { hou: '雨生百谷，播种时节', ys: '祛湿健脾，喝谷雨茶', act: '宜播种布局——事业上播的种子此时下土最好' },
+  立夏: { hou: '万物至此皆长大', ys: '养心为要，午休片刻', act: '宜立夏日称体重、吃立夏蛋，讨「不疰(zhù)夏」彩头' },
+  小满: { hou: '麦粒渐满，将熟未熟', ys: '防湿热，吃苦菜清心', act: '小满即圆满——宜知足盘点，忌贪大求全' },
+  芒种: { hou: '有芒之谷可种', ys: '防暑补水，午憩养心', act: '宜抢收抢种般推进要事，过了此时事倍功半' },
+  夏至: { hou: '昼最长，阳极阴生', ys: '宜食面（夏至面），护心气忌大汗', act: '阳极转阴之始，宜收敛锋芒、复盘上半年' },
+  小暑: { hou: '暑气初盛，蟋蟀居宇', ys: '静心防躁，绿豆汤解暑', act: '宜慢下来，重要谈判避开午时' },
+  大暑: { hou: '一年最热，湿热交蒸', ys: '伏天养阳，姜茶温中，忌贪凉', act: '宜伏案静修，不出长差不做大动' },
+  立秋: { hou: '凉风至，白露降', ys: '润肺·雪梨银耳；贴秋膘循序渐进', act: '「立秋一场雨，夏衣高捆起」——宜收纳整理、筹划秋收' },
+  处暑: { hou: '暑气至此而止', ys: '润燥·百合蜂蜜，防秋乏早睡', act: '「处暑满地黄」——宜收尾结算，颗粒归仓' },
+  白露: { hou: '阴气渐重，露凝而白', ys: '温润·白果山药，勿露身', act: '白露秋分夜，一夜凉一夜——添衣护关节，宜收敛神气' },
+  秋分: { hou: '昼夜均分，秋高气爽', ys: '平衡·芝麻核桃', act: '宜平衡工作与休息，账目人情两清' },
+  寒露: { hou: '露气寒冷，鸿雁来宾', ys: '暖胃·羊肉姜汤，足部保暖', act: '宜登高辞青，事业上宜守成盘点' },
+  霜降: { hou: '气肃而凝，露结为霜', ys: '温补·柿子板栗，防秋郁', act: '一年补透透不如补霜降——宜进补，也宜为冬藏做储备计划' },
+  立冬: { hou: '水始冰，地始冻', ys: '补肾·黑色食物，早卧晚起', act: '宜吃饺子「安耳朵」，进入冬藏：少折腾多蓄力' },
+  小雪: { hou: '虹藏不见，天气上升', ys: '温阳·核桃枸杞，防抑郁晒太阳', act: '宜腌菜备冬，事业上宜练内功不冒头' },
+  大雪: { hou: '至此而雪盛', ys: '御寒·当归生姜羊肉汤', act: '宜闭藏养精，大雪封门正好读书复盘' },
+  冬至: { hou: '阴极之至，阳气始生', ys: '进补·饺子汤圆，护住初生一阳', act: '「冬至大如年」——祭祖贺冬，吃饺子汤圆；化太岁准备季自今日开启' },
+  小寒: { hou: '天渐寒，尚未大冷', ys: '极温·八宝粥，护腰足', act: '宜猫冬蓄锐，全年收尾阶段忌开新局' },
+  大寒: { hou: '寒气之逆极', ys: '温补·红枣桂圆，防风御寒', act: '宜除旧布新备年货，大寒过后就是立春新循环' },
+};
+
+/** 传统节日提前准备表：days=提前几天开始提醒 prep=备办事项（信仰向给仪轨） */
+const FESTIVAL_PREP = {
+  春节: { days: 7, prep: '备年货、大扫除（廿四扫房）、备新衣春联；除夕守岁、初一拜年走喜神方' },
+  除夕: { days: 3, prep: '年夜饭菜单、祭祖供品、守岁安排；贴春联宜在除夕上午' },
+  元宵节: { days: 3, prep: '备汤圆花灯；上元夜宜许愿祈福，一年运势开场灯' },
+  龙抬头: { days: 2, prep: '提前预约理发（剃龙头讨彩头）；吃龙食（龙须面/龙耳饺子）' },
+  清明: { days: 3, prep: '扫墓安排：备鲜花祭品、查天气路线；祭祖宜上午，心诚为要' },
+  端午节: { days: 3, prep: '备艾草菖蒲、香囊五色绳；端午午时（11-13点）挂艾驱邪最应时' },
+  七夕: { days: 1, prep: '有情人的备心意；单身的宜社交结缘，七夕乞巧宜许愿' },
+  中元节: { days: 3, prep: '祭祖追思备供品；中元前后夜晚早归，心怀敬意即可，不必恐慌' },
+  中秋节: { days: 3, prep: '备月饼安排团圆饭；中秋夜拜月祈姻缘美满，远行的给家人去个电话' },
+  重阳节: { days: 3, prep: '敬老安排：回家看父母或去电话；登高赏菊佩茱(zhū)萸(yú)，祈健康长寿' },
+  冬至: { days: 3, prep: '备饺子汤圆；冬至一阳生，化太岁准备季开启（犯太岁者留意后续专题）' },
+  腊八节: { days: 3, prep: '泡腊八蒜、备腊八粥八宝料；年味渐浓宜列年货清单' },
+  小年: { days: 2, prep: '祭灶（糖瓜粘甜送灶神）、扫尘启动，辞旧迎新从打扫开始' },
+  元旦: { days: 2, prep: '年度复盘与新年目标，宜写在纸上' },
+};
+
+/** 地支六冲 / 六害 / 六破 / 相刑（犯太岁判定） */
+const ZHI_ORDER = '子丑寅卯辰巳午未申酉戌亥';
+const ZHI_SX = { 子: '鼠', 丑: '牛', 寅: '虎', 卯: '兔', 辰: '龙', 巳: '蛇', 午: '马', 未: '羊', 申: '猴', 酉: '鸡', 戌: '狗', 亥: '猪' };
+const SX_ZHI = Object.fromEntries(Object.entries(ZHI_SX).map(([z, s]) => [s, z]));
+const HAI_PAIR = { 子: '未', 未: '子', 丑: '午', 午: '丑', 寅: '巳', 巳: '寅', 卯: '辰', 辰: '卯', 申: '亥', 亥: '申', 酉: '戌', 戌: '酉' };
+const PO_PAIR = { 子: '酉', 酉: '子', 丑: '辰', 辰: '丑', 寅: '亥', 亥: '寅', 卯: '午', 午: '卯', 巳: '申', 申: '巳', 未: '戌', 戌: '未' };
+const XING_GROUP = [['寅', '巳', '申'], ['丑', '戌', '未'], ['子', '卯'], ['午'], ['辰'], ['酉'], ['亥']];
+
+/** 犯太岁判定：返回 [{type, plain}] 数组，空=不犯 */
+function taisuiOffenses(yearZhi, zodiac) {
+  const z = SX_ZHI[zodiac];
+  if (!z || !yearZhi) return [];
+  const out = [];
+  if (z === yearZhi) out.push({ type: '值太岁（本命年）', plain: '太岁当头坐，宜守稳、穿红、多行善' });
+  const zi = ZHI_ORDER.indexOf(z), yi = ZHI_ORDER.indexOf(yearZhi);
+  if ((zi + 6) % 12 === yi) out.push({ type: '冲太岁', plain: '冲为动——变动机会与波动并存，重大决定多思量' });
+  if (HAI_PAIR[z] === yearZhi) out.push({ type: '害太岁', plain: '防小人暗耗，合作签约看细条款' });
+  if (PO_PAIR[z] === yearZhi) out.push({ type: '破太岁', plain: '防破财破缘，财物往来留凭证' });
+  for (const g of XING_GROUP) {
+    if (g.includes(z) && g.includes(yearZhi) && z !== yearZhi) { out.push({ type: '刑太岁', plain: '防口舌官非，说话留三分、行事守规矩' }); break; }
+    if (g.length === 1 && g[0] === z && z === yearZhi) break; // 自刑并入值太岁
+  }
+  if (z === yearZhi && ['午', '辰', '酉', '亥'].includes(z)) out.push({ type: '刑太岁（自刑）', plain: '自我较劲之年，忌钻牛角尖，宜宽心' });
+  return out;
+}
+
+/** 化太岁化解方案（信仰向·民俗仪轨，全白话） */
+const TAISUI_HUAJIE = [
+  '🙏 拜太岁：正月初八顺星节是正日子（正月廿五前皆可），道观礼拜当年太岁星君；不便出门的可在家中洁净处诚心默祷',
+  '🧧 穿红佩吉：红内衣、红绳腰链从立春戴起，贴身为要',
+  '📿 恭请太岁符/太岁锦囊：正月里请，年末冬至后谢太岁送符',
+  '💗 行善积德：每月做一件力所能及的善事，福报是最好的化解',
+  '🚫 避太岁方动土：太岁方与岁破方（正对冲）不装修不动土，朝向也少久坐',
+];
+
+const GAN_ORDER = '甲乙丙丁戊己庚辛壬癸';
+/** 次年干支（太岁交接/准备季按「来年太岁」判定） */
+function nextYearGz(gzYear) {
+  const g = GAN_ORDER.indexOf(gzYear[0]), z = ZHI_ORDER.indexOf(gzYear[1]);
+  if (g < 0 || z < 0) return gzYear;
+  return GAN_ORDER[(g + 1) % 10] + ZHI_ORDER[(z + 1) % 12];
+}
+
+/** 太岁关键日判定（晨暮推共用）：返回专题文案或空 */
+function taisuiSpecial(d, prof, label) {
+  const dayWord = label || '今日';
+  const curGz = d.gz.year || '';
+  const curZhi = d.gz.year_zhi || curGz[1];
+  const nextGz = nextYearGz(curGz);
+  const isDongzhi = d.is_jieqi_today && d.jieqi_name === '冬至';
+  const isLichun = d.is_jieqi_today && d.jieqi_name === '立春';
+  const isShunxing = d.holiday === '顺星节';
+  const lichunSoon = (d.upcoming || []).find(u => u.kind === 'jieqi' && u.name === '立春');
+  const dongzhiSoon = (d.upcoming || []).find(u => u.kind === 'jieqi' && u.name === '冬至');
+  // 冬至/立春/其倒计时都按「来年太岁」判定；顺星节（正月）按当年
+  const useNext = isDongzhi || isLichun || !!(lichunSoon || dongzhiSoon);
+  const effGz = useNext ? nextGz : curGz;
+  const yearZhi = effGz[1];
+  if (!yearZhi) return null;
+  // 受众+家人犯太岁名单
+  const targets = [{ name: '您', zodiac: prof.zodiac }];
+  (prof.family || []).forEach(f => { if (f.zodiac) targets.push({ name: f.name, zodiac: f.zodiac }); });
+  const hit = targets.map(t => ({ ...t, offs: taisuiOffenses(yearZhi, t.zodiac) })).filter(t => t.offs.length);
+  if (!hit.length) return null;
+  const who = hit.map(t => `${t.name}（属${t.zodiac}·${t.offs.map(o => o.type).join('/')}）`).join('、');
+  const plains = [...new Set(hit.flatMap(t => t.offs.map(o => o.plain)))].join('；');
+
+  if (isDongzhi) {
+    return `━━━ ⭐ 化太岁准备季开启 ━━━
+🧧 冬至一阳生，来年${effGz}年犯太岁：${who}
+📿 ${plains}
+即日起进入化太岁准备季：
+${TAISUI_HUAJIE.join('\n')}`;
+  }
+  if (isShunxing) {
+    return `━━━ ⭐ 拜太岁正日 ━━━
+🙏 ${dayWord}正月初八顺星节——拜太岁最正的日子：${who}
+${TAISUI_HUAJIE[0]}
+${TAISUI_HUAJIE[1]}`;
+  }
+  if (isLichun) {
+    return `━━━ ⭐ 太岁交接日 ━━━
+🧧 立春太岁正式交接，${effGz}年${who}：${plains}
+${dayWord}宜：静心守和、穿红上身、不与人争；化解全案：
+${TAISUI_HUAJIE.join('\n')}`;
+  }
+  if (lichunSoon && lichunSoon.in_days <= 10) {
+    return `⏳ 立春（${lichunSoon.date}）太岁交接倒计时 ${lichunSoon.in_days} 天——${who}，拜太岁/请符/备红衣可以安排上了`;
+  }
+  if (dongzhiSoon && dongzhiSoon.in_days <= 10) {
+    return `⏳ 冬至（${dongzhiSoon.date}）后化太岁准备季开启——${who}，可先了解化解方案，从容备办`;
+  }
+  return null;
+}
+
+/** 节气专题板块（交节当天出，晨推挂载） */
+function jieqiSpecial(d) {
+  if (!d.is_jieqi_today) return '';
+  const sp = JIEQI_SPECIAL[d.jieqi_name];
+  if (!sp) return '';
+  return `━━━ 🌿 ${d.jieqi_name}节气专题 ━━━
+🍃 ${sp.hou}${d.jieqi_info ? '｜' + d.jieqi_info : ''}
+🥣 养生：${annotatePinyin(sp.ys)}
+🎯 今日应时：${annotatePinyin(sp.act)}`;
+}
+
+/** 近期备办（暮推挂载）：未来 10 天节气/节日/神诞前瞻，带提前量提示 */
+function upcomingBlock(d) {
+  const ups = (d.upcoming || []).slice(0, 4);
+  if (!ups.length) return '';
+  const lines = ups.map(u => {
+    let tip = '';
+    if (u.kind === 'festival' && FESTIVAL_PREP[u.name]) tip = FESTIVAL_PREP[u.name].prep;
+    else if (u.kind === 'jieqi' && JIEQI_SPECIAL[u.name]) tip = JIEQI_SPECIAL[u.name].act;
+    else if (u.kind === 'deity') tip = '可备鲜花素果，诚心敬拜';
+    const icon = { jieqi: '🌿', festival: '🎉', deity: '🙏' }[u.kind];
+    return `${icon} ${u.in_days}天后（${u.date}）${u.name}${tip ? '——' + annotatePinyin(tip) : ''}`;
+  });
+  return `━━━ 📅 近期备办 ━━━\n${lines.join('\n')}`;
+}
+
+/** 家庭冲煞具名提醒（chongLine 升级版，家属生肖命中今日所冲则具名） */
+function familyChongNote(d, prof) {
+  const fam = (prof.family || []).filter(f => f.zodiac === d.chong_shengxiao);
+  if (!fam.length) return '';
+  return `👨‍👩‍👧 家人提醒：${fam.map(f => f.name).join('、')}属${d.chong_shengxiao}，今日正冲——提醒 TA 大事缓办、出行留意`;
 }
 
 /** 公开版：R-SLIM 精简结构（2026-09-27）
@@ -475,6 +654,9 @@ function buildPublic(d, isTomorrow) {
   const gold = dayJishi.slice(0, 3).join('、') || jishiList[0] || '全天平和';
   const verdict = verdictLine(d);
   const TONE_LINE = toneLineFrom(verdict, tone);
+  // R-PUSH-P3 专题板块（条件触发：化太岁关键日 / 节气当天）
+  const taisuiSp = taisuiSpecial(d, prof);
+  const jieqiSp = jieqiSpecial(d);
 
   let msg = `📅 易道智鉴 · 晨推 ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
@@ -487,7 +669,7 @@ function buildPublic(d, isTomorrow) {
 ${dayGanLine(d, prof)}
 ${chongLine(d)}
 ${buildYunqiLine(d.year, parseInt((prof.birth || '').slice(0, 4), 10))}
-
+${taisuiSp ? '\n' + taisuiSp + '\n' : ''}${jieqiSp ? '\n' + jieqiSp + '\n' : ''}
 ━━━ ③ 今日最有利三件事 ━━━
 ${buildThreeWins(d, prof)}
 
@@ -504,7 +686,7 @@ ${buildRemedies(d, prof)}
 ${plainShensha(d)}
 `;
 
-  if (d.jieqi_info) msg += `\n🌿 ${d.jieqi}｜${d.jieqi_info}\n`;
+  if (d.jieqi_info && !d.is_jieqi_today) msg += `\n🌿 ${d.jieqi}｜${d.jieqi_info}\n`;
   if (d.holiday) msg += `\n🎉 ${d.holiday}${d.festival_lore ? '\n📜 ' + d.festival_lore : ''}${d.festival_guide ? '\n🎯 ' + d.festival_guide : ''}\n`;
   if (d.deities && d.deities.length) {
     msg += `\n🙏 ${d.deities.map(de => de.name + '诞辰').join('·')}\n`;
@@ -536,6 +718,9 @@ function buildEvening(d) {
   const birthYear = parseInt((prof.birth || '').slice(0, 4), 10);
 
   const yunqiBlock = buildYunqiBlock(d.year, birthYear);
+  // R-PUSH-P3：太岁关键日专题（明日）+ 近期备办前瞻
+  const taisuiSp = taisuiSpecial(d, prof, '明日');
+  const upcomingBlk = upcomingBlock(d);
 
   let msg = `🌙 易道智鉴 · 暮推（明日预告）
 📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}
@@ -552,7 +737,7 @@ function buildEvening(d) {
 ${dayGanLine(d, prof, '明日')}
 ${chongLine(d)}
 ${plainShensha(d)}
-━━━SPLIT━━━
+${taisuiSp ? taisuiSp + '\n' : ''}━━━SPLIT━━━
 ━━━ ③ 明日最有利三件事 ━━━
 ${buildThreeWins(d, prof, '明日')}
 
@@ -564,8 +749,7 @@ ${buildRemedies(d, prof, '明日')}
 ${yunqiBlock ? `
 ━━━ ⑥ 五运六气 · 天赋底色 ━━━
 ${yunqiBlock}
-` : ''}
-━━━ ${yunqiBlock ? '⑦' : '⑥'} 今夜收整三件事 ━━━
+` : ''}${upcomingBlk ? upcomingBlk + '\n\n' : ''}━━━ ${yunqiBlock ? '⑦' : '⑥'} 今夜收整三件事 ━━━
 1️⃣ 复盘今日一件做成的事，给自己记一功
 2️⃣ 列好明日三件要事，对齐上面的宜忌与黄金窗口
 3️⃣ 23点前放下手机，安稳入睡养气
