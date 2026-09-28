@@ -232,6 +232,9 @@ const XIONGSHA_GLOSS = {
   天刑: '慎防官非纠纷', 五虚: '忌开仓出货', 九空: '求财不宜', 大耗: '防大笔破财',
   劫煞: '防意外损失', 灾煞: '防灾祸，平安为上', 月煞: '小事不顺，心态放平',
   河魁: '防口舌', 死神: '宜静不宜动', 月刑: '防小人是非', 小耗: '小额破费，无伤大雅',
+  天罡: '忌词讼争执', 大时: '大事缓行，宜守常', 五离: '忌签约结盟', 八风: '防财物散失',
+  九坎: '求财谨慎', 九焦: '防焦灼误事', 复日: '事易重来，一次做对', 招摇: '防口舌招摇',
+  厌对: '忌嫁娶争辩', 血忌: '防见血，远离利器', 天吏: '忌与官方争执', 致死: '宜静养忌冒险',
 };
 
 /** 神煞精选：吉神取前 2（沿用 bridge 自带注解），凶煞取前 2 配白话 */
@@ -253,6 +256,46 @@ function chongLine(d) {
   return `⚔️ 冲${d.chong_zhi}（属${d.chong_shengxiao}的亲友大事缓一缓）；煞${d.sha}方不宜动土`;
 }
 
+// ─── R-PUSH-PLUS（2026-09-28）：调性红线 + 化解行动 ───
+/** 修身一句调性红线：恐吓/低俗/丧气词一律不入推送，命中即换后备口诀 */
+const KOUJUE_BLACKLIST = ['淫欲', '八专', '桃花劫', '孤鸾', '克夫', '克妻', '夭亡', '绝命', '横死', '短寿', '守寡', '鳏居'];
+function safeKoujue(d) {
+  const k = d.koujue || '';
+  if (k && !KOUJUE_BLACKLIST.some(w => k.includes(w))) return k;
+  return KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
+}
+
+/** 五行→穿衣色（民俗五行配色，通俗易懂） */
+const WUXING_COLOR = { 木: '青、绿色系', 火: '红、紫色系', 土: '黄、咖色系', 金: '白、金色系', 水: '黑、蓝色系' };
+
+/** 今日一招：幸运色 + 吉方位 + 黑道化解（只给跟缘主有关、可执行的建议） */
+function buildActionLine(d, label) {
+  const dayWord = label || '今日';
+  const ele = d.day_gan_ele;
+  const color = WUXING_COLOR[ele];
+  const lines = [];
+  if (color) {
+    const lucky = d.day_gan_ss && d.day_gan_ss.xi_ji === '喜';
+    lines.push(`🎨 ${dayWord}${ele}气当令${lucky ? '，正是您的幸运色' : ''}：穿衣搭配选${color}，应景助运`);
+  }
+  if (d.xishen || d.caishen) {
+    const dirs = [d.xishen && `喜神${d.xishen}`, d.caishen && `财神${d.caishen}`].filter(Boolean).join('·');
+    lines.push(`🧭 ${dirs}（洽谈办事面向此方更顺）；${d.sha}方为煞位，少去少动`);
+  }
+  if ((d.huanghei || '').includes('黑道')) {
+    lines.push(`🍵 黑道日化解：要事不取消，挪进黄金窗口里办；说话留三分，合同多看一遍`);
+  }
+  return lines.join('\n');
+}
+
+/** 定调收口语：与裁决结论同向，杜绝「可放手推进+稳住不开新局」式打架 */
+function toneLineFrom(verdict, tone) {
+  const positive = verdict.includes('为吉') || verdict.includes('皆宜');
+  if (tone === '进取') return '窗口难得，主动出击';
+  if (tone === '稳进') return '按节奏推进，不冒进';
+  return positive ? '吉日可成小事，大局面不铺开' : '稳住基本盘，不开新局';
+}
+
 /** 公开版：R-SLIM 精简结构（2026-09-27）
  *  晨推五板块：今日定调→跟您有关｜宜忌速办→节气节日（有则出）→修身一句→落款（━━━SPLIT━━━ 两段）
  *  暮推五板块：明日定调（含宜忌窗口）→跟您有关→五运六气→今夜收整→修身一句→落款 */
@@ -261,26 +304,28 @@ function buildPublic(d, isTomorrow) {
   const gz = d.gz;
   const yiJi = d.yi_ji;
   const tone = toneOf(d);
-  const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
+  const koujue = safeKoujue(d);
   const jianchu = (yiJi.jianchu || '').replace(/^(.日)\(\1/, '$1（').replace(')', '）');
   const jishiList = d.jishi_plain || [];
   const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
   const yiTop = (yiJi.yi_plain || yiJi.yi).split('、').slice(0, 3).join('、');
   const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
   const gold = dayJishi.slice(0, 3).join('、') || jishiList[0] || '全天平和';
-  const TONE_LINE = { 守: '稳住基本盘，不开新局', 稳进: '按节奏推进，不冒进', 进取: '窗口难得，主动出击' }[tone];
+  const verdict = verdictLine(d);
+  const TONE_LINE = toneLineFrom(verdict, tone);
   const xiJiAct = d.day_gan_ss.xi_ji === '喜' ? '今日天干助喜，该出手就出手' : d.day_gan_ss.xi_ji === '忌' ? '今日天干为忌，守成为上、少做大决定' : '今日天干中平，照计划推进即可';
 
   let msg = `📅 易道智鉴 · 晨推 ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
 
 ━━━ ① 今日定调 ━━━
-🎯 ${tone}（${d.score}分 ${d.score_stars}）：${verdictLine(d)}——${TONE_LINE}。
+🎯 ${tone}（${d.score}分 ${d.score_stars}）：${verdict}——${TONE_LINE}。
 ⏰ 黄金窗口：${gold}（要事排这里）
 
 ━━━ ② 跟您有关 ━━━
 👤 今日${gz.day}日：日干${gz.day_gan}对您的癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}）——${xiJiAct}。
 ${chongLine(d)}
+${buildActionLine(d)}
 ${buildYunqiLine(d.year)}
 ━━━SPLIT━━━
 ━━━ ③ 宜忌速办 ━━━
@@ -316,7 +361,8 @@ function buildEvening(d) {
   const dayJishi = jishiList.filter(s => /辰|巳|午|未|申|酉|戌/.test(s[0]));
   const yiTop = (yiJi.yi_plain || yiJi.yi).split('、').slice(0, 3).join('、');
   const jiTop = (yiJi.ji_plain || yiJi.ji).split('、').slice(0, 2).join('、');
-  const TONE_LINE = { 守: '稳住基本盘，不开新局', 稳进: '按节奏推进，不冒进', 进取: '窗口难得，主动出击' }[tone];
+  const verdict = verdictLine(d);
+  const TONE_LINE = toneLineFrom(verdict, tone);
 
   const yunqiBlock = buildYunqiBlock(d.year);
 
@@ -325,14 +371,16 @@ function buildEvening(d) {
 🏮 ${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
 
 ━━━ ① 明日定调 ━━━
-🎯 ${tone}（${d.score}分 ${d.score_stars}）：${verdictLine(d)}——${TONE_LINE}。
+🎯 ${tone}（${d.score}分 ${d.score_stars}）：${verdict}——${TONE_LINE}。
 ✅ 宜：${yiTop}
 🚫 忌：${jiTop}
 ⏰ 黄金窗口：${dayJishi.slice(0, 3).join('、') || jishiList[0] || '全天平和，按节奏即可'}
 📌 ${jianchu}｜☀️ ${d.huanghei}
 
 ━━━ ② 跟您有关 ━━━
+👤 明日${gz.day}日：日干${gz.day_gan}对您的癸水为${d.day_gan_ss.ss}（${d.day_gan_ss.plain}）——${d.day_gan_ss.xi_ji === '喜' ? '明日天干助喜，可安排要事' : d.day_gan_ss.xi_ji === '忌' ? '明日天干为忌，守成为上' : '明日天干中平，照计划推进'}。
 ${chongLine(d)}
+${buildActionLine(d, '明日')}
 ${plainShensha(d)}
 ${yunqiBlock ? `
 ━━━ ③ 五运六气 · 天赋底色 ━━━
@@ -356,7 +404,7 @@ function buildSimple(d) {
   const gz = d.gz;
   const yiJi = d.yi_ji;
   const chong = `冲${d.chong_zhi}（${d.chong_shengxiao}）·煞${d.sha}`;
-  const koujue = d.koujue || KOUJUE_TIPS[d.day % KOUJUE_TIPS.length];
+  const koujue = safeKoujue(d);
   // 吉时提取（白天 7-19 点实用时段，带钟点）
   let jishi = '';
   try {
