@@ -879,6 +879,38 @@ async function generateBaziReport(){
         aiMingli.attachButton(holder, 'bazi', { dayMaster: data.day_master, pillars: pillStr, wuxing: data.wuxing || '' });
       }
     }, 400);
+    // 古今同参·八字：千里命稿应运篇名人命造（日柱精确→日主同干回退）
+    renderBaziTongcan(pillars['日'] || '');
+  }
+
+  async function renderBaziTongcan(rizhu){
+    var old = document.getElementById('bazi-tongcan-host');
+    if(old) old.remove();
+    if(!rizhu || rizhu.length < 2) return;
+    var escH = window.escHtml || window.escapeHtml || function(s){return String(s);};
+    var data;
+    try {
+      var r = await fetch(API_BASE+'/api/bazi/match',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(8000),body:JSON.stringify({rizhu:rizhu,limit:3})});
+      data = await r.json();
+    } catch(e) { return; }
+    if(!data || !data.ok || !data.matches || !data.matches.length) return;
+    var host = document.createElement('div');
+    host.id = 'bazi-tongcan-host';
+    host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+    var items = '';
+    data.matches.forEach(function(m){
+      var badge = m.exact ? ' <span style="font-size:10px;background:rgba(201,168,76,.15);color:var(--gold,#c9a84c);border-radius:8px;padding:0 6px;margin-left:6px">同日柱</span>'
+                          : ' <span style="font-size:10px;border:1px solid var(--border,#2a3450);border-radius:8px;padding:0 6px;margin-left:6px">同日主</span>';
+      items += '<div style="border-left:3px solid var(--gold,#c9a84c);padding:6px 10px;margin:8px 0;background:rgba(201,168,76,.05);border-radius:0 6px 6px 0">'+
+        '<div style="color:var(--gold,#c9a84c);font-weight:600">'+escH(m.rizhu)+(m.person?' · '+escH(m.person):'')+badge+'</div>'+
+        '<div style="line-height:1.7;margin-top:4px">'+escH(m.narrative)+'</div>'+
+        '</div>';
+    });
+    host.innerHTML = '<div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:6px">📖 古今同参 · '+escH(data.rizhu)+'日柱（韦千里评点近代名人命造 '+data.exactCount+' 则同柱 / '+data.sameGanCount+' 则同干）</div>'+
+      items+
+      '<div style="color:var(--paper3);font-size:10px;margin-top:8px">出自 '+escH(data.matches[0].source)+'　'+escH(data.disclaimer)+'</div>';
+    var anchor = document.getElementById('bazi-flow-host') || document.getElementById('bazi-svg-host') || document.getElementById('baziResult');
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(host, anchor.nextSibling);
   }
 
   function renderBaziSvg(svg){
