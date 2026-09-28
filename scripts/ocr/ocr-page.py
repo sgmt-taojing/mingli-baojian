@@ -40,6 +40,43 @@ def find_columns(bw):
     return list(reversed(cols))  # 从右往左
 
 
+def split_spread(img):
+    """双页摊开检测：中央有宽留白则切成左右两页，返回阅读序（右页先）"""
+    h, w = img.shape
+    proj = binarize(img).sum(axis=0) / 255
+    lo, hi = int(w * 0.35), int(w * 0.65)
+    thr = proj.max() * 0.02
+    gap = proj[lo:hi] <= thr
+    best, cur = (0, 0, 0), None
+    for i, on in enumerate(gap):
+        if on and cur is None:
+            cur = i
+        elif not on and cur is not None:
+            if i - cur > best[0]:
+                best = (i - cur, cur, i)
+            cur = None
+    if cur is not None and len(gap) - cur > best[0]:
+        best = (len(gap) - cur, cur, len(gap))
+    if best[0] > w * 0.02:
+        cut = lo + (best[1] + best[2]) // 2
+        return [img[:, cut:], img[:, :cut]]  # 右页先读
+    return [img]
+
+
+def strip_border(img):
+    """去版框：最大轮廓判为边框则裁掉外框线"""
+    bw = binarize(img)
+    cnts, _ = cv2.findContours(bw, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not cnts:
+        return img
+    x, y, w, h = cv2.boundingRect(max(cnts, key=cv2.contourArea))
+    ih, iw = img.shape
+    if w > iw * 0.5 and h > ih * 0.5:
+        inset = max(6, int(iw * 0.004))
+        return img[y + inset:y + h - inset, x + inset:x + w - inset]
+    return img
+
+
 def find_chars(col_img):
     """列内水平投影切字；返回 [(y0,y1,is_punct)]——句读小框直接标标点不送 OCR"""
     proj = col_img.sum(axis=1) / 255
@@ -77,24 +114,33 @@ def main():
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         sys.exit(f'无法读取: {path}')
-    bw = binarize(img)
-    cols = find_columns(bw)
-    print(f'检出 {len(cols)} 列', file=sys.stderr)
+    regions = [strip_border(sub) for sub in split_spread(img)]
+    col_regions = []  # [(region_img, bw, cols)]
+    total_cols = 0
+    for sub in regions:
+        bw = binarize(sub)
+        cols = find_columns(bw)
+        col_regions.append((sub, bw, cols))
+        total_cols += len(cols)
+    print(f'检出 {len(regions)} 页区 {total_cols} 列', file=sys.stderr)
 
     with tempfile.TemporaryDirectory() as td:
         manifest = []
-        for ci, (x0, x1) in enumerate(cols):
-            col_bw = bw[:, x0:x1]
-            for ri, (y0, y1, punct) in enumerate(find_chars(col_bw)):
-                if punct:
-                    manifest.append((ci, ri, None))  # 句读圈点，不送 OCR
-                    continue
-                fp = os.path.join(td, f'c{ci:03d}r{ri:03d}.png')
-                # 留白边，Vision 对贴边字识别差
-                pad = 6
-                ch = img[max(0, y0 - pad):y1 + pad, max(0, x0 - pad):x1 + pad]
-                cv2.imwrite(fp, ch)
-                manifest.append((ci, ri, fp))
+        ci = 0
+        for sub, bw, cols in col_regions:
+            for x0, x1 in cols:
+                col_bw = bw[:, x0:x1]
+                for ri, (y0, y1, punct) in enumerate(find_chars(col_bw)):
+                    if punct:
+                        manifest.append((ci, ri, None))  # 句读圈点，不送 OCR
+                        continue
+                    fp = os.path.join(td, f'c{ci:03d}r{ri:03d}.png')
+                    # 留白边，Vision 对贴边字识别差
+                    pad = 6
+                    ch = sub[max(0, y0 - pad):y1 + pad, max(0, x0 - pad):x1 + pad]
+                    cv2.imwrite(fp, ch)
+                    manifest.append((ci, ri, fp))
+                ci += 1
         print(f'切出 {len(manifest)} 字块，批量识别中…', file=sys.stderr)
         r = subprocess.run([OCR_BIN, td], capture_output=True, text=True, timeout=1800)
         results = {}
