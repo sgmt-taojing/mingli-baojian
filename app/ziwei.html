@@ -233,7 +233,32 @@ function switchZwLunar(){
   if(btn) btn.textContent = zwCalMode === 'lunar' ? '☀️ 切换阳历' : '📅 切换农历';
 }
 
-function runZiweiPaipan(){
+// R-ENGINE-UNIFY（2026-09-28）：服务端 iztro 盘转本地渲染结构
+// 背景：本地 ZiweiEngine 五行局误用年干支纳音、公历未转农历，与 iztro 不一致；
+// 统一以服务端 iztro 为唯一源头，本地引擎仅作离线兜底。
+var ZW_REV_STAR = {紫微:'ziwei',天机:'tianji',太阳:'taiyang',武曲:'wuqu',廉贞:'lianzhen',天府:'tianfu',太阴:'taiyin',贪狼:'tanlang',巨门:'jumen',天相:'tianxiang',天梁:'tianliang',七杀:'qisha',破军:'pojun'};
+function zwServerToLocal(chart){
+  return {
+    year: chart.year, month: chart.month, day: chart.day, hour: chart.hour,
+    isLunar: !!chart.isLunar,
+    yearGanZhi: chart.yearGanZhi,
+    wuxingJu: chart.wuxingJu,
+    mingGong: '命宫',
+    mingGongIdx: chart.mingGongIdx,
+    shenGongIdx: chart.shenGongIdx,
+    siHua: chart.siHua,
+    engine: chart.engine || 'iztro',
+    palaces: (chart.palaces || []).map(function(p){
+      return {
+        index: p.index, name: p.name,
+        stars: (p.mainStars || []).map(function(s){ return ZW_REV_STAR[typeof s === 'string' ? s : (s && s.name)] || s; }).filter(Boolean),
+        isMingGong: !!p.isMingGong, isShenGong: !!p.isShenGong
+      };
+    })
+  };
+}
+
+async function runZiweiPaipan(){
   var year = parseInt(document.getElementById('zw-year').value);
   var month = parseInt(document.getElementById('zw-month').value);
   var day = parseInt(document.getElementById('zw-day').value);
@@ -242,7 +267,19 @@ function runZiweiPaipan(){
   if(!year || !month || !day){ showToast('请填写完整的出生年月日'); return; }
   if(!hour && hour !== 0){ hour = 12; }
 
-  var result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar', sex);
+  var result = null, engineTag = '本地';
+  // 优先服务端 iztro 引擎（唯一源头）；失败回退本地引擎（离线兜底）
+  try {
+    var resp = await fetch(API_BASE + '/api/paipan/ziwei', {
+      method: 'POST', headers: {'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+      signal: AbortSignal.timeout(10000),
+      body: JSON.stringify({year: year, month: month, day: day, hour: hour, isLunar: zwCalMode === 'lunar', sex: sex, deepRead: false})
+    });
+    var dj = await resp.json();
+    if (dj && dj.ok && dj.chart) { result = zwServerToLocal(dj.chart); engineTag = 'iztro'; }
+  } catch(e) { /* 离线回退 */ }
+  if (!result) result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar', sex);
+  result._engineTag = engineTag;
   var name = document.getElementById('zw-name').value || '';
   var container = document.getElementById('ziwei-result');
   ZiweiEngine.renderChart(container, result, name, sex);
@@ -268,7 +305,7 @@ function runZiweiPaipan(){
     var mingStarName = starNames[mingStar] || '空宫';
     var html = '<div style="padding:10px;background:rgba(201,168,76,.06);border-radius:6px;margin-bottom:8px">';
     html += '<div style="color:var(--zw-gold);font-weight:600;margin-bottom:4px">紫微命宫主星：' + mingStarName + '</div>';
-    html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + '</div>';
+    html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + (result._engineTag==='iztro' ? ' · 引擎：iztro 服务端' : ' · 引擎：本地兜底（离线）') + '</div>';
     html += '</div>';
     html += '<div style="font-size:11px;line-height:1.8">建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
     html += '<div id="aiZiweiBtn" style="margin:10px 0;text-align:center"></div>';
