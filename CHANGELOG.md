@@ -1619,3 +1619,10 @@
 - 抽检改判：kb-store/knowledge-raw/knowledge-supplement/kb-supplement 305 条非垃圾——真命理内容（八字源流/康熙笔画/八卦类象），标题混 JS 碎片属标题卫生（另立 P3），改归 mingli 桶；归队脚本扩至 59 模块 / 3,822 条，dry-run 通过
 - general 260 条确诊乱码且定位来源：entry_id `KB-nihaixia-r48-*` = 倪海厦 r48 坏批次；`scripts/kb_quarantine_general.py` 备妥（走 kb_quarantine 既有先例，全行留证），dry-run 通过
 - 裁决申请文档已附修正节；两脚本 --apply 均锁待批复
+
+## 2026-09-28 22:20 · 标题卫生脚本备妥（批复后一键三执行齐套）
+
+- `scripts/kb_title_hygiene.py`：五模块（kb-store/knowledge-raw/knowledge-supplement/kb-supplement/authoritative）JS 碎片标题 → 正文提取正标题；规则「首个干净句段优先、=== 注释兜底、同题 ·N 后缀去重、质量门（≥4 汉字）」
+- dry-run：1,238 条待修 / 529 条本洁 / 0 提取失败；抽样新标题均为通顺主题句（首版 === 规则曾致 962 条同题「断卦精要」，已修正为首句优先）
+- 安全口径：title 不在 kb_fts5 触发器 WHEN 内（展示层变更），apply 后自动 rebuild kb_formal_fts；逐行 jsonl 留证
+- 批复后执行序列：① kb_domain_rehome_mingli.py --apply ② kb_quarantine_general.py --apply ③ kb_title_hygiene.py --apply
