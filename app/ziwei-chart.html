@@ -260,18 +260,20 @@ async function doPaipan(){
   if(window.PaipanBaihua) PaipanBaihua.notify('ziwei', payload);
   renderSvg(svg);
   renderFlow(data.flow, targetYear, currentAge);
-  renderGujin(data.chart && data.chart.wuxingJu);
+  renderGujin(data.chart);
   if(data.interpretation) renderInterpretation(data.interpretation);
 }
 
-// ═══ 古今同参：康节本卷四古命例按五行局匹配（2026-09-28） ═══
-async function renderGujin(wuxingJu){
+// ═══ 古今同参：康节本卷四古命例按五行局+命宫主星匹配（2026-09-28） ═══
+async function renderGujin(chart){
   const old = document.getElementById('zw-gujin-host');
   if(old) old.remove();
-  if(!wuxingJu) return;
+  if(!chart || !chart.wuxingJu) return;
+  const mg = (chart.palaces||[]).find(function(p){return p.isMingGong;}) || {};
+  const myStars = (mg.mainStars||[]).map(function(s){return typeof s==='string'?s:(s&&(s.name||s.star))||'';}).filter(Boolean);
   let data;
   try {
-    const r = await fetch(API_BASE+'/api/mingtu/match',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(8000),body:JSON.stringify({mingju:wuxingJu,limit:3})});
+    const r = await fetch(API_BASE+'/api/mingtu/match',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(8000),body:JSON.stringify({mingju:chart.wuxingJu,stars:myStars,limit:3})});
     data = await r.json();
   } catch(e) { return; }
   if(!data || !data.ok || !data.matches || !data.matches.length) return;
@@ -280,14 +282,18 @@ async function renderGujin(wuxingJu){
   host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid var(--border,#2a3450);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
   let items = '';
   data.matches.forEach(function(m){
+    const sameBadge = (m.sameStars && m.sameStars.length) ? ' <span style="font-size:10px;background:rgba(78,201,176,.15);color:var(--jade,#4ec9b0);border-radius:8px;padding:0 6px;margin-left:6px">同星曜 '+esc(m.sameStars.join('、'))+'</span>' : '';
+    const starsLine = (m.gongStars && m.gongStars.length) ? '<div style="color:var(--paper3);font-size:11px;margin:2px 0">古人命宫：'+esc(m.gongStars.join('、'))+'</div>' : '';
     items += '<div style="border-left:3px solid var(--gold,#c9a84c);padding:6px 10px;margin:8px 0;background:rgba(201,168,76,.05);border-radius:0 6px 6px 0">'+
-      '<div style="color:var(--gold,#c9a84c);font-weight:600">'+esc(m.name)+(m.category?' <span style="font-size:10px;border:1px solid var(--gold,#c9a84c);border-radius:8px;padding:0 6px;margin-left:6px">'+esc(m.category)+'</span>':'')+'</div>'+
+      '<div style="color:var(--gold,#c9a84c);font-weight:600">'+esc(m.name)+(m.category?' <span style="font-size:10px;border:1px solid var(--gold,#c9a84c);border-radius:8px;padding:0 6px;margin-left:6px">'+esc(m.category)+'</span>':'')+sameBadge+'</div>'+
       '<div style="color:var(--paper3);font-size:11px;margin:3px 0">'+esc(m.birth)+'</div>'+
+      starsLine+
       '<div style="line-height:1.7">'+esc(m.duanyu)+'</div>'+
       '<div style="color:var(--jade,#4ec9b0);font-size:11px;margin-top:4px">💡 '+esc(m.lead)+'</div>'+
       '</div>';
   });
-  host.innerHTML = '<div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:6px">📖 古今同参 · '+esc(data.mingju)+'（古人同局命例 '+data.total+' 则）</div>'+
+  const subtitle = myStars.length ? '命宫 '+esc(myStars.join('、'))+' · ' : '';
+  host.innerHTML = '<div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:6px">📖 古今同参 · '+esc(data.mingju)+' · '+subtitle+'古人同局命例 '+data.total+' 则</div>'+
     items+
     '<div style="color:var(--paper3);font-size:10px;margin-top:8px">出自 '+esc(data.matches[0].source)+'　'+esc(data.disclaimer)+'</div>';
   const fl = document.getElementById('zw-flow-host');
