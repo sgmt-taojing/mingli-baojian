@@ -1601,3 +1601,9 @@
 - **指纹回填**：命理域 19,650 条旧粗指纹全部回填 sha256[:16] 新锚点（脚本 `scripts/kb_dedup_mingli_20260928.py`，BLOB 误存 1 行已兼容），回填后命理域 0 重复 / 0 旧指纹 / 0 碰撞，KBIngestor 幂等锚点对命理域恢复完整效力。kb_formal_fts 旧索引已 rebuild。
 - **域外挂账**（不动，报裁判）：reference 域真实重复 205 组/410 条（tcm 内化通道同文跨模块双收，如 tcm-diagnosis↔tcm-wangzhen、tcm-syndrome↔distill 对）；domain 空标 264,593 条待归口。两项涉医学边界，入 KANBAN 待裁判通道处置。
 - **自检**：agent-selfcheck 7/7 全绿（库变更后复跑）。
+
+## 2026-09-28 21:55 · 空域标归口裁决申请起草
+
+- 盘点：domain 空标 264,874 条构成摸清——医学典籍/课程 ≈26.1 万、诊疗引擎 ≈200、命理归队 ≈3,470（含 authoritative 1,462 实为 premium 命理内容）、乱码/暂存垃圾 ≈565
+- 风险定性：G24 诊疗检索排除按 domain='reference' 过滤，空标医学条目处于规则真空
+- 产出：`DELIVERY/adr-request-domain-backfill-20260928.md` 一页裁决申请（四桶映射 + reference 域 205 组去重建议 + 分工验收口径），随 KANBAN 挂账条目一并待批复
