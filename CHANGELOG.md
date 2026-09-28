@@ -1521,3 +1521,9 @@
 - **家庭专项**：subscribers.json 增 family 字段，家人犯太岁入化解名单、家人正冲今日所冲生肖时具名提醒。
 - **工程修正**：太岁交接按「来年干支」判定（lunar_python 年柱立春当日精确到时刻才切换，交接日公告需用次年干支，新增 nextYearGz）；bridge 补 is_jieqi_today/jieqi_name 结构化字段。
 - **验证**：构造日期实测——清明（祭祖专题）、冬至（准备季+节气专题）、2027-02-04 立春（太岁交接日+丁未值太岁正确命中缘主）、顺星节（不犯不推）、暮推近期备办（国庆/孔子诞/寒露前瞻）；--verify 11/11。
+## 2026-09-28 17:40 · 康节本卷四古今命图结构化收官：114 盘全量入库（Kimi）
+
+- **拆录完成**：n0198–n0254 共 57 页 114 盘全部转录为结构化 JSONL（`training/mingtu/mingtu.jsonl`，schema mingtu-v1）——标题/生辰（干支年+农历月日+时辰+阴阳男女+命局）/卒年/断语原文（繁体直录）/分类（富贵·贫贱·夭·寿）。含孔仲尼、呂太后、貂蟬、孔明、嚴介溪、暨太監等名命。
+- **引擎复盘交叉校验**（`scripts/mingtu_crosscheck.py`，五虎遁+纳音古法独立复盘）：114 盘中 99 盘命局全符、阴阳男女 114/114 全符；15 盘差异已回写 `engine_check.note` 以图为准——其中 5 盘原书局名不存在于五行局制（「水三局」×4、「木二局」×1）判定木刻本刻误，余为月/时转录或起例差异，报告落 `training/mingtu/engine_check_report.json`。
+- **KB 入库**（`scripts/mingtu_to_kb.py` 走 kb_ingest 新口径 R-INGEST-SPEC）：114 条全量入 `kb_formal`（module=ziwei-mingtu、domain=mingli，校验通过 0.85/差异 0.80，指纹幂等），formal 321,578→321,692。
+- **验收**：kb_fts5（trigram 生产检索路径）抽查呂太后/嚴介溪/暨太監/明珠兩照/淨身去勢全部命中本批条目；kb_formal_fts（unicode61）已 rebuild 对齐（321,692=321,692），CJK 整词检索走 trigram 路径属既有架构特性。
