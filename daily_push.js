@@ -109,7 +109,7 @@ function getBridgeData(isTomorrow) {
         const needsBridge = !payload.shichen || !payload.weather || !payload.wisdom;
         if (needsBridge) {
           // execFile 兜底取 bridge 全文，与 HTTP 端点字段合并（HTTP 优先）
-          const raw = runPython(BRIDGE, targetDate ? { DAILY_PUSH_OVERRIDE_DATE: targetDate } : {});
+          const raw = runPython(BRIDGE, { ...(targetDate ? { DAILY_PUSH_OVERRIDE_DATE: targetDate } : {}), DAILY_PUSH_BIRTHS: birthdaysEnv() });
           const lines = raw.split('\n').filter(Boolean);
           try {
             const bridgeData = JSON.parse(lines[lines.length - 1]);
@@ -142,7 +142,7 @@ function getBridgeData(isTomorrow) {
       // fall through to execFile
     }
   }
-  const raw = runPython(BRIDGE, targetDate ? { DAILY_PUSH_OVERRIDE_DATE: targetDate } : {});
+  const raw = runPython(BRIDGE, { ...(targetDate ? { DAILY_PUSH_OVERRIDE_DATE: targetDate } : {}), DAILY_PUSH_BIRTHS: birthdaysEnv() });
   // 取最后一个 JSON 行（兼容 python 侧误打印其他内容）
   const lines = raw.split('\n').filter(Boolean);
   const jsonLine = lines[lines.length - 1];
@@ -494,6 +494,7 @@ const FESTIVAL_PREP = {
   元旦: { days: 2, prep: '年度复盘与新年目标，宜写在纸上' },
   寒衣节: { days: 5, prep: '十月初一送寒衣：备寒衣纸、供品，祭祖扫墓为故亲送冬衣；宜上午行礼，心诚为要' },
   下元节: { days: 2, prep: '十月十五水官解厄日：宜祈福消灾、忏悔改过，吃素静心' },
+  观音借库日: { days: 2, prep: '正月廿六观音开库：信众可向观音「借库」祈财福——备鲜花素果诚心祈求，来年同日还库谢恩' },
 };
 
 // ═══ R-PUSH-P4（2026-09-28）信众关切专项矩阵 ═══
@@ -598,8 +599,7 @@ function shuowangLine(d) {
   return '';
 }
 
-/** 神诞 × 信众主题匹配：只给「与您有关」的神诞配专属备办（主题不匹配走通用提示） */
-const DEITY_THEME_PREP = {
+/** 神诞 × 信众主题匹配：只给「与您有关」的神诞配专属备办（主题不匹配走通用提示） */const DEITY_THEME_PREP = {
   财神赵公明: { themes: ['财富', '事业'], prep: '与您求财主题相关：备三牲素果、香炉净水；三月十五拜正财神，商户尤宜' },
   卫圣圣诞: { themes: ['财富'], prep: '正月初五接财神：初四晚备供、初五卯时（5-7点）迎五路财神，开市纳福' },
   关圣帝君: { themes: ['财富', '事业'], prep: '关公为武财神：经商者可备供敬拜，求财亦求义，诚信为先' },
@@ -620,6 +620,89 @@ function deityPrepLine(u, prof) {
   if (!meta) return '可备鲜花素果，诚心敬拜';
   const hit = (prof.themes || []).some(t => meta.themes.includes(t));
   return (hit ? '【与您有关】' : '') + meta.prep;
+}
+
+// ═══ R-PUSH-P5（2026-09-28）信众关怀全量补齐：生日/破日/三伏数九/考试季/观音借库 ═══
+
+/** 生日名单 → bridge env（本人+家人，农历生日由 bridge 用 lunar_python 换算） */
+function birthdaysEnv() {
+  const p = ACTIVE_PROFILE || DEFAULT_PROFILE;
+  const people = [{ name: p.name === '缘主' ? '您' : p.name, birth: p.birth }];
+  (p.family || []).forEach(f => { if (f.birth && f.name) people.push({ name: f.name, birth: f.birth }); });
+  return JSON.stringify(people.filter(x => x.birth));
+}
+
+/** 生肖本命佛（民俗通行对照，生日专题携带） */
+const SX_BENMINGFO = {
+  鼠: '千手观音', 牛: '虚空藏菩萨', 虎: '虚空藏菩萨', 兔: '文殊菩萨',
+  龙: '普贤菩萨', 蛇: '普贤菩萨', 马: '大势至菩萨', 羊: '大日如来',
+  猴: '大日如来', 鸡: '不动明王', 狗: '阿弥陀佛', 猪: '阿弥陀佛',
+};
+
+/** 生日专题：本人生日当天（公历/农历）出祝福板块；暮推挂家人生日预告 */
+function birthdaySpecial(d, prof, label) {
+  const bd = d.birthdays;
+  if (!bd) return '';
+  const dayWord = label || '今日';
+  const lines = [];
+  (bd.today || []).forEach(b => {
+    const isSelf = b.name === '您' || b.name === prof.name;
+    if (isSelf) {
+      const fo = SX_BENMINGFO[prof.zodiac] || '';
+      lines.push(`━━━ 🎂 ${dayWord}是您的${b.type} ━━━
+🎂 生日快乐！新的一岁，愿您「日日是好日」
+🙏 您的本命佛是${fo}——生日当天诚心念一声圣号，祈福新岁平安顺遂
+🌠 生日宜许愿：把心愿写在纸上（或默念三遍），愿行合一，步步生莲
+🍜 民俗生日三件套：长寿面+鸡蛋+一句感恩，感恩父母赐身、感恩岁月成全`);
+    } else {
+      lines.push(`🎂 ${dayWord}是${b.name}的${b.type}——记得送上祝福，陪伴是最长情的告白`);
+    }
+  });
+  return lines.join('\n');
+}
+
+/** 暮推：家人生日预告（10 天内） */
+function birthdayUpcomingLine(d) {
+  const ups = ((d.birthdays || {}).upcoming || []).filter(u => u.in_days <= 10);
+  if (!ups.length) return '';
+  return '🎂 生日预告：' + ups.map(u => `${u.in_days}天后（${u.date}）${u.name}${u.type}`).join('；') + '——提前备份心意';
+}
+
+/** 破日提示（岁破冲太岁/月破冲月建，大事不宜）——并入忌日行 */
+function poyueLine(d) {
+  const po = d.poyue || [];
+  if (!po.length) return '';
+  const plain = po.includes('岁破日')
+    ? '今日岁破（日支冲太岁）：大事勿用、不冲领导不硬碰，守拙为安'
+    : '今日月破（日支冲月建）：大事不宜，宜拆旧整理、坏中求新';
+  return '⚠️ ' + plain;
+}
+
+/** 三伏/数九养生行（晨暮推定调区一行） */
+function sanfuShujiuLine(d, label) {
+  const ss = d.sanfu_shujiu || {};
+  const dayWord = label || '今日';
+  if (ss.sanfu === '明日入伏') return '🌡️ 明日入伏：一年最热四十天将至，备好防暑降温，三伏宜养阳';
+  if (ss.sanfu) return `🌡️ ${dayWord}${ss.sanfu}：三伏天养阳正当时——少贪凉、姜茶温中、午间小憩`;
+  if (ss.shujiu) {
+    const cold = /三四九|三九|四九/.test(ss.shujiu) ? '（一年最寒时段，护好头脚腰）' : '';
+    return `❄️ ${dayWord}${ss.shujiu}${cold}：数九寒天宜早卧晚起、温补养藏`;
+  }
+  return '';
+}
+
+/** 考试季文昌专项（学业主题信众）：高考季 5/25-6/9 · 考研周 12/15-12/23 */
+function examSeasonNote(d, prof) {
+  const themes = prof.themes || [];
+  if (!themes.includes('学业')) return '';
+  const md = d.month * 100 + d.day;
+  if (md >= 525 && md <= 609) {
+    return '📚 高考季文昌提醒：家有考生——保持常态作息即是最好的助力；可诵文殊心咒祈开智慧，家长稳住情绪就是稳住孩子';
+  }
+  if (md >= 1215 && md <= 1223) {
+    return '📚 考研季文昌提醒：家有考生——最后阶段回归错题与真题，心态平和即是文昌；可拜文昌帝君祈文运';
+  }
+  return '';
 }
 
 
@@ -791,6 +874,10 @@ function buildPublic(d, isTomorrow) {
   const duoxingSp = duoxingSpecial(d, prof);
   const fengjiuNt = fengjiuNote(d, prof);
   const tiansheSp = tiansheSpecial(d);
+  // R-PUSH-P5 信众关怀（生日 / 破日 / 三伏数九 / 考试季）
+  const birthdaySp = birthdaySpecial(d, prof);
+  const examNt = examSeasonNote(d, prof);
+  const sanfuLn = sanfuShujiuLine(d);
 
   let msg = `📅 易道智鉴 · 晨推 ${d.year}年${d.month}月${d.day}日 ${d.weekday}
 🌙 ${d.lunar}｜${gz.year}年（${gz.year_shengxiao}年）·${gz.month}月·${gz.day}日
@@ -803,7 +890,7 @@ function buildPublic(d, isTomorrow) {
 ${dayGanLine(d, prof)}
 ${chongLine(d)}
 ${buildYunqiLine(d.year, parseInt((prof.birth || '').slice(0, 4), 10))}
-${taisuiSp ? '\n' + taisuiSp + '\n' : ''}${jieqiSp ? '\n' + jieqiSp + '\n' : ''}${duoxingSp ? '\n' + duoxingSp + '\n' : ''}${fengjiuNt ? '\n' + fengjiuNt + '\n' : ''}${tiansheSp ? '\n' + tiansheSp + '\n' : ''}
+${taisuiSp ? '\n' + taisuiSp + '\n' : ''}${jieqiSp ? '\n' + jieqiSp + '\n' : ''}${duoxingSp ? '\n' + duoxingSp + '\n' : ''}${fengjiuNt ? '\n' + fengjiuNt + '\n' : ''}${tiansheSp ? '\n' + tiansheSp + '\n' : ''}${birthdaySp ? '\n' + birthdaySp + '\n' : ''}${examNt ? '\n' + examNt + '\n' : ''}
 ━━━ ③ 今日最有利三件事 ━━━
 ${buildThreeWins(d, prof)}
 
@@ -817,7 +904,7 @@ ${buildRemedies(d, prof)}
 ✅ 宜：${yiTop}
 🚫 忌：${jiTop}
 📌 ${jianchu}｜☀️ ${d.huanghei}
-${huijiLine(d) ? huijiLine(d) + '\n' : ''}${shuowangLine(d) ? shuowangLine(d) + '\n' : ''}${plainShensha(d)}
+${huijiLine(d) ? huijiLine(d) + '\n' : ''}${poyueLine(d) ? poyueLine(d) + '\n' : ''}${shuowangLine(d) ? shuowangLine(d) + '\n' : ''}${sanfuLn ? sanfuLn + '\n' : ''}${plainShensha(d)}
 `;
 
   if (d.jieqi_info && !d.is_jieqi_today) msg += `\n🌿 ${d.jieqi}｜${d.jieqi_info}\n`;
@@ -859,8 +946,13 @@ function buildEvening(d) {
   const duoxingSp = duoxingSpecial(d, prof, '明日');
   const fengjiuNt = fengjiuNote(d, prof);
   const tiansheSp = tiansheSpecial(d, '明日');
-  const huijiNt = huijiLine(d);
+  const huijiNt = [huijiLine(d), poyueLine(d)].filter(Boolean).join('\n');
   const shuowangNt = shuowangLine(d);
+  // R-PUSH-P5：生日专题（明日生日提前知晓）+ 生日预告 + 三伏数九 + 考试季
+  const birthdaySp = birthdaySpecial(d, prof, '明日');
+  const birthdayUp = birthdayUpcomingLine(d);
+  const sanfuLn = sanfuShujiuLine(d, '明日');
+  const examNt = examSeasonNote(d, prof);
 
   let msg = `🌙 易道智鉴 · 暮推（明日预告）
 📅 ${d.year}年${d.month}月${d.day}日 ${d.weekday}｜${d.lunar}
@@ -872,12 +964,12 @@ function buildEvening(d) {
 🚫 忌：${jiTop}
 ⏰ 黄金窗口：${dayJishi.slice(0, 3).join('、') || jishiList[0] || '全天平和，按节奏即可'}
 📌 ${jianchu}｜☀️ ${d.huanghei}
-${huijiNt ? huijiNt + '\n' : ''}${shuowangNt ? shuowangNt + '\n' : ''}
+${huijiNt ? huijiNt + '\n' : ''}${shuowangNt ? shuowangNt + '\n' : ''}${sanfuLn ? sanfuLn + '\n' : ''}
 ━━━ ② 跟您有关 ━━━
 ${dayGanLine(d, prof, '明日')}
 ${chongLine(d)}
 ${plainShensha(d)}
-${taisuiSp ? taisuiSp + '\n' : ''}${duoxingSp ? duoxingSp + '\n' : ''}${fengjiuNt ? fengjiuNt + '\n' : ''}${tiansheSp ? tiansheSp + '\n' : ''}━━━SPLIT━━━
+${taisuiSp ? taisuiSp + '\n' : ''}${duoxingSp ? duoxingSp + '\n' : ''}${fengjiuNt ? fengjiuNt + '\n' : ''}${tiansheSp ? tiansheSp + '\n' : ''}${birthdaySp ? birthdaySp + '\n' : ''}${examNt ? examNt + '\n' : ''}${birthdayUp ? birthdayUp + '\n' : ''}━━━SPLIT━━━
 ━━━ ③ 明日最有利三件事 ━━━
 ${buildThreeWins(d, prof, '明日')}
 
