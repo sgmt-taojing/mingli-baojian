@@ -1585,3 +1585,11 @@
 - **浏览器实测三页全过**：paipan-center 双引擎联动出 4 例（傅毅/呂太后+杜白/周信芳）；ziwei.html 木三局 15 则出 3 例；断语、白话引读、出处、免责话术齐全。
 - **新发现挂账**：紫微双引擎（ziwei.html 本地 ZiweiEngine vs 服务端 iztro）同输入五行局互异（木三局 vs 火六局），已入 BACKLOG 三·补，建议引擎对拍立项（影响同参匹配正确性）。
 - **落账**：父仓本轮 commit；server 无改动（复用 8601592 两端点）。
+
+## 2026-09-28 21:00 · 紫微引擎统一修真：ziwei.html 改服务端 iztro 优先（Kimi）
+
+- **根因诊断**（手算定判）：1990-06-15 巳时（农历庚午五月廿三）命宫在丑、干支己丑、纳音霹雳火→**火六局**（服务端 iztro 正确）。本地 ZiweiEngine（app/js/ziwei-engine.js）三处硬伤：①五行局误用**年干支纳音**（应为命宫干支纳音）且自带纳音表庚午/辛未误植木三局（应为路旁土·土五局）；②公历输入未转农历直接安宫；③紫微定位系简化版。
+- **处置**：ziwei.html runZiweiPaipan 改 async——服务端 /api/paipan/ziwei 优先（zwServerToLocal 适配层转本地渲染结构，星曜中文→romanize 键），本地引擎仅离线兜底；盘图下加引擎标识（iztro 服务端/本地兜底）。
+- **审计扩展**：qimen/liuyao/meihua/liuren/fengshui 五个排盘页全部走服务端 API——ziwei.html 是唯一本地引擎分歧点，全域已唯一源头。
+- **实测**：同输入双页局名一致（火六局），同参卡随之对齐；BACKLOG 三·补引擎分歧项销账。
+- **落账**：父仓本轮 commit。
