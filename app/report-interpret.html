@@ -334,6 +334,21 @@ function renderPaipanReport(report){
     });
     html += '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts from public-domain classics.':'原文照录自公有领域典籍，未作改写。')+'</div></div>';
   }
+  // R-BZ-CANON2：调候（穷通宝鉴）+ 格局（三命通会）原典引证卡
+  if(report.tiaohouRef || report.gejuRef){
+    var escQ = function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); };
+    html += '<div style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(125,211,192,.25);border-left:3px solid #7dd3c0;border-radius:8px">';
+    html += '<div style="color:#7dd3c0;font-weight:600;margin-bottom:6px">📜 '+(isEn?'Climate & Pattern Classics':'调候与格局 · 原典引证')+'</div>';
+    if(report.tiaohouRef){
+      html += '<div style="margin-top:6px"><div style="font-size:12px;color:#7dd3c0">《穷通宝鉴（栏江网）》<span style="opacity:.55;font-size:11px">　调候·' + escQ(report.tiaohouRef.key) + '</span></div>'+
+              '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85">'+escQ(report.tiaohouRef.quote)+'</div></div>';
+    }
+    if(report.gejuRef){
+      html += '<div style="margin-top:8px"><div style="font-size:12px;color:#7dd3c0">《三命通会》（四库本）<span style="opacity:.55;font-size:11px">　' + escQ(report.gejuRef.chapter||'') + ' · 月令主气定格</span></div>'+
+              '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85">'+escQ(report.gejuRef.quote)+'</div></div>';
+    }
+    html += '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts, unedited.':'原文照录自公有领域典籍，未作改写。')+'</div></div>';
+  }
   // 化解板块独立渲染
   var tRC = function(text){ return (typeof i18n !== 'undefined' && i18n.translateReportContent) ? i18n.translateReportContent(text || '') : (text || ''); };
     if(report.huajie){
