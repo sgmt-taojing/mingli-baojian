@@ -198,6 +198,7 @@ async function doPaipan(){
   renderFlow(data.flow, targetYear, currentAge);
   if(data.interpretation) renderInterpretation(data.interpretation);
   if(data.canon) renderCanonCard(data.canon);   // R-CANON-EXT：六爻经典依据层
+  if(data.guaCiReference) renderGuaCiCard(data.guaCiReference);   // R-YJ-GUACI：周易卦爻辞引证
 }
 
 function renderChart(c){
@@ -357,6 +358,30 @@ function renderCanonCard(cn){
     h+='<div style="font-size:12px;line-height:1.9;opacity:.85">'+escC(it.excerpt||'')+'</div></div>';
   }
   h+='<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录自公有领域典籍，未作改写。</div>';
+  el.innerHTML=h;
+  el.style.display='block';
+}
+// R-YJ-GUACI：周易卦爻辞引证卡（本卦/变卦卦辞彖象 + 动爻爻辞）
+function renderGuaCiCard(g){
+  if(!g || !g.benGua) return;
+  const escG=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  const el=document.getElementById('paipan-guaci')||(()=>{
+    const d=document.createElement('div');
+    d.id='paipan-guaci';
+    d.style.cssText='margin:0 0 16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(78,201,176,.2);border-left:3px solid var(--jade,#4ec9b0);border-radius:12px';
+    const ref=document.getElementById('paipan-canon')||document.getElementById('paipan-interpretation');
+    (ref&&ref.parentNode?ref.parentNode:(document.querySelector('.ly-grid')||document.body)).appendChild(d);
+    return d;
+  })();
+  let h='<div style="font-size:15px;font-weight:600;color:var(--jade,#4ec9b0);margin-bottom:8px">📜 周易卦爻辞 · '+escG(g.benGua.name)+'</div>';
+  h+='<div style="font-size:12px;line-height:1.9;color:var(--jade,#4ec9b0)">卦辞：'+escG(g.benGua.guaCi)+'</div>';
+  if(g.benGua.xiang) h+='<div style="font-size:12px;line-height:1.9;opacity:.85">象曰：'+escG(g.benGua.xiang)+'</div>';
+  if(g.movingYaos&&g.movingYaos.length){
+    h+='<div style="margin-top:8px;font-size:12px;color:var(--gold,#c9a84c)">动爻爻辞（断卦核心）：</div>';
+    for(const y of g.movingYaos) h+='<div style="font-size:12px;line-height:1.9;opacity:.85">　'+escG(y.label)+'：'+escG(y.ci)+'</div>';
+  }
+  if(g.bianGua) h+='<div style="margin-top:8px;font-size:12px;line-height:1.9;opacity:.75">之卦 '+escG(g.bianGua.name)+'：'+escG(g.bianGua.guaCi)+'</div>';
+  h+='<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录《周易》'+escG(g.source?('·'+g.source):'')+'，未作改写。</div>';
   el.innerHTML=h;
   el.style.display='block';
 }
