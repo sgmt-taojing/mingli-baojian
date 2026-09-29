@@ -1232,6 +1232,11 @@ async function aiMingliDraft(){
       showTxt += '\n\n<b>🌿 医命同参 · 禀赋体质参考（倾向参考·非诊断，可借鉴改写）</b>\n' + escapeHtml(r.yimingReference);
       showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【禀赋体质参考】' + r.yimingReference.replace(/说明：[\s\S]*$/, '').trim()) + '">🌿 借鉴写入审核意见</button>';
     }
+    // R-QTBJ（2026-09-29）：穷通宝鉴调候原典引证——日干×月令静态表直查，原典原文，化用权在命理师
+    if(r.tiaohouReference){
+      showTxt += '\n\n<b>📜 调候原典 · 穷通宝鉴（原典引证·化用为通俗喜用，勿照抄）</b>\n' + escapeHtml(r.tiaohouReference);
+      showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【调候原典参考】' + r.tiaohouReference) + '">📜 借鉴写入审核意见</button>';
+    }
     // R-XT-ANNO（医命同参 Y6）：命相同参参考区块——相不独论，互证命局
     if(r.xiangReference){
       showTxt += '\n\n<b>👁️ 命相同参 · 相学参考（相不独论·须与命局互证）</b>\n' + escapeHtml(r.xiangReference);

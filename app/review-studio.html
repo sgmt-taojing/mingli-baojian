@@ -127,6 +127,7 @@ textarea.tall{min-height:180px}
         <div class="fld-label">AI 命理草案(只读参考)</div>
         <textarea class="tall" id="mlDraft" readonly style="opacity:.75" placeholder="点击「生成 AI 命理草案」"></textarea>
         <div id="mlCross" style="display:none;font-size:11px;line-height:1.7;background:rgba(155,89,182,.08);border:1px solid rgba(155,89,182,.3);border-radius:6px;padding:6px 8px;margin-bottom:6px;white-space:pre-wrap"></div>
+        <div id="mlTiaohou" style="display:none;font-size:11px;line-height:1.7;background:rgba(230,180,60,.08);border:1px solid rgba(230,180,60,.3);border-radius:6px;padding:6px 8px;margin-bottom:6px;white-space:pre-wrap"></div>
         <div class="fld-label">命理师批注(签名时生效)</div>
         <textarea id="mlAnnotation" placeholder="命理师专业补充:格局要点、与主诉互参、调候建议……"></textarea>
         <div class="btn-row">
@@ -249,6 +250,10 @@ $('btnMlDraft').addEventListener('click',function(){
     if(!res.ok){setSt('mlStatus','生成失败:'+(res.error||res.message||''),'err');return}
     mlDraftId=res.id;
     $('mlDraft').value=res.draft||'(空)';
+    // R-QTBJ：调候原典引证区块（穷通宝鉴·日干×月令，原典原文供命理师化用）
+    var thBox=$('mlTiaohou');
+    if(res.tiaohouReference){thBox.textContent='📜 调候原典引证 · '+res.tiaohouReference;thBox.style.display='block'}
+    else{thBox.style.display='none'}
     setSt('mlStatus','✅ 草案 #'+res.id+' 已生成,请审阅后批注签名','ok');
     renderMlCross(y,m,d,($('bHour').value!==''?parseInt($('bHour').value):12));
   }).catch(function(e){$('btnMlDraft').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
