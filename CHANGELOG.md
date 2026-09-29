@@ -1757,3 +1757,9 @@
 - 结论：六盘静态引证卡全部渲染即露出，无折叠、无点击门——六壬课经卡/奇门格局卡/梅花体用卡均为 inline 直渲；奇门格局卡在有格局时 display:block 自动露出
 - 唯二点击门（保留，属设计）：①AI 生成类（繇辞白话串讲——已由 R-JY-PEEK 预热命中自动展开覆盖；白话解读面板——重生成保留手动）②宫位级 drill-down（点宫看详情）与原始 JSON 调试折叠
 - 浏览器实证：ziwei-chart renderZiweiCanon 注入即显 ✓；liuyao-chart renderGuaCiCard 注入即显 ✓
+
+## 2026-09-29 R-LY-COINS-VALIDATE 白话面板体质查明 + 六爻 coins 入参校验
+
+- 查明：白话解读引擎 paipan-baihua-engine.js（1113 行）为纯规则引擎、零 AI 调用、亚秒级；七盘页面均在排盘成功后自动 PaipanBaihua.notify 即渲染内联面板——无点击门、无需预热（原预热设想证伪，不做）
+- 顺手修真：liuyao paipanByCoins 畸形 coins 入参（如扁平 [7,8,...]）直接崩栈 c.reduce——加逐爻形态校验（每次 3 枚 0/1 数组），畸形返回友好 400 指明格式
+- 实测：畸形入参→「第1次抛掷格式应为 3 枚铜钱…」✓；合法 coins→地风升排盘正确（爻位阴阳核验 ✓）✓；浏览器全链路：排盘后白话面板自动内联渲染 ✓
