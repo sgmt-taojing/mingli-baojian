@@ -1792,3 +1792,12 @@
 - 规约（生效）：8920 重启一律 `launchctl kickstart -k gui/$(id -u)/com.mingli-baojian.api-v2`，禁止 kill+nohup 手启
 - 顺手修：预热脚本「完批」汇总行误用开跑快照计数（显示 11 实为 311）——改读磁盘实况
 - 喜报：预热器首夜跑批 300/300 全成，白话缓存 311/4020，按此节奏 13 晚铺完
+
+## 2026-09-30 R-FS-CANON 风水原典数据层落成 + 两个全用户级排盘修真
+
+- 净源发现：宅经（卷上下）/葬书（内外杂篇）/撼龙经/青囊序奥语全文早已在 KB（Kanripo 四库文渊阁本），无需外采
+- scripts/build-fs-canon.py：KB 原典锚点截取生成 data/fs-canon.json 4 段（宅经总纲/葬书风水定义/青囊序龙神诀/水主财禄山人丁），锚点未命中即 FATAL，绝不手打原文
+- report-canon.js 增 buildFengshuiCanonLines：总纲+定义常挂，青囊序局势诀按 jushi 命中给「正合/正犯」判语；generateFengshuiReport 专用路径挂 segCanon（风水在 line121 分流不走主路径，主路径风水死分支已清）
+- 修真①（严重）：风水报告排盘旧传 sitting/facing 别名，端点只认 sittingMountain/facingMountain——**全量风水报告历史以来都错按子山午向排盘**；端点+报告双侧已修，实测乾山巽向正确排八运旺山旺向
+- 修真②：buildYear/moveInYear 从不透传——宅运盘恒按出生年/当下年排；已透传，实测 moveInYear=2004 → 8运盘 ✓
+- 实测双局势：旺山旺向局「正合此诀」✓ / 上山下水局「正犯此诀」✓
