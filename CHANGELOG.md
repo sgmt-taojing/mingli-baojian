@@ -1783,3 +1783,12 @@
 - report-canon.js 新增 buildBaziCanonLines（穷通宝鉴调候 116 组合 + 三命通会月令主气格局 11 章，十神判定与 _shishenGeju 同口径；pillars 中文键对象形态兼容）+ buildZiweiCanonLines（命宫主星→諸星問答論，与 _ziweiRefOf 同口径）
 - 实测：八字 1979-09-15 10时男 → 调候「乙酉」+ 七杀格·論偏官章 ✓；紫微同盘 → 命宫丁卯·火六局·天相问答论 ✓（standalone 测试中 8911 排盘偶发超时属 MB-PERF 已知事件循环竞争，非本段缺陷）
 - 至此求测报告原典引证六盘全满贯：六爻/梅花（卦爻辞+繇辞+白话）·六壬（课经）·奇门（格局）·八字（调候+格局）·紫微（问答论）；风水待原典数据层（挂账）
+
+## 2026-09-30 R-PROC-HYGIENE 进程卫生事故处置：僵尸实例致 DB 锁 + launchd 重启规约
+
+- 现象：十节点冒烟节点 9 连环 500「database is locked」
+- 根因：api-server-v2 由 launchd（com.mingli-baojian.api-v2，KeepAlive=true）托管，而此前多轮「kill 端口+nohup 手启」导致：手启实例占 8920、launchd 复活实例绑不上端口却驻留握库——累计 8 个一天龄僵尸 + 挂死的 kb-sync-guard/staging-auto-promote，多写者并发锁库
+- 处置：清僵尸 8+2 个、手启实例退场、launchctl kickstart -k 交还托管；yidao.db 实测读写通畅（321910 条无损）；自检复绿 7/7
+- 规约（生效）：8920 重启一律 `launchctl kickstart -k gui/$(id -u)/com.mingli-baojian.api-v2`，禁止 kill+nohup 手启
+- 顺手修：预热脚本「完批」汇总行误用开跑快照计数（显示 11 实为 311）——改读磁盘实况
+- 喜报：预热器首夜跑批 300/300 全成，白话缓存 311/4020，按此节奏 13 晚铺完

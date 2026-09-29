@@ -126,8 +126,9 @@ function cleanText(t) {
     }
     if (SLEEP > 0) await new Promise(r => setTimeout(r, SLEEP));
   }
-  let total = Object.keys(cache).length;
-  if (Object.keys(batch).length) total = mergeWrite(batch);
+  if (Object.keys(batch).length) mergeWrite(batch);
+  // 总量以磁盘实况为准（cache 是开跑时的快照，不能作数）
+  const total = Object.keys(readJson(CACHE_PATH, {})).length;
   console.log(`[preheat] 完批：成 ${ok} 败 ${fail}，缓存总量 ${total}/4020`);
   process.exit(fail > 0 && ok === 0 ? 1 : 0);
 })();
