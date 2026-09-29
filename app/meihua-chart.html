@@ -91,6 +91,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <input aria-label="数字3" type="number" id="mh-num3" placeholder="数字3(可选)" min="0" max="99">
   <input aria-label="出生地经度" type="number" id="mh-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
   <input aria-label="流年" type="number" id="mh-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年运势的目标年份">
+  <input aria-label="所问何事" type="text" id="mh-question" placeholder="所问何事(可选·如:财运/婚姻/健康)" title="填写后附梅花易数分类占原典断语">
   <button onclick="doPaipan()">排盘</button>
 
 <button onclick="generateFullReport('meihua')" style="margin-top:12px;padding:10px 24px;background:linear-gradient(135deg,#ffb44d,#ff7e5f);color:#0f1820;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:2px">📜 出具梅花易数报告</button>
@@ -161,6 +162,8 @@ async function doPaipan(){
   const currentAge = now.getFullYear() - +y;
   const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
   const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge,lang:_lang };
+  const _q = (document.getElementById('mh-question')||{}).value || '';
+  if(_q) body.question = _q;
   if(num1) body.num1 = +num1;
   if(num2) body.num2 = +num2;
   if(num3) body.num3 = +num3;
@@ -177,6 +180,7 @@ async function doPaipan(){
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   const svg = await rSvg.text();
+  window._mhRef=data.meihuaReference||null;
   renderChart(data.chart);
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
   if(window.PaipanBaihua) PaipanBaihua.notify('meihua', body);
@@ -226,6 +230,16 @@ function renderChart(c){
     html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">变用关系</span><span class="mh-tiyong-val mh-rel ${bRelClass}">${ty.bianRelation}</span></div>`;
   }
   html+='</div>';
+  // R-MH-TIYONG：梅花体用原典引证（体用生克篇）
+  const mr=window._mhRef;
+  if(mr){
+    html+='<div class="mh-tiyong" style="border-left:3px solid var(--jade,#4ec9b0)"><h3>📜 体用原典 · 梅花易数</h3>';
+    html+=`<div style="font-size:10px;color:var(--paper3);margin-bottom:4px">${mr.zongGang||''}</div>`;
+    if(mr.relation) html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">本卦体用</span><span class="mh-tiyong-val" style="color:var(--jade,#4ec9b0)">${mr.relation.quote}。</span></div>`;
+    if(mr.bianRelation) html+=`<div class="mh-tiyong-row"><span class="mh-tiyong-label">变卦体用</span><span class="mh-tiyong-val" style="color:var(--jade,#4ec9b0)">${mr.bianRelation.quote}。</span></div>`;
+    if(mr.category) html+=`<div style="margin-top:6px;font-size:11px;line-height:1.8;color:var(--jade,#4ec9b0)">【${mr.category.name}占】${mr.category.quote}</div>`;
+    html+=`<div style="margin-top:6px;font-size:10px;color:var(--paper3);opacity:.7">${mr.source}·原文照录</div></div>`;
+  }
   ct.innerHTML=html;
   // R-TAP-Y：梅花点读（本卦/互卦/变卦/动爻）——委托绑定在常驻容器上，重渲染不失效
   if (window.PaipanTap && !ct._tapBound) {
