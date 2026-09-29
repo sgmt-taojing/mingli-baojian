@@ -225,6 +225,7 @@ async function doPaipan(){
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   const svg = await rSvg.text();
+  window._qmGejuRef=data.gejuReference||null;
   renderChart(data.chart);
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
   if(window.PaipanBaihua) PaipanBaihua.notify('qimen', body);
@@ -298,7 +299,11 @@ function renderChart(c){
     for(const g of c.geju){
       const item=document.createElement('div');
       item.className='qm-geju-item '+(g.type==='吉'?'ji':'xiong');
-      item.innerHTML=`<div class="qm-geju-name ${g.type==='吉'?'ji':'xiong'}">${g.name} <span style="font-size:9px">[${g.type}]</span></div><div class="qm-geju-desc">${g.desc||''}</div>`;
+      // R-QM-GEJU：统宗原典引证（精确名或门迫通配）
+      const refList=window._qmGejuRef||[];
+      const ref=refList.find(r=>r.name===g.name)||refList.find(r=>r.name==='门迫'&&/迫.*宫$/.test(g.name))||refList.find(r=>/迫.*宫$/.test(r.name)&&/迫.*宫$/.test(g.name));
+      item.innerHTML=`<div class="qm-geju-name ${g.type==='吉'?'ji':'xiong'}">${g.name} <span style="font-size:9px">[${g.type}]</span></div><div class="qm-geju-desc">${g.desc||''}</div>`+
+        (ref&&ref.quote?`<div style="margin-top:4px;font-size:10px;line-height:1.7;color:var(--jade,#4ec9b0)">📜 ${ref.quote}</div><div style="font-size:9px;color:var(--paper3);opacity:.7">${ref.source}·原文照录</div>`:'');
       gjList.appendChild(item);
     }
   }
