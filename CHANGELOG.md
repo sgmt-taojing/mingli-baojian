@@ -1704,3 +1704,12 @@
 - **服务端**：`_meihuaRefOf()` 接 POST/GET `/api/paipan/meihua` 返回 `meihuaReference`——体用关系（剥离吉凶括号注→断语）+变用关系+可选 question 关键词→18 类分类占映射；实测 比和→「體用比和，則百事順遂」、问财运→求财占、问健康→疾病占全中
 - **前端** `app/meihua-chart.html`：新增可选「所问何事」输入框（进请求体 question），体用分析下挂「📜 体用原典」玉色卡（总纲+本变体用断语+分类占段+出处）；浏览器实测全渲染
 - 自检 7/7 绿
+
+## 2026-09-29 R-JY-YILIN 焦氏易林繇辞入六爻排盘（活化第八棒）
+
+- 解析元刊本焦氏易林 16 卷 64 块：繇辞 4020 条 + 版本缺文 76 条 = 4096 结构闭合；有注 3227 条
+- scripts/build-jy-yilin.py：卦画/文字双候选按文王序指认块头（恒头文字误作𢘆、夬头卦画误作䷀皆校正）；异体字映射 35 项；繇注分离=無註/未詳直切+四字句律白名单启发式，656 条不可切标 ambiguous 全文照存；避讳缺「恒」60 条+缺页 16 条登记 meta.missing
+- server/data/jy-yilin.json 落盘；api-server-v2.js 新增 _yilinRefOf（本卦之X卦→繇辞），六爻双端点挂 yilinReference
+- app/liuyao-chart.html 新增 renderYilinCard：繇辞四字句顿断、注文、ambiguous 提示、来源标注
+- 实测：泽天夬之兑为泽→「以㛰易系抱布自媒弃禮急情卒離憂悔」繇注齐全；浏览器 DOM #paipan-yilin 渲染通过
+- 证据件 DELIVERY/jy-yilin-evidence-20260929.json；自检 7/7 ✓

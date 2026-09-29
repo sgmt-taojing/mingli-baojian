@@ -199,6 +199,7 @@ async function doPaipan(){
   if(data.interpretation) renderInterpretation(data.interpretation);
   if(data.canon) renderCanonCard(data.canon);   // R-CANON-EXT：六爻经典依据层
   if(data.guaCiReference) renderGuaCiCard(data.guaCiReference);   // R-YJ-GUACI：周易卦爻辞引证
+  if(data.yilinReference) renderYilinCard(data.yilinReference);   // R-JY-YILIN：焦氏易林繇辞引证
 }
 
 function renderChart(c){
@@ -382,6 +383,28 @@ function renderGuaCiCard(g){
   }
   if(g.bianGua) h+='<div style="margin-top:8px;font-size:12px;line-height:1.9;opacity:.75">之卦 '+escG(g.bianGua.name)+'：'+escG(g.bianGua.guaCi)+'</div>';
   h+='<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录《周易》'+escG(g.source?('·'+g.source):'')+'，未作改写。</div>';
+  el.innerHTML=h;
+  el.style.display='block';
+}
+// R-JY-YILIN：焦氏易林繇辞引证卡（本卦之X卦 → 繇辞）
+function renderYilinCard(y){
+  if(!y || !y.verse) return;
+  const escY=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  const el=document.getElementById('paipan-yilin')||(()=>{
+    const d=document.createElement('div');
+    d.id='paipan-yilin';
+    d.style.cssText='margin:0 0 16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.2);border-left:3px solid var(--gold,#c9a84c);border-radius:12px';
+    const ref=document.getElementById('paipan-guaci')||document.getElementById('paipan-canon')||document.getElementById('paipan-interpretation');
+    (ref&&ref.parentNode?ref.parentNode:(document.querySelector('.ly-grid')||document.body)).appendChild(d);
+    return d;
+  })();
+  // 繇辞按四字句读加标点顿断
+  const verseFmt=escY(y.verse).replace(/(.{4})/g,'$1　').trim();
+  let h='<div style="font-size:15px;font-weight:600;color:var(--gold,#c9a84c);margin-bottom:8px">📿 焦氏易林 · '+escY(y.benGua)+' 之 '+escY(y.bianGua)+'</div>';
+  h+='<div style="font-size:13px;line-height:2.1;color:var(--gold,#c9a84c)">'+verseFmt+'</div>';
+  if(y.note) h+='<div style="margin-top:8px;font-size:12px;line-height:1.9;opacity:.75">注：'+escY(y.note)+'</div>';
+  if(y.ambiguous) h+='<div style="margin-top:6px;font-size:11px;opacity:.55">此条繇注连写，元刊本未标分界，全文照录。</div>';
+  h+='<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录'+escY(y.source)+'，未作改写。焦延寿以繇辞系于六十四卦之变，共四千零九十六首。</div>';
   el.innerHTML=h;
   el.style.display='block';
 }
