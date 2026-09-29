@@ -405,8 +405,28 @@ function renderYilinCard(y){
   if(y.note) h+='<div style="margin-top:8px;font-size:12px;line-height:1.9;opacity:.75">注：'+escY(y.note)+'</div>';
   if(y.ambiguous) h+='<div style="margin-top:6px;font-size:11px;opacity:.55">此条繇注连写，元刊本未标分界，全文照录。</div>';
   h+='<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录'+escY(y.source)+'，未作改写。焦延寿以繇辞系于六十四卦之变，共四千零九十六首。</div>';
+  // R-JY-BAIHUA：AI 白话串讲（点击触发；只译意象不断吉凶，吉凶归盘面）
+  h+='<div style="margin-top:10px"><button type="button" id="yilin-baihua-btn" style="padding:5px 14px;font-size:12px;border:1px solid var(--gold,#c9a84c);border-radius:16px;background:transparent;color:var(--gold,#c9a84c);cursor:pointer">💬 白话串讲</button>'
+    +'<span id="yilin-baihua-tip" style="margin-left:8px;font-size:11px;opacity:.5">AI 只翻译繇辞画面，吉凶以盘面为准</span></div>'
+    +'<div id="yilin-baihua-body" style="display:none;margin-top:8px;padding:10px 12px;background:rgba(201,168,76,.06);border-radius:8px;font-size:12.5px;line-height:1.9"></div>';
   el.innerHTML=h;
   el.style.display='block';
+  const btn=document.getElementById('yilin-baihua-btn');
+  if(btn) btn.onclick=function(){
+    const body=document.getElementById('yilin-baihua-body');
+    const tip=document.getElementById('yilin-baihua-tip');
+    btn.disabled=true; btn.style.opacity=.5; tip.textContent='正在串讲…';
+    fetch(API_BASE+'/api/paipan/liuyao/yilin-baihua?ben='+encodeURIComponent(y.benGua)+'&bian='+encodeURIComponent(y.bianGua),{headers:{'X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(75000)})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d&&d.ok&&d.baihua){
+          body.textContent=d.baihua; body.style.display='block';
+          tip.textContent='AI 串讲·仅供参考（'+(d.cached?'已缓存':'新生成')+'）';
+          btn.style.display='none';
+        }else{ tip.textContent=(d&&d.error)||'串讲失败，请稍后再试'; btn.disabled=false; btn.style.opacity=1; }
+      })
+      .catch(function(){ tip.textContent='网络异常，请稍后再试'; btn.disabled=false; btn.style.opacity=1; });
+  };
 }
 </script>
   <script src="js/paipan-toast.js"></script>

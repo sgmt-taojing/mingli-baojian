@@ -1713,3 +1713,10 @@
 - app/liuyao-chart.html 新增 renderYilinCard：繇辞四字句顿断、注文、ambiguous 提示、来源标注
 - 实测：泽天夬之兑为泽→「以㛰易系抱布自媒弃禮急情卒離憂悔」繇注齐全；浏览器 DOM #paipan-yilin 渲染通过
 - 证据件 DELIVERY/jy-yilin-evidence-20260929.json；自检 7/7 ✓
+
+## 2026-09-29 R-JY-BAIHUA 易林繇辞 AI 白话串讲
+
+- GET /api/paipan/liuyao/yilin-baihua?ben&bian：繇辞→AI 白话串讲（只译字面意象、不断吉凶，吉凶归盘面引擎）；callAIWithFallback 云端+mlx-v5 双路
+- 本地缓存 server/data/jy-yilin-baihua.json（4020 键空间随用随攒，原子写），命中即回
+- 排盘页易林卡挂「💬 白话串讲」按钮（点击触发防刷屏），渲染标注「AI 串讲·仅供参考」
+- 实测：夬之兑串讲生成→缓存命中→前端按钮→渲染全链路通；自检 7/7 ✓
