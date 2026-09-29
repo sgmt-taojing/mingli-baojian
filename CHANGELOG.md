@@ -1736,3 +1736,11 @@
 - 修真：ziwei-chart.html 用 proFetch 拉 SVG 但漏引 js/pro-gate.js，排盘流程静默中断（全用户级 bug）——补引用后恢复
 - 实测：1979-09-15 10时男 → 命宫丁卯·火六局·天相，引《問天相星所主若何？》原文；古今同参同局命中傅毅之命 14 例；自检 7/7 ✓
 - 引证层全满贯：八字/紫微/六爻/六壬/奇门/梅花 六盘齐备
+
+## 2026-09-29 R-JY-PREHEAT 繇辞白话串讲缓存铺量预热
+
+- scripts/preheat-yilin-baihua.js：夜间闲时预热器——读 jy-yilin.json 4020 键跳过已缓存，走本地 MLX（8960），prompt 与服务端串讲端点完全一致；mkdir 锁 + 读-合-写原子落盘；--limit/--sleep/--dry；MLX 探活失败 exit 2、连失败 5 次终止
+- 服务端互踩防护：_jybhLoad 加 mtime 检查（磁盘被预热脚本更新即重读）；_jybhSave 改 mkdir 锁 + 重读磁盘 + 合并（内存赢同键）+ tmp+rename，锁占用时跳过本次落盘不丢数据
+- 清洗管线：3B 模型泄漏 <s>/<|..|> 特殊token与角色残片——预热脚本与服务端在线生成同规则清洗（cleanText）；首批 7 条中 3 条已回填清洗，新批 4 条零泄漏
+- launchd 挂载 com.mingli-baojian.yilin-preheat：每晚 03:47 跑 --limit 300，日志 logs/yilin-preheat.log；预计 14 晚铺完全量 4020
+- 实测：两批共 10 条成功 0 失败；服务端对新预热键返回 cached:true（端点直读缓存，信众点开即达）
