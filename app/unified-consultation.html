@@ -1237,6 +1237,11 @@ async function aiMingliDraft(){
       showTxt += '\n\n<b>📜 调候原典 · 穷通宝鉴（原典引证·化用为通俗喜用，勿照抄）</b>\n' + escapeHtml(r.tiaohouReference);
       showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【调候原典参考】' + r.tiaohouReference) + '">📜 借鉴写入审核意见</button>';
     }
+    // R-SMT-GEJU（2026-09-29）：三命通会格局引证——月令主气十神定格局，原典论章节摘录
+    if(r.gejuReference){
+      showTxt += '\n\n<b>🏛️ 格局原典 · 三命通会（月令主气定格·原典引证供化用）</b>\n' + escapeHtml(r.gejuReference);
+      showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【格局原典参考】' + r.gejuReference) + '">🏛️ 借鉴写入审核意见</button>';
+    }
     // R-XT-ANNO（医命同参 Y6）：命相同参参考区块——相不独论，互证命局
     if(r.xiangReference){
       showTxt += '\n\n<b>👁️ 命相同参 · 相学参考（相不独论·须与命局互证）</b>\n' + escapeHtml(r.xiangReference);
