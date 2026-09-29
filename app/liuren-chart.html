@@ -174,6 +174,7 @@ async function doPaipan(){
   const data=await r.json();
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   window._lrChart=data.chart;
+  window._lrKetiRef=data.ketiReference||null;
   const svg = await rSvg.text();
   renderChart(data.chart);
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
@@ -228,6 +229,13 @@ function renderChart(c){
       `<div style="font-size:9px;color:var(--jade)">${liuqinOf(zhi)}</div></div>`;
   }
   html+='</div></div>';
+  // 课经原典引证（大六壬大全·袖中金，R-LR-KETI）
+  const kr=window._lrKetiRef;
+  if(kr&&kr.quote){
+    html+='<div class="lr-section"><h3>📜 课经原典 · '+kr.title+'</h3>'+
+      '<div style="font-size:9px;color:var(--paper3);margin-bottom:4px">'+kr.source+'｜起课:'+kr.method+'｜原典歌诀，供断课参证</div>'+
+      '<div style="font-size:12px;line-height:1.9;color:var(--jade);letter-spacing:1px">'+kr.quote+'</div></div>';
+  }
   // 式盘：地盘固定方位（上南下北左东右西），每宫 天盘支+天将
   //  巳 午 未 申
   //  辰       酉
