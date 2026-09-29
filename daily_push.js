@@ -639,6 +639,25 @@ const SX_BENMINGFO = {
   猴: '大日如来', 鸡: '不动明王', 狗: '阿弥陀佛', 猪: '阿弥陀佛',
 };
 
+/** R-BMYC（2026-09-29）：道藏《六十甲子本命元辰历》本命元辰对照（出生年甲子→元辰星+本命星官） */
+const BENMING_YUANCHEN = (() => {
+  try { return JSON.parse(require('fs').readFileSync(path.join(ROOT, 'server', 'data', 'benming-yuanchen.json'), 'utf8')).table; }
+  catch (_) { return null; }
+})();
+function yuanchenOfBirth(birth) {
+  if (!BENMING_YUANCHEN || !birth) return null;
+  const y = parseInt(String(birth).slice(0, 4), 10);
+  if (!y || y < 1900 || y > 2100) return null;
+  const gz = GAN_ORDER[(y - 4) % 10] + ZHI_ORDER[(y - 4) % 12];
+  const t = BENMING_YUANCHEN[gz];
+  return t ? { gz, star: t.star, lord: t.lord, attendants: t.attendants } : null;
+}
+function yuanchenLine(birth) {
+  const y = yuanchenOfBirth(birth);
+  if (!y) return '';
+  return `🌟 本命元辰：${y.gz}年生人，道藏《本命元辰历》载为${y.star}星君座下${y.lord}将军护持——生日/本命年宜静心礼敬，感恩祈福`;
+}
+
 /** 生日专题：本人生日当天（公历/农历）出祝福板块；暮推挂家人生日预告 */
 function birthdaySpecial(d, prof, label) {
   const bd = d.birthdays;
@@ -649,9 +668,10 @@ function birthdaySpecial(d, prof, label) {
     const isSelf = b.name === '您' || b.name === prof.name;
     if (isSelf) {
       const fo = SX_BENMINGFO[prof.zodiac] || '';
+      const yc = yuanchenLine(prof.birth);
       lines.push(`━━━ 🎂 ${dayWord}是您的${b.type} ━━━
 🎂 生日快乐！新的一岁，愿您「日日是好日」
-🙏 您的本命佛是${fo}——生日当天诚心念一声圣号，祈福新岁平安顺遂
+🙏 您的本命佛是${fo}——生日当天诚心念一声圣号，祈福新岁平安顺遂${yc ? '\n' + yc : ''}
 🌠 生日宜许愿：把心愿写在纸上（或默念三遍），愿行合一，步步生莲
 🍜 民俗生日三件套：长寿面+鸡蛋+一句感恩，感恩父母赐身、感恩岁月成全`);
     } else {
@@ -772,11 +792,14 @@ function taisuiSpecial(d, prof, label) {
   if (!hit.length) return null;
   const who = hit.map(t => `${t.name}（属${t.zodiac}·${t.offs.map(o => o.type).join('/')}）`).join('、');
   const plains = [...new Set(hit.flatMap(t => t.offs.map(o => o.plain)))].join('；');
+  // R-BMYC：本人犯太岁时附本命元辰（道藏元辰历），拜太岁一并礼敬本命星君
+  const ycSelf = hit.some(t => t.name === '您') ? yuanchenOfBirth(prof.birth) : null;
+  const ycLine = ycSelf ? `\n🌟 您的本命元辰：${ycSelf.gz}年·${ycSelf.star}星君座下${ycSelf.lord}将军——拜太岁时一并礼敬本命星君，道藏谓之「醮祭元辰」` : '';
 
   if (isDongzhi) {
     return `━━━ ⭐ 化太岁准备季开启 ━━━
 🧧 冬至一阳生，来年${effGz}年犯太岁：${who}
-📿 ${plains}
+📿 ${plains}${ycLine}
 即日起进入化太岁准备季：
 ${TAISUI_HUAJIE.join('\n')}`;
   }
@@ -788,7 +811,7 @@ ${TAISUI_HUAJIE[1]}`;
   }
   if (isLichun) {
     return `━━━ ⭐ 太岁交接日 ━━━
-🧧 立春太岁正式交接，${effGz}年${who}：${plains}
+🧧 立春太岁正式交接，${effGz}年${who}：${plains}${ycLine}
 ${dayWord}宜：静心守和、穿红上身、不与人争；化解全案：
 ${TAISUI_HUAJIE.join('\n')}`;
   }
