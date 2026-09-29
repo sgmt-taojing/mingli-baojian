@@ -178,6 +178,24 @@ async function doPaipan(){
   renderFlow(data.flow, targetYear);
   if(data.interpretation) renderInterpretation(data.interpretation);
   if(data.canon) renderCanonCard(data.canon);   // R-CANON-EXT：风水经典依据层
+  if(data.jushiCanon) renderFsJushiCanon(data.jushiCanon);   // R-FS-CANON-UI：局势判语引证（宅经/葬书/青囊序）
+}
+// R-FS-CANON-UI：局势判语引证卡（青玉边，置于经典依据卡后）
+function renderFsJushiCanon(lines){
+  if(!lines || !lines.length) return;
+  const escJ=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+  const old=document.getElementById('paipan-jushicanon'); if(old) old.remove();
+  const d=document.createElement('div');
+  d.id='paipan-jushicanon';
+  d.style.cssText='margin:0 0 16px;padding:16px;background:rgba(255,255,255,.02);border:1px solid rgba(78,201,176,.2);border-left:3px solid var(--jade,#4ec9b0);border-radius:12px';
+  let h='<div style="font-size:15px;font-weight:600;color:var(--jade,#4ec9b0);margin-bottom:8px">🏔️ 原典引证 · 局势判语</div>';
+  for(const ln of lines){
+    const isTail=/^原文照录/.test(ln);
+    h+='<div style="margin-top:6px;font-size:'+(isTail?'11px;opacity:.5':'12.5px;line-height:2;color:'+(  /此盘/.test(ln)?'var(--gold,#c9a84c)':'var(--jade,#4ec9b0)'))+'">'+escJ(ln)+'</div>';
+  }
+  d.innerHTML=h;
+  const ref=document.getElementById('paipan-canon')||document.getElementById('paipan-interpretation');
+  (ref&&ref.parentNode?ref.parentNode:(document.querySelector('.fs-grid')||document.body)).appendChild(d);
 }
 function renderChart(c){
   document.getElementById('fs-meta').innerHTML=`${c.year}年 · ${c.yunName} · 坐${c.sittingMountain}向${c.facingMountain}<br>`+
