@@ -1727,3 +1727,12 @@
 - report-interpret.html 新增「📜 调候与格局·原典引证」卡（青玉边，列 canon 卡后）
 - 实测：1979-09-15 10时男 → 乙木酉月 调候「乙酉」+ 七杀格·論偏官章，原文照录渲染通过；自检 7/7 ✓
 - 至此引证覆盖：六爻（卦爻辞+易林繇辞+京氏 canon）/六壬（课体）/奇门（格局）/梅花（体用）/八字报告（canon+调候+格局）——余紫微引证层排期
+
+## 2026-09-30 R-ZW-CANON 紫微排盘引证层 + pro-gate 漏引修真
+
+- scripts/build-zw-zhuxing.py：紫微全书卷一諸星問答論解析 34 星条（14 主星+20 辅星），server/data/zw-zhuxing.json 落盘，锚断言 14 主星齐全
+- api-server-v2.js 新增 _ziweiRefOf（命宫主星→问答论原文），紫微 POST/GET 双端点挂 ziweiReference
+- ziwei-chart.html 新增 renderZiweiCanon 卡（青玉边，插古今同参卡前）
+- 修真：ziwei-chart.html 用 proFetch 拉 SVG 但漏引 js/pro-gate.js，排盘流程静默中断（全用户级 bug）——补引用后恢复
+- 实测：1979-09-15 10时男 → 命宫丁卯·火六局·天相，引《問天相星所主若何？》原文；古今同参同局命中傅毅之命 14 例；自检 7/7 ✓
+- 引证层全满贯：八字/紫微/六爻/六壬/奇门/梅花 六盘齐备

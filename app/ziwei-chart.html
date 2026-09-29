@@ -261,7 +261,29 @@ async function doPaipan(){
   renderSvg(svg);
   renderFlow(data.flow, targetYear, currentAge);
   renderGujin(data.chart);
+  if(data.ziweiReference) renderZiweiCanon(data.ziweiReference);   // R-ZW-CANON：主星諸星問答論引证
   if(data.interpretation) renderInterpretation(data.interpretation);
+}
+
+// R-ZW-CANON：命宫主星 → 紫微全书卷一諸星問答論原典引证卡
+function renderZiweiCanon(ref){
+  const old = document.getElementById('zw-canon-host');
+  if(old) old.remove();
+  if(!ref || !ref.stars || !ref.stars.length) return;
+  const host = document.createElement('div');
+  host.id = 'zw-canon-host';
+  host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid rgba(125,211,192,.25);border-left:3px solid #7dd3c0;border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+  let items = '';
+  ref.stars.forEach(function(it){
+    items += '<div style="margin-top:8px"><div style="font-size:12px;color:#7dd3c0">《紫微斗数全书》<span style="opacity:.55;font-size:11px">　'+esc(it.title||'')+'</span></div>'+
+      '<div style="font-size:12px;line-height:1.9;opacity:.85">'+esc(it.quote||'')+'</div></div>';
+  });
+  host.innerHTML = '<div style="color:#7dd3c0;font-weight:600;margin-bottom:6px">📜 命宫主星 · 諸星問答論引证（命宫 '+esc(ref.mingGong||'')+' · '+esc(ref.wuxingJu||'')+'）</div>'+
+    items+
+    '<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录'+esc(ref.source||'紫微斗数全书·卷一')+'，未作改写。</div>';
+  const gujin = document.getElementById('zw-gujin-host');
+  if(gujin && gujin.parentNode) gujin.parentNode.insertBefore(host, gujin);
+  else { const main = document.querySelector('main') || document.body; main.appendChild(host); }
 }
 
 // ═══ 古今同参：康节本卷四古命例按五行局+命宫主星匹配（2026-09-28） ═══
@@ -550,6 +572,7 @@ function renderInterpretation(i){
 </div>
 <script src="js/paipan-navigator.js" defer></script>
 <script src="js/paipan-baihua-panel.js" defer></script>
+<script src="js/pro-gate.js" defer></script><!-- R-FIX-ZWPRO：页面 249 行用 proFetch 拉 SVG 但漏引此文件，致排盘流程静默中断 -->
   <script src="js/error-interceptor.js" defer></script>
 </body>
 </html>
