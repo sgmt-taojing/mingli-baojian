@@ -412,6 +412,21 @@ function renderYilinCard(y){
   el.innerHTML=h;
   el.style.display='block';
   const btn=document.getElementById('yilin-baihua-btn');
+  // R-JY-PEEK（2026-09-29）：预热缓存命中即自动展开，信众零点击读到译文；未命中保留手动按钮
+  (function(){
+    const body0=document.getElementById('yilin-baihua-body');
+    const tip0=document.getElementById('yilin-baihua-tip');
+    fetch(API_BASE+'/api/paipan/liuyao/yilin-baihua?peek=1&ben='+encodeURIComponent(y.benGua)+'&bian='+encodeURIComponent(y.bianGua),{headers:{'X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000)})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(d&&d.ok&&d.cached&&d.baihua){
+          body0.textContent=d.baihua; body0.style.display='block';
+          tip0.textContent='AI 串讲·仅供参考（已预热）';
+          if(btn) btn.style.display='none';
+        }
+      })
+      .catch(function(){ /* 探针失败静默，不影响手动按钮 */ });
+  })();
   if(btn) btn.onclick=function(){
     const body=document.getElementById('yilin-baihua-body');
     const tip=document.getElementById('yilin-baihua-tip');
