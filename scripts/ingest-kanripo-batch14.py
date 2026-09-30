@@ -15,9 +15,11 @@
 import sqlite3, json, hashlib, re, time, sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from lib.kb_ingest import KBIngestor  # R-INGEST-SPEC-20260927：禁止手写 INSERT，统一走新口径
+
 DB = Path(__file__).resolve().parent.parent / 'server' / 'database' / 'yidao.db'
 SRC = Path('/tmp/kr-books')
-NOW = time.strftime('%Y-%m-%d %H:%M:%S')
 
 # slug: (KRID, 简体书名, module)
 BOOKS = {
@@ -63,14 +65,12 @@ def juan_name(fname, raw):
         return m.group(1)
     return Path(fname).stem.split('_')[-1]
 
-def fp(s):
-    return 'KR|' + hashlib.sha1(s.encode('utf-8')).hexdigest()[:16]
-
 def run_book(slug, conn):
     krid, cname, module = BOOKS[slug]
     d = SRC / krid
     files = sorted(d.glob('*.txt'))
     ins = skip = 0
+    ing = KBIngestor(conn)
     for f in files:
         raw = f.read_text(encoding='utf-8')
         body = clean(raw)
@@ -90,20 +90,18 @@ def run_book(slug, conn):
         for i, c in enumerate(chunks, 1):
             t2 = kb_title + (f'·{i}' if len(chunks) > 1 else '')
             eid = 'KB-KR-' + hashlib.md5(t2.encode()).hexdigest()[:10]
-            if conn.execute('SELECT 1 FROM kb_formal WHERE entry_id=? OR title=?', (eid, t2)).fetchone():
-                skip += 1
-                continue
             full = f'【{cname}·{sub}】（公有领域原典·四庫全書文淵閣版·Kanripo）\n\n' + c
-            conn.execute("""INSERT INTO kb_formal
-                (entry_id, module, title, content, src_id, category, keywords, summary,
-                 trust_score, version, promoted_at, promoted_from, status, fingerprint, domain, tags)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (eid, module, t2, full, f'kanripo:{krid}', f'kanripo-{slug}',
-                 json.dumps([cname, sub[:12]], ensure_ascii=False),
-                 c[:80], 0.95, '1.0', NOW, f'kimi-t1-batch14-{slug}', 'formal', fp(full), 'mingli',
-                 json.dumps(['原典', cname, '四库全书', 'Kanripo'], ensure_ascii=False)))
-            ins += 1
-        conn.commit()
+            ok, _why = ing.insert(
+                entry_id=eid, module=module, title=t2, content=full,
+                src_id=f'kanripo:{krid}', category=f'kanripo-{slug}',
+                keywords=f'{cname},{sub[:12]}', summary=c[:80], trust=0.95,
+                source=f'kimi-t1-batch14-{slug}', domain='mingli',
+                tags=['原典', cname, '四库全书', 'Kanripo'], dedup_title=True)
+            if ok:
+                ins += 1
+            else:
+                skip += 1
+        ing.commit()
     print(f'[{cname}] 卷 {len(files)} → 入库 {ins} / 跳过 {skip}')
 
 def main():

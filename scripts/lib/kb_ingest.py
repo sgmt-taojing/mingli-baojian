@@ -61,8 +61,9 @@ class KBIngestor:
                category: str = None, keywords: str = '', summary: str = '',
                src_id: str = None, tags=None, domain: str = 'mingli',
                trust: float = 0.95, source: str = 'manual',
-               access_level: str = 'public'):
-        """新口径单条入库。返回 (True, 'inserted') 或 (False, 'duplicate'/'bad-domain')。"""
+               access_level: str = 'public', dedup_title: bool = False):
+        """新口径单条入库。返回 (True, 'inserted') 或 (False, 'duplicate'/'bad-domain')。
+        dedup_title=True 时同名条目也算命中（Kanripo 分段标题复跑场景）。"""
         if domain not in ALLOWED_DOMAINS:
             return False, f'bad-domain:{domain}'
         fp = fingerprint_of(content)
@@ -71,6 +72,9 @@ class KBIngestor:
         hit = cur.execute(
             "SELECT 1 FROM kb_formal WHERE entry_id=? OR fingerprint=? LIMIT 1",
             (entry_id, fp)).fetchone()
+        if not hit and dedup_title:
+            hit = cur.execute(
+                "SELECT 1 FROM kb_formal WHERE title=? LIMIT 1", (title,)).fetchone()
         if hit:
             self.duplicates += 1
             return False, 'duplicate'

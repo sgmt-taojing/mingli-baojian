@@ -1853,3 +1853,12 @@
 - ③ 测排机制：getTargetDate 支持 DAILY_PUSH_DATE=YYYY-MM-DD 覆盖（晨暮推皆可按任意日期干跑验证专项触发，不动生产调度）
 - 测排验证四连：寒露正日（10-08）节气专题 ✓｜重阳正日（10-18）备办全案+茱萸注音 ✓｜孔子诞辰对 LiuTao 回落通用仪轨 ✓｜冬至前 9 天（12-13）化太岁倒计时精准点名「您（属羊·值太岁本命年）」✓
 - 下一实战节点：10-08 寒露晨推自动出专题；12-22 冬至化太岁准备季开启链已就绪
+
+## 2026-09-30 R-INGEST-UNIFY 典籍入库脚本统一新口径 + lint 闸门
+
+- 背景：R-INGEST-SPEC-20260927 定版后，老抓取脚本仍手写 INSERT（旧指纹口径 KR|sha1、缺 access_level/created_at），误用即污染 KB
+- 改造四个典籍入库脚本走 lib/kb_ingest.KBIngestor：ingest-kanripo-batch14/15/16 + ingest-wikisource-batch13——保留各自 eid 前缀/标题幂等/分段超帽逻辑，指纹切换 SHA256[:16]、status=formal、domain=mingli、时间戳 localtime、批量 commit 防长事务；keywords 从 JSON 数组改为逗号串（贴合规范样例）
+- KBIngestor 增强：insert 增 dedup_title 参数（Kanripo 分段标题复跑场景，等价旧脚本 entry_id OR title 双查）
+- 新增 scripts/kb-ingest-lint.py 闸门：扫描 scripts/ 手写 INSERT INTO kb_formal（正则精确匹配表名，FTS 重建不误伤），52 个历史一次性脚本登记封存白名单，白名单外新增即 exit 1；已挂 agent-selfcheck 每日节奏
+- 沙盒实测：entry_id/指纹/标题三路幂等 ✓、bad-domain 拦截 ✓、formal+mingli+指纹字段 ✓；lint 首跑曾逮到 2 个 FTS 误报（正则修复）——闸门自己先过了遍实战
+- 自检 8/8 全绿

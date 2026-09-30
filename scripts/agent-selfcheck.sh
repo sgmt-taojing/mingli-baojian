@@ -21,5 +21,8 @@ N=$(sqlite3 data/mingli.db "SELECT COUNT(*) FROM master_cases;" 2>/dev/null | tr
 # G17-1：十节点端到端冒烟纳入每日自检（首部命理采集节点 + R756/R757/SLA 守卫）
 /usr/bin/python3 scripts/g5-smoke-e2e.py >/dev/null 2>&1
 check $? "十节点端到端冒烟（G5+G15）"
+# R-INGEST-LINT：kb_formal 手写 INSERT 闸门（新口径 R-INGEST-SPEC-20260927 守护）
+/usr/bin/python3 scripts/kb-ingest-lint.py >/dev/null 2>&1
+check $? "KB 入库口径 lint（禁手写 INSERT）"
 echo "═ 结果: ✓ $OK · ✗ $FAIL ═"
 [ "$FAIL" = "0" ]

@@ -20,6 +20,9 @@
 import sqlite3, json, hashlib, re, time, sys, urllib.request, urllib.parse
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).parent))
+from lib.kb_ingest import KBIngestor  # R-INGEST-SPEC-20260927：禁止手写 INSERT，统一走新口径
+
 DB = Path(__file__).resolve().parent.parent / 'server' / 'database' / 'yidao.db'
 NOW = time.strftime('%Y-%m-%d %H:%M:%S')
 API = 'https://zh.wikisource.org/w/api.php'
@@ -80,8 +83,6 @@ def page_text(title):
         return ''
     return d['parse'].get('wikitext', {}).get('*', '')
 
-def fp(s): return 'WS|' + hashlib.sha1(s.encode('utf-8')).hexdigest()[:16]
-
 def run_book(slug, conn):
     title, module, cname = BOOKS[slug]
     subs = subpages(title)
@@ -91,6 +92,7 @@ def run_book(slug, conn):
     pages = [title] + [s for s in subs if s != title]
     print(f'[{cname}] 页面 {len(pages)}')
     ins = skip = 0
+    ing = KBIngestor(conn)
     for p in pages:
         time.sleep(2)
         wt = page_text(p)
@@ -116,20 +118,18 @@ def run_book(slug, conn):
         for i, c in enumerate(chunks, 1):
             t2 = kb_title + (f'·{i}' if len(chunks) > 1 else '')
             eid2 = 'KB-WS-' + hashlib.md5(t2.encode()).hexdigest()[:10]
-            if conn.execute('SELECT 1 FROM kb_formal WHERE entry_id=? OR title=?', (eid2, t2)).fetchone():
-                skip += 1
-                continue
             full = f'【{cname}·{sub}】（公有领域原典·维基文库）\n\n' + c
-            conn.execute("""INSERT INTO kb_formal
-                (entry_id, module, title, content, src_id, category, keywords, summary,
-                 trust_score, version, promoted_at, promoted_from, status, fingerprint, domain, tags)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (eid2, module, t2, full, f'wikisource:{title}', f'wikisource-{slug}',
-                 json.dumps([cname, sub[:12]], ensure_ascii=False),
-                 c[:80], 0.95, '1.0', NOW, f'kimi-t1-batch13-{slug}', 'formal', fp(full), 'mingli',
-                 json.dumps(['原典', cname, '维基文库'], ensure_ascii=False)))
-            ins += 1
-        conn.commit()
+            ok, _why = ing.insert(
+                entry_id=eid2, module=module, title=t2, content=full,
+                src_id=f'wikisource:{title}', category=f'wikisource-{slug}',
+                keywords=f'{cname},{sub[:12]}', summary=c[:80], trust=0.95,
+                source=f'kimi-t1-batch13-{slug}', domain='mingli',
+                tags=['原典', cname, '维基文库'], dedup_title=True)
+            if ok:
+                ins += 1
+            else:
+                skip += 1
+        ing.commit()
     print(f'[{cname}] 入库 {ins} / 跳过 {skip}')
 
 def main():
