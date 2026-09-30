@@ -1837,3 +1837,10 @@
 - 三处修真：①/api/paipan/:module/report 端点 params 白名单漏 coins/dayGanZhi → 补透传；②unified-report-engine generateReport 排盘请求只发 year/month/day/hour/lunar → coins 六爻全量+dayGanZhi 随请求下发；③liuyao-chart.html generateFullReport 注入 coins（手动模式下未录齐则 toast 拦截）
 - 实测三连：API 级全老阳 coins → 乾为天→坤为地 ✓（卦爻辞/易林引证同步跟盘）；浏览器端到端：手录六爻全老阳+问事「事业」→ 报告页「乾为天（乾宫本宫卦）…6个动爻…变卦坤为地」 ✓；守卫：缺问事 query 时正确报「请补充关键信息」✓
 - 教训复用：浏览器实测首测出「火地晋」系标签页缓存旧版 HTML，重载后通过——前端改动实证必须带新 cb 参数重载
+
+## 2026-09-30 R-PUSH-FIX 微信推送通道全面检修：参数错位修真 + 冗余任务清理
+
+- 诊断三连：①晨/暮推 plist 的 ProgramArguments 错位——第 2 参数误插入 push-run.sh 路径，导致 push-run-personalized.sh 把脚本路径当 MODE 传给 daily_push.js，信众个性化生成连用且退出码 1（9-28 起日志可见）；②9-29/9-30 两日广播零入队零外发（守护日志佐证）；③kimiwork-push-guard-morning/evening 两个旧守卫任务仍在 07:17 跑 full 模式写中间文件但不外发——纯噪声
+- 修真：①两个 plist 删除错位参数（现仅 push-run-personalized.sh + public + 标题[+--tomorrow]），bootout/bootstrap 重载生效；②两个 push-guard 任务 bootout + plist 改名 .disabled-20260930（可恢复式禁用，不删文件）
+- 实测：手动全链路跑 push-run-personalized.sh public——LiuTao 画像生成 rc=0（偏财日/三件事/短板/化解/穿衣方位全出），2 段入队，daemon 13:07:49 推送成功 → single LiuTao ✓ 企业微信 webhook 通道活性确认
+- 明早 06:00 晨推为修复后首个自动验证点；暮推 18:00 同链路
