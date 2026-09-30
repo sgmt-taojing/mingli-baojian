@@ -1924,3 +1924,9 @@
 - shuffle 双连跑：bare 54.1% → shuffle 58.6%（A 锚定 38.6%→22.2% 瓦解）→ shuffle+assist 70.7%
 - 结论：A 锚定实锤 +4.5pp；assist 干支代算 +12.1pp；剩余 29.3% 即 ATTR4 真推理缺口（assist2 靶场）
 - shuffle plist 已自卸载归档
+
+## 2026-10-01 · R-BQA-ATTR5 十神层断裂 + 题库性别回填（R-BQA-GENDER）
+- 题库 bug：build-baziqa-new100 硬编码 gender=unknown → eval 兜底「女」→ 男性大运全反；已从 Wikidata P21 回填 58/58（备份 .bak-gender-20261001）
+- assist2（引擎全量注入）dev36 实测 2/36：性别修正后仍低迷——真根因=十神定位层断裂（壬水正印被判七杀），引擎给了正确原料但模型不会做十神生克
+- 断点栈定稿：干支换算✓assist → 推理路径✓noleak → 十神定位（assist3 靶点：引擎注入十神对照）→ 应期 doctrine（蒸馏缺口）
+- 注：dev36 为最难子集，assist2/3 净效果以全量 181 题为准
