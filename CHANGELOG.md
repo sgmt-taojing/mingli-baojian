@@ -1907,3 +1907,8 @@
 - 结论修正：ATTR2 的「完全偏离=真逻辑错」下修——约六成是题库人名未脱敏诱发的史实硬答；真推理层缺口集中在十神应期链（B）6~15 题
 - 行动：题库人名脱敏入 G26 题库治理；蒸馏补「大运→流年→十神应期」三段链样本；prompt 加禁史实声明
 - 证据：training/baziqa-results/v92-attr3-dev36-raw.jsonl + scripts/analyze-attr3-raw.py；报告 §六附录已更新
+
+## 2026-09-30 · R-BQA-NOLEAK 禁史实声明验证：推理路径归零化改造成功
+- eval-baziqa.py 加 --noleak（禁史实知识声明，逼回排盘推理路径）；dev36 复跑对比：正确率 7→6（抖动区间内），E 类 25→1，B 类 5→28
+- 结论：声明不提分但净化测量口径——题库泄漏噪声被封堵，真推理缺口定格在十神应期链（28 道错题=蒸馏精确靶点）
+- 证据：training/baziqa-results/v92-attr3b-noleak-dev36-raw.jsonl；报告 §六附录已更新

@@ -64,7 +64,7 @@ def ask(api, prompt, max_tokens=512):  # v2.2: 200→512（v9.2 起输出带完�
         return f'[ERR] {e}'
 
 
-def build_prompt(person, q, disp_options=None, assist=False):
+def build_prompt(person, q, disp_options=None, assist=False, noleak=False):
     prof = person.get('profile', {})
     birth = prof.get('birth', {})
     birth_str = f"{birth.get('year','?')}年{birth.get('month','?')}月{birth.get('day','?')}日 12时"
@@ -72,6 +72,11 @@ def build_prompt(person, q, disp_options=None, assist=False):
     place = birth.get('place', '')
     prompt = (f"以下是一位命主的出生信息：\n出生：{birth_str}\n性别：{gender}\n"
               f"出生地：{place}\n")
+    # R-BQA-NOLEAK（2026-09-30）：ATTR3 实证 58% 完全偏离错题是模型把题当史实问答硬答
+    # （题库人名/事件文本未脱敏的结构泄漏），声明禁史实知识把模型逼回排盘推理路径
+    if noleak:
+        prompt += ("重要：请严格仅凭命理推理作答（排盘→大运→流年→十神应期），"
+                   "不得使用你对该人物生平、事件时间的任何既有知识；即使认出此人，也当作陌生人命盘推演。\n")
     # R-BQA-ASSIST（2026-09-30）：生产仿真——排盘引擎永远先给干支，纯算术不该占用推理层
     # 干支换算题 bare-LLM 错误率 76%（心算缺陷），辅助口径隔离出真正的推理能力
     if assist:
@@ -140,6 +145,7 @@ def main():
     ap.add_argument('--data', default=DATA, help='题库 json 路径（默认 celebrity50_zh.json）')
     ap.add_argument('--shuffle', action='store_true', help='选项乱序去偏（R-BQA-DEBIAS，乱序种子=qid 可复现）')
     ap.add_argument('--assist', action='store_true', help='附出生年干支提示（R-BQA-ASSIST 生产仿真，隔离推理层）')
+    ap.add_argument('--noleak', action='store_true', help='禁史实知识声明（R-BQA-NOLEAK，逼回排盘推理路径）')
     ap.add_argument('--qids', default=None, help='只跑指定题号（逗号分隔或 @文件路径，R-BQA-ATTR3 错题定向复跑）')
     ap.add_argument('--save-raw', default=None, help='逐题推理原文落 JSONL（qid/prompt/response/extracted/answer）')
     args = ap.parse_args()
@@ -166,7 +172,7 @@ def main():
     total = correct = 0
     per_person = []
     model_dist, ans_dist, wrong_model_dist = Counter(), Counter(), Counter()
-    log_lines = [f'BaziQA 评估 · {tag} · {datetime.now().isoformat()} · API={args.api}' + (' · shuffle=on' if args.shuffle else '') + (' · assist=on' if args.assist else '')]
+    log_lines = [f'BaziQA 评估 · {tag} · {datetime.now().isoformat()} · API={args.api}' + (' · shuffle=on' if args.shuffle else '') + (' · assist=on' if args.assist else '') + (' · noleak=on' if args.noleak else '')]
     for p in people:
         qs = p.get('questions', [])[:10]
         if qid_filter is not None:
@@ -176,7 +182,7 @@ def main():
         p_ok = 0
         for q in qs:
             disp_opts, disp_ans, m2o = shuffle_options(q, args.shuffle)
-            prompt = build_prompt(p, q, disp_opts, assist=args.assist)
+            prompt = build_prompt(p, q, disp_opts, assist=args.assist, noleak=args.noleak)
             ans = ask(args.api, prompt)
             letter_raw = extract_answer(ans)
             letter = m2o.get(letter_raw, letter_raw) if args.shuffle else letter_raw  # 映射回原选项口径
