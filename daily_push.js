@@ -81,6 +81,9 @@ function runPython(script, env) {
 
 /** R119 修真补丁（2026-08-17）：计算 --tomorrow 目标日期 YYYY-MM-DD，供 bridge 与 full 共用 */
 function getTargetDate(isTomorrow) {
+  // R-PUSH-P6：DAILY_PUSH_DATE=YYYY-MM-DD 测排覆盖（专项推送可按任意日期干跑验证）
+  const ov = process.env.DAILY_PUSH_DATE;
+  if (ov && /^\d{4}-\d{2}-\d{2}$/.test(ov)) return ov;
   if (!isTomorrow) return null;
   const t = new Date();
   t.setDate(t.getDate() + 1);
@@ -614,12 +617,12 @@ function shuowangLine(d) {
   地藏王菩萨: { themes: ['家庭', '祭祖'], prep: '孝亲超度：为先祖诵经点灯，慎终追远' },
 };
 
-/** 暮推近期备办板块的神诞行升级：主题命中→专属备办+「与您有关」标 */
+/** 暮推近期备办板块的神诞行升级：主题命中→专属备办+「与您有关」标；不命中→通用仪轨（R-PUSH-P6 收严：未命中不再展示他主题的具体备办） */
 function deityPrepLine(u, prof) {
   const meta = DEITY_THEME_PREP[u.name];
   if (!meta) return '可备鲜花素果，诚心敬拜';
   const hit = (prof.themes || []).some(t => meta.themes.includes(t));
-  return (hit ? '【与您有关】' : '') + meta.prep;
+  return hit ? ('【与您有关】' + meta.prep) : '可备鲜花素果，诚心敬拜';
 }
 
 // ═══ R-PUSH-P5（2026-09-28）信众关怀全量补齐：生日/破日/三伏数九/考试季/观音借库 ═══
@@ -835,6 +838,14 @@ function jieqiSpecial(d) {
 🎯 今日应时：${annotatePinyin(sp.act)}`;
 }
 
+/** R-PUSH-P6：节日正日专题板块（节日当天晨推出备办全案，不再一行带过） */
+function festivalSpecial(d) {
+  const h = d.holiday;
+  if (!h || !FESTIVAL_PREP[h]) return '';
+  return `━━━ 🎉 ${h} · 今日正日 ━━━
+🎯 今日备办：${annotatePinyin(FESTIVAL_PREP[h].prep)}${d.festival_lore ? '\n📜 ' + d.festival_lore : ''}`;
+}
+
 /** 近期备办（暮推挂载）：未来 10 天节气/节日/神诞前瞻，带提前量提示 */
 function upcomingBlock(d) {
   const prof = ACTIVE_PROFILE || DEFAULT_PROFILE;
@@ -893,6 +904,8 @@ function buildPublic(d, isTomorrow) {
   // R-PUSH-P3 专题板块（条件触发：化太岁关键日 / 节气当天）
   const taisuiSp = taisuiSpecial(d, prof);
   const jieqiSp = jieqiSpecial(d);
+  // R-PUSH-P6：节日正日专题（寒衣节/重阳/中秋等逢节出备办全案）
+  const festivalSp = festivalSpecial(d);
   // R-PUSH-P4 信众关切专项（条件触发：九星躲星 / 逢九 / 天赦日）
   const duoxingSp = duoxingSpecial(d, prof);
   const fengjiuNt = fengjiuNote(d, prof);
@@ -913,7 +926,7 @@ function buildPublic(d, isTomorrow) {
 ${dayGanLine(d, prof)}
 ${chongLine(d)}
 ${buildYunqiLine(d.year, parseInt((prof.birth || '').slice(0, 4), 10))}
-${taisuiSp ? '\n' + taisuiSp + '\n' : ''}${jieqiSp ? '\n' + jieqiSp + '\n' : ''}${duoxingSp ? '\n' + duoxingSp + '\n' : ''}${fengjiuNt ? '\n' + fengjiuNt + '\n' : ''}${tiansheSp ? '\n' + tiansheSp + '\n' : ''}${birthdaySp ? '\n' + birthdaySp + '\n' : ''}${examNt ? '\n' + examNt + '\n' : ''}
+${taisuiSp ? '\n' + taisuiSp + '\n' : ''}${jieqiSp ? '\n' + jieqiSp + '\n' : ''}${festivalSp ? '\n' + festivalSp + '\n' : ''}${duoxingSp ? '\n' + duoxingSp + '\n' : ''}${fengjiuNt ? '\n' + fengjiuNt + '\n' : ''}${tiansheSp ? '\n' + tiansheSp + '\n' : ''}${birthdaySp ? '\n' + birthdaySp + '\n' : ''}${examNt ? '\n' + examNt + '\n' : ''}
 ━━━ ③ 今日最有利三件事 ━━━
 ${buildThreeWins(d, prof)}
 
@@ -931,7 +944,7 @@ ${huijiLine(d) ? huijiLine(d) + '\n' : ''}${poyueLine(d) ? poyueLine(d) + '\n' :
 `;
 
   if (d.jieqi_info && !d.is_jieqi_today) msg += `\n🌿 ${d.jieqi}｜${d.jieqi_info}\n`;
-  if (d.holiday) msg += `\n🎉 ${d.holiday}${d.festival_lore ? '\n📜 ' + d.festival_lore : ''}${d.festival_guide ? '\n🎯 ' + d.festival_guide : ''}\n`;
+  if (d.holiday && !festivalSp) msg += `\n🎉 ${d.holiday}${d.festival_lore ? '\n📜 ' + d.festival_lore : ''}${d.festival_guide ? '\n🎯 ' + d.festival_guide : ''}\n`;
   if (d.deities && d.deities.length) {
     msg += `\n🙏 ${d.deities.map(de => de.name + '诞辰').join('·')}\n`;
     (d.deity_guides || []).forEach(g => { msg += `   ${g}\n`; });
