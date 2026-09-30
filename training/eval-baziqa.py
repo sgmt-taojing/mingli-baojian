@@ -64,7 +64,31 @@ def ask(api, prompt, max_tokens=512):  # v2.2: 200→512（v9.2 起输出带完�
         return f'[ERR] {e}'
 
 
-def build_prompt(person, q, disp_options=None, assist=False, noleak=False, assist2=False):
+def ten_god(day_stem, other_stem):
+    """十神定位（R-BQA-ASSIST3）：五行生克+阴阳。引擎可算，模型不该心算。"""
+    EL = {'甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土',
+          '庚': '金', '辛': '金', '壬': '水', '癸': '水'}
+    YANG = set('甲丙戊庚壬')
+    de, oe = EL[day_stem], EL[other_stem]
+    same_yy = (day_stem in YANG) == (other_stem in YANG)
+    SHENG = {'木': '火', '火': '土', '土': '金', '金': '水', '水': '木'}
+    KE = {'木': '土', '土': '水', '水': '火', '火': '金', '金': '木'}
+    if de == oe:
+        return '比肩' if same_yy else '劫财'
+    if SHENG[de] == oe:   # 我生者
+        return '食神' if same_yy else '伤官'
+    if KE[de] == oe:      # 我克者
+        return '偏财' if same_yy else '正财'
+    if KE[oe] == de:      # 克我者
+        return '七杀' if same_yy else '正官'
+    return '偏印' if same_yy else '正印'  # 生我者
+
+
+BRANCH_QI = {'子': '癸', '丑': '己', '寅': '甲', '卯': '乙', '辰': '戊', '巳': '丙',
+             '午': '丁', '未': '己', '申': '庚', '酉': '辛', '戌': '戊', '亥': '壬'}
+
+
+def build_prompt(person, q, disp_options=None, assist=False, noleak=False, assist2=False, assist3=False):
     prof = person.get('profile', {})
     birth = prof.get('birth', {})
     birth_str = f"{birth.get('year','?')}年{birth.get('month','?')}月{birth.get('day','?')}日 12时"
@@ -89,7 +113,7 @@ def build_prompt(person, q, disp_options=None, assist=False, noleak=False, assis
     # R-BQA-ASSIST2（2026-10-01）：ATTR4 实证断点最密处=起运数(77%)/大运序列/流年干支，
     # 全是引擎一秒能给的算术。引擎全量注入：四柱+起运+大运表+候选年干支，
     # 推理层只做「事件→十神→应期匹配」这一真正需要命理智能的事
-    if assist2:
+    if assist2 or assist3:
         try:
             from lunar_python import Solar
             b = birth
@@ -97,18 +121,36 @@ def build_prompt(person, q, disp_options=None, assist=False, noleak=False, assis
             ec = solar.getLunar().getEightChar()
             male = 1 if prof.get('gender') == 'male' else 0
             yun = ec.getYun(male)
+            day_stem = ec.getDay()[0]
             blk = (f"排盘引擎参考（精确，可直接采信）：\n"
-                   f"四柱：{ec.getYear()} {ec.getMonth()} {ec.getDay()} {ec.getTime()}（日主 {ec.getDay()[0]}）\n"
+                   f"四柱：{ec.getYear()} {ec.getMonth()} {ec.getDay()} {ec.getTime()}（日主 {day_stem}）\n"
                    f"起运：出生后约 {yun.getStartYear()} 年 {yun.getStartMonth()} 个月起运\n大运：")
             dys = []
             for dy in yun.getDaYun(12)[1:]:
-                if dy.getGanZhi():
-                    dys.append(f"{dy.getStartYear()}年起({dy.getStartAge()}岁){dy.getGanZhi()}")
+                gz = dy.getGanZhi()
+                if gz:
+                    sg = f"（{gz[0]}={ten_god(day_stem, gz[0])}，{gz[1]}本气={ten_god(day_stem, BRANCH_QI[gz[1]])}）" if assist3 else ''
+                    dys.append(f"{dy.getStartYear()}年起({dy.getStartAge()}岁){gz}{sg}")
             blk += '；'.join(dys[:10]) + '\n候选年份干支：'
             years = sorted(set(int(m.group(1)) for o in (disp_options or q.get('options', []))
                                for m in [re.search(r'((?:19|20)\d{2})', o)] if m))
             STEMS = '甲乙丙丁戊己庚辛壬癸'; BRANCHES = '子丑寅卯辰巳午未申酉戌亥'
-            blk += '；'.join(f"{y}年={STEMS[(y-4)%10]}{BRANCHES[(y-4)%12]}" for y in years) + '\n'
+            yy = []
+            for y in years:
+                gs, gb = STEMS[(y - 4) % 10], BRANCHES[(y - 4) % 12]
+                sg = f"（{gs}={ten_god(day_stem, gs)}，{gb}={ten_god(day_stem, BRANCH_QI[gb])}）" if assist3 else ''
+                yy.append(f"{y}年={gs}{gb}{sg}")
+            blk += '；'.join(yy) + '\n'
+            # R-BQA-ASSIST3（2026-10-01）：ATTR5 实证十神定位层断裂（壬水正印被判七杀），
+            # 十神也是引擎可算的算术——连十神一起注入，只留应期 doctrine 给推理层
+            if assist3:
+                blk += (f"十神对照（对日主 {day_stem}）：四柱天干 "
+                        + '，'.join(f"{c}={ten_god(day_stem, c)}" for c in
+                                    [ec.getYear()[0], ec.getMonth()[0], ec.getTime()[0]])
+                        + '；地支本气 '
+                        + '，'.join(f"{br}={ten_god(day_stem, BRANCH_QI[br])}" for br in
+                                    [ec.getYear()[1], ec.getMonth()[1], ec.getDay()[1], ec.getTime()[1]])
+                        + '\n')
             prompt += blk
         except Exception:
             pass
@@ -173,6 +215,7 @@ def main():
     ap.add_argument('--assist', action='store_true', help='附出生年干支提示（R-BQA-ASSIST 生产仿真，隔离推理层）')
     ap.add_argument('--noleak', action='store_true', help='禁史实知识声明（R-BQA-NOLEAK，逼回排盘推理路径）')
     ap.add_argument('--assist2', action='store_true', help='引擎全量注入：四柱+起运+大运+候选年干支（R-BQA-ASSIST2）')
+    ap.add_argument('--assist3', action='store_true', help='assist2+十神对照注入（R-BQA-ASSIST3，ATTR5 断点对症）')
     ap.add_argument('--qids', default=None, help='只跑指定题号（逗号分隔或 @文件路径，R-BQA-ATTR3 错题定向复跑）')
     ap.add_argument('--save-raw', default=None, help='逐题推理原文落 JSONL（qid/prompt/response/extracted/answer）')
     args = ap.parse_args()
@@ -199,7 +242,7 @@ def main():
     total = correct = 0
     per_person = []
     model_dist, ans_dist, wrong_model_dist = Counter(), Counter(), Counter()
-    log_lines = [f'BaziQA 评估 · {tag} · {datetime.now().isoformat()} · API={args.api}' + (' · shuffle=on' if args.shuffle else '') + (' · assist=on' if args.assist else '') + (' · noleak=on' if args.noleak else '') + (' · assist2=on' if args.assist2 else '')]
+    log_lines = [f'BaziQA 评估 · {tag} · {datetime.now().isoformat()} · API={args.api}' + (' · shuffle=on' if args.shuffle else '') + (' · assist=on' if args.assist else '') + (' · noleak=on' if args.noleak else '') + (' · assist2=on' if args.assist2 else '') + (' · assist3=on' if args.assist3 else '')]
     for p in people:
         qs = p.get('questions', [])[:10]
         if qid_filter is not None:
@@ -209,7 +252,7 @@ def main():
         p_ok = 0
         for q in qs:
             disp_opts, disp_ans, m2o = shuffle_options(q, args.shuffle)
-            prompt = build_prompt(p, q, disp_opts, assist=args.assist, noleak=args.noleak, assist2=args.assist2)
+            prompt = build_prompt(p, q, disp_opts, assist=args.assist, noleak=args.noleak, assist2=args.assist2, assist3=args.assist3)
             ans = ask(args.api, prompt)
             letter_raw = extract_answer(ans)
             letter = m2o.get(letter_raw, letter_raw) if args.shuffle else letter_raw  # 映射回原选项口径
