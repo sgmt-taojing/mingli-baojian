@@ -1892,3 +1892,11 @@
 - R3 复扫：十干十二月覆盖缺口收敛为 0；kb-ingest-lint ✓；抽查八月己土条目内容含八月专论段
 - 结论：穷通宝鉴（栏江网）调候用神正文 120 干月全覆
 
+
+## 2026-09-30 · R-G26-KJZW 康节本紫微斗数全书正文入库（紫微密度翻倍第一波）
+- 盘点：kangjie-ziwei 402 页 OCR 净本质量过关（□>15% 乱码 0 页）；卷四命图 n197-254 已结构化（ziwei-mingtu 114 条），正文 342 页未入 KB
+- 入库 80 块（scripts/ingest-kangjie-ziwei-fulltext-20260930.py，段落边界切块 800-1600 字，页码锚点保留，赋名锚点入 keywords/标题）
+- 口径：trust 0.85（OCR 净本如实标注噪声提示）/ module=ziwei / src_id=kangjie-ziwei / 指纹幂等；lint ✓
+- 检索验证：ziwei 模块太微赋命中 1→28
+- 另两本质量门结论：ziwei-mingban 87% 页乱码超标、ziwei-nbshanren 50% 超标 → 不入库，列入重 OCR 挂账（需换引擎/参数）
+
