@@ -135,6 +135,17 @@ async function generateFullReport(mod){
     });
     if(inputs.lunar===undefined) inputs.lunar = (window.zwCalMode==='lunar') || (window.lrCalMode==='lunar');
     if(inputs.leapMonth===undefined) inputs.leapMonth = false;
+
+    // R-LY-COINS-RPT：铜钱手动起卦透传——报告盘与排盘页同盘，不再退化为时间起卦
+    if(mod==='liuyao' && typeof lyCoinsMode==='function' && lyCoinsMode()){
+      if(lyCoinSel.some(function(v){return v===null;})){
+        const fn0 = typeof showToast==='function'?showToast:alert;
+        fn0('铜钱起卦：请把六爻都点选完再出报告');
+        return;
+      }
+      inputs.coins = lyCoinSel.map(function(t){return LY_COIN_TYPES[t].coins;});
+      inputs.year=+inputs.year; inputs.month=+inputs.month; inputs.day=+inputs.day; // 铜钱卦以占课日干支定旬空
+    }
     
     const csrfRes = await fetch(API_BASE+'/api/csrf-token',{signal:AbortSignal.timeout(15000),headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json()).catch(()=>({csrfToken:''}));
     const csrf = csrfRes.csrfToken || csrfRes.token || '';
