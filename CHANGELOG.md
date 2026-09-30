@@ -1862,3 +1862,11 @@
 - 新增 scripts/kb-ingest-lint.py 闸门：扫描 scripts/ 手写 INSERT INTO kb_formal（正则精确匹配表名，FTS 重建不误伤），52 个历史一次性脚本登记封存白名单，白名单外新增即 exit 1；已挂 agent-selfcheck 每日节奏
 - 沙盒实测：entry_id/指纹/标题三路幂等 ✓、bad-domain 拦截 ✓、formal+mingli+指纹字段 ✓；lint 首跑曾逮到 2 个 FTS 误报（正则修复）——闸门自己先过了遍实战
 - 自检 8/8 全绿
+
+## 2026-09-30 R-BQA new100 基线解读 + 评测 Harness 双修真
+
+- **基线解读报告落盘** `DELIVERY/new100-baseline-report-20260930.md`：98/181=54.1% 定为锚点（5 选题随机基线 20%，2.7×）；三大发现——错题 38.6% 锚 A 选项（正确 A 仅 14.4%，位置偏差）、9 题空白未答（错题的 10.8%）、段间方差 45.2~65.6%（对比只看全量总分）；放行门槛 54.1%−2pp、有效提升 +3pp 且无单段退步 >5pp
+- **Harness 修真①（R-BQA-FMT）**：extract_answer 增第 6 级兜底（全文反向找最后孤立字母，救「先答后论述」）；prompt 末行强约束「最后一行只写：答案：X」
+- **Harness 修真②（R-BQA-DEBIAS）**：--shuffle 选项乱序去 A 锚定——种子=qid 可复现，展示字母↔原字母双向映射，统计仍归原口径
+- 验证：乱序映射/可复现性单测 ✓；活体冒烟 1 人（手塚治虫 1/3，日志映射正确）✓
+- 一次性复跑任务已挂：launchd `com.mingli-baojian.baziqa-shuffle` 今夜 02:37 全量 shuffle 复跑（~70 分钟），跑完自卸载；明早出 v92 vs v92-shuffle 对照报告，量化 A 锚定真实影响

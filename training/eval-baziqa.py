@@ -14,6 +14,7 @@ BaziQA 命理能力评估（命理宝鉴版）
 import argparse
 import json
 import os
+import random
 import re
 import sys
 import urllib.request
@@ -23,6 +24,29 @@ from datetime import datetime
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(BASE, 'baziqa', 'data', 'celebrity50_zh.json')
 RESULTS_DIR = os.path.join(BASE, 'baziqa-results')
+LETTERS = 'ABCDE'
+
+
+def shuffle_options(q, enable):
+    """R-BQA-DEBIAS（2026-09-30）：选项乱序去 A 锚定偏差。
+    返回 (展示选项, 正确答案展示字母, 展示字母→原字母映射)。乱序种子=qid，可复现。"""
+    opts = q.get('options', [])
+    if not enable or not opts:
+        return opts, q['answer'], {}
+    bodies = []
+    for o in opts:
+        m = re.match(r'^\s*([A-E])[.、．)]\s*(.*)$', o)
+        bodies.append(m.group(2) if m else o)
+    order = list(range(len(opts)))
+    random.Random('debias:' + str(q.get('question_id', ''))).shuffle(order)
+    orig_idx = LETTERS.index(q['answer']) if q['answer'] in LETTERS else -1
+    disp, m2o, new_ans = [], {}, ''
+    for di, oi in enumerate(order):
+        disp.append(f'{LETTERS[di]}. {bodies[oi]}')
+        m2o[LETTERS[di]] = LETTERS[oi]
+        if oi == orig_idx:
+            new_ans = LETTERS[di]
+    return disp, new_ans, m2o
 
 
 def ask(api, prompt, max_tokens=512):  # v2.2: 200→512（v9.2 起输出带完整选项辨析，200 会截断字母）
@@ -40,7 +64,7 @@ def ask(api, prompt, max_tokens=512):  # v2.2: 200→512（v9.2 起输出带完�
         return f'[ERR] {e}'
 
 
-def build_prompt(person, q):
+def build_prompt(person, q, disp_options=None):
     prof = person.get('profile', {})
     birth = prof.get('birth', {})
     birth_str = f"{birth.get('year','?')}年{birth.get('month','?')}月{birth.get('day','?')}日 12时"
@@ -48,9 +72,10 @@ def build_prompt(person, q):
     place = birth.get('place', '')
     prompt = (f"以下是一位命主的出生信息：\n出生：{birth_str}\n性别：{gender}\n"
               f"出生地：{place}\n\n题目：{q['question']}\n")
-    for opt in q.get('options', []):
+    for opt in (disp_options if disp_options is not None else q.get('options', [])):
         prompt += f"{opt}\n"
-    prompt += "\n请选择最符合的选项。"
+    # R-BQA-FMT（2026-09-30）：末行格式强约束，救空白未答
+    prompt += "\n请选择最符合的选项。最后一行只写：答案：X（X 为选项字母）。"
     return prompt
 
 
@@ -89,6 +114,10 @@ def extract_answer(text):
     m = re.search(r'(?<![A-Za-z0-9])([A-E])(?![A-Za-z0-9])', tail)
     if m:
         return m.group(1)
+    # 6) R-BQA-FMT 兜底：尾部反向找最后一个孤立字母（模型先答后论述的场景）
+    ms = re.findall(r'(?<![A-Za-z0-9])([A-E])(?![A-Za-z0-9])', t)
+    if ms:
+        return ms[-1]
     return ''
 
 
@@ -98,9 +127,11 @@ def main():
     ap.add_argument('--tag', default=None, help='版本标签（如 v9.2），用于结果文件名')
     ap.add_argument('--limit', type=int, default=0, help='限制人数（0=全量 50 人）')
     ap.add_argument('--offset', type=int, default=0, help='起始人序号（分段跑用，0 起）')
+    ap.add_argument('--data', default=DATA, help='题库 json 路径（默认 celebrity50_zh.json）')
+    ap.add_argument('--shuffle', action='store_true', help='选项乱序去偏（R-BQA-DEBIAS，乱序种子=qid 可复现）')
     args = ap.parse_args()
 
-    people = json.load(open(DATA))
+    people = json.load(open(args.data))
     if args.offset > 0:
         people = people[args.offset:]
     if args.limit > 0:
@@ -115,13 +146,15 @@ def main():
     total = correct = 0
     per_person = []
     model_dist, ans_dist, wrong_model_dist = Counter(), Counter(), Counter()
-    log_lines = [f'BaziQA 评估 · {tag} · {datetime.now().isoformat()} · API={args.api}']
+    log_lines = [f'BaziQA 评估 · {tag} · {datetime.now().isoformat()} · API={args.api}' + (' · shuffle=on' if args.shuffle else '')]
     for p in people:
         qs = p.get('questions', [])[:10]
         p_ok = 0
         for q in qs:
-            ans = ask(args.api, build_prompt(p, q))
-            letter = extract_answer(ans)
+            disp_opts, disp_ans, m2o = shuffle_options(q, args.shuffle)
+            ans = ask(args.api, build_prompt(p, q, disp_opts))
+            letter_raw = extract_answer(ans)
+            letter = m2o.get(letter_raw, letter_raw) if args.shuffle else letter_raw  # 映射回原选项口径
             ok = letter == q['answer']
             if ok:
                 p_ok += 1
