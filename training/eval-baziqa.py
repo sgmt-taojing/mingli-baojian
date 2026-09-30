@@ -140,7 +140,16 @@ def main():
     ap.add_argument('--data', default=DATA, help='题库 json 路径（默认 celebrity50_zh.json）')
     ap.add_argument('--shuffle', action='store_true', help='选项乱序去偏（R-BQA-DEBIAS，乱序种子=qid 可复现）')
     ap.add_argument('--assist', action='store_true', help='附出生年干支提示（R-BQA-ASSIST 生产仿真，隔离推理层）')
+    ap.add_argument('--qids', default=None, help='只跑指定题号（逗号分隔或 @文件路径，R-BQA-ATTR3 错题定向复跑）')
+    ap.add_argument('--save-raw', default=None, help='逐题推理原文落 JSONL（qid/prompt/response/extracted/answer）')
     args = ap.parse_args()
+
+    qid_filter = None
+    if args.qids:
+        src = open(args.qids[1:]).read() if args.qids.startswith('@') else args.qids
+        qid_filter = set(x.strip().strip('"') for x in re.split(r'[,\s]+', src) if x.strip())
+
+    raw_fp = open(args.save_raw, 'a', encoding='utf-8') if args.save_raw else None
 
     people = json.load(open(args.data))
     if args.offset > 0:
@@ -160,13 +169,25 @@ def main():
     log_lines = [f'BaziQA 评估 · {tag} · {datetime.now().isoformat()} · API={args.api}' + (' · shuffle=on' if args.shuffle else '') + (' · assist=on' if args.assist else '')]
     for p in people:
         qs = p.get('questions', [])[:10]
+        if qid_filter is not None:
+            qs = [q for q in qs if q.get('question_id') in qid_filter]
+            if not qs:
+                continue
         p_ok = 0
         for q in qs:
             disp_opts, disp_ans, m2o = shuffle_options(q, args.shuffle)
-            ans = ask(args.api, build_prompt(p, q, disp_opts, assist=args.assist))
+            prompt = build_prompt(p, q, disp_opts, assist=args.assist)
+            ans = ask(args.api, prompt)
             letter_raw = extract_answer(ans)
             letter = m2o.get(letter_raw, letter_raw) if args.shuffle else letter_raw  # 映射回原选项口径
             ok = letter == q['answer']
+            if raw_fp:
+                raw_fp.write(json.dumps({
+                    'qid': q['question_id'], 'person': p['name'], 'ok': ok,
+                    'extracted': letter, 'answer': q['answer'],
+                    'prompt': prompt, 'response': ans,
+                }, ensure_ascii=False) + '\n')
+                raw_fp.flush()
             if ok:
                 p_ok += 1
             total += 1
