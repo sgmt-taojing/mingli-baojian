@@ -32,6 +32,23 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 .ly-form input{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--paper);font-size:12px}
 .ly-form button{grid-column:1/-1;padding:10px;background:var(--gold);color:var(--bg);border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer}
 
+/* R-LY-COINS-UI 铜钱手动录入 */
+.ly-coins-toggle{max-width:500px;margin:0 auto 8px;text-align:center}
+.ly-coins-toggle button{padding:8px 20px;background:transparent;border:1px solid var(--gold);border-radius:18px;color:var(--gold);font-size:13px;cursor:pointer;letter-spacing:1px}
+.ly-coins{max-width:500px;margin:0 auto 16px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px}
+.ly-coins h4{color:var(--gold);font-size:13px;margin-bottom:4px;text-align:center}
+.ly-coins-hint{font-size:11px;color:var(--paper3);text-align:center;margin-bottom:10px;line-height:1.6}
+.ly-coin-row{display:grid;grid-template-columns:52px 1fr;gap:6px;align-items:center;margin-bottom:6px}
+.ly-coin-pos{color:var(--gold);font-size:12px;font-weight:600;text-align:right}
+.ly-coin-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.ly-coin-opt{padding:6px 2px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,.03);color:var(--paper2);font-size:11px;text-align:center;cursor:pointer;line-height:1.4}
+.ly-coin-opt:hover{border-color:var(--gold)}
+.ly-coin-opt.on{border-color:var(--gold);background:rgba(201,168,76,.15);color:var(--gold)}
+.ly-coin-opt .sym{font-size:13px;display:block;font-family:monospace}
+.ly-coin-opt.bian.on{border-color:var(--red);background:rgba(239,68,68,.12);color:var(--red)}
+.ly-coins-sum{text-align:center;font-size:12px;color:var(--jade);margin-top:8px;min-height:16px}
+@media(max-width:480px){.ly-coin-opt{font-size:10px;padding:5px 1px}}
+
 .ly-chart{max-width:600px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
 .ly-gua-name{text-align:center;font-size:16px;color:var(--gold);margin-bottom:12px;font-weight:600}
 .ly-gua-symbols{text-align:center;font-size:28px;margin-bottom:12px;letter-spacing:4px}
@@ -153,11 +170,68 @@ async function generateFullReport(mod){
 </script>
 </div>
 
+<div class="ly-coins-toggle no-print"><button type="button" id="ly-coins-btn" onclick="toggleLyCoins()">🪙 铜钱起卦 · 手动录入</button></div>
+<div id="ly-coins" class="ly-coins no-print" style="display:none">
+  <h4>🪙 铜钱起卦 · 六爻手动录入</h4>
+  <div class="ly-coins-hint">摇卦六次，按顺序从<b style="color:var(--gold)">初爻（第一次）</b>开始逐爻点选结果<br>字=正面　背=反面　◯/✕=动爻（变）</div>
+  <div id="ly-coin-rows"></div>
+  <div class="ly-coins-sum" id="ly-coins-sum">尚未录入</div>
+</div>
+
 <div id="ly-chart" class="ly-chart" style="display:none"></div>
 <div id="ly-info" class="ly-info" style="display:none"></div>
 
 <script>
 const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+// R-LY-COINS-UI：铜钱手动录入（契约：coins=6次抛掷数组，每次3枚 1=字/正面 0=背/反面，初爻在前）
+const LY_COIN_TYPES=[
+  {k:'shaoyang', label:'一字二背', sub:'少阳', sym:'⚊', coins:[1,0,0], bian:false},
+  {k:'shaoyin',  label:'二字一背', sub:'少阴', sym:'⚋', coins:[1,1,0], bian:false},
+  {k:'laoyang',  label:'三背',     sub:'老阳·变', sym:'⚊◯', coins:[0,0,0], bian:true},
+  {k:'laoyin',   label:'三字',     sub:'老阴·变', sym:'⚋✕', coins:[1,1,1], bian:true}
+];
+const LY_YAO_NAMES=['初爻','二爻','三爻','四爻','五爻','上爻'];
+let lyCoinSel=[null,null,null,null,null,null]; // 每爻选中的 LY_COIN_TYPES 下标
+function toggleLyCoins(){
+  const p=document.getElementById('ly-coins');
+  const show=p.style.display==='none';
+  p.style.display=show?'block':'none';
+  document.getElementById('ly-coins-btn').textContent=show?'🪙 收起铜钱录入（当前：铜钱起卦）':'🪙 铜钱起卦 · 手动录入';
+  if(show && !p._built){
+    p._built=true;
+    const rows=document.getElementById('ly-coin-rows');
+    let h='';
+    for(let i=0;i<6;i++){
+      h+='<div class="ly-coin-row"><div class="ly-coin-pos">'+LY_YAO_NAMES[i]+'</div><div class="ly-coin-opts">';
+      for(let t=0;t<4;t++){
+        const tp=LY_COIN_TYPES[t];
+        h+='<div class="ly-coin-opt'+(tp.bian?' bian':'')+'" data-yao="'+i+'" data-t="'+t+'" onclick="selLyCoin('+i+','+t+')"><span class="sym">'+tp.sym+'</span>'+tp.label+'<br>'+tp.sub+'</div>';
+      }
+      h+='</div></div>';
+    }
+    rows.innerHTML=h;
+    // 铜钱起卦以占课当日干支定旬空——自动填入今天（用户可再改）
+    const n=new Date();
+    document.getElementById('ly-year').value=n.getFullYear();
+    document.getElementById('ly-month').value=n.getMonth()+1;
+    document.getElementById('ly-day').value=n.getDate();
+  }
+  updLyCoinsSum();
+}
+function selLyCoin(yao,t){
+  lyCoinSel[yao]=t;
+  document.querySelectorAll('.ly-coin-opt[data-yao="'+yao+'"]').forEach(function(el){
+    el.classList.toggle('on', +el.dataset.t===t);
+  });
+  updLyCoinsSum();
+}
+function updLyCoinsSum(){
+  const el=document.getElementById('ly-coins-sum');
+  const n=lyCoinSel.filter(function(v){return v!==null;}).length;
+  if(n<6){el.textContent='已录入 '+n+'/6 爻';return;}
+  el.textContent='✓ 六爻齐全——点「排盘」以铜钱卦出盘';
+}
+function lyCoinsMode(){ const p=document.getElementById('ly-coins'); return p && p.style.display!=='none'; }
 async function doPaipan(){
   const y=document.getElementById('ly-year').value;
   const m=document.getElementById('ly-month').value;
@@ -178,6 +252,10 @@ async function doPaipan(){
   const body={year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge,lang:_lang };
   if(dg) body.dayGanZhi=dg;
   if(question) body.question=question;
+  if(lyCoinsMode()){
+    if(lyCoinSel.some(function(v){return v===null;})){showToast('铜钱起卦：请把六爻都点选完（已录 '+lyCoinSel.filter(function(v){return v!==null;}).length+'/6）');return;}
+    body.coins=lyCoinSel.map(function(t){return LY_COIN_TYPES[t].coins;});
+  }
   let r, rSvg;
   try {
     [r, rSvg] = await Promise.all([
@@ -192,6 +270,7 @@ async function doPaipan(){
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   const svg = await rSvg.text();
   renderChart(data.chart);
+  if(body.coins){const me=document.getElementById('ly-meta');me.innerHTML='<span style="color:var(--jade,#4ec9b0)">🪙 铜钱起卦（手动录入）</span><br>'+me.innerHTML;}
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
   if(window.PaipanBaihua) PaipanBaihua.notify('liuyao', body);
   renderSvg(svg);
