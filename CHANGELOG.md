@@ -1940,3 +1940,9 @@
 - ①事件→十神→宫位映射表 v1 入 KB（12 类事件：出道/就任/婚嫁男女/获奖/伤病/去世/得子/置业/破财/牢狱，典据三命通会·子平真诠·滴天髓，trust 0.85）
 - ②六段式 doctrine 样本 12 条（合成命主+lunar_python 引擎保真，排四柱→起运→大运→候选年十神→事件映射→应期判定），JSONL 落 training/distill-yingqi-doctrine-20261001.jsonl + 逐条入 KB（trust 0.80）
 - scripts/build-yingqi-doctrine-20261001.py，lint ✓；事件类型分布对齐 dev36 错题画像
+
+## 2026-10-01 · R-DISTILL-YINGQI-B2 应期样本第二批：难度梯度+特殊情形
+- 34 条（基础 11 / 进阶 11 / 高阶 10 / 岁运并临特殊 2），累计 46 条 doctrine 样本
+- 梯度设计：基础=流年直透 / 进阶=大运基调+流年共振 / 高阶=忌神伏因（印夺食需财制、伤官见官验通关、比劫夺财看财露白）
+- 特殊：岁运并临 2 条（三命通会灾福加倍法则的吉凶两型）
+- scripts/build-yingqi-doctrine-batch2-20261001.py（复用首批 EVENT_MAP/引擎函数），JSONL+KB 双落，lint ✓
