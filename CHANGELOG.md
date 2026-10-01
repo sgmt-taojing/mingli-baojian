@@ -1935,3 +1935,8 @@
 - ten_god() 引擎函数+大运/候选年/四柱十神全注入；dev36 3/36（子集极限），但推理原文质变：十神引用全对，断点下沉到「事件→十神→应期」映射缺失
 - 断点栈终版：干支换算✓/推理路径✓/起运大运流年✓/十神✓/应期 doctrine=蒸馏唯一靶点
 - 排队全量 181 题 noleak+assist3 复跑测净效果
+
+## 2026-10-01 · R-DISTILL-YINGQI 应期 doctrine 蒸馏首批落地
+- ①事件→十神→宫位映射表 v1 入 KB（12 类事件：出道/就任/婚嫁男女/获奖/伤病/去世/得子/置业/破财/牢狱，典据三命通会·子平真诠·滴天髓，trust 0.85）
+- ②六段式 doctrine 样本 12 条（合成命主+lunar_python 引擎保真，排四柱→起运→大运→候选年十神→事件映射→应期判定），JSONL 落 training/distill-yingqi-doctrine-20261001.jsonl + 逐条入 KB（trust 0.80）
+- scripts/build-yingqi-doctrine-20261001.py，lint ✓；事件类型分布对齐 dev36 错题画像
