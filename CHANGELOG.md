@@ -1951,3 +1951,8 @@
 - noleak+assist3 全量 181 题 = 59.7%（108/181）；70.7% 里 11pp 是题库泄漏水分
 - KB 活化修复：kb-sync-guard --sync 30h，今日 220 新条目（穷通 13+康节 80+应期 47+其他）全量进 kb_fts5 生产索引
 - 注意：launchd kb-sync-now 最近 exit 1，列入观察（手工同步已补上）
+
+## 2026-10-01 · R-KB-SYNC-FIX kb-sync-now exit 1 根因链清零
+- 根因三层：①err.log  traceback 是重试机制（_run_with_lock_retry）上线前的旧账 ②锁重试已内建但红线存量（重复组/NULL/无出处）让 patrol 按设计 exit 1 告警 ③今日 220 新条目未同步 fts5
+- 处置：--full 对齐（311 行）→ --normalize（tags NULL 311 规整，entry 空行 0 需人工）→ 红线4 回填（scripts/kb-srcid-backfill-20261001.py，五类映射 423/423 全命中：公有领域 326/作者标注 90/原典 7，审计 logs/kb-srcid-backfill-audit.jsonl）
+- 复验：patrol 五红线全绿 exit=0（主表=fts5=322050）
