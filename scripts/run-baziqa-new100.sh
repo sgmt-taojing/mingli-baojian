@@ -5,7 +5,7 @@
 set -u
 cd "$(dirname "$0")/.."
 TAG="v92-new100"
-DATA="training/baziqa/data/celebrity-new100_zh.json"
+DATA="training/baziqa/data/celebrity-new100_zh.masked.json"  # R-BQA-MASK 2026-10-04 脱敏版
 LOG=training/baziqa-results/${TAG}-runner.log
 PY=/usr/bin/python3
 

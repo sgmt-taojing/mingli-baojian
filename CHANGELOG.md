@@ -1967,3 +1967,10 @@
 - unified-report-engine.js：新增 buildYingqiSectionZiwei（十干四化表与排盘引擎同源，流年四化入宫+化忌入/冲目标宫位判规避，含当前大限）+ buildYingqiSectionLiuyao（用神规则 7 类含性别分用神，近程 60 日逢值/逢冲/逢合/旬空填实出空，lunar-typescript 逐日干支带锚点兜底）；API 包裹层自动解包（palaces/yaos 探测）
 - norm-report-engine.js：seg3 并段范围 bazi→bazi/ziwei/liuyao；修 autoRepairReport 与 buildSeg5Content 两处 params.questions 字符串归一（ziwei 校验触发修复路径时 .join 崩溃的存量 bug）
 - 验证：ziwei 报告「限运走势」段含四化应期（事业 2033/2034 应期、2026 化忌规避）；liuyao 报告「事态时效」段含用神逢值/逢冲时点；自检 8/8
+
+## 2026-10-04 · R-BQA-MASK 题库人名脱敏（G26 治理项收口）
+- scripts/mask-baziqa-names.py：全名+外文名分段（≥3 字符，长词优先）递归替换为 缘主NNN；跨卷全名兜底（节目名等第二人称引用→缘主***）；密封映射表 .name-map-sealed.json（training/ gitignore 内，不进仓库）
+- 八库全量执行 183 人：new100×58/new60×34/celebrity50×50/contest8×41，全名零残留硬线全绿；celebrity50 名分段跨卷提及 13 处（第二人称叙述，参考级备案）
+- 修正旧账：celebrity-new60_zh.v2-masked.json 与原版字节相同（脱敏空操作），本棒产出真脱敏 .masked.json
+- run-baziqa-new100.sh DATA 切到 celebrity-new100_zh.masked.json——后续跑库同步堵住人名泄漏口径（终审 70.7% 含 11pp 题库水分，复跑即为纯净水位）
+- 冒烟：masked 题库 2 人 6 题跑通（3/6），评测管线无回归
