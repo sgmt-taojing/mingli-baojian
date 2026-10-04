@@ -1974,3 +1974,8 @@
 - 修正旧账：celebrity-new60_zh.v2-masked.json 与原版字节相同（脱敏空操作），本棒产出真脱敏 .masked.json
 - run-baziqa-new100.sh DATA 切到 celebrity-new100_zh.masked.json——后续跑库同步堵住人名泄漏口径（终审 70.7% 含 11pp 题库水分，复跑即为纯净水位）
 - 冒烟：masked 题库 2 人 6 题跑通（3/6），评测管线无回归
+
+## 2026-10-04 · R-DISTILL-YINGQI-B3 应期样本第三批 8 条（总量 46→54）
+- scripts/build-yingqi-doctrine-batch3-20261004.py：补 EVENT_MAP 12 事件全覆盖——去世/寿限首次入库 ×2（高阶「用神死绝方论大限」+ 特殊·岁运并临「寿元星受制」），另补强破财/婚男/就任女/伤病/获奖/置业 6 条梯度
+- 8/8 入库（KB-YQ-B3 前缀，src_id mingli-yingqi-samples-v3，trust 0.80），主表 322,058 条
+- 活化链：kb-sync-guard --sync → 巡检发现红1存量（fts5 冗余 2,484 行+828 重复组，非本批引入）→ --full 清冗余 → 五红线全绿（主表=fts5=322058）
