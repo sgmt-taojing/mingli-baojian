@@ -1956,3 +1956,9 @@
 - 根因三层：①err.log  traceback 是重试机制（_run_with_lock_retry）上线前的旧账 ②锁重试已内建但红线存量（重复组/NULL/无出处）让 patrol 按设计 exit 1 告警 ③今日 220 新条目未同步 fts5
 - 处置：--full 对齐（311 行）→ --normalize（tags NULL 311 规整，entry 空行 0 需人工）→ 红线4 回填（scripts/kb-srcid-backfill-20261001.py，五类映射 423/423 全命中：公有领域 326/作者标注 90/原典 7，审计 logs/kb-srcid-backfill-audit.jsonl）
 - 复验：patrol 五红线全绿 exit=0（主表=fts5=322050）
+
+## 2026-10-04 · R-RPT-YINGQI 应期映射表接入生产报告链路
+- unified-report-engine.js：YINGQI_RULES（8 类事件规则）+ buildYingqiSection（排盘 dayun/liunian 十神直取，扫未来 10 年命中年份），bazi 报告「大运流年」段后挂应期速查（引擎规则生成，不裸靠 LLM）；generateReport 入口 questions 归一（字符串→数组）
+- norm-report-engine.js：入口 questions 字符串归一（下游 9 处 .join 依赖数组）；seg3 动态时效段追加 yingqi_text
+- norm-output-template.js：问事行防御性归一
+- 验证：bazi 报告带 questions=事业,财富 → 应期段含两类各 4 个应期年份+规避年份+白话断语；自检 8/8
