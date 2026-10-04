@@ -1962,3 +1962,8 @@
 - norm-report-engine.js：入口 questions 字符串归一（下游 9 处 .join 依赖数组）；seg3 动态时效段追加 yingqi_text
 - norm-output-template.js：问事行防御性归一
 - 验证：bazi 报告带 questions=事业,财富 → 应期段含两类各 4 个应期年份+规避年份+白话断语；自检 8/8
+
+## 2026-10-04 · R-RPT-YINGQI-EXT 应期映射推广 ziwei/liuyao
+- unified-report-engine.js：新增 buildYingqiSectionZiwei（十干四化表与排盘引擎同源，流年四化入宫+化忌入/冲目标宫位判规避，含当前大限）+ buildYingqiSectionLiuyao（用神规则 7 类含性别分用神，近程 60 日逢值/逢冲/逢合/旬空填实出空，lunar-typescript 逐日干支带锚点兜底）；API 包裹层自动解包（palaces/yaos 探测）
+- norm-report-engine.js：seg3 并段范围 bazi→bazi/ziwei/liuyao；修 autoRepairReport 与 buildSeg5Content 两处 params.questions 字符串归一（ziwei 校验触发修复路径时 .join 崩溃的存量 bug）
+- 验证：ziwei 报告「限运走势」段含四化应期（事业 2033/2034 应期、2026 化忌规避）；liuyao 报告「事态时效」段含用神逢值/逢冲时点；自检 8/8
