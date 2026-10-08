@@ -2014,3 +2014,10 @@
 - 引擎活化（mingxiang-tongcan-engine.js）：KBREF_MOLE/KBREF_VOICE/KBREF_FEMALE 映射接入引证层，buildTongcanCard 新增 moles/voice/gender 参数与白话观测行；引证排序调整为观测特异项优先（痣斑/声音/女相先于通用层），上限 6 条；api-server-v2.js 批注路由透传 xiangObservation.moles/voice + gender
 - 验证：node --check 双文件过；直调用例（黄+土形+财帛+山根黑子+声清圆+女）输出 6 条 📜 引证含斑点论/声音细则/九善九恶/女德论，断语真实溯源 KB-MX-038~041
 - 事故记录：自检冒烟节点0超时根因=mlx-v5 推理劣化（3 token/72s，进程运行 9h53m 内存压力），kickstart 重启+预热后恢复（稳态 2.2s），与本批代码无关；自检终态 8/8
+
+## 2026-10-08 · R-XT-AUTO 采集端三路特征→批注台自动填参（命相同参闭环最后一环）
+- unified-diagnosis.html：一帧采集返回命理三相特征后，按确定性映射生成同参观测卡存 localStorage（ml_xiang_obs，24h 有效）——面相三停标签→宫位观测（上停发达→官禄·饱满 / 中停发达→命宫·饱满 / 下停发达→相貌·饱满 / 三停均匀→命宫·平满 / 失衡偏窄→官禄·凹陷），痣相部位标签→moles 串；掌纹路暂不映射（引擎无对应参数，挂后续）
+- unified-consultation.html：aiMingliDraft 读取 ml_xiang_obs 自动填入 xiangObservation 随批注请求上送，带入时 toast 提示；读取失败静默降级不影响主流程
+- 链路：一帧采集（授权门 G15）→ 三路结构化特征 → 同参观测卡 → 批注台自动带入 → buildTongcanCard 出白话同参行+原典引证（R-XT-KBREF/B4）→ 命理师审改签名
+- 验证：Node 全链仿真（中停发达+鼻梁痣 → 命宫饱满+moles → 同参卡含宫位研判+斑点论引证 ✓）；两页面 8900 静态访问 200；自检 8/8
+- 环境备注：mlx-v5 推理在内存压力下（Ollama 占 36.9% 内存）波动大（2s~98s），冒烟节点0 超时属环境抖动非代码问题；视觉端点冷启动约 49s、热链可入 90s 窗口

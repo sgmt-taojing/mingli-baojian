@@ -794,10 +794,27 @@ function renderVisionDiagnosis(data) {
   if (data.mingli_consent === 'granted' && Array.isArray(data.mingli_features) && data.mingli_features.length) {
     html += '<div class="diag-section" style="border:1px solid rgba(212,175,55,.35);border-radius:8px;padding:8px">' +
       '<div class="label" style="color:var(--gold,#d4af37)">命理三相 · 结构化特征（已同步命理师批注层，非医学诊断依据）</div>';
+    // R-XT-AUTO（2026-10-08）：三路特征 → xiangObservation 候选，存 localStorage 供批注台自动带入
+    const XT_PALACE_MAP = {
+      '上停发达(早运)': ['官禄', '饱满'],   // 上停=发际至眉，天庭/官禄域
+      '中停发达(中年运)': ['命宫', '饱满'], // 中停=眉至鼻准，命宫/财帛域
+      '下停发达(晚运)': ['相貌', '饱满'],   // 下停=鼻准至地阁
+      '三停均匀(平稳)': ['命宫', '平满'],
+      '失衡偏窄(起伏)': ['官禄', '凹陷'],
+    };
+    const xtObs = { palaces: {}, moles: '', ts: Date.now() };
+    const xtMoles = [];
     data.mingli_features.forEach(f => {
       if (f && f.ok && f.features && f.features.top1) {
+        const label = f.features.top1.label;
+        if (f.mode === 'fortune_face' && XT_PALACE_MAP[label]) {
+          const [pal, obs] = XT_PALACE_MAP[label];
+          xtObs.palaces[pal] = obs;
+        } else if (f.mode === 'fortune_mole') {
+          xtMoles.push(label);
+        }
         html += `<div class="value"><strong style="color:var(--gold,#d4af37)">${esc(f.name)}</strong> · ${f.engine} · ${f.elapsedMs}ms<br>` +
-          `特征: <strong>${esc(f.features.top1.label)}</strong>` +
+          `特征: <strong>${esc(label)}</strong>` +
           (f.features.candidates && f.features.candidates.length > 1
             ? '<br>候选: ' + f.features.candidates.slice(1).map(x => esc(x.label)).join(' · ')
             : '') + `</div>`;
@@ -805,6 +822,11 @@ function renderVisionDiagnosis(data) {
         html += `<div class="value"><strong style="color:var(--muted)">${esc(f && f.name || '命理特征')}</strong> · 无结果</div>`;
       }
     });
+    xtObs.moles = xtMoles.join('、');
+    if (Object.keys(xtObs.palaces).length || xtObs.moles) {
+      try { localStorage.setItem('ml_xiang_obs', JSON.stringify(xtObs)); } catch (_) {}
+      html += '<div style="font-size:10px;color:var(--gold,#d4af37);margin-top:4px">✓ 已生成同参观测卡，命理批注时将自动带入（24h 内有效）</div>';
+    }
     html += '</div>';
   } else if (data.mingli_consent === 'skipped_no_consent') {
     html += '<div class="diag-section" style="font-size:11px;color:var(--muted)">命理三相未授权，已跳过（点「命理三相」开关完成本人/监护人授权后自动并轨）</div>';

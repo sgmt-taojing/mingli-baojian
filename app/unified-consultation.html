@@ -1212,10 +1212,25 @@ async function aiMingliDraft(){
   const btn = $('btnAiMingli'); btn.disabled = true;
   aiProgStart('AI 命理批注生成中');
   try {
-    const r = await aiPost('/api/clinic/mingli/draft', {
+    // R-XT-AUTO（2026-10-08）：一帧采集的命理三相特征自动带入（localStorage，24h 内有效）
+    let xiangObservation = null;
+    try {
+      const raw = localStorage.getItem('ml_xiang_obs');
+      if (raw) {
+        const xo = JSON.parse(raw);
+        if (xo && xo.ts && (Date.now() - xo.ts) < 24 * 3600 * 1000 &&
+            ((xo.palaces && Object.keys(xo.palaces).length) || xo.moles)) {
+          xiangObservation = { palaces: xo.palaces || {}, moles: xo.moles || '' };
+        }
+      }
+    } catch (_) { /* 读取失败不影响主流程 */ }
+    const reqBody = {
       year: y, month: m, day: d, hour: h,
       gender: $('mlGender').value, name: $('mlName').value.trim(), aiEnhance: true
-    });
+    };
+    if (xiangObservation) reqBody.xiangObservation = xiangObservation;
+    if (xiangObservation) toast('已带入一帧采集的面相/痣相特征，批注将含命相同参引证');
+    const r = await aiPost('/api/clinic/mingli/draft', reqBody);
     if(r.error){ toast('命理批注失败：' + r.error); return; }
     const ai = r.aiAnnotation;
     let showTxt = '';
