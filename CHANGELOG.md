@@ -2006,3 +2006,11 @@
 - server/mingxiang-tongcan-engine.js：buildTongcanCard 新增「━━━ 原典引证 ━━━」段——观测项→KB-MX 细则映射（宫位 KBREF_PALACE / 气色 KBREF_QISE / 四时气色 KBREF_QISE_SEASON / 形局 KBREF_XINGJU），`_kb()` 惰性 better-sqlite3 只读连接（readonly + fileMustExist，失败静默降级不影响主流程），`_kbSnippet()` 提取条目前 2 条「◆」断语各截 80 字，`_kbRefLines()` 去重限 5 条，插在边界说明之前
 - 验证：node --check 过；直调用例（黄气色+土形+三宫位观测）输出 5 条 📜 引证（辨色总诀/四时气色·秋/五行正形/禽兽形/相鼻细则），断语真实来自 KB-MX 库条目；重启后自检 8/8；批注接口需登录态，Node 直调+自检为验收口径
 - 意义：37 条命相细则从「入库」到「活化出参」闭环——同参卡每一条研判建议都能溯源到原典断语，命理师批注有据可依
+
+## 2026-10-08 · R-DISTILL-MX-B4 命相细则第四批·斑点/声音/女人相（批注能力 09-20 布置之五）
+- scripts/distill-mingxiang-b4-20261008.py：从相术部卷633/641/642 原典蒸馏 KB-MX-038~042——斑点论（雀卵斑/豆斑+五色得地四时生克总纲）、声音细则（五音正声/贵贱声辨/丹田声根/罗网声雌雄声杂格）、女人九善九恶相（清单式依据）、女德论（态德论/威媚辨/心形相称总纲）、女人相警语库（凶相歌/女人论/女玉管诀存真+现代柔化话术）
+- 女人相铁律：古制「刑克妨害」断语禁直出信众，批注层一律转化为性格/行为倾向+修养建议；涉孕产健康挂「咨询医师」
+- 5/5 入库（trust 0.85），fts5 活化 5 更/5 插，五红线全绿（主表=fts5=322,083）
+- 引擎活化（mingxiang-tongcan-engine.js）：KBREF_MOLE/KBREF_VOICE/KBREF_FEMALE 映射接入引证层，buildTongcanCard 新增 moles/voice/gender 参数与白话观测行；引证排序调整为观测特异项优先（痣斑/声音/女相先于通用层），上限 6 条；api-server-v2.js 批注路由透传 xiangObservation.moles/voice + gender
+- 验证：node --check 双文件过；直调用例（黄+土形+财帛+山根黑子+声清圆+女）输出 6 条 📜 引证含斑点论/声音细则/九善九恶/女德论，断语真实溯源 KB-MX-038~041
+- 事故记录：自检冒烟节点0超时根因=mlx-v5 推理劣化（3 token/72s，进程运行 9h53m 内存压力），kickstart 重启+预热后恢复（稳态 2.2s），与本批代码无关；自检终态 8/8
