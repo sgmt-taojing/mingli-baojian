@@ -1987,3 +1987,8 @@
 ## 2026-10-04 · R-DISTILL-MX-B1 命相细则蒸馏第一批（批注能力 09-20 布置之二）
 - scripts/distill-mingxiang-b1-20261004.py：从 KB-XST 原典（图书集成·相术部 卷631/642，公有领域）蒸馏 KB-MX-019~026 共 8 条——气色辨色总诀（皮色皮气/五脏发色/流散气浊）、四时气色细断 4 条（春颧/夏额/秋左颧/冬地阁，旺相囚死+大忌+细断）、十二宫总诀精要（父母宫日月角+头眼总纲+满面气色）、旺相休囚判色法（含贯通线吉断+应期日数）、神气有余不足辨（黄正公论+三气说）
 - 每条带批注用法+边界（相不独论 KB-MX-018，健康挂医师）；8/8 入库（module mingxiang，trust 0.85），五红线全绿（主表=fts5=322,067）
+
+## 2026-10-08 · R-FTS5-TRIG fts5 红1 复发根因摘除
+- 根因：r16-d-fts5/fix-fts5-unicode61 两个历史一次性脚本建的 kb_fts5_insert/delete/update 三触发器仍活在库中，绕过唯一写入口红线直写 fts5；蒸馏脚本（distill-desktop-* 等）重跑时 formal 指纹幂等不重复、fts5 却被触发器+脚本直写叠加 → r491q 系 600 条×5 副本等 828 重复组（10-04 清完后复发即此）
+- 处置：kb-sync-guard 新增 --drop-legacy-triggers 子命令（红线唯一入口内做 DDL），三触发器摘除；G24 kb_formal_reference_guard 与 hit_count_default 保留
+- 复绿：--full 清冗余 → 五红线全绿（主表=fts5=322,067）；此后新条目只经 --sync 咽喉入 fts5

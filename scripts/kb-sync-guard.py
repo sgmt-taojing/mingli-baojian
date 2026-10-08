@@ -9,6 +9,7 @@
   --fix-mojibake 尝试修复未标记乱码（latin1→gbk 链），失败打标降权
   --normalize    NULL 键规整（entry_id 空=删除待审、tags/summary NULL→''）
   --purge-empty  空壳行清除（title/content 为空的 PDF 残渣行，主表+fts5 双删，审计留证 logs/kb-purge-empty-audit.jsonl）
+  --drop-legacy-triggers  摘除历史 fts5 三触发器（唯一写入口红线防复发，R-FTS5-TRIG）
 
 红线（docs/KB-QUALITY-RULES.md 一）：除本脚本外，任何代码不得写 kb_fts5。
 """
@@ -206,6 +207,24 @@ def _run_with_lock_retry(fn, *a, retries=10, wait=30):
     raise SystemExit('FATAL: 重试耗尽仍被锁')
 
 
+def drop_legacy_triggers():
+    """R-FTS5-TRIG（2026-10-08）：摘除 fts5 三触发器（kb_fts5_insert/delete/update）。
+    根因：历史一次性脚本（r16-d-fts5/fix-fts5-unicode61）建的 AFTER INSERT/UPDATE 触发器
+    绕过唯一写入口红线直写 fts5，叠加蒸馏脚本重跑形成同 entry 多行（828 组×5 副本）。
+    摘除后 fts5 只经本脚本 --sync/--full 同步；G24 kb_formal_reference_guard 与
+    hit_count_default 触发器不动。"""
+    conn = connect()
+    dropped = []
+    for name in ('kb_fts5_insert', 'kb_fts5_delete', 'kb_fts5_update'):
+        cur = conn.execute(f"DROP TRIGGER IF EXISTS {name}")
+        if cur.rowcount != 0 or True:
+            dropped.append(name)
+    conn.commit()
+    left = [r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='trigger'")]
+    conn.close()
+    print(f'摘除 fts5 触发器: {dropped}；现存触发器: {left}')
+
+
 if __name__ == '__main__':
     args = sys.argv[1:]
     if '--sync' in args:
@@ -221,6 +240,8 @@ if __name__ == '__main__':
         _run_with_lock_retry(normalize)
     elif '--purge-empty' in args:
         _run_with_lock_retry(purge_empty)
+    elif '--drop-legacy-triggers' in args:
+        _run_with_lock_retry(drop_legacy_triggers)
     else:
         print(__doc__)
         sys.exit(2)
