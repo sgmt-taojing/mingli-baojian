@@ -447,6 +447,55 @@ function renderPaipanReport(report){
       + _mRows
       + '<div style="margin-top:8px;font-size:11px;opacity:.5">'+escM(_mhRef.source||'梅花易数·体用生克篇')+' · '+(isEn?'verbatim, unedited.':'原文照录，未作改写。')+'</div></details>';
   }
+  // R-LY-YJ-UI（2026-10-10）：六爻原典引证卡——周易卦爻辞（guaCiReference）+ 焦氏易林繇辞（yilinReference）
+  function _segData(key){
+    if(report.chart && report.chart[key]) return report.chart[key];
+    if(report.segments && Array.isArray(report.segments)){
+      for(var _di=0;_di<report.segments.length;_di++){
+        var _dd = report.segments[_di] && report.segments[_di].data;
+        if(_dd && _dd[key]) return _dd[key];
+        if(_dd && _dd.chart && _dd.chart[key]) return _dd.chart[key];
+      }
+    }
+    return null;
+  }
+  var _gcRef = _segData('guaCiReference'), _ylRef = _segData('yilinReference');
+  if(_gcRef || _ylRef){
+    var escL = (typeof escHtml==='function') ? escHtml : function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); };
+    var _lRows = '', _lCount = 0;
+    function _lyCard(label, quote){
+      _lCount++;
+      return '<div style="margin-top:6px;padding:6px 10px;background:rgba(125,211,192,.04);border-left:2px solid #7dd3c0;border-radius:0 6px 6px 0">'
+        + '<div style="font-size:12px;color:#7dd3c0;font-weight:600">'+escL(label)+'</div>'
+        + '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85;margin-top:3px">📜 '+escL(quote)+'</div></div>';
+    }
+    if(_gcRef && _gcRef.benGua){
+      var bg = _gcRef.benGua;
+      _lRows += _lyCard((isEn?'Ben Gua · ':'本卦 · ')+escL(bg.name||''), [bg.guaCi, bg.tuan, bg.xiang].filter(Boolean).join('　'));
+      if(_gcRef.bianGua) _lRows += _lyCard((isEn?'Bian Gua · ':'变卦 · ')+escL(_gcRef.bianGua.name||''), [_gcRef.bianGua.guaCi, _gcRef.bianGua.xiang].filter(Boolean).join('　'));
+      (_gcRef.movingYaos||[]).forEach(function(y){ _lRows += _lyCard((isEn?'Moving Yao · ':'动爻 · ')+escL(y.label||y.pos||''), y.ci||''); });
+    }
+    if(_ylRef && _ylRef.verse){
+      _lRows += _lyCard((isEn?'Yilin Verse · ':'焦氏易林 · ')+escL((_ylRef.benGua||'')+' 之 '+(_ylRef.bianGua||'')), _ylRef.verse + (_ylRef.note ? '（注：'+_ylRef.note+'）' : ''));
+    }
+    if(_lCount){
+      html += '<details style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(125,211,192,.25);border-left:3px solid #7dd3c0;border-radius:8px">'
+        + '<summary style="color:#7dd3c0;font-weight:600;cursor:pointer">📜 '+(isEn?'Liuyao Canon Citations':'六爻 · 原典引证')+'（'+_lCount+(isEn?' refs':' 条')+'）</summary>'
+        + _lRows
+        + '<div style="margin-top:8px;font-size:11px;opacity:.5">'+escL([_gcRef&&_gcRef.source, _ylRef&&_ylRef.source].filter(Boolean).join('；'))+' · '+(isEn?'verbatim, unedited.':'原文照录，未作改写。')+'</div></details>';
+    }
+  }
+  // R-LR-KETI-UI（2026-10-10）：六壬课体原典引证卡——ketiReference（元首/重审/涉害等九宗门）
+  var _ktRef = _segData('ketiReference');
+  if(_ktRef && _ktRef.quote){
+    var escK = (typeof escHtml==='function') ? escHtml : function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); };
+    html += '<details style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(125,211,192,.25);border-left:3px solid #7dd3c0;border-radius:8px">'
+      + '<summary style="color:#7dd3c0;font-weight:600;cursor:pointer">📜 '+(isEn?'Liuren Keti Citation':'六壬课体 · 原典引证')+'</summary>'
+      + '<div style="margin-top:6px;padding:6px 10px;background:rgba(125,211,192,.04);border-left:2px solid #7dd3c0;border-radius:0 6px 6px 0">'
+      + '<div style="font-size:12px;color:#7dd3c0;font-weight:600">'+escK(_ktRef.title||_ktRef.keti||'')+'<span style="opacity:.55;font-size:11px">　'+escK(_ktRef.method||'')+'</span></div>'
+      + '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85;margin-top:3px">📜 '+escK(_ktRef.quote)+'</div>'
+      + '<div style="font-size:10px;color:#8b93a7;opacity:.7;margin-top:2px">'+escK(_ktRef.source||'')+' · 原文照录</div></div></details>';
+  }
   // 化解板块独立渲染
   var tRC = function(text){ return (typeof i18n !== 'undefined' && i18n.translateReportContent) ? i18n.translateReportContent(text || '') : (text || ''); };
     if(report.huajie){
