@@ -1,3 +1,10 @@
+## 2026-10-09 19:45 · R-ZW-KBREF-UI 紫微细则引证上前端 ✅ 报告页折叠区渲染（Kimi）
+
+- **report-interpret.html**：`renderPaipanReport` 新增紫微细则原典引证折叠区——从 `segments[].data.deepRead`（网关 norm 包装）或 `chart.deepRead`（裸口径）双路径提取；逐宫渲染「宫位·主星」分组 + 📜 条目卡（标题/出处卷目/entry_id/◆断语/💡批注口径）+ 全盘谱引证（chartRefs）；`<details>` 折叠默认收起，escHtml 转义，中英文标签双轨。
+- **unified-report-engine.js**：紫微报告排盘请求带 `targetYear=当前年` → deepRead.chartRefs 激活流年双轨谱（ZW-050 逐年谱+ZW-049 限运总纲）入报告。
+- **实测**：重启 api-v2 后 POST /api/paipan/ziwei/report → 十二宫 12/12 有 kbrefs + chartRefs=[ZW-050,ZW-049]；内置浏览器注入 sessionStorage 全流程渲染验证：折叠区 41 条引证（全盘谱 2 + 十二宫 39），出处分标「《康节说易全书·紫微斗数》卷三 · KB-ZW-050」，截图核验样式与既有引证卡同语言。
+- **提交**：server `b197e88`（报告引擎 targetYear）；本条目与 report-interpret.html 随根仓库提交。
+
 ## 2026-10-09 17:55 · R-ZW-KBREF 紫微细则活化 ✅ 58 条细则接入排盘报告引证链（Kimi）
 
 - **新建 `server/ziwei-kbref-engine.js`**：照命相 R-XT-KBREF 同款模式，盘面特征（宫位×主星×四化×格局×流年）→ KB-ZW 细则确定性映射——宫位分宫断（ZW-042~047）/ 逐星速查+入命诀（ZW-051/052+036~041）/ 四化（化忌转化谱 ZW-041 孤本优先）/ 格局名正则谱 / 流年双轨（ZW-050+049）；惰性只读 kb_formal，`_srcName` 康节本卷目 vs 道藏本附录分标，严禁混系引用。

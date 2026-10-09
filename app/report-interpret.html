@@ -349,6 +349,54 @@ function renderPaipanReport(report){
     }
     html += '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts, unedited.':'原文照录自公有领域典籍，未作改写。')+'</div></div>';
   }
+  // R-ZW-KBREF-UI：紫微细则原典引证折叠区（2026-10-09）——deepRead.kbrefs（十二宫×58条细则）+ chartRefs（流年/格局谱）
+  var _zwDeep = null;
+  if(report.segments && Array.isArray(report.segments)){
+    for(var _si=0;_si<report.segments.length;_si++){
+      var _sd = report.segments[_si] && report.segments[_si].data;
+      if(_sd && _sd.deepRead && _sd.deepRead.palaces){ _zwDeep = _sd.deepRead; break; }
+    }
+  }
+  if(!_zwDeep && report.chart && report.chart.deepRead && report.chart.deepRead.palaces) _zwDeep = report.chart.deepRead;
+  if(_zwDeep){
+    var escZ = (typeof escHtml==='function') ? escHtml : function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); };
+    var _zps = Array.isArray(_zwDeep.palaces) ? _zwDeep.palaces : Object.values(_zwDeep.palaces);
+    var _zRows = '', _zRefCount = 0;
+    _zps.forEach(function(p){
+      var refs = (p && p.kbrefs) || [];
+      if(!refs.length) return;
+      var pname = p.name || p.palace || '';
+      var stars = (p.mainStars||[]).map(function(s){return typeof s==='string'?s:(s&&s.name)||'';}).filter(Boolean).join('·');
+      var rows = '';
+      refs.forEach(function(rf){
+        _zRefCount++;
+        rows += '<div style="margin-top:6px;padding:6px 10px;background:rgba(125,211,192,.04);border-left:2px solid #7dd3c0;border-radius:0 6px 6px 0">'
+          + '<div style="font-size:12px;color:#7dd3c0">📜 '+escZ(rf.title||'')+'<span style="opacity:.55;font-size:11px">　'+escZ(rf.source||'')+' · '+escZ(rf.entry_id||'')+'</span></div>'
+          + '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85;margin-top:3px">'+escZ((rf.quotes||[]).join('；'))+'</div>'
+          + (rf.service_note ? '<div style="font-size:11px;color:#8b93a7;margin-top:3px">💡 '+escZ(rf.service_note)+'</div>' : '')
+          + '</div>';
+      });
+      _zRows += '<div style="margin-top:10px"><div style="font-size:12px;font-weight:600;color:#ffb44d">'+escZ(pname)+(stars?' <span style="opacity:.6;font-weight:400">'+escZ(stars)+'</span>':'')+'</div>'+rows+'</div>';
+    });
+    var _zChartRefs = (_zwDeep.chartRefs||[]);
+    var _zChartHtml = '';
+    if(_zChartRefs.length){
+      _zChartHtml = '<div style="margin-top:10px"><div style="font-size:12px;font-weight:600;color:#ffb44d">'+(isEn?'Chart-level':'全盘谱引证')+'</div>';
+      _zChartRefs.forEach(function(rf){
+        _zRefCount++;
+        _zChartHtml += '<div style="margin-top:6px;padding:6px 10px;background:rgba(125,211,192,.04);border-left:2px solid #7dd3c0;border-radius:0 6px 6px 0">'
+          + '<div style="font-size:12px;color:#7dd3c0">📜 '+escZ(rf.title||'')+'<span style="opacity:.55;font-size:11px">　'+escZ(rf.source||'')+' · '+escZ(rf.entry_id||'')+'</span></div>'
+          + '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85;margin-top:3px">'+escZ((rf.quotes||[]).join('；'))+'</div></div>';
+      });
+      _zChartHtml += '</div>';
+    }
+    if(_zRefCount){
+      html += '<details style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(125,211,192,.25);border-left:3px solid #7dd3c0;border-radius:8px">'
+        + '<summary style="color:#7dd3c0;font-weight:600;cursor:pointer">📜 '+(isEn?'Ziwei Rules Citations':'紫微细则 · 原典引证')+'（'+_zRefCount+(isEn?' refs':' 条')+'）</summary>'
+        + _zChartHtml + _zRows
+        + '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts from Kangjie-edition Ziwei classics, unedited.':'原文照录《康节说易全书·紫微斗数》蒸馏细则，未作改写；分宫断语先宫位后主星，四化孤本优先。')+'</div></details>';
+    }
+  }
   // 化解板块独立渲染
   var tRC = function(text){ return (typeof i18n !== 'undefined' && i18n.translateReportContent) ? i18n.translateReportContent(text || '') : (text || ''); };
     if(report.huajie){
