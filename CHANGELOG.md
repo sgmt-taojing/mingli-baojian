@@ -1,3 +1,10 @@
+## 2026-10-09 22:40 · R-QM-GEJU-UI 奇门格局引证闭环 ✅ 排盘页实测+报告页补卡（Kimi）
+
+- **盘点结论**：奇门格局引证服务端（72c7ceb `_qmGejuRefOf` + data/qm-geju.json 统宗/烟波钓叟歌 10 格）与排盘页（qimen-chart.html 格局卡内嵌 📜 引证）09-29 已建成——本轮**浏览器实排验证**：2026-10-9 20时盘出「白虎猖狂 [凶] 辛加乙」，校正后经典口径与引证同屏渲染 ✅。
+- **补最后一环**：report-interpret.html 新增奇门格局原典引证折叠卡——三路径提取 `gejuReference`（chart 顶层 / segments[].data / segments[].data.chart），吉凶色边框分标+宫位+统宗原文+「原文照录」标。
+- **实测**：POST /api/paipan/qimen/report → gejuReference 落 segments[1].data；浏览器注入全流程 → 「📜 奇门格局 · 原典引证（3 条）」渲染（惊门迫震宫/开门迫巽宫/休门迫离宫 + 主客生克断）。
+- **引证体系现状**：紫微（细则 58 条·三端）/ 命相（MX-125 条·同参卡）/ 奇门（统宗 10 格·排盘页+报告页）/ 梅花（体用 18 类·端点）/ 八字（调候+格局·报告页）——五盘引证规格对齐。
+
 ## 2026-10-09 21:15 · R-ZW-KBREF-UI2 引证上排盘现场 ✅ ziwei.html + paipan-center.html（Kimi）
 
 - **ziwei.html**：排盘请求摘掉 `deepRead:false`（原来自废武功）+ 带 targetYear → 排盘当场渲染「📜 紫微细则 · 原典引证」折叠区（全盘谱 + 十二宫逐宫分组，与报告页同款条目卡）；`_zwDeepRead` 每盘复位防离线兜底沿用上一盘。

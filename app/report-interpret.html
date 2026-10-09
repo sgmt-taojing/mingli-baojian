@@ -350,8 +350,7 @@ function renderPaipanReport(report){
     html += '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts, unedited.':'原文照录自公有领域典籍，未作改写。')+'</div></div>';
   }
   // R-ZW-KBREF-UI：紫微细则原典引证折叠区（2026-10-09）——deepRead.kbrefs（十二宫×58条细则）+ chartRefs（流年/格局谱）
-  var _zwDeep = null;
-  if(report.segments && Array.isArray(report.segments)){
+  var _zwDeep = null;  if(report.segments && Array.isArray(report.segments)){
     for(var _si=0;_si<report.segments.length;_si++){
       var _sd = report.segments[_si] && report.segments[_si].data;
       if(_sd && _sd.deepRead && _sd.deepRead.palaces){ _zwDeep = _sd.deepRead; break; }
@@ -396,6 +395,31 @@ function renderPaipanReport(report){
         + _zChartHtml + _zRows
         + '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts from Kangjie-edition Ziwei classics, unedited.':'原文照录《康节说易全书·紫微斗数》蒸馏细则，未作改写；分宫断语先宫位后主星，四化孤本优先。')+'</div></details>';
     }
+  }
+  // R-QM-GEJU-UI（2026-10-09）：奇门格局原典引证卡——chart.gejuReference（统宗/烟波钓叟歌原文）
+  var _qmRef = (report.chart && report.chart.gejuReference) || (report.chart && report.chart.chart && report.chart.chart.gejuReference) || null;
+  if(!_qmRef && report.segments && Array.isArray(report.segments)){
+    for(var _qi=0;_qi<report.segments.length;_qi++){
+      var _qd = report.segments[_qi] && report.segments[_qi].data;
+      if(_qd && _qd.gejuReference){ _qmRef = _qd.gejuReference; break; }
+      if(_qd && _qd.chart && _qd.chart.gejuReference){ _qmRef = _qd.chart.gejuReference; break; }
+    }
+  }
+  if(_qmRef && _qmRef.length){
+    var escQ2 = (typeof escHtml==='function') ? escHtml : function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];}); };
+    var _qRows = '';
+    _qmRef.forEach(function(g){
+      var tone = g.type === '吉' ? '#10b981' : '#ef4444';
+      _qRows += '<div style="margin-top:6px;padding:6px 10px;background:rgba(125,211,192,.04);border-left:2px solid '+tone+';border-radius:0 6px 6px 0">'
+        + '<div style="font-size:12px;color:'+tone+';font-weight:600">'+escQ2(g.name||'')+' <span style="font-size:10px;opacity:.7">['+escQ2(g.type||'')+(g.palace?' · '+g.palace+'宫':'')+']</span></div>'
+        + (g.desc ? '<div style="font-size:11px;color:#8b93a7;margin-top:2px">'+escQ2(g.desc)+'</div>' : '')
+        + '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85;margin-top:3px">📜 '+escQ2(g.quote||'')+'</div>'
+        + '<div style="font-size:10px;color:#8b93a7;opacity:.7;margin-top:2px">'+escQ2(g.source||'')+' · 原文照录</div></div>';
+    });
+    html += '<details style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(125,211,192,.25);border-left:3px solid #7dd3c0;border-radius:8px">'
+      + '<summary style="color:#7dd3c0;font-weight:600;cursor:pointer">📜 '+(isEn?'Qimen Pattern Citations':'奇门格局 · 原典引证')+'（'+_qmRef.length+(isEn?' refs':' 条')+'）</summary>'
+      + _qRows
+      + '<div style="margin-top:8px;font-size:11px;opacity:.5">'+(isEn?'Verbatim excerpts from Qimen Tongzong / Yanbo Diaosou Ge, unedited.':'原文照录《奇门统宗》（含烟波钓叟歌），未作改写。')+'</div></details>';
   }
   // 化解板块独立渲染
   var tRC = function(text){ return (typeof i18n !== 'undefined' && i18n.translateReportContent) ? i18n.translateReportContent(text || '') : (text || ''); };
