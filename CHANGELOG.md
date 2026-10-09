@@ -1,3 +1,11 @@
+## 2026-10-09 20:30 · G21 能力发版通道建成 + paipan v1.3.0 首单 ✅（Kimi）
+
+- **发版脚本**：`scripts/release-capability.js`——输入能力 id+版本号+变更说明，产出与 family 包契约完全一致的 capability-pack（manifest/code 快照/selftest/rollback_ref/fingerprint），落 `_shared/sync-bus/outbox/capability-packs/<id>/<version>/` 并登记 `_shared/capability-registry.json` releases[]；版本单调递增拒重发，指纹为 G22 漂移巡检基准。
+- **基线对齐（首单 v1.3.0）**：对照 family 持有 v1.2.0（源 8a7e88a）逐文件 diff——差集=六爻 coins 校验（b42e074）+奇门烟波钓叟歌校正（72c7ceb 白虎猖狂辛+庚→辛+乙、补青龙逃走/朱雀投江）+紫微细则引证层（f179cc6 ziwei-palace-reader/ziwei-kbref-engine，契约新增可选 ziweiDeepRead）；paipan.py/八字 wrapper/真太阳时等其余文件与 v1.2.0 逐字节一致。
+- **试跑实测**：v1.3.0 包 Node selftest 6/6（含 kbref 无库降级用例）+ Python 桥 6/6（含 bazi）；rollback_ref→1.2.0，registry releases 已登记（fingerprint 6697f750…）。
+- **触发纪律入规范**：`docs/capability-release-policy.md`——能力条目同版本出包 / 知识增量走镜像通道不出包 / 红线 2h / 常规周窗。
+- **待消费方**：family 侧部署激活（packs[].deployed_version 更新）由 family 执行，源头不代写。
+
 ## 2026-10-09 20:05 · R-MX-KBREF-FOCUS 命相引证同款隐患修复 ✅（Kimi）
 
 - **排查结论**：mingxiang-tongcan-engine.js 命中紫微同款三坑中的两个——①`_kbSnippet` 用 `SELECT content + LIKE`（322k 行库全表扫描风险）；②多主题条目只取首两条 ◆ 断语，MX-049（痣相部位断·含额/眉眼/鼻梁/唇/下颌五段）、MX-093（宫位断法全谱·十二宫）、MX-123（黄红赤紫四色合章）会首两条落错主题。
