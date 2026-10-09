@@ -268,21 +268,61 @@ async function runZiweiPaipan(){
   if(!hour && hour !== 0){ hour = 12; }
 
   var result = null, engineTag = '本地';
+  window._zwDeepRead = null; // 复位：离线兜底时不得沿用上一盘引证
   // 优先服务端 iztro 引擎（唯一源头）；失败回退本地引擎（离线兜底）
   try {
     var resp = await fetch(API_BASE + '/api/paipan/ziwei', {
       method: 'POST', headers: {'Content-Type':'application/json','X-Skip-Interceptor':'1'},
       signal: AbortSignal.timeout(10000),
-      body: JSON.stringify({year: year, month: month, day: day, hour: hour, isLunar: zwCalMode === 'lunar', sex: sex, deepRead: false})
+      body: JSON.stringify({year: year, month: month, day: day, hour: hour, isLunar: zwCalMode === 'lunar', sex: sex, targetYear: new Date().getFullYear()})
     });
     var dj = await resp.json();
-    if (dj && dj.ok && dj.chart) { result = zwServerToLocal(dj.chart); engineTag = 'iztro'; }
+    if (dj && dj.ok && dj.chart) { result = zwServerToLocal(dj.chart); engineTag = 'iztro'; window._zwDeepRead = dj.deepRead || null; }
   } catch(e) { /* 离线回退 */ }
   if (!result) result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar', sex);
   result._engineTag = engineTag;
   var name = document.getElementById('zw-name').value || '';
   var container = document.getElementById('ziwei-result');
   ZiweiEngine.renderChart(container, result, name, sex);
+
+  // R-ZW-KBREF-UI2（2026-10-09）：排盘现场原典引证折叠区（deepRead.kbrefs 58 条细则直达）
+  (function renderZwKbrefs(){
+    var old = document.getElementById('zw-kbref-block'); if (old) old.remove();
+    var dr = window._zwDeepRead;
+    if (!dr || !dr.palaces) return;
+    var escZ = window.escHtml || window.escapeHtml || function(s){ return String(s==null?'':s); };
+    var zps = Array.isArray(dr.palaces) ? dr.palaces : Object.values(dr.palaces);
+    var rows = '', refCount = 0;
+    function refCard(rf){
+      refCount++;
+      return '<div style="margin-top:6px;padding:6px 10px;background:rgba(125,211,192,.04);border-left:2px solid #7dd3c0;border-radius:0 6px 6px 0">'
+        + '<div style="font-size:12px;color:#7dd3c0">📜 ' + escZ(rf.title||'') + '<span style="opacity:.55;font-size:11px">　' + escZ(rf.source||'') + ' · ' + escZ(rf.entry_id||'') + '</span></div>'
+        + '<div style="font-size:12px;line-height:1.9;color:#e4e8ee;opacity:.85;margin-top:3px">' + escZ((rf.quotes||[]).join('；')) + '</div>'
+        + (rf.service_note ? '<div style="font-size:11px;color:#8b93a7;margin-top:3px">💡 ' + escZ(rf.service_note) + '</div>' : '')
+        + '</div>';
+    }
+    if (dr.chartRefs && dr.chartRefs.length) {
+      rows += '<div style="margin-top:10px"><div style="font-size:12px;font-weight:600;color:var(--zw-gold,#c9a84c)">全盘谱引证</div>';
+      dr.chartRefs.forEach(function(rf){ rows += refCard(rf); });
+      rows += '</div>';
+    }
+    zps.forEach(function(p){
+      var refs = (p && p.kbrefs) || [];
+      if (!refs.length) return;
+      var stars = (p.mainStars||[]).map(function(s){ return typeof s==='string'?s:(s&&s.name)||''; }).filter(Boolean).join('·');
+      rows += '<div style="margin-top:10px"><div style="font-size:12px;font-weight:600;color:var(--zw-gold,#c9a84c)">' + escZ(p.name||p.palace||'') + (stars?' <span style="opacity:.6;font-weight:400">'+escZ(stars)+'</span>':'') + '</div>';
+      refs.forEach(function(rf){ rows += refCard(rf); });
+      rows += '</div>';
+    });
+    if (!refCount) return;
+    var div = document.createElement('div');
+    div.id = 'zw-kbref-block';
+    div.innerHTML = '<details style="margin-top:14px;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(125,211,192,.25);border-left:3px solid #7dd3c0;border-radius:8px">'
+      + '<summary style="color:#7dd3c0;font-weight:600;cursor:pointer">📜 紫微细则 · 原典引证（' + refCount + ' 条）</summary>'
+      + rows
+      + '<div style="margin-top:8px;font-size:11px;opacity:.5">原文照录《康节说易全书·紫微斗数》蒸馏细则，未作改写；分宫断语先宫位后主星，四化孤本优先。</div></details>';
+    container.appendChild(div);
+  })();
 
   // R-TAP-X: 缓存请求体 + 点宫白话解读（十二宫逐宫可点）
   window._paipanBody = window._paipanBody || {};

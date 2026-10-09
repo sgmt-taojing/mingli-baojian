@@ -1,3 +1,10 @@
+## 2026-10-09 21:15 · R-ZW-KBREF-UI2 引证上排盘现场 ✅ ziwei.html + paipan-center.html（Kimi）
+
+- **ziwei.html**：排盘请求摘掉 `deepRead:false`（原来自废武功）+ 带 targetYear → 排盘当场渲染「📜 紫微细则 · 原典引证」折叠区（全盘谱 + 十二宫逐宫分组，与报告页同款条目卡）；`_zwDeepRead` 每盘复位防离线兜底沿用上一盘。
+- **paipan-center.html**：同参速览调用同改（targetYear），结果区尾部加「原典引证速览」轻量折叠（全盘谱+命宫首引 ≤3 条），不抢古今同参主位。
+- **浏览器实测**：ziwei.html 填 1985-6-15 8时 → 折叠区 43 条 KB-ZW 引证（全盘谱/命宫/出处卷目全在）；paipan-center 同盘 → 速览 3 条 + 同参古例双引擎照常。
+- **至此引证链全贯通**：排盘页（当场）→ 报告页（折叠区）→ 能力包（v1.3.0 ziweiDeepRead 契约）三端同源。
+
 ## 2026-10-09 20:30 · G21 能力发版通道建成 + paipan v1.3.0 首单 ✅（Kimi）
 
 - **发版脚本**：`scripts/release-capability.js`——输入能力 id+版本号+变更说明，产出与 family 包契约完全一致的 capability-pack（manifest/code 快照/selftest/rollback_ref/fingerprint），落 `_shared/sync-bus/outbox/capability-packs/<id>/<version>/` 并登记 `_shared/capability-registry.json` releases[]；版本单调递增拒重发，指纹为 G22 漂移巡检基准。

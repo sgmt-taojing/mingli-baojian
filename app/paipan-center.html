@@ -221,7 +221,7 @@ async function tcRun(){
   var out=document.getElementById('tc-result');
   out.innerHTML='<div style="color:var(--paper3,#8b93a7);font-size:12px">排盘同参中…</div>';
   var zw=null,bz=null;
-  try{ zw=await tcPost('/api/paipan/ziwei',{year:parts[0],month:parts[1],day:parts[2],hour:hour,sex:sex,deepRead:false}); }catch(e){}
+  try{ zw=await tcPost('/api/paipan/ziwei',{year:parts[0],month:parts[1],day:parts[2],hour:hour,sex:sex,targetYear:new Date().getFullYear()}); }catch(e){}
   try{ bz=await tcPost('/api/paipan/calculate',{year:parts[0],month:parts[1],day:parts[2],hour:hour,minute:0,sex:sex}); }catch(e){}
   var jobs=[];
   if(zw&&zw.ok&&zw.chart&&zw.chart.wuxingJu){
@@ -250,6 +250,23 @@ async function tcRun(){
     });
     html+='</div>';
   });
+  // R-ZW-KBREF-UI2（2026-10-09）：紫微细则引证速览（全盘谱+命宫首引，完整十二宫见紫微排盘页/报告页）
+  if(zw&&zw.ok&&zw.deepRead&&zw.deepRead.palaces){
+    var zd=zw.deepRead;var zps=Array.isArray(zd.palaces)?zd.palaces:Object.values(zd.palaces);
+    var zmg=zps.find(function(p){return p&&(p.name==='命宫'||p.isMingGong);})||zps[0]||{};
+    var zrefs=[].concat(zd.chartRefs||[]).concat(zmg.kbrefs||[]).slice(0,3);
+    if(zrefs.length){
+      var zh='';
+      zrefs.forEach(function(rf){
+        zh+='<div style="margin-top:5px;padding:5px 9px;background:rgba(125,211,192,.04);border-left:2px solid #7dd3c0;border-radius:0 6px 6px 0;font-size:11px">'+
+          '<span style="color:#7dd3c0">📜 '+tcEsc(rf.title||'')+'</span> <span style="opacity:.5">'+tcEsc(rf.source||'')+' · '+tcEsc(rf.entry_id||'')+'</span>'+
+          '<div style="line-height:1.7;color:var(--paper,#e8dcc8);opacity:.85;margin-top:2px">'+tcEsc((rf.quotes||[]).join('；').slice(0,120))+'</div></div>';
+      });
+      html+='<details style="margin-top:10px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(125,211,192,.2);border-radius:8px">'+
+        '<summary style="color:#7dd3c0;font-size:12px;font-weight:600;cursor:pointer">📜 紫微细则 · 原典引证速览（'+zrefs.length+' 条）</summary>'+zh+
+        '<div style="font-size:10px;opacity:.5;margin-top:6px">原文照录《康节说易全书·紫微斗数》蒸馏细则 · 完整十二宫引证见紫微排盘页</div></details>';
+    }
+  }
   html+='<div style="color:var(--paper3,#8b93a7);font-size:10px;margin-top:8px">出自《康节说易全书·紫微斗数全书》卷四 / 《千里命稿·应运篇》　古今同参仅为文化参考：命由己造，古例不预断今人。</div>';
   out.innerHTML=html;
 }
