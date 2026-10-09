@@ -227,6 +227,13 @@ def main():
 
     raw_fp = open(args.save_raw, 'a', encoding='utf-8') if args.save_raw else None
 
+    # R-BQA-PREFLIGHT（2026-10-09）：API 预检——8960 挂时 ask() 全灭会写成 0/N 假成绩
+    # （10-08 事故：末段 27 题 1 秒全灭 0/27，把 54.1% 真基线拖成 47.0% 假汇总）。预检不过即退，不写盘。
+    probe = ask(args.api, '请只回复：OK', max_tokens=8)
+    if probe.startswith('[ERR]'):
+        print(f'[FATAL] API 预检失败（{args.api}）：{probe} —— 服务未就绪，本次不写任何结果', file=sys.stderr)
+        return 2
+
     people = json.load(open(args.data))
     if args.offset > 0:
         people = people[args.offset:]

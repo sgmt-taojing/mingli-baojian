@@ -10,11 +10,23 @@ LOG=training/baziqa-results/${TAG}-runner.log
 PY=/usr/bin/python3
 
 echo "=== $(date '+%F %T') new100 全量开跑（58 人 181 题）===" >> "$LOG"
+# R-BQA-PREFLIGHT（2026-10-09）：8960 预检——挂则整轮退出，杜绝 0/N 假成绩污染汇总（10-08 事故复盘）
+if ! curl -s -m 5 -o /dev/null http://127.0.0.1:8960/v1/models; then
+  echo "!!! $(date '+%F %T') 8960 推理服务不可达，整轮退出（不写成绩）===" >> "$LOG"
+  exit 2
+fi
 for OFF in 0 10 20 30 40 50; do
-  SEGLOG=training/baziqa-results/${TAG}-p$((OFF+1))-$((OFF+10)).log
-  # 断点续跑：段日志已有 ≥10 人结果则跳过
-  if [ -f "$SEGLOG" ] && [ "$(grep -c '^→ ' "$SEGLOG" 2>/dev/null || echo 0)" -ge 10 ]; then
+  # 断点续跑：段日志（实际人数文件名 glob，如 p51-58）已有 ≥10 人结果则跳过
+  # R-BQA-SEGFIX（2026-10-09）：原写死 p51-60 但实际产出 p51-58（58 人库末段 8 人），
+  # 文件名失配导致每次 RunAtLoad 永驻重跑末段——改 glob 匹配
+  SEGLOG=$(ls training/baziqa-results/${TAG}-p$((OFF+1))-*.log 2>/dev/null | head -1)
+  if [ -n "$SEGLOG" ] && [ "$(grep -c '^→ ' "$SEGLOG" 2>/dev/null || echo 0)" -ge 10 ]; then
     echo "--- $(date '+%F %T') 段 p$((OFF+1))-$((OFF+10)) 已完成，跳过 ---" >> "$LOG"
+    continue
+  fi
+  # 末段（不足 10 人）按「汇总行存在」判完成
+  if [ -n "$SEGLOG" ] && grep -q '=== 结果:' "$SEGLOG" 2>/dev/null; then
+    echo "--- $(date '+%F %T') 段 p$((OFF+1))-$((OFF+10))（末段）已完成，跳过 ---" >> "$LOG"
     continue
   fi
   echo "--- $(date '+%F %T') 段 p$((OFF+1))-$((OFF+10)) 开始 ---" >> "$LOG"
