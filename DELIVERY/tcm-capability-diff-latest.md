@@ -1,17 +1,22 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-09-26 17:48 ｜ 差集指纹 `9e703640e0ec961f`
-- tcm 侧 HEAD：`bf0782f 工程B1：5个多诊次演示患者种子（病历15+处方15+随访5，幂等），证型演变三阶段链真实数据实证，回归15/15绿`
-- 结论：**✅ 全对齐（无待吸收增量）**
+- 生成：2026-10-09 10:11 ｜ 差集指纹 `e3d3cd2d277781b2`
+- tcm 侧 HEAD：`86389f8 古籍相似医案接入问诊台：pass9 四诊特征 353 案 495 边，召回池 719，端点 pool_size + 脉象参数`
+- 结论：**⚠ 有待吸收增量**
 
-## L1 API 路由差集（tcm 有 · medical-stack 无）：0 条
-- （空）
+## L1 API 路由差集（tcm 有 · medical-stack 无）：6 条
+- `get /api/edu/personalized`
+- `get /api/graph/case-text`
+- `get /api/graph/similar-cases`
+- `get /api/growth/quiz/stats`
+- `get /api/growth/quiz/wrong-book`
+- `post /api/growth/quiz/attempt`
 
 ## 已知等价登记（勿重复建设）：1 条
 - `post /api/tcm/` → visual-observation-proxy 动态路由前缀（非独立端点）；ms 已有等价观察端点，严格代理按 ADR-007 架构定位豁免
 
 ## L2 关键模块导出函数差集
-- （空）
+- `auth.js` 缺：id, sub
 
 ## L2.5 检索处理器特征哈希（排序逻辑漂移监控，G17R 采纳项）
 
@@ -44,6 +49,7 @@
 ## L4.5 共享 js 哈希比对（页面同源监控）
 - `config-engine.js`：⚪ 有意适配（仅系统品牌名适配（SEC-001）；逻辑同源）
 - `i18n.js`：⚪ 有意适配（仅 app.name 品牌串适配（SEC-001）；逻辑同源）
+- `longitudinal-page.js`：🔴 漂移
 - `nav.js`：⚪ 有意适配（ms 导航为 curated 子集 + 命理宝鉴品牌适配（fhub/consult/insur 已对齐 tcm 增量））
 - `seed-loader.js`：⚪ 有意适配（R864 V2.0 已对齐（生产不自动注入假数据）；头部品牌标注差异）
 - `mingli-annotation-view.js`：⚪ ms 自有（ms 自有（命理批注面板视图，G15/G16 命理视图开关，命理域自有））
