@@ -2052,3 +2052,11 @@
 - 5/5 入库（trust 0.85），fts5 活化 16 更/5 插，五红线全绿（主表=fts5=322,104）
 - docs/XIANGSHU-COVERAGE-20261009.md 更新：B8 从待办挪至已覆盖（63 条细则），待办剩 B9~B15 七批
 - 引擎无需新参数：本批为名赋总纲层，批注话术的古断出处库，由命理师批注与报告生成层引证
+
+## 2026-10-09 · R-XT-SKILL 蒸馏知识标注化+命相同参 skill 对外服务
+- 用户指令：原古籍蒸馏知识存放标注，形成 skill 对外服务（原有逻辑优化）
+- 引擎升级（server/mingxiang-tongcan-engine.js）：引证三件套→四件套——_kbSnippet 升级带 entry_id/src_id 出处解析（_srcName：xst-juanNNN→《图书集成·艺术典·相术部》卷NNN）+【批注用法】服务层口径提取；展示行格式升级为「📜 标题（出处 · 条目号）：古断摘录」；新增 buildTongcanRefs() 结构化引证导出（entry_id/title/source/quotes/service_note/layer）
+- B8 名赋接入引证层：KBREF_XINGJU +MX-061（五行形局断）、KBREF_FEMALE +MX-061（女相专章）、KBREF_PALACE 命宫/相貌 +MX-059（总纲）、官禄 +MX-060（贵格谱）
+- 对外服务端点：POST /api/mingxiang/tongcan-card（8920，optionalAuth，只读语义入 CSRF 白名单）——输入面相观测结构化参数，输出白话同参行+citations 结构化引证+纪律声明
+- 服务封装文档：skills/mingxiang-tongcan/SKILL.md（调用契约/标注体系/四条红线/63 条细则覆盖清单）
+- 验证：直调引证 6 条带出处 ✓；端点实测 ok（11 行卡+6 引证+纪律声明）✓；重启自检 8/8 ✓
