@@ -1,3 +1,9 @@
+## 2026-10-10 07:10 · G21 通道首单闭环 ✅ family 已激活 v1.3.0；v1.3.1 无差集不发（Kimi）
+
+- **family 侧已自动激活**：outbox 包目录按 sync-bus 惯例更名 `1.3.0.activated`，family `capabilities/paipan/manifest.json` = v1.3.0，备份 `paipan-2026-10-09T12-18-23` 留档；部署文件与源头逐字节一致（qimen/liuyao/kbref 抽检 diff=0）。
+- **v1.3.1 决策**：拟发的差集（251b32b 报告引擎问事透传）属**服务侧报告层**，不在 paipan 包契约内（消费方不跑报告引擎）；引擎文件自 v1.3.0 打包后零改动 → 按纪律「无真实差集不发包」，v1.3.1 撤项。CHANGELOG 留此笔防后人误以为漏发。
+- **G22 漂移巡检基准就位**：registry releases 有 v1.3.0 fingerprint（6697f750…），family 部署态同源同纹，对拍通道可用。
+
 ## 2026-10-10 06:05 · R-LY-YJ-UI + R-LR-KETI-UI 六爻/六壬引证闭环 ✅ 六盘大满贯（Kimi）
 
 - **盘点结论**：端点引证 09-29 已全建（六爻 guaCiReference 周易卦爻辞+动爻 + yilinReference 焦氏易林繇辞 4096 条；六壬 ketiReference 九宗门课体），排盘页（liuyao-chart 双卡 / liuren-chart 课体卡）已在——缺口只有报告页。
