@@ -1219,8 +1219,8 @@ async function aiMingliDraft(){
       if (raw) {
         const xo = JSON.parse(raw);
         if (xo && xo.ts && (Date.now() - xo.ts) < 24 * 3600 * 1000 &&
-            ((xo.palaces && Object.keys(xo.palaces).length) || xo.moles)) {
-          xiangObservation = { palaces: xo.palaces || {}, moles: xo.moles || '' };
+            ((xo.palaces && Object.keys(xo.palaces).length) || xo.moles || xo.palm)) {
+          xiangObservation = { palaces: xo.palaces || {}, moles: xo.moles || '', palm: xo.palm || '' };
         }
       }
     } catch (_) { /* 读取失败不影响主流程 */ }
@@ -1229,7 +1229,7 @@ async function aiMingliDraft(){
       gender: $('mlGender').value, name: $('mlName').value.trim(), aiEnhance: true
     };
     if (xiangObservation) reqBody.xiangObservation = xiangObservation;
-    if (xiangObservation) toast('已带入一帧采集的面相/痣相特征，批注将含命相同参引证');
+    if (xiangObservation) toast('已带入一帧采集的面相/痣相/掌纹特征，批注将含命相同参引证');
     const r = await aiPost('/api/clinic/mingli/draft', reqBody);
     if(r.error){ toast('命理批注失败：' + r.error); return; }
     const ai = r.aiAnnotation;

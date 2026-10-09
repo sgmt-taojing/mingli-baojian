@@ -804,6 +804,7 @@ function renderVisionDiagnosis(data) {
     };
     const xtObs = { palaces: {}, moles: '', ts: Date.now() };
     const xtMoles = [];
+    const xtPalms = [];
     data.mingli_features.forEach(f => {
       if (f && f.ok && f.features && f.features.top1) {
         const label = f.features.top1.label;
@@ -812,6 +813,8 @@ function renderVisionDiagnosis(data) {
           xtObs.palaces[pal] = obs;
         } else if (f.mode === 'fortune_mole') {
           xtMoles.push(label);
+        } else if (f.mode === 'fortune_palm') {
+          xtPalms.push(label); // R-DISTILL-MX-B5：掌纹接入同参卡
         }
         html += `<div class="value"><strong style="color:var(--gold,#d4af37)">${esc(f.name)}</strong> · ${f.engine} · ${f.elapsedMs}ms<br>` +
           `特征: <strong>${esc(label)}</strong>` +
@@ -823,7 +826,8 @@ function renderVisionDiagnosis(data) {
       }
     });
     xtObs.moles = xtMoles.join('、');
-    if (Object.keys(xtObs.palaces).length || xtObs.moles) {
+    xtObs.palm = xtPalms.join('、');
+    if (Object.keys(xtObs.palaces).length || xtObs.moles || xtObs.palm) {
       try { localStorage.setItem('ml_xiang_obs', JSON.stringify(xtObs)); } catch (_) {}
       html += '<div style="font-size:10px;color:var(--gold,#d4af37);margin-top:4px">✓ 已生成同参观测卡，命理批注时将自动带入（24h 内有效）</div>';
     }
