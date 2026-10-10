@@ -1,4 +1,13 @@
-## 2026-10-10 16:20 · R-DZ-ANNO-LR/WB 道藏同参铺满诊疗三端 ✅ 直播室+会诊台（Kimi）
+## 2026-10-10 16:40 · R-TAP-Z 排盘全盘点读收口 ✅ 紫微排盘页+道藏排盘器（Kimi）
+
+- **缘起**：用户指令「所有的排盘，点击盘面的任何一个部分，可以给出对应的通俗的解读」。盘点发现点读体系 R-TAP-X/Y 已建成（弹层 paipan-tap-pop.js + 服务端 7 构建器 + /api/paipan/:module/baihua），bazi/ziwei/qimen/liuyao/liuren/meihua/fengshui 七盘早已可点；缺口二处：①ziwei-chart.html（主力紫微排盘页）未接弹层；②道藏排盘器宫格无点读。
+- **紫微排盘页（ziwei-chart.html）**：每宫头行加 🔮 徽标（.zw-tap），点击弹本宫白话详解（标题+吉凶级+总断+主星/煞曜逐条）；capture 相位拦截，不与既有「点宫看三方四正」冲突（实测弹层出、三方四正不误触）。请求体由 PaipanBaihua.notify 既有缓存直供。
+- **道藏排盘器（daozang-duan.html）**：宫格可点，弹层**本地组装**（零额外请求）——宫断总论 narrative（服务端本次起随盘下发）+ 逐星断语 + 命身宫歌曰 + 涉医红线宫「戒律」行；复用 pt-pop 弹层样式。paipan-tap-pop.js 新增 opts.data 直给通道（跳过 fetch）。
+- **服务端**：/api/daozang/paipan 宫断附着增 narrative 字段（daozang-duan.json 宫总论）；点读端点口径不变。
+- **实测**：①ziwei-chart 排盘→点命宫 🔮 → 弹「命宫（戊寅）·平」5 行白话 ✅；②daozang-duan 排盘→点未宫命宫 → 弹宫断总论+歌曰三条 ✅；③奇门页内旧实现点巽宫 → 弹「凶·惊门门迫」白话 ✅；④六壬点初传/梅花点本卦/八字点日柱/风水点中宫/六爻点三爻 curl 冒烟全通（六爻 coins 须 6×3 枚格式）。
+- **现状全景**：八字/紫微(两页)/奇门/六爻/梅花/六壬/风水/道藏 = 9 盘面全部点哪解哪。
+
+
 
 - **门诊直播室（clinic-live-room.html）**：AI 命理智能体排盘成功后异步追加「⚖️ 道藏本判级 · 双源同参」finding 卡（杖锚/命身宫星曜/五等判级/昼夜得地），optionalAuth 免令牌，失败静默不阻塞主盘。
 - **会诊工作台（consult-workbench.html）**：命理批注区加「⚖️ 道藏同参」按钮——一键取杖锚盘判级写入批注框（redline 标「凶断存真·勿入信众正文」），命理师化用后签名，与「借鉴写入」纪律一致。

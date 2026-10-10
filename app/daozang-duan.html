@@ -228,10 +228,11 @@ async function runPaipan(){
       hourZhi:document.getElementById('pph').value,gender:document.getElementById('ppg').value,
       ganRule:document.getElementById('ppyuan').checked?'yuanshu':'tongxing'})}).then(r=>r.json());
   if(!r.ok){box.innerHTML='<div class="mred">排盘失败：'+esc(r.error||'')+'</div>';return;}
+  window._dzPaipan=r;   // R-TAP-Z：留存结果供宫位点读
   const a=r.anchors;
-  const cells=r.palaces.map(p=>{
+  const cells=r.palaces.map((p,i)=>{
     const mk=(p.isMing?'<span style="color:var(--gold);font-size:10px">命</span>':'')+(p.isShen?'<span style="color:var(--teal);font-size:10px">身</span>':'');
-    return '<div class="pcell'+(p.redline_medical?' red':'')+'" style="cursor:default;position:relative">'+
+    return '<div class="pcell'+(p.redline_medical?' red':'')+'" data-i="'+i+'" style="position:relative" title="点我出本宫断语解读">'+
       '<div class="nm">'+esc(p.zhi)+' · '+esc(p.gong)+' '+mk+'</div>'+
       '<div class="ct" style="line-height:1.6">'+(p.stars.length?p.stars.map(s=>esc(s.name)).join(' '):'—')+'</div></div>';
   }).join('');
@@ -261,7 +262,30 @@ async function runPaipanSvg(){
   box.innerHTML='<div style="font-size:12px;color:var(--teal);margin-bottom:8px">📜 道藏本盘图（SVG · 可右键另存/长按分享）· 五行谱着色 · 金框=杖锚星</div>'+
     '<div style="background:#0a0e17;border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;overflow:auto">'+svg+'</div>';
 }
+// R-TAP-Z：排盘器宫位点读——本地组装宫断弹层（宫断总论+星曜断+歌曰+红线戒律），零额外请求
+function dzTapData(p){
+  const lines=[];
+  if(p.narrative)lines.push({label:'宫断',text:p.narrative,level:'neutral'});
+  (p.verdicts||[]).forEach(v=>lines.push({label:v.name,text:v.verdict,level:'neutral'}));
+  (p.songs||[]).forEach(s=>lines.push({label:'歌曰',text:s,level:'neutral'}));
+  if(p.redline_medical)lines.push({label:'戒律',text:'本宫涉医命红线断语，研究端存真，勿入信众正文',level:'bad'});
+  if(!lines.length)lines.push({label:'提示',text:'本宫暂无宫断条文（空宫或断语未录）',level:'neutral'});
+  return {ok:true,
+    title:p.zhi+'宫 · '+p.gong+(p.isMing?'（命宫）':'')+(p.isShen?'（身宫）':''),
+    level:p.redline_medical?'bad':'neutral',
+    summary:(p.stars||[]).length?'本宫星曜：'+p.stars.map(s=>s.name).join('、'):'本宫无曜（空宫）',
+    lines:lines};
+}
+document.getElementById('ppresult').addEventListener('click',function(ev){
+  const c=ev.target&&ev.target.closest?ev.target.closest('.pcell[data-i]'):null;
+  if(!c)return;
+  ev.stopPropagation();
+  const r=window._dzPaipan;if(!r)return;
+  const p=r.palaces[+c.dataset.i];if(!p)return;
+  if(window.PaipanTap)PaipanTap.show({container:document.getElementById('ppresult'),anchor:c,key:'dz'+p.zhi+p.gong,module:'daozang',data:dzTapData(p)});
+});
 boot();initGeju();initChandu();initPaipan();
 </script>
+<script src="js/paipan-tap-pop.js" defer></script>
 </body>
 </html>

@@ -71,6 +71,8 @@
     anchorPop(pop, container, opts.anchor);
 
     (async function () {
+      // R-TAP-Z: opts.data 直给本地数据（如道藏排盘器宫断），跳过服务端请求
+      if (opts.data) return opts.data;
       var body = Object.assign({}, (window._paipanBody || {})[opts.module] || {}, opts.params || {});
       var r = await fetch(API_BASE + '/api/paipan/' + opts.module + '/baihua', {
         method: 'POST',

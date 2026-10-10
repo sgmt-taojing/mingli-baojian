@@ -78,6 +78,8 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
 .zw-gong.pro.sf-on{border-color:var(--gold);background:rgba(201,168,76,.07);box-shadow:0 0 0 1px rgba(201,168,76,.35)}
 .zw-gong.pro.sf-off{opacity:.38}
 .zw-gong-head{display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.zw-tap{cursor:pointer;font-size:11px;opacity:.55;border:1px solid var(--border);border-radius:8px;padding:0 4px;line-height:1.5}
+.zw-tap:hover{opacity:1;border-color:var(--gold);color:var(--gold)}
 .zw-gong-dx{margin-left:auto;font-size:8px;color:var(--blue)}
 .zw-gong-ln{font-size:8px;color:var(--red);padding:0 3px;border:1px solid rgba(239,68,68,.4);border-radius:2px}
 .zw-star i{font-style:normal;font-size:7px;vertical-align:super;margin-left:1px}
@@ -555,6 +557,7 @@ function buildPro(){
     if(lnNow)html+='<span class="zw-gong-ln">流年</span>';
     const dx=(c.daXian||[]).find(function(d){return d.palaceIdx===b;});
     if(dx)html+='<span class="zw-gong-dx">'+dx.startAge+'-'+dx.endAge+'</span>';
+    if(p.name)html+='<span class="zw-tap" data-palace="'+p.name+'" title="点我出本宫白话解读">🔮</span>';
     html+='</div><div class="zw-stars">';
     const mains=p.mainStars||[];
     if(mains.length){
@@ -576,6 +579,17 @@ function buildPro(){
     div.addEventListener('click',function(){zwSelPalace(b);});
     grid.appendChild(div);
   });
+
+  // R-TAP-Z：🔮徽标点读白话解读（capture 先拦，避免误触三方四正联动）
+  if(!grid.dataset.tapBound){
+    grid.dataset.tapBound='1';
+    grid.addEventListener('click',function(ev){
+      const t=ev.target&&ev.target.closest?ev.target.closest('.zw-tap'):null;
+      if(!t||!grid.contains(t))return;
+      ev.stopPropagation();ev.preventDefault();
+      if(window.PaipanTap)PaipanTap.show({container:grid,anchor:t.closest('.zw-gong')||t,key:'zw'+t.dataset.palace,module:'ziwei',params:{palace:t.dataset.palace}});
+    },true);
+  }
 
   // 中央信息区
   const ctr=document.createElement('div');
@@ -653,6 +667,7 @@ function renderInterpretation(i){
 </div>
 <script src="js/paipan-navigator.js" defer></script>
 <script src="js/paipan-baihua-panel.js" defer></script>
+<script src="js/paipan-tap-pop.js" defer></script><!-- R-TAP-Z：🔮点读弹层 -->
 <script src="js/pro-gate.js" defer></script><!-- R-FIX-ZWPRO：页面 249 行用 proFetch 拉 SVG 但漏引此文件，致排盘流程静默中断 -->
   <script src="js/error-interceptor.js" defer></script>
 </body>
