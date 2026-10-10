@@ -1,3 +1,10 @@
+## 2026-10-10 13:40 · R-DZ-TONGYUAN-RPT 双源同参卡进报告页 ✅ 信众报告多一层版本互证（Kimi）
+
+- **生辰透传**：ziwei-chart.html `generateFullReport` 在报告入 sessionStorage 前注入 `birthPayload`（year/month/day/hour/minute/sex/isLunar/leapMonth/name）——服务端报告响应不含盘与生辰，前端自携带最稳，不扰服务端契约。
+- **报告页新卡**：report-interpret.html `renderZwShuangyuan(report)`——从 `segments[].data.palaces`（norm 报告 seg1 原始数据，ganZhi/isMingGong/isShenGong 齐全）取通行盘，凭 birthPayload 调 `/api/daozang/paipan` 生辰直通复算道藏盘，命身宫对照表（同/异标色）+ 道藏五等判级（redline 凶断不出信众端）+ 体系差异说明脚注。
+- **降级纪律**：无 birthPayload（旧报告/直链）或无盘数据 → 静默不出卡不报错；renderPaipanReport 纯字符串拼接不改签名，卡走占位后挂 DOM。
+- **浏览器实测**：1990-06-15 06:30 男全流程 → 命宫两源同宫「卯」标同、身宫酉/子标异、判级「不入局（常人之命）」+ 昼夜得地文渲染正确；两条降级路径实测静默通过。
+
 ## 2026-10-10 07:10 · G21 通道首单闭环 ✅ family 已激活 v1.3.0；v1.3.1 无差集不发（Kimi）
 
 - **family 侧已自动激活**：outbox 包目录按 sync-bus 惯例更名 `1.3.0.activated`，family `capabilities/paipan/manifest.json` = v1.3.0，备份 `paipan-2026-10-09T12-18-23` 留档；部署文件与源头逐字节一致（qimen/liuyao/kbref 抽检 diff=0）。

@@ -207,6 +207,9 @@ async function generateFullReport(mod){
       return;
     }
     
+    // R-DZ-TONGYUAN-RPT（2026-10-10）：生辰透传随报告走，报告页双源同参卡凭此复算道藏盘（服务端不存盘，前端自携带）
+    r.birthPayload = {year:inputs.year, month:inputs.month, day:inputs.day, hour:inputs.hour, minute:30,
+      sex:inputs.sex||'', isLunar:inputs.lunar===true||inputs.lunar==='true', leapMonth:!!inputs.leapMonth, name:inputs.name||''};
     // 保存报告到 sessionStorage，跳到报告展示页
     sessionStorage.setItem('lastReport', JSON.stringify(r));
     window.location.href = 'report-interpret.html?module='+mod+'&name='+encodeURIComponent(inputs.name||'缘主');
