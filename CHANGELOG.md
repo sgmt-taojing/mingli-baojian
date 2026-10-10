@@ -1,3 +1,11 @@
+## 2026-10-10 17:35 · R-TAP-STATS 点读埋点闭环 ✅（Kimi）
+
+- **缘起**：用户批准「记录哪些宫/爻/柱被点得最多，反哺白话内容优先级」。
+- **服务端**：POST /api/paipan/tap-stats（火忘式上报，module+key+title，sanitize 截断，CSRF 白名单已挂，失败静默不阻塞盘面）；GET /api/paipan/tap-stats 聚合视图（按模块×点位计数排行 top20）；日志落 server/logs/paipan-tap-stats.jsonl。
+- **前端**：paipan-tap-pop.js 弹层渲染成功后自动上报（含道藏本地数据路径）；qimen-chart.html 页内旧实现同步补埋点。
+- **实测**：curl 双写双聚合 ✅；浏览器真点紫微「福德」宫 → 日志落「zw福德 / 福德（庚辰）」✅。
+- **注意**：静态服务器 JS Cache-Control max-age=3600，部署后旧页面内存 JS 不带埋点属正常（自然缓存过期后自愈）；弹层主体功能不受影响。
+
 ## 2026-10-10 16:55 · R-TAP-HINT 点读提示条全盘面铺开 ✅（Kimi）
 
 - **问题**：点读能力虽全通，但信众不知道盘面可点——全靠 title 悬停提示，发现率极低。

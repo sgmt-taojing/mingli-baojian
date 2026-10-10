@@ -360,6 +360,8 @@ async function showPalacePop(p,cell){
       +'<div class="pp-hint">点击其他宫位切换 · 点空白处或按 ESC 关闭</div>';
     pop.querySelector('.pp-close').addEventListener('click',hidePalacePop);
     anchor();
+    // R-TAP-STATS: 点读埋点上报（火忘式，失败静默）
+    try{fetch(API_BASE+'/api/paipan/tap-stats',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},body:JSON.stringify({module:'qimen',key:'qm'+p,title:pd.title||''})}).catch(function(){});}catch(_){}
   }catch(e){
     pop.innerHTML='<div class="pp-title"><span>⚠️ '+escPal(e.message||'解读失败')+'</span><button class="pp-close">✕</button></div>';
     pop.querySelector('.pp-close').addEventListener('click',hidePalacePop);

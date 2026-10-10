@@ -103,6 +103,14 @@
         + '<div class="pt-hint">点击其他位置切换 · 点空白或按 ESC 关闭</div>';
       pop.querySelector('.pt-close').addEventListener('click', hide);
       anchorPop(pop, container, opts.anchor);
+      // R-TAP-STATS: 点读埋点上报（火忘式，失败静默）
+      try {
+        fetch(API_BASE + '/api/paipan/tap-stats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Skip-Interceptor': '1' },
+          body: JSON.stringify({ module: opts.module, key: opts.key, title: pd.title || '' })
+        }).catch(function () {});
+      } catch (_) {}
     }).catch(function (e) {
       if (_pop !== pop) return;
       pop.innerHTML = '<div class="pt-title"><span>⚠️ ' + esc((e && e.message) || '解读失败（请先排盘）') + '</span><button class="pt-close">✕</button></div>';
