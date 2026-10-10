@@ -1,3 +1,10 @@
+## 2026-10-10 16:00 · R-DZ-ANNO 批注台接道藏判级层 ✅ 命理师审核多一系互证（Kimi）
+
+- **服务端**：`/api/clinic/mingli/draft` 新增 `daozangReference`——复用 `_daozangBuildChart` 同生辰出道藏盘，输出「杖锚/命身宫星曜/五等判级/昼夜得地」一行同参文 + 体系差异说明；redline 判级标「凶断存真·勿入信众正文」；aiEnhance 时以极简一行注入 prompt 并加边界「道藏判级只作同参不作主断，凶断存真勿入正文」。
+- **问诊台（unified-consultation.html）**：AI 命理批注区加「⚖️ 道藏本判级 · 双源同参」区块 + 借鉴写入按钮（与调候/格局/命相三卡同规格，不自动入断语，签名权在人）。
+- **实测**：master 令牌打端点 → daozangReference 返回正确（杖锚申/命宫卯天福/身宫子天虚/不入局/昼生得地）；浏览器全流程 → 区块渲染 + 借鉴按钮点击写入审核意见 OK（"说明："段按惯例不入正文）。
+- **排障留档**：curl 直连 401 属正常（clinic:collaborate 权限）；本地测试令牌用 `sec.generateToken(uid, 24, ['master'])` 签发，注意 pino 警告混 stdout 需 grep 过滤。
+
 ## 2026-10-10 15:45 · R-DZ-SVGPAIR 双盘图对拍 ✅ 同参卡一点出双盘同屏（Kimi）
 
 - **排盘页（ziwei-chart.html）**：doPaipan 留存通行盘 SVG（`_zwSvgText`）与生辰（`_zwPayload`）免再请求；同参卡加「🖼️ 双盘图对拍」折叠入口，点开并排渲染 康节本通行盘 × 道藏本十八飞星盘（`toggleShuangyuanSvg`）。

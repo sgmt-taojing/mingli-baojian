@@ -1262,6 +1262,11 @@ async function aiMingliDraft(){
       showTxt += '\n\n<b>👁️ 命相同参 · 相学参考（相不独论·须与命局互证）</b>\n' + escapeHtml(r.xiangReference);
       showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【命相同参参考】' + r.xiangReference.replace(/说明：[\s\S]*$/, '').trim()) + '">👁️ 借鉴写入审核意见</button>';
     }
+    // R-DZ-ANNO（2026-10-10）：道藏本判级同参区块——杖锚体系互证命局不作主断，凶断存真勿入信众正文
+    if(r.daozangReference){
+      showTxt += '\n\n<b>⚖️ 道藏本判级 · 双源同参（杖锚体系·互证命局不作主断）</b>\n' + escapeHtml(r.daozangReference);
+      showTxt += '\n<button class="ai-btn" onclick="adoptMingli(this)" data-t="' + encodeURIComponent('【道藏本判级同参】' + r.daozangReference.replace(/说明：[\s\S]*$/, '').trim()) + '">⚖️ 借鉴写入审核意见</button>';
+    }
     aiShow(showTxt);
   } catch(e){
     toast(e.name === 'AbortError' ? 'AI 生成超时（95s），请重试或稍后再试' : 'AI 服务不可用：' + e.message);
