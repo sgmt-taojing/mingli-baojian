@@ -51,6 +51,20 @@ h1{color:var(--gold);font-size:22px;text-align:center;letter-spacing:4px}
   <div class="starchips" id="schips"></div>
   <div class="panel" id="sdetail" style="display:none"></div>
 
+  <div class="panel" id="paipan">
+    <h3>道藏本排盘器 <span style="font-size:11px;color:var(--paper3);font-weight:400">杖星为锚 · 十八飞星 · 卷一起例群（KB-ZW-055）· 联动五等判级</span></h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;font-size:12px;color:var(--paper3)">
+      <label>年干支 <select id="ppgan" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select><select id="ppyz" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <label>农历月 <select id="ppm" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <label>日 <select id="ppd" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <label>时 <select id="pph" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <label>性别 <select id="ppg" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"><option>男</option><option>女</option></select></label>
+      <label style="cursor:pointer"><input type="checkbox" id="ppyuan"> 原书干阴阳异文</label>
+      <button class="schip" style="border-color:var(--gold);color:var(--gold)" onclick="runPaipan()">排盘</button>
+    </div>
+    <div id="ppresult"></div>
+  </div>
+
   <div class="panel" id="geju">
     <h3>命格五等判级器 <span style="font-size:11px;color:var(--paper3);font-weight:400">骨肉三局赋 · 身命吉曜环守谱（卷二）</span></h3>
     <div style="font-size:12px;color:var(--paper3);margin-bottom:8px">点选身命所躔星曜（吉曜青 / 凶曜红），配生时支与身宫支，依赋文判上局 / 中局 / 下局 / 不入局 / 贫贱五等。</div>
@@ -195,7 +209,44 @@ async function showChandu(kind){
     (t.collation?'<div class="mred">⚠ 校勘存疑：'+esc(t.collation)+'</div>':'')+
     '<div style="font-size:11px;color:var(--paper3);margin-top:6px">'+esc(r.source)+'</div>';
 }
-boot();initGeju();initChandu();
+/* ===== 道藏本排盘器（KB-ZW-055 起例群） ===== */
+const PP_GAN='甲乙丙丁戊己庚辛壬癸'.split('');
+function initPaipan(){
+  document.getElementById('ppgan').innerHTML=PP_GAN.map(g=>'<option'+(g==='甲'?' selected':'')+'>'+g+'</option>').join('');
+  document.getElementById('ppyz').innerHTML=GJ_ZHI.map(z=>'<option'+(z==='寅'?' selected':'')+'>'+z+'</option>').join('');
+  document.getElementById('ppm').innerHTML=Array.from({length:12},(_,i)=>'<option value="'+(i+1)+'">'+'正二三四五六七八九十冬腊'[i]+'月</option>').join('');
+  document.getElementById('ppd').innerHTML=Array.from({length:30},(_,i)=>'<option value="'+(i+1)+'">'+['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'][i]+'</option>').join('');
+  document.getElementById('pph').innerHTML=GJ_ZHI.map(z=>'<option'+(z==='卯'?' selected':'')+'>'+z+'时</option>').join('');
+}
+async function runPaipan(){
+  const box=document.getElementById('ppresult');
+  box.innerHTML='<div style="color:var(--paper3);font-size:12px">排盘中…</div>';
+  const r=await fetch(API_BASE+'/api/daozang/paipan',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+    body:JSON.stringify({yearGan:document.getElementById('ppgan').value,yearZhi:document.getElementById('ppyz').value,
+      month:+document.getElementById('ppm').value,day:+document.getElementById('ppd').value,
+      hourZhi:document.getElementById('pph').value,gender:document.getElementById('ppg').value,
+      ganRule:document.getElementById('ppyuan').checked?'yuanshu':'tongxing'})}).then(r=>r.json());
+  if(!r.ok){box.innerHTML='<div class="mred">排盘失败：'+esc(r.error||'')+'</div>';return;}
+  const a=r.anchors;
+  const cells=r.palaces.map(p=>{
+    const mk=(p.isMing?'<span style="color:var(--gold);font-size:10px">命</span>':'')+(p.isShen?'<span style="color:var(--teal);font-size:10px">身</span>':'');
+    return '<div class="pcell'+(p.redline_medical?' red':'')+'" style="cursor:default;position:relative">'+
+      '<div class="nm">'+esc(p.zhi)+' · '+esc(p.gong)+' '+mk+'</div>'+
+      '<div class="ct" style="line-height:1.6">'+(p.stars.length?p.stars.map(s=>esc(s.name)).join(' '):'—')+'</div></div>';
+  }).join('');
+  const g=r.geju;
+  const gHtml=g?'<div style="margin-top:10px;border:1px solid '+(g.grade.redline?'var(--red)':'var(--teal)')+';border-radius:8px;padding:10px 12px">'+
+    '<b style="color:'+(g.grade.redline?'var(--red)':'var(--gold)')+'">'+esc(g.grade.name)+'</b>'+(g.pinjianComposite?' <span style="font-size:10px;color:var(--red)">（姚守身命+虚对照·合成贫贱断）</span>':'')+
+    '<span style="font-size:11px;color:var(--paper3);margin-left:8px">'+esc(g.zhouye.text)+'</span>'+
+    '<div class="verse" style="margin-top:4px">'+esc(g.grade.quote)+'</div>'+
+    '<div style="font-size:11px;color:var(--paper3);margin-top:4px">身命星：'+g.judgedStars.map(esc).join('、')+'｜对照星：'+g.duizhaoStars.map(esc).join('、')+'</div></div>':'';
+  const dx='<div style="margin-top:10px;font-size:12px;color:var(--paper3)">大限（十年一宫）：'+r.daxian.slice(0,8).map(x=>esc(x.range)+'→'+esc(x.palace)).join('　')+'</div>'+
+    '<div style="font-size:12px;color:var(--paper3)">小运（一年一宫）：'+r.xiaoyun.slice(0,8).map(x=>x.age+'岁→'+esc(x.palace)).join('　')+'</div>';
+  box.innerHTML='<div style="font-size:12px;color:var(--teal);margin-bottom:8px">杖锚 '+esc(a.zhang)+' ｜ 紫微锚 '+esc(a.ziwei)+' ｜ 命宫 '+esc(a.ming)+' ｜ 身宫 '+esc(a.shen)+' ｜ '+(a.yangPerson?'阳男阴女':'阴男阳女')+'（'+esc(a.ganRule)+'）'+(a.shenBoundary?' ｜ 身宫界日午时不过未时过':'')+'</div>'+
+    '<div class="grid">'+cells+'</div>'+gHtml+dx+
+    '<div style="font-size:11px;color:var(--paper3);margin-top:8px;border-top:1px dashed var(--border);padding-top:6px">⚠ '+esc(r.ruleNotes.ming)+'<br>'+esc(r.ruleNotes.gongDir)+'；'+esc(r.ruleNotes.ganRule)+'<br>'+esc(r.discipline)+'</div>';
+}
+boot();initGeju();initChandu();initPaipan();
 </script>
 </body>
 </html>
