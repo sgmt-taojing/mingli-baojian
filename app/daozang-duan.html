@@ -28,6 +28,7 @@ h1{color:var(--gold);font-size:22px;text-align:center;letter-spacing:4px}
 .schip{border:1px solid var(--border);border-radius:14px;padding:4px 10px;font-size:12px;color:var(--paper3);cursor:pointer;background:transparent;font-family:inherit}
 .schip:hover{border-color:var(--teal);color:var(--teal)}
 .schip.on{border-color:var(--teal);color:var(--teal);background:rgba(125,211,192,.08)}
+.schip.xi.on{border-color:var(--red);color:var(--red);background:rgba(224,108,117,.10)}
 .schip b{color:var(--paper);font-weight:600}
 .vtable{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
 .vtable td{border-top:1px solid var(--border);padding:7px 8px;line-height:1.7;vertical-align:top}
@@ -49,6 +50,20 @@ h1{color:var(--gold);font-size:22px;text-align:center;letter-spacing:4px}
   <h3 style="color:var(--teal);font-size:14px;margin:18px 0 8px">十八飞星 · 逐星总断</h3>
   <div class="starchips" id="schips"></div>
   <div class="panel" id="sdetail" style="display:none"></div>
+
+  <div class="panel" id="geju">
+    <h3>命格五等判级器 <span style="font-size:11px;color:var(--paper3);font-weight:400">骨肉三局赋 · 身命吉曜环守谱（卷二）</span></h3>
+    <div style="font-size:12px;color:var(--paper3);margin-bottom:8px">点选身命所躔星曜（吉曜青 / 凶曜红），配生时支与身宫支，依赋文判上局 / 中局 / 下局 / 不入局 / 贫贱五等。</div>
+    <div class="starchips" id="gjchips"></div>
+    <div class="starchips" id="gxchips"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+      <label style="font-size:12px;color:var(--paper3)">生时支 <select id="ghour" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <label style="font-size:12px;color:var(--paper3)">身宫支 <select id="gshen" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <button class="schip" style="border-color:var(--gold);color:var(--gold)" onclick="gradeGeju()">判级</button>
+    </div>
+    <div id="gresult"></div>
+  </div>
+
   <div class="foot" id="foot"></div>
 </div>
 <script>
@@ -102,7 +117,40 @@ async function showStar(name){
     ((s.inPalaces&&s.inPalaces.length)?'<table class="vtable">'+s.inPalaces.map(x=>'<tr><td>'+esc(x.palace)+'</td><td>'+esc(x.verdict)+'</td></tr>').join('')+'</table>':'');
   panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-boot();
+/* ===== 命格五等判级器（骨肉三局赋 ZW-057） ===== */
+const GJ_JI=['紫微','天贵','天印','天寿','天福','天禄','文昌','红鸾','天库','贯索'];
+const GJ_XI=['天虚','天姚','毛头','天刃','天刑','天哭','天异','天杖'];
+const GJ_ZHI='子丑寅卯辰巳午未申酉戌亥'.split('');
+const gjSel=new Set();
+function initGeju(){
+  document.getElementById('gjchips').innerHTML=GJ_JI.map(s=>'<button class="schip" data-s="'+s+'" onclick="toggleGj(this)"><b>'+s+'</b></button>').join('');
+  document.getElementById('gxchips').innerHTML=GJ_XI.map(s=>'<button class="schip xi" data-s="'+s+'" onclick="toggleGj(this)"><b>'+s+'</b></button>').join('');
+  const opts=GJ_ZHI.map(z=>'<option value="'+z+'"'+(z==='午'?' selected':'')+'>'+z+'</option>').join('');
+  document.getElementById('ghour').innerHTML=opts;
+  document.getElementById('gshen').innerHTML=opts;
+}
+function toggleGj(el){
+  const s=el.dataset.s;
+  if(gjSel.has(s)){gjSel.delete(s);el.classList.remove('on');}else{gjSel.add(s);el.classList.add('on');}
+}
+async function gradeGeju(){
+  const box=document.getElementById('gresult');
+  box.innerHTML='<div style="color:var(--paper3);font-size:12px">判级中…</div>';
+  const r=await fetch(API_BASE+'/api/daozang/geju',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+    body:JSON.stringify({shenmingStars:[...gjSel],hourZhi:document.getElementById('ghour').value,shenZhi:document.getElementById('gshen').value})}).then(r=>r.json());
+  if(!r.ok){box.innerHTML='<div class="mred">判级失败：'+esc(r.error||'未知错误')+'</div>';return;}
+  const g=r.grade, z=r.zhouye;
+  const red=g.redline;
+  box.innerHTML='<div style="border:1px solid '+(red?'var(--red)':'var(--teal)')+';border-radius:8px;padding:12px 14px;background:'+(red?'rgba(224,108,117,.06)':'rgba(125,211,192,.05)')+'">'+
+    '<div style="font-size:16px;font-weight:600;color:'+(red?'var(--red)':'var(--gold)')+'">'+esc(g.name)+(red?' <span class="badge" style="border:1px solid var(--red);color:var(--red);border-radius:8px;padding:1px 8px;font-size:10px">凶断存真 · 仅研究</span>':'')+'</div>'+
+    '<div class="narr" style="margin-top:6px">'+esc(g.note)+'</div>'+
+    '<div class="verse" style="margin-top:6px">'+esc(g.quote)+'</div>'+
+    '<div style="margin-top:8px;font-size:12px;color:'+(z.dedi?'var(--teal)':'var(--red)')+'">'+esc(z.text)+'</div>'+
+    '<div style="font-size:11px;color:var(--paper3);margin-top:4px">'+esc(z.quote)+'</div>'+
+    '<div style="font-size:11px;color:var(--paper3);margin-top:8px;border-top:1px dashed var(--border);padding-top:6px">'+esc(r.source)+'<br>'+esc(r.discipline)+'</div>'+
+    '</div>';
+}
+boot();initGeju();
 </script>
 </body>
 </html>
