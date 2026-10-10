@@ -353,10 +353,42 @@ async function renderZwShuangyuan(report){
       row('身宫', escS(txShenZhi)+'宫', escS(dz.anchors.shen)+'宫（'+escS(dzShenStars)+'）', shenDiff)+
       '</table>'+
       (g && g.grade && !g.grade.redline ? '<div style="margin-top:8px;border-top:1px dashed rgba(255,255,255,.08);padding-top:8px">道藏五等判级：<b style="color:#c9a84c">'+escS(g.grade.name)+'</b><span style="color:#8b93a7;font-size:11px;margin-left:8px">'+escS(g.zhouye?g.zhouye.text:'')+'</span></div>' : '')+
+      '<div style="margin-top:8px"><a href="javascript:void(0)" onclick="toggleZwShuangyuanSvg(this)" style="color:#e0a34c;text-decoration:none;border-bottom:1px dashed #e0a34c;font-size:11px">🖼️ 双盘图对拍（点开同屏对比两系盘图）</a></div>'+
+      '<div class="zw-sy-svgpair" style="display:none;margin-top:8px"></div>'+
       '<div style="color:#8b93a7;font-size:10px;margin-top:8px;line-height:1.7">两系不同源（紫微为锚 vs 杖星为锚），命身异位属体系差异而非错误，对照为版本互证；道藏盘含三处存疑规则（安命读法/宫布方向/干阴阳异文），详见 <a href="daozang-duan.html" style="color:#e0a34c;text-decoration:none;border-bottom:1px dashed #e0a34c">道藏研究端</a>。</div>';
     var content = document.getElementById('paipanReportContent');
     if(content) content.appendChild(host);
+    window._zwReportBirth = bp; // 双盘对拍用
   }catch(e){ console.warn('双源同参卡渲染失败', e); }
+}
+
+// R-DZ-SVGPAIR（报告页）：双盘图对拍——道藏盘凭 birthPayload 现取；通行盘 SVG 需 pro 权限，不可用则只列道藏盘
+async function toggleZwShuangyuanSvg(link){
+  var host = link && link.parentElement && link.parentElement.nextElementSibling;
+  if(!host || !host.classList.contains('zw-sy-svgpair')) return;
+  if(host.dataset.loaded === '1'){ host.style.display = host.style.display==='none' ? 'block' : 'none'; return; }
+  var bp = window._zwReportBirth;
+  if(!bp){ host.style.display='block'; host.innerHTML='<div style="font-size:11px;color:#8b93a7">缺生辰参数，无法出图。</div>'; return; }
+  host.style.display = 'block';
+  host.innerHTML = '<div style="font-size:11px;color:#8b93a7">盘图绘制中…</div>';
+  var body = JSON.stringify({year:+bp.year,month:+bp.month,day:+bp.day,hour:+bp.hour,minute:bp.minute||30,sex:bp.sex||'',isLunar:!!bp.isLunar,leapMonth:!!bp.leapMonth});
+  var dzSvg = '', txSvg = '';
+  try {
+    var r1 = await fetch(API+'/api/daozang/paipan/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000),body:body});
+    if(r1.ok) dzSvg = await r1.text();
+  } catch(e) {}
+  try {
+    var r2 = await fetch(API+'/api/paipan/ziwei/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000),body:body});
+    if(r2.ok){ var t = await r2.text(); if(t.indexOf('<svg') >= 0) txSvg = t; }
+  } catch(e) {}
+  var cell = function(title, svg){
+    var ok = /^\s*(<\?xml[^>]*\?>)?\s*<svg/.test(svg||'');
+    return '<div style="flex:1;min-width:280px;background:#0a0e17;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:6px;text-align:center">'+
+      '<div style="font-size:11px;color:#c9a84c;margin-bottom:4px">'+title+'</div>'+
+      (ok ? svg.replace('<svg ','<svg style="width:100%;height:auto" ') : '<div style="font-size:11px;color:#8b93a7;padding:30px 0">盘图不可用（通行盘图需 pro 权限）</div>')+'</div>';
+  };
+  host.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap">'+cell('康节本 · 通行紫微', txSvg)+cell('道藏本 · 十八飞星', dzSvg)+'</div>';
+  host.dataset.loaded = '1';
 }
 
 // R708: 动态检测 i18n 语言（renderPaipanReport 调用时再读，IIFE + defer 都能拿到）
