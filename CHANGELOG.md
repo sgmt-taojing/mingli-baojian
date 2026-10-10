@@ -1,3 +1,10 @@
+## 2026-10-10 15:20 · R-DZ-SVG 道藏盘 SVG 高清盘图 ✅ 与通行盘同规格可保存分享（Kimi）
+
+- **渲染器**：server/daozang-svg-render.js——4×4 方阵地支固定布位（与通行紫微盘同规格），宫名+地支阴阳宫+命身徽标（徽标与地支文字错位防叠）；星曜 chips 按 KB-ZW-059 躔度表五行谱着色（木青/火红/土金/金银/水蓝），杖锚星金框高亮；中心起例总览（生辰/杖锚/命身/造主阴阳/昼夜得地/判级/命身吉曜/体系声明）+ 五行图例；命身宫底附宫断口诀首条。
+- **API**：POST /api/daozang/paipan/svg——排盘主体从 JSON 端点抽出共用 `_daozangBuildChart`，两端点同源出盘防漂移；CSRF 白名单同步。redline 判级（姚虚同见等）**不上图**，出「存真判级 · 研究端专阅」——信众可保存分享物不含凶断名（单测两条断言过）。
+- **页面**：daozang-duan.html 排盘器加「📜 出高清盘图」按钮，浏览器实测 庚午年五月廿三卯时男 → 1200×1200 SVG 挂载，命宫卯/天杖金框/判级不入局全渲染；qlmanage 转 PNG 目检版式无遮挡。
+- **JSON 端点回归**：重构后 /api/daozang/paipan 输出逐字段不变（命宫卯/判级不入局复测一致）。
+
 ## 2026-10-10 13:40 · R-DZ-TONGYUAN-RPT 双源同参卡进报告页 ✅ 信众报告多一层版本互证（Kimi）
 
 - **生辰透传**：ziwei-chart.html `generateFullReport` 在报告入 sessionStorage 前注入 `birthPayload`（year/month/day/hour/minute/sex/isLunar/leapMonth/name）——服务端报告响应不含盘与生辰，前端自携带最稳，不扰服务端契约。

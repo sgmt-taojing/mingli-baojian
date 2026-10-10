@@ -61,6 +61,7 @@ h1{color:var(--gold);font-size:22px;text-align:center;letter-spacing:4px}
       <label>性别 <select id="ppg" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"><option>男</option><option>女</option></select></label>
       <label style="cursor:pointer"><input type="checkbox" id="ppyuan"> 原书干阴阳异文</label>
       <button class="schip" style="border-color:var(--gold);color:var(--gold)" onclick="runPaipan()">排盘</button>
+      <button class="schip" style="border-color:var(--teal);color:var(--teal)" onclick="runPaipanSvg()">📜 出高清盘图</button>
     </div>
     <div id="ppresult"></div>
   </div>
@@ -245,6 +246,20 @@ async function runPaipan(){
   box.innerHTML='<div style="font-size:12px;color:var(--teal);margin-bottom:8px">杖锚 '+esc(a.zhang)+' ｜ 紫微锚 '+esc(a.ziwei)+' ｜ 命宫 '+esc(a.ming)+' ｜ 身宫 '+esc(a.shen)+' ｜ '+(a.yangPerson?'阳男阴女':'阴男阳女')+'（'+esc(a.ganRule)+'）'+(a.shenBoundary?' ｜ 身宫界日午时不过未时过':'')+'</div>'+
     '<div class="grid">'+cells+'</div>'+gHtml+dx+
     '<div style="font-size:11px;color:var(--paper3);margin-top:8px;border-top:1px dashed var(--border);padding-top:6px">⚠ '+esc(r.ruleNotes.ming)+'<br>'+esc(r.ruleNotes.gongDir)+'；'+esc(r.ruleNotes.ganRule)+'<br>'+esc(r.discipline)+'</div>';
+}
+// R-DZ-SVG：出高清盘图（与通行紫微盘同规格 4×4 方阵，可右键保存/分享）
+async function runPaipanSvg(){
+  const box=document.getElementById('ppresult');
+  box.innerHTML='<div style="color:var(--paper3);font-size:12px">盘图绘制中…</div>';
+  const resp=await fetch(API_BASE+'/api/daozang/paipan/svg',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+    body:JSON.stringify({yearGan:document.getElementById('ppgan').value,yearZhi:document.getElementById('ppyz').value,
+      month:+document.getElementById('ppm').value,day:+document.getElementById('ppd').value,
+      hourZhi:document.getElementById('pph').value,gender:document.getElementById('ppg').value,
+      ganRule:document.getElementById('ppyuan').checked?'yuanshu':'tongxing'})});
+  if(!resp.ok){const j=await resp.json().catch(()=>({}));box.innerHTML='<div class="mred">盘图生成失败：'+esc(j.error||resp.status)+'</div>';return;}
+  const svg=await resp.text();
+  box.innerHTML='<div style="font-size:12px;color:var(--teal);margin-bottom:8px">📜 道藏本盘图（SVG · 可右键另存/长按分享）· 五行谱着色 · 金框=杖锚星</div>'+
+    '<div style="background:#0a0e17;border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;overflow:auto">'+svg+'</div>';
 }
 boot();initGeju();initChandu();initPaipan();
 </script>
