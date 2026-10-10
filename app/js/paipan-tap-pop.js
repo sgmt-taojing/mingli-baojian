@@ -13,6 +13,16 @@
   var API_BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
   var LV_COLOR = { good: '#4ec9b0', bad: '#ef4444', neutral: '#8b7e6a' };
   var LV_LABEL = { good: '吉', bad: '凶', neutral: '平' };
+  // R-TAP-HINT：各模块点读提示语（bind 时自动注入容器上方，一次）
+  var TIP = {
+    bazi: '💡 盘面可点读：点击年/月/日/时柱，出该柱通俗解读',
+    ziwei: '💡 盘面可点读：点击任意宫位，出该宫通俗解读',
+    qimen: '💡 盘面可点读：点击任意宫位，出该宫通俗解读',
+    liuyao: '💡 盘面可点读：点击任意一爻，出该爻通俗解读',
+    meihua: '💡 盘面可点读：点击本卦/互卦/变卦/动爻，出通俗解读',
+    liuren: '💡 盘面可点读：点击初传/中传/末传，出该传通俗解读',
+    fengshui: '💡 盘面可点读：点击九宫任意一宫，出该宫通俗解读'
+  };
   var _pop = null, _key = null;
 
   function esc(s) {
@@ -33,7 +43,8 @@
       '.pt-line{margin-bottom:5px;padding-left:2px}' +
       '.pt-line .pt-label{display:inline-block;min-width:52px;color:#c9a84c;font-weight:600;margin-right:6px}' +
       '.pt-line.good .pt-label{color:#4ec9b0}.pt-line.bad .pt-label{color:#ef4444}' +
-      '.pt-hint{margin-top:8px;font-size:10px;color:#8b7e6a;text-align:center}';
+      '.pt-hint{margin-top:8px;font-size:10px;color:#8b7e6a;text-align:center}' +
+      '.pt-tip{font-size:11px;color:#8b7e6a;text-align:center;margin:8px auto 2px;max-width:800px;line-height:1.6}';
     document.head.appendChild(st);
   }
 
@@ -103,6 +114,15 @@
   // 便捷绑定：在 container 上代理 selector 的点击
   function bind(container, selector, conf) {
     if (!container) return;
+    // R-TAP-HINT：注容器上方常驻提示条（防成 grid 子项，插到容器之外）
+    injectCss();
+    var tipText = (conf && TIP[conf.module]);
+    if (tipText && container.parentNode && !container.parentNode.querySelector('.pt-tip')) {
+      var tip = document.createElement('div');
+      tip.className = 'pt-tip';
+      tip.textContent = tipText;
+      container.parentNode.insertBefore(tip, container);
+    }
     container.addEventListener('click', function (ev) {
       var el = ev.target.closest(selector);
       if (!el || !container.contains(el)) return;

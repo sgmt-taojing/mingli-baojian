@@ -254,6 +254,14 @@ function renderChart(c){
   const layout=[4,9,2,3,5,7,8,1,6];
   const grid=document.getElementById('qm-grid');
   grid.innerHTML='';
+  // R-TAP-HINT：常驻点读提示（只注一次）
+  if(!document.getElementById('qm-tap-tip')){
+    const tip=document.createElement('div');
+    tip.id='qm-tap-tip';
+    tip.style.cssText='font-size:11px;color:var(--paper3,#8b7e6a);text-align:center;margin:8px auto 2px;max-width:800px';
+    tip.textContent='💡 盘面可点读：点击任意宫位，出该宫通俗解读';
+    grid.parentNode.insertBefore(tip,grid);
+  }
   for(const p of layout){
     const palace=c.palaces.find(x=>x.palace===p);
     if(!palace) continue;

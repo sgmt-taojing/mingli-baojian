@@ -245,6 +245,7 @@ async function runPaipan(){
   const dx='<div style="margin-top:10px;font-size:12px;color:var(--paper3)">大限（十年一宫）：'+r.daxian.slice(0,8).map(x=>esc(x.range)+'→'+esc(x.palace)).join('　')+'</div>'+
     '<div style="font-size:12px;color:var(--paper3)">小运（一年一宫）：'+r.xiaoyun.slice(0,8).map(x=>x.age+'岁→'+esc(x.palace)).join('　')+'</div>';
   box.innerHTML='<div style="font-size:12px;color:var(--teal);margin-bottom:8px">杖锚 '+esc(a.zhang)+' ｜ 紫微锚 '+esc(a.ziwei)+' ｜ 命宫 '+esc(a.ming)+' ｜ 身宫 '+esc(a.shen)+' ｜ '+(a.yangPerson?'阳男阴女':'阴男阳女')+'（'+esc(a.ganRule)+'）'+(a.shenBoundary?' ｜ 身宫界日午时不过未时过':'')+'</div>'+
+    '<div style="font-size:11px;color:var(--paper3);text-align:center;margin-bottom:6px">💡 盘面可点读：点击任意宫格，出本宫断语解读</div>'+
     '<div class="grid">'+cells+'</div>'+gHtml+dx+
     '<div style="font-size:11px;color:var(--paper3);margin-top:8px;border-top:1px dashed var(--border);padding-top:6px">⚠ '+esc(r.ruleNotes.ming)+'<br>'+esc(r.ruleNotes.gongDir)+'；'+esc(r.ruleNotes.ganRule)+'<br>'+esc(r.discipline)+'</div>';
 }
