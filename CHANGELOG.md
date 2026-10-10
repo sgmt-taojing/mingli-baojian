@@ -2303,3 +2303,10 @@
 - 原书抽验：冉求盘（n0201）十二宫×主辅煞逐宫与引擎复盘全符（12/12），99 条「局相合」组布局可信度实证
 - 入库：113 条追加【十二宫复盘布局】块（命宫◎+身宫标注+主辅煞全录；对拍相合 trust 0.9 / 校勘存疑 trust 0.7），fts5 同步 113 更/0 插，五红线全绿（主表=fts5=322,224）
 - 新增 scripts/mingtu-replay.js（批量复盘+三项符合率+节气月替代解）与 scripts/mingtu-ingest.py（幂等回写），报告落 training/mingtu-replay/replay-report-2026-10-10.json
+
+## 2026-10-10 古今同参·格局级匹配升级（/api/mingtu/match）
+
+- 服务端新增格局级路径：调用方传整盘 palaces 即启用——命宫主星 Jaccard 40% + 三方四正（命/迁/财/官）30% + 同原著局 20% + 身宫同宫 10%，全 114 例参选（破同局硬过滤），分级标签：格局全合/三方呼应/同局相参/泛参；不传 palaces 走旧路径完全兼容
+- 格局索引 server/database/mingtu-layouts.json（113 例，由 replay 报告+KB tags 导出，运行时懒加载）
+- 三端前端接入：ziwei-chart.html / paipan-center.html / ziwei.html 均上传整盘并渲染格局分级徽章
+- 实测：命宫太阳太阴盘 → 白居易命（木三局）凭命宫全合+三方呼应越局登顶 top1「格局全合」，同局项退居第三——格局相似优先于同局，升级目标达成

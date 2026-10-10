@@ -227,7 +227,8 @@ async function tcRun(){
   if(zw&&zw.ok&&zw.chart&&zw.chart.wuxingJu){
     var mg=(zw.chart.palaces||[]).find(function(p){return p.isMingGong;})||{};
     var stars=(mg.mainStars||[]).map(function(s){return typeof s==='string'?s:(s&&(s.name||s.star))||'';}).filter(Boolean);
-    jobs.push(tcPost('/api/mingtu/match',{mingju:zw.chart.wuxingJu,stars:stars,limit:2}).then(function(d){return {kind:'ziwei',d:d,meta:zw.chart.wuxingJu+(stars.length?' · 命宫 '+stars.join('、'):'')};}).catch(function(){return null;}));
+    var zwPal=(zw.chart.palaces||[]).map(function(p){return {name:p.name,mainStars:(p.mainStars||[]).map(function(s){return typeof s==='string'?s:(s&&(s.name||s.star))||'';}).filter(Boolean),isMingGong:!!p.isMingGong,isShenGong:!!p.isShenGong};});
+    jobs.push(tcPost('/api/mingtu/match',{mingju:zw.chart.wuxingJu,stars:stars,palaces:zwPal,limit:2}).then(function(d){return {kind:'ziwei',d:d,meta:zw.chart.wuxingJu+(stars.length?' · 命宫 '+stars.join('、'):'')};}).catch(function(){return null;}));
   }
   var rizhu=bz&&(bz.pillars&&(bz.pillars['日']||bz.pillars.Day))||(bz.chart&&bz.chart.pillars&&(bz.chart.pillars['日']||''))||'';
   if(bz&&bz.ok!==false&&rizhu&&/^[\u4e00-\u9fa5]{2}$/.test(rizhu)){
