@@ -226,6 +226,7 @@ textarea.tall{min-height:200px}
     <div class="fld-label">AI 命理草案(上方命理轨,审阅后在此批注)</div>
     <textarea id="mlAnnotation" placeholder="命理师专业批注:格局要点、与主诉互参、调候建议……"></textarea>
     <div class="btn-row">
+      <button class="btn" id="btnDzRef">⚖️ 道藏同参</button>
       <button class="btn primary" id="btnMlSign">✍️ 命理师签名 · 批注生效</button>
       <span id="mlState"></span>
     </div>
@@ -530,6 +531,26 @@ $('btnMlSign').addEventListener('click',function(){
     });
   }).catch(function(e){$('btnMlSign').disabled=false;setSt('mlStatus','请求失败:'+e.message,'err')});
   });
+});
+
+/* ── R-DZ-ANNO-WB（2026-10-10）：道藏本判级同参——一键取杖锚盘判级写入批注框供命理师化用 ── */
+$('btnDzRef').addEventListener('click',function(){
+  var y=parseInt($('pYear').value),m=parseInt($('pMonth').value),d=parseInt($('pDay').value);
+  if(!y||!m||!d){setSt('mlStatus','请先填患者生辰','err');return}
+  setSt('mlStatus','道藏同参取盘中…','');
+  fetch(API+'/api/daozang/paipan',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},
+    body:JSON.stringify({year:y,month:m,day:d,hour:($('pHour').value!==''?parseInt($('pHour').value):12),minute:30,sex:$('pGender').value,isLunar:false})})
+  .then(function(r){return r.json()}).then(function(dz){
+    if(!dz.ok){setSt('mlStatus','道藏排盘失败:'+(dz.error||''),'err');return}
+    var mingP=dz.palaces.find(function(p){return p.isMing})||{stars:[]};
+    var shenP=dz.palaces.find(function(p){return p.isShen})||{stars:[]};
+    var sn=function(p){return p.stars.length?p.stars.map(function(s){return s.name}).join('、'):'无星躔'};
+    var g=dz.geju;
+    var grade=g&&g.grade?(g.grade.redline?g.grade.name+'（凶断存真·勿入信众正文）':g.grade.name):'未判';
+    var line='【道藏本判级同参】杖锚'+dz.anchors.zhang+'宫，命宫'+dz.anchors.ming+'宫（'+sn(mingP)+'），身宫'+dz.anchors.shen+'宫（'+sn(shenP)+'）；五等判级：'+grade+'；'+(g&&g.zhouye?g.zhouye.text:'')+'。（杖锚体系互证不作主断）';
+    var ta=$('mlAnnotation');ta.value=(ta.value?ta.value+'\n':'')+line;
+    setSt('mlStatus','✅ 道藏同参已写入批注框，请化用后签名','ok');
+  }).catch(function(e){setSt('mlStatus','道藏同参不可用:'+e.message,'err')});
 });
 
 /* ── 完成态 ── */

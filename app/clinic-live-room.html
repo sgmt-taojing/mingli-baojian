@@ -690,6 +690,24 @@ async function runMingliAgent(){
     Room.emr.mingli = summary;
     setEmrField('fMingli', summary);
 
+    // R-DZ-ANNO-LR（2026-10-10）：道藏本判级同参卡（杖锚体系互证，异步追加不阻塞主盘）
+    fetch(API_MEDICAL + '/api/daozang/paipan', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Skip-Interceptor': '1' },
+      signal: AbortSignal.timeout(8000),
+      body: JSON.stringify({ year: y, month: m, day: d, hour: h || 12, minute: 30, sex: $('bGender').value, isLunar: false })
+    }).then(r => r.json()).then(dz => {
+      if (!dz.ok) return;
+      const mingP = dz.palaces.find(p => p.isMing) || { stars: [] };
+      const shenP = dz.palaces.find(p => p.isShen) || { stars: [] };
+      const sn = p => p.stars.length ? p.stars.map(s => s.name).join('、') : '无星躔';
+      const g = dz.geju;
+      const grade = g && g.grade ? (g.grade.redline ? g.grade.name + '（存真·研究口径）' : g.grade.name) : '未判';
+      $('mlBody').insertAdjacentHTML('beforeend',
+        '<div class="finding"><div class="f-title">⚖️ 道藏本判级 · 双源同参（杖锚体系·互证不作主断）</div>' +
+        '杖锚 ' + esc(dz.anchors.zhang) + '宫 · 命宫 ' + esc(dz.anchors.ming) + '（' + esc(sn(mingP)) + '）· 身宫 ' + esc(dz.anchors.shen) + '（' + esc(sn(shenP)) + '）<br>' +
+        '五等判级：<b style="color:var(--gold2)">' + esc(grade) + '</b>' + (g && g.zhouye ? ' · ' + esc(g.zhouye.text) : '') + '</div>');
+    }).catch(() => { /* 道藏同参失败不影响主盘 */ });
+
     _mlProg.finish(true, true);
     $('mlBody').innerHTML =
       '<div class="finding"><div class="f-title">🧭 八字命盘</div>' + esc(ml.pillars) + '</div>' +
