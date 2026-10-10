@@ -261,6 +261,7 @@ async function doPaipan(){
   renderSvg(svg);
   renderFlow(data.flow, targetYear, currentAge);
   renderGujin(data.chart);
+  renderShuangyuan(data.chart, payload);   // R-DZ-TONGYUAN：道藏本双源同参
   if(data.ziweiReference) renderZiweiCanon(data.ziweiReference);   // R-ZW-CANON：主星諸星問答論引证
   if(data.interpretation) renderInterpretation(data.interpretation);
 }
@@ -324,6 +325,50 @@ async function renderGujin(chart){
   const fl = document.getElementById('zw-flow-host');
   if(fl && fl.parentNode) fl.parentNode.insertBefore(host, fl.nextSibling);
   else document.body.appendChild(host);
+}
+
+// ═══ 双源同参：康节本（通行十四主星）× 道藏本（十八飞星杖锚）同盘对照（2026-10-10 R-DZ-TONGYUAN） ═══
+async function renderShuangyuan(chart, payload){
+  const old = document.getElementById('zw-shuangyuan-host');
+  if(old) old.remove();
+  if(!chart || !payload) return;
+  let dz;
+  try {
+    const r = await fetch(API_BASE+'/api/daozang/paipan',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},signal:AbortSignal.timeout(10000),
+      body:JSON.stringify({year:payload.year,month:payload.month,day:payload.day,hour:payload.hour,minute:payload.minute||30,sex:payload.sex,isLunar:payload.isLunar,leapMonth:payload.leapMonth})});
+    dz = await r.json();
+  } catch(e) { return; }
+  if(!dz || !dz.ok) return;
+  const txMing = (chart.palaces||[]).find(function(p){return p.isMingGong;}) || {};
+  const txShen = (chart.palaces||[]).find(function(p){return p.isShenGong;}) || {};
+  const txMingZhi = txMing.ganZhi ? txMing.ganZhi.slice(-1) : '?';
+  const txShenZhi = txShen.ganZhi ? txShen.ganZhi.slice(-1) : '?';
+  const txMingStars = (txMing.mainStars||[]).join('、') || '（无主星）';
+  const dzMingP = dz.palaces.find(function(p){return p.isMing;}) || {stars:[]};
+  const dzShenP = dz.palaces.find(function(p){return p.isShen;}) || {stars:[]};
+  const dzMingStars = dzMingP.stars.map(function(s){return s.name;}).join('、') || '（无星躔）';
+  const dzShenStars = dzShenP.stars.map(function(s){return s.name;}).join('、') || '（无星躔）';
+  const mingDiff = txMingZhi !== dz.anchors.ming, shenDiff = txShenZhi !== dz.anchors.shen;
+  const g = dz.geju;
+  const row = function(label, tx, dzv, diff){
+    return '<tr><td style="padding:5px 8px;color:var(--paper3);white-space:nowrap;border-top:1px solid var(--border,#2a3450)">'+label+'</td>'+
+      '<td style="padding:5px 8px;border-top:1px solid var(--border,#2a3450)">'+tx+'</td>'+
+      '<td style="padding:5px 8px;border-top:1px solid var(--border,#2a3450);color:'+(diff?'var(--gold,#c9a84c)':'inherit')+'">'+dzv+(diff?' <span style="font-size:10px;color:#e0a34c">异</span>':' <span style="font-size:10px;color:var(--jade,#4ec9b0)">同</span>')+'</td></tr>';
+  };
+  const host = document.createElement('div');
+  host.id = 'zw-shuangyuan-host';
+  host.style.cssText = 'max-width:800px;margin:12px auto;padding:12px;background:var(--card,#141928);border:1px solid rgba(125,211,192,.25);border-left:3px solid var(--gold,#c9a84c);border-radius:8px;font-size:12px;color:var(--paper,#e8dcc8)';
+  host.innerHTML = '<div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:6px">⚖️ 双源同参 · 康节本（通行紫微）× 道藏本（十八飞星）'+(dz.derived?'<span style="font-size:10px;color:var(--paper3);font-weight:400;margin-left:8px">道藏盘依 '+esc(dz.derived.lunarDate)+' '+esc(dz.derived.yearGanZhi)+'年 起例</span>':'')+'</div>'+
+    '<table style="width:100%;border-collapse:collapse;font-size:12px">'+
+    '<tr style="color:var(--paper3);font-size:11px"><td style="padding:2px 8px"></td><td>康节本（'+esc(chart.wuxingJu||'')+'）</td><td>道藏本（杖锚 '+esc(dz.anchors.zhang)+'）</td></tr>'+
+    row('命宫', esc(txMingZhi)+'宫（'+esc(txMingStars)+'）', esc(dz.anchors.ming)+'宫（'+esc(dzMingStars)+'）', mingDiff)+
+    row('身宫', esc(txShenZhi)+'宫', esc(dz.anchors.shen)+'宫（'+esc(dzShenStars)+'）', shenDiff)+
+    '</table>'+
+    (g?'<div style="margin-top:8px;border-top:1px dashed var(--border,#2a3450);padding-top:8px">道藏五等判级：<b style="color:'+(g.grade.redline?'var(--red,#e06c75)':'var(--gold,#c9a84c)')+'">'+esc(g.grade.name)+'</b><span style="color:var(--paper3);font-size:11px;margin-left:8px">'+esc(g.zhouye.text)+'</span></div>':'')+
+    '<div style="color:var(--paper3);font-size:10px;margin-top:8px;line-height:1.7">两系不同源（紫微为锚 vs 杖星为锚），命宫异位属体系差异而非错误，对照为版本互证；道藏盘含三处存疑规则（安命读法/宫布方向/干阴阳异文），详见 <a href="daozang-duan.html" style="color:#e0a34c;text-decoration:none;border-bottom:1px dashed #e0a34c">道藏研究端</a>。凶断存真仅供研究。</div>';
+  const gujin = document.getElementById('zw-gujin-host');
+  if(gujin && gujin.parentNode) gujin.parentNode.insertBefore(host, gujin.nextSibling);
+  else { const fl = document.getElementById('zw-flow-host'); if(fl && fl.parentNode) fl.parentNode.insertBefore(host, fl.nextSibling); else document.body.appendChild(host); }
 }
 
 function renderSvg(svg){
