@@ -2310,3 +2310,10 @@
 - 格局索引 server/database/mingtu-layouts.json（113 例，由 replay 报告+KB tags 导出，运行时懒加载）
 - 三端前端接入：ziwei-chart.html / paipan-center.html / ziwei.html 均上传整盘并渲染格局分级徽章
 - 实测：命宫太阳太阴盘 → 白居易命（木三局）凭命宫全合+三方呼应越局登顶 top1「格局全合」，同局项退居第三——格局相似优先于同局，升级目标达成
+
+## 2026-10-10 命图校勘台账页（mingtu-collation.html · 命理师研究端）
+
+- 14 条「局不符」命例一屏台账：原书局 vs 通行法复盘局 vs 节气月替代解（4 条命中）+ 断语摘录 + 页图直达
+- 新增接口：GET /api/mingtu/collations（台账+定夺合并）、POST /api/mingtu/collation-verdict（四档定夺 book/engine/jieqi/uncertain + 笔记，落侧边 verdicts JSON 不写 KB）、GET /api/mingtu/page-image（页图白名单 n0197-n0254）
+- 坑位记录：res.sendFile 被全局错误兜底转成 INTERNAL_404（疑 data-export-guard 拦截），改 createReadStream 流式输出后通
+- 实测：台账 14 卡渲染、统计条（4 节气月命中/10 未解/已定夺计数）正确、页图弹窗 1836×2376 原图加载、定夺按钮落盘复核无误

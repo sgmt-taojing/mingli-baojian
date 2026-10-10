@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>命图校勘台账 · 命理宝鉴</title>
+<style>
+:root{--bg:#0b0f1a;--card:#141928;--border:#2a3450;--paper:#e8dcc8;--paper3:#8b93a7;--gold:#c9a84c;--jade:#4ec9b0;--red:#e07a7a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:"Songti SC","STSong",serif;min-height:100vh}
+.wrap{max-width:960px;margin:0 auto;padding:20px 14px 60px}
+h1{color:var(--gold);font-size:22px;text-align:center;letter-spacing:4px}
+.sub{color:var(--paper3);font-size:12px;text-align:center;margin:6px 0 18px}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--paper3)}
+.stat b{color:var(--gold);font-size:18px;margin-right:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:12px 0}
+.card.resolved{border-color:rgba(78,201,176,.4)}
+.card h3{color:var(--gold);font-size:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:10px;border:1px solid var(--border);border-radius:8px;padding:1px 8px;color:var(--paper3);font-weight:400}
+.badge.gold{color:var(--gold);border-color:var(--gold)}
+.badge.jade{color:var(--jade);border-color:var(--jade)}
+.birth{color:var(--paper3);font-size:12px;margin:6px 0}
+.jurow{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0;font-size:13px}
+.ju{background:rgba(201,168,76,.08);border:1px solid var(--border);border-radius:6px;padding:6px 10px}
+.ju .k{color:var(--paper3);font-size:11px;display:block}
+.ju .v{color:var(--paper);font-weight:600}
+.ju.alt-ok{border-color:var(--jade)}
+.ju.alt-ok .v{color:var(--jade)}
+.duanyu{font-size:13px;line-height:1.8;color:var(--paper);background:rgba(0,0,0,.2);border-radius:6px;padding:8px 10px;margin:8px 0}
+.verdicts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.vbtn{background:transparent;border:1px solid var(--border);color:var(--paper3);border-radius:14px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.vbtn:hover{border-color:var(--gold);color:var(--gold)}
+.vbtn.on{background:var(--gold);color:#0b0f1a;border-color:var(--gold);font-weight:600}
+.vnote{flex:1;min-width:160px;background:#0b0f1a;border:1px solid var(--border);border-radius:6px;color:var(--paper);padding:5px 8px;font-size:12px;font-family:inherit}
+.imgbtn{background:transparent;border:1px solid var(--jade);color:var(--jade);border-radius:14px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:inherit}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;justify-content:center;align-items:center;flex-direction:column}
+.modal.show{display:flex}
+.modal img{max-width:94vw;max-height:82vh;border:2px solid var(--gold);border-radius:6px}
+.modal .cap{color:var(--gold);margin:10px;font-size:14px}
+.modal .close{position:absolute;top:14px;right:20px;color:var(--paper);font-size:26px;cursor:pointer;background:none;border:none}
+.foot{color:var(--paper3);font-size:11px;text-align:center;margin-top:24px;line-height:1.8}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gold);color:#0b0f1a;padding:8px 20px;border-radius:20px;font-size:13px;display:none;z-index:100}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>命图校勘台账</h1>
+  <div class="sub">《康节说易全书·紫微斗数全书》卷四 · 生辰复盘与原书对拍 · 局不符 14 例 · 命理师研究端</div>
+  <div class="stats" id="stats"></div>
+  <div id="list"></div>
+  <div class="foot">校勘结论仅作研究记录，不改库不入链；定夺积累后由源头统一裁定。<br>命理宝鉴 · 古籍校勘工作台</div>
+</div>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('show')">
+  <button class="close" onclick="document.getElementById('modal').classList.remove('show')">✕</button>
+  <div class="cap" id="modal-cap"></div>
+  <img id="modal-img" alt="原书页图">
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API_BASE=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
+const VK={book:'从原书',engine:'从引擎',jieqi:'节气月安命',uncertain:'存疑待考'};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',1800);}
+function openImg(page,title){
+  document.getElementById('modal-img').src=API_BASE+'/api/mingtu/page-image?n='+page;
+  document.getElementById('modal-cap').textContent=title+' · '+page+'.jpg（康节本卷四原页）';
+  document.getElementById('modal').classList.add('show');
+}
+async function setVerdict(entryId, verdict, btn){
+  const card=btn.closest('.card');
+  const note=card.querySelector('.vnote').value.trim();
+  try{
+    const r=await fetch(API_BASE+'/api/mingtu/collation-verdict',{method:'POST',headers:{'Content-Type':'application/json','X-Skip-Interceptor':'1'},body:JSON.stringify({entry_id:entryId,verdict:verdict,note:note})}).then(r=>r.json());
+    if(!r.ok){toast('保存失败：'+r.error);return;}
+    card.querySelectorAll('.vbtn').forEach(b=>b.classList.toggle('on',b.dataset.v===verdict));
+    card.classList.add('resolved');
+    toast('已定夺：'+VK[verdict]);
+  }catch(e){toast('网络错误');}
+}
+function render(items){
+  const decided=items.filter(i=>i.verdict).length;
+  const jieqi=items.filter(i=>i.alt).length;
+  document.getElementById('stats').innerHTML=
+    '<div class="stat"><b>'+items.length+'</b>存疑条目</div>'+
+    '<div class="stat"><b>'+jieqi+'</b>节气月假说命中</div>'+
+    '<div class="stat"><b>'+(items.length-jieqi)+'</b>未解（疑刻误/流派）</div>'+
+    '<div class="stat"><b>'+decided+'</b>已定夺</div>';
+  const host=document.getElementById('list');
+  host.innerHTML=items.map(it=>{
+    const altHtml=it.alt?'<div class="ju alt-ok"><span class="k">节气月解（月'+(it.alt.month_delta>0?'+1':'-1')+'）</span><span class="v">'+esc(it.alt.ju)+' · 命宫'+esc(it.alt.mg_gz)+' · '+esc(it.alt.stars)+'</span></div>':'';
+    const v=it.verdict;
+    const vbtns=Object.keys(VK).map(k=>'<button class="vbtn'+(v&&v.verdict===k?' on':'')+'" data-v="'+k+'" onclick="setVerdict(\''+esc(it.entry_id)+'\',\''+k+'\',this)">'+VK[k]+'</button>').join('');
+    return '<div class="card'+(v?' resolved':'')+'">'+
+      '<h3>'+esc(it.name)+' <span class="badge">'+esc(it.page)+' · '+esc(it.side)+'盘</span>'+(v?'<span class="badge jade">已定夺·'+esc(VK[v.verdict])+'</span>':'')+'</h3>'+
+      '<div class="birth">'+esc(it.birth)+'</div>'+
+      '<div class="jurow">'+
+        '<div class="ju"><span class="k">原书（印本）</span><span class="v">'+esc(it.ju_book)+'</span></div>'+
+        '<div class="ju"><span class="k">通行法复盘</span><span class="v">'+esc(it.ju_replay)+' · 命宫'+esc(it.mg_replay)+' · '+esc(it.stars_replay||'无主星')+'</span></div>'+
+        altHtml+
+      '</div>'+
+      '<div class="duanyu">'+esc(it.duanyu)+'</div>'+
+      '<div class="verdicts">'+vbtns+
+        '<input class="vnote" placeholder="校勘笔记（如：原页某宫刻误…）" value="'+esc(v&&v.note||'')+'">'+
+        '<button class="imgbtn" onclick="openImg(\''+esc(it.page)+'\',\''+esc(it.name)+'\')">📜 对原图</button>'+
+      '</div>'+
+      (v&&v.at?'<div style="color:var(--paper3);font-size:10px;margin-top:6px">定夺于 '+esc(v.at.slice(0,16).replace('T',' '))+'</div>':'')+
+    '</div>';
+  }).join('');
+}
+(async()=>{
+  try{
+    const d=await fetch(API_BASE+'/api/mingtu/collations',{headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json());
+    if(!d.ok)throw new Error(d.error||'加载失败');
+    render(d.items);
+  }catch(e){
+    document.getElementById('list').innerHTML='<div class="card" style="text-align:center;color:var(--red)">台账加载失败：'+esc(e.message)+'</div>';
+  }
+})();
+</script>
+</body>
+</html>
