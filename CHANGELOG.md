@@ -2317,3 +2317,10 @@
 - 新增接口：GET /api/mingtu/collations（台账+定夺合并）、POST /api/mingtu/collation-verdict（四档定夺 book/engine/jieqi/uncertain + 笔记，落侧边 verdicts JSON 不写 KB）、GET /api/mingtu/page-image（页图白名单 n0197-n0254）
 - 坑位记录：res.sendFile 被全局错误兜底转成 INTERNAL_404（疑 data-export-guard 拦截），改 createReadStream 流式输出后通
 - 实测：台账 14 卡渲染、统计条（4 节气月命中/10 未解/已定夺计数）正确、页图弹窗 1836×2376 原图加载、定夺按钮落盘复核无误
+
+## 2026-10-10 校勘台账入口挂载（pro 端三处）
+
+- paipan-center.html：排盘中心卡片区新增「🧐 命图校勘台账」入口卡（金色左边条，紧邻古今同参速览）
+- ziwei-chart.html：古今同参卡底部新增「校勘台账」直达链接
+- report-interpret.html：紫微细则引证折叠卡尾部新增台账链接（中英双语）
+- 三处均浏览器实测渲染通过

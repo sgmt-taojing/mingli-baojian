@@ -320,7 +320,7 @@ async function renderGujin(chart){
   const subtitle = myStars.length ? '命宫 '+esc(myStars.join('、'))+' · ' : '';
   host.innerHTML = '<div style="color:var(--gold,#c9a84c);font-weight:600;margin-bottom:6px">📖 古今同参 · '+esc(data.mingju)+' · '+subtitle+'古人同局命例 '+data.total+' 则</div>'+
     items+
-    '<div style="color:var(--paper3);font-size:10px;margin-top:8px">出自 '+esc(data.matches[0].source)+'　'+esc(data.disclaimer)+'</div>';
+    '<div style="color:var(--paper3);font-size:10px;margin-top:8px">出自 '+esc(data.matches[0].source)+'　'+esc(data.disclaimer)+'　<a href="mingtu-collation.html" style="color:#e0a34c;text-decoration:none;border-bottom:1px dashed #e0a34c">🧐 校勘台账</a></div>';
   const fl = document.getElementById('zw-flow-host');
   if(fl && fl.parentNode) fl.parentNode.insertBefore(host, fl.nextSibling);
   else document.body.appendChild(host);
