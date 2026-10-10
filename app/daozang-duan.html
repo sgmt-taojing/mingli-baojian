@@ -64,6 +64,19 @@ h1{color:var(--gold);font-size:22px;text-align:center;letter-spacing:4px}
     <div id="gresult"></div>
   </div>
 
+  <div class="panel" id="chandu">
+    <h3>躔度布局表 <span style="font-size:11px;color:var(--paper3);font-weight:400">骨肉三局赋双表 · 九阳环+九阴环同步轮转（卷二 n0300-n0304 原页精读）</span></h3>
+    <div style="font-size:12px;color:var(--paper3);margin-bottom:8px">时辰表卯起 / 宫支表酉起，双环每进一位同转一格；阴阳九对（紫贵·文红·福异·禄毛·印虚·寿贯·杖刑·库刃·姚哭）历 24 表不破。⚠ 表义为值时躔度序，<b>非安星落宫表</b>。</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+      <label style="font-size:12px;color:var(--paper3)">时辰表 <select id="cdhour" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <label style="font-size:12px;color:var(--paper3)">宫支表 <select id="cdgong" style="background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-family:inherit"></select></label>
+      <button class="schip" style="border-color:var(--gold);color:var(--gold)" onclick="showChandu('hour')">查时辰</button>
+      <button class="schip" style="border-color:var(--gold);color:var(--gold)" onclick="showChandu('gong')">查宫支</button>
+      <button class="schip" onclick="showChandu('pairs')">阴阳九对不变式</button>
+    </div>
+    <div id="cdresult"></div>
+  </div>
+
   <div class="foot" id="foot"></div>
 </div>
 <script>
@@ -150,7 +163,39 @@ async function gradeGeju(){
     '<div style="font-size:11px;color:var(--paper3);margin-top:8px;border-top:1px dashed var(--border);padding-top:6px">'+esc(r.source)+'<br>'+esc(r.discipline)+'</div>'+
     '</div>';
 }
-boot();initGeju();
+/* ===== 躔度布局表（骨肉三局赋 ZW-059） ===== */
+const CD_WX_COLOR={'木':'#7dd3c0','火':'#e06c75','土':'#d4a24e','金':'#c8ccd4','水':'#61afef'};
+function initChandu(){
+  const h=['卯','辰','巳','午','未','申','酉','戌','亥','子','丑','寅'].map(z=>'<option value="'+z+'">'+z+'时</option>').join('');
+  const g=['酉','戌','亥','子','丑','寅','卯','辰','巳','午','未','申'].map(z=>'<option value="'+z+'">'+z+'宫</option>').join('');
+  document.getElementById('cdhour').innerHTML=h;
+  document.getElementById('cdgong').innerHTML=g;
+}
+function cdStar(s){return '<span style="display:inline-block;border:1px solid '+(CD_WX_COLOR[s.wuxing]||'var(--border)')+';color:'+(CD_WX_COLOR[s.wuxing]||'var(--paper)')+';border-radius:6px;padding:2px 8px;margin:2px;font-size:13px">'+esc(s.star)+'<span style="font-size:10px;opacity:.7">'+esc(s.wuxing)+'</span></span>';}
+async function showChandu(kind){
+  const box=document.getElementById('cdresult');
+  if(kind==='pairs'){
+    const r=await fetch(API_BASE+'/api/daozang/chandu',{headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json());
+    if(!r.ok){box.innerHTML='<div class="mred">'+esc(r.error)+'</div>';return;}
+    box.innerHTML='<div style="font-size:12px;color:var(--paper3);margin-bottom:6px">双环同步轮转的不变式——任意时/宫表第 k 位必为下列九对之一（阳星·阴星）：</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px">'+r.invariant_pairs.map(p=>
+        '<span style="border:1px solid var(--gold);border-radius:8px;padding:4px 10px;font-size:13px"><b style="color:var(--teal)">'+esc(p[0])+'</b> <span style="color:var(--paper3)">×</span> <b style="color:var(--red)">'+esc(p[1])+'</b></span>').join('')+'</div>'+
+      '<div style="font-size:11px;color:var(--paper3);margin-top:8px">'+esc(r.rules.invariant)+'<br>'+esc(r.rules.semantics)+'</div>';
+    return;
+  }
+  const z=document.getElementById(kind==='hour'?'cdhour':'cdgong').value;
+  const r=await fetch(API_BASE+'/api/daozang/chandu?'+kind+'='+encodeURIComponent(z),{headers:{'X-Skip-Interceptor':'1'}}).then(r=>r.json());
+  if(!r.ok){box.innerHTML='<div class="mred">'+esc(r.error)+'</div>';return;}
+  const t=r.table;
+  const printedDiff=(t.printed.yang.join('')!==t.yang.map(s=>s.star).join(''));
+  box.innerHTML='<div style="font-size:14px;font-weight:600;color:var(--gold);margin-bottom:6px">'+esc(r.zhi)+(kind==='hour'?'时':'宫')+'（'+esc(t.label)+'） <span style="font-size:11px;color:var(--paper3);font-weight:400">轮转 offset='+t.offset+'</span></div>'+
+    '<div style="margin-bottom:4px"><span style="font-size:12px;color:var(--teal)">九阳环　</span>'+t.yang.map(cdStar).join('')+'</div>'+
+    '<div style="margin-bottom:6px"><span style="font-size:12px;color:var(--red)">九阴环　</span>'+t.yin.map(cdStar).join('')+'</div>'+
+    (printedDiff?'<div style="font-size:11px;color:var(--paper3);border-top:1px dashed var(--border);padding-top:6px">刻本照录阳行：'+t.printed.yang.map(esc).join(' ')+'</div>':'')+
+    (t.collation?'<div class="mred">⚠ 校勘存疑：'+esc(t.collation)+'</div>':'')+
+    '<div style="font-size:11px;color:var(--paper3);margin-top:6px">'+esc(r.source)+'</div>';
+}
+boot();initGeju();initChandu();
 </script>
 </body>
 </html>
