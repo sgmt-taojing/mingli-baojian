@@ -11,21 +11,26 @@
 | 卷次 | 卷/章/节定位（如 卷上·階二、系辞上传·第九章） | `title` 中段「·卷N/篇名」 |
 | 原文 | 古籍原文片段，只录不译不改 | `content` 主体 |
 | 古注摘要 | 该书自注或公认古注摘要，须注明注家 | `summary` 或 content 内「古注」段 |
-| 门类 | **五值枚举：八字 / 易卦 / 科仪 / 阳宅 / 择日** | `domain` 字段 |
+| 门类 | **十值枚举：八字 / 紫微 / 易卦 / 三式 / 科仪 / 阳宅 / 择日 / 相术 / 命名 / 民俗**（v2.1 扩充，缘主授权自行补充） | `domain` 字段 |
 | 古例/占断记录 | 书内自带案例、占验记录（阳宅/择日条目此栏兼记格局/宜忌） | content 内「古例」段，无则阙如 |
 | 版本异文 | 同条异本差异（如 道藏本 vs 四库本） | content 内「版本异文」段或并置条目互链 |
 
-## 二、门类映射表（module → domain，2026-10-12 已落库 6,219 条）
+## 二、门类映射表（module → domain，2026-10-12 v2.1 已落库 20,717 条）
 
 | 门类 | 已归档 module | 条数 |
 |---|---|---|
-| 八字 | bazi, shensha, shishen, nayin, hechong, r96-*（月令/用神/格局/赋文系列） | 2,335 |
+| 紫微 | ziwei, ziwei-mingtu, ziwei-xize, ziwei-case, ziwei+/%/ 杂域（迁移遗留待归一）, tianji-*, r39_*, r45_*, r41_* | 9,801 |
+| 八字 | bazi, shensha, shishen, nayin, hechong, hehun, wuxing, r96-*（月令/用神/格局赋文） | 2,639 |
+| 三式 | liuren, qimen, taiyi, taixuan | 2,284 |
 | 易卦 | yijing, liuyao, meihua, yizhan, bagua, yilin-gaicuo, liuyue | 2,216 |
-| 科仪 | taisui | 61 |
+| 民俗 | mantra, faith, folklore, zodiac, koujue-*, wisdom | 1,297 |
 | 阳宅 | fengshui, yangzhai（阴宅场景并入本类） | 815 |
 | 择日 | zeri, huangli, jieqi | 792 |
+| 相术 | xiangshu, mingxiang | 523 |
+| 命名 | naming | 289 |
+| 科仪 | taisui | 61 |
 
-**存疑待缘主定夺（未动）**：紫微系（ziwei/r39_*/r45_* 等约 7,000 条——五值枚举未含紫微，建议增列「紫微」门类）、三式（liuren/qimen/taiyi/taixuan——建议增列「三式」）、相术（xiangshu/mingxiang）、naming、mantra/faith/folklore。
+**未归档（非古籍校勘范围，保持 domain 原值）**：tcm 全系（医学序列另有医命同参规范）、engine/服务域（*-engine 等）、general/authoritative/kb-store 综合域。
 
 ## 三、校勘四务
 
