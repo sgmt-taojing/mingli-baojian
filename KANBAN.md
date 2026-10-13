@@ -1,3 +1,11 @@
+# 2026-10-13 12:10 — ✅ 多模态智能体端点：角色定义 v3 落地（缘主颁角色）·Kimi
+
+- 双端点上线实测：ancient-book-search（工具契约五参）+ multimodal-query（报文→三模式→双库→三段报告）。
+- 召回三连修：长句切三元组 / 二字词 LIKE 补充 / LIKE rank 污染归一修复 + DOMAIN_TERMS 术语表召回增强（断档问句 1→4 命中含科仪域）。
+- 四用例验收：科仪 2/2；模式1 犯太岁 4 命中；模式2 舌红少苔命中青蒿鳖甲汤原文；模式3 双库各 2。
+- 规格立档 docs/AGENT-SPEC-MULTIMODAL.md；未尽：vectors 留口未接、眼镜语音播报待联调。
+- 软待办：厚本回填下批、净源 22 缺+19 残、手稿 1852 蒸馏、678 重复题名、杂域归一、排盘页挂应期/择吉、.qclaw。
+
 # 2026-10-13 11:30 — ✅ 玉匣记 204 条回填示范 + 模板卡立档 ·Kimi
 
 - 回填 204/204（category/src_id/keywords 三组，原文零改动）+ JSON 杂串清洗；模板卡 docs/COLLATION-TEMPLATE-YUXIAJI.md 定版。

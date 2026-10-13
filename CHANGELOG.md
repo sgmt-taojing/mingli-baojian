@@ -1,3 +1,11 @@
+## 2026-10-13 12:10 · 多模态智能体端点上线：角色定义 v3 全量落地 ✅（Kimi · 缘主颁角色）
+
+- **双端点实测全通**：POST /api/agent/ancient-book-search（ancient_book_search 工具契约：query/lib_type/category/top_k/threshold）+ POST /api/agent/multimodal-query（MULTIMODAL_STD_INPUT 报文 → ASR/图像标签解析 → 三模式判定 → 双库检索 → 三段报告）。
+- **三模式省 Token**：模式1纯命理 / 模式2纯中医 / 模式3医命同参（双库各取 2 条），关键词正则自动切换；条文冲突检测（≥2 典籍来源并列提示不独断）。
+- **召回三连修**：①整句 trigram 必落空→长句切三元组；②trigram 无 2 字粒→二字词走 LIKE 补充；③LIKE 正 rank 污染 FTS 负 rank 归一基准→rank=NULL 固定 0.85 分 + FTS/LIKE 去重 FTS 优先；④新增 DOMAIN_TERMS 领域术语表（~90 词）召回增强——「今年犯太岁怎么化解」vs 库内「太岁化解方法」零 trigram 重叠的断档问句，由 1 条泛化案例提升到 4 条含科仪域条目。
+- **四用例验收**：科仪检索 2/2（太岁化解 1.0/太岁符 0.97）；犯太岁问诊→模式1 四命中 conflict=true；失眠心悸舌红少苔→模式2 命中温病条辨青蒿鳖甲汤（舌红少苔原文级命中）；八字火旺+失眠→模式3 双库各 2。
+- **规格立档**：docs/AGENT-SPEC-MULTIMODAL.md（角色原旨/三模式表/工具契约/实现要点/硬规则 7 条/报告模板/验收用例/未尽项 vectors 留口+眼镜播报待接）。
+
 ## 2026-10-13 11:30 · 玉匣记 204 条七字段回填示范收口 ✅（Kimi · 缘主批复）
 
 - **锁库插曲**：kb-sync-guard --sync 1（fts5 唯一合法写入口，kb-quality-patrol 链尾）10-12 16:0x 起 fts5 扫表 50 分钟持写锁，回填排队等候——确认其在做功（fts5NextMethod 活跃）未动它，16:32 自然退场后回填即通。该守卫长扫表是「老有告警」同源病灶之一，优化挂账。
