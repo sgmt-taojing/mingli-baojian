@@ -1,3 +1,10 @@
+## 2026-10-13 12:40 · 厚本五书 1,600 条七字段回填 + R827 守卫影子索引（50min→2.4s）✅（Kimi · 缘主令全面推进）
+
+- **五书回填 1,600 条**（training/backfill-classics-v2.py，照玉匣记模板卡参数化复用）：协纪辨方书 492（简体 457+繁体 62 含 27 条简繁双题去重）/ 六壬大全 614 / 焦氏易林 196 / 渊海子平 134 / 穷通宝鉴 164。category←典籍名本体；src_id 溯源保留（空→旧 category 来源值→书键）；keywords 四组标签 + 性质分型（古籍原文/医命活化/精华蒸馏/注解阐释——原生与衍生条目区分，红线不混）；JSON 数组型 keywords 解析合并。每书定制分型映射：协纪（义理本原/宜忌通规/神煞/立成表+择日十场景）、六壬（起课法/神将/课经毕法/占断）、易林（林辞占验）、渊海（格局用神/赋文歌诀/十神六亲/子平通论）、穷通（调候/四时调候/喜忌用神）。
+- **R827 病灶拔除**：kb-sync-guard --sync 的存在性检查 `entry_id IN (...)` 直查 fts5 内容列=全表扫（10-12 持锁 50min 同源）。修法：kb_fts5_idmap 影子索引（entry_id→rowid，322,233 行 10s 建成），存在性检查降 O(1) 主键查，UPDATE 走 rowid 快道；--full 删行后自动重建防陈旧；新增 --build-idmap 命令。实测：--sync 2 = **2.4s**（原 ~50min），挂账项销账。
+- **对账**：五书 formal↔fts5 抽样 5/5 全对齐（1,804 更/0 插）；检索端点实测通。
+- **新发现挂账**：launchd 链 `kb-quality-patrol→kb-sync-guard` 仍从旧 .openclaw-autoclaw 工作区（已卸载平台残留）触发，存在双跑/双库隐患，待缘主批复处置。
+
 ## 2026-10-13 12:10 · 多模态智能体端点上线：角色定义 v3 全量落地 ✅（Kimi · 缘主颁角色）
 
 - **双端点实测全通**：POST /api/agent/ancient-book-search（ancient_book_search 工具契约：query/lib_type/category/top_k/threshold）+ POST /api/agent/multimodal-query（MULTIMODAL_STD_INPUT 报文 → ASR/图像标签解析 → 三模式判定 → 双库检索 → 三段报告）。

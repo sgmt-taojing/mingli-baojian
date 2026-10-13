@@ -30,8 +30,24 @@ def connect():
     return conn
 
 
+# ── R827 · fts5 影子索引（2026-10-13）：fts5 内容列无索引，
+#    sync 的 entry_id IN (...) 存在性检查退化为全表扫（322k×全文=50min 持锁病灶）。
+#    idmap 表一次性轻量建成（仅 entry_id,rowid 两列），存在性检查降为 O(1) 主键查。──
+def ensure_idmap(conn):
+    conn.execute("CREATE TABLE IF NOT EXISTS kb_fts5_idmap(entry_id TEXT PRIMARY KEY, rid INTEGER)")
+    n = conn.execute("SELECT COUNT(*) FROM kb_fts5_idmap").fetchone()[0]
+    if n == 0:
+        t0 = time.time()
+        rows = conn.execute("SELECT entry_id, rowid FROM kb_fts5 WHERE entry_id IS NOT NULL AND entry_id != ''").fetchall()
+        conn.executemany("INSERT OR REPLACE INTO kb_fts5_idmap(entry_id, rid) VALUES(?,?)", rows)
+        conn.commit()
+        print(f'idmap 建成 {len(rows)} 行（{time.time()-t0:.0f}s）')
+    return conn
+
+
 def sync_incremental(hours=24):
     conn = connect()
+    ensure_idmap(conn)
     since = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time() - hours * 3600))
     # UNION 两腿各走索引（OR 会退化为全表 SCAN，25 万行实测 3 分钟+）
     rows = conn.execute("""
@@ -48,13 +64,15 @@ def sync_incremental(hours=24):
         return
     eids = [r[0] for r in valid]
     ph = ','.join('?' * len(eids))
-    existing = {r[0] for r in conn.execute(f"SELECT entry_id FROM kb_fts5 WHERE entry_id IN ({ph})", eids)}
-    upd = [r for r in valid if r[0] in existing]
+    # 走 idmap 主键查，不再 fts5 全表扫
+    existing = {r[0]: r[1] for r in conn.execute(f"SELECT entry_id, rid FROM kb_fts5_idmap WHERE entry_id IN ({ph})", eids)}
+    upd = [(r[1], r[2], r[3], r[4], r[5], existing[r[0]]) for r in valid if r[0] in existing]
     ins = [r for r in valid if r[0] not in existing]
-    conn.executemany("UPDATE kb_fts5 SET module=?,summary=?,content=?,tags=?,category=? WHERE entry_id=?",
-                     [(m, s, c, t, g, e) for e, m, s, c, t, g in upd])
-    conn.executemany("INSERT INTO kb_fts5(entry_id,module,summary,content,tags,category) VALUES(?,?,?,?,?,?)",
-                     [(e, m, s, c, t, g) for e, m, s, c, t, g in ins])
+    conn.executemany("UPDATE kb_fts5 SET module=?,summary=?,content=?,tags=?,category=? WHERE rowid=?", upd)
+    for e, m, s, c, t, g in ins:
+        cur = conn.execute("INSERT INTO kb_fts5(entry_id,module,summary,content,tags,category) VALUES(?,?,?,?,?,?)",
+                           (e, m, s, c, t, g))
+        conn.execute("INSERT OR REPLACE INTO kb_fts5_idmap(entry_id, rid) VALUES(?,?)", (e, cur.lastrowid))
     conn.commit()
     print(f'增量同步 {len(upd)} 更 / {len(ins)} 插（近 {hours}h）')
     conn.close()
@@ -97,6 +115,9 @@ def sync_full():
         conn.commit()
         done += len(chunk)
     print(f'全量对齐完成：对齐 {done} 行')
+    # 全量对齐有删行，idmap 影子索引重建防陈旧（R827）
+    conn.execute("DROP TABLE IF EXISTS kb_fts5_idmap")
+    conn.commit()
     conn.close()
 
 
@@ -242,6 +263,12 @@ if __name__ == '__main__':
         _run_with_lock_retry(purge_empty)
     elif '--drop-legacy-triggers' in args:
         _run_with_lock_retry(drop_legacy_triggers)
+    elif '--build-idmap' in args:
+        conn = connect()
+        conn.execute("DROP TABLE IF EXISTS kb_fts5_idmap")
+        conn.commit()
+        ensure_idmap(conn)
+        conn.close()
     else:
         print(__doc__)
         sys.exit(2)
