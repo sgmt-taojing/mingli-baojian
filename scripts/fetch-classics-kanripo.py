@@ -30,6 +30,16 @@ BOOKS = [
     ('疑龍經', 'fengshui', '风水,杨筠松,龙脉'),
     ('葬書', 'fengshui', '风水,郭璞,生气,藏风聚气'),
     ('青囊序', 'fengshui', '风水,曾求己,玄空,二十四山'),
+    # ── 2026-10-14 净源二梯队（章程书单缺口）──
+    ('周易本義', 'yijing', '朱熹,本义,卦爻辞,易学'),
+    ('河洛理數', 'shuzi', '河图洛书,陈抟,邵雍,数术'),
+    ('星平會海', 'bazi', '星平会海,子平,七政,命理'),
+    ('陽宅十書', 'fengshui', '阳宅,王君荣,宅法,形法'),
+    ('擇吉彙要', 'zeri', '择吉,汇要,宜忌'),
+    ('赤松子章曆', 'keyi', '赤松子,章历,天师道,上章'),
+    ('元辰章醮立成曆', 'keyi', '元辰,拜太岁,醮仪,章醮'),
+    ('麻衣神相', 'xiangshu', '麻衣,相法,面相'),
+    ('水鏡相法', 'xiangshu', '水镜,相法,面相'),
 ]
 
 def fetch(url, retry=3, timeout=30):
@@ -47,11 +57,30 @@ def fetch(url, retry=3, timeout=30):
     return last
 
 def find_repo(book):
-    """kanripo titlesearch 找仓库号（如 KR3g0048）"""
+    """kanripo titlesearch 找仓库号（如 KR3g0048）
+    2026-10-14：kanripo.org 被 Cloudflare 拦截，改 GitHub 仓库搜索 API + 人工定档覆盖表"""
+    if book in REPO_OVERRIDE:
+        return REPO_OVERRIDE[book]
     q = urllib.parse.quote(book)
-    html = fetch(f'https://www.kanripo.org/titlesearch?query={q}')
-    m = re.search(r'(KR[0-9a-z]{2}\d{4})/', html)
-    return m.group(1) if m else None
+    d = fetch(f'https://api.github.com/search/repositories?q={q}+org:kanripo&per_page=5')
+    try:
+        items = json.loads(d).get('items', [])
+    except Exception:
+        items = []
+    # 精确匹配「书名-朝代-」描述，防「周易本義」命中「周易本義通釋」
+    for it in items:
+        if (it.get('description') or '').startswith(book + '-'):
+            return it['name']
+    return items[0]['name'] if items else None
+
+# 2026-10-14 净源二梯队定档（GitHub org:kanripo 搜索实证）
+REPO_OVERRIDE = {
+    '周易本義': 'KR1a0031',      # 原本周易本義（宋·朱熹）
+    '京氏易傳': 'KR3g0030',      # 京氏易傳（漢·京房）
+    '葬書': 'KR3g0020',          # 葬書（晉·郭璞）
+    '赤松子章曆': 'KR5b0320',    # 赤松子章曆（六朝，道藏）
+    '元辰章醮立成曆': 'KR5g0097', # 元辰章醮立成曆（六朝，道藏；拜太岁源头）
+}
 
 def list_texts(repo):
     """GitHub API 列仓库内 _NNN.txt 文件"""
@@ -133,11 +162,9 @@ def main():
             report.append(f'{book}: ✗ {e}')
     if not DRY:
         INGESTOR.commit()
-        try:
-            c.execute("INSERT INTO kb_formal_fts(kb_formal_fts) VALUES('rebuild')")
-            conn.commit()
-        except Exception as e:
-            print('FTS rebuild 失败:', e)
+        # 2026-10-14 R827 口径：fts5 唯一合法写入口是 kb-sync-guard（影子索引秒级同步），
+        # 旧 kb_formal_fts rebuild 路径已废，改调守卫
+        subprocess.run(['/usr/bin/python3', str(Path(__file__).parent / 'kb-sync-guard.py'), '--sync', '600'], timeout=600)
     conn.close()
     print('\n'.join(report))
     print(f'═══ 合计：新增 {total_new} 卷，跳过 {total_skip} 卷{"（DRY）" if DRY else ""}')
