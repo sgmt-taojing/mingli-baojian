@@ -21,7 +21,7 @@
 </head>
 <body data-need-admin="true" class="theme-ops">
 <!-- R504: 新诊疗中心入口 -->
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="javascript:void(0)" onclick="toggleStaging()" style="padding:6px 14px;border:1px solid rgba(61,220,151,.35);border-radius:8px;background:rgba(61,220,151,.07);color:#3ddc97;text-decoration:none;font-size:12px;font-weight:600">🧪 知识审核（staging 158 待审）</a><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="javascript:void(0)" onclick="toggleStaging()" style="padding:6px 14px;border:1px solid rgba(61,220,151,.35);border-radius:8px;background:rgba(61,220,151,.07);color:#3ddc97;text-decoration:none;font-size:12px;font-weight:600">🧪 知识审核（staging 158 待审）</a><a href="javascript:void(0)" onclick="toggleManuscript()" style="padding:6px 14px;border:1px solid rgba(232,200,122,.4);border-radius:8px;background:rgba(232,200,122,.07);color:#e8c87a;text-decoration:none;font-size:12px;font-weight:600">📜 手稿审核（pending 队列）</a><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a></div>
 
 <header class="page-header-bar">
   <div class="phb-left">
@@ -131,6 +131,74 @@
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>
 
+<div id="manuscript-panel" style="display:none;margin-top:16px">
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+    <h3 style="color:#e8c87a;font-size:15px;margin:0">手稿审核（formal · pending → approved/rejected）</h3>
+    <span id="ms-cnt" style="color:#7a8aab;font-size:12px"></span>
+    <input id="ms-q" placeholder="按标题筛选…" style="padding:5px 10px;border:1px solid rgba(120,160,255,.3);border-radius:8px;background:rgba(0,0,0,.25);color:#dfe6f2;font-size:12px;width:160px" onkeydown="if(event.key==='Enter')msLoad()">
+    <button class="btn small primary" onclick="msApprove()">✅ 批量通过选中</button>
+    <button class="btn small danger" onclick="msReject()">❌ 批量拒绝选中</button>
+    <button class="btn small" onclick="msLoad()">↻ 刷新</button>
+  </div>
+  <div style="color:#7a8aab;font-size:11px;margin-bottom:8px">手稿蒸馏条目（今师授课转录，trust 0.80）。红线：审核只改 audit_status，不删改原文；与古籍相左者拒绝并注明，存疑留 pending。</div>
+  <div id="ms-list" style="max-height:520px;overflow:auto;border:1px solid rgba(120,160,255,.2);border-radius:10px;padding:8px">
+    <div class="muted" style="color:#7a8aab;font-size:12px;padding:20px;text-align:center">加载中…</div>
+  </div>
+</div>
+<script>
+var MS_SEL = {};
+function toggleManuscript(){
+  var p = document.getElementById('manuscript-panel');
+  if(p){ p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display !== 'none') msLoad(); }
+}
+function msLoad(){
+  var box = document.getElementById('ms-list');
+  var q = (document.getElementById('ms-q').value||'').trim();
+  fetch(API+'/api/kb/manuscript/pending?limit=100'+(q?'&q='+encodeURIComponent(q):'')).then(function(r){return r.json()}).then(function(d){
+    if(!d.ok){ box.innerHTML = '<div class="muted">加载失败</div>'; return; }
+    document.getElementById('ms-cnt').textContent = '共 ' + d.total + ' 条待审（本页 ' + d.rows.length + ' 条）';
+    MS_SEL = {};
+    if(!d.rows.length){ box.innerHTML = '<div class="muted" style="color:#2e8b57">✅ 无待审手稿</div>'; return; }
+    box.innerHTML = '<table style="width:100%;font-size:12px;border-collapse:collapse"><tr style="color:#e8c87a"><th style="padding:6px;text-align:left"><input type="checkbox" onchange="msAll(this)"></th><th>门类</th><th>标题</th><th>摘要/原文预览</th><th>创建时间</th></tr>' +
+      d.rows.map(function(r){
+        return '<tr data-id="'+r.entry_id+'"><td style="padding:5px;vertical-align:top"><input type="checkbox" class="ms-chk" value="'+r.entry_id+'" onchange="msChk()"></td>' +
+        '<td style="padding:5px;color:#4da3ff;vertical-align:top;white-space:nowrap">'+(r.category||r.module||'')+'</td>' +
+        '<td style="padding:5px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top" title="'+(r.title||'').replace(/"/g,'&quot;')+'">'+(r.title||'')+'</td>' +
+        '<td style="padding:5px;color:#9fb0c8;font-size:11px;max-width:420px">'+((r.preview||r.summary||'').slice(0,120))+'…</td>' +
+        '<td style="padding:5px;color:#7a8aab;font-size:11px;vertical-align:top;white-space:nowrap">'+(r.created_at||'').slice(0,10)+'</td></tr>';
+      }).join('') + '</table>';
+  }).catch(function(){ box.innerHTML = '<div class="muted">服务不可用</div>'; });
+}
+function msAll(cb){
+  document.querySelectorAll('.ms-chk').forEach(function(c){ c.checked = cb.checked; });
+  msChk();
+}
+function msChk(){
+  MS_SEL = {};
+  document.querySelectorAll('.ms-chk:checked').forEach(function(c){ MS_SEL[c.value] = 1; });
+}
+function msApprove(){
+  var ids = Object.keys(MS_SEL);
+  if(!ids.length){ toast('请先勾选手稿','err'); return; }
+  if(!confirm('确认通过 ' + ids.length + ' 条手稿？通过后 audit_status=approved 转为正式可引。')) return;
+  fetch(API+'/api/kb/manuscript/approve', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids})})
+    .then(function(r){return r.json()}).then(function(d){
+      toast('已通过 ' + (d.approved||0) + ' 条手稿','ok');
+      msLoad();
+    }).catch(function(){ toast('服务不可用','err'); });
+}
+function msReject(){
+  var ids = Object.keys(MS_SEL);
+  if(!ids.length){ toast('请先勾选手稿','err'); return; }
+  var notes = prompt('拒绝原因（留审计，如「与古籍原文相左」）：', '手稿与古籍相左/质量不达标');
+  if(notes === null) return;
+  fetch(API+'/api/kb/manuscript/reject', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entry_ids: ids, notes: notes})})
+    .then(function(r){return r.json()}).then(function(d){
+      toast('已拒绝 ' + (d.rejected||0) + ' 条手稿','ok');
+      msLoad();
+    }).catch(function(){ toast('服务不可用','err'); });
+}
+</script>
 <div id="staging-panel" style="display:none;margin-top:16px">
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
     <h3 style="color:#e8c87a;font-size:15px;margin:0">知识审核（staging → formal）</h3>
