@@ -1,3 +1,11 @@
+## 2026-10-14 14:10 · S3.3 手稿审核队列上线 + 顺带挖出两个存量暗伤 ✅（Kimi · 缘主令做）
+
+- **手稿审核三端点**（api-server-v2.js）：GET /api/kb/manuscript/pending（分页+标题筛选）/ POST approve / POST reject。手稿 1,610 条直入 kb_formal（promoted_from='manuscript-staging', audit_status='pending'），不走 kb_staging，故在 formal 层审核。红线守住：只改 audit_status/audit_by/audit_notes，不删改原文；approve/reject 均带 `WHERE audit_status='pending'` 幂等护栏（重复操作 changes=0）。
+- **前端面板**（admin-kb-panel.html）：新增「📜 手稿审核」折叠面板——总量+本页计数、标题筛选、门类/标题/原文预览四列、全选批量通过/拒绝（拒绝必填原因留审计）。
+- **暗伤一·性能**：pending 列表 COUNT+substr 走 kb_formal 全表扫（6.4GB/324k 行，单次 14s，node:sqlite 同步驱动阻塞事件循环→整站假死，实测把 /api/health 都拖超时）。修：CREATE INDEX idx_kb_formal_manuscript_pending(promoted_from, audit_status)，COUNT 14s→4ms，列表 0.2s。**教训入账：kb_formal 任何新查询口径必须先想索引。**
+- **暗伤二·CSRF**：/api/kb/staging/* 审核端点自 R735 上线起未入 CSRF 白名单，管理面板批量审核实则 403 不可用。补白名单 /api/kb/manuscript/ + /api/kb/staging/（同源页面+内网信任口径，同 R733 采集工作台判例）。
+- **冒烟全过**：approve/reject/复原 1,610 总数无漂移；浏览器端到端（8900 页面→8920 跨域→渲染 100 行）实测通过。
+
 ## 2026-10-14 13:20 · S3.2 全项目知识图谱重渲染：两日新入库 1,875+ 条全部上图 ✅（Kimi · 缘主令开工）
 
 - **图谱页数据全量刷新**（app/project-knowledge-graph.html 内嵌 DATA）：KB 320,568→324,114；命理域 18,930→24,318（门类分域新口径：紫微 9,801/mingli 3,588/八字 2,639/易卦 2,216/三式 2,131/民俗 1,297/阳宅 815/择日 792/相术 523/命名 289/数字术数 166/科仪 61）；医学域 ~263,000 + reference 36,760。
