@@ -136,6 +136,12 @@
     <h3 style="color:#e8c87a;font-size:15px;margin:0">手稿审核（formal · pending → approved/rejected）</h3>
     <span id="ms-cnt" style="color:#7a8aab;font-size:12px"></span>
     <input id="ms-q" placeholder="按标题筛选…" style="padding:5px 10px;border:1px solid rgba(120,160,255,.3);border-radius:8px;background:rgba(0,0,0,.25);color:#dfe6f2;font-size:12px;width:160px" onkeydown="if(event.key==='Enter')msLoad()">
+    <select id="ms-suggest" onchange="msLoad()" style="padding:5px 8px;border:1px solid rgba(120,160,255,.3);border-radius:8px;background:rgba(0,0,0,.25);color:#dfe6f2;font-size:12px">
+      <option value="">全部</option>
+      <option value="reject">❌ 建议拒绝</option>
+      <option value="human">👁 需细甄</option>
+      <option value="approve">✅ 建议通过</option>
+    </select>
     <button class="btn small primary" onclick="msApprove()">✅ 批量通过选中</button>
     <button class="btn small danger" onclick="msReject()">❌ 批量拒绝选中</button>
     <button class="btn small" onclick="msLoad()">↻ 刷新</button>
@@ -154,17 +160,22 @@ function toggleManuscript(){
 function msLoad(){
   var box = document.getElementById('ms-list');
   var q = (document.getElementById('ms-q').value||'').trim();
-  fetch(API+'/api/kb/manuscript/pending?limit=100'+(q?'&q='+encodeURIComponent(q):'')).then(function(r){return r.json()}).then(function(d){
+  var sg = document.getElementById('ms-suggest').value;
+  fetch(API+'/api/kb/manuscript/pending?limit=100'+(q?'&q='+encodeURIComponent(q):'')+(sg?'&suggest='+sg:'')).then(function(r){return r.json()}).then(function(d){
     if(!d.ok){ box.innerHTML = '<div class="muted">加载失败</div>'; return; }
-    document.getElementById('ms-cnt').textContent = '共 ' + d.total + ' 条待审（本页 ' + d.rows.length + ' 条）';
+    document.getElementById('ms-cnt').textContent = '共 ' + d.total + ' 条' + (sg?'（预审过滤中）':'待审') + '（本页 ' + d.rows.length + ' 条）';
     MS_SEL = {};
-    if(!d.rows.length){ box.innerHTML = '<div class="muted" style="color:#2e8b57">✅ 无待审手稿</div>'; return; }
-    box.innerHTML = '<table style="width:100%;font-size:12px;border-collapse:collapse"><tr style="color:#e8c87a"><th style="padding:6px;text-align:left"><input type="checkbox" onchange="msAll(this)"></th><th>门类</th><th>标题</th><th>摘要/原文预览</th><th>创建时间</th></tr>' +
+    if(!d.rows.length){ box.innerHTML = '<div class="muted" style="color:#2e8b57">✅ 无匹配条目</div>'; return; }
+    box.innerHTML = '<table style="width:100%;font-size:12px;border-collapse:collapse"><tr style="color:#e8c87a"><th style="padding:6px;text-align:left"><input type="checkbox" onchange="msAll(this)"></th><th>预审</th><th>门类</th><th>标题</th><th>摘要/原文预览</th><th>创建时间</th></tr>' +
       d.rows.map(function(r){
+        var badge = r._sg === 'reject' ? '<span style="color:#f07060" title="'+r._sgWhy+'">❌拒</span>'
+          : r._sg === 'human' ? '<span style="color:#e8c87a" title="'+r._sgWhy+'">👁甄</span>'
+          : '<span style="color:#3ddc97">✅过</span>';
         return '<tr data-id="'+r.entry_id+'"><td style="padding:5px;vertical-align:top"><input type="checkbox" class="ms-chk" value="'+r.entry_id+'" onchange="msChk()"></td>' +
+        '<td style="padding:5px;vertical-align:top;white-space:nowrap;font-size:11px">'+badge+'</td>' +
         '<td style="padding:5px;color:#4da3ff;vertical-align:top;white-space:nowrap">'+(r.category||r.module||'')+'</td>' +
-        '<td style="padding:5px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top" title="'+(r.title||'').replace(/"/g,'&quot;')+'">'+(r.title||'')+'</td>' +
-        '<td style="padding:5px;color:#9fb0c8;font-size:11px;max-width:420px">'+((r.preview||r.summary||'').slice(0,120))+'…</td>' +
+        '<td style="padding:5px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top" title="'+(r.title||'').replace(/"/g,'&quot;')+'">'+(r.title||'')+'</td>' +
+        '<td style="padding:5px;color:#9fb0c8;font-size:11px;max-width:400px">'+((r.preview||r.summary||'').slice(0,120))+'…</td>' +
         '<td style="padding:5px;color:#7a8aab;font-size:11px;vertical-align:top;white-space:nowrap">'+(r.created_at||'').slice(0,10)+'</td></tr>';
       }).join('') + '</table>';
   }).catch(function(){ box.innerHTML = '<div class="muted">服务不可用</div>'; });

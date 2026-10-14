@@ -1,3 +1,12 @@
+## 2026-10-14 14:45 · S3.4 手稿预审分级：机器建议上桌，审核工作量砍 63% ✅（Kimi · 缘主令做）
+
+- **training/manuscript-triage.py**：对 1,610 条 pending 手稿跑机器预审——强营销词（微信号/扫码/学费/报名等，已规避「代理商/加盟星」命理正文误伤）、OCR 乱码块、碎片、标点占比（>75% 铁垃圾=目录页/表格残骸）、医疗域混入（岐轩遁甲针法 19 条挂「待甄」）。
+- **分级结果**：✅ 建议通过 1,018 / 👁 需人工细甄 456 / ❌ 建议拒绝 136（目录页虚线残骸为主，抽验属实）。命理师只需重点过 592 条，工作量降 63%。
+- **台账** reports/manuscript-triage-20261014.md（总览+分门类+非默认明细）；**侧车** app/data/manuscript-triage.json（只存非默认建议）。
+- **端点增强**：/api/kb/manuscript/pending 挂预审侧车，suggest=reject/human/approve 服务端过滤（索引取轻行→内存过滤→分页取详情），每行注 _sg/_sgWhy 徽标数据。
+- **面板**：新增预审下拉（全部/建议拒绝/需细甄/建议通过）+ 每行预审徽标（❌拒/👁甄/✅过，悬停见触发原因）。
+- **红线守住**：预审不写库、不改 audit_status，通过/拒绝权仍在命理师；浏览器实测「建议拒绝」过滤 136 条徽标渲染正确。
+
 ## 2026-10-14 14:10 · S3.3 手稿审核队列上线 + 顺带挖出两个存量暗伤 ✅（Kimi · 缘主令做）
 
 - **手稿审核三端点**（api-server-v2.js）：GET /api/kb/manuscript/pending（分页+标题筛选）/ POST approve / POST reject。手稿 1,610 条直入 kb_formal（promoted_from='manuscript-staging', audit_status='pending'），不走 kb_staging，故在 formal 层审核。红线守住：只改 audit_status/audit_by/audit_notes，不删改原文；approve/reject 均带 `WHERE audit_status='pending'` 幂等护栏（重复操作 changes=0）。
