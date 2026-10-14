@@ -203,6 +203,8 @@
   <div id="zw-compare-result" style="font-size:12px;color:var(--zw-paper3)">排盘后自动生成比对分析</div>
 </div>
 
+<script src="js/vendor/iztro.min.js" defer></script>
+<script src="js/ziwei-browser-fallback.js" defer></script>
 <script src="js/ziwei-engine.js" defer></script>
 <script src="js/paipan-tap-pop.js" defer></script>
 <script>
@@ -279,7 +281,13 @@ async function runZiweiPaipan(){
     var dj = await resp.json();
     if (dj && dj.ok && dj.chart) { result = zwServerToLocal(dj.chart); engineTag = 'iztro'; window._zwDeepRead = dj.deepRead || null; }
   } catch(e) { /* 离线回退 */ }
-  if (!result) result = ZiweiEngine.paipan(year, month, day, hour, zwCalMode === 'lunar', sex);
+  // R-ENGINE-UNIFY-2（2026-10-14）：离线兜底改用浏览器端 iztro（与服务端同内核同版），
+  // 旧 ZiweiEngine.paipan 五行局表含非法干支已退役——iztro 未加载时诚实报错，不出错盘
+  if (!result && window.ZwBrowserFallback) {
+    var fbChart = ZwBrowserFallback.paipan(year, month, day, hour, zwCalMode === 'lunar', sex);
+    if (fbChart) { result = zwServerToLocal(fbChart); engineTag = 'iztro-browser'; }
+  }
+  if (!result) { showToast('排盘引擎未就绪：请联网重试（离线模式需加载 iztro 内核）'); return; }
   result._engineTag = engineTag;
   var name = document.getElementById('zw-name').value || '';
   var container = document.getElementById('ziwei-result');
@@ -345,7 +353,7 @@ async function runZiweiPaipan(){
     var mingStarName = starNames[mingStar] || '空宫';
     var html = '<div style="padding:10px;background:rgba(201,168,76,.06);border-radius:6px;margin-bottom:8px">';
     html += '<div style="color:var(--zw-gold);font-weight:600;margin-bottom:4px">紫微命宫主星：' + mingStarName + '</div>';
-    html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + (result._engineTag==='iztro' ? ' · 引擎：iztro 服务端' : ' · 引擎：本地兜底（离线）') + '</div>';
+    html += '<div style="font-size:11px;color:var(--zw-paper3)">五行局：' + result.wuxingJu + ' · 年干支：' + result.yearGanZhi + (result._engineTag==='iztro' ? ' · 引擎：iztro 服务端' : ' · 引擎：iztro 浏览器端（离线）') + '</div>';
     html += '</div>';
     html += '<div style="font-size:11px;line-height:1.8">建议同时排八字命盘，比对日主五行与紫微主星的脏腑对应关系。例如：紫微七杀入命 → 金气偏旺 → 肺/大肠需注意；天同太阴入命 → 水气偏旺 → 肾/膀胱需注意。</div>';
     html += '<div id="aiZiweiBtn" style="margin:10px 0;text-align:center"></div>';

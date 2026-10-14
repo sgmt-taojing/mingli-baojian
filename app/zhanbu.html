@@ -605,35 +605,59 @@ function runLiurenEngine(){
 }
 
 // === 紫微斗数 ===
+// R-ENGINE-UNIFY-2（2026-10-14）：演示数据+安慰剂按钮退役（违「事实为体」），
+// 改接浏览器端 iztro 真排盘（ZwBrowserFallback，与服务端同内核同版）
 function computeZiWei(){
   try{
     var name = document.getElementById('zwName').value || '命主';
     var date = document.getElementById('zwDate').value;
-    var hour = document.getElementById('zwHour').value;
+    var hourV = document.getElementById('zwHour').value;
+    var sex = document.getElementById('zwSex').value;
     if(!date){ try{toast('请选择出生日期');}catch(e){} return; }
+    var parts = date.split('-');
+    var hour = hourV === '' ? 12 : parseInt(hourV, 10);
+    var chart = window.ZwBrowserFallback ? ZwBrowserFallback.paipan(+parts[0], +parts[1], +parts[2], hour, false, sex) : null;
+    if(!chart){ try{toast('排盘引擎未加载，请刷新页面重试');}catch(e){} return; }
     var el = document.getElementById('zwResult'); if(el) el.style.display='block';
     var nm = document.getElementById('zwNameOut'); if(nm) nm.textContent = name;
-    var mt = document.getElementById('zwMetaOut'); if(mt) mt.textContent = date + ' ' + (hour?hour+'时':'') + ' · 紫微命盘';
-    var mg = document.getElementById('zwMingGong'); if(mg) mg.innerHTML = '<p style="font-size:14px">命宫主星：紫微星。身宫主星：天梁星。（演示数据，实际排盘需精确生时）</p>';
+    var mt = document.getElementById('zwMetaOut');
+    if(mt) mt.textContent = date + ' ' + (hourV?hourV+'时':'午时(默认)') + ' · ' + (chart.yearGanZhi||'') + '年 · ' + (chart.wuxingJu||'') + ' · iztro 引擎';
+    // 命宫/身宫主星（真实盘）
+    var mingP = chart.palaces[0];
+    var shenP = null;
+    chart.palaces.forEach(function(p){ if(p.isShenGong) shenP = p; });
+    var mg = document.getElementById('zwMingGong');
+    if(mg) mg.innerHTML = '<p style="font-size:14px">命宫（' + DI_ZHI_OF(mingP.index) + '宫）主星：' + (mingP.mainStars.join('、') || '空宫')
+      + '。身宫寄' + (shenP ? shenP.name + '（主星：' + (shenP.mainStars.join('、') || '空宫') + '）' : '未明') + '。</p>';
+    // 十四主星落宫（真实盘）
     var sg = document.getElementById('zwStarsGrid');
-    if(sg) sg.innerHTML = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'].map(function(s){
-      return '<div style="padding:6px 10px;border:1px solid rgba(201,168,76,.15);border-radius:4px;font-size:12px;text-align:center">' + s + '</div>';
-    }).join('');
-    var fc = document.getElementById('zwFourChange'); if(fc) fc.innerHTML = '<p style="font-size:14px">化禄·化权·化科·化忌 — 四化星依年干推算，影响命格转化方向。</p>';
+    if(sg){
+      var starPalace = {};
+      chart.palaces.forEach(function(p){ p.mainStars.forEach(function(s){ starPalace[s] = p.name; }); });
+      sg.innerHTML = ['紫微','天机','太阳','武曲','天同','廉贞','天府','太阴','贪狼','巨门','天相','天梁','七杀','破军'].map(function(s){
+        return '<div style="padding:6px 10px;border:1px solid rgba(201,168,76,.15);border-radius:4px;font-size:12px;text-align:center">' + s + '<br><span style="opacity:.6;font-size:11px">' + (starPalace[s]||'—') + '</span></div>';
+      }).join('');
+    }
+    // 生年四化（真实盘，mutagen 反查）
+    var fc = document.getElementById('zwFourChange');
+    if(fc){
+      var sh = chart.siHua || {};
+      fc.innerHTML = '<p style="font-size:14px">化禄：' + (sh.lu||'—') + ' · 化权：' + (sh.quan||'—') + ' · 化科：' + (sh.ke||'—') + ' · 化忌：' + (sh.ji||'—') + '</p>';
+    }
+    // 十二宫（真实盘，命宫起）
     var g12 = document.getElementById('zw12Gong');
-    if(g12) g12.innerHTML = ['命宫','兄弟','夫妻','子女','财帛','疾厄','迁移','奴仆','官禄','田宅','福德','父母'].map(function(g,i){
-      return '<div style="display:inline-block;padding:8px 12px;margin:2px;border:1px solid rgba(201,168,76,.1);border-radius:4px;font-size:12px">' + g + '</div>';
+    if(g12) g12.innerHTML = chart.palaces.map(function(p){
+      return '<div style="display:inline-block;padding:8px 12px;margin:2px;border:1px solid rgba(201,168,76,.1);border-radius:4px;font-size:12px">' + p.name + (p.isShenGong?'·身':'') + '<br><span style="opacity:.6;font-size:11px">' + (p.mainStars.join('、')||'空') + '</span></div>';
     }).join('');
-  }catch(e){ console.warn('computeZiWei:', e); try{toast('紫微排盘中');}catch(e2){} }
-}
-
-function runZiweiEngine(){
-  try{
-    var date = document.getElementById('zwDate').value;
-    if(!date){ try{toast('请先选择出生日期');}catch(e){} return; }
     var er = document.getElementById('zwEngineResult');
-    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--fire2)"><p style="font-size:13px;opacity:.85">紫微引擎：已根据 ' + date + ' 排盘完成。命宫主星及十二宫位已呈现，建议结合大限流年综合论命。</p></div>'; }
-  }catch(e){ console.warn('runZiweiEngine:', e); }
+    if(er){ er.classList.add('d-none'); er.innerHTML=''; }
+  }catch(e){ console.warn('computeZiWei:', e); try{toast('紫微排盘异常，请重试');}catch(e2){} }
+}
+function DI_ZHI_OF(i){ return ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][i] || ''; }
+
+// R-ENGINE-UNIFY-2：原安慰剂按钮改调真实排盘（与「排盘演命」同函数）
+function runZiweiEngine(){
+  computeZiWei();
 }
 
 // === 测字 ===
@@ -665,6 +689,8 @@ function randomCezi(){
 
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
+<script src="js/vendor/iztro.min.js" defer></script>
+<script src="js/ziwei-browser-fallback.js" defer></script>
 <script src="js/error-interceptor.js" defer></script>
 <script src="js/submit-guard.js"></script>
 <script src="js/escape-html.js"></script>

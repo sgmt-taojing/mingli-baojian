@@ -2,6 +2,12 @@
  * 紫微斗数排盘引擎 v1.0
  * 纯前端 JS 实现，不依赖后端 API
  * 基于出生年月日时 → 推算十二宫 + 主星 + 四化
+ *
+ * ⚠️ 退役通告（R-ENGINE-UNIFY-2 · 2026-10-14）：
+ * paipan() 已退役——五行局表误用「年干×月支」（古制应为命宫干支纳音），
+ * 且含「甲巳」等六十甲子非法组合，公历未转农历，排盘结果错误（违「事实为体」）。
+ * 在线走服务端 iztro（唯一源头），离线兜底走 js/ziwei-browser-fallback.js（iztro UMD 同内核）。
+ * 本文件仅保留 renderChart() 渲染器继续使用，请勿再调用 ZiweiEngine.paipan。
  */
 (function(){
   'use strict';
