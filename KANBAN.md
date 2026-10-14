@@ -1,3 +1,12 @@
+# 2026-10-14 20:40 — ✅ W2-⑥ 研学同参立项：盲推同参全链路上线 ·Kimi
+
+- 依据：10-01 角色定义「多人同命例独立推演、汇总比对、集体参悟校正；学员只读推演、无权改库」。
+- 表：tongcan_sessions（open→revealed→closed）+ tongcan_deductions（UNIQUE(session_id,user_id)，open 期可覆写）。
+- RBAC：新增 student 角色；yanxue:join（学员起）、yanxue:host（命理师起）。
+- 端点 ×6：开局/列表/详情（盲推隔离：open 局非主持只见自己）/交卷 upsert/揭盅（二字组相似度粗判）/封卷写 consensus；CSRF 白名单（全 Bearer JWT 无 Cookie）。
+- 面板：app/tongcan.html 自包含；浏览器实测全链路通过——开局→交卷→揭盅（confirm）→比对视图→参悟校正→定稿封局→列表状态流转。
+- 实测：学员视角 blind 只见自己、开局/揭盅 403、揭盅后见全部；封卷后改卷拒 SEALED。
+
 # 2026-10-14 19:25 — ✅ W1-③ 推送链路检修收官：三日停发修复 ·Kimi
 
 - 症状：晨暮推 10-12~14 停发三日——launchd 两任务挂「needs LWCR update」不触发；bootout+bootstrap 重载，print-disabled 确认启用，明晨 6:00 自验。

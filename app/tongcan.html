@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#050608">
+<title>研学同参 · 命理宝鉴</title>
+<style>
+  body{margin:0;background:#0b0d12;color:#e4e8ee;font-family:-apple-system,"PingFang SC",sans-serif;min-height:100vh}
+  .wrap{max-width:920px;margin:0 auto;padding:24px 16px 60px}
+  h1{font-size:20px;color:#c9a84c;margin:0 0 4px}
+  .sub{font-size:12px;color:#8b93a7;margin-bottom:20px}
+  .card{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.18);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  input,select,textarea{background:#12151c;border:1px solid rgba(201,168,76,.25);border-radius:6px;color:#e4e8ee;padding:8px 10px;font-size:13px}
+  textarea{width:100%;min-height:90px;font-family:inherit;box-sizing:border-box}
+  button{background:linear-gradient(135deg,#c9a84c,#a5843a);border:none;border-radius:6px;color:#0b0d12;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid rgba(201,168,76,.4);color:#c9a84c}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+  .b-open{background:rgba(61,220,151,.12);color:#3ddc97}
+  .b-revealed{background:rgba(232,200,122,.12);color:#e8c87a}
+  .b-closed{background:rgba(139,147,167,.15);color:#8b93a7}
+  .sess{cursor:pointer}
+  .sess:hover{border-color:rgba(201,168,76,.45)}
+  .ded{border-left:3px solid #c9a84c;padding:8px 12px;margin:8px 0;background:rgba(201,168,76,.04);border-radius:0 8px 8px 0}
+  .ded .who{font-size:12px;color:#c9a84c;margin-bottom:4px}
+  .ded .txt{font-size:13px;line-height:1.8;white-space:pre-wrap}
+  .ded .con{font-size:12px;color:#7dd3c0;margin-top:4px}
+  .muted{font-size:12px;color:#8b93a7}
+  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1d2230;border:1px solid rgba(201,168,76,.5);color:#e8c87a;padding:10px 20px;border-radius:8px;font-size:13px;display:none;z-index:99}
+  a{color:#c9a84c}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+  <h1>📜 研学同参</h1>
+  <div class="sub">多人同命例盲推 → 揭盅比对 → 集体参悟校正 ｜ 学员只读推演、无权改库 ｜ <a href="admin-kb-panel.html">← KB 面板</a></div>
+
+  <div class="card" id="loginCard" style="display:none">
+    ⚠️ 未登录或无权访问。请先 <a href="admin-login.html">登录后台</a>（需 yanxue 权限角色）。
+  </div>
+
+  <div class="card" id="createCard" style="display:none">
+    <div style="font-weight:600;color:#c9a84c;margin-bottom:8px">🎴 开一局同参（主持）</div>
+    <div class="row" style="margin-bottom:8px">
+      <input id="cTitle" placeholder="题目，如：壬辰造仕途同参" style="flex:1;min-width:220px">
+      <select id="cMode"><option value="mingli">命理同参</option><option value="yiming">医命同参</option></select>
+      <select id="cBatch"><option value="1">单局</option><option value="10">10 组演练</option><option value="100">100 组演练</option></select>
+    </div>
+    <textarea id="cCase" placeholder='命例题面 JSON，如 {"birth":"1952-10-01","hour":9,"sex":"男","note":"仕途问"}'></textarea>
+    <div class="row" style="margin-top:8px"><button onclick="createSession()">开局</button></div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div style="font-weight:600;color:#c9a84c">🗂 同参局列表</div>
+      <button class="ghost" onclick="loadSessions()">刷新</button>
+    </div>
+    <div id="sessList" style="margin-top:10px" class="muted">加载中…</div>
+  </div>
+
+  <div id="detailBox"></div>
+</div>
+
+<script>
+var API = (location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '';
+function token(){ return localStorage.getItem('admin_token') || ''; }
+function toast(m){ var t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(function(){t.style.display='none'},2400); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]}); }
+function api(path, opt){
+  opt = opt || {};
+  opt.headers = Object.assign({'Content-Type':'application/json','Authorization':'Bearer '+token()}, opt.headers||{});
+  return fetch(API+path, opt).then(function(r){ return r.json().catch(function(){ return {ok:false,error:'HTTP '+r.status}; }); });
+}
+var STATUS_CN = {open:'盲推中', revealed:'已揭盅', closed:'已校正'};
+var CUR = null;
+
+function loadSessions(){
+  api('/api/tongcan/sessions').then(function(d){
+    if(d.error==='AUTH_TOKEN_MISSING'||d.error==='RBAC_FORBIDDEN'||d.error==='AUTH_TOKEN_INVALID'){ document.getElementById('loginCard').style.display='block'; document.getElementById('sessList').textContent='无权访问'; return; }
+    var rows = (d.sessions||[]).map(function(s){
+      return '<div class="card sess" style="margin-bottom:8px" onclick="openSession(\''+s.session_uuid+'\')">'
+        + '<div class="row" style="justify-content:space-between">'
+        + '<div><b>'+esc(s.title)+'</b> <span class="muted">· '+(s.mode==='yiming'?'医命同参':'命理')+' · '+esc(s.host_name||'')+'</span></div>'
+        + '<div><span class="badge b-'+s.status+'">'+STATUS_CN[s.status]+'</span> <span class="muted">'+s.deduction_count+' 份推演</span></div>'
+        + '</div><div class="muted" style="margin-top:4px">'+esc(s.created_at||'')+'</div></div>';
+    }).join('');
+    document.getElementById('sessList').innerHTML = rows || '<span class="muted">暂无同参局，主持可开第一局</span>';
+  });
+}
+
+function createSession(){
+  var payload;
+  try { payload = JSON.parse(document.getElementById('cCase').value); } catch(e){ toast('题面 JSON 格式有误'); return; }
+  api('/api/tongcan/sessions', {method:'POST', body: JSON.stringify({
+    title: document.getElementById('cTitle').value,
+    mode: document.getElementById('cMode').value,
+    batch_size: +document.getElementById('cBatch').value,
+    case_payload: payload
+  })}).then(function(d){
+    if(d.ok){ toast('已开局'); document.getElementById('cTitle').value=''; document.getElementById('cCase').value=''; loadSessions(); }
+    else toast(d.message||d.error||'开局失败');
+  });
+}
+
+function openSession(uuid){
+  api('/api/tongcan/sessions/'+uuid).then(function(d){
+    if(!d.ok){ toast(d.message||'加载失败'); return; }
+    CUR = d;
+    var s = d.session;
+    var html = '<div class="card"><div class="row" style="justify-content:space-between">'
+      + '<div style="font-weight:600;color:#c9a84c">📖 '+esc(s.title)+'</div>'
+      + '<span class="badge b-'+s.status+'">'+STATUS_CN[s.status]+'</span></div>'
+      + '<div class="muted" style="margin:6px 0">题面：<code>'+esc(JSON.stringify(s.case_payload))+'</code></div>';
+    if (d.blind) html += '<div style="color:#3ddc97;font-size:12px;margin:6px 0">🙈 盲推中——他人推演揭盅前不可见</div>';
+
+    // 交卷区（open 才可交/改）
+    if (s.status==='open') {
+      html += '<div style="margin-top:10px"><div style="font-size:13px;color:#c9a84c;margin-bottom:6px">✍️ 我的推演（揭盅前可改）</div>'
+        + '<textarea id="myDed" placeholder="推演过程：依何典籍、如何取用…">'+(d.deductions[0]?esc(d.deductions[0].deduction):'')+'</textarea>'
+        + '<input id="myCon" placeholder="结论断语（一句话）" style="width:100%;margin-top:6px;box-sizing:border-box" value="'+(d.deductions[0]?esc(d.deductions[0].conclusion||''):'')+'">'
+        + '<div class="row" style="margin-top:8px"><button onclick="submitDed(\''+uuid+'\')">交卷</button></div></div>';
+    }
+
+    // 主持操作
+    if (d.is_host && s.status==='open') html += '<div class="row" style="margin-top:10px"><button class="ghost" onclick="reveal(\''+uuid+'\')">🔔 揭盅比对</button></div>';
+    if (d.is_host && s.status==='revealed') {
+      html += '<div style="margin-top:10px"><div style="font-size:13px;color:#c9a84c;margin-bottom:6px">🪷 集体参悟校正</div>'
+        + '<textarea id="consensus" placeholder="汇众家之长，定校正结论…"></textarea>'
+        + '<div class="row" style="margin-top:8px"><button onclick="closeSess(\''+uuid+'\')">定稿封局</button></div></div>';
+    }
+
+    // 推演比对区
+    if (d.deductions && d.deductions.length && !d.blind) {
+      html += '<div style="margin-top:12px"><div style="font-size:13px;color:#c9a84c">⚖️ 众家推演比对（'+d.deductions.length+' 份）</div>';
+      d.deductions.forEach(function(t){
+        html += '<div class="ded"><div class="who">'+esc(t.author_name)+' · '+esc(t.author_role)+' · '+esc(t.created_at||'')+'</div>'
+          + '<div class="txt">'+esc(t.deduction)+'</div>'
+          + (t.conclusion?'<div class="con">断：'+esc(t.conclusion)+'</div>':'')+'</div>';
+      });
+      html += '</div>';
+    } else if (d.blind && d.deductions && d.deductions.length) {
+      html += '<div style="margin-top:12px"><div style="font-size:13px;color:#c9a84c">✍️ 我的已交推演</div>';
+      d.deductions.forEach(function(t){
+        html += '<div class="ded"><div class="txt">'+esc(t.deduction)+'</div>'+(t.conclusion?'<div class="con">断：'+esc(t.conclusion)+'</div>':'')+'</div>';
+      });
+      html += '</div>';
+    }
+    if (s.consensus) html += '<div class="ded" style="border-color:#7dd3c0"><div class="who" style="color:#7dd3c0">🪷 集体参悟校正结论</div><div class="txt">'+esc(s.consensus)+'</div></div>';
+    html += '</div>';
+    document.getElementById('detailBox').innerHTML = html;
+    document.getElementById('detailBox').scrollIntoView({behavior:'smooth'});
+  });
+}
+
+function submitDed(uuid){
+  api('/api/tongcan/sessions/'+uuid+'/deductions', {method:'POST', body: JSON.stringify({
+    deduction: document.getElementById('myDed').value,
+    conclusion: document.getElementById('myCon').value
+  })}).then(function(d){ toast(d.ok?'已交卷':(d.message||'失败')); if(d.ok) openSession(uuid); });
+}
+function reveal(uuid){
+  if(!confirm('揭盅后全员可见所有推演且封卷，确认？')) return;
+  api('/api/tongcan/sessions/'+uuid+'/reveal', {method:'POST'}).then(function(d){
+    toast(d.ok?('已揭盅，收 '+d.deduction_count+' 份'+(d.conclusion_similarity!=null?'，结论相似度 '+d.conclusion_similarity:'')):(d.message||'失败'));
+    if(d.ok){ openSession(uuid); loadSessions(); }
+  });
+}
+function closeSess(uuid){
+  api('/api/tongcan/sessions/'+uuid+'/close', {method:'POST', body: JSON.stringify({consensus: document.getElementById('consensus').value})})
+    .then(function(d){ toast(d.ok?'已校正封局':(d.message||'失败')); if(d.ok){ openSession(uuid); loadSessions(); } });
+}
+
+// 主持身份探测（决定是否显示开区块）
+api('/api/tongcan/sessions').then(function(d){
+  // host 权限粗探：用一个空 title 触发校验代价高，改为看列表可访问即可入局；开区块显示由首次 403 提示兜底
+  // 简化：直接显示开区块，非主持点了会收到后端 403 提示（权限以服务端为准）
+  document.getElementById('createCard').style.display = 'block';
+});
+loadSessions();
+</script>
+</body>
+</html>
