@@ -26,3 +26,36 @@
 ## 结果
 
 章程书单六部：**五收一留账**。识典 OCR 均标「OCR未校/待校勘」，后续校勘走《COLLATION-STANDARD v2.2》。
+
+---
+
+# 残部续扫一轮定界 · 2026-10-14 晚（A1）
+
+## 渠道定界结论
+
+| 书 | 渠道 | 结果 |
+|---|---|---|
+| 周易正义 | Kanripo KR1a0007《周易註疏》WYG | ✅ 全 64 卦 41 卷文 → 101 条；旧维基残篇 9 条 superseded |
+| 太乙金镜式经 | Kanripo KR3g0047 | ✅ 全 10 卷 12 条；旧 kanripo15 残 11 条 superseded |
+| 大衍索隐 | Kanripo KR3g0014 | ✅ 全 3 卷 7 条；旧 kanripo16 残 5 条 superseded |
+| 遁甲演义 | Kanripo KR3g0048 | ✅ 全 4 卷 11 条；旧 kanripo15 残 7 条 superseded |
+| 元辰章醮立成历 | Kanripo KR5g0097（正统道藏 DZ1288） | ✅ +3 条（卷上下全） |
+| 太玄经 | Kanripo KR3g0001 | ✅ 全 10 卷 28 条（corpus/taixuan 集注本缺卷一由此补齐源头） |
+| 青囊序 | Kanripo KR3g0022 | ✅ 1 条全文 |
+| 青囊经 / 青囊奥语 | 维基文库 | ✅ 各 1 条（奥语残篇待补，已标注） |
+| 八宅明镜 | 常先易 selected-text-20260928 | ✅ 序+上 10+下 32 = 43 章全收 43 条 |
+| 梅花易数原文 | 本地 corpus/meihua-yishu | ✅ 已在库（6 文件，无需补） |
+| 黄帝宅经 | 本地 corpus/zhaijing KR3g0019 | ✅ 已在库 12 条 |
+| 阳宅三要 | 识典仅方志提及；看典 kandianguji.com/book/108111 有 4 卷全文 | ⏸️ 待收（看下轮） |
+| 罗经解定/三白宝海/玉函通秘/地理五诀/雪心赋/人子须知/玄空秘旨/火珠林/卜筮正宗 | Kanripo 无、维基文库无 | ⏸️ 识典 /search/{kw} 逐部定界（下轮） |
+
+## 手法备忘
+
+- 识典搜索正确路由是 `/search/{kw}`（整页加载，DOM 提取 book 链接）；`/search?keyword=` 与表单点击在本浏览器不触发搜索 XHR。
+- Kanripo 仓下载用 codeload tarball（`https://codeload.github.com/kanripo/{id}/tar.gz/refs/heads/master`），避免 raw 逐文件限流。
+- GitHub repo 搜索 API 定界：`/search/repositories?q={书名繁体}+org:kanripo`，description 以「书名-朝代-」开头为精确命中。
+- GitHub 搜索 API 限速 ~10 次/分，批量需 sleep 7s。
+
+## KB 轨迹
+
+324,377 → +周易註疏 101 +太乙 12 +大衍 7 +遁甲 11 +元辰 3 +太玄 28 +青囊序 1 +青囊经/奥语 2 +八宅明镜 43 = **324,585 条**；superseded 旧残条 32+9=41 条（原文未删，状态标记）。
