@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>命理宝鉴 · 全项目知识图谱 2026-09-27</title>
+<title>命理宝鉴 · 全项目知识图谱 2026-10-14</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:-apple-system,"PingFang SC",sans-serif; background:#0d1117; color:#e6edf3; overflow:hidden; }
@@ -24,7 +24,7 @@
 <body>
 <canvas id="graph"></canvas>
 <div id="legend">
-  <b style="color:#f0b429">命理宝鉴 · 知识图谱</b> <span style="color:#6e7681">2026-09-27</span><br>
+  <b style="color:#f0b429">命理宝鉴 · 知识图谱</b> <span style="color:#6e7681">2026-10-14</span><br>
   <span class="dot" style="background:#f0b429"></span>平台核心
   <span class="dot" style="background:#58a6ff"></span>服务中心（五端）
   <span class="dot" style="background:#3fb950"></span>排盘引擎 ×8
@@ -45,23 +45,23 @@
 <script>
 const DATA = {
   nodes: [
-    {id:'root', label:'命理宝鉴', cat:'core', desc:'命理×中医双引擎 SaaS 平台。\n五端服务：管理员/命理师/医生/患者/缘主。\n本地优先部署，1606 次提交，182 页面前端。', metric:'Git 提交: <b>1606</b><br>前端页面: <b>182</b><br>服务脚本: <b>343</b><br>launchd 常驻: <b>~50 项</b>'},
+    {id:'root', label:'命理宝鉴', cat:'core', desc:'命理×中医双引擎 SaaS 平台。\n五端服务：管理员/命理师/医生/患者/缘主。\n本地优先部署，1875 次提交，186 页面前端。', metric:'Git 提交: <b>1875</b><br>前端页面: <b>186</b><br>KB 全量: <b>324,114 条</b><br>launchd 常驻: <b>~50 项</b>'},
     // 五大服务中心
     {id:'c-admin', label:'管理员中心', cat:'center', parent:'root', desc:'center-admin.html\n排盘专业工具仅对管理员与命理师开放。\nKB 管理/模型管理/巡检面板。'},
     {id:'c-master', label:'命理师中心', cat:'center', parent:'root', desc:'center-master.html\n批注队列（48h SLA）、专业排盘七工具、\n名人案例库、点读解读（点宫位看白话）。'},
     {id:'c-doctor', label:'医生中心', cat:'center', parent:'root', desc:'center-doctor.html\n问诊台（一帧采集）、医技开单、叫号队列、\n电子病历/处方审核签名。'},
     {id:'c-patient', label:'患者中心', cat:'center', parent:'root', desc:'center-patient.html\n专有通道：建档→采集→AI 草稿→\n双师审核→病历/处方/命理批注。'},
     {id:'c-yuanzhu', label:'缘主中心', cat:'center', parent:'root', desc:'center-yuanzhu.html\n信众/大众入口：问答式采集、问事服务中心、\n民俗工具中心、每日推送。'},
-    {id:'c-curator', label:'馆长 Curator（新）', cat:'center', parent:'root', desc:'curator-api :8980（S2.1/S2.3 已上线）\n超级智能体门面：会话+意图路由 14 类+\n医学转介红线+三段报告契约。\n八字/姓名已端到端，其余工具接线中。', metric:'四探针: <b>全绿</b>（模型/引擎7/KB/FTS5）<br>端到端: <b>八字+姓名</b>'},
+    {id:'c-curator', label:'馆长 Curator', cat:'center', parent:'root', desc:'curator-api :8980 + app/curator.html（S2.6）\n超级智能体门面：会话+意图路由 14 类+\n医学转介红线+三段报告契约。\nS2.8 已接 ancient-book-search 古籍问答；\nS2.7 五中心悬浮「馆」钮全上线。', metric:'四探针: <b>全绿</b>（模型/引擎7/KB/FTS5）<br>端到端: <b>八字+姓名+古籍问答</b><br>悬浮入口: <b>五中心全覆盖</b>'},
     // 排盘引擎
-    {id:'e-bazi', label:'八字排盘', cat:'engine', parent:'c-master', desc:'bazi-engine-wrapper.js\n古制完整版：真太阳时、大运流年、十神格局。\n点读：点干支看白话解释。', metric:'KB 条目: <b>1,835</b><br>BaziQA: <b>35.9%</b>（v9.3）'},
-    {id:'e-ziwei', label:'紫微斗数', cat:'engine', parent:'c-master', desc:'ziwei-engine-node.js v3.0\n真太阳时+小限+流年+大限细化。\n点宫位看星曜组合白话。', metric:'KB 条目: <b>2,013</b>'},
-    {id:'e-liuyao', label:'六爻', cat:'engine', parent:'c-master', desc:'京氏易传+增删卜易经典层。\n点爻看爻辞白话解读。', metric:'KB 条目: <b>366</b>（liuyue）'},
-    {id:'e-qimen', label:'奇门遁甲', cat:'engine', parent:'c-master', desc:'转盘奇门，九宫格点读浮动解读。\n《奇门遁甲统宗》残本七卷入库（玄机赋全）。', metric:'KB 条目: <b>954</b>（+统宗 8）'},
-    {id:'e-fengshui', label:'风水罗盘', cat:'engine', parent:'c-master', desc:'九宫飞星+山向，天玉经/青囊奥语经典层。\n点九宫看飞星白话。', metric:'KB 条目: <b>781</b>'},
-    {id:'e-meihua', label:'梅花易数', cat:'engine', parent:'c-master', desc:'时间起卦/数字起卦。\n⚠️ 原典零（全书无 PD 净本），待寻源。', metric:'KB 条目: <b>282</b>（现代整理）'},
-    {id:'e-liuren', label:'大六壬', cat:'engine', parent:'c-master', desc:'六壬课式排盘。\n六壬双璧入库：指南注解本 16 条+\n断案元亨利贞四集 222 案 14 条。', metric:'KB 条目: <b>494</b>（+双璧 30）'},
-    {id:'e-zeri', label:'择日', cat:'engine', parent:'c-master', desc:'协纪辨方书体系，v1/v2 双版。\n民俗面问答化可达。', metric:'KB 条目: <b>325</b>'},
+    {id:'e-bazi', label:'八字排盘', cat:'engine', parent:'c-master', desc:'bazi-engine-wrapper.js\n古制完整版：真太阳时、大运流年、十神格局。\n点读：点干支看白话解释。\n回填：渊海子平 134 + 穷通宝鉴 164 入库。', metric:'KB 条目: <b>2,165</b><br>BaziQA: <b>36.7%</b>（v9.2）'},
+    {id:'e-ziwei', label:'紫微斗数', cat:'engine', parent:'c-master', desc:'ziwei-engine-node.js v3.0\n真太阳时+小限+流年+大限细化。\n点宫位看星曜组合白话。', metric:'KB 条目: <b>3,036</b>（ziwei）<br>紫微域: <b>9,801</b>'},
+    {id:'e-liuyao', label:'六爻', cat:'engine', parent:'c-master', desc:'京氏易传+增删卜易经典层。\n点爻看爻辞白话解读。', metric:'KB 条目: <b>665</b>（liuyao 299+liuyue 366）'},
+    {id:'e-qimen', label:'奇门遁甲', cat:'engine', parent:'c-master', desc:'转盘奇门，九宫格点读浮动解读。\n《奇门遁甲统宗》残本七卷入库（玄机赋全）。', metric:'KB 条目: <b>1,069</b>'},
+    {id:'e-fengshui', label:'风水罗盘', cat:'engine', parent:'c-master', desc:'九宫飞星+山向，天玉经/青囊奥语经典层。\n点九宫看飞星白话。', metric:'KB 条目: <b>864</b>'},
+    {id:'e-meihua', label:'梅花易数', cat:'engine', parent:'c-master', desc:'时间起卦/数字起卦。\n⚠️ 原典零（全书无 PD 净本），民间渠道留账。', metric:'KB 条目: <b>301</b>（现代整理）'},
+    {id:'e-liuren', label:'大六壬', cat:'engine', parent:'c-master', desc:'六壬课式排盘。\n六壬双璧入库：指南注解本 16 条+\n断案元亨利贞四集 222 案 14 条。\n回填：六壬大全 614 条入库。', metric:'KB 条目: <b>999</b>'},
+    {id:'e-zeri', label:'择日', cat:'engine', parent:'c-master', desc:'协纪辨方书体系，v1/v2 双版。\n民俗面问答化可达。\n回填：协纪辨方书 492 条入库。', metric:'KB 条目: <b>731</b>'},
     // 民俗工具
     {id:'m-wenshi', label:'问事服务中心', cat:'folk', parent:'c-yuanzhu', desc:'16 域问事：八字/紫微/六爻/风水等。\n问答式采集，语音输入+拍照上传，\n全维度白话报告。'},
     {id:'m-minsu', label:'民俗工具中心', cat:'folk', parent:'c-yuanzhu', desc:'姓名测评/取名改名/公司取名、\n手机号测+荐号、合婚 v2、太岁化解、\n黄历择日、节气节日、家庭关系。'},
@@ -76,16 +76,17 @@ const DATA = {
     {id:'ym-xiang', label:'命相同参引擎', cat:'engine', parent:'ym-root', desc:'mingxiang-tongcan-engine.js（Y6）\n十二宫位×十神域互证、五色×喜用×时令气色、\n形局宜忌。相不独论，须与命局互证。'},
     {id:'kb-xiangshu', label:'相术部原典', cat:'kb', parent:'ym-root', desc:'古今图书集成·艺术典·相术部卷631-650（Y5）。\n维基文库 37 万字净本→353 条（XST| 指纹）。\n含神相全编/人伦大统赋/神异赋/许负相法。\nxiangshu 模块 45→398 条。', metric:'入库: <b>353 条</b><br>净本: <b>37 万字</b>'},
     // 知识库
-    {id:'kb-mingli', label:'命理知识域', cat:'kb', parent:'root', desc:'mingli 域 18,930 条 / 58 模块：\nr45_palace 2,688 / 紫微 2,005 / 八字 1,856\nr45_huajie 1,260 / classics 1,031 / 奇门 1,025\n风水 778 / 咒语 548 / 六壬 875 / 六爻 366\n稀薄模块 41→29（定性表 docs/THIN-MODULE-TRIAGE-20260927.md，真缺口仅 9）', metric:'命理域合计: <b>18,930 条</b><br>KB 全量: <b>320,568 条</b><br>命理占比: <b>5.9%</b>（医学居大头）'},
-    {id:'kb-tcm', label:'医学知识域', cat:'kb', parent:'root', desc:'tcm 207,743 + 伤寒 20,218 + 方剂 14,014\n+ 倪师人纪 10,500 + 诊断 9,303 + 内经 5,279…\nG24 后存量 36,121 条标 reference 参考域，\n诊疗链路只命中 tcm 移植栈。', metric:'医学域合计: <b>~283,000 条</b><br>参考域隔离: <b>36,121 条</b>'},
-    {id:'kb-canon', label:'经典依据层', cat:'kb', parent:'kb-mingli', desc:'渊海子平/三命通会/滴天髓/子平真诠/\n星历考原/天玉经/增删卜易等原典实时命中。\n新增：六壬双璧（指南注解+断案222案）、\n奇门统宗（玄机赋全）、象数占候六部 82 条\n（太玄经/洪范皇极/天原发微/大衍索隐/易象图说/三易洞玑）。'},
+    {id:'kb-mingli', label:'命理知识域', cat:'kb', parent:'root', desc:'命理域合计 24,318 条（门类分域口径）：\n紫微 9,801 / mingli 3,588 / 八字 2,639\n易卦 2,216 / 三式 2,131 / 民俗 1,297\n阳宅 815 / 择日 792 / 相术 523\n命名 289 / 数字术数 166 / 科仪 61', metric:'命理域合计: <b>24,318 条</b><br>KB 全量: <b>324,114 条</b><br>命理占比: <b>7.5%</b>（医学居大头）'},
+    {id:'kb-tcm', label:'医学知识域', cat:'kb', parent:'root', desc:'tcm 201,989 + 伤寒论 16,968 + 方剂 12,689\n+ 诊断 8,155 + 倪师人纪 5,330+1,160…\n存量 36,760 条标 reference 参考域，\n诊疗链路只命中 tcm 移植栈。', metric:'医学域合计: <b>~263,000 条</b><br>参考域隔离: <b>36,760 条</b>'},
+    {id:'kb-canon', label:'经典依据层', cat:'kb', parent:'kb-mingli', desc:'渊海子平/三命通会/滴天髓/子平真诠/\n星历考原/天玉经/增删卜易等原典实时命中。\n10 月新入：厚本五书回填 1,600 条\n（协纪 492/六壬大全 614/易林 196/渊海 134/穷通 164）\n净源五部 265 条（三命通会/周易集解/\n五行大义/黄帝宅经/珞琭子两赋）。', metric:'10 月新入原典: <b>1,865 条</b>'},
     {id:'kb-verify', label:'真人校正库', cat:'kb', parent:'kb-mingli', desc:'名人八字反校：BaziQA 50 人 488 题。\n目标 10,000 真人校正库（进行中）。\n⚠️ wiki 702 名人事件待网络恢复补抓。'},
+    {id:'kb-manuscript', label:'手稿案例库（新）', cat:'kb', parent:'kb-mingli', desc:'手稿 1,852 条对照蒸馏（manuscript-collate.py）：\n印证 5 / 参照 237 / 独有 1,610。\n独有 1,610 条已入库，audit_status=pending\n待命理师审核后转正式。校勘红线：不删改古籍原文。', metric:'入库: <b>1,610 条</b>（pending）<br>对照台账: <b>已出</b>'},
     // 模型链
     {id:'ml-v93', label:'v9.2-fixed（在线）', cat:'model', parent:'root', desc:'MLX LoRA 微调链生产基线。\n8960 推理服务在役（S1.3 回退验证）。\nBaziQA 36.7%。\nv9.4 复测 32.2% 三判据全败→否决回退，\nv9.3 亦未过线，生产锁 v9.2。', metric:'BaziQA: <b>36.7%</b>（v9.2 基线）<br>v9.4: <b>32.2%</b> 否决<br>题库 v2 洗牌: <b>backlog</b>'},
     {id:'ml-chain', label:'微调管线', cat:'model', parent:'ml-v93', desc:'数据蒸馏→JSONL→LoRA 300 轮→\nfuse→launchd 热切换→488 题复测，\n全链自动（v93-chain.sh）。'},
     {id:'ml-distill', label:'知识蒸馏', cat:'model', parent:'ml-v93', desc:'distillery/：倪师天纪字幕 179 文件\nR1-R4 多轮 SOP 已收敛（G26）。\n应期专题 yingqi-series.py 管线。\n⚠️ 再婚/丧偶两批 0/10 全拒待重蒸。'},
     // 运行时
-    {id:'rt-api', label:'API 8920', cat:'runtime', parent:'root', desc:'api-server-v2.js 主服务。\nKB 检索/排盘/报告/认证/推送。\nhuajie-matcher 区间索引根修：\n排盘代理 14.1s→0.22s（64×），\n报告 TIMEOUT 根因消除。'},
+    {id:'rt-api', label:'API 8920', cat:'runtime', parent:'root', desc:'api-server-v2.js 主服务。\nKB 检索/排盘/报告/认证/推送。\nhuajie-matcher 区间索引根修：\n排盘代理 14.1s→0.22s（64×），\n报告 TIMEOUT 根因消除。\nR827 影子索引 kb_fts5_idmap：\n守卫 --sync 50min→2.4s。'},
     {id:'rt-mlx', label:'推理 8960', cat:'runtime', parent:'root', desc:'MLX 本地推理，当前挂 v9.2-fixed。\nlaunchd 热切换：kickstart 不重读 plist，\n须 bootout+bootstrap（S1.3 实录）。\n16GB 内存约束：训练时须停 8960。'},
     {id:'rt-med', label:'医学栈 8972/8974', cat:'runtime', parent:'root', desc:'medical-stack：tcm 内化栈。\n8972 诊断 / 8974 批注层。\n命理批注唯一合流点（R745/756/757 守卫）。'},
     {id:'rt-vision', label:'视觉采集群', cat:'runtime', parent:'c-doctor', desc:'面/舌/手/眼四诊 + 命理三相\n（fortune_face/mole/palm）并行识别。\n一帧采集，实时 AI 病历+命理草案。'},
@@ -93,7 +94,7 @@ const DATA = {
     // 外部协同
     {id:'x-tcm', label:'中医标准智能体', cat:'ext', parent:'rt-med', desc:'医学能力唯一源头。\nG17 六层验收 6/6 全签、G18 补丁机制。\n15min 镜像通道内化，只适配不训练。'},
     {id:'x-family', label:'家庭生活助手', cat:'ext', parent:'root', desc:'G13 病历回流（命理批注剥离）\nG21 命理能力包发版（paipan v1.x）。'},
-    {id:'x-g2claw', label:'G2CLAW 云端', cat:'ext', parent:'ml-distill', desc:'云端蒸馏算力。⚠️ 持续 500 故障中，\n熔断器兜底，再婚/丧偶专题排队等恢复。'},
+    {id:'x-g2claw', label:'云端蒸馏（已停用）', cat:'ext', parent:'ml-distill', desc:'G2CLAW/QClaw 已于 2026-09-28 停用卸载，\n蒸馏算力全面收回本地（Kimi + MLX 管线）。\n再婚/丧偶专题改走本地重蒸队列。'},
   ],
   edges: []
 };
