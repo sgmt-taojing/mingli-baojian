@@ -1,3 +1,10 @@
+# 2026-10-16 20:10 — ✅ ask 双端完全对齐：taisui/jieqi/holidays/zeri/family 五件入对话流 ·Kimi
+
+- **ask.html +5 工具**：太岁查询（birthYear 流）、择日建议（事项文本流）、节气时令/节日民俗（none 直达）、家庭排盘（称呼+出生年正则解析≥2 成员）；G_OF 分组归位（太岁→运势走向、家庭→婚恋合和、其余→日历幸运），工具总数 22→27。
+- **标题图 +5**：ask-taisui/family/zeri/jieqi/holidays.png（SimSong 金字+红印章同款式）。
+- **服务端顺手修**：baihuaFamily overview 叠句「。。」修复（relTail 条件拼接）。
+- **深链实测全过**：taisui 1990 庚午→2026 丙午值太岁 ✅、zeri 搬家→本月 7 吉日（10/13、10/25 黄道）✅、family 火×3 缺木土金水 ✅、jieqi 寒露→霜降 10/24 ✅、holidays 55 节日·重阳 2 天后 ✅、console 0 错误。
+
 # 2026-10-16 19:40 — ✅ 全平台文字占位标识图标化(694处)+ask双端拉齐81数理/楼层门牌 ·Kimi
 
 - **图标化**：单字占位标识（夜/珠/语/锁/财/店…共 61 种字）全平台两轮治理——v1 白名单 89 处/32 文件，v2 智能 codemod 605 处 SVG + 40 处 option 剥字/94 文件；48 种形象 SVG 图标（月亮/太极/聊泡/锁/钥匙/铜钱/店铺/佛珠/编钟/警示…）内联 currentColor，字间距排版（金 钱 课/返 回 首 页等 44 处）与正文巧合（剩 12.5h/第 1 爻等 61 字）人工甄别保留。codemod 沉淀 scripts/iconize-markers{,-v2}.py 可复跑。

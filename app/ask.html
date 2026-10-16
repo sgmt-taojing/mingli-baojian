@@ -224,10 +224,12 @@ const TOOLS = [
   { id:'tizhi',   ico:'🌿', nm:'体质禀赋', ds:'五行体质 时令调养', need:'birth' },
   // 运势走势：今年到十年
   { id:'liunian', ico:'📅', nm:'流年运势', ds:'今年运气 逐月走势', need:'birthYear' },
+  { id:'taisui',  ico:'🐉', nm:'太岁查询', ds:'犯太岁 化解提醒', need:'birthYear' },
   { id:'lifeflow', ico:'🌊', nm:'流年报告', ds:'本月大运 明年预览', need:'birth' },
   { id:'lifetimeline', ico:'📈', nm:'十年走势', ds:'黄金五年 转折提醒', need:'birth' },
   // 婚恋家庭：缘分配对
   { id:'hehun',   ico:'💑', nm:'合婚配对', ds:'两人缘分 婚配参考', need:'partner' },
+  { id:'family',  ico:'👨‍👩‍👧', nm:'家庭排盘', ds:'全家五行 和睦参考', need:'text', ph:'如 爸爸1965 妈妈1966 我1990', prompt:'把家庭成员发给我（称呼+出生年，至少两位，如：爸爸1965 妈妈1966 我1990）：' },
   // 起名改名：人生大事（宝宝/改名/公司/测评）
   { id:'qiming',  ico:'👶', nm:'宝宝起名', ds:'古籍取名 五行补益', need:'namebirth', ph:'输入姓氏 如 王', prompt:'宝宝（或改名者）的姓氏是？' },
   { id:'gaiming', ico:'✏️', nm:'改名测评', ds:'现名评分 新名备选', need:'rename', ph:'输入现用姓名 如 张伟', prompt:'请告诉我您的现用姓名（连名带姓 2-4 字）：' },
@@ -244,6 +246,9 @@ const TOOLS = [
   { id:'lifeplan',ico:'🧭', nm:'人生规划', ds:'命局阶段定位 五年路径', need:'birth' },
   // 日历幸运：每日必看
   { id:'huangli', ico:'📖', nm:'黄历择日', ds:'今日宜忌 选好日子', need:'none' },
+  { id:'zeri',    ico:'📆', nm:'择日建议', ds:'本月吉日 事项匹配', need:'text', ph:'想办什么事 如 搬家', prompt:'想办什么事？（如 嫁娶/开业/搬家/出行/动土/祭祀/安葬）我看本月哪些日子合适：' },
+  { id:'jieqi',   ico:'🌦️', nm:'节气时令', ds:'二十四节气 养生命门', need:'none' },
+  { id:'holidays',ico:'🎏', nm:'节日民俗', ds:'佛诞道诞 法定假日', need:'none' },
   { id:'lucky',   ico:'🍀', nm:'幸运数色', ds:'幸运数字 颜色方位', need:'birthYear' },
 ];
 const FACING_MAP = { '子':['子','午'],'午':['午','子'],'卯':['卯','酉'],'酉':['酉','卯'],'艮':['丑','未'],'坤':['未','丑'],'巽':['辰','戌'],'乾':['戌','辰'] };
@@ -264,8 +269,8 @@ const GROUPS = [
   ['日历幸运', '黄历择日 · 幸运数色'],
 ];
 const G_OF = { liuyao:0, meihua:0, qimen:0, liuren:0, bazi:1, ziwei:1, lifeindex:1, tizhi:1,
-  liunian:2, lifeflow:2, lifetimeline:2, hehun:3, qiming:4, gaiming:4, gongsi:4, xingming:4,
-  mobile:5, chepai:5, shuli81:5, floor:5, fengshui:6, lifeplan:7, huangli:8, lucky:8 };
+  liunian:2, taisui:2, lifeflow:2, lifetimeline:2, hehun:3, family:3, qiming:4, gaiming:4, gongsi:4, xingming:4,
+  mobile:5, chepai:5, shuli81:5, floor:5, fengshui:6, lifeplan:7, huangli:8, zeri:8, jieqi:8, holidays:8, lucky:8 };
 let _gHtml = '', _lastG = -1;
 TOOLS.forEach(t => {
   const g = G_OF[t.id] != null ? G_OF[t.id] : 0;
@@ -455,6 +460,16 @@ function collectBirth(skip) {
     if (state.tool.id === 'mobile' && v.replace(/\D/g, '').length < 7) { bot('手机号至少 7 位数字哦。'); return; }
     if (state.tool.id === 'chepai' && v.replace(/\D/g, '').length < 3) { bot('车牌数字部分至少 3 位（如 粤A6688）。'); return; }
     if (state.tool.id === 'xingming' && (v.length < 2 || v.length > 4)) { bot('姓名一般 2-4 个字（连名带姓一起填）。'); return; }
+    if (state.tool.id === 'family') {
+      // 家庭排盘：称呼+出生年 至少两位（R-FAMILY-ASK）
+      const pairs = [...v.matchAll(/([一-龥]{1,4})\s*(\d{4})/g)].map(m => ({ role: m[1], year: +m[2] })).filter(x => x.year > 1900 && x.year <= new Date().getFullYear());
+      if (pairs.length < 2) { bot('至少两位成员哦，格式：称呼+出生年（如 爸爸1965 妈妈1966 我1990）。'); return; }
+      state.birth = { text: v, members: pairs };
+      me(v);
+      $('askBirth').classList.add('hidden');
+      submitAsk();
+      return;
+    }
     state.birth = { text: v };
     me(v);
   } else if (need === 'textopt') {
@@ -576,6 +591,49 @@ async function fetchToolResult() {
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '查询失败');
     return { kind:'minsu', baihua: j.baihua, toolName:'今日黄历' };
+  }
+  // 太岁查询（R-DUAL：与民俗中心同源，birthYear 必带）
+  if (t === 'taisui') {
+    const r = await fetch(`${API}/api/minsu/taisui?year=${now.getFullYear()}&birthYear=${state.birth.year}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '查询失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 择日建议（本月·事项匹配）
+  if (t === 'zeri') {
+    const r = await fetch(`${API}/api/minsu/zeri?year=${now.getFullYear()}&month=${now.getMonth()+1}&event=${encodeURIComponent(state.birth.text)}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '查询失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 节气时令（今年二十四节气）
+  if (t === 'jieqi') {
+    const r = await fetch(`${API}/api/minsu/jieqi?year=${now.getFullYear()}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '查询失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 节日民俗（法定+佛诞+道诞+民俗）
+  if (t === 'holidays') {
+    const r = await fetch(`${API}/api/minsu/holidays?year=${now.getFullYear()}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '查询失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 家庭排盘（称呼+出生年≥2，POST）
+  if (t === 'family') {
+    const r = await fetch(`${API}/api/minsu/family`, {
+      method:'POST', headers:{ 'Content-Type':'application/json', 'X-Skip-Interceptor':'1' },
+      body: JSON.stringify({ members: state.birth.members }), signal: AbortSignal.timeout(20000)
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '排盘失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
   }
   if (t === 'liunian') {
     const r = await fetch(`${API}/api/minsu/liunian?year=${now.getFullYear()}&birthYear=${state.birth.year}`, { signal: AbortSignal.timeout(12000) });
