@@ -21,6 +21,11 @@
     if (!window.iztro || !window.iztro.astro) return null;
     opts = opts || {};
     var astro = window.iztro.astro;
+    // 2026-10-16 真太阳时：localReport 检出出生地经度时置 window.__solarLng，统一校正（同服务端 ziwei-iztro-core 顺序：先校正后定 timeIndex）
+    if (window.__solarLng != null && window._trueSolarLocal) {
+      var _ts = window._trueSolarLocal.toTrueSolar(y, m, d, h, 0, window.__solarLng);
+      h = _ts.true_hour + _ts.true_minute / 60;
+    }
     var timeIndex = Math.floor(((h + 1) % 24) / 2);
     var dateStr = y + '-' + m + '-' + d;
     var gender = (opts.sex === '女' || opts.sex === 'female') ? '女' : '男';

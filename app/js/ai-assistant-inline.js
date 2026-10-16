@@ -3197,8 +3197,7 @@ function _getUnifiedReport(modId,data){
     var yI=((yc-4)%10+10)%10;
     var mI=(yI*2+((ji+2)%12+12)%12)%10;
     var mS=tg[mI];
-    var ep=new Date(1900,0,1),tg2=new Date(yr,mn-1,dy);
-    var dd=Math.floor((tg2-ep)/86400000);
+    var dd=Math.floor((Date.UTC(yr,mn-1,dy)-Date.UTC(1900,0,1))/86400000); // 2026-10-16 修复：UTC 绝对日差，防夏令时/LMT 致日柱差一天
     var dS=tg[((dd%10)+10)%10],dB=dz[((dd+10)%12+12)%12];
     var hI=Math.floor((hr+1)/2)%12;
     var hB=dz[hI];
@@ -3764,7 +3763,36 @@ if(modId==='lifeplan'){
   return'报告生成引擎就绪';
 }
 
-function localReport(modId,data){return _getUnifiedReport(modId,data);}
+function localReport(modId,data){
+  // 2026-10-16 真太阳时接线：检出出生地→置 __solarLng→引擎统一校正→报告附披露；未命中城市表也如实披露
+  var _note=null;
+  try{
+    if(window._trueSolarLocal){
+      var _place=null;
+      if(data&&!Array.isArray(data)&&typeof data==='object'){
+        _place=data.birthplace||data.birthPlace||data.city||null;
+      }
+      if(!_place&&Array.isArray(data)){
+        for(var _pi=0;_pi<data.length;_pi++){
+          var _v=String(data[_pi]||'').trim();
+          if(_v.length>=2&&_v.length<=6){
+            var _h0=window._trueSolarLocal.lookupLng(_v);
+            if(_h0&&_h0.city===_v.replace(/市$/,'')){_place=_v;break;} // 元素本身即城市名（长文本中的城市不算，防误校正）
+          }
+        }
+      }
+      if(_place){
+        var _hit=window._trueSolarLocal.lookupLng(_place);
+        if(_hit){window.__solarLng=_hit.lng;_note=window._trueSolarLocal.correctionNote(_hit);}
+        else{_note='出生地「'+String(_place).slice(0,12)+'」未在内置城市表（覆盖直辖市/省会/主要城市），本次未做真太阳时校正——靠近时辰交界时建议提供经度精排';}
+      }
+    }
+  }catch(_e){}
+  var _r;
+  try{_r=_getUnifiedReport(modId,data);}finally{window.__solarLng=null;}
+  if(_note&&typeof _r==='string'&&_r.length>50&&_r.indexOf('报告生成引擎就绪')<0){_r+='\n\n【真太阳时】'+_note;}
+  return _r;
+}
 
 function dg2str(zhi, dS){
   var wxMap={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
@@ -3800,8 +3828,7 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
   if(mn>=5&&mn<=8)isYangDun=false;
   if(mn>=3&&mn<=4){isYangDun=(dy<15)?false:true;}
   if(mn>=9&&mn<=10){isYangDun=(dy<15)?true:false;}
-  var ep2=new Date(1900,0,1),tg2d=new Date(y,mn-1,dy);
-  var dd2=Math.floor((tg2d-ep2)/86400000);
+  var dd2=Math.floor((Date.UTC(y,mn-1,dy)-Date.UTC(1900,0,1))/86400000); // 2026-10-16 修复：UTC 绝对日差，防夏令时/LMT 致日柱差一天
   var dayGanZhiIdx=((dd2%60)+60)%60;
   var juPattern=dayGanZhiIdx%5;
   var yangJu=[[1,7,4],[8,2,5],[3,9,6],[3,9,6],[2,8,5]];
@@ -3831,8 +3858,7 @@ function _qimenCompute(y,mn,dy,hr,sex,ask){
   tianPan[5]=tianPan[2]||'癸';
   diPan[5]=diPan[2]||'癸';
   // 2. 时辰旬首→值符值使
-  var ep3=new Date(1900,0,1),tg3=new Date(y,mn-1,dy);
-  var dd3=Math.floor((tg3-ep3)/86400000);
+  var dd3=Math.floor((Date.UTC(y,mn-1,dy)-Date.UTC(1900,0,1))/86400000); // 2026-10-16 修复：UTC 绝对日差，防夏令时/LMT 致日柱差一天
   var dayGanIdx=((dd3%10)+10)%10;
   var hourshiIdx=Math.floor((hr+1)/2)%12;
   var hourGanIdx2=(dayGanIdx*2+hourshiIdx)%10; // 时干索引
@@ -4080,7 +4106,14 @@ async function _paipanAsync(y,m,d,h){
   // 降级：本地同步计算（精简版）
   return _paipanLocal(y,m,d,h);
 }
-function _paipan(y,m,d,h){return _paipanLocal(y,m,d,h);}
+function _paipan(y,m,d,h){
+  // 2026-10-16 真太阳时：localReport 检出出生地经度时置 window.__solarLng，此处统一校正（分数小时）
+  if(window.__solarLng!=null&&window._trueSolarLocal){
+    var _ts=window._trueSolarLocal.toTrueSolar(y,m,d,h,0,window.__solarLng);
+    h=_ts.true_hour+_ts.true_minute/60;
+  }
+  return _paipanLocal(y,m,d,h);
+}
 function _paipanLocal(y,m,d,h,gender,ziSect){
   // ziSect: 1=早子时(23时用当天日干,默认), 2=晚子时(23时用次日日干)
   if(!ziSect) ziSect=1;
@@ -4141,8 +4174,7 @@ function _paipanLocal(y,m,d,h,gender,ziSect){
   var yI=((yc-4)%10+10)%10;
   var mI=((yI*2+monthIdx+2)%10+10)%10;
   var mS=tg[mI];
-  var ep=new Date(1900,0,1),tg2=new Date(y,m-1,d);
-  var dd=Math.floor((tg2-ep)/86400000);
+  var dd=Math.floor((Date.UTC(y,m-1,d)-Date.UTC(1900,0,1))/86400000); // 2026-10-16 修复：改 UTC 绝对日差——本地 Date 受 1986-1991 夏令时/历史 LMT 影响，夏令时期间生日日柱差一天（如 1990-05-15 误为己卯，实为庚辰）
   var dS=tg[((dd%10)+10)%10],dB=dz[((dd+10)%12+12)%12];
   var hI=Math.floor((h+1)/2)%12;
   var hB=dz[hI];
