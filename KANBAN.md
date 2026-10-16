@@ -1,3 +1,12 @@
+# 2026-10-16 18:05 — ✅ heluo-math 三病灶根治+河洛面板上线 minsu-center，两页标签残缺修复 ·Kimi
+
+- **heluo-math.js（原全坏 dormant 模块）**：①姓名模式 `getKangxiStroke`/`_STROKE_TABLE` 未定义必抛错+`charCodeAt%16+1` 伪笔画——改查 `js/data/kangxi-strokes-common.json`（服务端康熙真字典 CJK 常用区抽取 20,993 字/181KB），查无诚实列出「暂无数据，未做估算」（按码点迭代兼容扩展字）；②`(Y*365+M*30+D)%60` 伪日干支——改 JDN 锚点真日柱（与 almanac-engine 同锚 2024-04-30 甲子，并用 2000-01-01 戊午交叉验证），天干河图数按壬1癸6/丙2丁7/甲3乙8/庚4辛9/戊5己10；③年飞星算出不用——上屏（2026 一白贪狼入中）；④IIFE 未导出函数致面板按钮全局不可达+mobile 分支块级作用域 xiongCount ReferenceError——导出+作用域修正。
+- **挂载**：#almanacHetuLuoshu 原无任何页面引用（死容器）——河洛数理面板正式上线 minsu-center.html（新增「🔮 河洛数理」分组），script 加 ?v= 破缓存。
+- **naming-portal.html**：手机号拍照识别卡标签汤（href 夹 0x01 控制字符+残缺 `拍</span>`）按行号修复，链接改 ask.html?tool=mobile；11 张卡浏览器实测全部有效。
+- **divination-tools.html**：6 张 ml-tap 卡片 `style="display:block"` 缺 `>`+`</ml-tap>` 错位（图标外内容全裸奔）批量修复。
+- **minsu-engine-node.js（v1）**：grep 无假数据模式，清白。
+- **浏览器实测**：面板出真日柱「癸亥日·河图数6（成数·水）」✅；13800138000 河图+洛书九星 67%吉✅；刘德华 金1土2（刘15/德15/华14 真笔画）✅；李🐉 诚实报缺未估算✅；console 0 错误✅。
+
 # 2026-10-16 17:35 — ✅ 数字术数区五格假笔画根治：康熙笔画真字典+可复跑构建管线 ·Kimi
 
 - **病灶**：minsu2-engine-node.js 五格剖象的 getStrokes 回退 `(charCodeAt % 20) + 1` 伪笔画（原小字典仅 ~80 字且混入字符串污染），所有未收字的姓名五格全是编造数。

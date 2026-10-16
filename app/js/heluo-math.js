@@ -49,8 +49,20 @@ var HETU_LUOSHU_SYSTEM={
 };
 
 // 河洛数理分析
-function analyzeByHetuLuoshu(input,type){
-  let result={input:input,type:type,hetu:{},luoshu:{},conclusion:'',advice:[]};
+// R-HELUO-REAL（2026-10-16）真字典接入：姓名笔画改查 js/data/kangxi-strokes-common.json
+// （服务端 server/data/kangxi-strokes.json 的 CJK 常用区抽取，康熙口径 20,993 字），
+// 查无此字诚实跳过并列出，禁编造（原 charCodeAt%16+1 伪笔画已退役）。
+var _kxStrokesPromise=null;
+function loadKangxiStrokes(){
+  if(!_kxStrokesPromise){
+    _kxStrokesPromise=fetch('js/data/kangxi-strokes-common.json')
+      .then(function(r){return r.ok?r.json():null;})
+      .catch(function(){return null;});
+  }
+  return _kxStrokesPromise;
+}
+function analyzeByHetuLuoshu(input,type,strokes){
+  let result={input:input,type:type,hetu:{},luoshu:{},conclusion:'',advice:[],missingChars:[]};
   
   // 河图五行分析
   let wxCount={水:0,火:0,木:0,金:0,土:0};
@@ -65,9 +77,10 @@ function analyzeByHetuLuoshu(input,type){
       else chengCount++;
     }
   }else if(type==='name'){
-    // 姓名笔画
-    for (let i=0;i<input.length;i++){
-      let stroke=getKangxiStroke(input[i])||_STROKE_TABLE[input[i]]||(input[i].charCodeAt(0)%16+1);
+    // 姓名笔画（康熙口径；查无→诚实跳过，记入 missingChars；按码点迭代兼容扩展字）
+    for (const ch of input){
+      let stroke=strokes?strokes[ch]:null;
+      if(!(stroke>0)){result.missingChars.push(ch);continue;}
       let num=stroke%10;
       let wx=HETU_LUOSHU_SYSTEM.hetu.shengShu[num]||HETU_LUOSHU_SYSTEM.hetu.chengShu[num];
       if(wx)wxCount[wx]++;
@@ -129,7 +142,7 @@ function analyzeByHetuLuoshu(input,type){
     let shengMap={木:'水',火:'木',土:'火',金:'土',水:'金'};
     result.advice.push('补'+minWx+'：宜多接触'+minWx+'行相关事物（'+(minWx==='木'?'绿色植物/木材':minWx==='火'?'红色物品/灯光':minWx==='土'?'黄色物品/陶瓷':minWx==='金'?'金属物品/白色':minWx==='水'?'水养植物/鱼缸/蓝色':'')+'）');
   }
-  if(type==='mobile'&&xiongCount>jiCount){
+  if(type==='mobile'&&(result.luoshu.xiongCount||0)>(result.luoshu.jiCount||0)){
     result.advice.push('凶星偏多，建议调整号码增加吉星数字（1/4/6/8/9）');
   }
   if(shengCount>chengCount*2){
@@ -148,19 +161,23 @@ function renderHetuLuoshuPanel(){
   let now=new Date();
   let Y=now.getFullYear(),M=now.getMonth()+1,D=now.getDate();
   
-  // 今日河图数
-  let dayGzIdx=(Y*365+M*30+D)%60;
-  let dayStemIdx=dayGzIdx%10;
-  let hetuShu=dayStemIdx+1; // 1-10
-  let hetuCheng=(dayStemIdx+6)%10+1;
-  let hetuWx=HETU_LUOSHU_SYSTEM.hetu.shengShu[hetuShu]||HETU_LUOSHU_SYSTEM.hetu.chengShu[hetuCheng]||'土';
+  // 今日日柱（真干支：JDN 锚点法，与 almanac-engine.js 同一锚——2024-04-30 甲子日 JDN=2460431）
+  // R-HELUO-REAL：原 (Y*365+M*30+D)%60 伪干支已退役
+  let jdn=_toJDN(Y,M,D);
+  let gzIdx=((jdn-2460431)%60+60)%60;
+  let GAN='甲乙丙丁戊己庚辛壬癸',ZHI='子丑寅卯辰巳午未申酉戌亥';
+  let dayGz=GAN[gzIdx%10]+ZHI[gzIdx%12];
+  // 天干河图数：壬1癸6（水）丙2丁7（火）甲3乙8（木）庚4辛9（金）戊5己10（土）
+  let HETU_BY_GAN=[3,8,2,7,5,10,4,9,1,6];
+  let hetuShu=HETU_BY_GAN[gzIdx%10];
+  let hetuWx={1:'水',6:'水',2:'火',7:'火',3:'木',8:'木',4:'金',9:'金',5:'土',10:'土'}[hetuShu];
+  let hetuShengCheng=hetuShu<=5?'生数':'成数';
   
-  // 今日洛书九星
-  let luoshuOrder=[9,3,7,1,5,8,4,2,6];
-  // 年命星：洛书轨迹，1864年一白入中宫
+  // 年飞星（洛书逆行：1864 年一白入中宫起算）
   let yearStar = 9 - ((Y - 1864) % 9) + 1;
   if(yearStar > 9) yearStar -= 9;
   if(yearStar < 1) yearStar += 9;
+  let yearStarInfo=HETU_LUOSHU_SYSTEM.luoshu.nineStars[yearStar];
   
   let html='';
   html+='<div style="font-size:15px;color:var(--gold);font-weight:bold;margin-bottom:14px;letter-spacing:3px;text-align:center">🔮 河洛数理</div>';
@@ -169,7 +186,7 @@ function renderHetuLuoshuPanel(){
   html+='<div style="background:rgba(52,152,219,.04);border:1px solid rgba(52,152,219,.15);border-radius:10px;padding:14px;margin-bottom:12px">';
   html+='<div style="font-size:13px;color:var(--cyan2);margin-bottom:8px">河图</div>';
   html+='<div style="font-size:12px;opacity:.7;line-height:1.8;margin-bottom:6px">'+HETU_LUOSHU_SYSTEM.hetu.formula+'</div>';
-  html+='<div class="rpt-is-5">今日河图数：<b class="rpt-is-1">'+hetuShu+'</b>(生数,'+hetuWx+') / <b class="rpt-is-1">'+hetuCheng+'</b>(成数,'+hetuWx+')</div>';
+  html+='<div class="rpt-is-5">今日 '+dayGz+' 日：河图数 <b class="rpt-is-1">'+hetuShu+'</b>（'+hetuShengCheng+'·'+hetuWx+'）　'+Y+' 年飞星：<b class="rpt-is-1">'+yearStarInfo.name+'</b>入中（'+yearStarInfo.domain+'）</div>';
   html+='</div>';
   
   // 洛书九宫图
@@ -203,18 +220,32 @@ function renderHetuLuoshuPanel(){
   el.innerHTML=html;
 }
 
-function runHetuAnalysis(){
+function _toJDN(y,m,d){
+  let a=Math.floor((14-m)/12);
+  let y2=y+4800-a,m2=m+12*a-3;
+  return d+Math.floor((153*m2+2)/5)+365*y2+Math.floor(y2/4)-Math.floor(y2/100)+Math.floor(y2/400)-32045;
+}
+
+async function runHetuAnalysis(){
   let input=document.getElementById('hetuMobileInput')?document.getElementById('hetuMobileInput').value.trim():'';
   let out=document.getElementById('hetuResult');
   if(!input||!out)return;
-  if(input.length<2){showToast('请输入至少2个字符');return;}
+  if(input.length<2){(typeof showToast==='function'?showToast:function(m){alert(m);})('请输入至少2个字符');return;}
   
   let type=/^\d+$/.test(input)?'mobile':'name';
-  let r=analyzeByHetuLuoshu(input,type);
+  let strokes=null;
+  if(type==='name'){
+    strokes=await loadKangxiStrokes();
+    if(!strokes){out.innerHTML='<div style="font-size:12px;color:var(--cinn2)">康熙笔画表加载失败，请检查网络后重试。</div>';out.style.display='block';return;}
+  }
+  let r=analyzeByHetuLuoshu(input,type,strokes);
   
   let html='';
   // 河图
   html+='<div style="font-size:12px;color:var(--cyan2);margin-bottom:6px;font-weight:bold">河图分析</div>';
+  if(r.missingChars&&r.missingChars.length){
+    html+='<div style="font-size:11px;color:var(--cinn2);margin-bottom:6px">「'+r.missingChars.join('」「')+'」暂无康熙笔画数据，未参与分析（未做估算）。</div>';
+  }
   html+='<div style="font-size:12px;line-height:2;margin-bottom:8px">';
   for (let wx in r.hetu.wxCount){if(r.hetu.wxCount[wx]>0)html+=wx+':'+r.hetu.wxCount[wx]+' ';}
   html+='</div>';
@@ -245,5 +276,11 @@ function runHetuAnalysis(){
   out.innerHTML=html;
   out.style.display='block';
 }
+
+// R-HELUO-REAL：IIFE 内函数显式导出（原未导出，面板按钮 onclick 全局不可达）
+global.renderHetuLuoshuPanel=renderHetuLuoshuPanel;
+global.runHetuAnalysis=runHetuAnalysis;
+global.analyzeByHetuLuoshu=analyzeByHetuLuoshu;
+global.loadKangxiStrokes=loadKangxiStrokes;
 
 })(typeof window !== "undefined" ? window : globalThis);
