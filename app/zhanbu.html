@@ -131,7 +131,7 @@
             <p class="hg-meaning" id="yjMean1"></p>
           </div>
           <div class="arrow-div">→</div>
-          <div class="hg-card changed" id="yjChanged" class="d-none">
+          <div class="hg-card changed d-none" id="yjChanged">
             <p class="hg-label">变 卦</p>
             <p class="hg-symbol" id="yjSym2"></p>
             <div class="gua-lines" id="yjGua2"></div>
@@ -346,7 +346,7 @@
         <h3>请输入一字</h3>
         <p class="input-hint">手写或输入一个汉字</p>
         <div class="input-row">
-          <input type="text" class="input-field" id="ceziInput" placeholder="请输入一个汉字" maxlength="1" style="font-size:32px;width:120px;text-align:center;font-family:'Ma Shan Zheng',serif" oninput="if(this.value.length aria-label="请输入一个汉字">1)this.value=this.value[0]">
+          <input type="text" class="input-field" id="ceziInput" placeholder="请输入一个汉字" maxlength="1" style="font-size:32px;width:120px;text-align:center;font-family:'Ma Shan Zheng',serif" oninput="if(this.value.length>1)this.value=this.value[0]" aria-label="请输入一个汉字">
           <button class="compute-btn" onclick="doCezi()" style="display:block;margin:0">开始解析</button>
         </div>
         <div class="input-row" style="margin-top:16px">
@@ -439,67 +439,148 @@ function playSound(type){
   }catch(e){ /* silent fallback */ }
 }
 
+// ═══ R-ZHANBU-REAL（2026-10-16）：安慰剂/假算法全退役，改接 8920 真排盘引擎 ═══
+// 治理依据：「事实为体」——前端不再自造卦表/笔画，六爻·梅花·奇门·六壬一律走
+// /api/paipan/<mod>（Node 原生引擎），白话解读走 /api/paipan/<mod>/baihua
+var API_V2 = 'http://127.0.0.1:8920';
+function _esc(s){ var d = document.createElement('div'); d.textContent = String(s == null ? '' : s); return d.innerHTML; }
+function _set(id, txt){ var el = document.getElementById(id); if(el) el.textContent = txt; }
+function _html(id, h){ var el = document.getElementById(id); if(el) el.innerHTML = h; }
+function apiPost(path, body){
+  return fetch(API_V2 + path, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body || {})
+  }).then(function(r){ return r.json(); });
+}
+function _nowParts(dateStr, hourStr){
+  var y, m, d, h;
+  if(dateStr){ var p = dateStr.split('-'); y = +p[0]; m = +p[1]; d = +p[2]; }
+  else { var n = new Date(); y = n.getFullYear(); m = n.getMonth() + 1; d = n.getDate(); }
+  h = (hourStr !== '' && hourStr != null) ? parseInt(hourStr, 10) : new Date().getHours();
+  return { year: y, month: m, day: d, hour: h };
+}
+function _engineFail(prefix, d){ try{ toast(prefix + '：' + ((d && d.error) || (d && d.message) || '排盘失败')); }catch(e){} }
+function _netFail(mod){ return function(e){ console.warn(mod + ' fetch:', e); try{ toast('排盘服务(8920)未就绪，请稍后重试'); }catch(_){} }; }
+// 白话解读（/baihua）统一渲染
+function _renderBaihua(er, resp, color){
+  if(!er) return;
+  er.classList.remove('d-none');
+  var d = (resp && resp.data) || resp || {};
+  if(!d.ok){ er.innerHTML = '<div class="analysis-card"><p style="font-size:13px;opacity:.8">' + _esc((resp && resp.message) || '解读生成失败') + '</p></div>'; return; }
+  var h = '<div class="analysis-card" style="border-color:' + color + '"><h5>引擎白话解读</h5><p style="font-size:13px;line-height:2;white-space:pre-wrap">' + _esc(d.overview || '') + '</p></div>';
+  (d.cards || []).slice(0, 6).forEach(function(cd){
+    h += '<div class="analysis-card" style="border-color:' + color + '"><h5>' + _esc(cd.title || '') + '</h5><p style="font-size:12px;line-height:1.9;white-space:pre-wrap;opacity:.9">' + _esc(cd.plain || '') + '</p></div>';
+  });
+  er.innerHTML = h;
+}
+
 // === 易经六爻 ===
 var _yjCastCount = 0;
-var _yjYao = [];
+var _yjCoins = []; // 6 × [1/0,1/0,1/0]，1=字 0=背（真随机，每次掷钱独立）
 function yjStart(mode){
   try{
     document.getElementById('yjDivArea').classList.remove('d-none');
     var hint = document.getElementById('yjHint');
     if(hint){ hint.style.display='block'; hint.textContent = mode==='person' ? '人盘起卦：心诚则灵，默念所问之人' : '事盘起卦：心诚则灵，默念所问之事'; }
-    _yjCastCount = 0; _yjYao = [];
+    _yjCastCount = 0; _yjCoins = [];
+    for(var i=0;i<6;i++){ var d=document.getElementById('yjD'+i); if(d){ d.classList.remove('d-active','d-static'); d.textContent=''; } }
     try{toast('已起卦，请掷钱六次');}catch(e){}
   }catch(e){ console.warn('yjStart:', e); }
 }
 
 function yjCast(){
   try{
-    var coins = state.lastCoins || [0,1,0]; state.lastCoins = [coins[1], coins[2], (coins[0]+coins[1]+coins[2])%2];
-    var sum = coins[0]+coins[1]+coins[2];
-    // 0=老阴(6) 1=少阳(7) 2=少阴(8) 3=老阳(9)
-    var yao = sum === 0 ? 6 : sum === 3 ? 9 : sum === 1 ? 7 : 8;
-    _yjYao.push(yao);
+    if(_yjCastCount >= 6) return;
+    var coins = [Math.random() < 0.5 ? 1 : 0, Math.random() < 0.5 ? 1 : 0, Math.random() < 0.5 ? 1 : 0];
+    _yjCoins.push(coins);
+    var sum = coins[0] + coins[1] + coins[2]; // 字（1）的个数
+    // 古制以背为阳：三背=老阳9，三字=老阴6，两背一字=少阳7，两一字背=少阴8
+    var yao = sum === 0 ? 9 : sum === 3 ? 6 : sum === 1 ? 7 : 8;
     for(var i=0;i<3;i++){
       var c = document.getElementById('yjC'+i);
       if(c) c.textContent = coins[i] ? '字' : '背';
     }
     var d = document.getElementById('yjD'+_yjCastCount);
-    if(d){ d.classList.add(yao===6||yao===9?'d-active':'d-static'); d.textContent = yao%2===0 ? '— —' : '———'; }
+    if(d){
+      d.classList.add(yao===6||yao===9?'d-active':'d-static');
+      d.textContent = (yao===7||yao===9) ? '———' : '— —';
+      if(yao===9) d.textContent += ' ○';
+      if(yao===6) d.textContent += ' ×';
+    }
     _yjCastCount++;
     var cnt = document.getElementById('yjCount');
-    if(cnt) cnt.textContent = '第 ' + (_yjCastCount+1) + ' / 6 爻';
-    if(_yjCastCount >= 6){
-      if(cnt) cnt.textContent = '卦象已成，点击「六爻引擎起卦」查看解析';
-      try{toast('六爻已成，可起卦解析');}catch(e){}
-    }
+    if(cnt) cnt.textContent = _yjCastCount >= 6 ? '卦象已成，点击「六爻引擎起卦」查看解析' : '第 ' + (_yjCastCount+1) + ' / 6 爻';
+    if(_yjCastCount >= 6){ try{toast('六爻已成，可起卦解析');}catch(e){} }
   }catch(e){ console.warn('yjCast:', e); }
+}
+
+function _guaLinesHtml(yaos){
+  var h = '';
+  for(var i = yaos.length - 1; i >= 0; i--){
+    var y = yaos[i];
+    var isYang = (y.yin === 0 || y.yinName === '阳');
+    var line = isYang ? '———' : '— —';
+    var mark = y.bian ? (isYang ? ' ○动' : ' ×动') : '';
+    h += '<div style="letter-spacing:2px;font-size:13px">' + _esc(y.ganZhi || '') + ' ' + _esc(y.liuqin || '') + ' ' + line + mark + '</div>';
+  }
+  return h;
 }
 
 function runLiuyaoEngine(){
   try{
-    if(_yjYao.length < 6){ try{toast('请先掷钱六次成卦');}catch(e){} return; }
-    var gua64 = ['坤','复','师','谦','豫','比','萃','晋','观','比','坎','蹇','解','蒙','涣','讼','升','蛊','井','巽','恒','鼎','大过','姤','复','颐','屯','益','震','噬嗑','随','无妄','明夷','贲','既济','家人','丰','离','革','同人','临','损','节','中孚','归妹','睽','兑','履','泰','大畜','需','小畜','大壮','大有','夬','乾'];
-    var bin = _yjYao.map(function(y){ return y%2; }).join('');
-    var idx = parseInt(bin, 2);
-    var guaName = gua64[idx] || '坤';
+    if(_yjCoins.length < 6){ try{toast('请先掷钱六次成卦');}catch(e){} return; }
+    var t = _nowParts(document.getElementById('yjQixinDate').value, document.getElementById('yjQixinHour').value);
     var el = document.getElementById('yjResult');
-    if(el){ el.style.display = 'block'; }
-    var title = document.getElementById('yjTitle'); if(title) title.textContent = guaName;
-    var meta = document.getElementById('yjMeta'); if(meta) meta.textContent = new Date().toLocaleDateString('zh-CN') + ' · 六爻起卦';
-    var interp = document.getElementById('yjInterp');
-    if(interp) interp.innerHTML = '<div class="analysis-card"><h5>卦象解析</h5><p style="font-size:14px;line-height:2">本卦：<b>' + guaName + '</b>卦。六爻阴阳已成，可参阅《周易》原文断吉凶。建议结合用神、世应、六亲关系综合分析。</p></div>';
-    var er = document.getElementById('yjEngineResult');
-    if(er){ er.style.display='block'; er.innerHTML = '<div class="analysis-card" style="border-color:var(--cyan)"><p style="font-size:13px;opacity:.85">引擎分析：六爻卦象「' + guaName + '」，请结合实际所问之事，参考卦辞爻辞断之。</p></div><div id="aiGuaBtn" style="margin-top:10px;text-align:center"></div>'; }
-    // R738: AI 解读（KB 知识库证据 + 语音问题带入）
-    setTimeout(function(){
-      var holder = document.getElementById('aiGuaBtn');
-      if (holder && window.aiMingli) {
-        var q = '';
-        try { q = (document.getElementById('yjQuestion') || {}).value || ''; } catch(_) {}
-        aiMingli.attachButton(holder, 'gua', { name: guaName + '卦', question: q });
-      }
-    }, 300);
-  }catch(e){ console.warn('runLiuyaoEngine:', e); try{toast('六爻引擎分析中，请稍候');}catch(e2){} }
+    if(el) el.style.display = 'block';
+    _set('yjTitle', '起卦中…');
+    apiPost('/api/paipan/liuyao', { year: t.year, month: t.month, day: t.day, hour: t.hour, coins: _yjCoins })
+      .then(function(d){
+        if(!d || d.ok === false || !d.chart){ _engineFail('六爻', d); _set('yjTitle', ''); return; }
+        renderLiuyao(d);
+      })
+      .catch(function(e){ _netFail('liuyao')(e); _set('yjTitle', ''); });
+  }catch(e){ console.warn('runLiuyaoEngine:', e); }
+}
+
+function renderLiuyao(d){
+  var c = d.chart, it = d.interpretation || {};
+  _set('yjMeta', (c.dayGanZhi || '') + '日 · ' + (c.gongName || '') + (c.guaType ? ' · ' + c.guaType : '') + (c.xunKong && c.xunKong.kong ? ' · 空亡 ' + c.xunKong.kong : ''));
+  _set('yjTitle', c.guaName || '');
+  _set('yjPinyin', it.guaJi || '');
+  _set('yjSym1', ((c.upper && c.upper.symbol) || '') + ((c.lower && c.lower.symbol) || ''));
+  _html('yjGua1', _guaLinesHtml(c.yaos || []));
+  _set('yjName1', c.guaName || '');
+  _set('yjPy1', ((c.upper && c.upper.name) || '') + '上' + ((c.lower && c.lower.name) || '') + '下');
+  _set('yjJud1', it.guaJi || '');
+  _set('yjMean1', it.summary || '');
+  var moving = (c.yaos || []).some(function(y){ return y.bian; });
+  var chg = document.getElementById('yjChanged');
+  if(chg){
+    if(moving && c.bianGua && c.bianGua.name){
+      chg.classList.remove('d-none'); chg.style.display = '';
+      _set('yjSym2', ''); _html('yjGua2', '');
+      _set('yjName2', c.bianGua.name); _set('yjPy2', '');
+      _set('yjJud2', '变卦'); _set('yjMean2', it.advice || '');
+    } else { chg.classList.add('d-none'); chg.style.display = 'none'; }
+  }
+  _html('yjInterp', '<div class="analysis-card"><h5>卦象解析</h5><p style="font-size:14px;line-height:2">' + _esc(it.summary || '') + '</p>'
+    + (it.advice ? '<p style="font-size:13px;line-height:2;color:var(--gold2)">' + _esc(it.advice) + '</p>' : '') + '</div>');
+  var er = document.getElementById('yjEngineResult');
+  if(er){
+    er.style.display = 'block';
+    er.innerHTML = '<div class="analysis-card" style="border-color:var(--cyan)"><p style="font-size:13px;opacity:.85">服务端真排盘（liuyao-engine-node）· 日辰 ' + _esc(c.dayGanZhi || '')
+      + ' · 世爻第' + ((c.shiYao || 0) + 1) + '爻 · 应爻第' + ((c.yingYao || 0) + 1) + '爻</p></div>'
+      + '<div id="aiGuaBtn" style="margin-top:10px;text-align:center"></div>';
+  }
+  // R738: AI 解读（KB 知识库证据 + 语音问题带入）
+  setTimeout(function(){
+    var holder = document.getElementById('aiGuaBtn');
+    if (holder && window.aiMingli) {
+      var q = '';
+      try { q = (document.getElementById('yjQuestion') || {}).value || ''; } catch(_) {}
+      aiMingli.attachButton(holder, 'gua', { name: (c.guaName || '') + '卦', question: q });
+    }
+  }, 300);
 }
 
 // R738: 问事语音输入
@@ -512,95 +593,201 @@ function runLiuyaoEngine(){
 
 function yjReset(){
   try{
-    _yjCastCount = 0; _yjYao = [];
+    _yjCastCount = 0; _yjCoins = [];
     document.getElementById('yjDivArea').classList.add('d-none');
     document.getElementById('yjResult').style.display = 'none';
+    var er = document.getElementById('yjEngineResult'); if(er){ er.style.display='none'; er.innerHTML=''; }
     for(var i=0;i<6;i++){ var d=document.getElementById('yjD'+i); if(d){ d.classList.remove('d-active','d-static'); d.textContent=''; } }
+    var cnt = document.getElementById('yjCount'); if(cnt) cnt.textContent = '第 1 / 6 爻';
     try{toast('已重置，可重新起卦');}catch(e){}
   }catch(e){ console.warn('yjReset:', e); }
 }
 
 // === 梅花易数 ===
+function _mhInputs(){
+  return {
+    n1: parseInt(document.getElementById('mhNum1').value) || 0,
+    n2: parseInt(document.getElementById('mhNum2').value) || 0,
+    n3: parseInt(document.getElementById('mhNum3').value) || 0
+  };
+}
 function computeMeiHua(){
   try{
-    var n1 = parseInt(document.getElementById('mhNum1').value) || 0;
-    var n2 = parseInt(document.getElementById('mhNum2').value) || 0;
-    var n3 = parseInt(document.getElementById('mhNum3').value) || 0;
-    if(!n1 && !n2){ try{toast('请输入至少两个数字');}catch(e){} return; }
-    var upper = n1 % 8 || 8;
-    var lower = (n1 + n2) % 8 || 8;
-    var dong = (n1 + n2 + (n3||0)) % 6 || 6;
-    var bagua = ['乾','兑','离','震','巽','坎','艮','坤'];
-    var el = document.getElementById('mhResult'); if(el) el.style.display='block';
-    var title = document.getElementById('mhTitle'); if(title) title.textContent = bagua[upper-1] + '上 ' + bagua[lower-1] + '下';
-    var sub = document.getElementById('mhSub'); if(sub) sub.textContent = '动爻：第 ' + dong + ' 爻';
-    var meta = document.getElementById('mhMeta'); if(meta) meta.textContent = new Date().toLocaleDateString('zh-CN') + ' · 梅花起卦';
-    var interp = document.getElementById('mhInterp');
-    if(interp) interp.innerHTML = '<div class="analysis-card"><h5>体用分析</h5><p style="font-size:14px;line-height:2">上卦「' + bagua[upper-1] + '」为用，下卦「' + bagua[lower-1] + '」为体。动爻在第 ' + dong + ' 爻。体用生克断吉凶，互卦变卦参断。</p></div>';
-  }catch(e){ console.warn('computeMeiHua:', e); try{toast('梅花易数分析中');}catch(e2){} }
+    var v = _mhInputs();
+    if(!v.n1 || !v.n2 || !v.n3){ try{toast('请输入三个数字（一数上卦、二数下卦、三数动爻）');}catch(e){} return; }
+    var t = _nowParts();
+    var el = document.getElementById('mhResult'); if(el) el.style.display = 'block';
+    _set('mhTitle', '起卦中…');
+    apiPost('/api/paipan/meihua', { year: t.year, month: t.month, day: t.day, hour: t.hour, num1: v.n1, num2: v.n2, num3: v.n3 })
+      .then(function(d){
+        if(!d || d.ok === false || !d.chart){ _engineFail('梅花', d); _set('mhTitle', ''); return; }
+        renderMeihua(d);
+      })
+      .catch(function(e){ _netFail('meihua')(e); _set('mhTitle', ''); });
+  }catch(e){ console.warn('computeMeiHua:', e); }
+}
+
+function renderMeihua(d){
+  var c = d.chart, it = d.interpretation || {};
+  var meta = c.meta || {};
+  _set('mhMeta', new Date().toLocaleDateString('zh-CN') + ' · 梅花起卦（数 ' + (meta.num1 || '') + ' / ' + (meta.num2 || '') + ' / ' + (meta.num3 || '') + '）');
+  _set('mhTitle', c.guaName || '');
+  _set('mhSub', '动爻：' + (c.dongYaoName || ('第' + c.dongYao + '爻')));
+  var ty = c.tiYong || {};
+  _html('mhInterp',
+    '<div class="analysis-card"><h5>体用分析</h5><p style="font-size:14px;line-height:2">'
+    + '本卦「' + _esc(c.guaName) + '」（上' + _esc((c.upper && c.upper.name) || '') + _esc((c.upper && c.upper.nature) || '') + ' 下' + _esc((c.lower && c.lower.name) || '') + _esc((c.lower && c.lower.nature) || '') + '），'
+    + '体卦' + _esc((ty.tiGua && ty.tiGua.name) || '') + '（' + _esc((ty.tiGua && ty.tiGua.wuxing) || '') + '），用卦' + _esc((ty.yongGua && ty.yongGua.name) || '') + '（' + _esc((ty.yongGua && ty.yongGua.wuxing) || '') + '）——<b>' + _esc(ty.relation || '') + '</b>。'
+    + '互卦「' + _esc((c.huGua && c.huGua.name) || '') + '」，变卦「' + _esc((c.bianGua && c.bianGua.name) || '') + '」（' + _esc(ty.bianRelation || '') + '）。</p>'
+    + (it.summary ? '<p style="font-size:13px;line-height:2;color:var(--jade2)">' + _esc(it.summary) + '</p>' : '')
+    + (it.advice ? '<p style="font-size:13px;line-height:2">' + _esc(it.advice) + '</p>' : '')
+    + '</div>');
 }
 
 function runMeihuaEngine(){
   try{
-    var n1 = parseInt(document.getElementById('mhNum1').value) || 0;
-    var n2 = parseInt(document.getElementById('mhNum2').value) || 0;
-    var n3 = parseInt(document.getElementById('mhNum3').value) || 0;
-    if(!n1 && !n2){ try{toast('请先输入数字起卦');}catch(e){} return; }
+    var v = _mhInputs();
+    if(!v.n1 || !v.n2 || !v.n3){ try{toast('请先输入三个数字起卦');}catch(e){} return; }
+    var t = _nowParts();
     var er = document.getElementById('mhEngineResult');
-    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--jade2)"><p style="font-size:13px;opacity:.85">梅花引擎分析：上卦' + ((n1%8)||8) + '下卦' + (((n1+n2)%8)||8) + '，动爻' + (((n1+n2+(n3||0))%6)||6) + '。体生用则凶，用生体则吉。请结合所问之事断之。</p></div>'; }
+    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card"><p style="font-size:13px;opacity:.8">引擎解读中…</p></div>'; }
+    apiPost('/api/paipan/meihua/baihua', { year: t.year, month: t.month, day: t.day, hour: t.hour, num1: v.n1, num2: v.n2, num3: v.n3 })
+      .then(function(resp){ _renderBaihua(er, resp, 'var(--jade2)'); })
+      .catch(function(e){ _netFail('meihua-baihua')(e); if(er) er.innerHTML = ''; });
   }catch(e){ console.warn('runMeihuaEngine:', e); }
 }
 
 // === 奇门遁甲 ===
+function _qmBody(){
+  var date = document.getElementById('qmDate').value;
+  if(!date) return null;
+  var hv = document.getElementById('qmHour').value;
+  var t = _nowParts(date, hv === '' ? 12 : hv);
+  var q = ''; try{ q = document.getElementById('qmQuestion').value || ''; }catch(_){}
+  t.question = q;
+  return t;
+}
 function computeQimen(){
   try{
-    var date = document.getElementById('qmDate').value;
-    var hour = document.getElementById('qmHour').value;
-    if(!date){ try{toast('请选择日期');}catch(e){} return; }
-    var el = document.getElementById('qmResult'); if(el) el.style.display='block';
-    var meta = document.getElementById('qmMeta'); if(meta) meta.textContent = date + ' ' + (hour?hour+'时':'') + ' · 奇门起盘';
-    var sub = document.getElementById('qmSub'); if(sub) sub.textContent = '时家奇门 · ' + (document.getElementById('qmDun').value==='yin'?'阴遁':'阳遁');
-    var grid = document.getElementById('qmGrid');
-    if(grid){
-      var cells = ['巽','离','坤','震','中','兑','艮','坎','乾'];
-      grid.innerHTML = cells.map(function(c,i){
-        return '<div class="qn-cell" style="border:1px solid rgba(201,168,76,.2);padding:8px;text-align:center"><p style="font-size:11px;opacity:.6">' + c + '</p><p style="font-size:14px;color:var(--gold2)">宫 ' + (i+1) + '</p></div>';
-      }).join('');
-    }
-    var interp = document.getElementById('qmInterp');
-    if(interp) interp.innerHTML = '<div class="analysis-card"><h5>奇门局分析</h5><p style="font-size:14px;line-height:2">已排九宫遁甲盘，请结合八门（休生伤杜景死惊开）、九星（天蓬天任天冲天辅天英天芮天柱天心天禽）、八神断吉凶。</p></div>';
-  }catch(e){ console.warn('computeQimen:', e); try{toast('奇门遁甲排盘中');}catch(e2){} }
+    var t = _qmBody();
+    if(!t){ try{toast('请选择日期');}catch(e){} return; }
+    var el = document.getElementById('qmResult'); if(el) el.style.display = 'block';
+    _set('qmSub', '起盘演算中…');
+    apiPost('/api/paipan/qimen', t)
+      .then(function(d){
+        if(!d || d.ok === false || !d.chart){ _engineFail('奇门', d); _set('qmSub', ''); return; }
+        renderQimen(d);
+      })
+      .catch(function(e){ _netFail('qimen')(e); _set('qmSub', ''); });
+  }catch(e){ console.warn('computeQimen:', e); }
+}
+
+function renderQimen(d){
+  var c = d.chart || {};
+  _set('qmMeta', (c.dayGanZhi || '') + '日 ' + (c.hourGanZhi || '') + '时 · ' + (c.jieqi || ''));
+  _set('qmSub', (c.ju || '') + (c.juYuan ? '（' + c.juYuan + '）' : '') + ' · 值符 ' + (c.zhiFuStar || '') + ' · 值使 ' + (c.zhiShiDoor || ''));
+  var order = [4, 9, 2, 3, 5, 7, 8, 1, 6]; // 洛书宫位排布
+  var byP = {};
+  (c.palaces || []).forEach(function(p){ byP[p.palace] = p; });
+  var grid = document.getElementById('qmGrid');
+  if(grid){
+    grid.innerHTML = order.map(function(n){
+      var p = byP[n] || {};
+      var marks = (p.isKongWang ? ' ○空' : '') + (p.isMa ? ' 马' : '');
+      return '<div class="qn-cell" style="border:1px solid rgba(201,168,76,.2);padding:8px;text-align:center">'
+        + '<p style="font-size:11px;opacity:.6">' + _esc(p.name || '') + (p.direction ? '·' + _esc(p.direction) : '') + _esc(marks) + '</p>'
+        + '<p style="font-size:13px;color:var(--gold2)">' + _esc(p.star || '') + '</p>'
+        + '<p style="font-size:13px;color:var(--violet2)">' + _esc(p.door || '') + '</p>'
+        + '<p style="font-size:11px;opacity:.75">' + _esc(p.god || '') + '</p>'
+        + '<p style="font-size:12px">' + _esc((p.tianpan || '') + (p.dipan || '')) + '</p>'
+        + '</div>';
+    }).join('');
+  }
+  var fy = (c.isFuYin ? '星伏吟 ' : '') + (c.isFanYin ? '星反吟 ' : '') + (c.menFuYin ? '门伏吟 ' : '') + (c.menFanYin ? '门反吟' : '');
+  var h = '';
+  if(fy) h += '<div class="analysis-card"><h5>伏吟 · 反吟</h5><p style="font-size:13px">' + _esc(fy) + '</p></div>';
+  if(c.geju && c.geju.length){
+    h += '<div class="analysis-card"><h5>格局提示</h5>' + c.geju.map(function(g){
+      return '<p style="font-size:12px;line-height:1.9">' + (g.type === '吉' ? '✅' : '⚠️') + ' ' + _esc(g.name || '') + (g.desc ? '——' + _esc(g.desc) : '') + '</p>';
+    }).join('') + '</div>';
+  }
+  if(!h) h = '<div class="analysis-card"><h5>奇门局分析</h5><p style="font-size:13px;line-height:2;opacity:.85">本局无伏反吟与特殊格局，可点下方「奇门引擎排盘」取白话解读。</p></div>';
+  _html('qmInterp', h);
 }
 
 function runQimenEngine(){
   try{
-    var date = document.getElementById('qmDate').value;
-    if(!date){ try{toast('请先选择日期起盘');}catch(e){} return; }
+    var t = _qmBody();
+    if(!t){ try{toast('请先选择日期起盘');}catch(e){} return; }
     var er = document.getElementById('qmEngineResult');
-    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--violet2)"><p style="font-size:13px;opacity:.85">奇门引擎：已根据 ' + esc(date) + ' 排盘完成。建议关注日干所落宫位，结合值符值使判断吉凶。</p></div>'; }
+    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card"><p style="font-size:13px;opacity:.8">引擎解读中…</p></div>'; }
+    apiPost('/api/paipan/qimen/baihua', t)
+      .then(function(resp){ _renderBaihua(er, resp, 'var(--violet2)'); })
+      .catch(function(e){ _netFail('qimen-baihua')(e); if(er) er.innerHTML = ''; });
   }catch(e){ console.warn('runQimenEngine:', e); }
 }
 
 // === 大六壬 ===
+function _lrBody(){
+  var date = document.getElementById('lrDate').value;
+  if(!date) return null;
+  var hv = document.getElementById('lrHour').value;
+  var t = _nowParts(date, hv === '' ? 12 : hv);
+  var q = ''; try{ q = document.getElementById('lrQuestion').value || ''; }catch(_){}
+  t.question = q;
+  return t;
+}
 function computeLiuRen(){
   try{
-    var date = document.getElementById('lrDate').value;
-    var hour = document.getElementById('lrHour').value;
-    if(!date){ try{toast('请选择日期');}catch(e){} return; }
-    var el = document.getElementById('lrResult'); if(el) el.style.display='block';
-    var meta = document.getElementById('lrMeta'); if(meta) meta.textContent = date + ' ' + (hour?hour+'时':'') + ' · 六壬起课';
-    var sub = document.getElementById('lrSub'); if(sub) sub.textContent = '四课三传 · 十二天将';
-    var interp = document.getElementById('lrInterp');
-    if(interp) interp.innerHTML = '<div class="analysis-card"><h5>六壬课分析</h5><p style="font-size:14px;line-height:2">已起四课三传。日辰为干，辰为支。初传、中传、末传递进，观天将所乘神将断吉凶。十二天将：贵人、螣蛇、朱雀、六合、勾陈、青龙、天空、白虎、太常、玄武、太阴、天后。</p></div>';
-  }catch(e){ console.warn('computeLiuRen:', e); try{toast('六壬起课中');}catch(e2){} }
+    var t = _lrBody();
+    if(!t){ try{toast('请选择日期');}catch(e){} return; }
+    var el = document.getElementById('lrResult'); if(el) el.style.display = 'block';
+    _set('lrSub', '起课演算中…');
+    apiPost('/api/paipan/liuren', t)
+      .then(function(d){
+        if(!d || d.ok === false || !d.chart){ _engineFail('六壬', d); _set('lrSub', ''); return; }
+        renderLiuren(d);
+      })
+      .catch(function(e){ _netFail('liuren')(e); _set('lrSub', ''); });
+  }catch(e){ console.warn('computeLiuRen:', e); }
+}
+
+function renderLiuren(d){
+  var c = d.chart || {};
+  _set('lrMeta', (c.dayGanZhi || '') + '日 ' + (c.hourZhi || '') + '时 · 月将' + (c.monthJiang || '') + (c.monthJiangName ? '（' + c.monthJiangName + '）' : '') + ' · ' + (c.isDaytime ? '昼占' : '夜占'));
+  var sc = c.sanChuan || {};
+  _set('lrSub', '三传：' + (sc.chu || '') + ' → ' + (sc.zhong || '') + ' → ' + (sc.mo || '') + (sc.method ? ' · ' + sc.method : ''));
+  var jiangOf = function(zhi){
+    var p = (c.palaces || []).filter(function(x){ return x.tianpanZhi === zhi; })[0];
+    return p ? p.tianjiang : '';
+  };
+  var h = '<div class="analysis-card"><h5>四课</h5><p style="font-size:14px;line-height:2">'
+    + (c.siKe || []).map(function(k){ return '第' + k.course + '课 ' + k.top + '/' + k.bottom; }).join(' · ') + '</p></div>';
+  h += '<div class="analysis-card"><h5>三传' + (sc.method ? ' · ' + _esc(sc.method) : '') + '</h5>'
+    + '<p style="font-size:14px;line-height:2">初传 ' + _esc(sc.chu || '') + '（' + _esc(jiangOf(sc.chu)) + '）→ 中传 ' + _esc(sc.zhong || '') + '（' + _esc(jiangOf(sc.zhong)) + '）→ 末传 ' + _esc(sc.mo || '') + '（' + _esc(jiangOf(sc.mo)) + '）</p>'
+    + '<p style="font-size:12px;opacity:.8">贵人' + _esc(c.guiren || '') + (c.guirenShun ? '顺行' : '逆行') + ' · 临' + _esc(c.guirenLin || '') + (c.isFuYin ? ' · 伏吟课' : '') + (c.isFanYin ? ' · 反吟课' : '') + '</p></div>';
+  if(c.shensha){
+    h += '<div class="analysis-card"><h5>神煞</h5><p style="font-size:12px;line-height:2">'
+      + Object.keys(c.shensha).map(function(k){ return _esc(k) + ' ' + _esc(c.shensha[k]); }).join(' · ') + '</p></div>';
+  }
+  h += '<div class="analysis-card"><h5>天地盘 · 十二天将</h5><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px">'
+    + (c.palaces || []).map(function(p){
+        var hot = [sc.chu, sc.zhong, sc.mo].indexOf(p.tianpanZhi) >= 0;
+        return '<div style="border:1px solid rgba(230,126,34,' + (hot ? '.7' : '.2') + ');padding:4px;text-align:center;font-size:11px"><b>' + _esc(p.tianpanZhi || '') + '</b><br><span style="opacity:.6">' + _esc(p.zhi || '') + '</span><br><span style="color:var(--orange)">' + _esc(p.tianjiang || '') + '</span></div>';
+      }).join('')
+    + '</div><p style="font-size:10px;opacity:.6;margin-top:6px">上行天盘 / 下行地盘，橙框为三传所乘</p></div>';
+  _html('lrInterp', h);
 }
 
 function runLiurenEngine(){
   try{
-    var date = document.getElementById('lrDate').value;
-    if(!date){ try{toast('请先选择日期起课');}catch(e){} return; }
+    var t = _lrBody();
+    if(!t){ try{toast('请先选择日期起课');}catch(e){} return; }
     var er = document.getElementById('lrEngineResult');
-    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card" style="border-color:var(--orange)"><p style="font-size:13px;opacity:.85">六壬引擎：已根据 ' + esc(date) + ' 起课完成。建议关注初传与日干关系，判断所问之事吉凶。</p></div>'; }
+    if(er){ er.classList.remove('d-none'); er.innerHTML = '<div class="analysis-card"><p style="font-size:13px;opacity:.8">引擎解读中…</p></div>'; }
+    apiPost('/api/paipan/liuren/baihua', t)
+      .then(function(resp){ _renderBaihua(er, resp, 'var(--orange)'); })
+      .catch(function(e){ _netFail('liuren-baihua')(e); if(er) er.innerHTML = ''; });
   }catch(e){ console.warn('runLiurenEngine:', e); }
 }
 
@@ -661,24 +848,30 @@ function runZiweiEngine(){
 }
 
 // === 测字 ===
+// R-ZHANBU-REAL：charCodeAt 假笔画/假五行退役（违「事实为体」）。
+// 诚实版：展示所测之字 + 知识库古籍 AI 解读；笔画五行等字库数据未接入前不展示。
 function doCezi(){
   try{
     var ch = document.getElementById('ceziInput').value.trim();
     if(!ch){ try{toast('请输入一个汉字');}catch(e){} return; }
-    var strokes = ch.charCodeAt(0) % 20 + 1;
-    var wuxing = ['金','木','水','火','土'][ch.charCodeAt(0) % 5];
     var el = document.getElementById('ceziResult'); if(el) el.style.display='block';
     var chr = document.getElementById('ceziChar'); if(chr) chr.textContent = ch;
-    var tags = document.getElementById('ceziTags'); if(tags) tags.innerHTML = '<span class="tag">笔画 ' + strokes + '</span> <span class="tag">五行 ' + wuxing + '</span>';
+    var tags = document.getElementById('ceziTags'); if(tags) tags.innerHTML = '<span class="tag">测字</span> <span class="tag">心诚则灵</span>';
     var ana = document.getElementById('ceziAnalysis');
-    if(ana) ana.innerHTML = '<div class="analysis-card"><h5>字义分析</h5><p style="font-size:14px;line-height:2">「' + ch + '」字，' + strokes + '画，五行属' + wuxing + '。字形拆解可见其意，字音辨其韵，字义断其吉凶。测字之道，在于心诚则灵，随机取义。</p></div>';
+    if(ana) ana.innerHTML = '<div class="analysis-card"><h5>字义分析</h5><p style="font-size:13px;line-height:2;opacity:.85">测字之道，观字形、辨字音、会字义，随机取象。本平台不提供编造数据——点击下方 AI 解读，将基于知识库古籍（《梅花易数》测字法门等）给出参考断语。</p></div><div id="ceziAiBtn" style="margin-top:10px;text-align:center"></div>';
+    setTimeout(function(){
+      var holder = document.getElementById('ceziAiBtn');
+      if(holder && window.aiMingli){
+        aiMingli.attachButton(holder, 'gua', { name: '测字「' + ch + '」', question: '测字问「' + ch + '」字吉凶' });
+      }
+    }, 200);
   }catch(e){ console.warn('doCezi:', e); try{toast('测字分析中');}catch(e2){} }
 }
 
 function randomCezi(){
   try{
     var chars = '福禄寿喜财吉康安顺和静善德仁义礼智信忠孝温良恭俭让';
-    var ch = chars[(state.charIdx = (state.charIdx||0)+1) % chars.length];
+    var ch = chars[Math.floor(Math.random() * chars.length)];
     var inp = document.getElementById('ceziInput'); if(inp) inp.value = ch;
     doCezi();
   }catch(e){ console.warn('randomCezi:', e); }
