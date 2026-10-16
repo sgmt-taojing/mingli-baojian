@@ -1,3 +1,9 @@
+# 2026-10-16 22:40 — ✅ 排盘页引擎普查：fallback同款年干支bug收口，三处感染全清 ·Kimi
+
+- **普查**：10 个排盘页引擎来源全摸清——ziwei/zhanbu 走「服务端iztro→浏览器iztro兜底」正确架构；ziwei-chart 等 7 页纯服务端 API 无本地引擎（离线诚实报错，无错盘风险）。
+- **同款 bug 第三处**：ziwei-browser-fallback.js（10-14 建）同样的 (?=年) 正则永不命中问题，立春前生人显示错年干支，已同口径修复（四柱首柱）；两页 fallback 脚本补 ?v= 破缓存。
+- **契约对齐**：_ziweiIztroLocal 宫名「仆役」→「奴仆」对齐服务端；补测含 name 全字段比对，双侧例 0 差异。
+
 # 2026-10-16 22:10 — ✅ 遗留全面建设：离线紫微iztro全parity+逐月流年真排+流式护栏 ·Kimi
 
 - **iztro 全 parity（8a6352fc）**：官方 UMD 内核入 vendor，ziwei-iztro-local.js 复刻服务端契约；立春前后双侧例与在线盘逐宫比对 0 差异，库缺席自动回退简式引擎。P2 挂账关闭。
