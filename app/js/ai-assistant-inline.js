@@ -2924,6 +2924,9 @@ function _getUnifiedReport(modId,data){
     var zm=zsBirth.match(/(\d{4})[年\-\/](\d{1,2})[月\-\/](\d{1,2})[日\s]*(\d{1,2})?[时点:]?/);
     var zy=2026,zm2=7,zd=20,zh=12;
     if(zm){zy=+zm[1];zm2=+zm[2];zd=+zm[3];if(zm[4])zh=+zm[4];}
+    // 2026-10-16 iztro 全 parity：优先 iztro 权威内核（与在线精排完全一致），库未加载时回退简式引擎
+    var _izc=(typeof window!=='undefined'&&window._ziweiIztroLocal)?window._ziweiIztroLocal(zy,zm2,zd,zh,{}):null;
+    if(_izc){return window._ziweiIztroReport(_izc,zsBirth);}
     var zp=_paipan(zy,zm2,zd,zh);
     var zdm=zp.day_master,zele=zdm.slice(-1);
     var zwx=zp.wuxing_count,zlack=zp.wuxing_lack;
