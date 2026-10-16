@@ -49,10 +49,15 @@
       if (!a || !a.palaces) return null;
 
       // 生年干支（iztro chineseDate 权威，缺省回退年柱推）
+      // 2026-10-16 修复：iztro chineseDate 实为四柱空格分隔（「己巳 丁丑 庚辰 辛巳」无「年」字），
+      // 旧 (?=年) 正则永不命中 → 立春前生人回退阳历年直推（如 1990-01 显示庚午，实际按己巳排盘），显示与内核矛盾。
+      // 修正：优先取四柱首柱（年柱），兼容带「年」格式（与服务端 ziwei-iztro-core.js 同日修复同口径）。
       var yearGanZhi = null;
       if (a.chineseDate) {
-        var m = String(a.chineseDate).match(/[甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥](?=年)/);
-        if (m) yearGanZhi = m[0];
+        var cdStr = String(a.chineseDate);
+        var mCn = cdStr.match(/([甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥])年/);
+        var mFirst = cdStr.match(/([甲乙丙丁戊己庚辛壬癸][子丑寅卯辰巳午未申酉戌亥])/);
+        yearGanZhi = mCn ? mCn[1] : (mFirst ? mFirst[1] : null);
       }
       var gIdx = ((year - 4) % 10 + 10) % 10;
       var zIdx = ((year - 4) % 12 + 12) % 12;
