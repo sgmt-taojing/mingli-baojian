@@ -166,8 +166,8 @@
   <button class="pa-filter" onclick="PatientArchive.setFilter('male',this)">男</button>
   <button class="pa-filter" onclick="PatientArchive.setFilter('female',this)">女</button>
   <button class="pa-filter" onclick="PatientArchive.setFilter('followup',this)">需复诊</button>
-  <button class="btn btn-ghost" onclick="PatientArchive.exportAll()">入 导出全部</button>
-  <button class="btn btn-primary" onclick="PatientArchive.runDistill()">研 蒸馏经验</button>
+  <button class="btn btn-ghost" onclick="PatientArchive.exportAll()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg> 导出全部</button>
+  <button class="btn btn-primary" onclick="PatientArchive.runDistill()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2.4 2.4 0 0 0 2 3.5h10a2.4 2.4 0 0 0 2-3.5l-5-9V3"/><path d="M7.5 15h9"/></svg> 蒸馏经验</button>
 </div>
 
 <!-- 患者表格 -->
@@ -290,7 +290,7 @@ var PatientArchive = {
       }
     });
     var maxTrend = Math.max.apply(null, Object.values(trend)) || 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">升 近7天就诊趋势</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> 近7天就诊趋势</div><div class="pa-bar-chart">';
     Object.keys(trend).forEach(function(k){
       var v = trend[k]; var pct = Math.round(v / maxTrend * 100);
       html += '<div class="pa-bar-row"><span class="pa-bar-label">' + k + '</span><div class="pa-bar-track"><div class="pa-bar-fill" style="width:' + pct + '%;background:var(--pa-gold)"></div></div><span class="pa-bar-val">' + v + '</span></div>';
@@ -307,7 +307,7 @@ var PatientArchive = {
     });
     var eleColors = {'木':'#10b981','火':'#ef4444','土':'#fbbf24','金':'#a78bfa','水':'#6366f1'};
     var maxConst = Math.max.apply(null, Object.values(constitutionMap)) || 1;
-    html += '<div class="pa-chart"><div class="pa-chart-title">草 体质分布（日主五行）</div><div class="pa-bar-chart">';
+    html += '<div class="pa-chart"><div class="pa-chart-title"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M6 18C6 9 11 4 20 4c0 9-5 14-14 14z"/><path d="M6 18c2.5-4.5 5.5-7.5 9-9"/></svg> 体质分布（日主五行）</div><div class="pa-bar-chart">';
     if(Object.keys(constitutionMap).length === 0){
       html += '<div class="pa-empty">暂无体质数据（需排盘后生成）</div>';
     } else {
@@ -420,7 +420,7 @@ var PatientArchive = {
         var time = v.timestamp ? new Date(v.timestamp).toLocaleString('zh-CN').substring(0,16) : '';
         var isLatest = i === 0;
         html += '<div style="margin-bottom:8px;padding:6px;border-left:3px solid ' + (isLatest ? 'var(--pa-gold)' : 'var(--pa-border)') + '">';
-        if(isLatest) html += '<span style="font-size:10px;color:var(--pa-gold)">钉 最近</span> ';
+        if(isLatest) html += '<span style="font-size:10px;color:var(--pa-gold)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg> 最近</span> ';
         html += '<span style="font-size:11px;color:var(--pa-paper3)">' + time + '</span><br>';
         if(v.diagnosis_text) html += '<span style="font-size:12px"><b>望诊：</b>' + v.diagnosis_text.substring(0,120) + '</span><br>';
         if(v.ai_analysis) html += '<span style="font-size:11px;color:var(--pa-paper2)"><b>AI：</b>' + v.ai_analysis.substring(0,80) + '</span><br>';

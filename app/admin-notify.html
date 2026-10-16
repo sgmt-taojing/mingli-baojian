@@ -95,9 +95,9 @@
   <div class="filter-bar">
     <select id="sev-filter" aria-label="严重程度筛选">
       <option value="">全部级别</option>
-      <option value="CRITICAL">危 CRITICAL</option>
-      <option value="WARN">警 WARN</option>
-      <option value="OK">成 OK</option>
+      <option value="CRITICAL">CRITICAL</option>
+      <option value="WARN">WARN</option>
+      <option value="OK">OK</option>
       <option value="INFO">ℹ️ INFO</option>
     </select>
     <button class="primary" onclick="loadLogs()">🔄 刷新</button>
@@ -125,7 +125,7 @@ async function loadLogs() {
     renderStats();
     renderList();
   } catch(e) {
-    document.getElementById('log-list').innerHTML = '<div class="empty">警 查阅失败</div>';
+    document.getElementById('log-list').innerHTML = '<div class="empty"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 查阅失败</div>';
   }
 }
 
@@ -142,7 +142,7 @@ function renderStats() {
 
 function renderList() {
   if (!allItems.length) {
-    document.getElementById('log-list').innerHTML = '<div class="empty">空 暂无通知记录</div>';
+    document.getElementById('log-list').innerHTML = '<div class="empty"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg> 暂无通知记录</div>';
     return;
   }
   document.getElementById('log-list').innerHTML = allItems.map(i => `
@@ -153,8 +153,8 @@ function renderList() {
       </div>
       ${i.message ? `<div class="log-msg">${esc(i.message)}</div>` : ''}
       <div class="log-meta">
-        <span>信 ${esc(i.source)}</span>
-        <span>时 ${esc(i.ts)}</span>
+        <span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M21 5 3 10v4l4 1 1.5 5h2.5L9.5 15 21 19z"/></svg> ${esc(i.source)}</span>
+        <span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg> ${esc(i.ts)}</span>
         <span>网 ${esc(i.ip)}</span>
       </div>
     </div>

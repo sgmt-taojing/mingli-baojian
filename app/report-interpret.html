@@ -96,7 +96,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 
 <!-- R249 引擎说明 -->
 <div class="section">
-  <div class="section-title">标 一处解读，多处调用</div>
+  <div class="section-title"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg> 一处解读，多处调用</div>
   <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">
     支持报告类型：体检报告 / 生化指标 / CT / MRI / X光 / 超声 / 血常规 / 手动录入。
     引擎自动匹配 24 项生化指标 + 15 项影像模式 + 日主五行 + 家族遗传，输出<strong>四维融合解读</strong>。
@@ -118,24 +118,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
 <!-- 输入区 -->
 <div class="section">
   <div class="tab-row">
-    <button class="tab-btn active" onclick="switchTab('upload')">拍 拍照OCR</button>
+    <button class="tab-btn active" onclick="switchTab('upload')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 拍照OCR</button>
     <button class="tab-btn" onclick="switchTab('manual')">✍️ 手动录入</button>
-    <button class="tab-btn" onclick="switchTab('blood')">注 血常规</button>
+    <button class="tab-btn" onclick="switchTab('blood')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2.4 2.4 0 0 0 2 3.5h10a2.4 2.4 0 0 0 2-3.5l-5-9V3"/><path d="M7.5 15h9"/></svg> 血常规</button>
     <button class="tab-btn" onclick="switchTab('imaging')">🔍 影像CT/MRI</button>
-    <button class="tab-btn" onclick="switchTab('risk')">警 风险加倍</button>
+    <button class="tab-btn" onclick="switchTab('risk')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 风险加倍</button>
   </div>
 
   <!-- Tab 1: OCR 上传 -->
   <div class="tab-content active" id="tab-upload">
     <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
-      <p>拍 点击或拖拽上传体检报告图片</p>
+      <p><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 点击或拖拽上传体检报告图片</p>
       <p style="font-size:11px">支持 JPG / PNG / WEBP（≤10MB）</p>
       <input aria-label="输入" type="file" id="fileInput" accept="image/*" style="display:none">
       <img loading="lazy" id="preview" alt="报告预览图">
     </div>
     <div class="btn-row">
       <button class="btn" onclick="doOCR()">🔍 OCR 识别</button>
-      <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()">夹 选择文件</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('fileInput').click()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> 选择文件</button>
     </div>
     <div id="ocrText" style="margin-top:12px;padding:10px;background:var(--bg);border-radius:6px;font-size:12px;display:none">
       <div style="color:var(--text-muted);margin-bottom:6px">OCR 识别文本：</div>
@@ -170,7 +170,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
     <div class="btn-row">
       <button class="btn" onclick="doManualInterpret()">☯ 立即解读</button>
       <button class="btn btn-ghost" onclick="clearManual()">🗑️ 清空</button>
-      <button class="btn btn-ghost" onclick="loadExample()">记 加载示例</button>
+      <button class="btn btn-ghost" onclick="loadExample()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 20h16M6 16l9-9a2.1 2.1 0 0 1 3 3l-9 9-4 1z"/></svg> 加载示例</button>
     </div>
   </div>
 
@@ -178,12 +178,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
   <div class="tab-content" id="tab-blood">
     <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">点击下方快捷按钮快速录入血常规：</p>
     <div class="quick-btns">
-      <button class="quick-btn" onclick="setBlood('hgb', 135)">安 血红蛋白正常</button>
-      <button class="quick-btn" onclick="setBlood('hgb', 90)">危 血红蛋白偏低</button>
-      <button class="quick-btn" onclick="setBlood('wbc', 6.5)">安 白细胞正常</button>
-      <button class="quick-btn" onclick="setBlood('wbc', 14)">危 白细胞偏高</button>
-      <button class="quick-btn" onclick="setBlood('plt', 220)">安 血小板正常</button>
-      <button class="quick-btn" onclick="setBlood('plt', 60)">危 血小板偏低</button>
+      <button class="quick-btn" onclick="setBlood('hgb', 135)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 血红蛋白正常</button>
+      <button class="quick-btn" onclick="setBlood('hgb', 90)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v5m0 3v.5"/></svg> 血红蛋白偏低</button>
+      <button class="quick-btn" onclick="setBlood('wbc', 6.5)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 白细胞正常</button>
+      <button class="quick-btn" onclick="setBlood('wbc', 14)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v5m0 3v.5"/></svg> 白细胞偏高</button>
+      <button class="quick-btn" onclick="setBlood('plt', 220)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 血小板正常</button>
+      <button class="quick-btn" onclick="setBlood('plt', 60)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v5m0 3v.5"/></svg> 血小板偏低</button>
     </div>
     <div class="input-row" style="margin-top:14px">
       <div class="input-group"><label>血红蛋白 (g/L)</label><input aria-label="b hgb" id="b-hgb"></div>
@@ -216,11 +216,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
   <div class="tab-content" id="tab-risk">
     <p style="color:var(--text-muted);font-size:13px;margin-bottom:10px">预置 5 个高风险场景，演示四维融合：</p>
     <div class="quick-btns" style="flex-direction:column;align-items:stretch">
-      <button class="quick-btn" onclick="runScenario('high-bp')">危 火日主+家族高血压+本人血压160/100</button>
-      <button class="quick-btn" onclick="runScenario('dm-family')">危 土日主+家族糖尿病+本人血糖9.5</button>
-      <button class="quick-btn" onclick="runScenario('liver')">警 木日主+肝功能异常+CT肝囊肿</button>
-      <button class="quick-btn" onclick="runScenario('kidney')">警 水日主+尿酸480+肾结石</button>
-      <button class="quick-btn" onclick="runScenario('normal')">安 金日主+指标正常</button>
+      <button class="quick-btn" onclick="runScenario('high-bp')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v5m0 3v.5"/></svg> 火日主+家族高血压+本人血压160/100</button>
+      <button class="quick-btn" onclick="runScenario('dm-family')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v5m0 3v.5"/></svg> 土日主+家族糖尿病+本人血糖9.5</button>
+      <button class="quick-btn" onclick="runScenario('liver')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 木日主+肝功能异常+CT肝囊肿</button>
+      <button class="quick-btn" onclick="runScenario('kidney')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 水日主+尿酸480+肾结石</button>
+      <button class="quick-btn" onclick="runScenario('normal')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 金日主+指标正常</button>
     </div>
   </div>
 
@@ -231,7 +231,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;backg
   <div class="section-title">☯ 解读结果</div>
   <div id="interpretResult"></div>
   <div class="btn-row">
-    <button class="btn" onclick="ingestToKB()">入 入库 KB</button>
+    <button class="btn" onclick="ingestToKB()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg> 入库 KB</button>
     <button class="btn btn-ghost" onclick="copyReport()">📊 复制报告</button>
     <button class="btn btn-ghost" onclick="window.print()">🖨️ 打印</button>
   </div>

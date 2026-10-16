@@ -59,7 +59,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 
   <!-- 安全上下文 -->
   <div class="card" id="ctx-card">
-    <h2>锁 安全上下文</h2>
+    <h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> 安全上下文</h2>
     <div class="status-row">
       <span class="status-dot" id="ctx-dot"></span>
       <span class="status-label">安全上下文（HTTPS/localhost）</span>
@@ -90,7 +90,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 
   <!-- 摄像头 -->
   <div class="card">
-    <h2>拍 摄像头</h2>
+    <h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 摄像头</h2>
     <div class="status-row">
       <span class="status-dot" id="cam-dot"></span>
       <span class="status-label">摄像头设备</span>
@@ -111,7 +111,7 @@ video{max-width:100%;border-radius:8px;background:#000;margin-top:8px}
 
   <!-- 麦克风 -->
   <div class="card">
-    <h2>麦 麦克风</h2>
+    <h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg> 麦克风</h2>
     <div class="status-row">
       <span class="status-dot" id="mic-dot"></span>
       <span class="status-label">麦克风设备</span>
@@ -225,7 +225,7 @@ async function testCamera() {
     document.getElementById('cam-snap').style.display = 'inline-block';
     
     const result = document.getElementById('cam-result');
-    result.innerHTML = '<div class="test-result result-ok">成 摄像头已启动 — 画面正在显示</div>';
+    result.innerHTML = '<div class="test-result result-ok"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 摄像头已启动 — 画面正在显示</div>';
     
     // 重新枚举（此时 label 可用）
     enumDevices();
@@ -266,7 +266,7 @@ function snapPhoto() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ image: dataUrl, type: 'face' }), signal: AbortSignal.timeout(15000) }).then(r => r.json()).then(data => {
     document.getElementById('cam-result').innerHTML = 
-      '<div class="test-result result-ok">成 拍照成功 — OCR 服务已接收<br>分析结果：' + JSON.stringify(data).substring(0, 200) + '</div>';
+      '<div class="test-result result-ok"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 拍照成功 — OCR 服务已接收<br>分析结果：' + JSON.stringify(data).substring(0, 200) + '</div>';
   }).catch(e => {
     document.getElementById('cam-result').innerHTML = 
       '<div class="test-result result-warn">警 拍照成功，但 OCR 服务未响应（端口 8913）<br>拍照数据 ' + Math.round(dataUrl.length / 1024) + 'KB</div>';
@@ -312,7 +312,7 @@ async function testMic() {
     }
     update();
     
-    document.getElementById('mic-result').innerHTML = '<div class="test-result result-ok">成 麦克风已启动 — 请说话，观察音量条变化</div>';
+    document.getElementById('mic-result').innerHTML = '<div class="test-result result-ok"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 麦克风已启动 — 请说话，观察音量条变化</div>';
     enumDevices();
   } catch(e) {
     let msg = esc(e.message);

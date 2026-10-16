@@ -110,13 +110,13 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
 
 <nav class="nav-bar">
   <a href="index.html">主平台</a>
-  <a href="ai-assistant.html">机 智能助手</a>
+  <a href="ai-assistant.html"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v2m6-2v2M9 20v2m6-2v2M2 9h2m-2 6h2M20 9h2m-2 6h2"/></svg> 智能助手</a>
   <a href="feedback-center.html" class="active">反馈</a>
-  <a href="login.html">密 登录</a>
+  <a href="login.html"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="8" cy="16" r="5"/><path d="M11.5 12.5 21 3m-4 1 3 3"/></svg> 登录</a>
 </nav>
 
 <div class="container">
-  <h1>语 意见反馈</h1>
+  <h1><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 意见反馈</h1>
   <p class="subtitle">提交问题建议 · 跟踪处理进度 · 帮助我们改进</p>
 
   <!-- 提交表单 -->
@@ -135,10 +135,10 @@ h1{font-size:20px;color:var(--gold);margin-bottom:6px;display:flex;align-items:c
     <div class="form-group">
       <label>优先级</label>
       <div class="priority-grid" id="priorityGrid">
-        <div class="pri-btn" data-pri="urgent">危 紧急</div>
-        <div class="pri-btn selected" data-pri="high">警 高</div>
-        <div class="pri-btn" data-pri="normal">警 普通</div>
-        <div class="pri-btn" data-pri="low">安 低</div>
+        <div class="pri-btn" data-pri="urgent"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z"/><path d="M12 8v5m0 3v.5"/></svg> 紧急</div>
+        <div class="pri-btn selected" data-pri="high"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 高</div>
+        <div class="pri-btn" data-pri="normal"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 普通</div>
+        <div class="pri-btn" data-pri="low"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 低</div>
       </div>
     </div>
 
@@ -551,7 +551,7 @@ function loadMyTickets() {
             '<div class="ti-header"><span class="ti-title">' + escapeHtml(t.title) + '</span>' +
             '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></div>' +
             '<div class="ti-meta">' + (catNames[t.category]||t.category) + ' · ' + (t.created_at||'').substring(0,16) + '</div>' +
-            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">语 官方已回复</div>' : '') +
+            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 官方已回复</div>' : '') +
           '</div>';
         }).join('');
         bindTicketClicks();
@@ -586,7 +586,7 @@ function loadRecentTickets() {
             '<div class="ti-header"><span class="ti-title">' + escapeHtml(t.title) + '</span>' +
             '<span class="status-badge status-' + t.status + '">' + (statusNames[t.status]||t.status) + '</span></div>' +
             '<div class="ti-meta">' + (catNames[t.category]||t.category) + ' · ' + (t.created_at||'').substring(0,16) + '</div>' +
-            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)">语 官方已回复</div>' : '') +
+            (t.admin_reply ? '<div style="margin-top:4px;font-size:12px;color:var(--green)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 官方已回复</div>' : '') +
           '</div>';
         }).join('');
         list.innerHTML = html;

@@ -55,8 +55,8 @@
 
 <div class="tabs">
   <div class="tab active" data-tab="stats">📊 总览</div>
-  <div class="tab" data-tab="batch">电 批量操作</div>
-  <div class="tab" data-tab="ingest">入 批量入库</div>
+  <div class="tab" data-tab="batch"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg> 批量操作</div>
+  <div class="tab" data-tab="ingest"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg> 批量入库</div>
   <div class="tab" data-tab="audit">🔍 审计</div>
   <div class="tab" data-tab="export">📤 导出</div>
 </div>
@@ -64,7 +64,7 @@
 <!-- 总览 -->
 <div id="panel-stats" class="panel active">
   <div class="grid" id="statsGrid"></div>
-  <h3 style="color:var(--gold);margin:20px 0 12px">升 模块分布 Top 12</h3>
+  <h3 style="color:var(--gold);margin:20px 0 12px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> 模块分布 Top 12</h3>
   <table id="modulesTable">
     <thead><tr><th>模块</th><th>条目</th><th>占比</th><th>来源</th></tr></thead>
     <tbody></tbody>
@@ -73,7 +73,7 @@
 
 <!-- 批量操作 -->
 <div id="panel-batch" class="panel">
-  <h3 style="color:var(--gold);margin-bottom:12px">电 批量操作</h3>
+  <h3 style="color:var(--gold);margin-bottom:12px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg> 批量操作</h3>
   <div class="row">
     <select id="batchModule" aria-label="选择模块">
       <option value="">-- 选择模块 --</option>
@@ -92,7 +92,7 @@
 
 <!-- 批量入库 -->
 <div id="panel-ingest" class="panel">
-  <h3 style="color:var(--gold);margin-bottom:12px">入 批量入库</h3>
+  <h3 style="color:var(--gold);margin-bottom:12px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg> 批量入库</h3>
   <div class="row">
     <select id="ingestModel" aria-label="选择入库模型">
       <option value="r45_palace">紫微 12 宫</option>
@@ -110,8 +110,8 @@
     <textarea id="ingestText" placeholder="JSON Lines (每行一条: {module, title, content, category, keywords, score})" aria-label="JSON 文本粘贴"></textarea>
   </div>
   <div class="row" style="margin-top:12px">
-    <button class="btn" onclick="ingestExecute()" aria-label="批量入库知识条目">入 入库</button>
-    <button class="btn warn" onclick="ingestGenerate()" aria-label="生成示例知识条目">机 生成示例</button>
+    <button class="btn" onclick="ingestExecute()" aria-label="批量入库知识条目"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg> 入库</button>
+    <button class="btn warn" onclick="ingestGenerate()" aria-label="生成示例知识条目"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v2m6-2v2M9 20v2m6-2v2M2 9h2m-2 6h2M20 9h2m-2 6h2"/></svg> 生成示例</button>
   </div>
   <div id="ingestResult" class="log"></div>
 </div>

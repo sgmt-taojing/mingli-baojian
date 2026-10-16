@@ -47,12 +47,12 @@
   <!-- 占卜子导航 -->
   <div class="zhanbu-subnav">
     <button class="zhanbu-subtab active" onclick="showZhanbuSub('yijing',this)">䷀ 易经六爻</button>
-    <button class="zhanbu-subtab" onclick="showZhanbuSub('meihua',this)">花 梅花易数</button>
+    <button class="zhanbu-subtab" onclick="showZhanbuSub('meihua',this)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><path d="M12 2.5c2 2 2 5 0 7-2-2-2-5 0-7zM12 21.5c-2-2-2-5 0-7 2 2 2 5 0 7zM2.5 12c2-2 5-2 7 0-2 2-5 2-7 0zM21.5 12c-2 2-5 2-7 0 2-2 5-2 7 0z"/></svg> 梅花易数</button>
     <button class="zhanbu-subtab" onclick="showZhanbuSub('qimen',this)">☯ 奇门遁甲</button>
     <button class="zhanbu-subtab" onclick="showZhanbuSub('liuren',this)">⬡ 大六壬</button>
     <button class="zhanbu-subtab" onclick="showZhanbuSub('ziwei',this)">⭐ 紫微斗数</button>
     <button class="zhanbu-subtab" onclick="showZhanbuSub('cezi',this)">✍️ 测字</button>
-    <button class="zhanbu-subtab" onclick="showSection('screenshot');closeMore()" style="margin-left:auto">拍 面相</button>
+    <button class="zhanbu-subtab" onclick="showSection('screenshot');closeMore()" style="margin-left:auto"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 面相</button>
   </div>
   <!-- 子模块容器（各子section的输入+结果区域会被JS动态移入） -->
   <div id="zhanbuContent">
@@ -88,7 +88,7 @@
         </div>
         <p id="yjHint" style="display:none;text-align:center;color:var(--gold);font-size:12px;margin-top:8px;opacity:.85"></p>
         <div class="input-row" style="margin-top:12px;gap:12px;justify-content:center">
-          <button class="compute-btn" onclick="yjStart('person')" id="yjBtnP">人 盘</button>
+          <button class="compute-btn" onclick="yjStart('person')" id="yjBtnP"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg> 盘</button>
           <button class="compute-btn" onclick="yjStart('matter')" id="yjBtnM">事 盘</button>
         </div>
       </div>
@@ -350,7 +350,7 @@
           <button class="compute-btn" onclick="doCezi()" style="display:block;margin:0">开始解析</button>
         </div>
         <div class="input-row" style="margin-top:16px">
-          <button class="compute-btn" onclick="randomCezi()" style="background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.3);color:var(--gold2)">骰 随机取字</button>
+          <button class="compute-btn" onclick="randomCezi()" style="background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.3);color:var(--gold2)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="9" cy="15" r="1.2" fill="currentColor" stroke="none"/></svg> 随机取字</button>
         </div>
       </div>
       <div class="result" id="ceziResult">
@@ -364,7 +364,7 @@
   </div>
   <!-- 专业注释 -->
   <div class="pro-note" style="margin-top:32px;padding:20px;background:rgba(201,168,76,.03);border:1px solid rgba(201,168,76,.08);border-radius:4px">
-    <h5 style="font-size:12px;letter-spacing:3px;color:var(--gold);margin-bottom:8px">经 占卜专业说明</h5>
+    <h5 style="font-size:12px;letter-spacing:3px;color:var(--gold);margin-bottom:8px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M5 4a2 2 0 0 1 2-2h12v18H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/></svg> 占卜专业说明</h5>
     <p style="font-size:12px;line-height:2;opacity:.85">易经六爻：以铜钱摇卦，得本卦、变卦、互卦，断以六亲生克。梅花易数：以数起卦，体用生克断吉凶，重直觉灵感。奇门遁甲：排九星八门八神，观天时地利人和。大六壬：以日辰天将四课三传断事，十二天将各有所主。紫微斗数：以出生时间排十二宫，观星曜格局论命。测字：以字形字义字音断机，需心诚则灵。</p>
   </div>
 </section>

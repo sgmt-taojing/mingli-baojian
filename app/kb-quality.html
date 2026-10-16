@@ -155,7 +155,7 @@ h1{font-size:1.6rem;color:var(--gold);text-align:center;margin:20px 0 4px}
 <div class="grid" id="grid"></div>
 </div>
 
-<button class="export-btn" onclick="exportCSV()">入 导出 CSV</button>
+<button class="export-btn" onclick="exportCSV()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg> 导出 CSV</button>
 <button class="refresh" onclick="load()" title="刷新">更</button>
 <dialog id="modal" class="modal-bg" aria-label="模块详情">
   <div class="modal">
@@ -265,7 +265,7 @@ function renderGovernance(s){
     govEl=document.createElement('div');
     govEl.id='govPanel';
     govEl.style.cssText='margin:20px 0;padding:16px;background:rgba(13,17,23,.5);border:1px solid rgba(201,168,76,.1);border-radius:12px';
-    govEl.innerHTML='<h2 style="font-size:14px;font-weight:600;color:#c9a84c;margin:0 0 12px;border-bottom:1px solid rgba(201,168,76,.1);padding-bottom:8px">盾 治理建议</h2><div id="govList">'+html+'</div>';
+    govEl.innerHTML='<h2 style="font-size:14px;font-weight:600;color:#c9a84c;margin:0 0 12px;border-bottom:1px solid rgba(201,168,76,.1);padding-bottom:8px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg> 治理建议</h2><div id="govList">'+html+'</div>';
     // 插入到 distro 后
     const distro=document.getElementById('distro');
     if(distro && distro.nextSibling) distro.parentNode.insertBefore(govEl, distro.nextSibling);
@@ -321,7 +321,7 @@ function showDetail(mod){
   document.getElementById('modalTitle').textContent=`${m.module} · ${m.grade}`;
   document.getElementById('modalStats').innerHTML=`
     <span>图 <b>${fmt(m.cnt)}</b> 条目</span>
-    <span>标 trust <b>${m.avg_trust}</b></span>
+    <span><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg> trust <b>${m.avg_trust}</b></span>
     <span>金 <b>${m.gold}</b> 🥈 <b>${m.silver}</b> 🥉 <b>${m.bronze}</b>${m.needs_fix?' ⚠<b>'+m.needs_fix+'</b>':''}</span>
     <span>↕ min <b>${m.min_trust?.toFixed(2)||'-'}</b> / max <b>${m.max_trust?.toFixed(2)||'-'}</b></span>
   `;
@@ -365,9 +365,9 @@ function showDetail(mod){
       document.getElementById('modalDetail').innerHTML=`
         <h4 style="color:#aaa;font-size:.85rem;margin:12px 0 8px">📊 Trust 分布（共 ${fmt(total)} 条）</h4>
         ${distroHtml}
-        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">冠 Trust Top 5</h4>
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 8l3.5 3.5L12 4l5.5 7.5L21 8l-1.8 10H4.8z"/></svg> Trust Top 5</h4>
         <div class="trust-list">${topHtml}</div>
-        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px">警 Trust Bottom 5</h4>
+        <h4 style="color:#aaa;font-size:.85rem;margin:16px 0 8px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> Trust Bottom 5</h4>
         <div class="trust-list">${lowHtml}</div>`;
     })
     .catch(err=>{

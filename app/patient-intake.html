@@ -118,7 +118,7 @@ textarea{resize:vertical;min-height:60px}
 <option value="20">晚上（19-21点·戌时）</option>
 <option value="22">夜间（21-23点·亥时）</option>
 </select>
-<div class="hint">示 体质评估需要出生时间信息，大致时段即可</div>
+<div class="hint"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.8.6 1.5 1.5 1.5 2.6v.5h4v-.5c0-1.1.7-2 1.5-2.6A6 6 0 0 0 12 3z"/></svg> 体质评估需要出生时间信息，大致时段即可</div>
 </div>
 <div class="form-group"><label>出生地</label><input aria-label="出生日期" id="birthplace" placeholder="如：浙江杭州（用于体质地域评估）"></div>
 <button class="btn" onclick="goStep(2)">下一步：症状描述</button>
@@ -232,7 +232,7 @@ if(!caseId){throw new Error((d.data&&d.data.error)||d.error||d.message||'服务�
 document.getElementById('step4').style.display='none';
 document.getElementById('result').style.display='block';
 var c=document.getElementById('result-content');
-c.innerHTML='您的诊疗编号：<b>#'+caseId+'</b><br><br>系统正在为您安排：<br>☯ 命理大师 — 分析体质与健康状况<br>注 中医医生 — 综合诊断并开具处方<br><br>请耐心等待，您可以在身份中心查看进度。';
+c.innerHTML='您的诊疗编号：<b>#'+caseId+'</b><br><br>系统正在为您安排：<br>☯ 命理大师 — 分析体质与健康状况<br><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2.4 2.4 0 0 0 2 3.5h10a2.4 2.4 0 0 0 2-3.5l-5-9V3"/><path d="M7.5 15h9"/></svg> 中医医生 — 综合诊断并开具处方<br><br>请耐心等待，您可以在身份中心查看进度。';
 }).catch(function(e){
 btn.disabled=false;btn.textContent='重新提交';
 var c=document.getElementById('result-content');

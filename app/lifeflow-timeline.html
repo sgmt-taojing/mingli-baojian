@@ -232,12 +232,12 @@ aria-label="年" value="1990" min="1900" max="2100">
 
       // 黄金/谨慎
       html += '<div class="result-card">';
-      html += '<h2>冠 黄金 5 年 vs ⚠️ 谨慎 5 年</h2>';
+      html += '<h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 8l3.5 3.5L12 4l5.5 7.5L21 8l-1.8 10H4.8z"/></svg> 黄金 5 年 vs ⚠️ 谨慎 5 年</h2>';
       html += '<div class="best-worst">';
-      html += '<div class="col-card gold"><h4>冠 黄金 5 年</h4>';
+      html += '<div class="col-card gold"><h4><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 8l3.5 3.5L12 4l5.5 7.5L21 8l-1.8 10H4.8z"/></svg> 黄金 5 年</h4>';
       (d.top5Years || []).forEach(function(y){ html += '<div class="year-row"><span>' + y.year + '(' + y.age + '岁) ' + y.ganzhi + ' 大运' + y.dayun + '</span><span class="score">' + y.avgScore + '分 ' + y.overall + '</span></div>'; });
       html += '</div>';
-      html += '<div class="col-card bad"><h4>警 谨慎 5 年</h4>';
+      html += '<div class="col-card bad"><h4><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 谨慎 5 年</h4>';
       (d.cautiousYears || []).forEach(function(y){ html += '<div class="year-row"><span>' + y.year + '(' + y.age + '岁) ' + y.ganzhi + ' 大运' + y.dayun + '</span><span class="score">' + y.avgScore + '分 ' + y.overall + '</span></div>'; });
       html += '</div></div></div>';
 
@@ -254,7 +254,7 @@ aria-label="年" value="1990" min="1900" max="2100">
 
       // 行动指引
       html += '<div class="result-card">';
-      html += '<h2>示 行动指引</h2>';
+      html += '<h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.8.6 1.5 1.5 1.5 2.6v.5h4v-.5c0-1.1.7-2 1.5-2.6A6 6 0 0 0 12 3z"/></svg> 行动指引</h2>';
       html += '<ol class="next-steps">';
       html += '<li>黄金年主动出击（拓人脉/创业/重大决策）</li>';
       html += '<li>谨慎年保守（守业/学习/积蓄）</li>';
@@ -271,7 +271,7 @@ aria-label="年" value="1990" min="1900" max="2100">
       area.scrollIntoView({behavior:'smooth'});
     } catch(e) {
       var errArea = document.getElementById('resultArea');
-      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(esc(e.message)) + '<br><br><button class="btn" onclick="generateOffline()">箱 使用本地 KB 兜底</button></div>';
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(esc(e.message)) + '<br><br><button class="btn" onclick="generateOffline()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> 使用本地 KB 兜底</button></div>';
       errArea.style.display = 'block';
     } finally {
       btn.disabled = false; btn.textContent = '🌐 生成终身三维滚动预览';
@@ -294,7 +294,7 @@ aria-label="年" value="1990" min="1900" max="2100">
     // 修正年龄计算
     data.s4 = new Date().getFullYear() - parseInt(document.getElementById('inpYear').value);
     var r = window._MODULE_REPORTS.lifeflowTimeline.diagnose(data);
-    var html = '<div class="result-card"><h2>箱 本地 KB 兜底（终身三维）</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
+    var html = '<div class="result-card"><h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> 本地 KB 兜底（终身三维）</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
     var area = document.getElementById('resultArea');
     area.innerHTML = html;
     area.style.display = 'block';

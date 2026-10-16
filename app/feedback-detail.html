@@ -83,7 +83,7 @@ body{font-family:system-ui,-apple-system,'PingFang SC',sans-serif;background:#0d
 <nav class="nav-bar">
   <a href="index.html">主平台</a>
   <a href="feedback-center.html">反馈</a>
-  <a href="login.html">密 登录</a>
+  <a href="login.html"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="8" cy="16" r="5"/><path d="M11.5 12.5 21 3m-4 1 3 3"/></svg> 登录</a>
 </nav>
 
 <div class="container" id="app">
@@ -170,7 +170,7 @@ function renderTicket(t) {
 
   // 内容
   html += '<div class="content-card">';
-  html += '<h2>记 详细描述</h2>';
+  html += '<h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 20h16M6 16l9-9a2.1 2.1 0 0 1 3 3l-9 9-4 1z"/></svg> 详细描述</h2>';
   html += '<div class="content-body">' + escapeHtml(t.content) + '</div>';
   if (t.screenshot_path) {
     html += '<div class="screenshot-box"><img loading="lazy" src="' + escapeHtml(t.screenshot_path) + '" onclick="window.open(this.src)" alt="截图"></div>';
@@ -183,14 +183,14 @@ function renderTicket(t) {
   // 后台回复
   if (t.admin_reply) {
     html += '<div class="reply-card">';
-    html += '<h2>语 官方回复</h2>';
+    html += '<h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> 官方回复</h2>';
     html += '<div class="reply-body">' + escapeHtml(t.admin_reply) + '</div>';
     if (t.updated_at) {
       html += '<div class="reply-time">' + escapeHtml(t.updated_at) + '</div>';
     }
     html += '</div>';
   } else if (t.status === 'open' || t.status === 'in_progress') {
-    html += '<div class="content-card" style="text-align:center;color:var(--text-muted);font-size:13px">待 我们正在处理您的反馈，请耐心等待...</div>';
+    html += '<div class="content-card" style="text-align:center;color:var(--text-muted);font-size:13px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M6 3h12M6 21h12M7.5 3c0 5 4.5 5 4.5 9s-4.5 4-4.5 9M16.5 3c0 5-4.5 5-4.5 9s4.5 4 4.5 9"/></svg> 我们正在处理您的反馈，请耐心等待...</div>';
   }
 
   // 评分（已解决的工单）

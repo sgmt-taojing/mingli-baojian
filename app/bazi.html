@@ -122,7 +122,7 @@
         <option value="19">戌时 19:00-21:00(黄昏)</option>
         <option value="21">亥时 21:00-23:00(人定)</option>
       </select>
-      <p class="input-hint" id="shichenHint">警 时辰按<b>农历</b>计算，每个时辰相当于2小时。以上时间对应农历时辰，公历时间仅作参考。</p>
+      <p class="input-hint" id="shichenHint"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 时辰按<b>农历</b>计算，每个时辰相当于2小时。以上时间对应农历时辰，公历时间仅作参考。</p>
       <p class="input-hint" style="cursor:pointer;color:var(--gold);font-size:11px"><ml-tap type="text" tabindex="0" role="button" aria-label="时辰对照表点击展开" on:tap="toggleShichenTable()" on:keydown="if(event.key==='Enter'||event.key===' ')toggleShichenTable()">📊 时辰对照表(点击展开)</ml-tap></p>
       <!-- 时辰对照表(默认隐藏) -->
       <div id="shichenTable" style="display:none;margin-top:8px;padding:12px;background:rgba(201,168,76,.04);border-radius:8px;font-size:12px;line-height:1.8">
@@ -271,14 +271,14 @@
         <button class="pro-btn pro-btn-primary" onclick="saveProFields()">💾 保存全量信息</button>
         <button class="pro-btn pro-btn-secondary" onclick="applyPro2Bazi()">↪ 录入八字段</button>
       </div>
-      <div class="pro-saved-tip" id="proSavedTip">成 已保存到本地档案</div>
+      <div class="pro-saved-tip" id="proSavedTip"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 已保存到本地档案</div>
     </div>
 
     <p class="input-hint">出生日期为公历。时辰不填则按中午12:00计算。经度用于真太阳时校正。</p>
     <button class="compute-btn" style="background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(201,168,76,.08));border:1px solid rgba(201,168,76,.35);color:#d4b06a;font-weight:700;font-size:15px;padding:12px 40px;letter-spacing:4px" onclick="playSound('success');computeBazi()" id="baziBtn">排 盘 演 命</button>
     <button class="compute-btn" style="background:linear-gradient(135deg,#9b59b6,#6c3483);color:#fff;border:none;font-size:13px;padding:12px 30px;letter-spacing:2px;margin-top:8px" onclick="generateBaziReport()">📜 出具八字报告</button>
     <div style="display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap">
-      <button class="compute-btn" style="background:transparent;border:1px solid rgba(201,168,76,.15);font-size:12px;padding:8px 16px;opacity:.6" onclick="runBaziEnhancedFortune()">升 运势 + 健康深度增强</button>
+      <button class="compute-btn" style="background:transparent;border:1px solid rgba(201,168,76,.15);font-size:12px;padding:8px 16px;opacity:.6" onclick="runBaziEnhancedFortune()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> 运势 + 健康深度增强</button>
     </div>
     <div style="text-align:center;margin-top:6px;font-size:11px;color:var(--fg3)">钉 排盘后点击此按钮，生成今年/明年运势、健康专题、当日运势、企业主视角</div>
 <div id="baziQuickLinks"></div>
@@ -593,7 +593,7 @@
     <div class="bazi-module-body collapsed">
       <div style="padding:12px;background:rgba(39,174,96,.04);border:1px solid rgba(39,174,96,.12);border-radius:8px;margin-bottom:10px">
         <p style="font-size:13px;color:var(--jade2);line-height:1.8;margin:0">基于八字命理+十二长生+五行+大运流年，提供7大板块疾病预防预警分析。</p>
-        <p style="font-size:11px;opacity:.95;margin-top:6px">警 仅供养生保健参考，不构成医疗诊断</p>
+        <p style="font-size:11px;opacity:.95;margin-top:6px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 仅供养生保健参考，不构成医疗诊断</p>
         <button class="compute-btn" onclick="runHealthForecast()" id="healthForecastBtn" style="margin-top:10px;padding:8px 24px;font-size:13px;background:rgba(39,174,96,.12);border:1px solid rgba(39,174,96,.3);color:var(--jade2);border-radius:20px;cursor:pointer">🩺 生成健康预测</button>
       </div>
       <div id="healthForecastResult"></div>
@@ -602,7 +602,7 @@
     <div class="back-row">
       <button class="export-btn" onclick="exportBaziReport('html')">导出HTML</button>
       <button class="export-btn" onclick="exportBaziReport('pdf')" style="background:rgba(46,204,113,.15);border-color:rgba(46,204,113,.3)">📄 导出PDF</button>
-      <button class="export-btn" onclick="exportBaziReport('word')" style="background:rgba(52,152,219,.15);border-color:rgba(52,152,219,.3)">记 导出Word</button>
+      <button class="export-btn" onclick="exportBaziReport('word')" style="background:rgba(52,152,219,.15);border-color:rgba(52,152,219,.3)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 20h16M6 16l9-9a2.1 2.1 0 0 1 3 3l-9 9-4 1z"/></svg> 导出Word</button>
       <button class="back-btn" onclick="showSection('hero')">返 回 首 页</button>
     </div>
     <!-- 会员年度提醒 -->

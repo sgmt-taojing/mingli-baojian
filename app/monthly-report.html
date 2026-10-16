@@ -318,13 +318,13 @@ aria-label="年" value="1990" min="1900" max="2100">
       html += renderMonthCard(curData, true);
       // 附加 R90 化解建议（如果有 KB 命中）
       if(report.currentMonth && report.currentMonth.text){
-        html += '<div class="result-card"><h3>宝 化解方案与月令详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.currentMonth.text)+'</pre></div>';
+        html += '<div class="result-card"><h3><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 21 8 9l4-6 4 6z"/></svg> 化解方案与月令详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.currentMonth.text)+'</pre></div>';
       }
       // 下月详细
       html += '<h2>⏭️ 下月前瞻 ('+esc(nxtData.name || (nxtData.month+'月'))+' · '+esc(nxtData.ganZhi||'')+')</h2>';
       html += renderMonthCard(nxtData, false);
       if(report.nextMonth && report.nextMonth.text){
-        html += '<div class="result-card"><h3>宝 下月化解与详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.nextMonth.text)+'</pre></div>';
+        html += '<div class="result-card"><h3><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M12 21 8 9l4-6 4 6z"/></svg> 下月化解与详解</h3><pre style="white-space:pre-wrap;font-family:inherit;font-size:.82rem;line-height:1.7">'+esc(report.nextMonth.text)+'</pre></div>';
       }
       // 全年总览表
       html += renderYearTable(yearOv, nowMonth);

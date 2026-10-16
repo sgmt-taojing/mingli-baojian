@@ -104,7 +104,7 @@ input[type=date]{color-scheme:dark}
 <div class="tabs">
 <div class="tab active" data-tab="weekly" onclick="switchTab('weekly')">📊 本周概览</div>
 <div class="tab" data-tab="history" onclick="switchTab('history')">📊 历史分析</div>
-<div class="tab" data-tab="followup" onclick="switchTab('followup')">记 周随访提交</div>
+<div class="tab" data-tab="followup" onclick="switchTab('followup')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 20h16M6 16l9-9a2.1 2.1 0 0 1 3 3l-9 9-4 1z"/></svg> 周随访提交</div>
 <div class="tab" data-tab="knowledge" onclick="switchTab('knowledge')">📚 已入库KB</div>
 </div>
 
@@ -219,7 +219,7 @@ var today=new Date().toISOString().slice(0,10);
 var h='<div class="card"><div class="card-title">🗒️ 周随访提交</div>';
 h+='<div class="hint">每周提交一次随访，对比预测与实际，自动入库KB</div>';
 h+='<div class="form-group"><label>随访日期</label><input aria-label="日期" type="date" id="fu_date" value="'+today+'"></div>';
-h+='<div class="form-group"><label>实际结果</label><select id="fu_outcome" aria-label="fu_outcome"><option value="better">成 改善(预测有效)</option><option value="stable">稳定(预测部分有效)</option><option value="worse">败 恶化(预测偏离)</option><option value="unknown">❓ 待评估</option></select></div>';
+h+='<div class="form-group"><label>实际结果</label><select id="fu_outcome" aria-label="fu_outcome"><option value="better">改善(预测有效)</option><option value="stable">稳定(预测部分有效)</option><option value="worse">恶化(预测偏离)</option><option value="unknown">❓ 待评估</option></select></div>';
 h+='<div class="form-group"><label>本周实际症状变化</label><textarea id="fu_symptoms" placeholder="如：头痛减轻了，睡眠改善了，仍有疲劳感" aria-label="如：头痛减轻了，睡眠改善了，仍有疲劳感"></textarea></div>';
 h+='<div class="form-group"><label>本周预测 vs 实际验证</label><textarea id="fu_followup" placeholder="如：预测肝火旺+夏季心脏风险，实际8月体检肝功能异常符合预测" aria-label="如：预测肝火旺+夏季心脏风险，实际8月体检肝功能异常符合预测"></textarea></div>';
 h+='<div class="form-group"><label>额外建议补充</label><textarea id="fu_rec" placeholder="如：建议加强肝脏保护，少饮酒" aria-label="如：建议加强肝脏保护，少饮酒"></textarea></div>';

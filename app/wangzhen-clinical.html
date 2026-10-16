@@ -278,8 +278,8 @@
     </div>
   </div>
   <div style="display:flex;gap:6px;align-items:center">
-    <span id="wz-capabilities" class="wz-capabilities">待 检测中...</span>
-    <a href="wangzhen-center.html" class="nav-back">经 望诊中心</a>
+    <span id="wz-capabilities" class="wz-capabilities"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M6 3h12M6 21h12M7.5 3c0 5 4.5 5 4.5 9s-4.5 4-4.5 9M16.5 3c0 5-4.5 5-4.5 9s4.5 4 4.5 9"/></svg> 检测中...</span>
+    <a href="wangzhen-center.html" class="nav-back"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M5 4a2 2 0 0 1 2-2h12v18H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/></svg> 望诊中心</a>
     <a href="patient-archive.html" class="nav-back">📊 患者档案</a>
     <a href="tcm-clinic.html" class="nav-back">🩺 中医诊所</a>
     <a href="index.html" class="nav-back">🏠 主页</a>
@@ -342,7 +342,7 @@
 
         <!-- 主诉症状：大框 + 语音 + 结构化点选 -->
         <div class="wz-form-row">
-          <label>主诉症状 <button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;margin-left:4px" onclick="wangzhenClinical.startVoiceInput('np-chief')">麦 语音</button></label>
+          <label>主诉症状 <button class="btn btn-ghost" style="font-size:9px;padding:2px 6px;margin-left:4px" onclick="wangzhenClinical.startVoiceInput('np-chief')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg> 语音</button></label>
           <textarea id="np-chief" class="wz-textarea" placeholder="患者主诉症状，如：头痛失眠、面色苍白、胃胀不适..." style="min-height:70px" aria-label="患者主诉症状，如：头痛失眠、面色苍白、胃胀不适..."></textarea>
         </div>
 
@@ -394,7 +394,7 @@
         <div style="font-size:10px;color:var(--wz-paper3);margin-bottom:6px" id="wz-last-visit-info"></div>
         <div class="wz-btn-row">
           <button class="btn btn-secondary" style="font-size:11px" onclick="wangzhenClinical.startFollowup()">🔄 开始复诊</button>
-          <button class="btn btn-ghost" style="font-size:11px" onclick="wangzhenClinical.viewPatientHistory()">夹 完整病历</button>
+          <button class="btn btn-ghost" style="font-size:11px" onclick="wangzhenClinical.viewPatientHistory()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> 完整病历</button>
         </div>
       </div>
     </div>
@@ -439,13 +439,13 @@
         <img loading="lazy" id="wz-photo-preview" class="wz-photo-preview" alt="采集照片">
       </div>
       <div class="wz-btn-row">
-        <button class="btn btn-primary" id="wz-btn-camera" onclick="wangzhenClinical.startCamera()">拍 启动摄像头</button>
-        <button class="btn btn-secondary" id="wz-btn-capture" onclick="wangzhenClinical.capturePhoto()" style="display:none">拍 拍照分析</button>
+        <button class="btn btn-primary" id="wz-btn-camera" onclick="wangzhenClinical.startCamera()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 启动摄像头</button>
+        <button class="btn btn-secondary" id="wz-btn-capture" onclick="wangzhenClinical.capturePhoto()" style="display:none"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 拍照分析</button>
         <button class="btn btn-ghost" onclick="wangzhenClinical.stopCamera()">关闭摄像头</button>
       </div>
       <!-- 多角度采集 -->
       <div id="wz-multi-angle" style="display:none;margin-top:8px">
-        <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">拍 多角度采集（可选）</div>
+        <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 多角度采集（可选）</div>
         <div style="display:flex;gap:4px;flex-wrap:wrap">
           <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.captureAngle('front')">正面</button>
           <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.captureAngle('left')">左侧45°</button>
@@ -456,13 +456,13 @@
       </div>
 <!-- 采集设备选择区 -->
       <div style="margin-top:8px;padding:10px;border:1px solid rgba(99,179,237,.2);border-radius:8px;background:rgba(99,179,237,.04)">
-        <div style="font-size:12px;color:var(--wz-cyan);font-weight:600;margin-bottom:6px">拍 采集设备</div>
+        <div style="font-size:12px;color:var(--wz-cyan);font-weight:600;margin-bottom:6px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 采集设备</div>
         <select id="wz-camera-select" class="wz-select" style="width:100%;font-size:11px;margin-bottom:6px" aria-label="选择采集设备">
           <option value="">正在检测设备...</option>
         </select>
         <div class="wz-btn-row" style="flex-wrap:wrap">
-          <button class="btn btn-primary" style="font-size:11px" id="wz-btn-start" onclick="wangzhenClinical.startCamera()">拍 启动摄像头</button>
-          <button class="btn btn-ghost" style="font-size:11px" onclick="document.getElementById('wz-upload-input').click()">夹 上传图片</button>
+          <button class="btn btn-primary" style="font-size:11px" id="wz-btn-start" onclick="wangzhenClinical.startCamera()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="14" r="3.5"/></svg> 启动摄像头</button>
+          <button class="btn btn-ghost" style="font-size:11px" onclick="document.getElementById('wz-upload-input').click()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> 上传图片</button>
         </div>
         <input aria-label="输入" type="file" id="wz-upload-input" accept="image/*" style="display:none" onchange="wangzhenClinical.handleUpload(this)">
         <div id="wz-device-info" style="font-size:10px;color:var(--wz-paper3);margin-top:4px"></div>
@@ -476,14 +476,14 @@
       <div class="wz-card-title">🌾 医嘱记录</div>
       <textarea id="wz-voice-text" class="wz-voice-text" placeholder="点击语音输入，或直接打字记录医嘱..." aria-label="点击语音输入，或直接打字记录医嘱..."></textarea>
       <div class="wz-btn-row">
-        <button class="btn btn-secondary" id="wz-btn-voice" onclick="wangzhenClinical.toggleVoiceInput()">麦 语音输入</button>
+        <button class="btn btn-secondary" id="wz-btn-voice" onclick="wangzhenClinical.toggleVoiceInput()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg> 语音输入</button>
         <button class="btn btn-ghost" onclick="wangzhenClinical.speakText(document.getElementById('wz-voice-text').value)">播报</button>
       </div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
         <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('prescription')">📊 处方</button>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('lifestyle')">草 调养</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('lifestyle')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M6 18C6 9 11 4 20 4c0 9-5 14-14 14z"/><path d="M6 18c2.5-4.5 5.5-7.5 9-9"/></svg> 调养</button>
         <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('followup')">📅 复诊</button>
-        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('warning')">警 注意</button>
+        <button class="btn btn-ghost" style="font-size:10px;padding:4px 8px" onclick="wangzhenClinical.insertTemplate('warning')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 注意</button>
       </div>
     </div>
 
@@ -493,11 +493,11 @@
       <div class="section-hint">👆 操作：点击下方区域卡片 → 勾选面部特征 → 点「诊断此区域」</div>
       <div class="wz-tabs">
         <div class="wz-tab active" onclick="window.wangzhenCenter.switchTab('zones')">📊 分区</div>
-        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('colors')">设 五色</div>
+        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('colors')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M4.9 4.9l2.1 2.1m10 10 2.1 2.1M4.9 19.1 7 17m10-10 2.1-2.1"/></svg> 五色</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('organs')">眼️ 五官</div>
-        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('therapy')">药 理疗</div>
+        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('therapy')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7z"/><path d="M7 7l7 7"/></svg> 理疗</div>
         <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('quickref')">速查</div>
-        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('ai')">机 AI</div>
+        <div class="wz-tab" onclick="window.wangzhenCenter.switchTab('ai')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="10" y="10" width="4" height="4"/><path d="M9 2v2m6-2v2M9 20v2m6-2v2M2 9h2m-2 6h2M20 9h2m-2 6h2"/></svg> AI</div>
       </div>
       <div data-tab="zones" style="display:block">
         <div id="wangzhen-zone-map"></div>
@@ -532,7 +532,7 @@
 
       <!-- 推送给周易大师 -->
       <div style="margin-top:12px;padding:10px;border:1px solid rgba(99,179,237,.2);border-radius:8px;background:rgba(99,179,237,.04)">
-        <div style="font-size:12px;color:var(--wz-cyan);font-weight:600;margin-bottom:6px">信 周易大师协助</div>
+        <div style="font-size:12px;color:var(--wz-cyan);font-weight:600;margin-bottom:6px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M21 5 3 10v4l4 1 1.5 5h2.5L9.5 15 21 19z"/></svg> 周易大师协助</div>
         <div style="font-size:11px;color:var(--wz-paper3);margin-bottom:6px">一键将患者命理数据推送给周易大师，大师解读后同步回传</div>
         <div class="wz-btn-row">
           <button class="btn btn-secondary" onclick="wangzhenClinical.pushToMaster()">📤 推送给周易大师解读</button>
@@ -543,10 +543,10 @@
 
       <!-- 治疗方案（综合知识库）-->
       <div style="margin-top:12px;padding:10px;border:1px solid rgba(16,185,129,.2);border-radius:8px;background:rgba(16,185,129,.04)">
-        <div style="font-size:12px;color:var(--wz-jade);font-weight:600;margin-bottom:6px">药 综合治疗方案（知识库精准推荐）</div>
+        <div style="font-size:12px;color:var(--wz-jade);font-weight:600;margin-bottom:6px"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7z"/><path d="M7 7l7 7"/></svg> 综合治疗方案（知识库精准推荐）</div>
         <div id="wz-treatment-plan" style="font-size:11px;color:var(--wz-paper3)">完成综合分析后自动生成</div>
         <div class="wz-btn-row" style="display:none" id="wz-treatment-actions">
-          <button class="btn btn-primary" onclick="wangzhenClinical.confirmAndPushToPatient()">成 医生确认 → 推送给患者</button>
+          <button class="btn btn-primary" onclick="wangzhenClinical.confirmAndPushToPatient()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg> 医生确认 → 推送给患者</button>
         </div>
       </div>
     </div>
@@ -574,12 +574,12 @@
           <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="runFaceTongueFusion()">🔄 面舌联动分析</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('舌诊案例 辨证论治')">📚 KB案例推荐</button>
-            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊合参 望闻问切')">经 四诊合参知识</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊合参 望闻问切')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M5 4a2 2 0 0 1 2-2h12v18H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/></svg> 四诊合参知识</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('28种病理舌象')">28舌象查询</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('面诊 面部脏腑对应')">眼️ 面诊分区</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('目诊 五脏六腑')">眼️ 目诊</button>
             <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('四诊仪 数据采集')">📊 四诊仪规范</button>
-            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('误诊 鉴别 染苔')">警 误诊鉴别</button>
+            <button class="btn btn-ghost" style="font-size:10px;padding:4px 10px" onclick="searchKbCases('误诊 鉴别 染苔')"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M12 3 2 21h20z"/><path d="M12 10v5m0 3v.5"/></svg> 误诊鉴别</button>
           </div>
           <div id="wz-kb-cases" style="margin-top:8px"></div>
         </div>

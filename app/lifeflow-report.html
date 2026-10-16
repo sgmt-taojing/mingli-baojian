@@ -206,7 +206,7 @@ aria-label="年" value="1990" min="1900" max="2100">
       html += '<div class="result-card">';
       html += '<h2>海 三维度详情</h2>';
       html += '<div class="triple-grid">';
-      html += '<div class="triple-card"><div class="label">夜 流月</div><div class="value">' + esc(r.currentMonth.name) + ' · ' + esc(r.currentMonth.element) + '</div><div class="status">' + statusBadge(r.currentMonth.status) + ' ' + r.currentMonth.score + '分</div></div>';
+      html += '<div class="triple-card"><div class="label"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg> 流月</div><div class="value">' + esc(r.currentMonth.name) + ' · ' + esc(r.currentMonth.element) + '</div><div class="status">' + statusBadge(r.currentMonth.status) + ' ' + r.currentMonth.score + '分</div></div>';
       html += '<div class="triple-card"><div class="label">📅 流年</div><div class="value">' + esc(r.currentLiunian.ganzhi) + ' · ' + esc(r.currentLiunian.element) + '</div><div class="status">' + statusBadge(r.currentLiunian.status) + ' ' + r.currentLiunian.score + '分</div></div>';
       html += '<div class="triple-card"><div class="label">📤 大运</div><div class="value">' + esc(r.currentDayun.ganzhi) + ' · ' + esc(r.currentDayun.element) + '</div><div class="status">' + statusBadge(r.currentDayun.status) + ' ' + r.currentDayun.score + '分</div></div>';
       html += '</div>';
@@ -226,7 +226,7 @@ aria-label="年" value="1990" min="1900" max="2100">
 
       // 行动指引
       html += '<div class="result-card">';
-      html += '<h2>示 行动指引</h2>';
+      html += '<h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.8.6 1.5 1.5 1.5 2.6v.5h4v-.5c0-1.1.7-2 1.5-2.6A6 6 0 0 0 12 3z"/></svg> 行动指引</h2>';
       html += '<ol class="advice-list">';
       (r.advices || []).forEach(function(a){ html += '<li>' + esc(a) + '</li>'; });
       html += '</ol>';
@@ -253,7 +253,7 @@ aria-label="年" value="1990" min="1900" max="2100">
       }
     } catch(e) {
       var errArea = document.getElementById('resultArea');
-      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(esc(e.message)) + '<br><br><button class="btn" onclick="generateOffline()">箱 使用本地 KB 兜底</button></div>';
+      errArea.innerHTML = '<div class="result-card" style="border-color:var(--red);color:var(--red)">败 ' + esc(esc(e.message)) + '<br><br><button class="btn" onclick="generateOffline()"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> 使用本地 KB 兜底</button></div>';
       errArea.style.display = 'block';
     } finally {
       btn.disabled = false; btn.textContent = '🔮 生成三维联动报告';
@@ -274,7 +274,7 @@ aria-label="年" value="1990" min="1900" max="2100">
       s4: (parseInt(document.getElementById('inpTargetYear').value) || 2026) - (parseInt(document.getElementById('inpYear').value) || 1990)
     };
     var r = window._MODULE_REPORTS.lifeflow.diagnose(data);
-    var html = '<div class="result-card"><h2>箱 本地 KB 兜底</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
+    var html = '<div class="result-card"><h2><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg> 本地 KB 兜底</h2><div style="white-space:pre-wrap;font-size:.85rem;line-height:1.8">' + esc(r.html) + '</div></div>';
     var area = document.getElementById('resultArea');
     area.innerHTML = html;
     area.style.display = 'block';
