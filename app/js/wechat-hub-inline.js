@@ -992,9 +992,8 @@ function calcSanyuanDayMaster() {
 function _calcDayStem(year, month, day) {
   // 基准: 1900-01-01 = 甲戌日 (甲=1)
   // 实际: 1900-01-01 的干支为甲戌日，日干为甲
-  let baseDate = new Date(1900, 0, 1);
-  let targetDate = new Date(year, month - 1, day);
-  let diffDays = Math.floor((targetDate - baseDate) / 86400000);
+  // 2026-10-16 修复：UTC 绝对日差，防 1986-1991 夏令时/历史 LMT 致日柱差一天
+  let diffDays = Math.floor((Date.UTC(year, month - 1, day) - Date.UTC(1900, 0, 1)) / 86400000);
   let stemIdx = ((diffDays % 10) + 10) % 10;
   let stems = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   return stems[stemIdx];

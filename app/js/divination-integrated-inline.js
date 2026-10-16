@@ -1428,9 +1428,8 @@ function analyzeByBazi(){
   if(!dateStr){showToast('请选择出生日期');return;}
   const parts=dateStr.split('-');
   const y=parseInt(parts[0]),m=parseInt(parts[1]),day=parseInt(parts[2]);
-  const baseDate=new Date(1900,0,1);
-  const inputDate=new Date(y,m-1,day);
-  const diffDays=Math.floor((inputDate-baseDate)/(1000*60*60*24));
+  // 2026-10-16 修复：UTC 绝对日差，防 1986-1991 夏令时/历史 LMT 致日柱差一天
+  const diffDays=Math.floor((Date.UTC(y,m-1,day)-Date.UTC(1900,0,1))/(1000*60*60*24));
   const tgIdx=((diffDays%10)+10)%10;
   const TG=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
   const tgElement={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'};

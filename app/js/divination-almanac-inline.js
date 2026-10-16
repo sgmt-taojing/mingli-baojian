@@ -619,7 +619,7 @@ function leapMonth(y){return LUNAR_INFO[y-1900]&0xf;}
 function leapDays(y){if(leapMonth(y))return(LUNAR_INFO[y-1900]&0x10000)?30:29;return 0;}
 function monthDays(y,m){return(LUNAR_INFO[y-1900]&(0x10000>>m))?30:29;}
 function getSimpleLunar(date){
-  let offset=Math.floor((date-new Date(1900,0,31))/86400000);
+  let offset=Math.floor((Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())-Date.UTC(1900,0,31))/86400000); // 2026-10-16 修复：UTC 防夏令时
   let i,temp=0;
   for(i=1900;i<2101&&offset>0;i++){temp=lunarYearDays(i);offset-=temp;}
   if(offset<0){offset+=temp;i--;}
@@ -658,7 +658,7 @@ function getGanZhi(date) {
   let yearGan=yearGzIdx%10;
   let monthGan=(yearGan*2+month+1)%10;
   // 日干支：1900-01-31=甲辰(index 40)
-  let dayGzIdx=((40+Math.floor((new Date(year,month-1,day)-new Date(1900,0,31))/86400000))%60+60)%60;
+  let dayGzIdx=((40+Math.floor((Date.UTC(year,month-1,day)-Date.UTC(1900,0,31))/86400000))%60+60)%60; // 2026-10-16 修复：UTC 防夏令时
   return TG[yearGzIdx%10]+DZ[yearGzIdx%12]+'年 '+TG[monthGan]+DZ[monthBranch]+'月 '+TG[dayGzIdx%10]+DZ[dayGzIdx%12]+'日';
 }
 
@@ -975,7 +975,7 @@ function updateDailyAdvice(almanac) {
   // ── 计算当日干支 ──
   const GAN_INDEX=(Y-4)%10,ZHI_INDEX=(Y-4)%12;
   const monthGzIdx=((Y-1900)*12+M+13)%60;
-  const dayGzIdx=((40+Math.floor((new Date(Y,M,D) - new Date(1900,0,31))/86400000))%60+60)%60; // 1900-01-31=甲辰(offset 40)
+  const dayGzIdx=((40+Math.floor((Date.UTC(Y,M,D) - Date.UTC(1900,0,31))/86400000))%60+60)%60; // 1900-01-31=甲辰(offset 40) // 2026-10-16 修复：UTC 防夏令时
   const dayStem=STEMS[dayGzIdx%10],dayBranch=BRANCHES[dayGzIdx%12];
   const stemWx=ELE[dayStem]||'土';
   const branchWx={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'}[dayBranch]||'土';

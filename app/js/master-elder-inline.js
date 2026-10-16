@@ -89,9 +89,8 @@ function computeBazi(year, month, day, hour){
   const monthBranch = BRANCH_LIST[(m + 1) % 12];
 
   // 日柱：用基准日 1900-01-01 = 甲戌 (10)
-  const baseDate = new Date(1900, 0, 1);
-  const targetDate = new Date(y, m-1, +day);
-  const diffDays = Math.floor((targetDate - baseDate) / 86400000);
+  // 2026-10-16 修复：UTC 绝对日差，防 1986-1991 夏令时/历史 LMT 致日柱差一天
+  const diffDays = Math.floor((Date.UTC(y, m-1, +day) - Date.UTC(1900, 0, 1)) / 86400000);
   const dayIdx = (10 + diffDays + 60*100) % 60; // 防止负数
   const dayStem = STEM_LIST[dayIdx % 10];
   const dayBranch = BRANCH_LIST[dayIdx % 12];

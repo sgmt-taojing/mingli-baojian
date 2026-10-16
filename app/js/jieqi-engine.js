@@ -176,9 +176,7 @@ var JieqiEngine = {
    * 日柱（连续纪日法，1900-01-01=甲子日）
    */
   getDayPillar: function(year, month, day){
-    var base = new Date(1900, 0, 1);
-    var target = new Date(year, month-1, day);
-    var diff = Math.round((Date.UTC(year, month-1, day) - Date.UTC(1900, 0, 1)) / 86400000);
+    var diff = Math.round((Date.UTC(year, month-1, day) - Date.UTC(1900, 0, 1)) / 86400000); // 2026-10-16 清理：删除未使用的本地时区 base/target（计算本就走 UTC）
     var idx = ((diff + 10) % 60 + 60) % 60; /* 1900-01-01=甲戌(idx=10) */
     return {
       gan: TIAN_GAN[idx % 10],

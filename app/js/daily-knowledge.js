@@ -15,8 +15,8 @@ function getDailyKnowledge(date) {
   let BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   
   // 计算日干支（基于1900-01-01甲戌日）
-  const baseDate = new Date(1900, 0, 1);
-  const diff = Math.floor((date - baseDate) / 86400000);
+  // 2026-10-16 修复：UTC 绝对日差，防 1986-1991 夏令时/历史 LMT 致日柱差一天
+  const diff = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(1900, 0, 1)) / 86400000);
   const dayStemIdx = ((diff + 0) % 10 + 10) % 10; // 1900-01-01为甲戌日，甲=0
   const dayBranchIdx = ((diff + 10) % 12 + 12) % 12; // 戌=10
   const dayStem = STEMS[dayStemIdx];
