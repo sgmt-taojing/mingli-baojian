@@ -986,7 +986,18 @@ async function generateReport(){
     });
   }
 
-  // ③ 模块 KB 兜底（仅真正断网时启用；在线一律走下方 KB 检索 + AI 流式，本地模板为规则估算非真实排盘）
+  // ③ 断网兜底：优先真本地引擎（_getUnifiedReport 22 模块真排盘），未覆盖再退规则模板
+if(navigator.onLine === false){
+  try {
+    var _lr = localReport(state.module, state.data);
+    if (_lr && typeof _lr === 'string' && _lr.length > 50 && _lr.indexOf('报告生成引擎就绪') < 0) {
+      var _lrTxt = '【⚠️ 离线模式 · 本地真排盘引擎（非 AI 润色，联网后可重新生成更详尽解读）】\n\n' + _lr;
+      showReport(_lrTxt);
+      autoSavePaipan(_lrTxt);
+      return;
+    }
+  } catch(e){ console.warn('[offline localReport]', e); }
+}
 if(navigator.onLine === false && window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   try {
     const mr = _MODULE_REPORTS[state.module];
@@ -2922,8 +2933,8 @@ function _getUnifiedReport(modId,data){
     var monthGongIdx=(2+zm2-1)%12;
     var zShi=Math.floor((zh+1)/2)%12;var mingGongIdx=(monthGongIdx-zShi+12)%12;
     var shenGongIdx=(monthGongIdx+zShi)%12;
-    var yc2=(m===1||(m===2&&d<4))?zy-1:zy;
-    var yI2=((yc2-4)%10+10)%10;
+    var yI2=tg2.indexOf((zp.pillars['年']||'甲子')[0]); // 2026-10-16 修复：宫干年干以真排盘年柱为准（原误用未调立春的年份变量，1-2 月生人会错）
+    if(yI2<0)yI2=0;
     var mgGanIdx=(yI2*2+mingGongIdx+2)%10;
     var mgGan=tg2[mgGanIdx],mgZhi=dz12[mingGongIdx];
     var juMap={'甲子':'金六','乙丑':'金六','丙寅':'火四','丁卯':'火四','戊辰':'木三','己巳':'木三','庚午':'土五','辛未':'土五','壬申':'金六','癸酉':'金六','甲戌':'火四','乙亥':'火四','丙子':'水二','丁丑':'水二','戊寅':'土五','己卯':'土五','庚辰':'金六','辛巳':'金六','壬午':'木三','癸未':'木三','甲申':'水二','乙酉':'水二','丙戌':'土五','丁亥':'土五','戊子':'火四','己丑':'火四','庚寅':'木三','辛卯':'木三','壬辰':'水二','癸巳':'水二','甲午':'金六','乙未':'金六','丙申':'火四','丁酉':'火四','戊戌':'木三','己亥':'木三','庚子':'土五','辛丑':'土五','壬寅':'金六','癸卯':'金六','甲辰':'火四','乙巳':'火四','丙午':'水二','丁未':'水二','戊申':'土五','己酉':'土五','庚戌':'金六','辛亥':'金六','壬子':'木三','癸丑':'木三','甲寅':'水二','乙卯':'水二','丙辰':'土五','丁巳':'土五','戊午':'火四','己未':'火四','庚申':'木三','辛酉':'木三','壬戌':'水二','癸亥':'水二'}
