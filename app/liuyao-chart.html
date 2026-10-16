@@ -281,6 +281,7 @@ async function doPaipan(){
   if(!data.ok){showToast('排盘失败: '+data.error);return;}
   const svg = await rSvg.text();
   renderChart(data.chart);
+  if(window._solarNote) _solarNote(data.chart, document.getElementById('ly-meta'), {year:+y,month:+m,day:+d,hour:+h,minute:0,lng:lng});
   if(body.coins){const me=document.getElementById('ly-meta');me.innerHTML='<span style="color:var(--jade,#4ec9b0)">🪙 铜钱起卦（手动录入）</span><br>'+me.innerHTML;}
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
   if(window.PaipanBaihua) PaipanBaihua.notify('liuyao', body);
@@ -543,5 +544,7 @@ function renderYilinCard(y){
 <script src="js/paipan-baihua-panel.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 <script src="js/pro-gate.js" defer></script>
+<script src="js/true-solar-local.js?v=20261016a"></script>
+<script src="js/paipan-solar-note.js?v=20261016b"></script>
 </body>
 </html>

@@ -177,6 +177,7 @@ async function doPaipan(){
   window._lrKetiRef=data.ketiReference||null;
   const svg = await rSvg.text();
   renderChart(data.chart);
+  if(window._solarNote) _solarNote(data.chart, document.getElementById('lr-meta'), {year:+y,month:+m,day:+d,hour:+h,minute:0,lng:lng});
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
   if(window.PaipanBaihua) PaipanBaihua.notify('liuren', body);
   renderSvg(svg);
@@ -364,5 +365,7 @@ function renderInterpretation(i){
 <script src="js/paipan-tap-pop.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 <script src="js/pro-gate.js" defer></script>
+<script src="js/true-solar-local.js?v=20261016a"></script>
+<script src="js/paipan-solar-note.js?v=20261016b"></script>
 </body>
 </html>

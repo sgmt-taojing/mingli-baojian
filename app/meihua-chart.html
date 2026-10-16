@@ -182,6 +182,7 @@ async function doPaipan(){
   const svg = await rSvg.text();
   window._mhRef=data.meihuaReference||null;
   renderChart(data.chart);
+  if(window._solarNote) _solarNote(data.chart, document.getElementById('mh-meta'), {year:+y,month:+m,day:+d,hour:+h,minute:0,lng:lng});
   if(window.PaipanNav) PaipanNav.notifyChart(data.chart);
   if(window.PaipanBaihua) PaipanBaihua.notify('meihua', body);
   renderSvg(svg);
@@ -321,5 +322,7 @@ function renderInterpretation(i){
 <script src="js/paipan-tap-pop.js" defer></script>
   <script src="js/error-interceptor.js" defer></script>
 <script src="js/pro-gate.js" defer></script>
+<script src="js/true-solar-local.js?v=20261016a"></script>
+<script src="js/paipan-solar-note.js?v=20261016b"></script>
 </body>
 </html>
