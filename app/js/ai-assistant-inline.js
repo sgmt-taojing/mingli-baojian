@@ -3323,24 +3323,27 @@ function _getUnifiedReport(modId,data){
     // 简化的日子吉凶表
     var yiSet={'日常出行':['祭祀','出行','签约','会友'],'搬家入伙':['移徙','入宅','安床','祭祀'],'结婚嫁娶':['嫁娶','纳婿','祭祀','祈福'],'开业开张':['开市','开业','纳财','挂匾'],'动土装修':['修造','动土','竖柱','上梁'],'出行远行':['出行','赴任','远行'],'安葬':['安葬','破土','祭祀'],'祈福':['祈福','祭祀','斋醮'],'签约':['订盟','签署','交易'],'求财':['纳财','开市','交易'],'求子':['求嗣','安床','祭祀'],'就医':['求医','针灸'],'入学':['入学','拜师'],'交易':['交易','纳财'],'建造':['竖柱','上梁']}[zrEvent]||['祭祀','祈福'];
     var jiSet={'日常出行':['动土','安葬'],'搬家入伙':['破土','安葬'],'结婚嫁娶':['安葬','破土'],'开业开张':['安葬','诉讼'],'动土装修':['嫁娶','出行'],'出行远行':['动土','安葬'],'安葬':['嫁娶','开业'],'祈福':['诉讼','动土'],'签约':['诉讼','破土'],'求财':['诉讼','破财'],'求子':['安葬','诉讼'],'就医':['诉讼','安葬'],'入学':['诉讼','安葬'],'交易':['诉讼'],'建造':['嫁娶']}[zrEvent]||['诉讼','破土'];
-    // 当前日期2026年7月计算未来30天吉日
+    // 2026-10-16 修复：废弃硬编码 2026-07-20——以真实今日起算未来 30 天
     var bestDates=[];
-    var goodMonth=[1,3,5,7,9,11];// 农历奇数月
-    for(var _d=20;_d<=31;_d++)bestDates.push('2026年7月'+_d+'日');
-    for(var _d=1;_d<=20;_d++)bestDates.push('2026年8月'+_d+'日');
+    var _today=new Date();
+    for(var _i=1;_i<=30;_i++){var _dt=new Date(_today.getFullYear(),_today.getMonth(),_today.getDate()+_i);bestDates.push(_dt.getFullYear()+'年'+(_dt.getMonth()+1)+'月'+_dt.getDate()+'日');}
     var zrR='━━━ 择日择吉完整报告 ━━━\n\n';
     zrR+='【事项类型】'+zrEvent+'\n';
     zrR+='【择日时段】'+zrPeriod+'\n';
     zrR+='【求测人生辰】'+zrBirth+'｜'+zrSex+'\n\n';
     zrR+='━━━ 一、黄道黑道日 ━━━\n';
-    // 当前日干支
-    var today=new Date(2026,6,20);
-    var dayZhiIndex=Math.floor((today.getTime()-new Date(1900,0,1).getTime())/86400000)%12;
-    var todayZhi=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][dayZhiIndex];
-    var todayGong=tg12[dayZhiIndex];
-    zrR+='【今日】2026年7月20日(农历六月'+todayZhi+'日)\n';
+    // 2026-10-16 修复：今日干支/建除由 _paipan 真排（原以 1900 锚点 mod12 直推，干支与真日柱不符且日期硬编码 2026-07-20）
+    var today=_today;
+    var _tp=_paipan(today.getFullYear(),today.getMonth()+1,today.getDate(),12);
+    var todayGz=_tp.pillars['日'];
+    var _dzs='子丑寅卯辰巳午未申酉戌亥';
+    var todayGong=tg12[((_dzs.indexOf(todayGz[1])-_dzs.indexOf(_tp.pillars['月'][1]))%12+12)%12];
+    var _hdSet={'除':1,'危':1,'定':1,'执':1,'成':1,'开':1};// 口诀：建满平收黑，除危定执黄，成开皆可用，闭破不相当
+    zrR+='【今日】'+today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日（'+todayGz+'日）\n';
     zrR+='【值日】'+todayGong+'日('+tg12Act[todayGong]+')\n';
-    zrR+='【黄道/黑道】'+(['建','除','满','平','定','执','破','危','成','收','开','闭'].indexOf(todayGong)%2===0?'黄道日':'黑道日')+'\n\n';
+    zrR+='【黄道/黑道】'+(_hdSet[todayGong]?'黄道日':'黑道日')+'\n\n';
+    // 候选日信息：干支/建除同口径真排
+    function _zrInfo(str){var t=new Date(str.replace(/[年月日]/g,'-'));var p=_paipan(t.getFullYear(),t.getMonth()+1,t.getDate(),12);var g=p.pillars['日'];var jc=tg12[((_dzs.indexOf(g[1])-_dzs.indexOf(p.pillars['月'][1]))%12+12)%12];return{gz:g,gong:jc,bi:_dzs.indexOf(g[1])};}
     zrR+='━━━ 二、择日基本原则 ━━━\n';
     zrR+='【宜】选择黄道吉日+与主人八字相合\n';
     zrR+='【忌】月破/岁破/四废/往亡/劫煞日\n';
@@ -3356,15 +3359,15 @@ function _getUnifiedReport(modId,data){
     zrR+='┌──────────────┬─────────┬───────┐\n';
     zrR+='│ 日期         │ 值日    │ 等级  │\n';
     zrR+='├──────────────┼─────────┼───────┤\n';
-    bestDates.slice(0,12).forEach(function(d,i){var tmpDate=new Date(d.replace(/[年月日]/g,'-'));var gi=Math.floor((tmpDate.getTime()-new Date(1900,0,1).getTime())/86400000)%12;var gong=tg12[gi];var lv=gong==='开'||gong==='成'||gong==='定'?'★★★':gong==='建'||gong==='满'||gong==='除'?'★★':'★';zrR+='│ '+d+' │ '+gong+'日 │ '+lv+' │\n';});
+    bestDates.slice(0,12).forEach(function(d,i){var info=_zrInfo(d);var gong=info.gong;var lv=gong==='开'||gong==='成'||gong==='定'?'★★★':gong==='建'||gong==='满'||gong==='除'?'★★':'★';zrR+='│ '+d+' │ '+gong+'日 │ '+lv+' │\n';});
     zrR+='└──────────────┴─────────┴───────┘\n\n';
     zrR+='━━━ 五、最佳3日详解 ━━━\n';
     var best3=bestDates.slice(0,3);
     best3.forEach(function(d,i){
-      var tmpDate=new Date(d.replace(/[年月日]/g,'-'));var gi=Math.floor((tmpDate.getTime()-new Date(1900,0,1).getTime())/86400000)%12;var gong=tg12[gi];var dg=(((gi+1)*7+13)%10);var dz=(((gi)*5+2)%12);var dsT=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][dg];var dzS=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][dz];
+      var info=_zrInfo(d);var gong=info.gong;var gi=info.bi;
       zrR+='【第'+(i+1)+'推荐 · '+d+'】\n';
       zrR+='  值日：'+gong+'日('+tg12Act[gong]+')\n';
-      zrR+='  干支：'+dsT+dzS+'日\n';
+      zrR+='  干支：'+info.gz+'日\n';
       zrR+='  宜：'+yiSet.join('/')+'\n';
       zrR+='  吉时：卯时(5-7点)/巳时(9-11点)/酉时(17-19点)\n';
       zrR+='  凶方：'+['南','东','西','北'][gi%4]+'方不宜\n';
@@ -4419,24 +4422,27 @@ function _nayin(ys,yb){
     // 简化的日子吉凶表
     var yiSet={'日常出行':['祭祀','出行','签约','会友'],'搬家入伙':['移徙','入宅','安床','祭祀'],'结婚嫁娶':['嫁娶','纳婿','祭祀','祈福'],'开业开张':['开市','开业','纳财','挂匾'],'动土装修':['修造','动土','竖柱','上梁'],'出行远行':['出行','赴任','远行'],'安葬':['安葬','破土','祭祀'],'祈福':['祈福','祭祀','斋醮'],'签约':['订盟','签署','交易'],'求财':['纳财','开市','交易'],'求子':['求嗣','安床','祭祀'],'就医':['求医','针灸'],'入学':['入学','拜师'],'交易':['交易','纳财'],'建造':['竖柱','上梁']}[zrEvent]||['祭祀','祈福'];
     var jiSet={'日常出行':['动土','安葬'],'搬家入伙':['破土','安葬'],'结婚嫁娶':['安葬','破土'],'开业开张':['安葬','诉讼'],'动土装修':['嫁娶','出行'],'出行远行':['动土','安葬'],'安葬':['嫁娶','开业'],'祈福':['诉讼','动土'],'签约':['诉讼','破土'],'求财':['诉讼','破财'],'求子':['安葬','诉讼'],'就医':['诉讼','安葬'],'入学':['诉讼','安葬'],'交易':['诉讼'],'建造':['嫁娶']}[zrEvent]||['诉讼','破土'];
-    // 当前日期2026年7月计算未来30天吉日
+    // 2026-10-16 修复：废弃硬编码 2026-07-20——以真实今日起算未来 30 天
     var bestDates=[];
-    var goodMonth=[1,3,5,7,9,11];// 农历奇数月
-    for(var _d=20;_d<=31;_d++)bestDates.push('2026年7月'+_d+'日');
-    for(var _d=1;_d<=20;_d++)bestDates.push('2026年8月'+_d+'日');
+    var _today=new Date();
+    for(var _i=1;_i<=30;_i++){var _dt=new Date(_today.getFullYear(),_today.getMonth(),_today.getDate()+_i);bestDates.push(_dt.getFullYear()+'年'+(_dt.getMonth()+1)+'月'+_dt.getDate()+'日');}
     var zrR='━━━ 择日择吉完整报告 ━━━\n\n';
     zrR+='【事项类型】'+zrEvent+'\n';
     zrR+='【择日时段】'+zrPeriod+'\n';
     zrR+='【求测人生辰】'+zrBirth+'｜'+zrSex+'\n\n';
     zrR+='━━━ 一、黄道黑道日 ━━━\n';
-    // 当前日干支
-    var today=new Date(2026,6,20);
-    var dayZhiIndex=Math.floor((today.getTime()-new Date(1900,0,1).getTime())/86400000)%12;
-    var todayZhi=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][dayZhiIndex];
-    var todayGong=tg12[dayZhiIndex];
-    zrR+='【今日】2026年7月20日(农历六月'+todayZhi+'日)\n';
+    // 2026-10-16 修复：今日干支/建除由 _paipan 真排（原以 1900 锚点 mod12 直推，干支与真日柱不符且日期硬编码 2026-07-20）
+    var today=_today;
+    var _tp=_paipan(today.getFullYear(),today.getMonth()+1,today.getDate(),12);
+    var todayGz=_tp.pillars['日'];
+    var _dzs='子丑寅卯辰巳午未申酉戌亥';
+    var todayGong=tg12[((_dzs.indexOf(todayGz[1])-_dzs.indexOf(_tp.pillars['月'][1]))%12+12)%12];
+    var _hdSet={'除':1,'危':1,'定':1,'执':1,'成':1,'开':1};// 口诀：建满平收黑，除危定执黄，成开皆可用，闭破不相当
+    zrR+='【今日】'+today.getFullYear()+'年'+(today.getMonth()+1)+'月'+today.getDate()+'日（'+todayGz+'日）\n';
     zrR+='【值日】'+todayGong+'日('+tg12Act[todayGong]+')\n';
-    zrR+='【黄道/黑道】'+(['建','除','满','平','定','执','破','危','成','收','开','闭'].indexOf(todayGong)%2===0?'黄道日':'黑道日')+'\n\n';
+    zrR+='【黄道/黑道】'+(_hdSet[todayGong]?'黄道日':'黑道日')+'\n\n';
+    // 候选日信息：干支/建除同口径真排
+    function _zrInfo(str){var t=new Date(str.replace(/[年月日]/g,'-'));var p=_paipan(t.getFullYear(),t.getMonth()+1,t.getDate(),12);var g=p.pillars['日'];var jc=tg12[((_dzs.indexOf(g[1])-_dzs.indexOf(p.pillars['月'][1]))%12+12)%12];return{gz:g,gong:jc,bi:_dzs.indexOf(g[1])};}
     zrR+='━━━ 二、择日基本原则 ━━━\n';
     zrR+='【宜】选择黄道吉日+与主人八字相合\n';
     zrR+='【忌】月破/岁破/四废/往亡/劫煞日\n';
@@ -4452,15 +4458,15 @@ function _nayin(ys,yb){
     zrR+='┌──────────────┬─────────┬───────┐\n';
     zrR+='│ 日期         │ 值日    │ 等级  │\n';
     zrR+='├──────────────┼─────────┼───────┤\n';
-    bestDates.slice(0,12).forEach(function(d,i){var tmpDate=new Date(d.replace(/[年月日]/g,'-'));var gi=Math.floor((tmpDate.getTime()-new Date(1900,0,1).getTime())/86400000)%12;var gong=tg12[gi];var lv=gong==='开'||gong==='成'||gong==='定'?'★★★':gong==='建'||gong==='满'||gong==='除'?'★★':'★';zrR+='│ '+d+' │ '+gong+'日 │ '+lv+' │\n';});
+    bestDates.slice(0,12).forEach(function(d,i){var info=_zrInfo(d);var gong=info.gong;var lv=gong==='开'||gong==='成'||gong==='定'?'★★★':gong==='建'||gong==='满'||gong==='除'?'★★':'★';zrR+='│ '+d+' │ '+gong+'日 │ '+lv+' │\n';});
     zrR+='└──────────────┴─────────┴───────┘\n\n';
     zrR+='━━━ 五、最佳3日详解 ━━━\n';
     var best3=bestDates.slice(0,3);
     best3.forEach(function(d,i){
-      var tmpDate=new Date(d.replace(/[年月日]/g,'-'));var gi=Math.floor((tmpDate.getTime()-new Date(1900,0,1).getTime())/86400000)%12;var gong=tg12[gi];var dg=(((gi+1)*7+13)%10);var dz=(((gi)*5+2)%12);var dsT=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'][dg];var dzS=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'][dz];
+      var info=_zrInfo(d);var gong=info.gong;var gi=info.bi;
       zrR+='【第'+(i+1)+'推荐 · '+d+'】\n';
       zrR+='  值日：'+gong+'日('+tg12Act[gong]+')\n';
-      zrR+='  干支：'+dsT+dzS+'日\n';
+      zrR+='  干支：'+info.gz+'日\n';
       zrR+='  宜：'+yiSet.join('/')+'\n';
       zrR+='  吉时：卯时(5-7点)/巳时(9-11点)/酉时(17-19点)\n';
       zrR+='  凶方：'+['南','东','西','北'][gi%4]+'方不宜\n';
