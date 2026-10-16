@@ -86,7 +86,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <select id="fs-building-type" aria-label="建筑类型"><option value="">-- 类型(可选) --</option><option value="apartment">公寓</option><option value="house">独立屋/别墅</option><option value="shop">商铺</option><option value="office">办公室</option><option value="factory">厂房</option></select>
   <select id="fs-floor" aria-label="楼层"><option value="">-- 楼层(可选) --</option><option value="1">1F</option><option value="2">2F</option><option value="3">3F</option><option value="4">4F</option><option value="5">5F</option><option value="6">6F</option><option value="7">7F</option><option value="8">8F+</option></select>
   <input aria-label="出生年份" type="number" id="fs-birth-year" placeholder="命主出生年(可选,如1985)" min="1900" max="2100" style="grid-column:1/-1">
-  <input aria-label="经度" type="number" id="fs-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="宅址经度（用于真太阳时校正）">
+  <input aria-label="经度" type="number" id="fs-lng" placeholder="经度(选填·📍定位/手填)"  step="0.01" min="73" max="135" title="宅址经度（用于真太阳时校正）">
   <input aria-label="流年" type="number" id="fs-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年飞星的目标年份">
   <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px;grid-column:1/-1"><input  type="checkbox" id="fs-annual" style="width:auto" checked aria-label="fs annual"> 排流年飞星</label>
   <button onclick="doPaipan()">排盘</button>
@@ -152,11 +152,11 @@ async function doPaipan(){
   const annual = document.getElementById('fs-annual').checked;
   // R474-G: 经度（真太阳时）+ 流年
   const lngEl = document.getElementById('fs-lng');
-  const lng = lngEl ? (+lngEl.value || 121.47) : 121.47;
+  const lng = (window._paipanGeo ? _paipanGeo.read('fs-lng',73,135) : (lngEl && lngEl.value!=='' ? +lngEl.value : null));
   const tyEl = document.getElementById('fs-target-year');
   const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
   const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
-  const body={year:+y,sittingMountain:s,facingMountain:f,name,buildingType,floor:floor?+floor:null,birthYear:birthYear?+birthYear:null,annual,lng,targetYear,lang:_lang };
+  const body={year:+y,sittingMountain:s,facingMountain:f,name,buildingType,floor:floor?+floor:null,birthYear:birthYear?+birthYear:null,annual,...(lng!=null?{lng}:{}),targetYear,lang:_lang };
   if(birthYear) body.currentAge = +targetYear - +birthYear;
   let r, rSvg;
   try {
@@ -355,13 +355,15 @@ function renderCanonCard(cn){
   <script src="js/mobile-nav.js?v=20261016a"></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
-<script src="js/paipan-navigator.js?v=20261016a" defer></script>
+<script src="js/paipan-navigator.js?v=20261016b" defer></script>
 <script src="js/paipan-tap-pop.js?v=20261016a" defer></script>
 <script src="js/paipan-baihua-panel.js?v=20261016a" defer></script>
   <script src="js/error-interceptor.js?v=20261016a" defer></script>
 <script>document.addEventListener('DOMContentLoaded', function(){ try { I18N.init(); } catch(e){} });</script>
 <script src="js/pro-gate.js?v=20261016a" defer></script>
 <script src="js/true-solar-local.js?v=20261016a"></script>
+<script src="js/paipan-geo.js?v=20261016a"></script>
 <script src="js/paipan-solar-note.js?v=20261016b"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){if(window._paipanGeo)_paipanGeo.attach("fs-lng");});</script>
 </body>
 </html>

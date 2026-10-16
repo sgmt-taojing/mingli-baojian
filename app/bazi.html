@@ -1023,11 +1023,21 @@ async function generateBaziReport(){
   else bindBaziTap();
 })();
 </script>
-<script src="js/paipan-navigator.js?v=20261016a" defer></script>
+<script src="js/paipan-navigator.js?v=20261016b" defer></script>
 <script src="js/paipan-baihua-panel.js?v=20261016a" defer></script>
 <script src="js/paipan-tap-pop.js?v=20261016a" defer></script>
 <script src="js/i18n.js?v=708i18n" defer></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
+<script src="js/paipan-geo.js?v=20261016a"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){
+  if(!window._paipanGeo) return;
+  _paipanGeo.attach("pf_bpLng"); _paipanGeo.attach("baziLng");
+  // 2026-10-16：主表单 baziLng 与专业面板 pf_bpLng 空值互同步，防两处经度不一致
+  var a=document.getElementById("baziLng"),b=document.getElementById("pf_bpLng");
+  function sync(src,dst){if(src&&dst&&dst.value===''&&src.value!==''){dst.value=src.value;}}
+  if(a) a.addEventListener("change",function(){sync(a,b);});
+  if(b) b.addEventListener("change",function(){sync(b,a);});
+});</script>
 </body>
 </html>

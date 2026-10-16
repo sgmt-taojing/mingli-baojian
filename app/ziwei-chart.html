@@ -172,7 +172,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <input aria-label="月" type="number" id="zw-month" placeholder="月" value="10" min="1" max="12">
   <input aria-label="日" type="number" id="zw-day" placeholder="日" value="28" min="1" max="31">
   <input aria-label="时" type="number" id="zw-hour" placeholder="时" value="7" min="0" max="23">
-  <input aria-label="出生地经度" type="number" id="zw-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
+  <input aria-label="出生地经度" type="number" id="zw-lng" placeholder="经度(选填·📍定位/手填)"  step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
   <input aria-label="流年" type="number" id="zw-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年运势的目标年份">
   <label style="font-size:11px;color:var(--paper3);display:flex;align-items:center;gap:4px"><input  type="checkbox" id="zw-leap" style="width:auto" aria-label="zw leap"> 闰月</label>
   <button onclick="doPaipan()">排盘</button>
@@ -237,7 +237,7 @@ async function doPaipan(){
   const h=document.getElementById('zw-hour').value;
   const s=document.getElementById('zw-sex').value;
   const lngEl = document.getElementById('zw-lng');
-  const lng = lngEl ? (+lngEl.value || 121.47) : 121.47;
+  const lng = (window._paipanGeo ? _paipanGeo.read('zw-lng',73,135) : (lngEl && lngEl.value!=='' ? +lngEl.value : null));
   if(!y||!m||!d||h===''){showToast('请填写完整的年月日时');return;}
   const name = document.getElementById('zw-name').value || '';
   const isLunar = zwCalMode === 'lunar';
@@ -246,7 +246,7 @@ async function doPaipan(){
   const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
   const now = new Date();
   const currentAge = now.getFullYear() - +y;
-  const payload = {year:+y,month:+m,day:+d,hour:+h,minute:30,sex:s,name,isLunar,leapMonth:leap,lng,targetYear,currentAge};
+  const payload = {year:+y,month:+m,day:+d,hour:+h,minute:30,sex:s,name,isLunar,leapMonth:leap,...(lng!=null?{lng}:{}),targetYear,currentAge};
   let rJson, rSvg;
   try {
     [rJson, rSvg] = await Promise.all([
@@ -521,7 +521,8 @@ function renderChart(c){
   const meta=document.getElementById('zw-meta');
   // 2026-10-16：真太阳时校正披露（经度默认 121.47°E，必须让用户看见校正值）
   const si=c.solarInfo;
-  const solarHtml=(si&&si.applied)?'<br><span style="color:#7dd3c0;font-size:11px">【真太阳时】经度 '+esc(si.lng)+'°E · 校正 '+(si.correction_minutes>0?'+':'')+esc(si.correction_minutes)+' 分钟 → 真太阳时 '+si.true_hour+':'+('0'+si.true_minute).slice(-2)+'</span>':'';
+  const solarHtml=(si&&si.applied)?'<br><span style="color:#7dd3c0;font-size:11px">【真太阳时】经度 '+esc(si.lng)+'°E · 校正 '+(si.correction_minutes>0?'+':'')+esc(si.correction_minutes)+' 分钟 → 真太阳时 '+si.true_hour+':'+('0'+si.true_minute).slice(-2)+'</span>'
+    :'<br><span style="color:#7dd3c0;font-size:11px;opacity:.75">【真太阳时】未校正（东八区标准时）；点输入框旁 📍 定位或手填出生地经度可校正</span>';
   meta.innerHTML=`${c.yearGanZhi}年 · ${c.wuxingJu} · 命宫：${c.mingGong}<br>`+
     `<span>命主:${c.mingZhu||''}</span><span>身主:${c.shenZhu||''}</span>`+
     `<span>截空:${(c.jieKong||[]).join('、')}</span><span>旬空:${(c.xunKong||[]).join('、')}</span>`+solarHtml;
@@ -668,10 +669,12 @@ function renderInterpretation(i){
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
 </div>
-<script src="js/paipan-navigator.js?v=20261016a" defer></script>
+<script src="js/paipan-navigator.js?v=20261016b" defer></script>
 <script src="js/paipan-baihua-panel.js?v=20261016a" defer></script>
 <script src="js/paipan-tap-pop.js?v=20261016a" defer></script><!-- R-TAP-Z：🔮点读弹层 -->
 <script src="js/pro-gate.js?v=20261016a" defer></script><!-- R-FIX-ZWPRO：页面 249 行用 proFetch 拉 SVG 但漏引此文件，致排盘流程静默中断 -->
   <script src="js/error-interceptor.js?v=20261016a" defer></script>
+<script src="js/paipan-geo.js?v=20261016a"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){if(window._paipanGeo)_paipanGeo.attach("zw-lng");});</script>
 </body>
 </html>

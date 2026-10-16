@@ -136,7 +136,7 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
   <input aria-label="日" type="number" id="qm-day" placeholder="日" min="1" max="31" value="2">
   <input aria-label="时" type="number" id="qm-hour" placeholder="时(0-23)" min="0" max="23" value="10">
   <input aria-label="占事" type="text" id="qm-question" placeholder="所问何事(可选)" maxlength="50">
-  <input aria-label="出生地经度" type="number" id="qm-lng" placeholder="经度(默认121.47)" value="121.47" step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
+  <input aria-label="出生地经度" type="number" id="qm-lng" placeholder="经度(选填·📍定位/手填)"  step="0.01" min="73" max="135" title="出生地经度（用于真太阳时校正）">
   <input aria-label="流年" type="number" id="qm-target-year" placeholder="流年" value="2026" min="1900" max="2100" title="查流年运势的目标年份">
   <button onclick="doPaipan()">排盘</button>
 
@@ -203,13 +203,13 @@ async function doPaipan(){
   const sex = document.getElementById('qm-sex').value;
   const question = document.getElementById('qm-question').value || '';
   const lngEl = document.getElementById('qm-lng');
-  const lng = lngEl ? (+lngEl.value || 121.47) : 121.47;
+  const lng = (window._paipanGeo ? _paipanGeo.read('qm-lng',73,135) : (lngEl && lngEl.value!=='' ? +lngEl.value : null));
   const tyEl = document.getElementById('qm-target-year');
   const targetYear = tyEl ? (+tyEl.value || new Date().getFullYear()) : new Date().getFullYear();
   const now = new Date();
   const currentAge = now.getFullYear() - +y;
   const _lang = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh')) ? 'en' : 'zh';
-  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,lng,targetYear,currentAge,lang:_lang };
+  const body = {year:+y,month:+m,day:+d,hour:+h,name,sex,...(lng!=null?{lng}:{}),targetYear,currentAge,lang:_lang };
   if(question) body.question = question;
   window._qmBody = body; // R-PALACE-TAP: 点宫解读复用同一排盘参数
   let r, rSvg;
@@ -436,11 +436,13 @@ function renderInterpretation(i){
 <script src="js/mobile-nav.js?v=20261016a"></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
-<script src="js/paipan-navigator.js?v=20261016a" defer></script>
+<script src="js/paipan-navigator.js?v=20261016b" defer></script>
 <script src="js/paipan-baihua-panel.js?v=20261016a" defer></script>
   <script src="js/error-interceptor.js?v=20261016a" defer></script>
 <script src="js/pro-gate.js?v=20261016a" defer></script>
 <script src="js/true-solar-local.js?v=20261016a"></script>
+<script src="js/paipan-geo.js?v=20261016a"></script>
 <script src="js/paipan-solar-note.js?v=20261016b"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){if(window._paipanGeo)_paipanGeo.attach("qm-lng");});</script>
 </body>
 </html>

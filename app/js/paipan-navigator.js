@@ -45,6 +45,7 @@
       var sex = (document.getElementById('baziSex') || {}).value;
       if (sex) s.sex = sex;
       var lng = (document.getElementById('baziLng') || {}).value;
+      if (!lng) lng = (document.getElementById('pf_bpLng') || {}).value; // 2026-10-16：专业面板经度兜底
       if (lng) s.lng = +lng;
       var ty = (document.getElementById('baziTargetYear') || {}).value;
       if (ty) s.targetYear = +ty;
@@ -138,6 +139,14 @@
     bar.style.cssText = 'height:100%;width:' + data.coverage.percent + '%;background:var(--gold,#c9a84c);transition:width .4s';
     barWrap.appendChild(bar);
     panel.appendChild(barWrap);
+
+    // 2026-10-16：明确导航为建议非门控——信息不全可直接排盘，精度随补齐提升
+    if (data.coverage.percent < 100) {
+      var free = document.createElement('div');
+      free.style.cssText = 'color:var(--paper3,#8b7e6a);font-size:10px;margin-bottom:8px;opacity:.8';
+      free.textContent = '以上为精度建议，非必填；信息不全也可直接排盘，随时补齐后重排更准。';
+      panel.appendChild(free);
+    }
 
     if (!data.followups.length) {
       var done = document.createElement('div');

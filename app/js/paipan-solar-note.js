@@ -22,6 +22,10 @@
       if(r.applied) txt = '【真太阳时】经度 ' + r.lng + '°E · 校正 ' + (r.correction_minutes > 0 ? '+' : '') + r.correction_minutes +
             ' 分钟 → 真太阳时 ' + r.true_hour + ':' + ('0' + r.true_minute).slice(-2) + '（Spencer 1971）';
     }
+    // 2026-10-16：未校正也如实披露（定夺口径：经度由定位/手填获得，无则按东八区标准时）
+    if(!txt && info){
+      txt = '【真太阳时】未校正（东八区标准时）；点输入框旁 📍 定位或手填出生地经度可校正';
+    }
     if(!txt) return;
     var div = document.createElement('div');
     div.id = 'pp-solar-note';
