@@ -10,6 +10,28 @@
   var FACE_OCR = 'http://127.0.0.1:8913';
   var PAIPAN_API = 'http://127.0.0.1:8911';
   var TTS_API = 'http://127.0.0.1:8912';
+  // 2026-10-17：病历服务端签名链接入——api-v2(8920) 承载 /api/clinic/* 病例链
+  var CLINIC_API = (location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '';
+  var _csrfToken = '';
+  function fetchCsrfToken(){
+    if(_csrfToken) return Promise.resolve(_csrfToken);
+    return fetch(CLINIC_API + '/api/csrf-token', { signal: AbortSignal.timeout(5000) })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ _csrfToken = d.csrfToken || ''; return _csrfToken; });
+  }
+  function clinicPost(path, body){
+    return fetchCsrfToken().then(function(token){
+      return fetch(CLINIC_API + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(8000)
+      }).then(function(r){ return r.json(); });
+    });
+  }
+
+  // 2026-10-17：全文件共用 HTML 转义（报告/病例列表等用户输入落 DOM 处一律走这里）
+  function escH(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   // ===== 患者管理 =====
 
@@ -1366,12 +1388,15 @@
       return;
     }
 
-    // 收集诊断结果
+    // 收集诊断结果（2026-10-17：剔除面板占位文案「…将显示在此」，防占位符混入病历主诉）
     var resultPanel = document.getElementById('wangzhen-result-panel');
     var diagnosisText = resultPanel ? resultPanel.textContent.trim() : '';
+    if(/将显示在此|等待|暂无/.test(diagnosisText) && diagnosisText.length < 30) diagnosisText = '';
     var voiceText = ((document.getElementById('wz-voice-text') || {}).value || '').trim();
     var aiResult = ((document.getElementById('wz-ai-result') || {}).textContent || '').trim();
+    if(/将显示在此|暂无|等待/.test(aiResult) && aiResult.length < 30) aiResult = '';
     var paipanText = ((document.getElementById('wz-paipan-result') || {}).textContent || '').trim();
+    if(/将显示在此|暂无|待排盘/.test(paipanText) && paipanText.length < 30) paipanText = '';
 
     // 2026-10-17：证据门控——空诊断不得保存为病例（原：点保存即 ✅，空壳污染病历库）
     var evidence = [];
@@ -1397,9 +1422,66 @@
       timestamp: new Date().toISOString()
     };
     saveToLocal(payload);
-    showToast('✅ 诊断已保存（含：' + evidence.join('、') + '）');
     completeStep(5);
     renderSavedCases(payload.patient_id);
+
+    // 2026-10-17：接入服务端病历签名链——建档(幂等)→创建诊疗记录(pending_master)→双师审核台队列
+    // 服务端不可达时如实降级：仅本机暂存，不冒充已入队
+    showToast('⏳ 已本机暂存，正在同步服务端审核队列…');
+    syncCaseToServer(currentPatient, payload)
+      .then(function(caseId){
+        payload.server_case_id = caseId;
+        updateLocalCaseId(payload.timestamp, caseId);  // 就地补记病例号，不产生重复条目
+        renderSavedCases(payload.patient_id);
+        showToast('✅ 已入审核队列（病例 #' + caseId + '，含：' + evidence.join('、') + '），待医师/命理师审核签名');
+      })
+      .catch(function(err){
+        console.warn('[wangzhen] 服务端同步失败:', err);
+        showToast('⚠️ 服务端不可达：诊断仅本机暂存（含：' + evidence.join('、') + '），未入审核队列', 'warning');
+      });
+  }
+
+  // 患者建档（幂等：服务端按手机号/姓名+生日复用档案）→ 创建诊疗记录
+  function syncCaseToServer(patient, payload){
+    function ensurePatient(){
+      if(patient.server_id) return Promise.resolve(patient.server_id);
+      var bazi = patient.bazi || {};
+      var birthDate = (bazi.y && bazi.m && bazi.d)
+        ? bazi.y + '-' + String(bazi.m).padStart(2, '0') + '-' + String(bazi.d).padStart(2, '0') : '';
+      return clinicPost('/api/clinic/patient', {
+        name: patient.name || '',
+        sex: patient.gender || '',
+        birth_date: birthDate,
+        birth_hour: (bazi.h !== '' && bazi.h !== undefined) ? parseInt(bazi.h) : null,
+        phone: patient.phone || ''
+      }).then(function(d){
+        if(!d || d.error || !d.data || !d.data.patient_id) throw new Error('建档失败: ' + ((d && (d.message || (d.data && d.data.error))) || 'no patient_id'));
+        patient.server_id = d.data.patient_id;
+        // 回写本机患者档案，下次直接复用
+        try {
+          var list = JSON.parse(localStorage.getItem('mlbj_doctor_patients') || '[]');
+          for(var i = 0; i < list.length; i++){
+            if(list[i].id === patient.id){ list[i].server_id = patient.server_id; break; }
+          }
+          localStorage.setItem('mlbj_doctor_patients', JSON.stringify(list));
+        } catch(e) {}
+        return patient.server_id;
+      });
+    }
+    return ensurePatient().then(function(serverId){
+      var symptoms = [payload.diagnosis_text, payload.voice_notes].filter(function(s){ return s && s.length; }).join('\n');
+      if(!symptoms) symptoms = payload.ai_analysis || payload.paipan_text || '望诊记录';
+      return clinicPost('/api/clinic/case', {
+        patient_id: serverId,
+        symptoms: symptoms.slice(0, 2000),
+        constitution: (payload.ai_analysis || '').slice(0, 500),
+        paipan_summary: (payload.paipan_text || '').slice(0, 1000),
+        paipan_ref: { source: 'wangzhen-clinical', evidence_sections: payload.evidence_sections, ts: payload.timestamp }
+      }).then(function(d){
+        if(!d || d.error || !d.data || !d.data.case_id) throw new Error('病例创建失败: ' + ((d && (d.message || (d.data && d.data.error))) || 'no case_id'));
+        return d.data.case_id;
+      });
+    });
   }
 
   function saveToLocal(payload){
@@ -1408,6 +1490,18 @@
     history.unshift(payload);
     if(history.length > 50) history = history.slice(0, 50);
     localStorage.setItem(key, JSON.stringify(history));
+  }
+
+  // 服务端同步成功后，就地补记病例号（按 timestamp 定位，不产生重复条目）
+  function updateLocalCaseId(timestamp, caseId){
+    try {
+      var key = 'wz_diagnosis_history';
+      var history = JSON.parse(localStorage.getItem(key) || '[]');
+      for(var i = 0; i < history.length; i++){
+        if(history[i].timestamp === timestamp){ history[i].server_case_id = caseId; break; }
+      }
+      localStorage.setItem(key, JSON.stringify(history));
+    } catch(e) {}
   }
 
   function renderSavedCases(userId){
@@ -1425,9 +1519,13 @@
     var html = '';
     patientCases.forEach(function(h, i){
       var realIdx = history.indexOf(h);
+      // 2026-10-17：☁️=已入服务端审核队列（带病例号），💾=仅本机暂存——状态如实区分；文本一律转义
+      var syncBadge = h.server_case_id
+        ? '<span title="已入服务端审核队列" style="color:#2a7">☁️ 病例#' + h.server_case_id + '</span> '
+        : '<span title="仅本机暂存，未入审核队列" style="color:#b80">💾 本机</span> ';
       html += '<div class="wz-case-item" onclick="window.wangzhenClinical.showCaseDetail(' + realIdx + ')" style="cursor:pointer">';
-      html += '<div class="wz-case-date">'+(h.timestamp||'').substring(0,16)+'</div>';
-      html += '<div class="wz-case-text">'+(h.diagnosis_text||'').substring(0,80)+'...</div>';
+      html += '<div class="wz-case-date">' + syncBadge + escH((h.timestamp||'').substring(0,16)) + '</div>';
+      html += '<div class="wz-case-text">' + escH((h.diagnosis_text||'').substring(0,80)) + '...</div>';
       html += '</div>';
     });
     container.innerHTML = html;
@@ -1440,14 +1538,16 @@
       return;
     }
 
-    // 2026-10-17：报告内容一律转义（患者姓名等用户输入原样写入 HTML 有 XSS 风险）
-    function escH(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    // 2026-10-17：报告内容一律转义（escH 已提升至 IIFE 顶层，全文件共用）
 
     var resultPanel = document.getElementById('wangzhen-result-panel');
     var diagnosisText = resultPanel ? resultPanel.textContent.trim() : '';
+    if(/将显示在此|等待|暂无/.test(diagnosisText) && diagnosisText.length < 30) diagnosisText = '';
     var voiceText = ((document.getElementById('wz-voice-text') || {}).value || '').trim();
     var aiResult = ((document.getElementById('wz-ai-result') || {}).textContent || '').trim();
+    if(/将显示在此|暂无|等待/.test(aiResult) && aiResult.length < 30) aiResult = '';
     var paipanText = ((document.getElementById('wz-paipan-result') || {}).textContent || '').trim();
+    if(/将显示在此|暂无|待排盘/.test(paipanText) && paipanText.length < 30) paipanText = '';
 
     // 2026-10-17：完整性披露——报告顶部如实列出已采集/未采集证据，空壳段落不进报告
     var secState = [
