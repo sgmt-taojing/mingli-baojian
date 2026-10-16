@@ -236,6 +236,8 @@ const TOOLS = [
   // 号码吉凶：日常所用
   { id:'mobile',  ico:'📱', nm:'手机号吉凶', ds:'数理+命局喜用 选号建议', need:'textopt', ph:'输入手机号（11位）', prompt:'请把手机号发给我（只用于数理分析）。出生年月日选填——填了我按您的命局喜用测契合、精挑尾号，不填按数理通法评测：' },
   { id:'chepai',  ico:'🚗', nm:'车牌号吉凶', ds:'选号参考 数字形态', need:'text', ph:'输入车牌 如 粤A6688', prompt:'请把车牌号发给我（汉字字母都行，如 粤A6688）：' },
+  { id:'shuli81', ico:'🔢', nm:'81数理解析', ds:'任意数字 吉凶五行', need:'textopt', ph:'输入正整数 如24', prompt:'把想查的数发给我（手机号/车牌/姓名总格数都行，正整数）。出生年月日选填——填了我按您的命局看本命生克：' },
+  { id:'floor',   ico:'🚪', nm:'楼层门牌', ds:'河图楼层 本命宜忌', need:'textopt', ph:'楼层或门牌号 如8', prompt:'把楼层或门牌号发给我（如 8、18、2803）。出生年月日选填——填了我按您的命局看居住宜忌：' },
   // 风水堪舆：住宅办公
   { id:'fengshui',ico:'🏠', nm:'风水堪舆', ds:'住宅办公 方位吉凶', need:'facing' },
   // 人生规划：阶段与路径
@@ -263,7 +265,7 @@ const GROUPS = [
 ];
 const G_OF = { liuyao:0, meihua:0, qimen:0, liuren:0, bazi:1, ziwei:1, lifeindex:1, tizhi:1,
   liunian:2, lifeflow:2, lifetimeline:2, hehun:3, qiming:4, gaiming:4, gongsi:4, xingming:4,
-  mobile:5, chepai:5, fengshui:6, lifeplan:7, huangli:8, lucky:8 };
+  mobile:5, chepai:5, shuli81:5, floor:5, fengshui:6, lifeplan:7, huangli:8, lucky:8 };
 let _gHtml = '', _lastG = -1;
 TOOLS.forEach(t => {
   const g = G_OF[t.id] != null ? G_OF[t.id] : 0;
@@ -460,6 +462,7 @@ function collectBirth(skip) {
     if (!v) { bot(state.tool.prompt || '请先输入内容。'); return; }
     if (state.tool.id === 'mobile' && v.replace(/\D/g, '').length < 7) { bot('手机号至少 7 位数字哦。'); return; }
     if (state.tool.id === 'xingming' && (v.length < 2 || v.length > 4)) { bot('姓名一般 2-4 个字（连名带姓一起填）。'); return; }
+    if ((state.tool.id === 'shuli81' || state.tool.id === 'floor') && !(+v >= 1)) { bot('请输入正整数（1 起，如 24 / 8）。'); return; }
     const opt = (y && m && d) ? { year:y, month:m, day:d, hour: $('bHour').value === '' ? 12 : +$('bHour').value } : {};
     state.birth = { text: v, sex: state.sex, ...opt };
     me(v + (opt.year ? ` · ${y}年${m}月${d}日生` : ''));
@@ -617,6 +620,24 @@ async function fetchToolResult() {
     const r = await fetch(`${API}/api/minsu/plate?number=${encodeURIComponent(state.birth.text)}`, { signal: AbortSignal.timeout(12000) });
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || '分析失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 81 数理解析（R-SHULI81：数理五行推导，非古籍断语——口径由服务端白话 tips 披露）
+  if (t === 'shuli81') {
+    const bp = state.birth.year ? `&birthYear=${state.birth.year}` : '';
+    const r = await fetch(`${API}/api/minsu/shuli81?n=${encodeURIComponent(state.birth.text)}${bp}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '解析失败');
+    if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
+    return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
+  }
+  // 楼层门牌（R-FLOOR：河图楼层法+本命生克宜忌）
+  if (t === 'floor') {
+    const bp = state.birth.year ? `&birthYear=${state.birth.year}` : '';
+    const r = await fetch(`${API}/api/minsu/floor?n=${encodeURIComponent(state.birth.text)}${bp}`, { signal: AbortSignal.timeout(12000) });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || '解析失败');
     if (!j.baihua || !j.baihua.ok) throw new Error('白话解读生成失败');
     return { kind:'minsu', baihua: j.baihua, toolName: state.tool.nm };
   }

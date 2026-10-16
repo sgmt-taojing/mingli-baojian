@@ -1,3 +1,9 @@
+# 2026-10-16 19:40 — ✅ 全平台文字占位标识图标化(694处)+ask双端拉齐81数理/楼层门牌 ·Kimi
+
+- **图标化**：单字占位标识（夜/珠/语/锁/财/店…共 61 种字）全平台两轮治理——v1 白名单 89 处/32 文件，v2 智能 codemod 605 处 SVG + 40 处 option 剥字/94 文件；48 种形象 SVG 图标（月亮/太极/聊泡/锁/钥匙/铜钱/店铺/佛珠/编钟/警示…）内联 currentColor，字间距排版（金 钱 课/返 回 首 页等 44 处）与正文巧合（剩 12.5h/第 1 爻等 61 字）人工甄别保留。codemod 沉淀 scripts/iconize-markers{,-v2}.py 可复跑。
+- **实测**：ai-assistant 快捷区/nav 8 SVG ✅、privacy-center ✅、divination-knowledge 26 tab ✅、report-interpret/wangzhen-clinical/wechat-hub/tizhi/admin 零残留 ✅、console 0 错误。
+- **双端拉齐**：ask.html 新增「81数理解析/楼层门牌」两卡（textopt 流·生辰选填带本命生克）+ 服务端 minsu-baihua-engine 补 shuli81/floor 白话 builder（双端同源）+ 金漆标题图 ask-shuli81/ask-floor.png（SimSong 金字+红印章同款式）。深链 ?tool=shuli81/?tool=floor 全流程实测：白话总览+「非古籍断语」口径披露上屏 ✅ 0 错误。
+
 # 2026-10-16 18:50 — ✅ 全站诊断审计+P0根治：AI助手32模块编造报告短路收编，81数理/楼层门牌上线 ·Kimi
 
 - **审计**：端点 21 项全过、页面 20 页全 200（docs/AUDIT-20261016.md）。
