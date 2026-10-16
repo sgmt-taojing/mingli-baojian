@@ -1229,6 +1229,10 @@
     if(!window.fetch) return; // jsdom guard
     var params = 'year='+bazi.year+'&month='+bazi.month+'&day='+bazi.day+'&hour='+bazi.hour;
     if(bazi.lunar) params += '&lunar=1';
+    // 2026-10-16：出生地经度→真太阳时校正（服务端 /paipan 支持 &lng=，留空按东八区标准时）
+    var _lngEl = document.getElementById('wz-bazi-lng');
+    var _lng = _lngEl && _lngEl.value !== '' ? parseFloat(_lngEl.value) : null;
+    if(_lng !== null && !isNaN(_lng) && _lng >= 73 && _lng <= 135) params += '&lng=' + _lng;
     fetch(PAIPAN_API + '/paipan?'+params,{signal:AbortSignal.timeout(15000)})
       .then(function(r){ return r.json(); })
       .then(function(data){
@@ -1294,6 +1298,8 @@
     // 生肖
     if(xiao) html += '<div class="pd-row"><span>生肖</span><b>'+xiao+'</b></div>';
     if(lunar) html += '<div class="pd-row"><span>农历</span><b style="font-size:11px">'+lunar+'</b></div>';
+    // 2026-10-16：真太阳时校正披露（与排盘页/ai-assistant 同口径）
+    if(d.input && d.input.true_solar) html += '<div class="pd-row"><span>真太阳时</span><b style="font-size:11px;color:#7dd3c0">'+d.input.true_solar+(d.input.correction?' · '+d.input.correction:'')+'</b></div>';
     
     // 神煞
     var ssKeys = Object.keys(shensha);

@@ -519,9 +519,12 @@ function zwSelPalace(b){_zwSel=(_zwSel===b?-1:b);buildPro();}
 function renderChart(c){
   _zwChart=c;
   const meta=document.getElementById('zw-meta');
+  // 2026-10-16：真太阳时校正披露（经度默认 121.47°E，必须让用户看见校正值）
+  const si=c.solarInfo;
+  const solarHtml=(si&&si.applied)?'<br><span style="color:#7dd3c0;font-size:11px">【真太阳时】经度 '+esc(si.lng)+'°E · 校正 '+(si.correction_minutes>0?'+':'')+esc(si.correction_minutes)+' 分钟 → 真太阳时 '+si.true_hour+':'+('0'+si.true_minute).slice(-2)+'</span>':'';
   meta.innerHTML=`${c.yearGanZhi}年 · ${c.wuxingJu} · 命宫：${c.mingGong}<br>`+
     `<span>命主:${c.mingZhu||''}</span><span>身主:${c.shenZhu||''}</span>`+
-    `<span>截空:${(c.jieKong||[]).join('、')}</span><span>旬空:${(c.xunKong||[]).join('、')}</span>`;
+    `<span>截空:${(c.jieKong||[]).join('、')}</span><span>旬空:${(c.xunKong||[]).join('、')}</span>`+solarHtml;
   buildPro();
 }
 
