@@ -1,3 +1,12 @@
+# 2026-10-16 16:35 — ✅ yijing-qimen.html 专业排盘工具三重假清零（全站普查收官） ·Kimi
+
+- **普查结论**：12 个排盘页中 10 页接真引擎（bazi/ziwei/fengshui/liuren/liuyao/meihua/qimen-chart、paipan-center/quick、zhanbu），仅 yijing-qimen.html（面向命理师的专业工具页）三重全假。
+- **假一·掷钱必少阴**：yjCastCoins 的 total 恒为 8（3+2+3 固定），铜钱显示硬编码「字背字」，所有人摇六次必得同一卦。改 Math.random 真随机（古制以背为阳），coins 6×3 存 yjCoins 供服务端。
+- **假二·卦名必错**：showYjResult 用二进制序号查文王序 HEXAGRAMS 表（全阳得「未济」而非「乾为天」），且表内 gua 位图多为占位。改调 `/api/paipan/liuyao` 真排盘，本地表仅按卦名取卦辞；新增日辰六亲卡（日辰/卦宫/世应/空亡/六亲爻位）；YJ_INTERP 仅 15 卦有文案，缺卦以服务端 interpretation 兜底。
+- **假三·自制简化奇门**：computeQimenData 干支用编造偏移、阴阳遁按月粗分、布星门神无局数符头、八门混入虚构「存储」门——整函数删除，改接 `/api/paipan/qimen`（节气定局）+ _adaptQimenChart 适配层复用原九宫渲染；补真格局提示与伏反吟卡；qmGuaSelect 手动遁法诚实停用（toast 明示按节气自动定局）；结果 meta 由错误的「农历」改公历干支。
+- **附带修复**：startYijing 按 6 循环取 yjCoin 元素（实际只有 3 枚）取到 null 抛错——人盘/事盘入口整体坏死的陈年 bug；yijing-qimen-inline.js 引用加 ?v= 破缓存。
+- **浏览器实测**：六爻 vals[8,9,7,7,8,6]→雷风恒（上震下巽逐爻核对一致）二爻上爻动化火山旅·震宫三世卦·世三应六·六亲齐·癸亥日空亡子丑✅；奇门 2026-10-16 未时→阴遁三局下元·值符天柱值使惊门·六条真格局（白虎猖狂/朱雀投江等）·与接口直测一致✅；console 0 错误。
+
 # 2026-10-16 15:20 — ✅ zhanbu.html 占卜决疑全模块真引擎化（安慰剂清零） ·Kimi
 
 - **治理依据**：W1-①「事实为体」先例——假数据/安慰剂一律退役改真引擎。

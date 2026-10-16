@@ -112,151 +112,9 @@ const BRANCH_PALACE = {
 // ============================================================
 // QIMEN CALCULATOR
 // ============================================================
-
-function computeQimenData(year, month, day, hourNum) {
-  // Derive Liuren day (cycle of 9)
-  // Simplified: use zodiac day number mod 9 + 1
-  // Use solar terms to determine position
-
-  // Liuren calculation (days since winter solstice offset)
-  // Simplified: use Julian day concept with Chinese cyclical system
-  const jd = Date.UTC(year, month - 1, day) / 86400000;
-  const liurenBase = ((Math.floor(jd) + 2440587 - 2451545) % 9 + 9) % 9;
-
-  // Derive stem index for the day
-  const stemIdx = ((Math.floor(jd) - 4) % 10 + 10) % 10;
-
-  // Derive branch
-  const branchIdx = ((Math.floor(jd) - 6) % 12 + 12) % 12;
-  const dayBranch = BRANCHES[branchIdx];
-
-  // Hour branch
-  const hourKeys = Object.keys(BRANCH_HOUR).map(Number).sort((a,b)=>a-b);
-  let hourBranch = '子';
-  for (let i = hourKeys.length-1; i >= 0; i--) {
-    if (hourNum >= hourKeys[i]) { hourBranch = BRANCH_HOUR[hourKeys[i]]; break; }
-  }
-  const hourIdx = BRANCHES.indexOf(hourBranch);
-
-  // Yin/Yang Dun
-  // 夏至(约180天)前阳遁，之后阴遁
-  const isYang = month >= 11 || month <= 4; // Simplified: winter half year = yang
-  const dun = isYang ? YANG_DUN : YIN_DUN;
-
-  // Determine starting palace based on day+hour stem
-  const keyStemIdx = stemIdx;
-  const keyPalace = STEM_KEY_PALACE[keyStemIdx];
-
-  // Derive key palace based on hour
-  // 子上起甲，逆布六仪，顺布三奇
-  // Simplified: key palace shifts based on hour
-  const hourShift = hourIdx;
-  const startPalace = ((keyPalace - 1 + hourShift) % 9) + 1;
-
-  // Is 阳遁 or 阴遁
-  const isYangDun = isYang;
-
-  // Build palace data
-  const palaces = {};
-  const rotatePalace = isYangDun ? YANG_DUN : YIN_DUN; // 1-9
-
-  for (let i = 0; i < 9; i++) {
-    const p宫 = rotatePalace[i]; // the actual palace number at position i
-    palaces[p宫] = {
-      position: i,
-      num: p宫,
-      name: PALACES[p宫].name,
-      element: PALACES[p宫].element,
-      direction: PALACES[p宫].direction,
-      trigram: PALACES[p宫].trigram,
-    };
-  }
-
-  // Distribute nine stars
-  // 天蓬芮任冲辅英禽心柱 (in order 1-9 starting position varies)
-  const starNames = ['蓬','芮','任','冲','辅','英','禽','心','柱'];
-  const starStart = (startPalace - 1 + (isYangDun ? 0 : 8)) % 9; // start index
-  for (let i = 0; i < 9; i++) {
-    const p宫 = rotatePalace[i];
-    const sIdx = (starStart + i) % 9;
-    const sKey = starNames[sIdx].charAt(0);
-    palaces[p宫].star = STARS['pei']; // will be mapped below
-    palaces[p宫].starKey = sKey;
-  }
-
-  // Map star keys
-  const starKeyMap = {'蓬':'pei','芮':'yin','任':'ying','冲':'chu','辅':'fang','英':'you','禽':'jin','心':'zhen','柱':'rong'};
-  for (let p in palaces) {
-    const key = palaces[p].starKey;
-    palaces[p].star = STARS[starKeyMap[key]];
-  }
-
-  // Distribute eight doors (skip center)
-  const doorNames = ['休','开','生','伤','杜','景','死','惊'];
-  const doorStart = (startPalace - 1 + (isYangDun ? 0 : 8)) % 8;
-  let doorPos = 0;
-  for (let i = 0; i < 9; i++) {
-    const p宫 = rotatePalace[i];
-    if (p宫 === 5) continue; // skip center
-    const dIdx = (doorStart + doorPos) % 8;
-    const dKey = doorNames[dIdx];
-    palaces[p宫].door = {name:dKey};
-    doorPos++;
-  }
-  // Map door names to full door objects
-  const doorKeyMap = {'休':'xin','开':'kai','生':'sheng','伤':'shang','杜':'du','景':'jing','死':'si','惊':'du'};
-  for (let p in palaces) {
-    if (palaces[p].door) {
-      const dKey = doorKeyMap[palaces[p].door.name];
-      palaces[p].door = DOORS_FULL[dKey];
-    }
-  }
-
-  // Distribute eight gods
-  const godNames = ['符','龙','冲','辅','英','芮','柱','心'];
-  const godStart = (startPalace - 1 + (isYangDun ? 0 : 8)) % 8;
-  let godPos = 0;
-  for (let i = 0; i < 9; i++) {
-    const p宫 = rotatePalace[i];
-    if (p宫 === 5) continue;
-    const gIdx = (godStart + godPos) % 8;
-    const gKey = godNames[gIdx];
-    const godKeyMap = {'符':'zhi','龙':'tian','冲':'chu','辅':'fang','英':'ying','芮':'yin','柱':'rong','心':'zhen'};
-    palaces[p宫].god = GODS[godKeyMap[gKey]];
-    godPos++;
-  }
-
-  // Set key palace (值使)
-  const keyPalaceName = PALACES[keyPalace].name;
-  // Find which door is at key palace
-  const valueDoor = palaces[keyPalace]?.door?.name || '开';
-  const valueDoorKey = doorKeyMap[valueDoor] || 'kai';
-  palaces[keyPalace].isKey = true;
-
-  // Determine the main star at center (禽星)
-  palaces[5] = {
-    position: 4, num:5, name:'中五宫', element:'土', direction:'中',
-    trigram:'＋', star: STARS.jin, door: DOORS_FULL.jin,
-    god: GODS.tian, isCenter: true
-  };
-
-  return {
-    year, month, day, hourBranch,
-    stemIdx, dayBranch,
-    keyPalace, startPalace,
-    isYangDun, dun,
-    palaces,
-    stemSymbol: STEMS[stemIdx],
-    dayStem: STEMS[stemIdx],
-    dayBranchSymbol: dayBranch,
-    hourStem: STEMS[(stemIdx + hourIdx) % 10],
-    jiuxing: palaces[keyPalace]?.star?.name || '天心',
-    bamen: palaces[keyPalace]?.door?.name || '开门',
-    bashen: palaces[keyPalace]?.god?.name || '值符',
-    qimenType: isYang ? '阳遁' : '阴遁',
-    liurenDay: (liurenBase + 1),
-  };
-}
+// R-YQ-REAL（2026-10-16）：原 computeQimenData 自制简化奇门已退役删除——
+// 其日干支用编造偏移、阴阳遁按月粗分、布星门神无局数符头、八门混入虚构「存储」门，
+// 违「事实为体」。现一律改接服务端真排盘 /api/paipan/qimen（qimen-engine-node，节气定局）。
 
 // ============================================================
 // RENDER QIMEN
@@ -264,8 +122,7 @@ function computeQimenData(year, month, day, hourNum) {
 
 function renderQimen(qd) {
   // Title
-  document.getElementById('qmResultMeta').textContent =
-    `奇门遁甲 · ${qd.qimenType} · 农历${qd.year}年${qd.month}月${qd.day}日`;
+  document.getElementById('qmResultMeta').textContent = qd.metaText || `奇门遁甲 · ${qd.qimenType}`;
   document.getElementById('qmResultTitle').textContent = '九宫遁甲盘';
   document.getElementById('qmResultSub').textContent =
     `日干${qd.dayStem}${qd.dayBranchSymbol} · 时支${qd.hourBranch} · ${qd.jiuxing}星临宫 · ${qd.bamen}为值使`;
@@ -479,6 +336,15 @@ function renderQimenInterp(qd) {
   const overall = getQimenOverall(qd);
   addInterpCard(container, '全 局 论 断', overall.overview, 'blue-accent');
 
+  // R-YQ-REAL：服务端真格局与伏反吟上屏
+  if (qd.geju && qd.geju.length) {
+    addInterpCard(container, '格 局 提 示', qd.geju.map(g =>
+      `<p>${g.type === '吉' ? '✅' : '⚠️'} ${g.name || ''}${g.desc ? '——' + g.desc : ''}</p>`
+    ).join(''), 'red-accent');
+  }
+  const fyText = [qd.isFuYin ? '星伏吟' : '', qd.isFanYin ? '星反吟' : '', qd.menFuYin ? '门伏吟' : '', qd.menFanYin ? '门反吟' : ''].filter(Boolean).join(' · ');
+  if (fyText) addInterpCard(container, '伏 吟 · 反 吟', `<p>${fyText}</p>`, 'violet-accent');
+
   // Key palace analysis
   const keyDesc = `${kpPalace?.name} · ${kpData?.star?.name || ''}星 · ${kpData?.door?.name || ''}门 · ${kpData?.god?.name || ''}`;
   const keyAnalysis = `${overall.keyFortune}。值使${qd.bamen}门落${kpPalace?.name}，${overall.keyAdvice}`;
@@ -656,30 +522,90 @@ function getQimenOverall(qd) {
 // COMPUTE WRAPPER
 // ============================================================
 
-function computeQimen() {
+// R-YQ-REAL：服务端真排盘接入与适配层
+var API_V2 = 'http://127.0.0.1:8920';
+function _findObjByName(obj, name) {
+  if (!name) return null;
+  var ks = Object.keys(obj);
+  for (var i = 0; i < ks.length; i++) { if (obj[ks[i]].name === name) return obj[ks[i]]; }
+  return null;
+}
+// 服务端 qimen chart → renderQimen 期望的 qd 结构
+function _adaptQimenChart(c) {
+  var palaces = {};
+  (c.palaces || []).forEach(function(sp){
+    var base = PALACES[sp.palace] || {};
+    var star = _findObjByName(STARS, sp.star) || { name: sp.star || '', symbol: (sp.star || '').replace('天', '').charAt(0), nature: '', desc: '', type: '' };
+    var door1 = (sp.door || '').replace('门', '');
+    var doorFull = _findObjByName(DOORS_FULL, sp.door) || null;
+    var door = door1 ? { name: door1, nature: (doorFull && doorFull.nature) || '', desc: (doorFull && doorFull.desc) || '', color: (doorFull && doorFull.color) || 'var(--metal)' } : null;
+    var god = _findObjByName(GODS, sp.god) || { name: sp.god || '', symbol: (sp.god || '').replace(/太|值/g, '').charAt(0) || (sp.god || '').charAt(0), nature: '', desc: '' };
+    palaces[sp.palace] = {
+      num: sp.palace,
+      name: base.name || ((sp.name || '') + '宫'),
+      element: base.element || '',
+      direction: sp.direction || base.direction || '',
+      trigram: base.trigram || '',
+      star: star, door: door, god: god,
+      tianpan: sp.tianpan, dipan: sp.dipan,
+      isKongWang: !!sp.isKongWang, isMa: !!sp.isMa,
+      isCenter: sp.palace === 5,
+      isKey: sp.palace === c.zhiShiPalace
+    };
+  });
+  if (!palaces[5]) palaces[5] = { num: 5, name: '中五宫', element: '土', direction: '中', trigram: '＋', star: STARS.jin, door: null, god: null, isCenter: true };
+  var kpData = palaces[c.zhiShiPalace] || {};
+  return {
+    metaText: '奇门遁甲 · ' + (c.ju || '') + (c.juYuan ? '（' + c.juYuan + '）' : '') + ' · ' + (c.dayGanZhi || '') + '日 ' + (c.hourGanZhi || '') + '时' + (c.jieqi ? ' · ' + c.jieqi : ''),
+    qimenType: c.ju || '',
+    isYangDun: !!c.isYang,
+    keyPalace: c.zhiShiPalace || 5,
+    palaces: palaces,
+    dayStem: (c.dayGanZhi || '').charAt(0),
+    dayBranchSymbol: (c.dayGanZhi || '').charAt(1),
+    hourBranch: (c.hourGanZhi || '').charAt(1) || '',
+    jiuxing: c.zhiFuStar || '',
+    bamen: (c.zhiShiDoor || '').replace('门', ''),
+    bashen: (kpData.god && kpData.god.name) || '',
+    geju: c.geju || [],
+    isFuYin: c.isFuYin, isFanYin: c.isFanYin, menFuYin: c.menFuYin, menFanYin: c.menFanYin
+  };
+}
+
+async function computeQimen() {
   const dateVal = document.getElementById('qmDateInput').value;
   const hourVal = document.getElementById('qmHourSelect').value;
-  const name = document.getElementById('qmNameInput').value || '有缘人';
   const guaVal = document.getElementById('qmGuaSelect').value;
 
   if (!dateVal || !hourVal) {
     showToast('请选择日期和时辰');
     return;
   }
+  if (guaVal === 'yang' || guaVal === 'yin') {
+    showToast('遁法依节气自动定局（古制），手动指定已停用');
+  }
 
   const [year, month, day] = dateVal.split('-').map(Number);
   const hourNum = parseInt(hourVal);
-
-  const qd = computeQimenData(year, month, day, hourNum);
-
-  // Override if user specified
-  if (guaVal === 'yang') qd.isYangDun = true;
-  else if (guaVal === 'yin') qd.isYangDun = false;
-
-  renderQimen(qd);
-
-  document.getElementById('qmResultSection').classList.add('visible');
-  document.getElementById('qmResultSection').scrollIntoView({ behavior: 'smooth' });
+  const btn = document.getElementById('qmComputeBtn');
+  btn.disabled = true; btn.textContent = '排 盘 中...';
+  try {
+    const resp = await fetch(API_V2 + '/api/paipan/qimen', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month, day, hour: hourNum })
+    });
+    const d = await resp.json();
+    if (!d || d.ok === false || !d.chart) { showToast((d && d.error) || '奇门排盘失败'); return; }
+    const qd = _adaptQimenChart(d.chart);
+    renderQimen(qd);
+    document.getElementById('qmResultSection').classList.add('visible');
+    document.getElementById('qmResultSection').scrollIntoView({ behavior: 'smooth' });
+  } catch (e) {
+    console.warn('qimen fetch:', e);
+    showToast('排盘服务(8920)未就绪，请稍后重试');
+  } finally {
+    btn.disabled = false; btn.textContent = '起 盘 演 算';
+  }
 }
 
 // ============================================================
@@ -774,11 +700,12 @@ const YJ_INTERP = {
 let yjMode = 'person';
 let yjLine = 0;
 let yjVals = [];
+let yjCoins = []; // 6 × [1/0,1/0,1/0]，1=字 0=背，供服务端真排盘
 let yjTossing = false;
 
 function startYijing(mode) {
   yjMode = mode;
-  yjLine = 0; yjVals = []; yjTossing = false;
+  yjLine = 0; yjVals = []; yjCoins = []; yjTossing = false;
   document.getElementById('yjDivSection').style.display = 'block';
   document.getElementById('yjResultSection').classList.remove('visible');
   document.getElementById('yjDivBtn').disabled = false;
@@ -786,7 +713,12 @@ function startYijing(mode) {
   document.getElementById('yjTossCount').textContent = '第 1 / 6 爻';
   for (let i = 0; i < 6; i++) {
     document.getElementById('yjDot' + i).className = 'line-dot';
+  }
+  // R-YQ-REAL：铜钱元素只有 3 枚（yjCoin0-2），旧版按 6 循环取到 null 直接抛错——
+  // 人盘/事盘入口因此整体坏死，本次一并修复
+  for (let i = 0; i < 3; i++) {
     const c = document.getElementById('yjCoin' + i);
+    if (!c) continue;
     c.style.opacity = '0'; c.style.transform = 'translateY(-20px) rotateY(180deg)';
     c.textContent = '背'; c.style.color = ''; c.style.borderColor = '';
   }
@@ -804,8 +736,12 @@ async function yjCastCoins() {
   for (let i = 0; i < yjLine; i++) document.getElementById('yjDot' + i).className = 'line-dot done';
   document.getElementById('yjDot' + yjLine).className = 'line-dot';
   await sleep(100);
-  let total = 0;
-  for (let i = 0; i < 3; i++) total += (i % 2 === 0) ? 3 : 2;
+  // R-YQ-REAL（2026-10-16）：掷钱改真随机——旧版 total 恒为 8（每掷皆少阴、卦卦相同），纯安慰剂
+  const coinsArr = [Math.random() < 0.5 ? 1 : 0, Math.random() < 0.5 ? 1 : 0, Math.random() < 0.5 ? 1 : 0]; // 1=字 0=背
+  yjCoins.push(coinsArr);
+  const ziCount = coinsArr[0] + coinsArr[1] + coinsArr[2];
+  // 古制以背为阳：三背=老阳9，三字=老阴6，两背一字=少阳7，两一字背=少阴8
+  const total = ziCount === 0 ? 9 : ziCount === 3 ? 6 : ziCount === 1 ? 7 : 8;
   const coins = [
     document.getElementById('yjCoin0'),
     document.getElementById('yjCoin1'),
@@ -818,8 +754,7 @@ async function yjCastCoins() {
   await sleep(200);
   for (let i = 0; i < 3; i++) {
     await sleep(150 + i * 40);
-    const isHead = (i === 0 ? 2 : (i === 1 ? 2 : 3)) > 0; // visual only
-    const val = (i % 2 === 0);
+    const val = coinsArr[i] === 1;
     coins[i].style.opacity = '1'; coins[i].style.transform = 'none';
     coins[i].textContent = val ? '字' : '背';
     coins[i].style.color = val ? 'var(--gold2)' : 'var(--gold)';
@@ -847,8 +782,13 @@ async function yjCastCoins() {
   yjTossing = false;
 }
 
-function showYjResult() {
-  // R738: AI 奇门解读
+function _findHex(guaName) {
+  if (!guaName) return null;
+  return HEXAGRAMS.find(h => guaName === h.name || guaName.endsWith(h.name) || guaName.startsWith(h.name)) || null;
+}
+
+async function showYjResult() {
+  // R738: AI 解读按钮（保留）
   setTimeout(function(){
     var holder = document.getElementById('aiQimenBtn');
     if (!holder) {
@@ -867,58 +807,55 @@ function showYjResult() {
     }
   }, 600);
 
-  const gua = [[0,0,0],[0,0,0]];
-  const movingLines = [];
-  for (let i = 0; i < 6; i++) {
-    const v = yjVals[i];
-    const isYang = v % 2 === 1;
-    const isMoving = v === 6 || v === 9;
-    const pos = 5 - i;
-    if (i < 3) gua[1][2-i] = isYang ? 1 : 0;
-    else gua[0][2-(i-3)] = isYang ? 1 : 0;
-    if (isMoving) movingLines.push({pos:i, val:v});
+  // R-YQ-REAL（2026-10-16）：本卦/变卦不再查本地错位卦表（旧版二进制序号查文王序表，卦名全错），
+  // 改调服务端真排盘 /api/paipan/liuyao（coins 6×3 透传），本地 HEXAGRAMS 仅按卦名取卦辞释义。
+  const birthV = (document.getElementById('yjBirthInput') || {}).value || '';
+  let yy, mm, dd;
+  if (birthV) { const p = birthV.split('-'); yy = +p[0]; mm = +p[1]; dd = +p[2]; }
+  else { const n = new Date(); yy = n.getFullYear(); mm = n.getMonth() + 1; dd = n.getDate(); }
+  const hh = new Date().getHours();
+  let chart = null, it = {};
+  try {
+    const resp = await fetch(API_V2 + '/api/paipan/liuyao', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year: yy, month: mm, day: dd, hour: hh, coins: yjCoins })
+    });
+    const d = await resp.json();
+    if (d && d.ok !== false && d.chart) { chart = d.chart; it = d.interpretation || {}; }
+  } catch (e) { console.warn('liuyao fetch:', e); }
+  if (!chart) {
+    showToast('排盘服务(8920)未就绪，请稍后重试');
+    yjTossing = false;
+    const btn = document.getElementById('yjDivBtn');
+    btn.disabled = false; btn.textContent = '重 新 掷 卦';
+    return;
   }
-  const upper = gua[0][0]*4 + gua[0][1]*2 + gua[0][2];
-  const lower = gua[1][0]*4 + gua[1][1]*2 + gua[1][2];
-  const hexNum = upper * 8 + lower + 1;
-  const hex = HEXAGRAMS[hexNum - 1] || HEXAGRAMS[0];
 
-  let changedNum = null, changedHex = null;
-  const changedGua = JSON.parse(JSON.stringify(gua));
-  if (movingLines.length > 0) {
-    for (const ml of movingLines) {
-      const isYang2 = gua[Math.floor((5-ml.pos)/3) ? 0 : 1][(5-ml.pos)%3];
-      if (isYang2) { if (ml.pos < 3) changedGua[1][2-ml.pos] = 0; else changedGua[0][2-(ml.pos-3)] = 0; }
-      else { if (ml.pos < 3) changedGua[1][2-ml.pos] = 1; else changedGua[0][2-(ml.pos-3)] = 1; }
-    }
-    const cu = changedGua[0][0]*4 + changedGua[0][1]*2 + changedGua[0][2];
-    const cl = changedGua[1][0]*4 + changedGua[1][1]*2 + changedGua[1][2];
-    changedNum = cu * 8 + cl + 1;
-    changedHex = HEXAGRAMS[changedNum - 1];
-  }
+  const yaos = chart.yaos || [];
+  const movingLines = yaos.filter(y => y.bian);
+  const hex = _findHex(chart.guaName) || HEXAGRAMS[0];
+  const hasBian = movingLines.length > 0 && chart.bianGua && chart.bianGua.name;
+  const changedHex = hasBian ? _findHex(chart.bianGua.name) : null;
 
   const name = document.getElementById('yjNameInput').value || '有缘人';
   const modeText = yjMode === 'person' ? '人盘·命格' : '事盘·时局';
-  document.getElementById('yjResultMeta').textContent = `${modeText} · ${name}`;
-  document.getElementById('yjResultSymbol').textContent = hex.symbol;
-  document.getElementById('yjResultTitle').textContent = hex.name + '卦';
+  document.getElementById('yjResultMeta').textContent = `${modeText} · ${name} · ${chart.dayGanZhi || ''}日 · ${chart.gongName || ''}${chart.guaType ? '·' + chart.guaType : ''}`;
+  document.getElementById('yjResultSymbol').textContent = ((chart.upper && chart.upper.symbol) || '') + ((chart.lower && chart.lower.symbol) || '');
+  document.getElementById('yjResultTitle').textContent = chart.guaName || hex.name;
   document.getElementById('yjResultPinyin').textContent = hex.pinyin;
-  document.getElementById('yjPrimaryName').textContent = hex.name + '卦';
+  document.getElementById('yjPrimaryName').textContent = chart.guaName || (hex.name + '卦');
   document.getElementById('yjPrimaryPinyin').textContent = hex.pinyin;
-  document.getElementById('yjPrimaryMeaning').textContent = hex.judgment + ' · ' + hex.meaning;
+  document.getElementById('yjPrimaryMeaning').textContent = hex.judgment + ' · ' + hex.meaning + (it.guaJi ? '。' + it.guaJi : '');
 
-  // Lines
-  const linesGua = [
-    gua[1][0], gua[1][1], gua[1][2],
-    gua[0][0], gua[0][1], gua[0][2]
-  ];
+  // Lines（yaos[0]=初爻，自上爻→初爻绘制）
   const pgEl = document.getElementById('yjPrimaryGua');
   pgEl.innerHTML = '';
   for (let i = 5; i >= 0; i--) {
+    const y = yaos[i] || {};
+    const isYang = (y.yin === 0 || y.yinName === '阳');
+    const isOld = !!y.bian;
     const div = document.createElement('div');
     div.style.cssText = 'width:70px;height:8px;position:relative;margin:2px 0';
-    const isYang = linesGua[i];
-    const isOld = yjVals[i] === 6 || yjVals[i] === 9;
     div.innerHTML = isYang
       ? `<div style="position:absolute;left:0;right:0;top:3px;height:3px;background:${isOld?'var(--cinn2)':'var(--gold)'};border-radius:1px"></div>`
       : `<div style="position:absolute;left:0;right:50%;top:3px;height:3px;background:${isOld?'var(--cinn2)':'var(--gold)'};border-radius:1px"></div><div style="position:absolute;left:50%;right:0;top:3px;height:3px;background:${isOld?'var(--cinn2)':'var(--gold)'};border-radius:1px"></div>`;
@@ -930,16 +867,18 @@ function showYjResult() {
   if (changedHex) {
     arrow.style.display = 'flex';
     changedCard.style.display = 'block';
-    document.getElementById('yjChangedName').textContent = changedHex.name + '卦';
+    document.getElementById('yjChangedName').textContent = chart.bianGua.name;
     document.getElementById('yjChangedPinyin').textContent = changedHex.pinyin;
     document.getElementById('yjChangedMeaning').textContent = changedHex.judgment + ' · ' + changedHex.meaning;
     const cgEl = document.getElementById('yjChangedGua');
     cgEl.innerHTML = '';
-    const clines = [changedGua[1][0],changedGua[1][1],changedGua[1][2],changedGua[0][0],changedGua[0][1],changedGua[0][2]];
     for (let i = 5; i >= 0; i--) {
+      const y = yaos[i] || {};
+      let isYang = (y.yin === 0 || y.yinName === '阳');
+      if (y.bian) isYang = !isYang;
       const div = document.createElement('div');
       div.style.cssText = 'width:70px;height:8px;position:relative;margin:2px 0';
-      div.innerHTML = clines[i]
+      div.innerHTML = isYang
         ? `<div style="position:absolute;left:0;right:0;top:3px;height:3px;background:var(--jade);border-radius:1px"></div>`
         : `<div style="position:absolute;left:0;right:50%;top:3px;height:3px;background:var(--jade);border-radius:1px"></div><div style="position:absolute;left:50%;right:0;top:3px;height:3px;background:var(--jade);border-radius:1px"></div>`;
       cgEl.appendChild(div);
@@ -949,18 +888,19 @@ function showYjResult() {
     changedCard.style.display = 'none';
   }
 
-  // Interp
-  const interp = YJ_INTERP[hexNum] || YJ_INTERP[1];
+  // Interp（YJ_INTERP 仅 15 卦有文案，缺卦用服务端真解读兜底）
+  const interp = YJ_INTERP[hex.num] || null;
+  const liuqinText = yaos.map(y => (y.positionName || '') + (y.liuqin || '')).filter(s => s.length > 3).join('、');
   const container = document.getElementById('yjInterpBlocks');
   container.innerHTML = '';
 
   const blocks = [
-    { title:'象 数 总 述', text: interp.overview, accent:'blue-accent' },
-    { title: yjMode === 'person' ? '人 盘 命 格' : '事 盘 时 局', text: yjMode === 'person' ? interp.person : interp.matter, accent:'violet-accent' },
-    { title:'六 爻 变 化', text: changedHex ? `本卦${hex.name}卦，${movingLines.length}爻动，化${changedHex.name}卦。阴阳转换，事态将由本卦向变卦转化。` : '六爻安静，本卦自持。此卦所示之事，当守不宜变，静待时机。', accent: changedHex ? 'red-accent' : 'green-accent' },
-    { title:'时 机 推 断', text: interp.timing, accent:'blue-accent' },
-    { title:'方 向 指 引', text: interp.direction, accent:'green-accent' },
-    { title:'智 慧 启 示', text: interp.advice, accent:'violet-accent' },
+    { title:'象 数 总 述', text: (interp && interp.overview) || it.summary || hex.meaning, accent:'blue-accent' },
+    { title: yjMode === 'person' ? '人 盘 命 格' : '事 盘 时 局', text: (interp && (yjMode === 'person' ? interp.person : interp.matter)) || it.advice || '参卦辞爻辞，以日辰生克断之。', accent:'violet-accent' },
+    { title:'六 爻 变 化', text: changedHex ? `本卦${chart.guaName}，${movingLines.length}爻动，化${chart.bianGua.name}卦。阴阳转换，事态将由本卦向变卦转化。` : '六爻安静，本卦自持。此卦所示之事，当守不宜变，静待时机。', accent: changedHex ? 'red-accent' : 'green-accent' },
+    { title:'日 辰 六 亲', text: `日辰${chart.dayGanZhi || ''}（${chart.dayWuxing || ''}），${chart.gongName || ''}·${chart.guaType || ''}，世爻第${(chart.shiYao || 0) + 1}爻、应爻第${(chart.yingYao || 0) + 1}爻${chart.xunKong && chart.xunKong.kong ? '，空亡' + chart.xunKong.kong : ''}。${liuqinText ? '六亲：' + liuqinText + '。' : ''}`, accent:'blue-accent' },
+    { title:'时 机 推 断', text: (interp && interp.timing) || it.advice || '观动爻与世应旺衰定时机。', accent:'blue-accent' },
+    { title:'智 慧 启 示', text: (interp && interp.advice) || it.guaJi || hex.judgment, accent:'violet-accent' },
   ];
 
   for (const b of blocks) {
