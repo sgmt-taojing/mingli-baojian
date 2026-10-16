@@ -1227,6 +1227,9 @@
   function fetchPaipan(bazi){
     if(!bazi || !bazi.year) return;
     if(!window.fetch) return; // jsdom guard
+    // 2026-10-17：排盘状态全程如实披露（原来失败只 console.warn，医生无感知）
+    var status = document.getElementById('wz-paipan-status');
+    if(status){ status.textContent = '⏳ 排盘中…'; status.style.background = 'rgba(245,158,11,.15)'; status.style.cursor = 'default'; status.onclick = null; }
     var params = 'year='+bazi.year+'&month='+bazi.month+'&day='+bazi.day+'&hour='+bazi.hour;
     if(bazi.lunar) params += '&lunar=1';
     // 2026-10-16：出生地经度→真太阳时校正（服务端 /paipan 支持 &lng=，留空按东八区标准时）
@@ -1236,10 +1239,19 @@
     fetch(PAIPAN_API + '/paipan?'+params,{signal:AbortSignal.timeout(15000)})
       .then(function(r){ return r.json(); })
       .then(function(data){
+        var d = data.data || data;
+        if(d && d.error){ throw new Error(d.error); }
         renderPaipan(data);
       })
       .catch(function(err){
         console.warn('[wangzhen-clinical] 排盘失败:', err.message);
+        if(status){
+          status.textContent = '⚠️ 排盘失败 · 点击重试';
+          status.style.background = 'rgba(239,68,68,.18)';
+          status.style.cursor = 'pointer';
+          status.onclick = function(){ fetchPaipan(bazi); };
+        }
+        showToast('⚠️ 体质排盘失败：' + (err.message || '网络异常') + '（可点状态徽标重试）', 'warning');
       });
   }
 
@@ -1250,6 +1262,9 @@
     if(d.error){ container.innerHTML = '<span class="muted" style="color:#f87171">⚠️ '+d.error+'</span>'; return; }
     
     var pillars = d.pillars || {};
+    // 2026-10-17：排盘成功即更新状态徽标（原仅在 renderHealthSummary 里置 ✅，该路径不一定走到）
+    var _st = document.getElementById('wz-paipan-status');
+    if(_st){ _st.textContent = '✅ 已完成'; _st.style.background = 'rgba(16,185,129,.15)'; _st.style.cursor = 'default'; _st.onclick = null; }
     var dm = d.day_master || '';
     var wxScore = d.wuxing_score || {};
     var wxCount = d.wuxing_count || {};
@@ -1353,9 +1368,21 @@
 
     // 收集诊断结果
     var resultPanel = document.getElementById('wangzhen-result-panel');
-    var diagnosisText = resultPanel ? resultPanel.textContent : '';
-    var voiceText = (document.getElementById('wz-voice-text') || {}).value || '';
-    var aiResult = (document.getElementById('wz-ai-result') || {}).textContent || '';
+    var diagnosisText = resultPanel ? resultPanel.textContent.trim() : '';
+    var voiceText = ((document.getElementById('wz-voice-text') || {}).value || '').trim();
+    var aiResult = ((document.getElementById('wz-ai-result') || {}).textContent || '').trim();
+    var paipanText = ((document.getElementById('wz-paipan-result') || {}).textContent || '').trim();
+
+    // 2026-10-17：证据门控——空诊断不得保存为病例（原：点保存即 ✅，空壳污染病历库）
+    var evidence = [];
+    if(diagnosisText.length >= 10) evidence.push('望诊诊断');
+    if(aiResult.length >= 10) evidence.push('AI面部分析');
+    if(paipanText.length >= 10) evidence.push('体质排盘');
+    if(voiceText.length >= 2) evidence.push('医嘱记录');
+    if(evidence.length === 0){
+      showToast('⚠️ 尚无诊断内容可保存：请先完成 望诊/排盘/AI分析/医嘱 至少一项', 'warning');
+      return;
+    }
 
     var payload = {
       patient_id: currentPatient.id || currentPatient.user_id || 0,
@@ -1364,11 +1391,13 @@
       diagnosis_text: diagnosisText,
       voice_notes: voiceText,
       ai_analysis: aiResult,
+      paipan_text: paipanText,
+      evidence_sections: evidence,   // 证据清单，供病历完整性核查
       kb_source: 'wangzhen-kb-data.json',
       timestamp: new Date().toISOString()
     };
     saveToLocal(payload);
-    showToast('✅ 诊断已保存');
+    showToast('✅ 诊断已保存（含：' + evidence.join('、') + '）');
     completeStep(5);
     renderSavedCases(payload.patient_id);
   }
@@ -1411,43 +1440,44 @@
       return;
     }
 
+    // 2026-10-17：报告内容一律转义（患者姓名等用户输入原样写入 HTML 有 XSS 风险）
+    function escH(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
     var resultPanel = document.getElementById('wangzhen-result-panel');
-    var diagnosisText = resultPanel ? resultPanel.textContent : '';
-    var voiceText = (document.getElementById('wz-voice-text') || {}).value || '';
-    var aiResult = (document.getElementById('wz-ai-result') || {}).textContent || '';
-    var paipanText = (document.getElementById('wz-paipan-result') || {}).textContent || '';
+    var diagnosisText = resultPanel ? resultPanel.textContent.trim() : '';
+    var voiceText = ((document.getElementById('wz-voice-text') || {}).value || '').trim();
+    var aiResult = ((document.getElementById('wz-ai-result') || {}).textContent || '').trim();
+    var paipanText = ((document.getElementById('wz-paipan-result') || {}).textContent || '').trim();
 
-    var report = '═══ 命理宝鉴 · 望诊报告 ═══\n\n';
-    report += '患者：' + (currentPatient.name || '') + '\n';
-    report += '日期：' + new Date().toLocaleDateString('zh-CN') + '\n\n';
+    // 2026-10-17：完整性披露——报告顶部如实列出已采集/未采集证据，空壳段落不进报告
+    var secState = [
+      ['命理排盘', paipanText.length >= 10],
+      ['AI 面部分析', aiResult.length >= 10],
+      ['望诊诊断', diagnosisText.length >= 10],
+      ['医嘱记录', voiceText.length >= 2]
+    ];
+    var missing = secState.filter(function(x){ return !x[1]; }).map(function(x){ return x[0]; });
+    if(secState.every(function(x){ return !x[1]; })){
+      showToast('⚠️ 四项证据均未采集，报告为空：请先完成至少一项再生成', 'warning');
+      return;
+    }
 
-    if(paipanText){
-      report += '【命理排盘】\n' + paipanText + '\n\n';
-    }
-    if(aiResult){
-      report += '【AI 面部分析】\n' + aiResult + '\n\n';
-    }
-    report += '【望诊诊断】\n' + diagnosisText + '\n\n';
-    if(voiceText){
-      report += '【医嘱语音记录】\n' + voiceText + '\n\n';
-    }
-    report += '═══ 本报告仅为中医面诊辅助筛查参考，不替代医院专业检查 ═══\n';
+    var patientName = currentPatient.display_name || currentPatient.name || '';
 
-    // 用新窗口打开可打印报告
     var win = window.open('', '_blank');
     if(win){
-      win.document.write('<html><head><meta charset="UTF-8"><title>望诊报告 - '+(currentPatient.display_name||currentPatient.name||'')+'</title>');
-      win.document.write('<style>body{font-family:"PingFang SC",serif;max-width:680px;margin:40px auto;padding:20px;line-height:1.8;color:#333}h1{color:#c9a84c;text-align:center}.section{margin:16px 0;padding:12px;border:1px solid #ddd;border-radius:8px}.section-title{font-weight:bold;color:#c9a84c;margin-bottom:8px}.disclaimer{color:#999;font-size:12px;text-align:center;margin-top:20px}@media print{.no-print{display:none}}</style>');
+      win.document.write('<html><head><meta charset="UTF-8"><title>望诊报告 - '+escH(patientName)+'</title>');
+      win.document.write('<style>body{font-family:"PingFang SC",serif;max-width:680px;margin:40px auto;padding:20px;line-height:1.8;color:#333}h1{color:#c9a84c;text-align:center}.section{margin:16px 0;padding:12px;border:1px solid #ddd;border-radius:8px}.section-title{font-weight:bold;color:#c9a84c;margin-bottom:8px}.disclaimer{color:#999;font-size:12px;text-align:center;margin-top:20px}.completeness{color:#8a6d2b;font-size:12px;background:#fdf6e3;border:1px solid #e8d9b0;border-radius:6px;padding:8px 10px;margin:12px 0}@media print{.no-print{display:none}}</style>');
       win.document.write('</head><body>');
       win.document.write('<h1>🔍 望诊报告</h1>');
-      win.document.write('<div class="section"><div class="section-title">患者信息</div>'+(currentPatient.display_name||currentPatient.name||'')+' · '+new Date().toLocaleDateString('zh-CN')+'</div>');
-      if(paipanText) win.document.write('<div class="section"><div class="section-title">命理排盘</div>'+paipanText.replace(/\n/g,'<br>')+'</div>');
-      if(aiResult) win.document.write('<div class="section"><div class="section-title">AI 面部分析</div>'+aiResult.replace(/\n/g,'<br>')+'</div>');
-      if(diagnosisText) win.document.write('<div class="section"><div class="section-title">望诊诊断</div>'+diagnosisText.replace(/\n/g,'<br>')+'</div>');
-      if(voiceText) win.document.write('<div class="section"><div class="section-title">医嘱记录</div>'+voiceText.replace(/\n/g,'<br>')+'</div>');
+      win.document.write('<div class="section"><div class="section-title">患者信息</div>'+escH(patientName)+' · '+new Date().toLocaleDateString('zh-CN')+'</div>');
+      win.document.write('<div class="completeness">📋 证据完整性：已采集「'+secState.filter(function(x){return x[1];}).map(function(x){return x[0];}).join('、')+'」'+(missing.length?'；未采集「'+missing.join('、')+'」（对应章节缺失属正常，非报告错误）':'')+'</div>');
+      if(paipanText.length >= 10) win.document.write('<div class="section"><div class="section-title">命理排盘</div>'+escH(paipanText).replace(/\n/g,'<br>')+'</div>');
+      if(aiResult.length >= 10) win.document.write('<div class="section"><div class="section-title">AI 面部分析</div>'+escH(aiResult).replace(/\n/g,'<br>')+'</div>');
+      if(diagnosisText.length >= 10) win.document.write('<div class="section"><div class="section-title">望诊诊断</div>'+escH(diagnosisText).replace(/\n/g,'<br>')+'</div>');
+      if(voiceText.length >= 2) win.document.write('<div class="section"><div class="section-title">医嘱记录</div>'+escH(voiceText).replace(/\n/g,'<br>')+'</div>');
       win.document.write('<div class="disclaimer">⚠️ 本报告仅为中医面诊辅助筛查参考，不替代医院专业检查。高危信号请及时就医。</div>');
-      win.document.write('<button class="no-print" onclick="window.print()" style="margin:20px auto;display:block;padding:10px 30px;font-size:14px;cursor:pointer">🖨️ 打印</button>');
-      win.document.write('<div style="margin:16px 0;text-align:center"><button onclick="window.print()" style="padding:10px 30px;font-size:14px;cursor:pointer;border:1px solid #c9a84c;background:#c9a84c;color:#fff;border-radius:6px">🖨️ 打印报告</button> <button onclick="window.close()" style="padding:10px 20px;font-size:14px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#333;border-radius:6px">关闭</button></div>');
+      win.document.write('<div class="no-print" style="margin:16px 0;text-align:center"><button onclick="window.print()" style="padding:10px 30px;font-size:14px;cursor:pointer;border:1px solid #c9a84c;background:#c9a84c;color:#fff;border-radius:6px">🖨️ 打印报告</button> <button onclick="window.close()" style="padding:10px 20px;font-size:14px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#333;border-radius:6px">关闭</button></div>');
       win.document.write('</body></html>');
       win.document.close();
     } else {
