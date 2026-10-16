@@ -991,7 +991,7 @@ if(navigator.onLine === false){
   try {
     var _lr = localReport(state.module, state.data);
     if (_lr && typeof _lr === 'string' && _lr.length > 50 && _lr.indexOf('报告生成引擎就绪') < 0) {
-      var _lrTxt = '【⚠️ 离线模式 · 本地真排盘引擎（非 AI 润色，联网后可重新生成更详尽解读）】\n\n' + _lr;
+      var _lrTxt = '【⚠️ 离线模式 · 本地简式排盘引擎（星曜从简，与在线精排可能有出入；非 AI 润色，联网后请重新生成）】\n\n' + _lr;
       showReport(_lrTxt);
       autoSavePaipan(_lrTxt);
       return;
