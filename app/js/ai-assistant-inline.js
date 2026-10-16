@@ -986,12 +986,12 @@ async function generateReport(){
     });
   }
 
-  // ③ 模块 KB 兜底（music/lifeindex/lifeplan 三大模块断网可用）
-if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
+  // ③ 模块 KB 兜底（仅真正断网时启用；在线一律走下方 KB 检索 + AI 流式，本地模板为规则估算非真实排盘）
+if(navigator.onLine === false && window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
   try {
     const mr = _MODULE_REPORTS[state.module];
     const rep = mr.diagnose(state.data);
-    let html = '【模块KB兜底 · '+mr.name+'】\n\n';
+    let html = '【⚠️ 离线模式 · 本地规则模板参考（非真实排盘/AI 结果，联网后请重新生成）· '+mr.name+'】\n\n';
     if(rep.ttsText) html += '🔊 朗读：'+rep.ttsText+'\n\n';
     if(rep.total !== undefined) html += '综合指数：'+rep.total+' 分\n\n';
     if(rep.element) html += '主导五行：'+rep.element+' 行\n';
@@ -1244,21 +1244,9 @@ if(window._MODULE_REPORTS && _MODULE_REPORTS[state.module]){
     promptExtra = '\n\n【本地知识库参考材料（'+kbHit.source+'）】\n' + kbHit.snippet.substring(0, 1500);
   }
 
-  // R51：KB 命中分 < 0.4 时，调 module-reports 断网兜底诊断 → 让 AI 有真实数据可润色
-  if(kbHit.score < 0.4 && window._MODULE_REPORTS && window._MODULE_REPORTS[state.module]){
-    try {
-      const mr = window._MODULE_REPORTS[state.module];
-      const rep = mr.diagnose(state.data);
-      if(rep){
-        let fb = '\n\n【本地引擎诊断参考（'+mr.name+' KB 兜底）】\n' + (rep.summary||'');
-        if(rep.element) fb += '\n主导元素：' + rep.element;
-        if(rep.total) fb += '\n综合指数：' + rep.total + ' 分';
-        if(rep.nextSteps) fb += '\n建议：' + rep.nextSteps.slice(0,5).join('；');
-        if(rep.suggestions) fb += '\n布局建议：' + rep.suggestions.slice(0,3).join('；');
-        promptExtra += fb;
-      }
-    } catch(e){ console.warn('[R51 fallback]', e); }
-  }
+  // R51（已治理 2026-10-16）：KB 命中分 < 0.4 时不再把本地兜底模板数据注入 AI 提示词。
+  // 原因：兜底模板含 seed 推导的伪五行/伪评分/伪宜忌，注入会污染在线报告真实性；
+  // 兜底模板仅保留给真正断网（navigator.onLine===false）时的展示路径。
 
   // ③ 调用后端 AI — P0-A: SSE 流式输出
   const prompt='用户选择了「'+mod.name+'」模块，通过对话收集了以下信息：'+collected.join('；')+'。请基于以上信息给出专业、丰富、详实的分析评估报告，报告要拿来即用，包含具体建议。'+promptExtra;

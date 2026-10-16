@@ -182,6 +182,18 @@ body{background:var(--bg);color:var(--paper);font-family:'PingFang SC','Microsof
     <img class="ms-name-img" src="assets/minsu/title-plate.png" alt="车牌号码">
     <div class="ms-desc">尾数五行 · 81数理 · 豹子号/顺子/对子</div>
     <div class="ms-api">GET /api/minsu/plate</div>
+  </a>
+  <a class="ms-card" href="javascript:void(0)" onclick="showTool('shuli81')" style="border-left:3px solid #e879f9">
+    <span class="ms-icon">🔢</span>
+    <div class="ms-name" style="font-size:15px">81数理</div>
+    <div class="ms-desc">吉凶 · 阴阳 · 河图五行 · 与本命生克</div>
+    <div class="ms-api">GET /api/minsu/shuli81</div>
+  </a>
+  <a class="ms-card" href="javascript:void(0)" onclick="showTool('floor')" style="border-left:3px solid #fbbf24">
+    <span class="ms-icon">🏢</span>
+    <div class="ms-name" style="font-size:15px">楼层门牌</div>
+    <div class="ms-desc">河图楼层法 · 尾数五行 · 与本命生克宜忌</div>
+    <div class="ms-api">GET /api/minsu/floor</div>
   </a></div>
 <div class="ms-group-head"><span class="ms-group-badge">📈 · 流年运势</span><span class="ms-group-desc">今年运气 · 幸运加持</span></div>
 <div class="ms-grid"><a class="ms-card ms-liunian" href="ask.html?tool=liunian">
@@ -289,6 +301,8 @@ async function showTool(tool){
       xingming:{t:'姓名评分',h:`<input id="f1" type="text" placeholder="输入姓名（连名带姓 2-4 字）" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'五格三才按繁体笔画计算'},
       liunian:{t:'流年运程',h:`<input id="f1" type="number" placeholder="出生年 如1990" style="width:150px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:`看 ${CY} 年逐月运势`},
       lucky:{t:'幸运数色',h:`<input id="f1" type="number" placeholder="出生年 如1990" style="width:150px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'按生年五行推幸运数字/颜色/方位'},
+      shuli81:{t:'81数理解析',h:`<input id="f1" type="number" placeholder="输入正整数 如24" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'手机号/车牌/姓名的数都能查；填了「我的生辰」会带本命生克'},
+      floor:{t:'楼层门牌吉凶',h:`<input id="f1" type="number" placeholder="楼层或门牌号 如8" style="flex:1;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px">`,hint:'河图楼层法；填了「我的生辰」会带本命生克宜忌'},
       hehun:{t:'合婚配对',h:`<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%"><span style="color:var(--paper3);font-size:12px">男方</span><input id="f1" type="number" placeholder="年*" style="width:74px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f3" type="number" placeholder="月" min="1" max="12" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f4" type="number" placeholder="日" min="1" max="31" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f5" type="number" placeholder="时0-23" min="0" max="23" style="width:70px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%"><span style="color:var(--paper3);font-size:12px">女方</span><input id="f2" type="number" placeholder="年*" style="width:74px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f6" type="number" placeholder="月" min="1" max="12" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f7" type="number" placeholder="日" min="1" max="31" style="width:56px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"><input id="f8" type="number" placeholder="时0-23" min="0" max="23" style="width:70px;padding:8px;background:var(--card);color:var(--paper);border:1px solid var(--border);border-radius:6px"></div>`,hint:'年份必填；月日填全自动升级全八字合婚（夫妻宫/五行互补五维加权），只填年份按年柱简评'},
       family:{t:'家庭排盘',h:`<div id="famRows" style="width:100%"></div><button onclick="addFamRow()" style="padding:6px 14px;background:var(--card);color:var(--gold);border:1px dashed var(--gold);border-radius:6px;cursor:pointer">+ 加一位成员</button>`,hint:'至少两位成员（称呼+出生年）'},
     }[tool];
@@ -321,6 +335,8 @@ function runTool(tool){
   else if(tool==='xingming'){ const n=v('f1'); if(n.length<2||n.length>4){result.innerHTML='<div style="color:#ef4444;padding:10px">姓名填 2-4 个字（连名带姓）。</div>';return;} url=`/api/minsu/xingming?name=${encodeURIComponent(n)}`; }
   else if(tool==='liunian'){ const n=v('f1'); if(!n){result.innerHTML='<div style="color:#ef4444;padding:10px">请填出生年份。</div>';return;} url=`/api/minsu/liunian?year=${new Date().getFullYear()}&birthYear=${n}`; }
   else if(tool==='lucky'){ const n=v('f1'); if(!n){result.innerHTML='<div style="color:#ef4444;padding:10px">请填出生年份。</div>';return;} url=`/api/minsu/lucky?birthYear=${n}`; }
+  else if(tool==='shuli81'){ const n=v('f1'); if(!n||+n<1){result.innerHTML='<div style="color:#ef4444;padding:10px">请输入正整数（1 起）。</div>';return;} let _bp=''; try{const mb=JSON.parse(localStorage.getItem('ms-birth')||'null'); if(mb&&mb.y) _bp=`&birthYear=${mb.y}`;}catch(_){} url=`/api/minsu/shuli81?n=${encodeURIComponent(n)}${_bp}`; }
+  else if(tool==='floor'){ const n=v('f1'); if(!n||+n<1){result.innerHTML='<div style="color:#ef4444;padding:10px">请输入楼层或门牌号（正整数）。</div>';return;} let _bp=''; try{const mb=JSON.parse(localStorage.getItem('ms-birth')||'null'); if(mb&&mb.y) _bp=`&birthYear=${mb.y}`;}catch(_){} url=`/api/minsu/floor?n=${encodeURIComponent(n)}${_bp}`; }
   else if(tool==='hehun'){
     const a=v('f1'),b=v('f2');
     if(!a||!b){result.innerHTML='<div style="color:#ef4444;padding:10px">两位出生年份都要填哦。</div>';return;}
@@ -411,6 +427,22 @@ async function execTool(tool, url, postBody){
     html+=`五行：${c.wuxing} | 幸运数字：${c.luckyNumbers.join('、')}<br>`;
     html+=`幸运色：${c.luckyColors.join('、')} | 方位：${c.luckyDirection} | 季节：${c.luckySeason}<br>`;
     html+=`<span style="color:var(--jade)">${c.suggestion}</span>`;
+    html+='</div>';
+  }else if(tool==='shuli81'){
+    const lc=c.luck==='吉'?'var(--green)':c.luck==='凶'?'var(--red)':'var(--gold)';
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">🔢 数 ${c.input} → 81数理 ${c.number}（<b style="color:${lc}">${c.luck}</b>）</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    html+=`阴阳：${c.yinyang} | 河图数：${c.hetuNumber}（${c.hetuWuxing}） | ${c.shengCheng}<br>`;
+    if(c.personal) html+=`本命：${c.personal.yearGan}年生·${c.personal.myWuxing} → 与数关系：<b>${c.personal.relation}</b><br>`;
+    html+=`<span style="color:var(--jade)">${c.suggestion}</span><br>`;
+    html+=`<span style="color:var(--paper3);font-size:11px">${c.basis}</span>`;
+    html+='</div>';
+  }else if(tool==='floor'){
+    html=`<h3 style="color:var(--gold);margin-bottom:8px">🏢 ${c.input} 层/号 · 属${c.hetuWuxing}（河图尾数 ${c.hetuNumber}）</h3>`;
+    html+=`<div style="font-size:12px;line-height:2">`;
+    if(c.personal) html+=`本命：${c.personal.yearGan}年生·${c.personal.myWuxing} → ${c.personal.relation}：<b>${c.personal.verdict}</b><br>`;
+    html+=`<span style="color:var(--jade)">${c.suggestion}</span><br>`;
+    html+=`<span style="color:var(--paper3);font-size:11px">${c.basis}</span>`;
     html+='</div>';
   }else if(tool==='hehun' && data.dimensions){
     // v2 全八字合婚：五维加权

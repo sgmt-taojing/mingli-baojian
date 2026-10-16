@@ -48,15 +48,16 @@ function generate(){
       const result=DIMS.map(d=>{
         let bias=(WX_DIM_BIAS[ele] && WX_DIM_BIAS[ele][d.key]) || 0;
         if(d.weight<=0.04) bias-=2;
-        const noise=Math.floor(Math.abs(Math.sin(d.key.charCodeAt(0)*age))*8)-4;
-        const score=Math.max(30,Math.min(99,Math.round(base*0.7+d.weight*100+boost+bias+noise)));
+        // 2026-10-16 治理：移除 sin 伪噪声（确定但无意义的假精度），评分完全由规则模型决定
+        const score=Math.max(30,Math.min(99,Math.round(base*0.7+d.weight*100+boost+bias)));
         return {...d,score,bias:bias>0?`+${bias}`:bias<0?`${bias}`:''};
       });
       const total=Math.round(result.reduce((s,d)=>s+d.score*d.weight,0));
       const sorted=[...result].sort((a,b)=>b.score-a.score);
       const top3=sorted.slice(0,3).map(d=>d.name);
       const bot2=sorted.slice(-2).map(d=>d.name);
-      let grade=total>=85?'上等命格':total>=75?'中上命格':total>=65?'中等等格':total>=55?'中下等格':'下等命格';
+      // 去神秘化：规则模型估算分级，不使用「命格」措辞
+      let grade=total>=85?'优势突出':total>=75?'整体良好':total>=65?'均衡发展':total>=55?'蓄力提升':'重点加强';
       const actions=[
         `【扬长】强化${top3[0]}与${top3[1]||top3[0]}领域，每周投入 5 小时专项`,
         `【补短】针对性提升${bot2[0]}维度，建立月度复盘`,
@@ -76,7 +77,7 @@ function generate(){
         {y:4,t:'中段汇总：成果回顾'},
         {y:5,t:'中期锁势：进入下个五年计划'}
       ];
-      const summary=`${age}岁，五行属${ele}（${ELE_FOCUS[ele]}），生命指数综合 ${total} 分，${grade}。优势区：${top3.join('、')}。待提升：${bot2.join('、')}。建议聚焦扬长 + 补短并行。`;
+      const summary=`${age}岁，五行属${ele}（${ELE_FOCUS[ele]}），生命指数综合 ${total} 分，评级「${grade}」。优势区：${top3.join('、')}。待提升：${bot2.join('、')}。建议聚焦扬长 + 补短并行。（评分依据：五行主属 + 12 维度权重的规则模型估算，非八字排盘结果，仅供自我规划参考）`;
       render({ele,age,total,grade,result,top3,bot2,actions,next5,summary,focus,extra});
       btn.disabled=false; btn.textContent='🔄 重新生成';
     }catch(e){

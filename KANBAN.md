@@ -1,3 +1,11 @@
+# 2026-10-16 18:50 — ✅ 全站诊断审计+P0根治：AI助手32模块编造报告短路收编，81数理/楼层门牌上线 ·Kimi
+
+- **审计**：端点 21 项全过、页面 20 页全 200（docs/AUDIT-20261016.md）。
+- **P0**：ai-assistant-inline.js generateReport 中 _MODULE_REPORTS 32 模块兜底无条件短路 KB+AI 主流程——在线用户也永远拿到 seed%5 伪五行/1+seed%81 伪天格/getDate()%10 伪宜忌。已收编为仅 navigator.onLine===false 触发，报告头明示「离线模式·规则模板·非真实排盘」。
+- **P1×2**：R51 把兜底伪数据注入在线 AI 提示词整块移除；lifeindex 移除 sin() 伪噪声（评分确定可复现）、「上等命格」等措辞改规则分级+「规则模型估算」标注。
+- **新端点**：GET /api/minsu/shuli81（河图尾数五行+本命生克，明示非古籍断语）、GET /api/minsu/floor（河图楼层法宜忌）；minsu-center 新增两卡共 19 卡，自动带 birthYear。
+- **实测**：lifeindex 确定性+新措辞 ✅；ai-assistant 在线走 KB/AI 推理链不再兜底 ✅；shuli81/floor 浏览器全流程 ✅；console 0 错误。
+
 # 2026-10-16 18:05 — ✅ heluo-math 三病灶根治+河洛面板上线 minsu-center，两页标签残缺修复 ·Kimi
 
 - **heluo-math.js（原全坏 dormant 模块）**：①姓名模式 `getKangxiStroke`/`_STROKE_TABLE` 未定义必抛错+`charCodeAt%16+1` 伪笔画——改查 `js/data/kangxi-strokes-common.json`（服务端康熙真字典 CJK 常用区抽取 20,993 字/181KB），查无诚实列出「暂无数据，未做估算」（按码点迭代兼容扩展字）；②`(Y*365+M*30+D)%60` 伪日干支——改 JDN 锚点真日柱（与 almanac-engine 同锚 2024-04-30 甲子，并用 2000-01-01 戊午交叉验证），天干河图数按壬1癸6/丙2丁7/甲3乙8/庚4辛9/戊5己10；③年飞星算出不用——上屏（2026 一白贪狼入中）；④IIFE 未导出函数致面板按钮全局不可达+mobile 分支块级作用域 xiongCount ReferenceError——导出+作用域修正。
