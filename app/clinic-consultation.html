@@ -474,7 +474,7 @@ body.role-master .role-banner.master{display:flex}
     <div class="prelim-box" id="prelimBox" style="display:none">
       <div class="hdr">⚡ AI 初步诊疗结论 <span class="badge">实时</span> <span style="font-size:10px;color:var(--muted);font-weight:400">（减轻医生工作量·仅供参考）</span></div>
       <div class="body" id="prelimContent"></div>
-      <div class="hint-row">⚠ 初步结论仅辅助参考，最终诊断需医生/大师确认 · 数据将在7天后蒸馏入库优化AI模型</div>
+      <div class="hint-row">⚠ 初步结论仅辅助参考，最终诊断需医生/大师确认 · 报告确认后进入服务端审核队列，经医师/命理师签名生效</div>
     </div>
   </div>
 </div>
@@ -607,7 +607,7 @@ body.role-master .role-banner.master{display:flex}
       <button class="btn btn-outline" onclick="printReport()">🖨️ 打印</button>
     </div>
     <div class="distill-note">
-      💡 本报告将在7天后自动蒸馏入库，用于优化AI诊断模型和知识库
+      💡 确认后报告进入服务端审核队列（pending_master），经医师/命理师双轨审核签名后生效，可按医学规范流转
     </div>
   </div>
 </div>
@@ -1392,7 +1392,36 @@ function buildReport() {
 }
 
 // ═══ Finalize ═══
+// 2026-10-17：确认报告接入服务端病历签名链（建档幂等→pending_master→双师审核队列），
+// 原「7天后蒸馏入库」为无机制支撑的空口承诺，本轮改为如实披露三态。
+function escC(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+let _csrfTokenC = '';
+function fetchCsrfC(){
+  if(_csrfTokenC) return Promise.resolve(_csrfTokenC);
+  return fetch(API + '/api/csrf-token', { signal: AbortSignal.timeout(5000) })
+    .then(r => r.json()).then(d => { _csrfTokenC = d.csrfToken || ''; return _csrfTokenC; });
+}
+function clinicPostC(path, body){
+  return fetchCsrfC().then(token => fetch(API + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(8000)
+  }).then(r => r.json()));
+}
+function updateLocalReportCaseId(rptId, caseId){
+  try {
+    const reports = JSON.parse(localStorage.getItem('clinic_reports') || '[]');
+    const r = reports.find(x => x.id === rptId);
+    if(r){ r.server_case_id = caseId; localStorage.setItem('clinic_reports', JSON.stringify(reports)); }
+  } catch(e) {}
+}
 window.finalizeReport = function(btn) {
+  // 门控：无患者姓名或无实质内容不得确认（防空壳报告）
+  const patientName = (state.intake && state.intake.patient ? String(state.intake.patient) : '').trim();
+  const hasContent = !!(state.sizhen || state.mingli || (state.intake && state.intake.voice) || state.doctorNote || state.masterNote);
+  if(!patientName){ showToast('⚠️ 请先完成第 1 步信息采集（患者姓名必填）', true); return; }
+  if(!hasContent){ showToast('⚠️ 尚无诊疗内容可确认：请先完成 AI 分析或填写医师/大师意见', true); return; }
   if (btn) { btn.disabled = true; btn.textContent = '✓ 已确认'; }
   const report = {
     id: 'RPT-' + Date.now(),
@@ -1410,8 +1439,51 @@ window.finalizeReport = function(btn) {
     reports.unshift(report);
     localStorage.setItem('clinic_reports', JSON.stringify(reports.slice(0, 50)));
   } catch(e) {}
-  showToast('✅ 报告已确认，数据将在7天后蒸馏入库');
-  document.getElementById('flowStatus').textContent = '✓ 已完成';
+  showToast('⏳ 报告已本机暂存，正在同步服务端审核队列…');
+  document.getElementById('flowStatus').textContent = '⏳ 同步审核队列中…';
+  // 服务端同步：建档（幂等）→ 创建病例（pending_master）→ 双师审核队列
+  const birth = (state.intake && state.intake.birth) || {};
+  const birthDate = (birth.year && birth.month && birth.day)
+    ? birth.year + '-' + String(birth.month).padStart(2, '0') + '-' + String(birth.day).padStart(2, '0') : '';
+  const symptomText = [];
+  if(state.intake && state.intake.symptoms){
+    Object.keys(state.intake.symptoms).forEach(g => {
+      const arr = state.intake.symptoms[g];
+      if(arr && arr.length) symptomText.push(g + ':' + arr.join('、'));
+    });
+  }
+  if(state.intake && state.intake.voice) symptomText.push(state.intake.voice);
+  if(state.sizhen && state.sizhen.conclusion) symptomText.push(String(state.sizhen.conclusion).slice(0, 300));
+  if(state.doctorSyndrome) symptomText.push('辨证:' + state.doctorSyndrome);
+  if(state.doctorNote) symptomText.push('医师意见:' + state.doctorNote);
+  if(state.masterNote) symptomText.push('大师批注:' + state.masterNote);
+  const paipanSummary = state.mingli ? JSON.stringify(state.mingli).slice(0, 1000) : '';
+  clinicPostC('/api/clinic/patient', {
+    name: patientName,
+    sex: state.intake.gender === 'male' ? '男' : state.intake.gender === 'female' ? '女' : (state.intake.gender || ''),
+    birth_date: birthDate,
+    birth_hour: (birth.hour !== undefined && birth.hour !== '') ? parseInt(birth.hour) : null,
+    phone: ''
+  }).then(d => {
+    if(!d || d.error || !d.data || !d.data.patient_id) throw new Error('建档失败');
+    return clinicPostC('/api/clinic/case', {
+      patient_id: d.data.patient_id,
+      symptoms: (symptomText.join('\n') || '综合会诊记录').slice(0, 2000),
+      constitution: state.mingli && state.mingli.constitution ? String(state.mingli.constitution).slice(0, 500) : '',
+      paipan_summary: paipanSummary,
+      paipan_ref: { source: 'clinic-consultation', scene: scene, role: currentRole, ts: report.timestamp }
+    });
+  }).then(d2 => {
+    if(!d2 || d2.error || !d2.data || !d2.data.case_id) throw new Error('病例创建失败');
+    updateLocalReportCaseId(report.id, d2.data.case_id);
+    renderReportList();
+    showToast('✅ 报告已确认并入审核队列（病例 #' + d2.data.case_id + '），待医师/命理师审核签名生效');
+    document.getElementById('flowStatus').textContent = '✓ 已入审核队列 #' + d2.data.case_id;
+  }).catch(err => {
+    console.warn('[clinic-consultation] 服务端同步失败:', err);
+    showToast('⚠️ 服务端不可达：报告仅本机暂存，未入审核队列', true);
+    document.getElementById('flowStatus').textContent = '⚠ 仅本机暂存';
+  });
   renderReportList();
   document.getElementById('step5').classList.remove('collapsed');
 };
@@ -1427,13 +1499,18 @@ window.renderReportList = function() {
     var symp = r.sizhen && r.sizhen.symptoms ? (Array.isArray(r.sizhen.symptoms) ? r.sizhen.symptoms.join('、') : r.sizhen.symptoms) : '—';
     var syn = r.doctorSyndrome || '—';
     var name = (r.patient && r.patient.patient) ? r.patient.patient : (r.patient && r.patient.name) ? r.patient.name : '未知';
+    // 2026-10-17：☁️=已入服务端审核队列，💾=仅本机暂存——状态如实区分；文本一律转义
+    var badge = r.server_case_id
+      ? '<span title="已入服务端审核队列" style="color:var(--jade);font-size:10px">☁️ 病例#' + r.server_case_id + '</span> '
+      : '<span title="仅本机暂存，未入审核队列" style="color:#d4a017;font-size:10px">💾 本机</span> ';
     return '<div class="intake-card" style="cursor:pointer">' +
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">' +
-      '<span style="font-size:12px;color:var(--gold);font-weight:600">' + name + '</span>' +
+      badge +
+      '<span style="font-size:12px;color:var(--gold);font-weight:600">' + escC(name) + '</span>' +
       '<span style="font-size:10px;color:var(--muted)">' + new Date(r.timestamp).toLocaleString('zh-CN') + '</span>' +
-      '<span style="font-size:10px;color:var(--jade);margin-left:auto">' + syn + '</span>' +
+      '<span style="font-size:10px;color:var(--jade);margin-left:auto">' + escC(syn) + '</span>' +
       '</div>' +
-      '<div style="font-size:11px;color:var(--muted)">症状: ' + symp + '</div>' +
+      '<div style="font-size:11px;color:var(--muted)">症状: ' + escC(symp) + '</div>' +
       '</div>';
   }).join('');
 };
