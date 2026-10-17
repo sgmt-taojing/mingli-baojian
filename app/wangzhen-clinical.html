@@ -301,8 +301,8 @@
       <!-- 新建患者表单 -->
       <div id="wz-new-patient-form" style="display:none;margin-top:10px;padding:10px;border:1px solid var(--wz-border);border-radius:8px;background:rgba(0,0,0,.2)">
         <div class="wz-form-row">
-          <label>姓名</label>
-          <input aria-label="姓名" type="text" id="np-name" class="wz-input" placeholder="患者姓名">
+          <label>姓名 <span style="color:#e74c3c">*</span></label>
+          <input aria-label="姓名" type="text" id="np-name" class="wz-input" placeholder="患者姓名（必填）">
         </div>
         <div class="wz-form-grid">
           <div class="wz-form-row">
@@ -315,13 +315,13 @@
           </div>
         </div>
         <div class="wz-form-row">
-          <label>电话（选填）</label>
-          <input aria-label="手机号" type="text" id="np-phone" class="wz-input" placeholder="联系电话">
+          <label>电话 <span style="font-size:10px;color:#d4a017">建议填写</span></label>
+          <input aria-label="手机号" type="text" id="np-phone" class="wz-input" placeholder="联系电话 · 用于档案复用，避免重复建档">
         </div>
 
         <!-- 出生日期：农历/阳历切换 -->
         <div class="wz-form-row">
-          <label>出生日期</label>
+          <label>出生日期 <span style="font-size:10px;color:#d4a017">建议填写</span></label>
           <div class="wz-cal-switch" id="np-cal-switch">
             <button class="active" onclick="wangzhenClinical.switchCalendar('solar')">阳历</button>
             <button onclick="wangzhenClinical.switchCalendar('lunar')">农历</button>
@@ -338,6 +338,7 @@
               <option value="1">闰月</option>
             </select>
           </div>
+          <div style="font-size:10px;color:#888;margin-top:4px">用于体质排盘与个性化报告；阳历/农历可切换，不知时辰可留空</div>
         </div>
 
         <!-- 主诉症状：大框 + 语音 + 结构化点选 -->
@@ -635,7 +636,7 @@
 <!-- JS -->
 <script src="js/wangzhen-kb-loader.js?v=20261016a" defer></script>
 <script src="js/wangzhen-center.js?v=20261016a" defer></script>
-<script src="js/wangzhen-clinical.js?v=20261017c" defer></script>
+<script src="js/wangzhen-clinical.js?v=20261017d" defer></script>
 
 <!-- 初始化下拉 -->
 <script>

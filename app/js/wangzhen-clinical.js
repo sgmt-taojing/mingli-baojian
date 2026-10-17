@@ -97,7 +97,16 @@
     enumCameras();
     // 自动选中
     selectPatient(pt.id, pt.name);
-    showToast('✅ 患者已保存: ' + name);
+    // 2026-10-17：建档质量分层提示——电话/生日皆空时如实告知后果（不阻断，尊重散客场景）
+    var hasPhone = !!(pt.phone && String(pt.phone).trim());
+    var hasBirth = !!(pt.bazi.y && pt.bazi.m && pt.bazi.d);
+    if(!hasPhone && !hasBirth){
+      showToast('✅ 患者已保存: ' + name + '（提示：未填电话和生日，档案无法自动复用，下次同名将重复建档）', 'warning');
+    } else if(!hasBirth){
+      showToast('✅ 患者已保存: ' + name + '（提示：未填生日，体质排盘与个性化报告将不可用）', 'warning');
+    } else {
+      showToast('✅ 患者已保存: ' + name);
+    }
   }
 
   // ===== 医嘱模板 =====
