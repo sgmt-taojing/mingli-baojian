@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语料清洗 · 人工校验台 - 命理宝鉴</title>
+<style>
+:root{--bg:#f5f1e8;--card:#fffdf7;--ink:#2c2c2c;--gold:#b8860b;--line:#e0d8c3;--ok:#2e7d32;--warn:#e65100;--bad:#b71c1c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Songti SC","STSong",serif;background:var(--bg);color:var(--ink);padding:20px;max-width:960px;margin:0 auto}
+h1{font-size:22px;color:var(--gold);border-bottom:2px solid var(--gold);padding-bottom:8px;margin-bottom:14px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;font-size:14px}
+.bar input,.bar select{padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;font-family:inherit}
+.bar button{padding:6px 14px;border:1px solid var(--gold);background:var(--gold);color:#fff;border-radius:6px;cursor:pointer;font-family:inherit}
+.progress{flex:1;min-width:200px;background:#e8e0cc;border-radius:8px;height:22px;position:relative;overflow:hidden}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,#c9a227,#b8860b);transition:width .3s}
+.progress span{position:absolute;inset:0;text-align:center;font-size:12px;line-height:22px;color:#333}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:13px}
+.pill{padding:2px 10px;border-radius:12px;border:1px solid var(--line);background:#f8f4ea}
+.pill.rule{font-weight:bold}
+.pill.rule.ancient{color:var(--ok);border-color:var(--ok)}
+.pill.rule.modern{color:var(--warn);border-color:var(--warn)}
+.pill.rule.junk{color:var(--bad);border-color:var(--bad)}
+.title{font-size:17px;font-weight:bold;margin-bottom:8px;color:#4a3c1a}
+.content{white-space:pre-wrap;font-size:15px;line-height:1.9;max-height:420px;overflow-y:auto;border-top:1px dashed var(--line);padding-top:10px}
+.verdicts{display:flex;gap:12px;margin-top:16px}
+.verdicts button{flex:1;padding:14px;font-size:16px;border-radius:8px;border:2px solid;cursor:pointer;background:#fff;font-family:inherit;transition:transform .1s}
+.verdicts button:hover{transform:translateY(-2px)}
+.v-ancient{color:var(--ok);border-color:var(--ok)}
+.v-modern{color:var(--warn);border-color:var(--warn)}
+.v-junk{color:var(--bad);border-color:var(--bad)}
+.v-skip{color:#777;border-color:#bbb;flex:0 0 100px !important}
+.hint{text-align:center;color:#998;font-size:12px;margin-top:12px}
+.stats{display:flex;gap:16px;font-size:13px;color:#665}
+.flash{position:fixed;top:18px;left:50%;transform:translateX(-50%);padding:8px 22px;border-radius:20px;color:#fff;font-size:14px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9}
+.done{text-align:center;padding:60px 0;color:var(--gold);font-size:18px}
+</style>
+</head>
+<body>
+<h1>📜 语料清洗 · 人工校验台</h1>
+<div class="bar" id="loginBar">
+  <span>手机号登录（需 kb:ingest 权限）：</span>
+  <input id="phone" placeholder="手机号" style="width:130px">
+  <button onclick="login()">登录</button>
+  <span id="loginMsg" style="color:var(--bad)"></span>
+</div>
+<div class="bar">
+  <label>批次 <input id="batch" style="width:110px"></label>
+  <button onclick="loadQueue(0)">加载队列</button>
+  <label><input type="checkbox" id="onlyPending" checked> 只看未裁决</label>
+  <div class="progress"><i id="pgFill" style="width:0%"></i><span id="pgText">—</span></div>
+</div>
+<div class="bar stats" id="statLine"></div>
+<div class="card" id="card" style="display:none">
+  <div class="meta">
+    <span class="pill" id="mModule"></span>
+    <span class="pill" id="mEntry"></span>
+    <span class="pill rule" id="mRule"></span>
+  </div>
+  <div class="title" id="mTitle"></div>
+  <div class="content" id="mContent"></div>
+  <div class="verdicts">
+    <button class="v-ancient" onclick="judge('ancient')">古籍原文 <small>(1)</small></button>
+    <button class="v-modern" onclick="judge('modern')">现代讲义 <small>(2)</small></button>
+    <button class="v-junk" onclick="judge('junk')">垃圾 <small>(3)</small></button>
+    <button class="v-skip" onclick="next()">跳过 →</button>
+  </div>
+  <div class="hint">规则判的标签显示在上方，您认为对就点同类确认，错就点正确类纠正。快捷键 1/2/3，空格跳过。</div>
+</div>
+<div class="done" id="doneBox" style="display:none">🎉 本批队列裁决完毕</div>
+<div class="flash" id="flash"></div>
+<script>
+var API='http://127.0.0.1:8900';
+var token=localStorage.getItem('mlbj_token')||'';
+var csrf='';
+var queue=[],qi=0,offset=0;
+document.getElementById('batch').value=new URLSearchParams(location.search).get('batch')||('');
+if(token) document.getElementById('loginBar').style.display='none';
+
+function flash(msg,color){var f=document.getElementById('flash');f.textContent=msg;f.style.background=color||'#555';f.style.opacity=1;setTimeout(function(){f.style.opacity=0},1200)}
+function login(){
+  var p=document.getElementById('phone').value.trim();
+  fetch(API+'/api/user/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:p})}).then(function(r){return r.json()}).then(function(d){
+    var t=(d.data&&(d.data.token||d.data.accessToken))||d.token;
+    if(!t){document.getElementById('loginMsg').textContent='登录失败';return}
+    token=t;localStorage.setItem('mlbj_token',t);document.getElementById('loginBar').style.display='none';flash('已登录','#2e7d32');
+  }).catch(function(){document.getElementById('loginMsg').textContent='网络错误'});
+}
+function getCsrf(){return fetch(API+'/api/csrf-token').then(function(r){return r.json()}).then(function(d){csrf=(d.data&&(d.data.token||d.data.csrfToken))||d.token||d.csrfToken||''})}
+function loadQueue(off){
+  offset=off||0;
+  var b=document.getElementById('batch').value.trim();
+  var pend=document.getElementById('onlyPending').checked?'1':'0';
+  fetch(API+'/api/admin/kb-tag-review/queue?batch='+encodeURIComponent(b)+'&pending='+pend+'&limit=50&offset='+offset,{headers:{'Authorization':'Bearer '+token}})
+  .then(function(r){return r.json()}).then(function(d){
+    var data=d.data||d;
+    if(!data.rows){flash(data.message||d.error||'加载失败','#b71c1c');return}
+    queue=data.rows;qi=0;render();prog(data.progress);
+  }).catch(function(e){flash('加载失败:'+e.message,'#b71c1c')});
+}
+function prog(p){
+  if(!p)return;
+  var pct=p.total?Math.round(p.done/p.total*100):0;
+  document.getElementById('pgFill').style.width=pct+'%';
+  document.getElementById('pgText').textContent=p.done+'/'+p.total+' ('+pct+'%)';
+  var acc=p.done?Math.round(p.agree/p.done*100):null;
+  document.getElementById('statLine').innerHTML='<span>规则一致率：<b>'+(acc===null?'—':acc+'%')+'</b></span><span>（目标 ≥90%，低于则回炉调规则重打标）</span>';
+}
+function render(){
+  var it=queue[qi];
+  if(!it){
+    document.getElementById('card').style.display='none';
+    if(queue.length>=50){loadQueue(offset+50);return}
+    document.getElementById('doneBox').style.display='block';return;
+  }
+  document.getElementById('doneBox').style.display='none';
+  document.getElementById('card').style.display='block';
+  document.getElementById('mModule').textContent=it.module||'—';
+  document.getElementById('mEntry').textContent=it.entry_id;
+  var r=document.getElementById('mRule');r.textContent='规则判：'+({ancient:'古籍原文',modern:'现代讲义',junk:'垃圾'})[it.rule_tag];r.className='pill rule '+it.rule_tag;
+  document.getElementById('mTitle').textContent=it.title||'(无标题)';
+  document.getElementById('mContent').textContent=it.content||'(无正文)';
+}
+function judge(v){
+  var it=queue[qi];if(!it)return;
+  var body={batch:it.batch,entry_id:it.entry_id,verdict:v};
+  var go=function(){
+    fetch(API+'/api/admin/kb-tag-review/verdict',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'x-csrf-token':csrf},body:JSON.stringify(body)})
+    .then(function(r){return r.json()}).then(function(d){
+      var data=d.data||d;
+      if(data.ok){
+        flash(v===it.rule_tag?'✓ 确认一致':'✎ 已纠正为「'+({ancient:'古籍原文',modern:'现代讲义',junk:'垃圾'})[v]+'」', v===it.rule_tag?'#2e7d32':'#e65100');
+        it.verdict=v;next();
+      }else flash(data.error||'提交失败','#b71c1c');
+    }).catch(function(){flash('网络错误','#b71c1c')});
+  };
+  if(csrf)go();else getCsrf().then(go);
+}
+function next(){qi++;render()}
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT')return;
+  if(e.key==='1')judge('ancient');else if(e.key==='2')judge('modern');else if(e.key==='3')judge('junk');else if(e.key===' '){e.preventDefault();next()}
+});
+</script>
+</body>
+</html>
