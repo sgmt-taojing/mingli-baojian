@@ -488,19 +488,26 @@ $('btnRxSign').addEventListener('click',function(){
   var diagnosis=$('docDiagnosis').value.trim(),prescription=$('docPrescription').value.trim();
   if(!diagnosis&&!prescription){setSt('rxStatus','请先填写辨证诊断或处方','err');return}
   if(!token){setSt('rxStatus','请先在上方填入签名 Token','err');return}
+  // 2026-10-17：与审核台同规范——命理师先签、医生定稿随附命理结论；未签需明示确认
+  if(!mlDone||!mlDone.id){
+    if(!confirm('⚠ 命理师尚未审核签名。\n按平台规范应先完成「命理批注签名」，再由医生定稿，命理结论随处方归档。\n\n仍要在无命理结论的情况下定稿吗？'))return;
+  }
   ensurePatient(function(){
   $('btnRxSign').disabled=true;setSt('rxStatus','建方中…','');
   fetch(API+'/api/clinic/prescription/draft',{method:'POST',headers:hdr(),
-    body:JSON.stringify({diagnosis:diagnosis,prescription:prescription,patientId:currentPatientId})})
+    body:JSON.stringify({diagnosis:diagnosis,prescription:prescription,patientId:currentPatientId,mingliAnnotationId:(mlDone&&mlDone.id)||undefined})})
   .then(function(r){return r.json()}).then(function(d){
-    if(!d.ok){setSt('rxStatus','建方失败:'+(d.error||d.message||''),'err');$('btnRxSign').disabled=false;return}
-    setSt('rxStatus','草案 #'+d.id+' 已建,签名中…','');
+    if(!d.ok){
+      // 2026-10-17：本地缓存的患者 id 已被服务端清理——清掉缓存引导重建档，不再悬空引用
+      if(d.error==='PATIENT_NOT_FOUND'){localStorage.removeItem('cw_patient_id');currentPatientId=null;setSt('rxStatus','患者档案不存在（本地缓存已过期），请重新建档后签名','err');$('btnRxSign').disabled=false;return}
+      setSt('rxStatus','建方失败:'+(d.error||d.message||''),'err');$('btnRxSign').disabled=false;return}
+    setSt('rxStatus','草案 #'+d.id+' 已建'+(d.mingliAttached?'（随附命理批注）':'')+',签名中…','');
     return fetch(API+'/api/clinic/prescription/sign',{method:'POST',headers:hdr(),body:JSON.stringify({id:d.id})})
     .then(function(r){return r.json()}).then(function(s){
       $('btnRxSign').disabled=false;
       if(!s.ok){setSt('rxStatus','签名失败:'+(s.error||s.message||''),'err');return}
-      rxDone=s;$('rxState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>';
-      setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效','ok');
+      rxDone=s;$('rxState').innerHTML='<span class="signed-mark">已签名 · '+esc(s.signer)+'</span>'+(s.mingliAttached?' <span class="signed-mark">☯ 命理批注 #'+s.mingliAnnotationId+' 随案归档</span>':'');
+      setSt('rxStatus','✅ 电子处方 #'+s.id+' 已生效'+(s.mingliAttached?'，命理批注随案归档':'（无命理批注随案）'),'ok');
       $('prodRx').textContent='#'+s.id+' · '+s.signer;checkDone();
     });
   }).catch(function(e){$('btnRxSign').disabled=false;setSt('rxStatus','请求失败:'+e.message,'err')});
@@ -519,7 +526,9 @@ $('btnMlSign').addEventListener('click',function(){
   fetch(API+'/api/clinic/mingli/draft',{method:'POST',headers:hdr(),
     body:JSON.stringify({year:y,month:m,day:d,hour:($('pHour').value!==''?parseInt($('pHour').value):12),gender:$('pGender').value,name:$('pName').value||'',patientId:currentPatientId})})
   .then(function(r){return r.json()}).then(function(res){
-    if(!res.ok){setSt('mlStatus','草案失败:'+(res.error||res.message||''),'err');$('btnMlSign').disabled=false;return}
+    if(!res.ok){
+      if(res.error==='PATIENT_NOT_FOUND'){localStorage.removeItem('cw_patient_id');currentPatientId=null;setSt('mlStatus','患者档案不存在（本地缓存已过期），请重新建档后签名','err');$('btnMlSign').disabled=false;return}
+      setSt('mlStatus','草案失败:'+(res.error||res.message||''),'err');$('btnMlSign').disabled=false;return}
     mlDraftId=res.id;setSt('mlStatus','草案 #'+res.id+' 落库,签名中…','');
     return fetch(API+'/api/clinic/mingli/sign',{method:'POST',headers:hdr(),body:JSON.stringify({id:mlDraftId,annotation:ann})})
     .then(function(r){return r.json()}).then(function(s){
