@@ -1,3 +1,16 @@
+# 2026-10-18 16:10 — 🔴 监管催办：M1/M2 今日到期未动（总指挥） ·Kimi
+
+- **M1（截止今日 10-18）**：奇门两页（qimen-chart.html / yijing-qimen.html）未引用统一 PaipanTap 组件（paipan-tap-pop.js），探针持续红。bazi/ziwei 等 7 页已是标准接法，照抄即可。
+- **M2（截止今日 10-18）**：历史/详情页（report.html、tcm-report.html 等）未接入 interpVersion 版本标注；盘面 7 页经 paipan-baihua-panel.js 已有版本徽标，历史/详情页需同版本生效。
+- 明早 09:53 巡检若仍红将标「已逾期」并上周报告警。开工铁律：先读此卡再动手。
+
+# 2026-10-17 16:20 — ✅ 会诊类披露一致性：工作台断链与悬空档案双修复 ·Kimi
+
+- **断链修复**：工作台处方建方不带命理批注（审核台已有随附规范）——补 mingliAnnotationId 随附 + 命理师先签 confirm 门控 + 结果如实标注；实测命理#21→处方#12 随案归档 ✓。
+- **悬空引用根治**：localStorage 缓存的患者 id 已被服务端删除时照用不误（实测处方引用不存在的 users#28）——服务端双 draft 端点校验 PATIENT_NOT_FOUND，前端清缓存引导重建档。
+- **审计基线**：unified-consultation 双写披露、clinic-live-room 逐项成败披露均模范，无需改动。
+- 测试数据全清，角色收回。
+
 # 2026-10-17 13:40 — ✅ 综合会诊虚假承诺根治：确认报告接服务端签名链 ·Kimi
 
 - **病灶**：clinic-consultation 三处宣称「7天后蒸馏入库」，实际只写 localStorage 无任何消费方——空口承诺，且无门控空壳可确认。
