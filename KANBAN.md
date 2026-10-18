@@ -1,8 +1,21 @@
+# 2026-10-18 16:35 — ✅ M1+M2 收口：奇门两页迁入统一 PaipanTap + 11 历史详情页版本标注 ·Kimi
+
+- **M1**：qimen-chart.html 旧页内弹层（showPalacePop 约 50 行）整体退役，改 `PaipanTap.bind(grid,'.qm-gong')`（报文走既有 PaipanBaihua.notify 缓存，key 保持 qm+宫位兼容埋点）；yijing-qimen.html 九宫格（.palace-cell）此前无点读，新接入同一组件并缓存排盘报文。实盘：8920 qimen/baihua 带 palace 参数返回 tapDetail.v2 五段式 + interpVersion 2.0.0；8914 冒烟两页 200 且组件挂载到位。
+- **M2**：新建 `js/interp-version-badge.js`（版本号实时取 /api/paipan/glossary 单一事实源，服务不可达静默不显示，点击可见契约说明），批量挂载 11 个历史/详情页（report/tcm-report/lifeflow/monthly/lifeindex/lifeplan/master-archive/youthplan/reports-hub/patient-report/feedback-detail）。入口一致契约补齐：盘面✅报告✅历史/详情✅。
+- 备份 .bak-m1-20261018 ×4、.bak-m2-20261018 ×11；监管探针复跑双绿。
+
 # 2026-10-18 16:10 — 🔴 监管催办：M1/M2 今日到期未动（总指挥） ·Kimi
 
 - **M1（截止今日 10-18）**：奇门两页（qimen-chart.html / yijing-qimen.html）未引用统一 PaipanTap 组件（paipan-tap-pop.js），探针持续红。bazi/ziwei 等 7 页已是标准接法，照抄即可。
 - **M2（截止今日 10-18）**：历史/详情页（report.html、tcm-report.html 等）未接入 interpVersion 版本标注；盘面 7 页经 paipan-baihua-panel.js 已有版本徽标，历史/详情页需同版本生效。
 - 明早 09:53 巡检若仍红将标「已逾期」并上周报告警。开工铁律：先读此卡再动手。
+
+# 2026-10-18 22:58 — ✅ 悬空引用漏洞类全收口：五个写端点补存在性校验 ·Kimi
+
+- **普查**：接收外部 ID 的写端点全量过一遍——submit-symptom 天然安全、签名/流转端点已有行检查、lab-evidence 不落库；5 处缺口补齐。
+- **修复**：clinic/case（患者存在，散客锚点 0 豁免）、followup（病例存在）、prescription/draft 与 mingli/draft（caseId 存在）、tech-order（caseId+queueId 双校验）。
+- **实测七组全过**：悬空全拦截、散客锚点放行、测试数据已清。
+- **结论**：前端缓存 id 失效时服务端一律如实报错，不再静默落悬空数据。
 
 # 2026-10-17 16:20 — ✅ 会诊类披露一致性：工作台断链与悬空档案双修复 ·Kimi
 
