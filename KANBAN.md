@@ -1,3 +1,10 @@
+# 2026-10-18 23:15 — ✅ 古籍检索层审计：库隔离修复+「文献无记载」诚实红线加固 ·Kimi
+
+- **病灶**：isTcmModule 漏归 r45_tcm/r491_/*-tcm/*_tcm 边界模块（命理库召回中医条目）；OOD 垃圾问法（微波炉/量子机）命中现代 junk 条目，「文献无记载」红线失效；中医库相关性弱（挂账）。
+- **修复（server 960b3b8）**：库路由补归四条规则；新增领域锚诚实门槛——无领域词查询须标题命中 bigram 或 trigram 覆盖≥3，配停用 bigram 表防「怎么办」类标题锚漏检。
+- **回归八组全绿**：正常查询命中质量不变；微波炉→文献无记载 ✓；命理库中医查询→文献无记载 ✓；multimodal-query 管线 ✓。
+- **挂账**：KB 语料卫生（现代 junk 混库，需清洗立项）；中医库排序弱（症状本体映射优化）；详见 AUDIT-20261016.md 第十七轮。
+
 # 2026-10-18 16:35 — ✅ M1+M2 收口：奇门两页迁入统一 PaipanTap + 11 历史详情页版本标注 ·Kimi
 
 - **M1**：qimen-chart.html 旧页内弹层（showPalacePop 约 50 行）整体退役，改 `PaipanTap.bind(grid,'.qm-gong')`（报文走既有 PaipanBaihua.notify 缓存，key 保持 qm+宫位兼容埋点）；yijing-qimen.html 九宫格（.palace-cell）此前无点读，新接入同一组件并缓存排盘报文。实盘：8920 qimen/baihua 带 palace 参数返回 tapDetail.v2 五段式 + interpVersion 2.0.0；8914 冒烟两页 200 且组件挂载到位。
