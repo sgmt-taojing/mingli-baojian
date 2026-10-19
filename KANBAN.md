@@ -1,3 +1,10 @@
+# 2026-10-19 11:35 — ✅ domain 回填专项：99.8% 覆盖，category 过滤全库生效 ·Kimi
+
+- **回填 262,528 条**：module→domain 显式映射（中医 259,873 / reference 2,370 / mingli 144 / 紫微 88 / 三式 44 等），scripts/domain-backfill.js 可复跑，仅填空不覆盖。
+- **覆盖率 20% → 99.8%**（328,090/328,717）；category 过滤实测：八字→仅 bazi、阳宅→仅 fengshui，基线不变。
+- **复核清单 627 条**：general/epb（已裁决 junk）+ monthly_cure/yanzhi/distill_wenmo·fusion，含糊不猜待定夺。
+- **挂账**：domain 词汇表混杂（mingli 与八字并列、英文残留），下一轮出注册表统一。
+
 # 2026-10-19 11:05 — ✅ 面相典籍立项：图书集成相术部20卷1387条入库 ·Kimi
 
 - **入库**：《钦定古今图书集成·艺术典·相术部》卷631-650 条目化 1387 条（含《神相全编》全帙/相儿经/人相篇），xiangshu 模块 452→1839 条，scripts/xiangshu-slice.js 可复跑。
