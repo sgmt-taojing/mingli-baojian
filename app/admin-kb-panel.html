@@ -21,7 +21,7 @@
 </head>
 <body data-need-admin="true" class="theme-ops">
 <!-- R504: 新诊疗中心入口 -->
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="javascript:void(0)" onclick="toggleStaging()" style="padding:6px 14px;border:1px solid rgba(61,220,151,.35);border-radius:8px;background:rgba(61,220,151,.07);color:#3ddc97;text-decoration:none;font-size:12px;font-weight:600">🧪 知识审核（staging 158 待审）</a><a href="javascript:void(0)" onclick="toggleManuscript()" style="padding:6px 14px;border:1px solid rgba(232,200,122,.4);border-radius:8px;background:rgba(232,200,122,.07);color:#e8c87a;text-decoration:none;font-size:12px;font-weight:600">📜 手稿审核（pending 队列）</a><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><a href="javascript:void(0)" onclick="toggleStaging()" style="padding:6px 14px;border:1px solid rgba(61,220,151,.35);border-radius:8px;background:rgba(61,220,151,.07);color:#3ddc97;text-decoration:none;font-size:12px;font-weight:600">🧪 知识审核（staging 158 待审）</a><a href="javascript:void(0)" onclick="toggleManuscript()" style="padding:6px 14px;border:1px solid rgba(232,200,122,.4);border-radius:8px;background:rgba(232,200,122,.07);color:#e8c87a;text-decoration:none;font-size:12px;font-weight:600">📜 手稿审核（pending 队列）</a><a href="unified-diagnosis.html" style="padding:6px 14px;border:1px solid rgba(201,168,76,.3);border-radius:8px;background:rgba(201,168,76,.06);color:#c9a84c;text-decoration:none;font-size:12px;font-weight:600">🦋 统一诊疗中心</a><a href="javascript:void(0)" onclick="toggleBrowse()" style="padding:6px 14px;border:1px solid rgba(255,160,220,.35);border-radius:8px;background:rgba(255,160,220,.07);color:#ffa0dc;text-decoration:none;font-size:12px;font-weight:600">📖 门类浏览（梦占/各库抽检）</a></div>
 
 <header class="page-header-bar">
   <div class="phb-left">
@@ -222,6 +222,61 @@ function msReject(){
     <div class="muted" style="color:#7a8aab;font-size:12px;padding:20px;text-align:center">加载中…</div>
   </div>
 </div>
+<div id="browse-panel" style="display:none;margin-top:16px">
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+    <h3 style="color:#e8c87a;font-size:15px;margin:0">门类浏览（formal 正式库抽检）</h3>
+    <select id="br-module" onchange="brLoad(0)" style="padding:5px 8px;border:1px solid rgba(120,160,255,.3);border-radius:8px;background:rgba(0,0,0,.25);color:#dfe6f2;font-size:12px">
+      <option value="mengzhan">梦占 mengzhan</option>
+      <option value="ziwei">紫微 ziwei</option>
+      <option value="bazi">八字 bazi</option>
+      <option value="classics">典籍 classics</option>
+      <option value="folklore">民俗 folklore</option>
+      <option value="taisui">太岁 taisui</option>
+      <option value="zeri">择日 zeri</option>
+      <option value="tcm">中医 tcm</option>
+      <option value="shanghan-lun">伤寒论 shanghan-lun</option>
+    </select>
+    <span id="br-cnt" style="color:#7a8aab;font-size:12px"></span>
+    <span id="br-tags" style="color:#9a8a6a;font-size:11px"></span>
+    <button class="btn small" onclick="brPrev()">← 上一页</button>
+    <button class="btn small" onclick="brNext()">下一页 →</button>
+    <button class="btn small" onclick="brLoad(BR_OFF)">↻ 刷新</button>
+  </div>
+  <div style="color:#7a8aab;font-size:11px;margin-bottom:8px">只读抽检正式库条目（含语料标签分布）。梦占门类为 OCR 断语切条（trust 0.7 · ocr-unverified），抽错请报「梦占切条」issue 流程回炉。</div>
+  <div id="br-list" style="max-height:520px;overflow:auto;border:1px solid rgba(120,160,255,.2);border-radius:10px;padding:8px">
+    <div class="muted" style="color:#7a8aab;font-size:12px;padding:20px;text-align:center">选择门类后加载…</div>
+  </div>
+</div>
+<script>
+var BR_OFF = 0, BR_TOTAL = 0;
+function toggleBrowse(){
+  var p = document.getElementById('browse-panel');
+  if(p){ p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display !== 'none') brLoad(0); }
+}
+function brPrev(){ if(BR_OFF >= 20) brLoad(BR_OFF - 20); }
+function brNext(){ if(BR_OFF + 20 < BR_TOTAL) brLoad(BR_OFF + 20); }
+function brLoad(off){
+  BR_OFF = Math.max(0, off||0);
+  var mod = document.getElementById('br-module').value;
+  var box = document.getElementById('br-list');
+  fetch(API+'/api/admin/kb/browse?module='+encodeURIComponent(mod)+'&limit=20&offset='+BR_OFF)
+    .then(function(r){return r.json()}).then(function(d){
+      var data = d.data || d;
+      if(!data.rows){ box.innerHTML = '<div class="muted">加载失败：'+(d.message||data.error||'')+'</div>'; return; }
+      BR_TOTAL = data.total;
+      document.getElementById('br-cnt').textContent = '共 '+data.total+' 条 · 第 '+(BR_OFF+1)+'-'+Math.min(BR_OFF+20,data.total)+' 条';
+      document.getElementById('br-tags').textContent = (data.tagDist||[]).map(function(t){return t.tag+':'+t.c}).join(' · ');
+      if(!data.rows.length){ box.innerHTML = '<div class="muted">该门类暂无条目</div>'; return; }
+      box.innerHTML = '<table style="width:100%;font-size:12px;border-collapse:collapse"><tr style="color:#e8c87a"><th style="padding:6px;text-align:left">标题</th><th>摘要</th><th>trust</th><th>审计</th></tr>' +
+        data.rows.map(function(r){
+          return '<tr><td style="padding:5px;max-width:280px;color:#dfe6f2">'+(r.title||'')+'</td>' +
+            '<td style="padding:5px;color:#9aa5bd;max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(r.summary||'')+'">'+(r.summary||'')+'</td>' +
+            '<td style="padding:5px;color:#4da3ff">'+r.trust_score+'</td>' +
+            '<td style="padding:5px;color:#9a8a6a">'+(r.audit_status||'')+'</td></tr>';
+        }).join('') + '</table>';
+    }).catch(function(e){ box.innerHTML = '<div class="muted">网络错误</div>'; });
+}
+</script>
 <script>
 var API=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?'http://127.0.0.1:8920':'';
 
