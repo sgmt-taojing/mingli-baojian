@@ -1,5 +1,6 @@
 
 const API = window.location.origin;
+const AUTH_H = () => { const t = localStorage.getItem('admin_token')||localStorage.getItem('token')||''; return t ? {'Authorization':'Bearer '+t} : {}; };
 async function loadStats() {
   document.getElementById('statsPanel').style.display='block';
   document.getElementById('searchPanel').style.display='none';
@@ -7,7 +8,7 @@ async function loadStats() {
   document.getElementById('searchBox').style.display='none';
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===0));
   try {
-    const r = await fetch(API + '/api/admin/kb/stats',{credentials:'include',signal:AbortSignal.timeout(15000)});
+    const r = await fetch(API + '/api/admin/kb/stats',{credentials:'include',headers:AUTH_H(),signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     if (d.error) { document.getElementById('kbGrid').innerHTML = '⚠️ '+d.error; return; }
     document.getElementById('kbGrid').innerHTML = (d.modules||[]).map(m=>`
@@ -30,7 +31,7 @@ document.getElementById('searchBox').addEventListener('input', async (e)=>{
   const q = e.target.value.trim();
   if (q.length<2) return;
   try {
-    const r = await fetch(API + '/api/admin/kb/search?q='+encodeURIComponent(q),{credentials:'include',signal:AbortSignal.timeout(15000)});
+    const r = await fetch(API + '/api/admin/kb/search?q='+encodeURIComponent(q),{credentials:'include',headers:AUTH_H(),signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     document.getElementById('searchPanel').innerHTML = (d.results||[]).slice(0,20).map(x=>`
       <div class="kb-card">
@@ -48,7 +49,7 @@ async function loadHits() {
   document.getElementById('searchBox').style.display='none';
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===2));
   try {
-    const r = await fetch(API + '/api/ai/kb-hit-stats',{credentials:'include',signal:AbortSignal.timeout(15000)});
+    const r = await fetch(API + '/api/ai/kb-hit-stats',{credentials:'include',headers:AUTH_H(),signal:AbortSignal.timeout(15000)});
     const d = await r.json();
     document.getElementById('hitsPanel').innerHTML = '<h3>KB 命中统计</h3><div class="kb-card"><div class="kb-stat">'+(d.total_hits||0)+'</div><div class="kb-meta">累计命中次数</div></div>'+(d.by_module||[]).map(m=>`<div class="kb-card"><h3>${m.module}</h3><div class="kb-stat">${m.hits}</div></div>`).join('');
   } catch(e){ document.getElementById('hitsPanel').innerHTML='❌ '+e.message; }

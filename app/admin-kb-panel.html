@@ -57,7 +57,7 @@
 <script src="js/a11y-divination-hub.js?v=20261016a" defer></script>
   
 </main>
-<script src="js/admin-kb-panel-inline.js?v=20261016a" defer></script>
+<script src="js/admin-kb-panel-inline.js?v=20261019a" defer></script>
   <script src="js/mobile-nav.js?v=20261016a" defer></script>
 
 <style>
@@ -225,17 +225,10 @@ function msReject(){
 <div id="browse-panel" style="display:none;margin-top:16px">
   <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
     <h3 style="color:#e8c87a;font-size:15px;margin:0">门类浏览（formal 正式库抽检）</h3>
-    <select id="br-module" onchange="brLoad(0)" style="padding:5px 8px;border:1px solid rgba(120,160,255,.3);border-radius:8px;background:rgba(0,0,0,.25);color:#dfe6f2;font-size:12px">
+    <select id="br-module" onchange="brLoad(0)" style="padding:5px 8px;border:1px solid rgba(120,160,255,.3);border-radius:8px;background:rgba(0,0,0,.25);color:#dfe6f2;font-size:12px;max-width:260px">
       <option value="mengzhan">梦占 mengzhan</option>
-      <option value="ziwei">紫微 ziwei</option>
-      <option value="bazi">八字 bazi</option>
-      <option value="classics">典籍 classics</option>
-      <option value="folklore">民俗 folklore</option>
-      <option value="taisui">太岁 taisui</option>
-      <option value="zeri">择日 zeri</option>
-      <option value="tcm">中医 tcm</option>
-      <option value="shanghan-lun">伤寒论 shanghan-lun</option>
     </select>
+    <span id="br-grp" style="color:#c9a84c;font-size:11px"></span>
     <span id="br-cnt" style="color:#7a8aab;font-size:12px"></span>
     <span id="br-tags" style="color:#9a8a6a;font-size:11px"></span>
     <button class="btn small" onclick="brPrev()">← 上一页</button>
@@ -248,18 +241,55 @@ function msReject(){
   </div>
 </div>
 <script>
-var BR_OFF = 0, BR_TOTAL = 0;
+var BR_OFF = 0, BR_TOTAL = 0, BR_REGS = null;
 function toggleBrowse(){
   var p = document.getElementById('browse-panel');
-  if(p){ p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display !== 'none') brLoad(0); }
+  if(p){ p.style.display = p.style.display === 'none' ? 'block' : 'none'; if(p.style.display !== 'none'){ brLoadRegistry(); brLoad(0); } }
+}
+// 模块注册表驱动（第三十轮）：220 模块按 16 标准组分组，中文展示名 + 条目数
+function kbAuthH(){ var t=localStorage.getItem('admin_token')||localStorage.getItem('token')||''; return t?{'Authorization':'Bearer '+t}:{}; }
+function brLoadRegistry(){
+  if (BR_REGS) { brRenderSelect(); return; }
+  fetch(API+'/api/admin/kb/modules',{credentials:'include',headers:kbAuthH()}).then(function(r){return r.json()}).then(function(d){
+    var data = d.data || d;
+    if (!data.rows) return;
+    BR_REGS = data.rows;
+    brRenderSelect();
+  }).catch(function(){});
+}
+function brRenderSelect(){
+  var sel = document.getElementById('br-module');
+  if (!sel || !BR_REGS) return;
+  var cur = sel.value || 'mengzhan';
+  var groups = {};
+  BR_REGS.forEach(function(r){ (groups[r.std_group] = groups[r.std_group] || []).push(r); });
+  var html = '';
+  Object.keys(groups).forEach(function(g){
+    html += '<optgroup label="'+g+'">';
+    groups[g].forEach(function(r){
+      var warn = r.note ? ' ⚠' : '';
+      html += '<option value="'+r.module+'"'+(r.module===cur?' selected':'')+'>'+r.display_name+'（'+r.entry_count+'）'+warn+'</option>';
+    });
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
+  brShowGroup();
+}
+function brShowGroup(){
+  if (!BR_REGS) return;
+  var mod = document.getElementById('br-module').value;
+  var r = BR_REGS.find(function(x){return x.module===mod});
+  var el = document.getElementById('br-grp');
+  if (el && r) el.textContent = '['+(r.domain&&r.domain!==r.std_group?r.std_group+'·'+r.domain:r.std_group)+']'+(r.note?' '+r.note:'');
 }
 function brPrev(){ if(BR_OFF >= 20) brLoad(BR_OFF - 20); }
 function brNext(){ if(BR_OFF + 20 < BR_TOTAL) brLoad(BR_OFF + 20); }
 function brLoad(off){
   BR_OFF = Math.max(0, off||0);
+  brShowGroup();
   var mod = document.getElementById('br-module').value;
   var box = document.getElementById('br-list');
-  fetch(API+'/api/admin/kb/browse?module='+encodeURIComponent(mod)+'&limit=20&offset='+BR_OFF)
+  fetch(API+'/api/admin/kb/browse?module='+encodeURIComponent(mod)+'&limit=20&offset='+BR_OFF,{credentials:'include',headers:kbAuthH()})
     .then(function(r){return r.json()}).then(function(d){
       var data = d.data || d;
       if(!data.rows){ box.innerHTML = '<div class="muted">加载失败：'+(d.message||data.error||'')+'</div>'; return; }
