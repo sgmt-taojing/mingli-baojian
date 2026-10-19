@@ -58,3 +58,14 @@
     });
   }
 })();
+// R749: 全站图标统一——注入 icon-swap.js（emoji 标识 → 线性 SVG）
+// 安全边界由 icon-swap.js 自保证：仅替换注册表内的物体类 emoji，内容符号不动
+(function () {
+  if (window.ML_ICON_SWAP === false) return;
+  if (document.querySelector('script[data-ml-icon-swap]')) return;
+  var sc = document.createElement('script');
+  sc.src = 'js/icon-swap.js?v=20261020a';
+  sc.dataset.mlIconSwap = '1';
+  sc.defer = true;
+  document.head.appendChild(sc);
+})();
