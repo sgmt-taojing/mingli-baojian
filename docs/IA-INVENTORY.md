@@ -1,6 +1,6 @@
 # 命理宝鉴 · 全站信息架构盘点表（2026-10-19 第三十四轮）
 
-共 188 个页面。按文件名+标题关键词自动归类，供后续整合/下线决策复核。
+共 188 个页面。按文件名+标题关键词自动归类，供后续整合/下线决策复核。2026-10-20 第三十五轮：原「其他 48」已细分为 康养健康 8 / 命理师工作台 10 / 规划蓝图 3 / AI助手与工具 3 / 设备与AI工程 11 / 商业运营 4 / 系统支撑 8，另有 review-studio 归入问诊医疗（41）。
 
 | 功能域 | 页面 | 标题 |
 |---|---|---|
@@ -38,6 +38,7 @@
 |  | tcm-syndromes.html | TCM 四诊辨证索引 · 命理宝鉴 |
 |  | tcm-visual-reference.html | TCM 四诊视觉参考 · 命理宝鉴 |
 |  | unified-consultation.html | AI 实时诊疗一体化平台 · 命理宝鉴 |
+|  | review-studio.html | 双师审核台 · 电子处方+命理批注 · 命理宝鉴 |
 |  | unified-diagnosis.html | 统一诊疗中心 · 命理宝鉴 |
 |  | voice-consult.html | 语音问诊 · 周易中医联合分析 · 命理宝鉴 |
 |  | wangzhen-center.html | 望诊中心 · 命理宝鉴 |
@@ -144,51 +145,50 @@
 |  | share-center.html | 分享中心 · 命理宝鉴 |
 |  | voice-portal.html | 一句话直达 · 命理宝鉴 |
 |  | wechat-hub.html | 命理宝鉴 · 缘主工具 |
-| 其他 | activate.html | 激活 · 选择您的地区和语言 |
-|  | ai-assistant.html | AI命理助手 · 命理宝鉴 |
-|  | ai-engine-config.html | AI 视觉引擎配置 · 命理宝鉴 |
-|  | api-docs.html | API 文档 · 命理宝鉴 |
-|  | camera-capture.html | 桌面摄像头采集 · 命理宝鉴 |
-|  | clear-cache.html | 清理缓存 | 命理宝鉴 |
-|  | curator.html | 命理馆长 · 命理宝鉴 |
-|  | daily-summary.html | 今日完成 · 命理宝鉴 |
-|  | device-test.html | 设备检测 · 命理宝鉴 |
-|  | disclaimer.html | 免责声明 — 命理宝鉴 |
-|  | distill-cache-status.html | 蒸馏缓存命中看板 · 命理宝鉴 |
-|  | export-guard.html | 数据安全导出 · 命理宝鉴 |
-|  | feedback-detail.html | 反馈详情 · 命理宝鉴 |
-|  | glass-console.html | 先知智镜 · 智能眼镜控制台 · 命理宝鉴 |
-|  | glass-history.html | 智能眼镜 · 历史回溯 · 命理宝鉴 |
-|  | health-forecast.html | 健康预测 · 命理宝鉴 |
-|  | im.html | 站内消息 · 命理宝鉴 |
+| 康养健康 | health-forecast.html | 健康预测 · 命理宝鉴 |
+|  | personal-push.html | 千人千面 · 居家个性化推送 · 命理宝鉴 |
+|  | pharmacy.html | 药房台 · 命理宝鉴医疗云 |
+|  | sos.html | 紧急求助 · 一键呼叫 · 命理宝鉴 |
+|  | tizhi.html | 体质辨识 · 命理宝鉴 |
+|  | wellness-guide.html | 健康指导 · 命理宝鉴 |
+|  | wellness-track.html | 健康打卡 · 康养监测 · 命理宝鉴 |
+|  | wellness-weekly.html | 康养人周分析 · 命理宝鉴 |
+| 命理师工作台 | curator.html | 命理馆长 · 命理宝鉴 |
 |  | koujue-gallery.html | 命理宝鉴 · 口诀库 |
-|  | lifeflow-timeline.html | 终身三维滚动预览 · 命理宝鉴 |
-|  | lifeplan-detail.html | 人生蓝图 · 命理宝鉴 |
 |  | master-archive.html | 命理宝鉴 · 公共档案库（54 命理大师全量） |
 |  | master-class.html | 名师课堂 · 命理宝鉴 |
 |  | master-elder.html | 周易大师端 · 老年友好版 · 命理宝鉴 |
 |  | master-workstation.html | 命理大师工作台 · 命理宝鉴 |
 |  | masters.html | masters · 命理宝鉴 |
-|  | merchant-apply.html | 商家入驻 · 命理宝鉴 |
 |  | merit-system.html | 命理宝鉴 · 功德系统 |
 |  | mingli-review.html | 命理档案审核 · 命理师工作台 |
 |  | mingtu-collation.html | 命图校勘台账 · 命理宝鉴 |
+| 规划蓝图 | lifeflow-timeline.html | 终身三维滚动预览 · 命理宝鉴 |
+|  | lifeplan-detail.html | 人生蓝图 · 命理宝鉴 |
+|  | youthplan-detail.html | 青少年专属规划 · 命理宝鉴 |
+| AI助手与工具 | ai-assistant.html | AI命理助手 · 命理宝鉴 |
 |  | nihaisha-tool.html | 倪师智慧·中医课程检索工具 · 命理宝鉴 |
+|  | yijing-oracle.html | 易经·人盘事盘 · 命理宝鉴 |
+| 设备与AI工程 | ai-engine-config.html | AI 视觉引擎配置 · 命理宝鉴 |
+|  | camera-capture.html | 桌面摄像头采集 · 命理宝鉴 |
+|  | device-test.html | 设备检测 · 命理宝鉴 |
+|  | distill-cache-status.html | 蒸馏缓存命中看板 · 命理宝鉴 |
+|  | export-guard.html | 数据安全导出 · 命理宝鉴 |
+|  | glass-console.html | 先知智镜 · 智能眼镜控制台 · 命理宝鉴 |
+|  | glass-history.html | 智能眼镜 · 历史回溯 · 命理宝鉴 |
 |  | ocr-history.html | OCR 历史 · 命理宝鉴 |
-|  | offline.html | 离线模式 · 命理宝鉴 |
-|  | org-analytics.html | 机构经营分析 · 命理宝鉴 |
-|  | personal-push.html | 千人千面 · 居家个性化推送 · 命理宝鉴 |
-|  | pharmacy.html | 药房台 · 命理宝鉴医疗云 |
-|  | review-studio.html | 双师审核台 · 电子处方+命理批注 · 命理宝鉴 |
-|  | shop.html | 命理宝鉴 · 服务套餐 |
-|  | sos.html | 紧急求助 · 一键呼叫 · 命理宝鉴 |
-|  | tizhi.html | 体质辨识 · 命理宝鉴 |
 |  | training-collect.html | 训练素材采集工作台 · 命理宝鉴 |
 |  | vision-demo.html | AI 视觉演示 · 命理宝鉴 |
 |  | vision-engine-health.html | 视觉引擎健康 · 命理宝鉴 |
+| 商业运营 | merchant-apply.html | 商家入驻 · 命理宝鉴 |
+|  | org-analytics.html | 机构经营分析 · 命理宝鉴 |
+|  | shop.html | 命理宝鉴 · 服务套餐 |
 |  | wechat-h5.html | 命理宝鉴 · 微信公众号 |
-|  | wellness-guide.html | 健康指导 · 命理宝鉴 |
-|  | wellness-track.html | 健康打卡 · 康养监测 · 命理宝鉴 |
-|  | wellness-weekly.html | 康养人周分析 · 命理宝鉴 |
-|  | yijing-oracle.html | 易经·人盘事盘 · 命理宝鉴 |
-|  | youthplan-detail.html | 青少年专属规划 · 命理宝鉴 |
+| 系统支撑 | activate.html | 激活 · 选择您的地区和语言 |
+|  | api-docs.html | API 文档 · 命理宝鉴 |
+|  | clear-cache.html | 清理缓存 |
+|  | daily-summary.html | 今日完成 · 命理宝鉴 |
+|  | disclaimer.html | 免责声明 — 命理宝鉴 |
+|  | feedback-detail.html | 反馈详情 · 命理宝鉴 |
+|  | im.html | 站内消息 · 命理宝鉴 |
+|  | offline.html | 离线模式 · 命理宝鉴 |
