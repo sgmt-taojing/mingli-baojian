@@ -1,6 +1,6 @@
 /**
  * paipan-tap-pop.js — 排盘点读浮动弹层（R-TAP-X）
- * 六爻点爻 / 紫微点宫 / 风水点宫 /（奇门走页内旧实现，接口一致）
+ * 六爻点爻 / 紫微点宫 / 风水点宫 / 奇门点宫（M1·2026-10-18 两奇门页已迁入统一组件）
  *
  * 用法：
  *   PaipanTap.bind(container, selector, { module, keyOf(el), paramOf(el) })
@@ -44,13 +44,60 @@
       '.pt-line .pt-label{display:inline-block;min-width:52px;color:#c9a84c;font-weight:600;margin-right:6px}' +
       '.pt-line.good .pt-label{color:#4ec9b0}.pt-line.bad .pt-label{color:#ef4444}' +
       '.pt-hint{margin-top:8px;font-size:10px;color:#8b7e6a;text-align:center}' +
-      '.pt-tip{font-size:11px;color:#8b7e6a;text-align:center;margin:8px auto 2px;max-width:800px;line-height:1.6}';
+      '.pt-tip{font-size:11px;color:#8b7e6a;text-align:center;margin:8px auto 2px;max-width:800px;line-height:1.6}' +
+      '.pt-sec{margin-top:8px}' +
+      '.pt-sec-t{font-size:11px;font-weight:600;color:#c9a84c;margin-bottom:3px}' +
+      '.pt-sec-b{font-size:12px;color:#e8dcc8;margin-bottom:4px;padding-left:2px;line-height:1.7}' +
+      '.pt-meta{font-size:10px;color:#8b7e6a}' +
+      '.pt-term{border-bottom:1px dashed rgba(201,168,76,.6);cursor:help}' +
+      '.pt-termbox{margin-top:6px;padding:6px 8px;background:rgba(201,168,76,.08);border-radius:6px;font-size:11px;line-height:1.6;color:#e8dcc8}' +
+      '.pt-termbox b{color:#c9a84c}' +
+      '.pt-disc{margin-top:10px;padding-top:6px;border-top:1px dashed rgba(201,168,76,.25);font-size:10px;color:#8b7e6a;line-height:1.6}';
     document.head.appendChild(st);
   }
 
   function hide() { if (_pop) { _pop.remove(); _pop = null; _key = null; } }
   document.addEventListener('click', hide);
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') hide(); });
+
+  // R-INTERP-V2-GLOSSARY: 术语点击解释（词典懒加载一次，长词优先匹配）
+  var _gloss = null, _glossRe = null;
+  (function loadGlossary() {
+    try {
+      fetch(API_BASE + '/api/paipan/glossary', { headers: { 'X-Skip-Interceptor': '1' } })
+        .then(function (r) { return r.json(); })
+        .then(function (g) {
+          if (!g || !g.ok || !g.terms) return;
+          _gloss = g.terms;
+          var keys = Object.keys(_gloss).sort(function (a, b) { return b.length - a.length; });
+          if (keys.length) _glossRe = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g');
+        }).catch(function () {});
+    } catch (_) {}
+  })();
+  // 输入必须是已转义文本；术语本身为纯中文词，无 HTML 注入面
+  function linkify(escapedText) {
+    if (!_glossRe) return escapedText;
+    return escapedText.replace(_glossRe, function (m) { return '<span class="pt-term" data-t="' + m + '">' + m + '</span>'; });
+  }
+  // 弹层内术语点击 → 底部释义条
+  function bindTermClicks(pop) {
+    pop.addEventListener('click', function (ev) {
+      var t = ev.target.closest && ev.target.closest('.pt-term');
+      if (!t || !_gloss) return;
+      ev.stopPropagation();
+      var term = t.getAttribute('data-t');
+      var g = _gloss[term];
+      if (!g) return;
+      var box = pop.querySelector('.pt-termbox');
+      if (!box) {
+        box = document.createElement('div');
+        box.className = 'pt-termbox';
+        var disc = pop.querySelector('.pt-disc');
+        pop.insertBefore(box, disc || null);
+      }
+      box.innerHTML = '<b>' + esc(term) + '</b>（' + esc(g.cat || '') + '）：' + esc(g.plain || '');
+    });
+  }
 
   function anchorPop(pop, container, anchor) {
     var pw = Math.min(320, container.clientWidth * 0.9);
@@ -97,10 +144,40 @@
     })().then(function (pd) {
       if (_pop !== pop) return; // 已切换/关闭
       if (!pd || !pd.ok) throw new Error((pd && pd.error) || '解读生成失败');
-      pop.innerHTML = '<div class="pt-title"><span>🔮 ' + esc(pd.title) + ' <span style="font-size:10px;border:1px solid currentColor;border-radius:8px;padding:0 6px;color:' + (LV_COLOR[pd.level] || LV_COLOR.neutral) + '">' + (LV_LABEL[pd.level] || '') + '</span></span><button class="pt-close" title="关闭">✕</button></div>'
-        + '<div class="pt-summary ' + pd.level + '">' + esc(pd.summary) + '</div>'
-        + (pd.lines || []).map(function (l) { return '<div class="pt-line ' + l.level + '"><span class="pt-label">' + esc(l.label) + '</span>' + esc(l.text) + '</div>'; }).join('')
-        + '<div class="pt-hint">点击其他位置切换 · 点空白或按 ESC 关闭</div>';
+      var head = '<div class="pt-title"><span>🔮 ' + esc(pd.title || '点读解读') + ' <span style="font-size:10px;border:1px solid currentColor;border-radius:8px;padding:0 6px;color:' + (LV_COLOR[pd.level] || LV_COLOR.neutral) + '">' + (LV_LABEL[pd.level] || '') + '</span></span><button class="pt-close" title="关闭">✕</button></div>';
+      var foot = '<div class="pt-hint">点击其他位置切换 · 点空白或按 ESC 关闭</div>';
+      // R-INTERP-V2: 五段式渲染（一句白话→依据→关联→注意事项→建议），空宫/不确定性如实呈现
+      if (pd.v2) {
+        var v = pd.v2;
+        var html = head;
+        html += '<div class="pt-summary ' + (pd.level || 'neutral') + '">' + esc(v.plain || pd.summary || '') + '</div>';
+        if (v.empty) html += '<div class="pt-sec"><div class="pt-sec-t">📭 空宫/信息说明</div><div class="pt-sec-b">' + esc(v.empty) + '</div></div>';
+        var sec = function (icon, title, arr, fmt) {
+          if (!arr || !arr.length) return '';
+          return '<div class="pt-sec"><div class="pt-sec-t">' + icon + ' ' + title + '</div>'
+            + arr.map(function (x) { return '<div class="pt-sec-b">' + fmt(x) + '</div>'; }).join('') + '</div>';
+        };
+        var advFmt = function (a) {
+          var meta = [a.when && ('何时做：' + a.when), a.cost && ('成本：' + a.cost), (a.done && a.done !== '—') && ('完成标准：' + a.done), a.recheck && ('复查：' + a.recheck)].filter(Boolean).join('；');
+          return '<b>' + esc(a.do) + '</b>——' + esc(a.how || '') + (meta ? '<br><span class="pt-meta">' + esc(meta) + '</span>' : '');
+        };
+        var linkFmt = function (x) { return linkify(esc(x)); };
+        html += sec('📖', '依据', v.basis, linkFmt);
+        html += sec('🔗', '关联', v.relations, linkFmt);
+        html += sec('⚠️', '注意事项', v.cautions, linkFmt);
+        html += sec('🛠', '建议·现实行动', v.advice && v.advice.practical, advFmt);
+        html += sec('🏮', '建议·传统化解（民俗参考）', v.advice && v.advice.traditional, advFmt);
+        html += sec('💭', '不确定性说明', v.uncertainty, esc);
+        html += '<div class="pt-disc">' + esc(v.disclaimer || '') + '</div>';
+        html += '<div class="pt-hint">解读版本 v' + esc(v.version || '') + ' · 术语带虚线下划线可点击 · ESC 关闭</div>';
+        pop.innerHTML = html;
+        bindTermClicks(pop);
+      } else {
+        pop.innerHTML = head
+          + '<div class="pt-summary ' + pd.level + '">' + esc(pd.summary) + '</div>'
+          + (pd.lines || []).map(function (l) { return '<div class="pt-line ' + l.level + '"><span class="pt-label">' + esc(l.label) + '</span>' + esc(l.text) + '</div>'; }).join('')
+          + foot;
+      }
       pop.querySelector('.pt-close').addEventListener('click', hide);
       anchorPop(pop, container, opts.anchor);
       // R-TAP-STATS: 点读埋点上报（火忘式，失败静默）

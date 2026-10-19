@@ -68,13 +68,42 @@
     // 头部
     var head = el('div', 'display:flex;justify-content:space-between;align-items:center;margin-bottom:10px');
     head.appendChild(el('span', 'color:var(--gold,#c9a84c);font-weight:600;letter-spacing:1px;font-size:14px', '💬 白话解读 · ' + (MODULE_NAME[module] || module)));
-    head.appendChild(el('span', 'color:var(--paper3,#8b7e6a);font-size:11px', '不懂术语也能看懂'));
+    head.appendChild(el('span', 'color:var(--paper3,#8b7e6a);font-size:11px', '不懂术语也能看懂' + (data.interpVersion ? ' · 解读 v' + data.interpVersion : '')));
     panel.appendChild(head);
 
     // ① 白话总览
     var ov = el('div', 'background:rgba(201,168,76,.08);border-left:3px solid var(--gold,#c9a84c);border-radius:6px;padding:10px 12px;margin-bottom:12px;line-height:1.8;font-size:13px');
     ov.textContent = data.overview || '';
     panel.appendChild(ov);
+
+    // ①·5 轻重缓急（R-INTERP-V2：四档优先级排列，每条带排序理由与盘面回链）
+    if (data.priorityReport && data.priorityReport.length) {
+      var TIER_STYLE = {
+        '优先处理': { color: '#ef4444', icon: '🔴' },
+        '近期关注': { color: '#f9ab00', icon: '🟡' },
+        '长期改善': { color: '#4ec9b0', icon: '🟢' },
+        '参考信息': { color: '#8b8f9e', icon: '⚪' }
+      };
+      panel.appendChild(el('div', 'color:var(--gold,#c9a84c);font-size:12px;font-weight:600;margin:10px 0 6px', '📋 轻重缓急 · 先看哪个'));
+      data.priorityReport.forEach(function (tier) {
+        var st = TIER_STYLE[tier.tier] || TIER_STYLE['参考信息'];
+        var tbox = el('div', 'margin-bottom:8px;border:1px solid var(--border,#2a3450);border-radius:8px;overflow:hidden');
+        var th = el('div', 'display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(255,255,255,.04);font-size:12px');
+        th.appendChild(el('span', 'font-weight:600;color:' + st.color, st.icon + ' ' + tier.tier + '（' + tier.items.length + '）'));
+        th.appendChild(el('span', 'font-size:10px;color:var(--paper3,#8b7e6a)', tier.reason || ''));
+        tbox.appendChild(th);
+        tier.items.forEach(function (it) {
+          var row = el('div', 'padding:6px 10px;border-top:1px solid rgba(255,255,255,.04);font-size:12px;line-height:1.7');
+          var rt = el('div', 'display:flex;justify-content:space-between;gap:8px;align-items:baseline');
+          rt.appendChild(el('span', 'color:var(--gold,#c9a84c);font-weight:600;flex-shrink:0', it.title));
+          if (it.anchor && it.anchor !== it.title) rt.appendChild(el('span', 'font-size:10px;color:var(--paper3,#8b7e6a)', '↩ 盘面：' + it.anchor));
+          row.appendChild(rt);
+          row.appendChild(el('div', 'color:var(--paper,#e8dcc8)', it.plain));
+          tbox.appendChild(row);
+        });
+        panel.appendChild(tbox);
+      });
+    }
 
     // ② 逐要素卡
     if (data.cards && data.cards.length) {

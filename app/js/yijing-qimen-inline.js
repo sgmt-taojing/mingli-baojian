@@ -158,8 +158,21 @@ function renderQimen(qd) {
       <p class="palace-hp" style="font-size:10px;opacity:.35;line-height:1.5;margin-top:4px">${qiInfo.analysis}</p>
     `;
     if (isKey) cell.style.boxShadow = 'inset 0 0 20px rgba(201,168,76,.15)';
+    cell.dataset.palace = p宫; // M1：统一 PaipanTap 点读
+    cell.style.cursor = 'pointer';
+    cell.title = '点击查看该宫白话解读';
     grid.appendChild(cell);
   });
+
+  // M1：九宫格统一 PaipanTap 点读（绑定一次，重渲染不受影响）
+  if (window.PaipanTap && !grid._tapBound) {
+    grid._tapBound = true;
+    PaipanTap.bind(grid, '.palace-cell', {
+      module: 'qimen',
+      keyOf: function (el) { return 'yjqm' + el.dataset.palace; },
+      paramOf: function (el) { return { palace: el.dataset.palace }; }
+    });
+  }
 
   // Plate info
   const kp = qd.palaces[qd.keyPalace];
@@ -596,6 +609,9 @@ async function computeQimen() {
     });
     const d = await resp.json();
     if (!d || d.ok === false || !d.chart) { showToast((d && d.error) || '奇门排盘失败'); return; }
+    // M1：缓存排盘报文供 PaipanTap 点读复用（与 baihua 面板同契约）
+    window._paipanBody = window._paipanBody || {};
+    window._paipanBody['qimen'] = { year, month, day, hour: hourNum };
     const qd = _adaptQimenChart(d.chart);
     renderQimen(qd);
     document.getElementById('qmResultSection').classList.add('visible');

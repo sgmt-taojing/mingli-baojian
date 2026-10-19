@@ -14,19 +14,28 @@
       '.mbn-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 10px;text-decoration:none;color:#a09080;font-size:10px;min-width:52px;border-radius:8px;transition:.15s}' +
       '.mbn-item.active{color:#e8cc7a;background:rgba(201,168,76,.1)}' +
       '.mbn-item:hover{color:#e8cc7a}' +
-      '.mbn-icon{font-size:20px;line-height:1}';
+      '.mbn-icon{width:22px;height:22px;display:block}.mbn-icon svg{width:100%;height:100%;display:block}';
     document.head.appendChild(st);
   }
   // R747: divination-hub 已是跳转页，不再特殊排除
 
   // R747: 导航项重构——面向大众的高频功能（去掉运维项，首页指向大厅）
+  // R748: emoji → 统一线性 SVG 图标（stroke=currentColor，视觉口径一致，不依赖系统 emoji 字体）
+  var IC = {
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9.5 21v-6h5v6"/></svg>',
+    voice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12z"/></svg>',
+    paipan: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a4.5 4.5 0 0 1 0 9 4.5 4.5 0 0 0 0 9"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="16.5" r="1.1" fill="currentColor" stroke="none"/></svg>',
+    assistant: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V3.5"/><circle cx="9" cy="12.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="12.5" r="1.1" fill="currentColor" stroke="none"/><path d="M9.5 16h5"/></svg>',
+    huangli: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3v4M16 3v4"/><path d="M8 14h3M8 17h6"/></svg>',
+    mine: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 21c1.5-4 4.5-6 7.5-6s6 2 7.5 6"/></svg>'
+  };
   var ITEMS = [
-    { href: 'index.html', icon: '🏠', label: '首页', key: 'home' },
-    { href: 'voice-portal.html', icon: '⚡', label: '直达', key: 'voice' },
-    { href: 'paipan-quick.html', icon: '☯', label: '命理', key: 'paipan' },
-    { href: 'ai-assistant.html', icon: '🤖', label: '助手', key: 'assistant' },
-    { href: 'huangli-daily.html', icon: '📅', label: '黄历', key: 'huangli' },
-    { href: 'patient-journey.html', icon: '📋', label: '我的', key: 'mine' }
+    { href: 'index.html', icon: IC.home, label: '首页', key: 'home' },
+    { href: 'voice-portal.html', icon: IC.voice, label: '直达', key: 'voice' },
+    { href: 'paipan-quick.html', icon: IC.paipan, label: '命理', key: 'paipan' },
+    { href: 'ai-assistant.html', icon: IC.assistant, label: '助手', key: 'assistant' },
+    { href: 'huangli-daily.html', icon: IC.huangli, label: '黄历', key: 'huangli' },
+    { href: 'patient-journey.html', icon: IC.mine, label: '我的', key: 'mine' }
   ];
 
   var path = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
