@@ -1,10 +1,10 @@
 # tcm → mingli 能力差集巡检（二阶段增量吸收）
 
-- 生成：2026-10-19 20:22 ｜ 差集指纹 `96a10c8c21bce29a`
-- tcm 侧 HEAD：`9cda9265 v2.19.97 经验方召回92%→96%：词典补14别名+E源抽取主治优先降噪`
+- 生成：2026-10-20 11:50 ｜ 差集指纹 `ea0f54bce616b4b6`
+- tcm 侧 HEAD：`d7d82020 v2.19.110 白话蒸馏中提示+一键优先蒸馏（证型/方剂双通道）+ 磁盘应急`
 - 结论：**⚠ 有待吸收增量**
 
-## L1 API 路由差集（tcm 有 · medical-stack 无）：19 条
+## L1 API 路由差集（tcm 有 · medical-stack 无）：20 条
 - `get /api/clinic/agent/xinglin-review`
 - `get /api/clinic/draft-adoption`
 - `get /api/edu/personalized`
@@ -18,6 +18,7 @@
 - `get /api/multimodal/std-input/contract`
 - `get /api/public/kb/ancient-search`
 - `get /api/teaching/round/:id`
+- `post /api/clinic/agent/vernacular-prioritize`
 - `post /api/clinic/agent/xinglin-review/ack`
 - `post /api/growth/quiz/attempt`
 - `post /api/kb/proofread/submit`

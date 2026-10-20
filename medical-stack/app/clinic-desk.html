@@ -2430,6 +2430,18 @@ function updateQueueButton() {
 }
 
 /* ═══════════════════════ R771 智能体副驾驶：逐句实时上行 + 增量 delta 卡片 + 逐项审核 ═══════════════════════ */
+/* v2.19.110：证型/方剂白话一键优先蒸馏（双通道） */
+async function prioritizeVernacular(syndrome, formula, el) {
+  try {
+    const body = syndrome ? { syndrome } : { formula };
+    const r = await apiCall('/api/clinic/agent/vernacular-prioritize', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }, 6000);
+    if (r && r.ok) {
+      el.outerHTML = '<span style="color:#047857">✓ 已提至蒸馏队首' + (r.already === 'covered' ? '（已有白话）' : '（队列 ' + (r.queue || 1) + ' 条）') + '</span>';
+    } else {
+      el.outerHTML = '<span style="color:#b45309">' + escHtml((r && r.error) || '提交失败') + '</span>';
+    }
+  } catch (e) { el.outerHTML = '<span style="color:#b45309">提交失败</span>'; }
+}
 async function agentEvent(kind, text, role, vision, vital, lab, labs, audio) {
   if (!clinicSessionId) return;                    // 离线会话跳过（会话建立后自然接入）
   const payload = { sessionId: clinicSessionId, kind: kind, text: text || '', role: role || null };
@@ -2467,7 +2479,11 @@ function renderCopilot(d) {
       (d.rationale ? '<br><span style="color:var(--text2);font-size:11px;line-height:1.6">💬 ' + escHtml(d.rationale) + '</span>' : (diff ? '<br><span style="color:var(--text3);font-size:10px">鉴别：' + escHtml(diff) + '</span>' : '')) +
       // v2.19.105：证型/方剂蒸馏白话上屏（古籍说人话，与患者端科普同源）
       (d.syndromeNote ? '<br><span style="display:block;font-size:10px;color:#047857;background:#ecfdf5;border-radius:5px;padding:2px 6px;margin-top:3px">💬 证型白话·' + escHtml(d.syndromeNote.title) + '：' + escHtml(d.syndromeNote.text) + '</span>' : '') +
+      // v2.19.110：证型白话未覆盖 → 琥珀提示条 + 一键优先蒸馏
+      (!d.syndromeNote && d.syndromeNotePending ? '<br><span style="display:block;font-size:10px;color:#92400e;background:#fffbeb;border-radius:5px;padding:2px 6px;margin-top:3px">💬 「' + escHtml(d.syndromeNotePending.syndrome) + '」白话释义蒸馏队列中 <a href="javascript:void(0)" style="color:#1d4ed8;text-decoration:underline" onclick="prioritizeVernacular(\'' + escHtml(d.syndromeNotePending.syndrome) + '\',\'\',this)">优先蒸馏</a></span>' : '') +
       (d.formulaNote ? '<br><span style="display:block;font-size:10px;color:#047857;background:#ecfdf5;border-radius:5px;padding:2px 6px;margin-top:3px">💬 方剂白话·' + escHtml(d.formulaNote.title) + '：' + escHtml(d.formulaNote.text) + '</span>' : '') +
+      // v2.19.110b：方剂白话未覆盖 → 琥珀提示条 + 一键优先蒸馏
+      (!d.formulaNote && d.formulaNotePending ? '<br><span style="display:block;font-size:10px;color:#92400e;background:#fffbeb;border-radius:5px;padding:2px 6px;margin-top:3px">💬 「' + escHtml(d.formulaNotePending.formula) + '」白话释义蒸馏队列中 <a href="javascript:void(0)" style="color:#1d4ed8;text-decoration:underline" onclick="prioritizeVernacular(\'\',\'' + escHtml(d.formulaNotePending.formula) + '\',this)">优先蒸馏</a></span>' : '') +
       (d.formulaReview ? '<br><span style="color:#b45309;font-size:10px;background:#fffbeb;border-radius:4px;padding:1px 5px">⚠️ 方源校勘：' + escHtml((d.formulaReview.notes[0] || '').slice(0, 90)) + '</span>' : '') +
       (d.formulaOptions && d.formulaOptions.length > 1 ? '<br><span style="color:var(--text3);font-size:10px">备选：' + escHtml(d.formulaOptions.slice(1).map(f => (d.formulaOptionsReview || []).includes(f) ? f + '⚠️' : f).join('、')) + '</span>' : '') + '</div>' +
       '<div class="cp-actions"><span class="cp-btn yes" onclick="adoptDelta(\'' + cid + '\',\'' + d.syndrome + '\',\'' + (d.formula || '') + '\')">✓ 采纳入方</span>' +
