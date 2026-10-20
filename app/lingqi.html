@@ -84,6 +84,7 @@ body{background:var(--bg);color:var(--txt);font-family:"Songti SC","STSong",seri
     </div>
     <div id="rBody"></div>
     <div class="poem hidden" id="rPoem"></div>
+    <button class="btn" style="margin-top:14px" onclick="goReport()">生成解读报告 →</button>
   </div>
 
   <div class="card hidden" id="emptyRes">
@@ -194,6 +195,34 @@ function renderVer(){
   else poem.classList.add('hidden');
 }
 function showVer(v){curVer=v;renderVer();}
+/* R-LQ-RPT（2026-10-20）：一键接入报告解读中心——三段式（原文引用/白话导读/语音播报）+ 经典依据卡 */
+function goReport(){
+  const d=DATA[curKey]; if(!d)return;
+  const v=d.siku||d.ocr, o=d.ocr;
+  const shapeTxt=v.shape.replace(/([一二三四])上/,'$1上 ').replace(/([一二三四])中/,'$1中 ').replace(/([一二三四])下/,'$1下');
+  // ①原文引用区：双版本照录
+  let raw='';
+  if(d.siku) raw+='【四库全书本】'+(d.siku.num?'第'+d.siku.num+'课 ':'')+d.siku.name+'（'+d.siku.gong.replace('/',' · ')+'）\n课形 '+shapeTxt+'　'+d.siku.xiang+'\n象曰：'+d.siku.xiangyue+(d.siku.cike?'\n课断：'+d.siku.cike:'')+(d.siku.shiyue?'\n诗曰：'+d.siku.shiyue:'');
+  if(d.ocr) raw+=(raw?'\n\n':'')+'【术数全书本】'+d.ocr.name+'\n象曰：'+d.ocr.xiangyue+(d.ocr.cike?'\n课断：'+d.ocr.cike:'')+(d.ocr.shiyue?'\n诗曰：'+d.ocr.shiyue:'');
+  // ②白话导读区：课断段为古人白话断语，照录不改写
+  const guide=(d.ocr&&d.ocr.cike)||v.cike||'（此课断语阙如）';
+  // ③语音播报短句：卦名+象+课断首句（原文摘句重组，不杜撰）
+  const firstSen=(v.cike||v.xiangyue||'').split(/[。；;]/)[0]||'';
+  const spoken='占得灵棋'+(v.num?'第'+v.num+'课':'一课')+'，'+v.name+'，'+v.xiang+'。'+firstSen+'。';
+  const report={
+    module:'lingqi',
+    summary:'掷灵棋得「'+v.name+'」——课形 '+shapeTxt+'，'+v.xiang+(v.gong?'，'+v.gong.replace('/',' · '):''),
+    segments:[
+      {id:'seg1',title:'① 原文引用区（照录未改）',content:raw},
+      {id:'seg2',title:'② 白话导读区（课断为古人白话断语，照录）',content:guide},
+      {id:'seg3',title:'③ 语音播报短句',content:spoken}
+    ],
+    canon:{note:'本课出自《灵棋经》（旧题汉·东方朔撰），四库全书本与术数全书本互校；阙课不补，以存本真。',
+      items:[{book:'灵棋经',title:v.name+'（'+shapeTxt+'·'+v.xiang+'）',excerpt:v.xiangyue||v.cike||''}]}
+  };
+  try{sessionStorage.setItem('lastReport',JSON.stringify(report));}catch(e){}
+  location.href='report-interpret.html?module=lingqi&name='+encodeURIComponent('缘主');
+}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 </body>
