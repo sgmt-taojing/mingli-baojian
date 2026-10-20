@@ -26,6 +26,7 @@ const KB_SOURCES = [
   {name:'LIUYAOO_KB', entryId:'liuyao-model-v1', modelEntryCount:20, obj:()=>window.LIUYAO_KB, mods:['liuyao','yijing'], weight:0.9},
   {name:'LIUREN_KB', entryId:'liuren-model-v1', modelEntryCount:30, obj:()=>window.LIUREN_KB, mods:['liuren'], weight:0.9},
   {name:'LINGQI_KB', entryId:'lingqi-model-v1', modelEntryCount:210, obj:()=>window.LINGQI_KB, mods:['lingqi'], weight:0.9},
+  {name:'YAPAI_KB', entryId:'yapai-model-v1', modelEntryCount:126, obj:()=>window.YAPAI_KB, mods:['yapai'], weight:0.9},
   {name:'YIJING_KB', entryId:'yijing-model-v1', modelEntryCount:8, obj:()=>window.YIJING_KB, mods:['yijing','zhouyi'], weight:0.9},
   {name:'FENGSHUI_KB', entryId:'fengshui-model-v1', modelEntryCount:44, obj:()=>window.FENGSHUI_KB, mods:['fengshui','zeri','huangli'], weight:0.9},
   {name:'ZODIAC_KB', entryId:'zodiac-model-v1', modelEntryCount:94, obj:()=>window.ZODIAC_KB, mods:['zodiac','shengxiao','taisui','mobile'], weight:0.85},
@@ -318,6 +319,11 @@ const MODULES={
     {q:'您要占问何事？',options:['事业功名','财运求财','感情婚姻','健康疾病','出行远行','失物寻找','官事诉讼','综合运途']},
     {q:'起课方式？',options:['前往掷灵棋法器(推荐)','已知课形手动查课','仅咨询灵棋经义']},
     {q:'请描述所问背景（如已起课请直接告知课形或卦名）',hint:'例如：考虑跳槽，掷得二上三中一下 / 大通卦问求财'}
+  ]},
+  'yapai':{name:'牙牌神数',icon:'🀄',desc:'百二十五课',steps:[
+    {q:'您要占问何事？',options:['事业功名','财运求财','感情婚姻','健康疾病','出行远行','失物寻找','官事诉讼','综合运途']},
+    {q:'起课方式？',options:['已知课形手动查课','仅咨询牙牌义例']},
+    {q:'请描述所问背景（如已起课请直接告知三骰组合与课名）',hint:'例如：问求财，占得 上上·上中·中平，第X课'}
   ]},
   'zeri':{name:'择日择吉',icon:'📅',desc:'选吉日',steps:[
     {q:'您要择日做什么事？',options:['搬家入宅','结婚嫁娶','开业典礼','动土装修','签约谈判','出行远行','安葬祭祀','其他']},
@@ -779,6 +785,8 @@ async function send(pre){
 function detectModule(text){
   // R154：灵棋动作词最优先（parse_natural_query 会把「问事业」类后缀抢路由）
   if(/掷灵棋|灵棋起课|起灵棋|摇灵棋|灵棋课占|掷课/.test((text||'').toLowerCase()))return 'lingqi';
+  // 牙牌神数动作词同样置顶（防 parse_natural_query 抢路由）
+  if(/牙牌|牙牌神数|掷牙牌/.test((text||'').toLowerCase()))return 'yapai';
   if(typeof parse_natural_query==='function'){
     const r=parse_natural_query(text||'');
     if(r && r.module)return r.module;
