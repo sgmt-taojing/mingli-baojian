@@ -355,7 +355,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 
 <script>
 // ═══ 命理宝鉴·医道 四诊采集 v2.0 — 真实 API 驱动的无缝 AI 采集 ═══
-const API = '/';
+const API = ''; // 同源部署空前缀（'/' 会拼出 //api/... 协议相对地址）
 const state = { inquiry: null, face: null, tongue: null, hand: null, captures: {} };
 let currentStep = 1;
 let faceStream = null, tongueStream = null, handStream = null;
@@ -469,20 +469,26 @@ async function capture(part, label, callAI) {
   if (callAI && dataUrl) {
     document.getElementById(part + '-result').innerHTML = '<div style="padding:10px;color:var(--text2)">🔬 AI 分析中...</div>';
     try {
+      // 合规字段：图像网关要求 patient_id + consent_to_process（登录医师操作采集即授权会话；缺省必 400 曾致 AI 分析空转）
+      if (!state.capturePid) state.capturePid = 'cli-' + Date.now().toString(36);
       const r = await fetch(API + '/api/tcm/tongue-analyze', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl, part: part })
+        body: JSON.stringify({ image: dataUrl, part: part, patient_id: state.capturePid, consent_to_process: true })
       });
       const d = await r.json();
       if (d.ok) {
         state[part].aiAnalysis = d;
-        document.getElementById(part + '-result').innerHTML = 
+        // 观察服务契约（label 单分类输出）与富特征契约双兼容
+        const obsLine = d.label
+          ? '🔬 <strong>AI 观察特征</strong>: <b>' + d.label + '</b>' + (d.model_score != null ? '（模型置信 ' + (d.model_score*100).toFixed(1) + '%）' : '')
+          : '🤖 <strong>AI ' + label + '分析</strong>: ' + d.tongue_color + ' · ' + d.coating + ' · ' + d.moisture;
+        document.getElementById(part + '-result').innerHTML =
           '<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px;margin-top:8px">' +
-          '🤖 <strong>AI ' + label + '分析</strong>: ' + d.tongue_color + ' · ' + d.coating + ' · ' + d.moisture +
-          '<br>📚 KB: ' + (d.kb_match?.syndrome || '待匹配') + ' · ' + (d.kb_match?.formula || '—') +
-          '<br>💡 ' + (d.advice || '') + ' <span style="opacity:.6">(置信 ' + Math.round(d.confidence*100) + '%)</span>' +
+          obsLine +
+          '<br>📚 KB: ' + ((d.kb_match && d.kb_match.syndrome) || '待匹配') + ' · ' + ((d.kb_match && d.kb_match.formula) || '—') +
+          '<br>💡 ' + (d.advice || '') + (d.confidence ? ' <span style="opacity:.6">(置信 ' + Math.round(d.confidence*100) + '%)</span>' : '') +
           '</div>';
-        toast('✅ AI ' + label + '完成 · ' + d.kb_match?.syndrome || '');
+        toast('✅ AI ' + label + '完成');
       } else {
         document.getElementById(part + '-result').innerHTML = '<div style="color:var(--text2);padding:10px">AI 引擎离线，已保存本地特征</div>';
       }

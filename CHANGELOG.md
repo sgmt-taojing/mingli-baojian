@@ -1529,7 +1529,7 @@
 - 背景：用户拟卸载智谱 AutoClaw；审计发现 5 个 launchd 服务的 node 解释器指向其内嵌运行时（~/Library/Application Support/autoclaw/embedded-gateway-runtime/fead26bb…/node），卸载即服务全挂。
 - 改造：com.mingli-baojian.medical-api(8972)/medical-extra(8974)/medical-static(8973) + com.smart-home-family.capability-drift-redline/regular 共 5 个 plist，node 路径统一换为系统 /Users/tom/.local/bin/node（版本与内嵌一致 v22.22.3，零兼容风险）；原件备份 /tmp/*.bak-autoclaw。
 - 验收：5 服务全部重载成功；8972 /api/tcm/health 七能力（tongue/face/hand/inquiry/syndrome/formula/acupoint）正常、进程确认跑在系统 node；8973 静态 200、8974 存活。服务层对智谱依赖清零。
-- 遗留提醒：项目本体在 ~/.openclaw-autoclaw/workspace（61GB），卸载智谱后**该目录不得手动删除**（含全部项目与数据）；路径未迁，无需改动任何配置。
+- 遗留提醒：项目本体在 ~/kimi（61GB），卸载智谱后**该目录不得手动删除**（含全部项目与数据）；路径未迁，无需改动任何配置。
 
 ## 2026-09-24 · mlx-v5 熔断修真（KANBAN 挂账 N 日的代码层隐患清零）
 

@@ -13,8 +13,8 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 """蒸馏 ziwei-new-sections.js + authoritative-knowledge-base.js + knowledge-details-extra.js"""
 import re, json, sqlite3, hashlib, os
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
-PREMIUM = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/kb-store/premium"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
+PREMIUM = "/Users/tom/kimi/projects/mingli-baojian/server/kb-store/premium"
 
 db = sqlite3.connect(DB)
 cur = db.cursor()

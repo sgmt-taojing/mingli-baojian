@@ -19,7 +19,7 @@
 第一步（搜索筛选，唯一需要判断的环节）：按库内 README.md 规范（只收公开信息、来源必溯、不编造、不确定标 approximate），搜索筛选 2-3 位新名人（历史人物/时辰记载明确者优先），整理成 candidates JSON 写到 /tmp/celebrity-candidates.json，每人含：person_id、slug（拼音）、name、source、source_url、gender、birth{year,month,day,hour,place,approximate}、facts（改名/迁居/婚姻/子女/事业/健康/财富/官非事件年表，事件带 year）。
 
 第二步（确定性环节全部交给脚本，禁止手工排盘）：
-cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian && python3 scripts/celebrity-ingest.py /tmp/celebrity-candidates.json
+cd /Users/tom/kimi/projects/mingli-baojian && python3 scripts/celebrity-ingest.py /tmp/celebrity-candidates.json
 
 第三步：读脚本输出的 reverse_checks（每事件已预排流年干支十神+所在大运），对每人的 1 个关键事件给一句命中判定（命中/不命中+一句话理由），连同脚本首行摘要作为最终回复（纯中文）。
 

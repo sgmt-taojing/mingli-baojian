@@ -1,8 +1,8 @@
 #!/bin/bash
 # vision-distill-progress.sh — 古籍视觉识别进度检查（纯脚本版，R749 替代 30min agentTurn cron）
 # 原 cron「古籍识别进度检查（每30分钟）」为 LLM agentTurn，180s 超时连败；本脚本零 LLM。
-LOG="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/vision-distill-log.jsonl"
-OUT="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/vision-distill-progress.log"
+LOG="/Users/tom/kimi/projects/mingli-baojian/.openclaw/tmp/vision-distill-log.jsonl"
+OUT="/Users/tom/kimi/projects/mingli-baojian/.openclaw/tmp/vision-distill-progress.log"
 TS=$(date '+%F %T')
 if [ ! -f "$LOG" ]; then
   echo "[$TS] vision-distill-log.jsonl 不存在（识别未启动）" >> "$OUT"

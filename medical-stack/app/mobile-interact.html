@@ -74,6 +74,25 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 .code-row .btn{flex:0 0 108px}
 .login-err{color:var(--accent);font-size:11px;min-height:16px;margin-bottom:8px}
 .offline-note{display:none;background:#fef3c7;color:#92600a;font-size:11px;border-radius:8px;padding:8px 10px;margin-bottom:10px}
+
+/* ⑥ 问诊（八级追问链同步 · 移动端） */
+.inq-input{width:100%;min-height:76px;padding:11px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:#fff;resize:vertical;font-family:inherit;line-height:1.6}
+.inq-syn{background:#f8f3ea;border:1px solid #e5d9c3;border-radius:var(--radius);padding:12px;margin:8px 0}
+.inq-syn .sy{font-size:15px;font-weight:700;color:var(--primary)}
+.inq-syn .cf{font-size:11px;color:var(--text3)}
+.inq-syn .fx{font-size:12px;color:var(--text2);margin-top:6px;line-height:1.7}
+.inq-diff{font-size:11px;color:var(--text2);margin-top:6px;border-top:1px dashed var(--border);padding-top:6px}
+.fu-item{display:flex;gap:8px;align-items:flex-start;padding:9px 10px;border:1px solid var(--border);border-radius:8px;margin:6px 0;background:#fff;font-size:12px;line-height:1.6}
+.fu-item .fi{flex:0 0 22px;font-size:15px}
+.fu-item .fc{flex:1}
+.fu-item .ask{color:var(--text);font-weight:600}
+.fu-item .why{color:var(--text3);font-size:11px;margin-top:2px}
+.fu-item .src{font-size:10px;color:var(--text3);margin-top:2px}
+.fu-item .done{flex:0 0 auto;font-size:11px;color:var(--primary);border:1px solid var(--primary);background:#fff;border-radius:6px;padding:4px 8px;cursor:pointer}
+.fu-item.asked{opacity:.45}
+.inq-alert{border-radius:8px;padding:9px 10px;margin:6px 0;font-size:12px;line-height:1.6}
+.inq-alert.red{background:#fdecea;color:var(--accent)}
+.inq-alert.yellow{background:#fef3c7;color:#92600a}
 </style>
 </head>
 <body>
@@ -96,7 +115,7 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
 <div class="wrap">
   <div class="offline-note" id="offline-note">📡 当前离线：可浏览页面框架，数据与操作不可用（操作不会伪造成功）</div>
   <div class="top-bar">
-    <h1>🩺 医师移动工作台<small>病历审批 · 药方确认 · 随访 · 急症 · 预约</small></h1>
+    <h1>🩺 医师移动工作台<small>问诊 · 病历审批 · 药方确认 · 随访 · 急症 · 预约</small></h1>
     <div class="doc-badge" id="doc-badge"></div>
   </div>
 
@@ -154,9 +173,29 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     </div>
     <div id="list-appt"><div class="loading">载入中…</div></div>
   </div>
+
+  <!-- ⑥ 问诊（八级追问链：红旗排除>鉴别分歧>方证核对>验脉>验舌>治法核对>症状深挖>十问缺口） -->
+  <div class="pane" id="pane-inq">
+    <div class="card">
+      <h4>🎙️ 问诊录入<span class="tag blue" id="inq-sid-tag"></span></h4>
+      <textarea class="inq-input" id="inq-text" placeholder="录入医患对话或主诉，如：头痛发热两天，怕冷无汗，脉浮紧…（症状按顿号/逗号/句号自动切分送引擎）" aria-label="问诊主诉录入"></textarea>
+      <div class="actions">
+        <button class="btn primary" id="inq-btn" onclick="inqSubmit()">▶ 送智能体分析</button>
+        <button class="btn outline" style="flex:0 0 88px" onclick="inqReset()">新会话</button>
+      </div>
+    </div>
+    <div id="inq-alerts"></div>
+    <div id="inq-syn"></div>
+    <div class="card" id="inq-fu-card" style="display:none">
+      <h4>🧭 追问导航<span class="tag gold">按优先级排序</span></h4>
+      <div id="inq-fu"></div>
+    </div>
+    <div class="empty" id="inq-empty">录入对话后，智能体实时比对知识库出具辨证草案与下一步追问建议<br>AI 辅助结论仅供医师参考，最终诊疗决策由执业医师作出</div>
+  </div>
 </div>
 
 <div class="tabbar">
+  <button id="tab-inq" onclick="switchTab('inq')"><span class="ic">🎙️</span>问诊</button>
   <button id="tab-emr" onclick="switchTab('emr')"><span class="ic">📋</span>病历审批<span class="bdg" id="bdg-emr" style="display:none"></span></button>
   <button id="tab-rx" onclick="switchTab('rx')"><span class="ic">🌿</span>药方确认<span class="bdg" id="bdg-rx" style="display:none"></span></button>
   <button id="tab-followup" onclick="switchTab('followup')"><span class="ic">📞</span>随访处理<span class="bdg" id="bdg-fu" style="display:none"></span></button>
@@ -215,7 +254,7 @@ window.addEventListener('online', syncOfflineNote);
 syncOfflineNote();
 
 // ═══ Tab 切换 ═══
-var TABS = ['emr', 'rx', 'followup', 'emg', 'appt'];
+var TABS = ['inq', 'emr', 'rx', 'followup', 'emg', 'appt'];
 function switchTab(t) {
   CUR_TAB = t;
   TABS.forEach(function(x) {
@@ -240,6 +279,7 @@ function loadTab(t) {
   else if (t === 'followup') loadFu();
   else if (t === 'emg') loadEmg();
   else if (t === 'appt') loadAppts();
+  else if (t === 'inq') inqEnter();
 }
 
 // ① 病历审批：今日会话中 status=reviewing 的待签发病历
@@ -406,6 +446,98 @@ function loadAppts() {
         '<div class="meta">' + esc(a.doctor_name) + (a.phone_masked ? ' · ' + esc(a.phone_masked) : '') + '</div></div>';
     }).join('');
   }).catch(function(){ document.getElementById('list-appt').innerHTML = '<div class="empty">📡 服务离线</div>'; });
+}
+
+// ⑥ 问诊：主诉/对话 → 智能体事件端点 → 辨证草案 + 八级追问导航（与桌面问诊台同源）
+var INQ_PRI_ICON = { red: '🚩', diff: '🔀', formula: '🌿', pulse: '🫀', tongue: '👅', method: '⚖️', deep: '🔍', tenq: '📋' };
+var INQ_ASKED = {};  // 本页已标记的追问 key（服务端 askedKeys 同步去重）
+function inqSid() {
+  var sid = sessionStorage.getItem('mw_inq_sid');
+  if (!sid) { sid = 'mwq-' + Date.now(); sessionStorage.setItem('mw_inq_sid', sid); }
+  return sid;
+}
+function inqEnter() {
+  document.getElementById('inq-sid-tag').textContent = '会话 ' + inqSid().slice(-6);
+}
+function inqReset() {
+  if (!confirm('开启新问诊会话？当前会话的累积症状与追问进度将清空（已落盘病历不受影响）。')) return;
+  sessionStorage.removeItem('mw_inq_sid');
+  INQ_ASKED = {};
+  document.getElementById('inq-text').value = '';
+  document.getElementById('inq-syn').innerHTML = '';
+  document.getElementById('inq-alerts').innerHTML = '';
+  document.getElementById('inq-fu-card').style.display = 'none';
+  document.getElementById('inq-empty').style.display = '';
+  inqEnter();
+}
+// 朴素症状切分：按标点切成 2-8 字段子串，宁粗勿缺（服务端引擎链自行过滤噪声）
+function inqSplitSymptoms(text) {
+  return text.split(/[、，,。；;！!？?\s\n]+/).map(function(s){ return s.trim(); })
+    .filter(function(s){ return s.length >= 2 && s.length <= 8; }).slice(0, 12);
+}
+function inqSubmit() {
+  var text = document.getElementById('inq-text').value.trim();
+  if (text.length < 2) { toast('请先录入对话或主诉'); return; }
+  var syms = inqSplitSymptoms(text);
+  if (!syms.length) { toast('未能切分出有效症状词（2-8 字，用顿号/逗号分隔）'); return; }
+  var btn = document.getElementById('inq-btn'); btn.disabled = true; btn.textContent = '分析中…';
+  api('/api/clinic/agent/event', { method: 'POST', body: {
+    sessionId: inqSid(), kind: 'utterance', role: 'doctor', text: text,
+    extracted: { symptoms: syms }
+  } }).then(function(d) {
+    btn.disabled = false; btn.textContent = '▶ 送智能体分析';
+    if (!d.ok) { toast(d.error || '分析失败'); return; }
+    renderInq(d);
+  }).catch(function() {
+    btn.disabled = false; btn.textContent = '▶ 送智能体分析';
+    toast('📡 服务离线，操作未执行');
+  });
+}
+function renderInq(d) {
+  document.getElementById('inq-empty').style.display = 'none';
+  // 红旗/警示
+  document.getElementById('inq-alerts').innerHTML = (d.alerts || []).map(function(a) {
+    return '<div class="inq-alert ' + (a.level === 'red' ? 'red' : 'yellow') + '">' + (a.level === 'red' ? '🚨' : '⚠️') + ' ' + esc(a.text) + '</div>';
+  }).join('');
+  // 辨证草案
+  var synBox = document.getElementById('inq-syn');
+  if (d.syndrome) {
+    var html = '<div class="inq-syn"><div><span class="sy">🩺 ' + esc(d.syndrome) + '</span> ' +
+      '<span class="cf">置信度 ' + Math.round((d.confidence || 0) * 100) + '% · ' + (d.turns || 1) + ' 轮 · ' + (d.ms || 0) + 'ms</span></div>';
+    if (d.formula) html += '<div class="fx">推荐方剂：<b>' + esc(d.formula) + '</b>' +
+      (d.formulaOptions && d.formulaOptions.length > 1 ? '（备选：' + esc(d.formulaOptions.slice(1).join('、')) + '）' : '') +
+      (d.kbDivergent ? ' <span class="tag gold">KB 召回头名不一致，注意鉴别</span>' : '') + '</div>';
+    if (d.rationale) html += '<div class="fx">' + esc(d.rationale) + '</div>';
+    (d.differential || []).forEach(function(df) {
+      html += '<div class="inq-diff">鉴别：' + esc(df.syndrome) + '（' + Math.round((df.confidence || 0) * 100) + '%）' + (df.gist ? ' — ' + esc(df.gist) : '') + '</div>';
+    });
+    synBox.innerHTML = html + '</div>';
+  } else if (!d.changed) {
+    synBox.innerHTML = '<div class="inq-syn"><div class="cf">证型结论暂无变化（继续补充问诊信息以收敛）</div></div>';
+  }
+  // 追问导航（每次全量渲染最新一轮，服务端已按优先级排序、去重）
+  var fus = d.followups || [];
+  var fuCard = document.getElementById('inq-fu-card');
+  if (fus.length) {
+    fuCard.style.display = '';
+    document.getElementById('inq-fu').innerHTML = fus.map(function(f) {
+      var asked = INQ_ASKED[f.key] ? ' asked' : '';
+      return '<div class="fu-item' + asked + '" id="fu-' + esc(f.key).replace(/[^\w-]/g, '_') + '">' +
+        '<div class="fi">' + (INQ_PRI_ICON[f.priority] || '❓') + '</div>' +
+        '<div class="fc"><div class="ask">' + esc(f.ask) + '</div>' +
+        '<div class="why">' + esc(f.why || '') + '</div>' +
+        '<div class="src">' + esc(f.source || '') + '</div></div>' +
+        '<button class="done" onclick="inqAsked(\'' + esc(f.key).replace(/'/g, '') + '\', this)">已问</button></div>';
+    }).join('');
+  } else if (d.changed) {
+    fuCard.style.display = 'none';
+  }
+}
+function inqAsked(key, btn) {
+  INQ_ASKED[key] = true;
+  var item = btn.closest('.fu-item');
+  if (item) item.classList.add('asked');
+  api('/api/clinic/agent/followup-asked', { method: 'POST', body: { sessionId: inqSid(), key: key } }).catch(function(){});
 }
 
 // 初始化：URL 指定 tab（manifest shortcuts），默认病历审批

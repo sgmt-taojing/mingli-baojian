@@ -11,7 +11,7 @@
 """
 import sqlite3, json, datetime, sys
 
-ROOT = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT = "/Users/tom/kimi/projects/mingli-baojian"
 DB = f"{ROOT}/server/database/yidao.db"
 APPLY = "--apply" in sys.argv
 REASON = "乱码入库-二进制碎片无知识价值-20260928审计"

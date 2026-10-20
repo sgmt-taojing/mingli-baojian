@@ -13,8 +13,8 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 """yanzhi-part2.js 命理部分蒸馏: 姓名学/测字/生肖/五行命名"""
 import re, sqlite3, hashlib
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
-SRC = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/knowledge/yanzhi-part2.js"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
+SRC = "/Users/tom/kimi/projects/mingli-baojian/knowledge/yanzhi-part2.js"
 
 db = sqlite3.connect(DB)
 cur = db.cursor()

@@ -3,7 +3,7 @@
 # 用途：tcm 新能力移植进 medical-stack 后、声明「激活」前必跑。
 # 流程：重启 8972 → 同案对拍（--gate absorb）→ PASS 才允许登记 KANBAN 激活；FAIL 即回滚不激活。
 set -uo pipefail
-BASE="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+BASE="/Users/tom/kimi/projects/mingli-baojian"
 echo "[gate] 重启 medical-api(8972)…"
 launchctl kickstart -k "gui/$(id -u)/com.mingli-baojian.medical-api" && sleep 4
 echo "[gate] 同案对拍（端点零差异 + Recall@K 双侧差 ≤0.02）…"

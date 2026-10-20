@@ -132,7 +132,7 @@ if(t==='knowledge')loadKB();
 }
 
 function getCsrf(){
-return fetch(API+'/api/csrf',{credentials:'include',signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(j){return j.csrf_token||j.data&&j.data.csrf_token||''}).catch(function(e){console.warn('[wellness] csrf:',esc(e.message));return ''})
+return fetch(API+'/api/csrf-token',{credentials:'include',signal:AbortSignal.timeout(8000)}).then(function(r){return r.json()}).then(function(j){return j.csrfToken||j.csrf_token||j.data&&(j.data.csrfToken||j.data.csrf_token)||''}).catch(function(e){console.warn('[wellness] csrf:',esc(e.message));return ''})
 }
 
 function loadWeekly(){
@@ -280,6 +280,6 @@ switchTab('weekly');
   <script src="js/mobile-nav.js?v=20261020a" defer></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
-<script src="js/error-interceptor.js?v=20261016a" defer></script>
+<script src="js/error-interceptor.js?v=20261020b" defer></script>
 </body>
 </html>

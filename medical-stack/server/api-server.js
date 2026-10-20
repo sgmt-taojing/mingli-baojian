@@ -346,7 +346,7 @@ function ensureKbData(cache) {
 app.get('/api/capabilities', (req, res) => {
   // R121：AI 框架能力注册表（tcm-agent 自描述）
   try {
-    const reg = JSON.parse(require('fs').readFileSync('/Users/tom/.openclaw-autoclaw/workspace/projects/_shared/capability-registry.json', 'utf8'));
+    const reg = JSON.parse(require('fs').readFileSync('/Users/tom/kimi/projects/_shared/capability-registry.json', 'utf8'));
     res.json({ version: reg.version, capabilities: reg.capabilities.filter(c => c.project === 'tcm-agent') });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });

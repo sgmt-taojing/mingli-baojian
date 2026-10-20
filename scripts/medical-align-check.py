@@ -20,7 +20,7 @@ import sqlite3, json, hashlib, sys, re, shutil
 from pathlib import Path
 from datetime import datetime
 
-WS = Path('/Users/tom/.openclaw-autoclaw/workspace')
+WS = Path('/Users/tom/kimi')
 MINGLI_DB = WS / 'projects' / 'mingli-baojian' / 'server' / 'database' / 'yidao.db'
 AUTH_KB = WS / 'projects' / 'tcm-agent' / 'server' / 'kb-store' / 'tcm-synced-kb.json'
 QUARANTINE_KB = WS / 'projects' / 'tcm-agent' / 'server' / 'kb-store' / 'quarantine.json'

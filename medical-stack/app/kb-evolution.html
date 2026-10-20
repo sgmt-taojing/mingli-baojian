@@ -327,9 +327,10 @@ body { background: #f5f1e8; }
     var rs = d.results || [];
     if (!rs.length) { list.innerHTML = '未找到相关条目'; return; }
     list.innerHTML = rs.map(function(it){
+      var vn = it.vernacular ? '<div style="color:#047857;background:#ecfdf5;border-radius:6px;padding:4px 6px;margin-top:3px">💬 ' + String(it.vernacular).slice(0,100).replace(/</g,'&lt;') + '</div>' : '';
       return '<div style="border-top:1px dotted #e5e7eb;padding:6px 0">' +
         '<div style="font-weight:600;color:#1f2937">' + String(it.title||'').replace(/</g,'&lt;') + '</div>' +
-        '<div style="color:#6b7280;margin-top:2px">' + String(it.content||'').slice(0,120).replace(/</g,'&lt;') + '…</div>' +
+        '<div style="color:#6b7280;margin-top:2px">' + String(it.content||'').slice(0,120).replace(/</g,'&lt;') + '…</div>' + vn +
         '<div style="font-size:10px;color:#9ca3af;margin-top:2px">' + (it.module||'') + '</div></div>';
     }).join('');
   }).catch(function(){ var list = document.getElementById('kb-q-list'); if (list) list.innerHTML = '检索服务不可用'; });

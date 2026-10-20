@@ -39,6 +39,12 @@ textarea{min-height:60px;resize:vertical}
 .entry-link:hover{background:var(--primary);color:#fff;border-radius:3px}
 .entry-info-btn{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;color:var(--primary)}
 .entry-info-btn:hover{background:var(--primary);color:#fff}
+.emr-print-btn{position:fixed;right:16px;bottom:20px;z-index:200;padding:12px 18px;border-radius:24px;border:none;background:var(--primary,#6b3a1f);color:#fff;font-size:14px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+@media print {
+  .page-header-bar, .std-bar, .emr-print-btn, nav, #emr-realtime, input, button { display: none !important; }
+  body { background: #fff; }
+  .card { box-shadow: none; break-inside: avoid; }
+}
 </style>
 <link rel="stylesheet" href="css/mobile.css">
 <link rel="stylesheet" href="css/standard.css">
@@ -162,7 +168,9 @@ setInterval(initEmrPage, 30000);
   <a href="javascript:history.back()" class="phb-back" aria-label="返回">‹</a>
   <span class="phb-dot" aria-hidden="true"></span>
   <span class="phb-title">电子病历</span>
+  <button style="padding:6px 14px;font-size:12px;border:none;border-radius:14px;background:var(--primary,#6b3a1f);color:#fff;cursor:pointer" onclick="window.print()">🖨️ 打印</button>
 </div>
+<button class="emr-print-btn" onclick="window.print()">🖨️ 打印病历</button>
 
 <div class="container">
 <div class="std-bar"><span class="std-tag">👥 使用对象 <b>医生</b></span><span class="std-tag">⚙️ 功能 <b>电子病历</b></span><span class="std-tag">💎 使用价值 <b>7段标准化病历模板，保存/搜索/导出</b></span></div>

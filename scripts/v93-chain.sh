@@ -1,7 +1,7 @@
 #!/bin/bash
 # v9.3 全链路：等训练完 → fuse → 部署 8960 → 全量 488 复测（2026-09-24）
 # 后台常驻，全程日志 training/mlx-checkpoints/v93-chain.log
-R=/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+R=/Users/tom/kimi/projects/mingli-baojian
 LOG=$R/training/mlx-checkpoints/v93-chain.log
 exec >>$LOG 2>&1
 set -x
@@ -24,7 +24,7 @@ python3 - <<'PY'
 import plistlib, os
 p=os.path.expanduser('~/Library/LaunchAgents/com.mingli-baojian.mlx-v8.plist')
 d=plistlib.load(open(p,'rb'))
-d['EnvironmentVariables']['MLX_MODEL']='/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v9.3-7b'
+d['EnvironmentVariables']['MLX_MODEL']='/Users/tom/kimi/projects/mingli-baojian/training/mlx-models/mingli-sft-v9.3-7b'
 plistlib.dump(d, open(p,'wb'))
 print('plist MLX_MODEL → v9.3')
 PY

@@ -3,7 +3,7 @@
 解决双字中文词（用神、六爻、起名等）无法匹配的问题。"""
 import sqlite3, shutil, time, os, sys
 
-DB_PATH = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
+DB_PATH = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'
 BACKUP_PATH = DB_PATH + '.fts5-fix-bak'
 
 def main():

@@ -11,7 +11,7 @@
 """
 import os, re, json, sqlite3, time, glob, sys
 
-PROJ = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+PROJ = "/Users/tom/kimi/projects/mingli-baojian"
 DB = f"{PROJ}/server/database/yidao.db"
 SUBS = "/Volumes/模型训练数据/training-corpus/nishi-materials/subs"
 DESKTOP = "/Users/tom/Desktop/周易-中医"

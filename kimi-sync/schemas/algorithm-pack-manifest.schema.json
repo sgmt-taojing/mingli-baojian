@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kimi.local/sync-engine/schemas/algorithm-pack-manifest.schema.json",
+  "title": "算法包 manifest 规范（pack_type: algorithm）",
+  "description": "四项目知识同步体系设计 v1.7 §3B.1：AI 算法包复用知识包 OTA 通道（验签/门禁/回滚），在知识包 manifest 基础上扩展算法专有字段。",
+  "type": "object",
+  "required": [
+    "pack_id", "version", "pack_type", "kind", "from", "domain",
+    "algorithm", "eval", "ota", "checksums", "created_at", "signature"
+  ],
+  "properties": {
+    "pack_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "pack_type": {"const": "algorithm"},
+    "kind": {"enum": ["full", "delta"], "description": "delta 必须声明 parent_version"},
+    "parent_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "from": {"type": "string", "description": "供给方项目，如 ai-vision-toolkit"},
+    "domain": {"type": "string", "pattern": "^av\\.[a-z0-9.]+$", "description": "算法域，如 av.shezhen / av.face / av.voice"},
+    "priority": {"enum": ["P0", "P1", "P2"]},
+    "requires": {
+      "type": "object",
+      "description": "依赖门禁：输出标签映射所需的本体版本等",
+      "additionalProperties": {"type": "string"}
+    },
+    "algorithm": {
+      "type": "object",
+      "required": ["task", "modality", "model_file", "model_format", "inference_contract", "privacy"],
+      "properties": {
+        "task": {"type": "string", "description": "如 tongue-image-feature-extraction"},
+        "modality": {"type": "array", "items": {"enum": ["image", "video", "audio", "text"]}, "minItems": 1},
+        "model_file": {"type": "string", "description": "权重文件相对路径，须出现在 checksums 中"},
+        "model_format": {"enum": ["onnx", "coreml", "tflite", "pt", "gguf"]},
+        "inference_contract": {"type": "string", "description": "推理合约文件相对路径：输入规格/输出标签/置信度口径"},
+        "runtime_requirements": {
+          "type": "object",
+          "properties": {
+            "min_ram_mb": {"type": "integer"},
+            "accelerator": {"enum": ["cpu", "gpu", "ane", "any"]}
+          }
+        },
+        "privacy": {
+          "type": "object",
+          "required": ["local_first", "data_retention"],
+          "properties": {
+            "local_first": {"type": "boolean"},
+            "data_retention": {"enum": ["ephemeral", "session", "persistent"], "description": "默认 ephemeral（即用即弃）"}
+          }
+        }
+      }
+    },
+    "eval": {
+      "type": "object",
+      "required": ["baseline_report", "metrics", "availability_statement"],
+      "properties": {
+        "baseline_report": {"type": "string", "description": "基线评测报告相对路径"},
+        "metrics": {"type": "object", "description": "关键指标，如 top1_accuracy / label_f1"},
+        "availability_statement": {"type": "string", "description": "可用性声明：适用边界与已知局限"}
+      }
+    },
+    "ota": {
+      "type": "object",
+      "required": ["upgrade_path", "rollback_to", "compat_matrix"],
+      "properties": {
+        "upgrade_path": {"type": "array", "items": {"type": "string"}, "description": "兼容升级链（历史版本列表）"},
+        "rollback_to": {"type": ["string", "null"], "description": "可回滚到的版本"},
+        "compat_matrix": {"type": "object", "description": "消费方引擎/本体兼容矩阵，如 {\"sync-engine\": \">=1.0.0\"}"}
+      }
+    },
+    "changelog": {"type": "array", "items": {"type": "object"}},
+    "checksums": {
+      "type": "object",
+      "description": "payload 全部文件 sha256，含模型权重与合约",
+      "additionalProperties": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+    },
+    "created_at": {"type": "string"},
+    "signature": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

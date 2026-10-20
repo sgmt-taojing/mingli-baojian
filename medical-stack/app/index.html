@@ -509,6 +509,7 @@ async function searchKB() {
         title: r.title || '',
         module: r.module || '',
         snippet: (r.content || '').substring(0, 120).replace(q, '<span class="highlight">' + q + '</span>'),
+        vernacular: r.vernacular || '',
         confidence: r.confidence || 0.75
       }));
     }
@@ -530,6 +531,7 @@ async function searchKB() {
       '<div class="kb-title">' + esc(r.title) + '</div>' +
       '<div class="kb-meta">模块: ' + esc(r.module) + ' · 置信度: ' + (r.confidence*100).toFixed(0) + '%</div>' +
       '<div class="kb-snippet">' + r.snippet + '</div>' +
+      (r.vernacular ? '<div class="kb-snippet" style="color:#047857;background:#ecfdf5;border-radius:6px;padding:4px 6px;margin-top:3px">💬 ' + esc(r.vernacular.substring(0, 100)) + '</div>' : '') +
       '</div>';
   }
   if (!results.length) html += '<div style="padding:16px;color:var(--text3);text-align:center">未找到匹配结果</div>';

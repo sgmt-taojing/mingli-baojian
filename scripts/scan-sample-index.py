@@ -7,9 +7,9 @@ import os, json, fitz, glob, hashlib, sqlite3, subprocess
 from datetime import datetime
 
 BASE = '/Volumes/data1/training-materials/desktop-20260816/倪师智慧结晶'
-DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
-LOG = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/scan-sample-index.jsonl'
-SKILL = '/Users/tom/.openclaw-autoclaw/skills/autoglm-image-recognition'
+DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'
+LOG = '/Users/tom/kimi/projects/mingli-baojian/.openclaw/tmp/scan-sample-index.jsonl'
+SKILL = '/Users/tom/kimi/skills/autoglm-image-recognition'
 MAX_BOOKS, MAX_PAGES = 2, 3
 
 def classify(fname):

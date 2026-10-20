@@ -19,7 +19,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-WS = Path.home() / ".openclaw-autoclaw" / "workspace"
+WS = Path.home() / "kimi"
 TCM_APP = WS / "projects" / "tcm-agent" / "app"
 MS = WS / "projects" / "mingli-baojian" / "medical-stack"
 MS_APP = MS / "app"

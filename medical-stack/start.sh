@@ -3,7 +3,7 @@
 # 依赖：NODE_PATH 复用 tcm-agent node_modules（express/better-sqlite3 等）
 set -u
 cd "$(dirname "$0")"
-TCM_NODE=~/.openclaw-autoclaw/workspace/projects/tcm-agent/node_modules
+TCM_NODE=~/kimi/projects/tcm-agent/node_modules
 LOG_DIR=data/logs
 mkdir -p "$LOG_DIR"
 

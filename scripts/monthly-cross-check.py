@@ -245,7 +245,7 @@ except Exception as e:
 # ── C3 历法一致性（true-solar.js 双侧同源） ──
 try:
     local = sha256_file(ROOT / "server" / "true-solar.js")
-    packs = sorted(glob.glob("/Users/tom/.openclaw-autoclaw/workspace/_shared/capability-outbox/capability-mingli-paipan-*/code/true-solar.js"))
+    packs = sorted(glob.glob("/Users/tom/kimi/shared/ota-bus/capability-outbox/capability-mingli-paipan-*/code/true-solar.js"))
     mism = [p for p in packs if sha256_file(Path(p)) != local]
     rec("C3_calendar_consistency", not mism,
         "local=%s… 能力包副本 %d 个%s" % (local[:12], len(packs), "，全同源" if not mism else "，异源: %s" % mism))

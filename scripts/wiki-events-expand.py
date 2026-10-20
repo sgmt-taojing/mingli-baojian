@@ -12,7 +12,7 @@ wiki-events-expand.py — 验证语料事件二轮扩容（R-WIKI-EXPAND · 2026
 """
 import json, re, sqlite3, sys, time, urllib.parse, urllib.request
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh) mingli-corpus/1.1 (research)"}
 OFFLINE_ONLY = '--offline-only' in sys.argv
 

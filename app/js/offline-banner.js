@@ -9,7 +9,11 @@
 (function (global) {
   'use strict';
 
-  const PING_URL = '/api/health'; // 后端健康检查（轻量）
+  // 2026-10-20 修复：相对路径 '/api/health' 在静态站(8900)恒 404 → 误判离线；
+  // 本地开发指向 api-v2(8920)，线上(公网部署)退回同源相对路径
+  const _API_BASE = (typeof global.API !== 'undefined' && global.API) ? String(global.API).replace(/\/$/, '')
+    : ((location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '');
+  const PING_URL = _API_BASE + '/api/health'; // 后端健康检查（轻量）
   const PING_TIMEOUT_MS = 5000;
   const PING_INTERVAL_MS = 30000;
 

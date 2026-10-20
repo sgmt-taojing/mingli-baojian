@@ -8,7 +8,7 @@
 #   start  — 卸守护 + 启动训练（默认）
 #   finish — 训练完成后：fuse + 重启 inference（需人工确认 adapter 已生成）
 set -e
-cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+cd /Users/tom/kimi/projects/mingli-baojian
 source .venv-mlx/bin/activate
 LOG=training/mlx-checkpoints/mingli-sft-v8-7b.train.log
 PIDFILE=training/mlx-checkpoints/mingli-sft-v8-7b.train.pid

@@ -25,6 +25,7 @@ const KB_SOURCES = [
   {name:'MEIHUA_KB', entryId:'meihua-model-v1', modelEntryCount:42, obj:()=>window.MEIHUA_KB, mods:['meihua','liuyao'], weight:0.9},
   {name:'LIUYAOO_KB', entryId:'liuyao-model-v1', modelEntryCount:20, obj:()=>window.LIUYAO_KB, mods:['liuyao','yijing'], weight:0.9},
   {name:'LIUREN_KB', entryId:'liuren-model-v1', modelEntryCount:30, obj:()=>window.LIUREN_KB, mods:['liuren'], weight:0.9},
+  {name:'LINGQI_KB', entryId:'lingqi-model-v1', modelEntryCount:202, obj:()=>window.LINGQI_KB, mods:['lingqi'], weight:0.9},
   {name:'YIJING_KB', entryId:'yijing-model-v1', modelEntryCount:8, obj:()=>window.YIJING_KB, mods:['yijing','zhouyi'], weight:0.9},
   {name:'FENGSHUI_KB', entryId:'fengshui-model-v1', modelEntryCount:44, obj:()=>window.FENGSHUI_KB, mods:['fengshui','zeri','huangli'], weight:0.9},
   {name:'ZODIAC_KB', entryId:'zodiac-model-v1', modelEntryCount:94, obj:()=>window.ZODIAC_KB, mods:['zodiac','shengxiao','taisui','mobile'], weight:0.85},
@@ -311,6 +312,11 @@ const MODULES={
     {q:'您要预测何事？(大六壬专长：失物行人、婚嫁疾病、官司胜负)',options:['失物寻找','行人归期','婚姻成败','事业升降','疾病轻重','官司胜败','财运得失','其他']},
     {q:'请详述背景或关键时间节点(如失物时间、离家时间)',hint:'例如：昨晚8点在办公室丢失钱包，内有身份证'},
     {q:'课体偏好？(用于选取用神)',options:['纯用神','取三传','课体全解','化解方案']}
+  ]},
+  'lingqi':{name:'灵棋经占卜',icon:'🎲',desc:'百二十五课',steps:[
+    {q:'您要占问何事？',options:['事业功名','财运求财','感情婚姻','健康疾病','出行远行','失物寻找','官事诉讼','综合运途']},
+    {q:'起课方式？',options:['前往掷灵棋法器(推荐)','已知课形手动查课','仅咨询灵棋经义']},
+    {q:'请描述所问背景（如已起课请直接告知课形或卦名）',hint:'例如：考虑跳槽，掷得二上三中一下 / 大通卦问求财'}
   ]},
   'zeri':{name:'择日择吉',icon:'📅',desc:'选吉日',steps:[
     {q:'您要择日做什么事？',options:['搬家入宅','结婚嫁娶','开业典礼','动土装修','签约谈判','出行远行','安葬祭祀','其他']},
@@ -768,6 +774,8 @@ async function send(pre){
 }
 
 function detectModule(text){
+  // R154：灵棋动作词最优先（parse_natural_query 会把「问事业」类后缀抢路由）
+  if(/掷灵棋|灵棋起课|起灵棋|摇灵棋|灵棋课占|掷课/.test((text||'').toLowerCase()))return 'lingqi';
   if(typeof parse_natural_query==='function'){
     const r=parse_natural_query(text||'');
     if(r && r.module)return r.module;
@@ -787,6 +795,7 @@ function detectModule(text){
   if(/天纪|易经|六十四卦|倪师/.test(t))return 'tianji';
   if(/紫微|斗数/.test(t))return 'ziwei';
   if(/体检报告|血常规|化验单|生化指标|ct|mri|x光|超声|影像|健康报告/.test(t))return 'wellness-report';
+  if(/灵棋|掷灵棋/.test(t))return null; // 灵棋知识提问 → 走 KB 直答（动作词已在前面路由）
   if(/六爻|占卜/.test(t))return 'liuyao';
   if(/梅花|易数/.test(t))return 'meihua';
   if(/六壬/.test(t))return 'liuren';
@@ -2103,6 +2112,25 @@ async function callAI(q){
             }
           }
           walk(kb);
+          // R154: 倒排索引子串直配 — 中文提问无空格分词，整句单 token 走 walk 命中率为 0；
+          // 守卫：至少命中一个 ≥3 字强键才启用，防「占卜/财运」等泛词误直答
+          if (kb.invertedIndex && kb.items) {
+            let ikHits = 0, ikStrong = 0, ikBest = -1, ikBestRank = -1;
+            for (const ik in kb.invertedIndex) {
+              if (ik.length >= 2 && qLower.indexOf(ik.toLowerCase()) >= 0) {
+                ikHits++;
+                if (ik.length >= 3) ikStrong++;
+                // 专属度优先：指向条目越少越精确（防「灵棋经」泛键盖过「大通卦」专键）；同专属度取键更长者
+                const arr = kb.invertedIndex[ik];
+                const rank = (1000 - Math.min(arr.length, 999)) * 100 + ik.length;
+                if (rank > ikBestRank) { ikBestRank = rank; ikBest = arr[0]; }
+              }
+            }
+            if (ikStrong >= 1 && ikHits > hits && ikBest >= 0 && kb.items[ikBest]) {
+              hits = ikHits;
+              snippet = '【' + kb.items[ikBest].title + '】\n' + (kb.items[ikBest].content || '').substring(0, 1400);
+            }
+          }
           const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
           if (score > best.score) best = {score: Math.round(score*100)/100, snippet, source: src.name, entryId: src.entryId || null};
         }
@@ -2113,8 +2141,19 @@ async function callAI(q){
           hist.push({role:'assistant', content: fullReply.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
           if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', best.score, true);
-          // R102: 异步回写 hit_count 到后端 DB
-          try{fetch((location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'')+'/api/ai/kb-hit-batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entries:[best.entryId].filter(Boolean)}), signal: AbortSignal.timeout(15000)}).catch(function(){})}catch(e){console.warn(e.message)}
+          // R102: 异步回写 hit_count 到后端 DB（2026-10-20 修真：补 CSRF token + credentials，此前恒 403）
+          try{
+            const _hitBase=(location.hostname==='127.0.0.1'||location.hostname==='localhost'?'http://127.0.0.1:8920':'');
+            const _hitEntries=[best.entryId].filter(Boolean);
+            if(_hitEntries.length){
+              const _csrfP=window._mlCsrfCache&&(Date.now()-window._mlCsrfTime<25*60*1000)
+                ?Promise.resolve(window._mlCsrfCache)
+                :fetch(_hitBase+'/api/csrf-token',{credentials:'include',signal:AbortSignal.timeout(8000)})
+                  .then(r=>r.json()).then(j=>{window._mlCsrfCache=j.csrfToken||j.csrf_token||(j.data&&(j.data.csrfToken||j.data.csrf_token))||'';window._mlCsrfTime=Date.now();return window._mlCsrfCache;})
+                  .catch(()=> '');
+              _csrfP.then(tk=>fetch(_hitBase+'/api/ai/kb-hit-batch',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','x-csrf-token':tk||''},body:JSON.stringify({entries:_hitEntries}), signal: AbortSignal.timeout(15000)})).catch(function(){});
+            }
+          }catch(e){console.warn(e.message)}
           try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
           try { recordKbEngine('kb-fastpath'); } catch(e) {}
           return;

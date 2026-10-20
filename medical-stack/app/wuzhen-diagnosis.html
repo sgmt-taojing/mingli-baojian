@@ -129,7 +129,8 @@ var MODES = {
   hand:  { label: '手诊', endpoint: '/api/tcm/hand-analyze', resultKey: 'hand_features', kbKey: 'kb_match', color: '#7c3aed' }
 };
 
-var apiBase = 'http://127.0.0.1:8972';
+var apiBase = '';  // 同源走 8931 静态反代（原直连 8932 跨域被 localOriginGuard 拦，且 auth-shim 同源才稳）
+var boothPid = 'wz-' + Date.now().toString(36);  // 采集亭会话级患者标识（身份绑定在问诊台完成）
 var currentMode = 'face';
 var stream = null;
 var canvas = document.getElementById('canvas');
@@ -180,12 +181,15 @@ function postAnalyze(mode, imageData) {
   var m = MODES[mode];
   var t0 = performance.now();
   return getCsrf().then(function(token){
+    // 合规字段：PrivacyConsent 横幅授权背书 consent_to_process；网关缺 patient_id/consent 必 400
+    var consentFields = { patient_id: boothPid, consent_to_process: true };
     return fetch(apiBase + m.endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
-      body: JSON.stringify(mode === 'eye' ? { image: imageData, eye_side: 'both' }
-                           : mode === 'tongue' ? { image: imageData, part: 'tongue' }
-                           : { image: imageData })
+      body: JSON.stringify(Object.assign(
+        mode === 'eye' ? { image: imageData, eye_side: 'both' }
+        : mode === 'tongue' ? { image: imageData, part: 'tongue' }
+        : { image: imageData }, consentFields))
     });
   }).then(function(r){ return r.json(); }).then(function(data){
     var latency = Math.round(performance.now() - t0);
@@ -208,6 +212,14 @@ function renderResult(mode, data, latency) {
   var html = '<div style="margin-bottom:8px"><span class="chip">' + m.label + '</span>';
   html += '<span class="chip">延迟 ' + latency + 'ms</span>';
   if (conf !== undefined && conf !== null) html += '<span class="chip">置信度 ' + (typeof conf === 'number' ? (conf*100).toFixed(0)+'%' : conf) + '</span></div>';
+
+  // 观察服务契约（审核模型上线后）：label 单分类输出直达主展示
+  if (data && data.status === 'observed' && data.label) {
+    html += '<div class="kb-card"><h4>🔬 AI 观察特征</h4>';
+    html += '<p><strong>特征：</strong>' + data.label + (data.model_score != null ? '（模型置信 ' + (data.model_score*100).toFixed(1) + '%）' : '') + '</p>';
+    if (data.advice) html += '<p style="color:var(--text3);font-size:11px">' + data.advice + '</p>';
+    html += '</div>';
+  }
 
   if (kb) {
     html += '<div class="kb-card"><h4>📚 KB 辨证</h4>';
@@ -241,7 +253,7 @@ function renderResult(mode, data, latency) {
   if (window.DesktopHUD) {
     DesktopHUD.push({
       source: mode,
-      syndrome: (kb && kb.syndrome) || (features && features.syndrome) || (m.label + '分析'),
+      syndrome: (kb && kb.syndrome) || (data && data.label) || (features && features.syndrome) || (m.label + '分析'),
       confidence: (kb && kb.confidence) || (typeof conf === 'number' ? conf : null),
       detail: (kb && kb.formula) ? ('方剂: ' + kb.formula) : '',
       urgency: 'P3_ROUTINE'

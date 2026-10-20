@@ -10,7 +10,7 @@ import json, os, shutil
 from pathlib import Path
 from collections import Counter
 
-ROOT = Path('/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian')
+ROOT = Path('/Users/tom/kimi/projects/mingli-baojian')
 CROSS_TAGS = ('smart-home-family', 'family-life', 'epb-assistant',
               'wechat-platform', 'digital-workshop', 'digital-ecosystem')
 ARCHIVE_DIR = ROOT / 'data' / 'archived-dpo'

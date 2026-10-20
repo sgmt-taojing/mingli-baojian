@@ -6,8 +6,8 @@ import os, re, fitz, json, hashlib, sqlite3, sys
 from datetime import datetime
 
 BASE = '/Volumes/data1/training-materials/desktop-20260816/倪师智慧结晶'
-DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
-LOG = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/nihaisha-text-distill.jsonl'
+DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'
+LOG = '/Users/tom/kimi/projects/mingli-baojian/.openclaw/tmp/nihaisha-text-distill.jsonl'
 MAX_PAGES = 120  # 每本最多 120 页（控制规模）
 
 def classify(fname, text):

@@ -31,7 +31,7 @@ from pathlib import Path
 
 random.seed(43)
 
-BASE = Path("/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian")
+BASE = Path("/Users/tom/kimi/projects/mingli-baojian")
 DATA = BASE / "training/mlx-r105-data"
 
 # ============ 族 A：内部文档段落泄漏（idx23 型） ============

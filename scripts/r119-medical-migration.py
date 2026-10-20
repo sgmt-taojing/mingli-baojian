@@ -14,9 +14,9 @@ import sqlite3, json, hashlib, os, shutil, sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-MINGLI_DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
-AUTH_KB = '/Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/tcm-synced-kb.json'
-REPORT = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/r119-migration-report.json'
+MINGLI_DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'
+AUTH_KB = '/Users/tom/kimi/projects/tcm-agent/server/kb-store/tcm-synced-kb.json'
+REPORT = '/Users/tom/kimi/projects/mingli-baojian/.openclaw/tmp/r119-migration-report.json'
 MODULE_MAP = {
     'tcm': 'tcm', 'tcm-classical': 'tcm-classical', 'nihaisha-tcm': 'nihaisha-tcm',
     'tcm-clinical': 'tcm-clinical', 'tcm-fangji': 'tcm-fangji', 'tcm-syndrome': 'tcm-syndrome',

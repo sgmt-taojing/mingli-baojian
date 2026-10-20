@@ -10,7 +10,7 @@ batch-verify-corpus.py — 校正库批量排盘+校验
 """
 import json, re, sqlite3, sys, time, urllib.request
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
 PAIPAN = "http://localhost:8911/paipan"
 VERIFY = "http://localhost:8920/api/verification/verify"
 

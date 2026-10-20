@@ -3,7 +3,7 @@
 # 背景：health-patrol 15 分钟粒度只能给「案发窗口」，无法锁定 unlink 方。
 # 本哨兵每 60s 记录 yidao.db-wal inode 与 api-v2 pid，只在「变化」时落一行 JSONL，
 # 案发即可秒级对撞 launchd 任务日志（tcm-import 等均有秒级时间戳）。
-PROJECT_ROOT="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+PROJECT_ROOT="/Users/tom/kimi/projects/mingli-baojian"
 WAL="$PROJECT_ROOT/server/database/yidao.db-wal"
 STATE_DIR="$PROJECT_ROOT/logs"
 INODE_STATE="$STATE_DIR/.wal-inode-last"

@@ -41,7 +41,7 @@ def save_chats(d):
 # ── 企微指令桥 v1（2026-09-26 · 裁判 · ADR-027）──
 # 白名单指令直答（读状态文件，纯本地）；其余指令落 cmd-inbox 由 Kimi Work 异步处理。
 CMD_INBOX = os.path.join(ROOT, 'data', 'cmd-inbox')
-SYNC_LATEST = os.path.expanduser('~/.openclaw-autoclaw/workspace/sync-reports/latest.json')
+SYNC_LATEST = os.path.expanduser('~/kimi/sync-reports/latest.json')
 os.makedirs(CMD_INBOX, exist_ok=True)
 
 

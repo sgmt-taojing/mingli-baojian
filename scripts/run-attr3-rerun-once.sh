@@ -3,7 +3,7 @@
 # bare 口径（同基线）+ --save-raw 落推理原文，供逐题逻辑断点分析
 # 跑完自我卸载（与 run-shuffle-eval-once.sh 同一模式）
 set -uo pipefail
-ROOT="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT="/Users/tom/kimi/projects/mingli-baojian"
 LABEL="com.mingli-baojian.baziqa-attr3"
 cd "$ROOT" || exit 1
 /usr/bin/python3 training/eval-baziqa.py --tag v92-attr3-dev36 \

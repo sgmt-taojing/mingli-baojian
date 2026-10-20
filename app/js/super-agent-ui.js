@@ -5,10 +5,11 @@
  */
 
 // 复用 adaptive-renderer.js 的颜色/图标配置（脚本加载顺序保证可用）
-const CARD_ICONS = (typeof window !== 'undefined' && window.CARD_ICONS) || {
+// 2026-10-20 修复：与 adaptive-renderer.js 顶层 const 同名冲突导致整脚本 SyntaxError，改用别名+typeof 守卫
+const _SA_CARD_ICONS = (typeof CARD_ICONS !== 'undefined' && CARD_ICONS) || (typeof window !== 'undefined' && window.CARD_ICONS) || {
   reminder: '⏰', suggestion: '💡', tip: '🌟', alert: '⚠️', seasonal: '🌸', health: '🌿',
 };
-const CARD_COLORS = (typeof window !== 'undefined' && window.CARD_COLORS) || {
+const _SA_CARD_COLORS = (typeof CARD_COLORS !== 'undefined' && CARD_COLORS) || (typeof window !== 'undefined' && window.CARD_COLORS) || {
   reminder: { bg: 'rgba(201,168,76,0.08)', border: 'rgba(201,168,76,0.3)', accent: '#c9a84c' },
   suggestion: { bg: 'rgba(167,139,250,0.08)', border: 'rgba(167,139,250,0.3)', accent: '#a78bfa' },
   tip: { bg: 'rgba(6,182,212,0.08)', border: 'rgba(6,182,212,0.3)', accent: '#22d3ee' },
@@ -169,8 +170,8 @@ function renderProactiveBanner({ suggestion = null, dismissible = true, onAction
     const id = 'sau-banner-' + Date.now();
     var _bannerSeq = (typeof _bannerSeq==="number") ? ++_bannerSeq : 0;
     const sug = suggestion || SEASONAL_SUGGESTIONS[_bannerSeq % SEASONAL_SUGGESTIONS.length];
-    const cfg = CARD_COLORS[sug.type] || CARD_COLORS.tip;
-    const icon = CARD_ICONS[sug.type] || CARD_ICONS.tip;
+    const cfg = _SA_CARD_COLORS[sug.type] || _SA_CARD_COLORS.tip;
+    const icon = _SA_CARD_ICONS[sug.type] || _SA_CARD_ICONS.tip;
 
     const banner = document.createElement('div');
     banner.className = 'sau-proactive-banner';

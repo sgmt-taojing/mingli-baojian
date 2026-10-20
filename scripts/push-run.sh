@@ -5,7 +5,7 @@
 # 生成失败/内容为空时不外发；发送器未配置 webhook 时自动 mock 落盘 data/push-outbox/
 set -o pipefail
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-ROOT="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT="/Users/tom/kimi/projects/mingli-baojian"
 NODE="/Users/tom/.local/bin/node"
 PY="/usr/bin/python3"
 MODE="${1:-public}"

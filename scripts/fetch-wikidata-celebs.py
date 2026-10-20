@@ -9,7 +9,7 @@ fetch-wikidata-celebs.py v2 — 批量版
 """
 import json, re, sqlite3, sys, time, urllib.parse, urllib.request
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh) mingli-corpus/1.0 (research)"}
 PER_COUNTRY = int(sys.argv[1]) if len(sys.argv) > 1 else 150
 COUNTRIES = [("Q148", "中国"), ("Q8646", "香港"), ("Q865", "台湾"), ("Q334", "新加坡"),

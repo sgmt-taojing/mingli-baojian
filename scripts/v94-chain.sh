@@ -1,7 +1,7 @@
 #!/bin/bash
 # v9.4 全链路：等训练完 → fuse → 部署 8960 → 全量 488 复测（2026-09-25）
 # 后台常驻，全程日志 training/mlx-checkpoints/v94-chain.log
-R=/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+R=/Users/tom/kimi/projects/mingli-baojian
 LOG=$R/training/mlx-checkpoints/v94-chain.log
 exec >>$LOG 2>&1
 set -x
@@ -12,7 +12,7 @@ echo "=== $(date '+%F %T') 训练结束，开始 fuse ==="
 tail -3 $R/training/mlx-checkpoints/v94-train.log
 
 cd $R
-/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.venv-mlx/bin/python -u -m mlx_lm fuse \
+/Users/tom/kimi/projects/mingli-baojian/.venv-mlx/bin/python -u -m mlx_lm fuse \
   --model training/mlx-models/mingli-sft-v9.0-7b \
   --adapter-path training/mlx-checkpoints/mingli-sft-v94 \
   --save-path training/mlx-models/mingli-sft-v9.4-7b || exit 1
@@ -23,7 +23,7 @@ python3 - <<'PY'
 import plistlib, os
 p=os.path.expanduser('~/Library/LaunchAgents/com.mingli-baojian.mlx-v8.plist')
 d=plistlib.load(open(p,'rb'))
-d['EnvironmentVariables']['MLX_MODEL']='/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v9.4-7b'
+d['EnvironmentVariables']['MLX_MODEL']='/Users/tom/kimi/projects/mingli-baojian/training/mlx-models/mingli-sft-v9.4-7b'
 plistlib.dump(d, open(p,'wb'))
 print('plist MLX_MODEL → v9.4')
 PY

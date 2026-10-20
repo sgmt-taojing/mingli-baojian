@@ -21,7 +21,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _RUNNER = os.path.join(_HERE, "code", "_runner.js")
 _BAZI_PY = os.path.join(_HERE, "code", "paipan-bazi.py")
 _MINGLI_NM = os.path.expanduser(
-    "~/.openclaw-autoclaw/workspace/projects/mingli-baojian/node_modules"
+    "~/kimi/projects/mingli-baojian/node_modules"
 )
 
 _NODE_ENGINES = ("qimen", "liuyao", "meihua", "liuren", "ziwei")

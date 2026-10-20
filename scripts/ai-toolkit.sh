@@ -44,11 +44,11 @@ case "${1:-}" in
     curl -s -m 8 "$MINGLI/api/daily-almanac" | python3 -m json.tool 2>/dev/null | head -20
     ;;
   push)
-    cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+    cd /Users/tom/kimi/projects/mingli-baojian
     node daily_push.js public ${2:-} 2>/dev/null
     ;;
   festival)
-    cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+    cd /Users/tom/kimi/projects/mingli-baojian
     node festival-wishes.js ${2:-today} 2>/dev/null | head -8
     ;;
   verify)
@@ -70,7 +70,7 @@ case "${1:-}" in
     ;;
   ganzhi)
     # 今日干支/五行（一签相关性同源）
-    python3 -c "import sys,importlib.util;spec=importlib.util.spec_from_file_location('dr','/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/daily-recommendation.py');DR=importlib.util.module_from_spec(spec);spec.loader.exec_module(DR);import datetime;g=DR.get_ganzhi(datetime.date.today().year,datetime.date.today().month,datetime.date.today().day);wx={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}.get(g['day_gan'],'?');print('干支:',g['year_gz'],g['month_gz'],g['day_gz'],'| 日主五行:',wx)"
+    python3 -c "import sys,importlib.util;spec=importlib.util.spec_from_file_location('dr','/Users/tom/kimi/projects/mingli-baojian/server/daily-recommendation.py');DR=importlib.util.module_from_spec(spec);spec.loader.exec_module(DR);import datetime;g=DR.get_ganzhi(datetime.date.today().year,datetime.date.today().month,datetime.date.today().day);wx={'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'}.get(g['day_gan'],'?');print('干支:',g['year_gz'],g['month_gz'],g['day_gz'],'| 日主五行:',wx)"
     ;;
   medication)
     # shf 开药登记（人脸核验能力入口）

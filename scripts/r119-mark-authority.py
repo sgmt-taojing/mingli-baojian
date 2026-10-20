@@ -7,7 +7,7 @@ kb_formal: authority='tcm-agent-pending-migration' → 'tcm-agent-active'
 """
 import sqlite3, sys, time
 
-DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
+DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'
 BATCH = 2000
 MAX_RETRY = 3
 

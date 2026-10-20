@@ -95,7 +95,7 @@ const fs = require('fs');
 if (!process.env._PAIPAN_SELFTEST_REEXEC) {
   const candidates = [
     process.env.MINGLI_NODE_MODULES || '',
-    path.join(process.env.HOME || '', '.openclaw-autoclaw/workspace/projects/mingli-baojian/node_modules'),
+    path.join(process.env.HOME || '', 'kimi/projects/mingli-baojian/node_modules'),
   ].filter(Boolean);
   for (const p of candidates) {
     if (fs.existsSync(path.join(p, 'lunar-typescript'))) {

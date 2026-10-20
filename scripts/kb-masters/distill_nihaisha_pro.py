@@ -14,8 +14,8 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 43+ 模块完整内容 → KB"""
 import re, sqlite3, hashlib, os
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
-PRO = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/kb-store/professional"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
+PRO = "/Users/tom/kimi/projects/mingli-baojian/server/kb-store/professional"
 
 db = sqlite3.connect(DB)
 cur = db.cursor()

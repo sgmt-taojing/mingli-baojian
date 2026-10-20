@@ -16,7 +16,7 @@ _CANDIDATES = [
     # 2) 历史布局：仓库内 _shared（兼容旧 checkout）
     os.path.normpath(os.path.join(_HERE, '..', '_shared', 'scripts', 'daily-patrol.py')),
     # 3) 工作区级 _shared（兜底）
-    os.path.normpath(os.path.join(os.path.expanduser('~'), '.openclaw-autoclaw', 'workspace', '_shared', 'scripts', 'daily-patrol.py')),
+    os.path.normpath(os.path.join(os.path.expanduser('~'), 'kimi', 'projects', '_shared', 'scripts', 'daily-patrol.py')),
 ]
 
 AUTH = next((p for p in _CANDIDATES if os.path.exists(p)), None)

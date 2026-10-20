@@ -30,8 +30,11 @@ LEDGER = ROOT / 'knowledge' / 'collected' / '稿件提取台账.md'
 OUTDIR = ROOT / 'knowledge' / 'collected'
 DB = ROOT / 'server' / 'database' / 'yidao.db'
 
-API_BASE = os.environ.get('AI_API_BASE', 'https://api.g2claw.com')
-API_KEY = os.environ.get('G2CLAW_API_KEY', '') or '2c71a17ca3224fa297cb31c77de10605'
+# R-T2（2026-10-15）：私有化路线——云端 g2 后端默认关闭，硬编码退役 key 已移除。
+# 恢复云端需 AI_CLOUD_ENABLE=1 且 G2CLAW_API_KEY 有效；缺省走 rules 规则抽取（零外部依赖）。
+_CLOUD = os.environ.get('AI_CLOUD_ENABLE') == '1'
+API_BASE = (os.environ.get('AI_API_BASE', '') or '') if _CLOUD else ''
+API_KEY = (os.environ.get('G2CLAW_API_KEY', '') or '') if _CLOUD else ''
 MODEL = os.environ.get('AI_MODEL', 'glm-5.2')
 PIPELINE_VERSION = 'v1'
 
@@ -234,7 +237,7 @@ def ai_distill(chunk_text, src_name, backend='auto', module=''):
     mlx 7B schema 保真度三连败已弃用为缺省，仅显式 --backend mlx 启用）"""
     if backend == 'rules':
         return rules_distill(chunk_text, src_name, module), 'rules'
-    backends = ['g2', 'rules'] if backend == 'auto' else [backend]
+    backends = (['g2', 'rules'] if API_KEY else ['rules']) if backend == 'auto' else [backend]
     # G2 熔断：本轮连续失败 3 次后全局停用（额度耗尽期省 2×10s/块）
     if backend == 'auto' and getattr(ai_distill, '_g2_dead', 0) >= 3:
         backends = ['rules']

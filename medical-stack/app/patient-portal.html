@@ -614,7 +614,7 @@ function crudImport() {
 
 setTimeout(initPtCrud, 300);
 </script>
-<script>function quickAssess(){location.href="clinic-desk.html";}</script><script src="js/error-interceptor.js"></script>
+<script>function quickAssess(){location.href="ai-diagnosis.html";}</script><script src="js/error-interceptor.js"></script>
 <script src="js/common.js"></script>
 <script src="js/ui/states.js"></script>
 <script src="js/ui/a11y.js"></script>
@@ -632,6 +632,7 @@ try {
 </script>
 <script>
 // ═══ 愿景2026·切片10：今日中医科普（图谱静态生成，按日轮换，科普不诊断） ═══
+// D3：已绑定报告令牌（my-reports）的患者升级为个性化推送——按近期就诊证型置顶相关科普
 (function(){
   var _tips = null, _idx = 0;
   function dayOfYear() { var n = new Date(), s = new Date(n.getFullYear(), 0, 0); return Math.floor((n - s) / 86400000); }
@@ -639,18 +640,40 @@ try {
     var t = _tips[_idx % _tips.length];
     var box = document.getElementById('daily-tip');
     if (!box) return;
-    box.innerHTML = '<b style="color:var(--primary)">' + t.title + '</b><div style="margin-top:4px">' + t.body + '</div>';
+    box.innerHTML = '<b style="color:var(--primary)">' + t.title + '</b>' +
+      (t.why ? '<div style="font-size:10px;color:var(--green,#16a34a);margin-top:2px">💚 ' + t.why + '</div>' : '') +
+      '<div style="margin-top:4px">' + t.body + '</div>';
     var link = document.getElementById('daily-tip-graph');
     if (link) link.href = 'graph-explorer.html?q=' + encodeURIComponent(t.graph_q);
   }
   window.dailyTipNext = function() { if (_tips) { _idx++; renderTip(); } };
-  fetch('data/daily-tip.json').then(function(r){ return r.json(); }).then(function(d) {
-    if (!d || !d.tips || !d.tips.length) return;
-    _tips = d.tips; _idx = dayOfYear();
+  function show() {
     var card = document.getElementById('daily-tip-card');
     if (card) card.style.display = '';
     renderTip();
-  }).catch(function(){ /* 科普不可用静默隐藏 */ });
+  }
+  var tk = null;
+  try { tk = localStorage.getItem('my_rpt_token'); } catch (e) {}
+  if (tk) {
+    fetch('/api/edu/personalized?token=' + encodeURIComponent(tk)).then(function(r){ return r.json(); }).then(function(d) {
+      if (d && d.ok && (d.personalized.length || d.rotation.length)) {
+        _tips = d.personalized.concat(d.rotation);
+        _idx = 0;
+        var h = document.querySelector('#daily-tip-card h3');
+        if (h && d.personalized.length) h.innerHTML = '💡 为您推荐 <span style="font-size:10px;color:var(--text3);font-weight:400">按您近期就诊证型个性化 · 科普不诊断</span>';
+        show();
+        return;
+      }
+      fallback();
+    }).catch(fallback);
+  } else fallback();
+  function fallback() {
+    fetch('data/daily-tip.json').then(function(r){ return r.json(); }).then(function(d) {
+      if (!d || !d.tips || !d.tips.length) return;
+      _tips = d.tips; _idx = dayOfYear();
+      show();
+    }).catch(function(){ /* 科普不可用静默隐藏 */ });
+  }
 })();
 </script>
 <script src="/pwa-inject.js"></script>

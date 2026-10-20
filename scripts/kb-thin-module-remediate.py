@@ -4,7 +4,7 @@
 # 纪律：BEGIN IMMEDIATE + busy_timeout + datetime('now','localtime')；全程审计留证；幂等（按当前值匹配）
 import sqlite3, json, os, time, sys
 
-ROOT = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT = "/Users/tom/kimi/projects/mingli-baojian"
 DB = f"{ROOT}/server/database/yidao.db"
 AUDIT = f"{ROOT}/logs/kb-thin-module-remediate-audit.jsonl"
 

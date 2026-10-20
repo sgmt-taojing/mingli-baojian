@@ -10,7 +10,7 @@ R116 临床蒸馏前置数据准备：解决周一 06:00 临床经验蒸馏 cron
 """
 import json, os, sys, glob, sqlite3, datetime
 
-WS = os.path.expanduser('~/.openclaw-autoclaw/workspace')
+WS = os.path.expanduser('~/kimi')
 PROJ = os.path.join(WS, 'projects/mingli-baojian')
 OUT = os.path.join(WS, '.openclaw/tmp/patient_export_latest.json')
 DB = os.path.join(PROJ, 'server/database/yidao.db')

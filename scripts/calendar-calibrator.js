@@ -32,7 +32,7 @@ const https = require('https');
 const http = require('http');
 const { execSync } = require('child_process');
 
-const PROJECT = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian';
+const PROJECT = '/Users/tom/kimi/projects/mingli-baojian';
 const GZ_FILE = path.join(PROJECT, 'shared/ganzhi-60.js');
 const AUDIT_FILE = path.join(PROJECT, 'logs/calibration-audit.jsonl');
 const VERIFY_CMD = `cd ${PROJECT} && node scripts/verify-ganzhi.js`;

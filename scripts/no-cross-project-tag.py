@@ -11,7 +11,7 @@ R119 防御脚本（2026-08-16）
 import sqlite3, json, sys, os
 from pathlib import Path
 
-ROOT = Path('/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian')
+ROOT = Path('/Users/tom/kimi/projects/mingli-baojian')
 CROSS_TAGS = ('smart-home-family', 'family-life', 'epb-assistant',
               'wechat-platform', 'digital-workshop', 'digital-ecosystem')
 

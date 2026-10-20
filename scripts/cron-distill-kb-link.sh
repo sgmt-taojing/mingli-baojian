@@ -17,11 +17,11 @@ fi
 
 # 修真 2026-08-28 02:00 心跳：LOG_FILE 原在 set -e 之后才定义，早失败分支写日志
 # 报「No such file or directory」连败 → 提前到最前，保证任何分支都能落日志
-LOG_FILE="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/cron-distill-kb-link.log"
+LOG_FILE="/Users/tom/kimi/projects/mingli-baojian/.openclaw/tmp/cron-distill-kb-link.log"
 touch "$LOG_FILE"
 echo "[$(date '+%F %T')] 开始 distill-link 任务" >> "$LOG_FILE"
 
-cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+cd /Users/tom/kimi/projects/mingli-baojian
 
 # 1) 全量画像蒸馏（直接调 engine 模块）
 "$NODE_BIN" -e "
@@ -51,5 +51,5 @@ echo "[$(date '+%F %T')] 任务完成" >> "$LOG_FILE"
 
 # R804（2026-09-18）：蒸馏落盘→主表入库断链防再发——夜间蒸馏 jsonl 补账入主表（五红线通道）
 echo "[$(date '+%F %T')] [R804] 蒸馏补账检查..." >> "$LOG_FILE"
-python3 "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/scripts/distill-backlog-ingest.py" --days 4 >> "$LOG_FILE" 2>&1 || echo "[$(date '+%F %T')] [R804] 补账失败(非阻塞)" >> "$LOG_FILE"
-python3 "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/scripts/kb-sync-guard.py" --sync 48 >> "$LOG_FILE" 2>&1 || true
+python3 "/Users/tom/kimi/projects/mingli-baojian/scripts/distill-backlog-ingest.py" --days 4 >> "$LOG_FILE" 2>&1 || echo "[$(date '+%F %T')] [R804] 补账失败(非阻塞)" >> "$LOG_FILE"
+python3 "/Users/tom/kimi/projects/mingli-baojian/scripts/kb-sync-guard.py" --sync 48 >> "$LOG_FILE" 2>&1 || true

@@ -15,7 +15,7 @@ from pathlib import Path
 from datetime import datetime
 
 NM = Path('/Volumes/模型训练数据/training-corpus/nishi-materials')
-PROJ = Path('/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian')
+PROJ = Path('/Users/tom/kimi/projects/mingli-baojian')
 DB = PROJ / 'server' / 'database' / 'yidao.db'
 OUT = PROJ / 'DELIVERY' / f'g26-r1-audit-{datetime.now():%Y%m%d-%H%M}.json'
 

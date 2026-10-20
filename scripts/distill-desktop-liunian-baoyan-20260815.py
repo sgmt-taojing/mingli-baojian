@@ -19,7 +19,7 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 import sqlite3, re, hashlib
 from datetime import datetime, timezone, timedelta
 
-DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
+DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'
 NOW = datetime.now().isoformat()
 LOCAL_TZ = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M:%S')
 LECTURER = '路总亲授'

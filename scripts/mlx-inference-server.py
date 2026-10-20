@@ -46,21 +46,27 @@ elif 'mingli-sft-v8.1-7b' in MODEL:
 print(f'[mlx-server v3] Loading {MODEL}' + (f' + adapter {ADAPTER}' if ADAPTER else ' (fused, no adapter)') + ' ...')
 _model, _tokenizer, _sampler, _lp = None, None, None, None
 
+import threading as _threading
+_model_lock = _threading.Lock()  # 2026-10-15 修复并发加载竞态：多请求并发触发多份 4GB 加载互相拖死
+
 def ensure_model():
     global _model, _tokenizer, _sampler, _lp
     if _model is not None:
         return _model, _tokenizer, _sampler, _lp
-    from mlx_lm import load, generate
-    from mlx_lm.sample_utils import make_sampler, make_logits_processors
-    if ADAPTER:
-        _model, _tokenizer = load(MODEL, adapter_path=ADAPTER)
-    else:
-        _model, _tokenizer = load(MODEL)
-    # R712: 修真循环乱码 — 降温度 + 加强 repetition_penalty
-    # R105: 温度 0.4→0.5 适度放开（v8 SFT 后重复倾向已大幅下降）
-    _sampler = make_sampler(temp=0.5, top_p=0.85)
-    _lp = make_logits_processors(repetition_penalty=1.2)
-    print(f'[mlx-server v3] Model loaded OK')
+    with _model_lock:
+        if _model is not None:  # double-check：等待锁期间别的线程可能已加载完成
+            return _model, _tokenizer, _sampler, _lp
+        from mlx_lm import load, generate
+        from mlx_lm.sample_utils import make_sampler, make_logits_processors
+        if ADAPTER:
+            _model, _tokenizer = load(MODEL, adapter_path=ADAPTER)
+        else:
+            _model, _tokenizer = load(MODEL)
+        # R712: 修真循环乱码 — 降温度 + 加强 repetition_penalty
+        # R105: 温度 0.4→0.5 适度放开（v8 SFT 后重复倾向已大幅下降）
+        _sampler = make_sampler(temp=0.5, top_p=0.85)
+        _lp = make_logits_processors(repetition_penalty=1.2)
+        print(f'[mlx-server v3] Model loaded OK')
     return _model, _tokenizer, _sampler, _lp
 
 

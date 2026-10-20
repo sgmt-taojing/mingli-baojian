@@ -13,7 +13,7 @@ R119 修真：cron 不再做现场决策，改为确定性单步处理。
 import os, sys, json, hashlib, sqlite3, traceback
 from datetime import datetime, timezone, timedelta
 
-ROOT = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT = "/Users/tom/kimi/projects/mingli-baojian"
 SRC_DIR = "/Volumes/data1/训练素材-20260816/周易-中医"  # R121：源目录已移至 data1
 ACCT_FILE = f"{ROOT}/.openclaw/tmp/yzx-processed.json"
 DB_PATH = f"{ROOT}/server/database/yidao.db"

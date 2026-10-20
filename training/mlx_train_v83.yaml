@@ -14,16 +14,16 @@
 # 2026-08-15 12:50 v8.2 评估：AVG 93.8 PASS（命理 100 / 中医 100 / 边界 76.9）
 # 失分点：idx23 50 分（吐内部文档段落+重复 6 次）、idx24 40 分（泄漏字段名）
 
-model: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.2-7b"  # R726：命名沿用，真实 base 是 3B Qwen2.5
+model: "/Users/tom/kimi/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.2-7b"  # R726：命名沿用，真实 base 是 3B Qwen2.5
 
-model: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.2-7b"
+model: "/Users/tom/kimi/projects/mingli-baojian/training/mlx-models/mingli-sft-v8.2-7b"
 train: true
 test: false
 
 # v8.3 数据：去重后的 v8.2 全集 + 两类缺口反向 SFT
 train_file: "train.v83.jsonl"
 valid_file: "valid.v83.jsonl"
-data: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-r105-data"
+data: "/Users/tom/kimi/projects/mingli-baojian/training/mlx-r105-data"
 
 # LoRA（基于 v8.2 fused 增量训练，与 v8.2 同配方——已验证有效）
 fine_tune_type: "lora"
@@ -58,4 +58,4 @@ val_batches: 20
 seed: 42
 
 # 输出（独立目录，保留 v8.2 不被覆盖）
-adapter_path: "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/training/mlx-checkpoints/mingli-sft-v83-7b"
+adapter_path: "/Users/tom/kimi/projects/mingli-baojian/training/mlx-checkpoints/mingli-sft-v83-7b"

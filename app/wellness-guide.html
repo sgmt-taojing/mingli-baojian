@@ -310,9 +310,9 @@ var payload={
     symptoms:chk('symptoms'),
     last_report:h.substring(0,5000),last_report_date:new Date().toISOString()
 };
-var csrfReq=API+'/api/csrf';
+var csrfReq=API+'/api/csrf-token';
 fetch(csrfReq, {signal: AbortSignal.timeout(15000), credentials:'include'}).then(function(r){return r.json()}).then(function(cs){
-    var csrfToken=cs.csrf_token||cs.data&&cs.data.csrf_token||'';
+    var csrfToken=cs.csrfToken||cs.csrf_token||cs.data&&(cs.data.csrfToken||cs.data.csrf_token)||'';
     return fetch(API+'/api/wellness/profile',{method:'POST',headers:{'Content-Type':'application/json','x-csrf-token':csrfToken},signal:AbortSignal.timeout(15000),body:JSON.stringify(payload),credentials:'include'})
 }).then(function(r){return r.json()}).then(function(d){
     var saveInfo='<div class="card"><div class="card-title">💾 档案已保存</div>';
@@ -332,7 +332,7 @@ render();
   <script src="js/mobile-nav.js?v=20261020a" defer></script>
 </main>
 <footer style="text-align:center;padding:12px;font-size:11px;color:rgba(255,255,255,.3)">命理宝鉴 · 仅供学习参考</footer>
-<script src="js/error-interceptor.js?v=20261016a" defer></script>
+<script src="js/error-interceptor.js?v=20261020b" defer></script>
 <script src="js/submit-guard.js?v=20261016a"></script>
 <script src="js/escape-html.js?v=20261016a"></script>
 </body>

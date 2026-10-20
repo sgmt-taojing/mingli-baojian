@@ -13,8 +13,8 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 """shuhan-kb-combined.js 深度蒸馏 Round2: dimai(地脉)/renjian(人间)/xiangxue(相学)"""
 import re, sqlite3, hashlib
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
-SRC = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/knowledge/shuhan-kb-combined.js"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
+SRC = "/Users/tom/kimi/projects/mingli-baojian/knowledge/shuhan-kb-combined.js"
 
 db = sqlite3.connect(DB)
 cur = db.cursor()

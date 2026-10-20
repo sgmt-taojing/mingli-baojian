@@ -21,14 +21,14 @@ import os, re, sqlite3, hashlib, sys
 SUBS_CANDIDATES = [
     "/Volumes/模型训练数据/training-corpus/nishi-materials/subs",
     "/Volumes/模型训练数据/cold-storage/nishi-materials/subs",
-    "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.data/nishi-subs",
+    "/Users/tom/kimi/projects/mingli-baojian/.data/nishi-subs",
 ]
 SUBS = None
 for _p in SUBS_CANDIDATES:
     if os.path.isdir(_p) and any(f.endswith('.txt') for f in os.listdir(_p)):
         SUBS = _p
         break
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
 
 # 水印/噪音行模式
 NOISE_PATTERNS = [

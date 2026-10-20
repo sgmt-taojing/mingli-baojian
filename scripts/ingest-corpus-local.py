@@ -10,7 +10,7 @@
 import os, re, sys, sqlite3, hashlib
 from pathlib import Path
 
-ROOT = Path('/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian')
+ROOT = Path('/Users/tom/kimi/projects/mingli-baojian')
 DB = ROOT / 'server' / 'database' / 'yidao.db'
 C = ROOT / 'corpus'
 sys.path.insert(0, str(ROOT / 'scripts'))

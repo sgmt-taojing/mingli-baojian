@@ -3,10 +3,10 @@
 # 停8960 → 训练(seq768稳定配方/300iter) → fuse → 同管线双模型488题本地评估 → 三选一定案 → 恢复8960
 # 同管线原则：v9.0 与 v9.2 均用 eval-baziqa-local.py（v2.5 提取）本地评估，排除管线差异
 set -uo pipefail
-cd /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+cd /Users/tom/kimi/projects/mingli-baojian
 # R-TCC2：launchd 上下文 source 外盘软链 activate 触发 EPERM；
 # 改为直接调用 venv python 绝对路径（与 mlx-v8.plist 同模式，实证可行）
-VPY=/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.venv-mlx/bin/python
+VPY=/Users/tom/kimi/projects/mingli-baojian/.venv-mlx/bin/python
 UID_N=$(id -u)
 LABEL=com.mingli-baojian.mlx-v8
 LOG=training/logs/wo002-v92-chain.log

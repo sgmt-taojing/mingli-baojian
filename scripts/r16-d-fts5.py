@@ -3,7 +3,7 @@
 走 INSERT...SELECT 模式（必须）
 """
 import sqlite3, time
-DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'
+DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'
 
 def build():
     conn = sqlite3.connect(DB)

@@ -12,7 +12,7 @@ fill-wikidata-events.py — 维基名人库事件补齐（R-WIKI-FILL）
 """
 import json, re, sqlite3, sys, time, urllib.parse, urllib.request
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh) mingli-corpus/1.0 (research)"}
 
 EV_PAT = re.compile(r"((?:19|20)\d{2})\s*年[^。；;]{0,40}(结婚|嫁|娶|离婚|逝世|去世|病逝|出道|获[奖得]|荣获|当选|上任|就任|退役|移民|移居|创立|创办|确诊|患癌|入狱|被捕|破产|生子|诞下)")

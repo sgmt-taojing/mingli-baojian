@@ -1,0 +1,16 @@
+{
+  "pack_id": "tcm-tongue-basics",
+  "version": "1.0.0",
+  "parent_version": null,
+  "producer": "tcm-agent",
+  "pipeline": "古籍采录 → 标注 → 条目化 → 评审 → skill 封装（设计文档 §4 五道工序）",
+  "distillation_log": [
+    {"step": "采录", "ref": "《临证验舌法》《舌鉴辨正》《温热论》原文", "note": "模拟演练数据，正式生产线由 AI Vision Toolkit OCR 供稿"},
+    {"step": "标注", "ref": "source_ref + annotation 强制携带", "note": "原文与标注分离存储，随包携带"},
+    {"step": "条目化", "ref": "§1 知识条目公约格式", "note": "8 条"},
+    {"step": "评审", "ref": "annotation.human_reviewed=true", "note": "演练数据默认已评审"},
+    {"step": "skill封装", "ref": "payload/skills/tcm_tongue_basics/SKILL.md", "note": "贡献的终点形态"}
+  ],
+  "entries": ["tcm-sz-001", "tcm-sz-002", "tcm-sz-003", "tcm-sz-004", "tcm-sz-005", "tcm-sz-006", "tcm-sz-007", "tcm-sz-008"],
+  "generatedAt": "2026-10-10T12:00:00"
+}

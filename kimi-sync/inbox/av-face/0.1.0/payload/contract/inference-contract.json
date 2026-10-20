@@ -1,0 +1,53 @@
+{
+  "contract_id": "av-face-inference-v1",
+  "input_schema": {
+    "image": {
+      "format": [
+        "jpeg",
+        "png"
+      ],
+      "min_resolution": [
+        640,
+        480
+      ],
+      "color_space": "sRGB",
+      "capture": "正面免冠自然光，表情中性"
+    },
+    "video": {
+      "fps_min": 15,
+      "note": "视频流用于神态动态特征"
+    }
+  },
+  "output_schema": {
+    "granularity": "面象结构化特征（传统文化参考口径，不出解读结论）",
+    "labels": [
+      "bo:ml.face.santing",
+      "bo:ml.face.wuguan",
+      "bo:ml.face.shiergong",
+      "bo:ml.face.seze",
+      "bo:ml.face.gexiang",
+      "bo:ml.face.shentai"
+    ],
+    "confidence": {
+      "type": "float",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "report_threshold": 0.6,
+      "note": "低于阈值只入趋势档案，不进当次报告"
+    }
+  },
+  "streaming": {
+    "frame_window_ms": 500,
+    "mode": "一帧通办，帧级路由",
+    "frame_bus": {
+      "parallel_with": [
+        "av-shezhen",
+        "av-voice"
+      ],
+      "isolation": "各路独立推理互不阻塞，帧元数据共享（时间戳/会话ID）",
+      "backpressure": "单路超时不拖垮整帧，降级为跳过该路本帧"
+    }
+  }
+}

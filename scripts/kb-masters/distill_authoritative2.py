@@ -13,8 +13,8 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 """authoritative-knowledge-base.js 深度蒸馏 Round2: 纳音/64卦/神煞/六爻/风水"""
 import re, sqlite3, hashlib
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
-SRC = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/kb-store/premium/authoritative-knowledge-base.js"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
+SRC = "/Users/tom/kimi/projects/mingli-baojian/server/kb-store/premium/authoritative-knowledge-base.js"
 
 db = sqlite3.connect(DB)
 cur = db.cursor()

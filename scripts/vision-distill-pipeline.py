@@ -11,10 +11,10 @@ vision-distill-pipeline.py — 扫描件 PDF 视觉蒸馏流水线（R119 · 202
 import os, sys, json, hashlib, sqlite3, glob, subprocess, tempfile, argparse
 from datetime import datetime
 
-ROOT = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian'
+ROOT = '/Users/tom/kimi/projects/mingli-baojian'
 DB_PATH = f'{ROOT}/server/database/yidao.db'
 LOG_PATH = f'{ROOT}/.openclaw/tmp/vision-distill-log.jsonl'
-SKILL_DIR = '/Users/tom/.openclaw-autoclaw/skills/autoglm-image-recognition'
+SKILL_DIR = '/Users/tom/kimi/skills/autoglm-image-recognition'
 SRC_DIR = os.path.expanduser('~/Desktop/周易-中医')
 
 def log_load():

@@ -355,6 +355,9 @@ body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Microsoft
     </div>
     <textarea class="tcm-textarea" id="dr-notes" placeholder="医嘱、注意事项..."></textarea>
 
+    <h4 style="margin-top:10px">📜 方源校勘 · 核定清单 <span id="xlr-badge" style="font-size:9px;color:var(--text3)">加载中…</span></h4>
+    <div id="xlr-panel" style="max-height:220px;overflow-y:auto;font-size:11px"></div>
+
     <div class="btn-row" style="margin-top:12px">
       <button class="btn green" onclick="confirmDiagnosis(true)">✅ 采纳AI · 签发处方</button>
       <button class="btn accent" onclick="confirmDiagnosis(false)">✏️ 修正定稿</button>
@@ -392,7 +395,7 @@ async function initCam() {
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment', width:{ideal:640}, height:{ideal:480} } });
     document.getElementById('cam-video').srcObject = mediaStream;
-    document.getElementById('cam-status').textContent = '📷 无感监测中 · 面/舌/手入镜即自动识别';
+    document.getElementById('cam-status').textContent = '📷 无感监测就绪 · 确认患者身份后面/舌/手入镜即自动识别';
     setInterval(frameTick, 500);
   } catch(e) { document.getElementById('cam-status').textContent = '⚠️ 摄像头不可用，可手动输入'; }
 }
@@ -452,13 +455,21 @@ async function manualCapture() {
 
 async function analyzeAll(isAuto) {
   if (!mediaStream) return toast('请先开启摄像头');
-  const dataUrl = grabFrame(0.85);
   const statusEl = document.getElementById('cam-status');
+  // 合规闸门（图像处理授权）：患者身份未确认前不上行任何图像——
+  // 网关要求 patient_id + consent_to_process，缺省必 400（此前自动采集全链路空转）
+  if (!session.profile.name.v) {
+    if (!isAuto) toast('请先确认患者身份（档案卡姓名）再采集');
+    statusEl.textContent = '📷 监测待激活 · 确认患者身份后开始采集';
+    return;
+  }
+  const dataUrl = grabFrame(0.85);
+  const pid = vitalPid();
   statusEl.textContent = '🔬 一帧全诊：面/舌/手并行识别中…';
   const results = await Promise.all(['face', 'tongue', 'hand'].map(async part => {
     if (isAuto && coverState[part] && Date.now() - coverState[part] < COVER_RECAPTURE_MS) return null;  // 该部位刚采过
     try {
-      const r = await fetch(API + CAM_ROUTE[part], { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ image: dataUrl, image_url: dataUrl }) });
+      const r = await fetch(API + CAM_ROUTE[part], { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ image: dataUrl, patient_id: pid, consent_to_process: true }) });
       const d = await r.json();
       return (d && d.ok !== false) ? { part, d } : null;
     } catch(e) { return null; }
@@ -512,6 +523,8 @@ function renderFourCover() {
 }
 
 function summarizeFeatures(part, d) {
+  // 观察服务契约（label 单分类输出）：审核模型上线后直接可用
+  if (d && d.label) return d.label + (d.model_score != null ? '（模型置信 ' + Math.round(d.model_score * 100) + '%）' : '');
   if (part === 'tongue') return [d.tongue_color, d.coating, d.moisture].filter(Boolean).join(' · ') || JSON.stringify(d).slice(0, 40);
   if (part === 'face')   return [d.complexion, d.tongue_color, d.luster].filter(Boolean).join(' · ') || '面部特征已提取';
   return d.summary || d.palm_color || '手部特征已提取';
@@ -1347,6 +1360,8 @@ function renderAIPanel() {
     html += '<div class="ai-syndrome">' + escHtml(f.matched_syndrome || '待四诊合参') +
       (f.matched_syndrome ? ' <button type="button" class="entry-info-btn" title="查看证型条目卡片（辨证依据/治法/代表方）" aria-label="查看证型条目卡片" onclick="showEntryCardByName(\'' + escHtml(f.matched_syndrome).replace(/'/g, "\\'") + '\', event.clientX, event.clientY)">ⓘ</button>' : '') + '</div>';
     html += '<div class="ai-formula">' + escHtml(f.formula || '—') + '</div>';
+    const _xr = f.formula && xlrItems.find(i => i.formula === f.formula && !i.acknowledged);
+    if (_xr) html += '<div style="text-align:center;font-size:10px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:5px;padding:3px 8px;margin:4px 12px">⚠️ 方源校勘存疑：' + escHtml((_xr.notes[0] || '').slice(0, 80)) + '</div>';
     html += '<div style="text-align:center;font-size:11px;color:var(--text3)">置信度 ' + Math.round((f.confidence||0)*100) + '% · ' + escHtml(f.source||'') + ' · 证据 ' + session.evidence.length + ' 条</div>';
   }
 
@@ -1378,6 +1393,8 @@ function renderAIPanel() {
   if (kb.results && kb.results.length) {
     kb.results.slice(0, 5).forEach(r => {
       html += '<div class="ai-row"><span style="font-size:10px;color:var(--text3)">' + escHtml(r.module||'') + '</span><span>' + escHtml((r.title||'').slice(0,26)) + '</span><span>' + (r.score||0) + '分</span></div>';
+      // v2.19.101：KB 命中条带蒸馏白话（有白话层的条目一眼看懂在讲什么）
+      if (r.vernacular) html += '<div style="font-size:10px;color:#047857;background:#ecfdf5;border-radius:5px;padding:2px 6px;margin:1px 0 3px 0">💬 ' + escHtml(String(r.vernacular).slice(0,80)) + '</div>';
     });
   } else if (!kb.__offline) {
     html += '<div style="font-size:10px;color:var(--text3)">无命中条目</div>';
@@ -1389,14 +1406,19 @@ function renderAIPanel() {
     html += '<div class="ai-block"><div class="ai-title">🩺 相似医案（' + simCases.length + '）</div>';
     simCases.slice(0, 3).forEach(c => {
       const badge = c.teaching ? '<span style="font-size:10px;color:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:0 3px;margin-left:4px">🎓教学</span>' : '';
+      // v2.19.7：舌脉相合上浮徽章——让医生看见这案为什么排前面（0 不显示）
+      const tpBadge = (c.tp_boost > 0) ? '<span style="font-size:10px;color:#c2410c;background:#fff7ed;border:1px solid #fdba74;border-radius:4px;padding:0 3px;margin-left:4px" title="四诊舌脉与本案相合，相似度上浮 +' + c.tp_boost + '">👅🫀相合 +' + c.tp_boost + '</span>' : '';
       // E6（契约 v1.4.6）：病种标签 chip + 教学案以方剂名为题（原来只显示 TEACH-NNN 编号）
       const areaChip = c.disease_area ? '<span style="font-size:10px;color:#fff;background:var(--accent);border-radius:4px;padding:0 4px;margin-right:4px">' + escHtml(c.disease_area) + '</span>' : '';
       const srcLabel = c.source === 'confirmed' ? '签发病历' : c.source === 'report' ? 'AI 报告' : c.teaching ? '教学示范' : '';
       const label = (c.teaching && c.formula) ? c.formula : (c.title || c.case_id || '医案');
-      html += '<div class="ai-row"><span>' + areaChip + escHtml(label.slice(0,24)) + badge + '</span><span>' + escHtml((c.syndrome||'').slice(0,12)) + (srcLabel ? ' · ' + srcLabel : '') + '</span></div>';
+      html += '<div class="ai-row"><span>' + areaChip + escHtml(label.slice(0,24)) + badge + tpBadge + '</span><span>' + escHtml((c.syndrome||'').slice(0,12)) + (srcLabel ? ' · ' + srcLabel : '') + '</span></div>';
     });
     html += '</div>';
   }
+
+  // ── 古籍相似医案（D1b 图谱四诊特征检索，异步填充） ──
+  html += '<div class="ai-block" id="graph-sim-block" style="display:none"><div class="ai-title">📚 古籍医案 · 四诊相似 <span id="graph-sim-pool" style="font-size:9px;color:var(--text3);font-weight:400">按舌/脉/证检索古籍医案库</span></div><div id="graph-sim-cases"></div></div>';
 
   // ── 多流派参考 ──
   const opEntries = Object.entries(ops).filter(([, op]) => op?.opinion);
@@ -1422,6 +1444,76 @@ function renderAIPanel() {
   html += '<div style="text-align:right;font-size:10px;color:var(--text3)">最后更新 ' + new Date(aiResult.at||Date.now()).toTimeString().slice(0,8) + ' · 每新证据自动刷新</div>';
 
   document.getElementById('ai-panel').innerHTML = html;
+  loadGraphSimilarCases(aiResult);
+}
+
+/* D1b 古籍相似医案：取望诊舌象 + 辨证证型，调图谱四诊检索，异步填充不阻塞主面板 */
+async function loadGraphSimilarCases(aiResult) {
+  const block = document.getElementById('graph-sim-block');
+  const box = document.getElementById('graph-sim-cases');
+  if (!block || !box) return;
+  try {
+    const tongueWords = [];
+    const vt = session.vision && session.vision.tongue;
+    if (vt) ['tongue_color', 'coating', 'moisture'].forEach(k => { if (vt[k]) tongueWords.push(vt[k]); });
+    const pulseWords = (session.pulseTypes || []).slice();
+    // pass13：选中 ≥2 脉时追加组合词（如 脉沉细），触发图谱相兼脉精准打分；字序由服务端全排列容错
+    if (pulseWords.length >= 2) pulseWords.push('脉' + pulseWords.join(''));
+    const d = (aiResult.diagnose && aiResult.diagnose.data) || {};
+    const syndrome = d.syndrome || d.matched_syndrome || (d.inhouse_diagnosis && d.inhouse_diagnosis.syndrome) || '';
+    if (!tongueWords.length && !pulseWords.length && !syndrome) return;
+    const qs = 'tongue=' + encodeURIComponent(tongueWords.join(',')) + '&pulse=' + encodeURIComponent(pulseWords.join(',')) + '&pattern=' + encodeURIComponent(syndrome) + '&limit=3';
+    const r = await apiCall('/api/graph/similar-cases?' + qs, null, 6000);
+    if (!r || !r.ok || !r.cases || !r.cases.length) return;
+    const poolTag = document.getElementById('graph-sim-pool');
+    if (poolTag && r.pool_size) poolTag.textContent = '按舌/脉/证在 ' + r.pool_size + ' 案知识库中检索';
+    let h = '';
+    r.cases.forEach((c, idx) => {
+      const fx = c.formulas && c.formulas.length ? ' · 用方 ' + escHtml(c.formulas.join('/')) : '';
+      const isG25 = String(c.id || '').startsWith('case:g25-');
+      const nameHtml = isG25
+        ? '<a href="javascript:void(0)" style="color:var(--primary);text-decoration:none" title="点击展开案段原文" onclick="toggleG25CaseText(\'gsim' + idx + '\',\'' + encodeURIComponent(c.id) + '\')">' + escHtml(c.name) + ' 📖</a>'
+        : escHtml(c.name);
+      // v2.19.9 相合明细徽章：舌👅橙/脉🫀粉/相兼脉🫀🫀；证型「应见」推演项灰显加标注，与实测相合区分
+      let chips;
+      if (c.shared_detail && c.shared_detail.length) {
+        chips = c.shared_detail.map(x => {
+          const icon = x.kind === 'tongue' ? '👅' : '🫀';
+          const sty = x.kind === 'tongue' ? 'color:#c2410c;background:#fff7ed;border-color:#fdba74' : 'color:#9d174d;background:#fdf2f8;border-color:#f9a8d4';
+          const dim = x.origin === 'expected' ? 'opacity:.55' : '';
+          const tag = x.origin === 'expected' ? '应见' : '';
+          return '<span style="font-size:9px;border:1px solid;border-radius:3px;padding:0 2px;margin-right:2px;' + sty + ';' + dim + '" title="' + (x.origin === 'expected' ? '证型应见推演（图谱 indicated_by）' : '患者实测相合') + '">' + icon + escHtml(x.name) + (tag ? '<span style="font-size:8px">' + tag + '</span>' : '') + '</span>';
+        }).join('');
+      } else {
+        chips = escHtml(c.shared.join('、'));
+      }
+      h += '<div class="ai-row"><span>' + nameHtml + '</span><span style="font-size:10px;color:var(--text3)">同见 ' + chips + fx + '</span></div>';
+      if (isG25) h += '<div id="gsim' + idx + '" style="display:none"></div>';
+    });
+    box.innerHTML = h;
+    block.style.display = '';
+  } catch (e) { /* 静默降级：图谱不可用不影响主面板 */ }
+}
+
+/* 案文直达：展开/收起 G25 古籍案段原文（视觉转写文本） */
+async function toggleG25CaseText(panelId, encId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  if (panel.dataset.loaded) { panel.style.display = panel.style.display === 'none' ? '' : 'none'; return; }
+  panel.style.display = '';
+  panel.innerHTML = '<div style="font-size:10px;color:var(--text3);padding:4px">原文加载中…</div>';
+  try {
+    const r = await apiCall('/api/graph/case-text?id=' + encId, null, 8000);
+    if (!r || !r.ok) { panel.innerHTML = '<div style="font-size:10px;color:var(--accent);padding:4px">原文暂不可得（' + escHtml((r && r.error) || 'network') + '）</div>'; return; }
+    panel.innerHTML =
+      '<div style="margin:2px 0 6px;padding:8px 10px;background:var(--bg,#f7f5f0);border-left:3px solid var(--accent);border-radius:6px;font-size:11px;line-height:1.8;max-height:160px;overflow-y:auto;white-space:pre-wrap">' +
+      escHtml(r.text) + '</div>' +
+      '<div style="font-size:9px;color:var(--text3);margin-bottom:6px">《' + escHtml(r.book || '') + '》p' + (r.pages || []).join('/p') +
+      (r.truncated ? ' · 原文过长已截断' : '') + '<br>' + escHtml(r.disclaimer || '') + '</div>';
+    panel.dataset.loaded = '1';
+  } catch (e) {
+    panel.innerHTML = '<div style="font-size:10px;color:var(--accent);padding:4px">原文加载失败</div>';
+  }
 }
 
 /* 两证名共有字数（粗略相近度） */
@@ -1763,8 +1855,8 @@ async function confirmDiagnosis(adoptAI) {
   const complaint = document.getElementById('chief-complaint').value.trim();
   const statusEl = document.getElementById('dr-status');
 
-  // 0. 智能体处方安全终审（R774：五层校验，block 硬拦截 / warn 医师确认 / pass 放行）
-  statusEl.textContent = '⏳ 智能体处方安全终审中（十八反十九畏·剂量·既往·检验·体征）...';
+  // 0. 智能体处方安全终审（R774：七道校验，block 硬拦截 / warn 医师确认 / pass 放行）
+  statusEl.textContent = '⏳ 智能体处方安全终审中（配伍禁忌·剂量·既往·检验·体征·方证参校·法方参校）...';
   let presignReview = null;
   try {
     const rvR = await fetch(API + '/api/clinic/agent/presign-review', { method:'POST', headers:{'Content-Type':'application/json'},
@@ -2373,7 +2465,11 @@ function renderCopilot(d) {
       '<div style="font-size:12px;margin-top:2px"><b>' + escHtml(d.syndrome) + '</b>（' + Math.round((d.confidence || 0) * 100) + '%）→ <b style="color:var(--green)">' + escHtml(d.formula || '—') + '</b>' +
       // R857：首选 vs 次选人话说理（证机+主症抓手），无说理时回退老版百分比行
       (d.rationale ? '<br><span style="color:var(--text2);font-size:11px;line-height:1.6">💬 ' + escHtml(d.rationale) + '</span>' : (diff ? '<br><span style="color:var(--text3);font-size:10px">鉴别：' + escHtml(diff) + '</span>' : '')) +
-      (d.formulaOptions && d.formulaOptions.length > 1 ? '<br><span style="color:var(--text3);font-size:10px">备选：' + escHtml(d.formulaOptions.slice(1).join('、')) + '</span>' : '') + '</div>' +
+      // v2.19.105：证型/方剂蒸馏白话上屏（古籍说人话，与患者端科普同源）
+      (d.syndromeNote ? '<br><span style="display:block;font-size:10px;color:#047857;background:#ecfdf5;border-radius:5px;padding:2px 6px;margin-top:3px">💬 证型白话·' + escHtml(d.syndromeNote.title) + '：' + escHtml(d.syndromeNote.text) + '</span>' : '') +
+      (d.formulaNote ? '<br><span style="display:block;font-size:10px;color:#047857;background:#ecfdf5;border-radius:5px;padding:2px 6px;margin-top:3px">💬 方剂白话·' + escHtml(d.formulaNote.title) + '：' + escHtml(d.formulaNote.text) + '</span>' : '') +
+      (d.formulaReview ? '<br><span style="color:#b45309;font-size:10px;background:#fffbeb;border-radius:4px;padding:1px 5px">⚠️ 方源校勘：' + escHtml((d.formulaReview.notes[0] || '').slice(0, 90)) + '</span>' : '') +
+      (d.formulaOptions && d.formulaOptions.length > 1 ? '<br><span style="color:var(--text3);font-size:10px">备选：' + escHtml(d.formulaOptions.slice(1).map(f => (d.formulaOptionsReview || []).includes(f) ? f + '⚠️' : f).join('、')) + '</span>' : '') + '</div>' +
       '<div class="cp-actions"><span class="cp-btn yes" onclick="adoptDelta(\'' + cid + '\',\'' + d.syndrome + '\',\'' + (d.formula || '') + '\')">✓ 采纳入方</span>' +
       '<span class="cp-btn no" onclick="rejectDelta(\'' + cid + '\',\'' + d.syndrome + '\',\'' + (d.formula || '') + '\')">✗ 驳回</span></div></div>';
   }
@@ -2388,7 +2484,8 @@ function renderCopilot(d) {
         const refs = (f.refs || []).map(r => r.module + '·' + r.title).join('；');
         return '<div class="cp-chip" style="display:flex;justify-content:space-between;align-items:center;margin:3px 0;padding:4px 8px;background:#faf5ff;color:#6d28d9" ' +
           'title="命中症状：' + escHtml(f.matched.join('、')) + (refs ? '｜出处：' + escHtml(refs) : '') + '">' +
-          '<span><b>' + escHtml(f.name) + '</b> <span style="font-size:9px;opacity:.7">命中' + f.overlap + '症 · ' + SRC_BADGE[f.src] + (f.demoted ? ' · 已降级' : '') + '</span></span>' +
+          '<span><b>' + escHtml(f.name) + '</b> <span style="font-size:9px;opacity:.7">命中' + f.overlap + '症 · ' + SRC_BADGE[f.src] + (f.demoted ? ' · 已降级' : '') + '</span>' +
+          (f.note ? '<br><span style="font-size:9px;color:#047857">💬 ' + escHtml(f.note.text.slice(0, 60)) + '</span>' : '') + '</span>' +
           '<span style="white-space:nowrap"><span class="cp-btn yes" style="margin-left:6px" onclick="adoptRecall(\'' + rid + '\',\'' + escHtml(f.name) + '\')">入方</span>' +
           '<span class="cp-btn no" onclick="rejectRecall(\'' + rid + '\',\'' + escHtml(f.name) + '\')">✗</span></span></div>';
       }).join('') + '</div></div>';
@@ -2410,15 +2507,17 @@ function renderCopilot(d) {
       }).join('') + '</div>' +
       '<div style="font-size:9px;color:var(--text3);margin-top:3px">⚠️ 历史个案参考，须结合当下四诊辨证</div></div>';
   }
-  // ② 问诊导航卡（R780：五级优先级 + 追问理由，点击标记已问）
+  // ② 问诊导航卡（R780：六级优先级 + 追问理由，点击标记已问）
   if (d.followups && d.followups.length) {
-    const QSTYLE = { red:['🚩','#fef2f2','#b91c1c','#fca5a5'], diff:['🔀','#fffbeb','#92400e','#fcd34d'], formula:['📜','#eff6ff','#1d4ed8','#93c5fd'], deep:['🔍','#f0f9ff','#075985','#7dd3fc'], tenq:['📋','#f8fafc','#475569','#cbd5e1'] };
+    const QSTYLE = { red:['🚩','#fef2f2','#b91c1c','#fca5a5'], diff:['🔀','#fffbeb','#92400e','#fcd34d'], formula:['📜','#eff6ff','#1d4ed8','#93c5fd'], pulse:['🫀','#fdf2f8','#9d174d','#f9a8d4'], tongue:['👅','#fff7ed','#c2410c','#fdba74'], deep:['🔍','#f0f9ff','#075985','#7dd3fc'], tenq:['📋','#f8fafc','#475569','#cbd5e1'] };
     html += '<div class="cp-card"><div class="cp-title">💬 问诊导航 <span class="cp-ms">按优先级排序 · 点击标记已问</span></div><div style="margin-top:3px">' +
       d.followups.map(f => {
         const st = QSTYLE[f.priority] || QSTYLE.tenq;
         return '<div class="cp-chip" style="display:block;margin:3px 0;padding:4px 8px;background:' + st[1] + ';border-left:3px solid ' + st[3] + ';color:' + st[2] + '" ' +
-          'title="' + escHtml((f.why || f.source) + '（' + f.source + '）') + '" onclick="askFollowup(\'' + String(f.key).replace(/'/g, '') + '\',this)">' +
-          st[0] + ' ' + escHtml(f.ask) + '<span style="float:right;font-size:9px;opacity:.7">' + escHtml(f.source) + '</span></div>';
+          'title="' + escHtml((f.why || f.source) + '（' + f.source + '）' + (f.note ? '｜古籍白话：' + f.note.text : '') + '）" onclick="askFollowup(\'' + String(f.key).replace(/'/g, '') + '\',this)">' +
+          st[0] + ' ' + escHtml(f.ask) + '<span style="float:right;font-size:9px;opacity:.7">' + escHtml(f.source) + '</span>' +
+          // v2.19.106：方证核对追问附古籍白话注解（一眼看懂为什么问）
+          (f.note ? '<br><span style="font-size:9px;color:#047857">💬 ' + escHtml(f.note.title) + '：' + escHtml(f.note.text.slice(0, 60)) + '</span>' : '') + '</div>';
       }).join('') + '</div></div>';
   }
   // ③ 穿戴·中医提示卡（R772：体征→证型倾向映射）
@@ -2806,6 +2905,51 @@ initClinicSession().then(async () => {
     }
   } catch(e) {}
 });
+
+/* ═══════════════════════ 方源校勘 · 核定清单（R863：经验方存疑直达签发席） ═══════════════════════ */
+let xlrItems = [];
+async function loadXinglinReview() {
+  const panel = document.getElementById('xlr-panel');
+  const badge = document.getElementById('xlr-badge');
+  const d = await apiCall('/api/clinic/agent/xinglin-review');
+  if (!d || !d.ok) { panel.innerHTML = '<div style="color:var(--text3);padding:6px">清单暂不可用（' + (d && d.error || '离线') + '）</div>'; badge.textContent = ''; return; }
+  xlrItems = d.items || [];
+  const pending = xlrItems.filter(i => !i.acknowledged).length;
+  badge.textContent = pending ? ('待核定 ' + pending + ' / ' + xlrItems.length) : ('全部已核定 · ' + xlrItems.length);
+  badge.style.color = pending ? '#b45309' : 'var(--green)';
+  renderXlrPanel('');
+}
+function renderXlrPanel(filter) {
+  const panel = document.getElementById('xlr-panel');
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const items = xlrItems.filter(i => !filter || (i.formula || '').includes(filter) || i.title.includes(filter));
+  if (!items.length) { panel.innerHTML = '<div style="color:var(--text3);padding:6px">无匹配存疑条目</div>'; return; }
+  panel.innerHTML = items.map((it, idx) => {
+    const g = xlrItems.indexOf(it);
+    const done = it.acknowledged;
+    return '<details style="border:1px solid ' + (done ? 'var(--green)' : '#fde68a') + ';border-radius:6px;margin:4px 0;padding:4px 8px;' + (done ? 'opacity:.55' : 'background:#fffbeb') + '">'
+      + '<summary style="cursor:pointer;font-size:11px">' + (done ? '✓ ' : '⚠️ ') + '<b>' + esc(it.formula || '（未标方名）') + '</b> · ' + esc(it.title.slice(0, 26)) + '</summary>'
+      + '<div style="padding:4px 2px;color:#92400e">' + (it.notes || []).map(n => '<div>· ' + esc(n) + '</div>').join('') + '</div>'
+      + (it.contra && it.contra.length ? '<div style="padding:2px;color:#991b1b">' + it.contra.map(c => '<div>☠ ' + esc(c) + '</div>').join('') + '</div>' : '')
+      + (done ? '' : '<button class="btn small" style="margin:4px 0" onclick="ackXlr(' + g + ')">已核定</button>')
+      + '</details>';
+  }).join('');
+}
+async function ackXlr(idx) {
+  const it = xlrItems[idx];
+  if (!it) return;
+  const d = await apiCall('/api/clinic/agent/xinglin-review/ack', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ formula: it.formula, title: it.title }) });
+  if (d && d.ok) { it.acknowledged = true; addEvidence('ai', '方源校勘已核定：' + (it.formula || it.title.slice(0, 20))); loadXinglinReview(); }
+  else alert('核定留痕失败：' + (d && d.error || '离线'));
+}
+// 拟方命中存疑清单时面板即时过滤高亮（与 dr-formula 输入联动）
+(function () {
+  const inp = document.getElementById('dr-formula');
+  if (inp) inp.addEventListener('input', () => { if (xlrItems.length) renderXlrPanel(inp.value.trim()); });
+})();
+loadXinglinReview();
 </script>
 <script src="js/error-interceptor.js"></script>
 <script src="js/common.js"></script>

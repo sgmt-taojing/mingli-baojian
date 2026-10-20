@@ -113,7 +113,12 @@
     timeoutMs: 15000,             // 默认 15s 超时
     logCacheKey: '_err_log_v1',   // localStorage 缓存 key
     logCacheMax: 20,              // 只保留最近 20 条
-    reportEndpoint: '/api/log/error', // 错误上报端点
+    // 2026-10-20 修复：相对路径在静态站(8900)恒 501；本地开发指向 api-v2(8920)，线上退回同源
+    reportEndpoint: (function(){
+      const base = (typeof window !== 'undefined' && window.API) ? String(window.API).replace(/\/$/, '')
+        : ((typeof location !== 'undefined' && (location.hostname === '127.0.0.1' || location.hostname === 'localhost')) ? 'http://127.0.0.1:8920' : '');
+      return base + '/api/log/error';
+    })(), // 错误上报端点
     enableReport: true,           // 5xxxxx 自动上报
     enableToast: true,            // 全局 toast 提示
     skipHeader: 'X-Skip-Interceptor'

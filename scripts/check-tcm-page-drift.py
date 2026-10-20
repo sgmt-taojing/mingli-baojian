@@ -25,7 +25,7 @@ import sys
 import time
 from pathlib import Path
 
-WS = Path.home() / ".openclaw-autoclaw" / "workspace"
+WS = Path.home() / "kimi"
 PROJ = WS / "projects" / "mingli-baojian"
 TCM = WS / "projects" / "tcm-agent"
 DELIVERY = PROJ / "DELIVERY"

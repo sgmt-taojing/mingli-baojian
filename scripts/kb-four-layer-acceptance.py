@@ -14,7 +14,7 @@ KB 四层进化全链路验收脚本（R471 · evo-2026-08-04-kb-smart-four-laye
 import sqlite3, json, time, urllib.request, urllib.parse, os
 from datetime import datetime
 
-DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'  # R112: 唯一权威库（knowledge/ 已归档）
+DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'  # R112: 唯一权威库（knowledge/ 已归档）
 BASE = 'http://127.0.0.1:8930'
 
 def get(path):

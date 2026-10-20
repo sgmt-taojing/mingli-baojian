@@ -348,7 +348,7 @@ function lookupDynamic(today) {
   try {
     var execSync = require('child_process').execSync;
     var y = today.getFullYear(), m = today.getMonth() + 1, d = today.getDate();
-    var script = "import sys;sys.path.insert(0,'/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server');from lunar_python import Solar;l=Solar.fromYmd(" + y + "," + m + "," + d + ").getLunar();print(l.getMonth(),l.getDay(),l.getJieQi() or '')";
+    var script = "import sys;sys.path.insert(0,'/Users/tom/kimi/projects/mingli-baojian/server');from lunar_python import Solar;l=Solar.fromYmd(" + y + "," + m + "," + d + ").getLunar();print(l.getMonth(),l.getDay(),l.getJieQi() or '')";
     var out = execSync("python3 -c \"" + script.replace(/"/g, '\\"') + "\"", { timeout: 5000, encoding: 'utf8' }).trim();
     var parts = out.split(/[\s,]+/).filter(Boolean);
     var lm = parseInt(parts[0], 10), ld = parseInt(parts[1], 10), jieqi = parts[2] || '';
@@ -555,7 +555,7 @@ function upscaleTo4k(srcUrl, savePath) {
 function generateImage(prompt) {
   var spawn = require('child_process').spawn;
   var py = process.env.PYTHON || 'python3';
-  var skillPath = '/Users/tom/.openclaw-autoclaw/skills/autoglm-generate-image-seedream/generate-image-seedream.py';
+  var skillPath = '/Users/tom/kimi/skills/autoglm-generate-image-seedream/generate-image-seedream.py';
   return new Promise(function (resolve) {
     var p = spawn(py, [skillPath, prompt], { stdio: ['ignore', 'pipe', 'pipe'] });
     var stdout = '', stderr = '';

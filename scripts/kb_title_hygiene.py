@@ -14,7 +14,7 @@
 """
 import sqlite3, re, json, datetime, sys
 
-ROOT = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT = "/Users/tom/kimi/projects/mingli-baojian"
 DB = f"{ROOT}/server/database/yidao.db"
 APPLY = "--apply" in sys.argv
 MODULES = ["kb-store", "knowledge-raw", "knowledge-supplement", "kb-supplement", "authoritative"]

@@ -2,7 +2,7 @@
 # cron-distill-mingli-outbound.sh
 # R103-v2: mingli-baojian 命理 KB 蒸馏到 tcm-agent + smart-home-family
 set -e
-PROJECT_DIR="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+PROJECT_DIR="/Users/tom/kimi/projects/mingli-baojian"
 LOG_FILE="/tmp/distill-mingli-outbound.log"
 TS=$(date '+%F %T')
 echo "[$TS] === mingli-baojian 命理 KB 蒸馏开始 ===" >> "$LOG_FILE"
@@ -61,8 +61,8 @@ except Exception:
 conn.close()
 PYEOF
 
-cp "$EXPORT" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json
-cp "$EXPORT" /Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json
+cp "$EXPORT" /Users/tom/kimi/projects/smart-home-family/server/kb-store/mingli-pure.json
+cp "$EXPORT" /Users/tom/kimi/projects/tcm-agent/server/kb-store/aux-mingli.json
 echo "  ✓ 推送到 SHF + TCM-aux" >> "$LOG_FILE"
 
 # ── R746 全量镜像导出（2026-08-26 家庭生活助手"全量采集命理知识"需求）──
@@ -122,7 +122,7 @@ except Exception:
     pass
 conn.close()
 PYEOF
-cp "$EXPORT_FULL" /Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-full.json
+cp "$EXPORT_FULL" /Users/tom/kimi/projects/smart-home-family/server/kb-store/mingli-full.json
 echo "  ✓ 全量镜像推送到 SHF（mingli-full.json）" >> "$LOG_FILE"
 find exports/distill-outbound -name "mingli-pure-*.json" -mtime +7 -delete
 find exports/distill-outbound -name "mingli-full-*.json" -mtime +7 -delete
@@ -130,7 +130,7 @@ echo "[$TS] === 完成 ===" >> "$LOG_FILE"
 # R104-W1.2: 更新蒸馏注册表
 python3 - <<'PYEOF'
 import json, os, time
-REG = "/Users/tom/.openclaw-autoclaw/workspace/projects/_shared/distill-status.json"
+REG = "/Users/tom/kimi/projects/_shared/distill-status.json"
 data = {}
 if os.path.exists(REG):
     with open(REG) as f: data = json.load(f)
@@ -143,8 +143,8 @@ def count_json(path):
         return len(d) if isinstance(d, list) else sum(len(v) for v in d.values() if isinstance(v, list))
     except Exception:
         return -1
-shf_total = count_json("/Users/tom/.openclaw-autoclaw/workspace/projects/smart-home-family/server/kb-store/mingli-pure.json")
-tcm_total = count_json("/Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json")
+shf_total = count_json("/Users/tom/kimi/projects/smart-home-family/server/kb-store/mingli-pure.json")
+tcm_total = count_json("/Users/tom/kimi/projects/tcm-agent/server/kb-store/aux-mingli.json")
 data['chains']['mingli-shf'] = {
     "domain": "命理",
     "source": "mingli-baojian",
@@ -170,7 +170,7 @@ PYEOF
 python3 - <<'PYEOF'
 import json, os, time, glob
 
-REG = "/Users/tom/.openclaw-autoclaw/workspace/projects/_shared/distill-registry.json"
+REG = "/Users/tom/kimi/projects/_shared/distill-registry.json"
 
 def count_json(path):
     try:
@@ -186,10 +186,10 @@ def count_json(path):
 
 try:
     # 本轮导出文件（与 distill-status 同源：mingli-pure.json → shf / aux-mingli.json → tcm）
-    exports = sorted(glob.glob("/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/exports/distill-outbound/mingli-pure-*.json"))
+    exports = sorted(glob.glob("/Users/tom/kimi/projects/mingli-baojian/exports/distill-outbound/mingli-pure-*.json"))
     total = count_json(exports[-1]) if exports else -1
     if total < 0:
-        total = count_json("/Users/tom/.openclaw-autoclaw/workspace/projects/tcm-agent/server/kb-store/aux-mingli.json")
+        total = count_json("/Users/tom/kimi/projects/tcm-agent/server/kb-store/aux-mingli.json")
     now = time.strftime('%Y-%m-%d %H:%M:%S') + '+08:00'
 
     with open(REG) as f:

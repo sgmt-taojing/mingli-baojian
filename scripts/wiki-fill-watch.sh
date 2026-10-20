@@ -6,7 +6,7 @@
 #   通了即跑 fill-wikidata-events.py（幂等断点续跑，rc 2=仍未通）；
 #   全部补齐后自卸载（bootout）+ 桌面通知 + 日志留证。
 set -uo pipefail
-PROJ="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+PROJ="/Users/tom/kimi/projects/mingli-baojian"
 LOG="$PROJ/logs/wiki-fill-watch.log"
 TS=$(date "+%Y-%m-%d %H:%M:%S")
 LABEL="com.mingli-baojian.wiki-fill-watch"

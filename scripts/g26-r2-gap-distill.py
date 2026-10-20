@@ -18,8 +18,8 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from yidao_safe import safe_close  # noqa: E402
 
 DB = ROOT / 'server' / 'database' / 'yidao.db'
-API_BASE = os.environ.get('AI_API_BASE', 'https://api.g2claw.com')
-API_KEY = os.environ.get('G2CLAW_API_KEY', '')
+API_BASE = os.environ.get('AI_API_BASE', '') if os.environ.get('AI_CLOUD_ENABLE') == '1' else ''  # R-T2: 云端默认关闭
+API_KEY = os.environ.get('G2CLAW_API_KEY', '') if os.environ.get('AI_CLOUD_ENABLE') == '1' else ''
 MODEL = os.environ.get('AI_MODEL', 'glm-5.2')
 NOW = datetime.now().isoformat()
 

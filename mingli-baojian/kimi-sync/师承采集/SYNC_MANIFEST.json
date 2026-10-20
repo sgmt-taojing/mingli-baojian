@@ -1,0 +1,29 @@
+{
+  "pack_id": "lineage-collection-task-ml",
+  "version": "0.1.0",
+  "type": "task_assignment",
+  "from": "kimi-supervisor",
+  "to": "ml-agent",
+  "created_at": "2026-10-09",
+  "spec_ref": "四项目知识依赖与蒸馏体系设计 v1.3 §10.3 / 师承采集工程实施方案 v0.1",
+  "scope": {
+    "domain_filter": ["命理-子平", "命理-紫微", "命理-相学"],
+    "task": "命理流派师承口诀采集：盘点登记 → 授权签约 → 四轮访谈 → 条目化 → 核稿入库"
+  },
+  "sla": {
+    "inventory_deadline": "2 周内完成盘点清单登记",
+    "p0_consent_deadline": "P0 专家授权书本季度内签署",
+    "p0_interview_deadline": "P0 专家 3 个月内完成四轮访谈"
+  },
+  "payload": [
+    "师承采集对象盘点表.xlsx",
+    "TASK.md"
+  ],
+  "supervision": {
+    "checker": "monitor/check_progress.py",
+    "return_path": "sync-packages/ml-agent/return/",
+    "report_rule": "填写后的盘点表回传至 return/ 目录，监督方据此出具检查报告"
+  },
+  "notes": "命理流派采集可能涉及门派忌讳（不传之秘），授权谈判策略见实施方案 §9 开放问题 3",
+  "signature": "unsigned-draft-v0.1"
+}

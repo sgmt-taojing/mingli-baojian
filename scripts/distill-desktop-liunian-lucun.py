@@ -6,8 +6,8 @@
 import sqlite3, re, hashlib
 from datetime import datetime
 
-DB = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db'  # R112: 唯一权威库（knowledge/ 已归档）
-SRC = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/.openclaw/tmp/desktop-extract/流年班第十课_——禄存，42颗杂耀.txt'
+DB = '/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db'  # R112: 唯一权威库（knowledge/ 已归档）
+SRC = '/Users/tom/kimi/projects/mingli-baojian/.openclaw/tmp/desktop-extract/流年班第十课_——禄存，42颗杂耀.txt'
 
 NOW = datetime.now().isoformat()
 SOURCE_TAG = 'desktop:liunianban_l10_lucun_42'

@@ -8,7 +8,7 @@
 """
 import sqlite3, sys
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
 
 def main():
     dry = "--dry-run" in sys.argv

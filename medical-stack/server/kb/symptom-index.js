@@ -101,7 +101,7 @@ function formulaRecall(text, limit = 5, exclude = null) {
     // R827：在线驳回降级——有效命中数 −1，降到 0 即本轮不再召回
     const penalty = _demote[name] ? 1 : 0;
     if (matched.length - penalty <= 0) continue;
-    if ((f.src || 'B') === 'C' && matched.length < 2) continue;   // C 源降噪
+    if ((f.src || 'B') === 'C' && matched.length < 2 && f.canon.length > 1) continue;   // C 源降噪；单症状方全中（1/1 精确覆盖）放行——R863d 白癜风经验方案
     rows.push({
       name,
       overlap: matched.length - penalty,

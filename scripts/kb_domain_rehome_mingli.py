@@ -12,7 +12,7 @@
 """
 import sqlite3, hashlib, json, datetime, sys, os
 
-ROOT = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT = "/Users/tom/kimi/projects/mingli-baojian"
 DB = f"{ROOT}/server/database/yidao.db"
 APPLY = "--apply" in sys.argv
 

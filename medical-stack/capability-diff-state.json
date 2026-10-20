@@ -1,19 +1,63 @@
 {
-  "digest": "9e703640e0ec961f",
+  "digest": "96a10c8c21bce29a",
   "last": {
-    "ts": "2026-09-26 20:30",
-    "digest": "9e703640e0ec961f",
+    "ts": "2026-10-20 10:16",
+    "digest": "96a10c8c21bce29a",
     "changed": false,
-    "clean": true,
-    "missing_api_count": 0,
-    "missing_api": [],
-    "module_diffs": {},
+    "clean": false,
+    "missing_api_count": 19,
+    "missing_api": [
+      "get /api/clinic/agent/xinglin-review",
+      "get /api/clinic/draft-adoption",
+      "get /api/edu/personalized",
+      "get /api/graph/case-text",
+      "get /api/graph/similar-cases",
+      "get /api/growth/quiz/stats",
+      "get /api/growth/quiz/wrong-book",
+      "get /api/kb/proofread/entry",
+      "get /api/kb/proofread/page-image",
+      "get /api/kb/proofread/worklist",
+      "get /api/multimodal/std-input/contract",
+      "get /api/public/kb/ancient-search",
+      "get /api/teaching/round/:id",
+      "post /api/clinic/agent/xinglin-review/ack",
+      "post /api/growth/quiz/attempt",
+      "post /api/kb/proofread/submit",
+      "post /api/multimodal/std-input",
+      "post /api/teaching/round",
+      "post /api/teaching/round/:id/answer"
+    ],
+    "module_diffs": {
+      "auth.js": [
+        "createToken",
+        "id",
+        "sub"
+      ]
+    },
     "seed_missing": [],
-    "processor_drift": [],
-    "js_drift": [],
+    "processor_drift": [
+      {
+        "route": "/api/tcm/kb/search",
+        "tcm": null,
+        "ms": "cc2825765991dd8a",
+        "status": "MISSING"
+      },
+      {
+        "route": "/api/tcm/kb/formula-recall",
+        "tcm": null,
+        "ms": "b1cca84d4f18f7e6",
+        "status": "MISSING"
+      }
+    ],
+    "js_drift": [
+      {
+        "file": "longitudinal-page.js",
+        "status": "DRIFT"
+      }
+    ],
     "asset_drift": [],
-    "page_gap_count": 60,
+    "page_gap_count": 57,
     "extra_api_count": 25,
-    "tcm_head": "bf0782f 工程B1：5个多诊次演示患者种子（病历15+处方15+随访5，幂等），证型演变三阶段链真实数据实证，回归15/15绿"
+    "tcm_head": "866bec6b v2.19.107 运维看板白话层覆盖 Widget（vernacular-coverage 采集脚本）"
   }
 }

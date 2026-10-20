@@ -1,9 +1,9 @@
 #!/bin/bash
 # weekly-eval.sh · 周一 06:00 跑三件套评估 + 反馈聚合 + 合规扫描 + HTML 周报
-# cron: 0 6 * * 1 bash /Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/scripts/weekly-eval.sh
+# cron: 0 6 * * 1 bash /Users/tom/kimi/projects/mingli-baojian/scripts/weekly-eval.sh
 
 set -euo pipefail
-PROJECT_DIR=/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian
+PROJECT_DIR=/Users/tom/kimi/projects/mingli-baojian
 cd "$PROJECT_DIR"
 
 WEEK_ID=$(date +%Y-W%V)

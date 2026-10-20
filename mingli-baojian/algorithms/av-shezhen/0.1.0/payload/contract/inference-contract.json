@@ -1,0 +1,50 @@
+{
+  "contract_id": "av-shezhen-inference-v1",
+  "input_schema": {
+    "image": {
+      "format": [
+        "jpeg",
+        "png"
+      ],
+      "min_resolution": [
+        640,
+        480
+      ],
+      "color_space": "sRGB",
+      "capture": "自然光舌面正面，伸舌居中"
+    },
+    "preprocess": [
+      "face_detect",
+      "tongue_segment",
+      "color_calibrate"
+    ]
+  },
+  "output_schema": {
+    "granularity": "特征与趋势（不出诊断结论，诊断归消费方核定闸）",
+    "labels": [
+      "bo:tongue.color.pale_red",
+      "bo:tongue.color.pale",
+      "bo:tongue.color.red",
+      "bo:tongue.color.crimson",
+      "bo:tongue.color.purple",
+      "bo:coating.thin_white",
+      "bo:coating.yellow",
+      "bo:coating.greasy",
+      "bo:coating.cracked",
+      "bo:coating.prickly"
+    ],
+    "confidence": {
+      "type": "float",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "report_threshold": 0.6,
+      "note": "低于阈值只入趋势档案，不进当次报告"
+    }
+  },
+  "streaming": {
+    "frame_window_ms": 500,
+    "mode": "一帧通办，帧级路由"
+  }
+}

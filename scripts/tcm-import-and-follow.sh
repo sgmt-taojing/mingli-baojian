@@ -11,7 +11,7 @@
 # R754 修真（2026-09-14）：rc=3 = 镜像写入后扫描窗口期 EPERM 优雅跳过，视为通过（下轮 mtime 幂等自动补）；
 # 各步 rc 显式回显，结尾打印 CHAIN_RESULT 行供 launchd 日志/巡检取证。
 set -uo pipefail
-BASE="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/scripts"
+BASE="/Users/tom/kimi/projects/mingli-baojian/scripts"
 ok() { [ "$1" -eq 0 ] || [ "$1" -eq 3 ]; }
 /usr/bin/python3 "$BASE/import-tcm-kb.py"
 IMPORT_RC=$?

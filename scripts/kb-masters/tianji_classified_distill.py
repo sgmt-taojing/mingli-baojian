@@ -14,7 +14,7 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 import os, re, sqlite3, hashlib
 
 SUBS = "/Volumes/模型训练数据/training-corpus/nishi-materials/subs-tianji-classified"
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
 
 def detect_module(fname):
     if '紫微' in fname: return 'ziwei'

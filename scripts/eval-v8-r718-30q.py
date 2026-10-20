@@ -9,7 +9,7 @@ _VERSION = _sys.argv[1] if len(_sys.argv) > 1 else 'v8-postR105'
 import http.cookiejar
 import json, time, re, urllib.request, urllib.error, sys, os
 
-BASE = '/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian'
+BASE = '/Users/tom/kimi/projects/mingli-baojian'
 API_CHAT = 'http://127.0.0.1:8920/api/ai/chat'
 API_CSRF = 'http://127.0.0.1:8920/api/csrf-token'
 

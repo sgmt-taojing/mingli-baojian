@@ -5,7 +5,7 @@
 # daemon（wecom-aibot）按 item.chatid 定向外发；未登记会话的信众自动跳过并告警。
 set -o pipefail
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-ROOT="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT="/Users/tom/kimi/projects/mingli-baojian"
 NODE="/Users/tom/.local/bin/node"
 PY="/usr/bin/python3"
 MODE="${1:-public}"

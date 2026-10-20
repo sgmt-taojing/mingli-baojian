@@ -27,7 +27,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-WS = Path.home() / ".openclaw-autoclaw" / "workspace"
+WS = Path.home() / "kimi"
 MINGLI = WS / "projects" / "mingli-baojian"
 MIRROR = MINGLI / "server" / "kb-store" / "tcm-authoritative-full.json"
 MS = MINGLI / "medical-stack"

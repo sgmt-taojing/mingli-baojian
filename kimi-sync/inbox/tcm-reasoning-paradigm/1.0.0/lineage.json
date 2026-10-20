@@ -1,0 +1,16 @@
+{
+  "pack_id": "tcm-reasoning-paradigm",
+  "version": "1.0.0",
+  "parent_version": null,
+  "producer": "tcm-agent",
+  "pipeline": "运行规范提取 → 规则条目化 → 评审 → skill 封装（离线蒸馏指令 2026-10-13）",
+  "distillation_log": [
+    {"step": "源料定位", "ref": "tcm-agent/server/multimodal-std-input.js（多模态标准报文处理规范，含六类范式硬规则）", "note": "与学习素材四项对应：历史对话样本→报文契约、古籍知识库案例→检索规则、面诊报告样例→三段式、异常处理→降级与边界"},
+    {"step": "条目化", "ref": "§1 知识条目公约格式", "note": "6 条（tcm-pd-001~006），source_ref 携带规范原文引文"},
+    {"step": "评审", "ref": "annotation.human_reviewed=true", "note": "逐条与源文件规则核对"},
+    {"step": "skill封装", "ref": "payload/skills/tcm_reasoning_paradigm/{SKILL.md,paradigm_runtime.py}", "note": "本机独立运行载体：消费方后端可配（local_kb_api=自有检索服务 / local_files=本地已安装条目）"},
+    {"step": "边界转译", "ref": "tcm-pd-006", "note": "源端命理拒答规则按消费方语境转译：命理宝鉴拒答处方、家庭助手拒答诊断"}
+  ],
+  "entries": ["tcm-pd-001", "tcm-pd-002", "tcm-pd-003", "tcm-pd-004", "tcm-pd-005", "tcm-pd-006"],
+  "generatedAt": "2026-10-13T11:50:00"
+}

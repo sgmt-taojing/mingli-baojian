@@ -2,7 +2,7 @@
 # R702: 蒸馏闭环 — feedback-aggregator → 高质量候选 → KB staging 入库 → 命中率统计
 # 每周一 03:00 运行（launchd: com.mingli-baojian.distill-feedback-loop）
 set -e
-PROJECT_DIR="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+PROJECT_DIR="/Users/tom/kimi/projects/mingli-baojian"
 LOG_FILE="$PROJECT_DIR/.openclaw/tmp/distill-feedback-loop.log"
 WEEK=$(date +%Y-W%V)
 echo "[$(date '+%F %T')] === 蒸馏闭环 $WEEK ===" >> "$LOG_FILE"

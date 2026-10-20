@@ -1,7 +1,7 @@
 #!/bin/bash
 # run-assist3-full-once.sh — new100 全量 181 题 noleak+assist3 净效果验证（R-BQA-ASSIST3-FULL）
 set -uo pipefail
-ROOT="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+ROOT="/Users/tom/kimi/projects/mingli-baojian"
 LABEL="com.mingli-baojian.baziqa-assist3-full"
 cd "$ROOT" || exit 1
 /usr/bin/python3 training/eval-baziqa.py --tag v92-noleak-assist3-new100 --noleak --assist3 \

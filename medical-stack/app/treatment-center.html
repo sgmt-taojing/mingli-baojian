@@ -627,6 +627,9 @@ async function captureAndAnalyze() {
 
   // 拍摄为 base64
   var dataURL = canvas.toDataURL('image/jpeg', 0.85);
+  // 合规闸门：图像网关要求 patient_id + consent_to_process（缺省必 400，此前五路全空转）
+  if (!state.patientId) { toast('请先选择患者再采集分析'); return; }
+  var consentBody = { patient_id: state.patientId, consent_to_process: true };
   // 5 路并行调用（面诊/舌诊/眼诊/手诊/唇诊各自独立端点）
   var endpoints = {
     face: '/api/tcm/face-analyze',
@@ -639,7 +642,7 @@ async function captureAndAnalyze() {
     return fetch(endpoints[key], {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: dataURL, part: key === 'face' ? 'face' : key })
+      body: JSON.stringify(Object.assign({ image: dataURL, part: key === 'face' ? 'face' : key }, consentBody))
     })
     .then(function(r) { return r.json().catch(function() { return null; }); })
     .then(function(d) { return { key: key, data: d }; })
@@ -657,16 +660,19 @@ async function captureAndAnalyze() {
         card.classList.add('done');
         state.algoState[r.key] = 'done';
         var summary = '';
-        if (r.key === 'face') {
-          summary = '面色：' + (r.data.complexion || '明润') + ' | 光泽：' + (r.data.luster || '有光泽') + (r.data.regions ? ' | 部位：' + Object.values(r.data.regions).join('/') : '');
+        if (r.data.label) {
+          // 观察服务契约（label 单分类输出）：只展示真实返回，缺字段不虚构
+          summary = 'AI 观察：' + r.data.label + (r.data.model_score != null ? '（模型置信 ' + (r.data.model_score*100).toFixed(1) + '%）' : '');
+        } else if (r.key === 'face') {
+          summary = '面色：' + (r.data.complexion || '未提取') + ' | 光泽：' + (r.data.luster || '未提取') + (r.data.regions ? ' | 部位：' + Object.values(r.data.regions).join('/') : '');
         } else if (r.key === 'tongue') {
-          summary = '舌色：' + (r.data.tongue_color || '淡红') + ' | 苔：' + (r.data.coating || '薄白') + ' | 形：' + (r.data.shape || '正常');
+          summary = '舌色：' + (r.data.tongue_color || '未提取') + ' | 苔：' + (r.data.coating || '未提取') + ' | 形：' + (r.data.shape || '未提取');
         } else if (r.key === 'eye') {
-          summary = '眼白：' + (r.data.sclera || '清澈') + ' | 眼睑：' + (r.data.eyelid || '正常') + ' | 色泽：' + (r.data.color || '正常');
+          summary = '眼白：' + (r.data.sclera || '未提取') + ' | 眼睑：' + (r.data.eyelid || '未提取') + ' | 色泽：' + (r.data.color || '未提取');
         } else if (r.key === 'hand') {
-          summary = '掌色：' + (r.data.palm_color || '淡红') + ' | 甲色：' + (r.data.nail || '粉') + ' | 润：' + (r.data.moisture || '润');
+          summary = '掌色：' + (r.data.palm_color || '未提取') + ' | 甲色：' + (r.data.nail || '未提取') + ' | 润：' + (r.data.moisture || '未提取');
         } else if (r.key === 'lip') {
-          summary = '唇色：' + (r.data.lip_color || '淡红') + ' | 润燥：' + (r.data.moisture || '润') + (r.data.lip_shape ? ' | 形：' + r.data.lip_shape : '');
+          summary = '唇色：' + (r.data.lip_color || '未提取') + ' | 润燥：' + (r.data.moisture || '未提取') + (r.data.lip_shape ? ' | 形：' + r.data.lip_shape : '');
         }
         resultEl.textContent = summary;
       } else {

@@ -2,7 +2,7 @@
 # g26-monthly-sop.sh · G26 命理知识补蒸馏 SOP 常态化（月度）
 # R1 覆盖审计 → 有差集则 R2 补蒸馏 → R3 复扫 → 日志留痕；差集不清则非零退出（health-patrol 可捕）
 set -uo pipefail
-PROJ="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+PROJ="/Users/tom/kimi/projects/mingli-baojian"
 cd "$PROJ"
 TS=$(date '+%F %T')
 LOG="logs/g26-sop.log"

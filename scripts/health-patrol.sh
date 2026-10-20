@@ -1,5 +1,5 @@
 #!/bin/bash
-PROJECT_ROOT="/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian"
+PROJECT_ROOT="/Users/tom/kimi/projects/mingli-baojian"
 LOG="$PROJECT_ROOT/.openclaw/tmp/health.log"
 ALERTS_DIR="$PROJECT_ROOT/data/alerts"
 ALERTS_FILE="$ALERTS_DIR/health-alerts.jsonl"
@@ -32,7 +32,7 @@ fi
 
 # 1b. 端口绑定安全扫描（R-2026-08-15：修真 8941-8945/8787/8931-8933 共 9 服务 0.0.0.0→127.0.0.1）
 # scan-bind-exposure.sh 检测：监听 *:port 服务 + PORTS 字典漏列的 Python/Node 进程
-BIND_EXPOSURE=$(bash /Users/tom/.openclaw-autoclaw/workspace/projects/_shared/scripts/scan-bind-exposure.sh 2>&1)
+BIND_EXPOSURE=$(bash /Users/tom/kimi/projects/_shared/scripts/scan-bind-exposure.sh 2>&1)
 BIND_EXPOSURE_RC=$?
 if [ $BIND_EXPOSURE_RC -ne 0 ]; then
     while IFS= read -r line; do
@@ -47,8 +47,8 @@ LAUNCHD_BAD=$(launchctl list 2>/dev/null | grep "mingli-baojian" | awk '$1 ~ /^-
 # 2a. 备份快照健康（R-2026-09-14 引入；R802 语义分级）
 # TCC-LOCKED 已定性为架构事实（cron/launchd 写外盘被系统拒，R801 实弹定案）：
 # 本地冷备主通道（04:30 daily-local-cold-backup）正常时不再告警，只在主通道也断或盘真丢时报
-GUARD_LOG="$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
-LCB_DIR="$HOME/.openclaw-autoclaw/backups/local-cold"
+GUARD_LOG="$HOME/kimi/shared/memory/backup-guard.log"
+LCB_DIR="/Volumes/模型训练数据/cold-storage/local-cold"
 LCB_FRESH=$(find "$LCB_DIR" -maxdepth 1 -name "20*" -type d -mtime -2 2>/dev/null | wc -l | tr -d ' ')
 if [ -f "$GUARD_LOG" ]; then
     VMISS=$(grep -c "VOLUME-MISSING" "$GUARD_LOG" 2>/dev/null || echo 0)
@@ -62,7 +62,7 @@ if [ -f "$GUARD_LOG" ]; then
         ALERTS+=("备份双通道全断：本地冷备 48h 未更新且外盘定时备份被 TCC 拒——需人工干预")
     fi
 fi
-SNAP_LOG="$HOME/.openclaw-autoclaw/workspace/memory/snapshot-cron.log"
+SNAP_LOG="$HOME/kimi/shared/memory/snapshot-cron.log"
 if [ -f "$SNAP_LOG" ]; then
     SNAP_MTIME=$(stat -f %m "$SNAP_LOG" 2>/dev/null || echo 0)
     NOW_EPOCH=$(date +%s)
@@ -72,7 +72,7 @@ if [ -f "$SNAP_LOG" ]; then
 fi
 
 # 2b+. 本地冷备健康（R801：外置盘被 TCC 全拒后备份主通道迁本地冷区，48h 未更新告警）
-LCB_DIR="$HOME/.openclaw-autoclaw/backups/local-cold"
+LCB_DIR="/Volumes/模型训练数据/cold-storage/local-cold"
 if [ -d "$LCB_DIR" ]; then
     LCB_MTIME=$(find "$LCB_DIR" -maxdepth 1 -name "20*" -type d -mtime -2 2>/dev/null | wc -l | tr -d ' ')
     [ "$LCB_MTIME" -eq 0 ] && ALERTS+=("本地冷备 48h 未更新（com.autoclaw.daily-local-cold-backup 未跑或失败）")
@@ -83,7 +83,7 @@ fi
 CODEX_HITS=$( { 
     crontab -l 2>/dev/null | grep -i "Documents/Codex"; \
     grep -il "Documents/Codex" "$HOME"/Library/LaunchAgents/*.plist 2>/dev/null | grep -v "codex-cleanup"; \
-    grep -rln "Documents/Codex" "$HOME/.openclaw-autoclaw/workspace/projects/"*/scripts/ 2>/dev/null | grep -v "health-patrol.sh"; \
+    grep -rln "Documents/Codex" "$HOME/kimi/projects/"*/scripts/ 2>/dev/null | grep -v "health-patrol.sh"; \
 } | sort -u)
 [ -n "$CODEX_HITS" ] && ALERTS+=("Codex 红线漂移——新自动化引用 Codex 目录（仅 Codex 自带清理任务豁免）: $(echo "$CODEX_HITS" | tr '\n' '；' | head -c 160)")
 
@@ -209,7 +209,7 @@ PY
 fi
 
 # ===== R112 cron 蒸馏任务健康巡检：consecutiveErrors ≥3 告警 =====
-CRON_JOBS_JSON="/Users/tom/.openclaw-autoclaw/cron/jobs.json"
+CRON_JOBS_JSON="/Users/tom/kimi/shared/legacy/cron-jobs.json"
 if [ -f "$CRON_JOBS_JSON" ]; then
     BAD_CRON=$(python3 -c "
 import json, time

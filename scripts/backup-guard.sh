@@ -15,19 +15,19 @@ if [ -d "$DEST" ]; then
   if [ "$PROBE_OK" -eq 1 ]; then
     # 自愈语义：探测成功则清除历史 TCC-LOCKED/VOLUME-MISSING 标记，
     # 避免单次瞬态失败后的陈旧记录反复触发巡检告警（2026-09-15 修真）
-    if [ -f "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log" ] && grep -q "TCC-LOCKED\|VOLUME-MISSING" "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log" 2>/dev/null; then
-      echo "$(date '+%F %T') RECOVERED probe ok, clearing stale marks" >> "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
+    if [ -f "$HOME/kimi/shared/memory/backup-guard.log" ] && grep -q "TCC-LOCKED\|VOLUME-MISSING" "$HOME/kimi/shared/memory/backup-guard.log" 2>/dev/null; then
+      echo "$(date '+%F %T') RECOVERED probe ok, clearing stale marks" >> "$HOME/kimi/shared/memory/backup-guard.log"
       # 只清失败行，保留 RECOVERED 审计痕迹
-      grep -v "TCC-LOCKED\|VOLUME-MISSING" "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log" > "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log.tmp" 2>/dev/null
-      mv "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log.tmp" "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
+      grep -v "TCC-LOCKED\|VOLUME-MISSING" "$HOME/kimi/shared/memory/backup-guard.log" > "$HOME/kimi/shared/memory/backup-guard.log.tmp" 2>/dev/null
+      mv "$HOME/kimi/shared/memory/backup-guard.log.tmp" "$HOME/kimi/shared/memory/backup-guard.log"
     fi
       exit 0   # 写入正常
   fi
   echo "⚠️ TCC-LOCKED: 定时上下文对外置卷无写权限（3 次重试均失败，Operation not permitted）"
   echo "   修复路径: 系统设置 → 隐私与安全性 → 完全磁盘访问权限 → 勾选 cron/launchd/bash 对应项，或改用 launchd 环境跑备份"
   # 失败自记录，供巡检发现
-  echo "$(date '+%F %T') TCC-LOCKED probe failed" >> "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
+  echo "$(date '+%F %T') TCC-LOCKED probe failed" >> "$HOME/kimi/shared/memory/backup-guard.log"
   exit 2
 fi
-echo "$(date '+%F %T') VOLUME-MISSING $DEST not mounted" >> "$HOME/.openclaw-autoclaw/workspace/memory/backup-guard.log"
+echo "$(date '+%F %T') VOLUME-MISSING $DEST not mounted" >> "$HOME/kimi/shared/memory/backup-guard.log"
 exit 1

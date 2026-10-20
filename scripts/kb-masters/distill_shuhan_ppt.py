@@ -13,8 +13,8 @@ if _lg_os.environ.get('ALLOW_LEGACY_INGEST') != '1':
 """shuhan-ppt-ocr.txt 全量蒸馏 — 舒晗奇门36课PPT OCR"""
 import re, sqlite3, hashlib
 
-DB = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/server/database/yidao.db"
-SRC = "/Users/tom/.openclaw-autoclaw/workspace/projects/mingli-baojian/knowledge/shuhan-ppt-ocr.txt"
+DB = "/Users/tom/kimi/projects/mingli-baojian/server/database/yidao.db"
+SRC = "/Users/tom/kimi/projects/mingli-baojian/knowledge/shuhan-ppt-ocr.txt"
 
 db = sqlite3.connect(DB)
 cur = db.cursor()
