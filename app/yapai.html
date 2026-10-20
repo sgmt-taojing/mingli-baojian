@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掷牙牌 · 牙牌神数 · 命理宝鉴</title>
+<style>
+:root{--gold:#c9a84c;--gold-l:#e8cc7a;--bg:#0a0a0c;--card:#141416;--line:rgba(201,168,76,.22);--txt:#d8d2c4;--dim:#8a8478}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:"Songti SC","STSong",serif;min-height:100vh;padding-bottom:90px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px}
+.hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.hd a{color:var(--dim);text-decoration:none;font-size:13px}
+.hd h1{font-size:20px;color:var(--gold-l);font-weight:600;letter-spacing:2px}
+.badge{font-size:11px;color:var(--gold);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.yi{font-size:13px;color:var(--dim);line-height:1.9}
+.yi b{color:var(--gold);font-weight:600}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;padding:8px;border:1px solid var(--line);background:none;color:var(--dim);border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+.tabs button.on{color:var(--gold-l);border-color:var(--gold);background:rgba(201,168,76,.08)}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#8a6d2a,#c9a84c);color:#0a0a0c;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;font-family:inherit;margin-top:14px}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5}
+/* 掷牌 */
+.throws{display:flex;justify-content:center;gap:18px;margin:14px 0}
+.throw{text-align:center}
+.dice{display:flex;gap:5px;justify-content:center;margin-bottom:8px;min-height:38px}
+.die{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--line);background:radial-gradient(circle at 35% 30%,#22221f,#101012);display:flex;align-items:center;justify-content:center;font-size:19px;color:var(--gold-l)}
+.die.rolling{animation:roll .12s linear 6}
+@keyframes roll{50%{transform:rotate(90deg) scale(.85)}}
+.throw .lv{font-size:14px;color:var(--gold);min-height:20px}
+.throw .nm{font-size:11px;color:var(--dim);margin-top:2px}
+/* 手动 */
+.manual{display:flex;gap:10px;margin:12px 0}
+.manual .col{flex:1;text-align:center}
+.manual .col h4{font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:600}
+.lvrow{display:flex;flex-direction:column;gap:6px}
+.lvrow button{padding:7px 4px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--txt);cursor:pointer;font-size:13px;font-family:inherit}
+.lvrow button.on{background:var(--gold);color:#0a0a0c;font-weight:700}
+/* 结果 */
+.res h2{font-size:21px;color:var(--gold-l);letter-spacing:2px;margin-bottom:4px}
+.res .sub{font-size:13px;color:var(--dim);margin-bottom:12px;line-height:1.8}
+.res .sub span{margin-right:14px}
+.poem{font-size:15px;line-height:2.3;color:var(--gold-l);text-align:center;padding:8px 0}
+.sec{margin:12px 0;padding:12px 14px;background:rgba(201,168,76,.05);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-size:14px;line-height:2}
+.sec h5{font-size:12px;color:var(--gold);margin-bottom:4px;letter-spacing:2px}
+.disc{font-size:11px;color:#5a5548;text-align:center;line-height:1.8;margin-top:16px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd"><a href="index.html">← 返回大厅</a><h1>掷牙牌</h1><span class="badge">牙牌神数 · 清·岳庆山樵</span></div>
+
+  <div class="card yi">
+    <b>占法（卷首）：</b>每掷三骰计开数——<b>十二开以上为上上，十至十一开上中，八至九开中平，五至七开中下，一至四开下下</b>；连占三次得三档，合成一百二十五课。零开须祷告再占。心有所疑，一事一占。
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button id="tabCast" class="on" onclick="setMode('cast')">掷牌起课</button>
+      <button id="tabManual" onclick="setMode('manual')">手动查课</button>
+    </div>
+
+    <div id="castPane">
+      <div class="throws" id="throws"></div>
+      <button class="btn" id="castBtn" onclick="cast()">掷 牌</button>
+    </div>
+
+    <div id="manualPane" class="hidden">
+      <div class="manual" id="manualCols"></div>
+      <button class="btn" onclick="lookupManual()">查 课</button>
+    </div>
+  </div>
+
+  <div class="card res hidden" id="result">
+    <h2 id="rName"></h2>
+    <div class="sub" id="rSub"></div>
+    <div class="poem" id="rPoem"></div>
+    <div class="sec" id="rJie"></div>
+    <div class="sec" id="rDuan"></div>
+    <button class="btn" onclick="goReport()">生成解读报告 →</button>
+  </div>
+
+  <div class="disc">本工具内容出自《牙牌神数》（清·岳庆山樵，文明书局1925年版，台图扫描本与华轩居士转录本互校28处，公有领域古籍），仅供传统民俗文化研究参考，不作吉凶预测依据。</div>
+</div>
+
+<script src="js/mobile-nav.js?v=20261020a"></script>
+<script>
+'use strict';
+let DATA=null, curKey=null;
+const LV=['上上','上中','中平','中下','下下'];
+const DICE=['⚀','⚁','⚂','⚃','⚄','⚅'];
+fetch('data/yapai-125.json?v=20261021a').then(r=>r.json()).then(j=>{DATA=j;});
+
+// 三掷区
+(function(){
+  const box=document.getElementById('throws');
+  for(let t=0;t<3;t++){
+    const th=document.createElement('div');th.className='throw';
+    th.innerHTML='<div class="dice" id="dice'+t+'"></div><div class="lv" id="lv'+t+'"></div><div class="nm">第'+['一','二','三'][t]+'掷</div>';
+    box.appendChild(th);
+    const dz=document.getElementById('dice'+t);
+    for(let i=0;i<3;i++){const d=document.createElement('div');d.className='die';d.textContent='?';dz.appendChild(d);}
+  }
+})();
+// 手动三列
+(function(){
+  const cols=document.getElementById('manualCols');
+  ['第一掷','第二掷','第三掷'].forEach((nm,ci)=>{
+    const col=document.createElement('div');col.className='col';
+    col.innerHTML='<h4>'+nm+'</h4>';
+    const row=document.createElement('div');row.className='lvrow';
+    LV.forEach((lv,li)=>{
+      const b=document.createElement('button');b.textContent=lv;
+      if(li===0)b.classList.add('on');
+      b.onclick=()=>{row.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');};
+      row.appendChild(b);
+    });
+    col.appendChild(row);cols.appendChild(col);
+  });
+})();
+function setMode(m){
+  document.getElementById('tabCast').classList.toggle('on',m==='cast');
+  document.getElementById('tabManual').classList.toggle('on',m==='manual');
+  document.getElementById('castPane').classList.toggle('hidden',m!=='cast');
+  document.getElementById('manualPane').classList.toggle('hidden',m!=='manual');
+}
+function levelOf(sum){
+  if(sum>=12)return 1; if(sum>=10)return 2; if(sum>=8)return 3; if(sum>=5)return 4; return 5;
+}
+function cast(){
+  if(!DATA)return;
+  const btn=document.getElementById('castBtn');btn.disabled=true;
+  const diceEls=[0,1,2].map(t=>[...document.getElementById('dice'+t).children]);
+  diceEls.flat().forEach(d=>{d.textContent='?';d.classList.remove('rolling');void d.offsetWidth;d.classList.add('rolling');});
+  for(let t=0;t<3;t++)document.getElementById('lv'+t).textContent='';
+  setTimeout(()=>{
+    const lvs=[];
+    for(let t=0;t<3;t++){
+      let sum=0;
+      diceEls[t].forEach(d=>{const v=1+Math.floor(Math.random()*6);d.textContent=DICE[v-1];sum+=v;d.classList.remove('rolling');});
+      const lv=levelOf(sum);
+      lvs.push(lv);
+      document.getElementById('lv'+t).textContent=LV[lv-1]+'（'+sum+'开）';
+    }
+    btn.disabled=false;
+    show(lvs.join('-'),'掷牌起课');
+  },780);
+}
+function lookupManual(){
+  if(!DATA)return;
+  const cols=document.querySelectorAll('#manualCols .col');
+  const lvs=[...cols].map(c=>{const bs=[...c.querySelectorAll('button')];return bs.findIndex(b=>b.classList.contains('on'))+1;});
+  show(lvs.join('-'),'手动查课');
+}
+function show(key,via){
+  curKey=key;
+  const d=DATA.lessons[key];
+  const res=document.getElementById('result');
+  if(!d){res.classList.add('hidden');return;}
+  res.classList.remove('hidden');
+  document.getElementById('rName').textContent='第'+d.n+'课 · '+(d.motto||'');
+  document.getElementById('rSub').innerHTML='<span>'+d.combo+'</span><span>'+via+'</span>';
+  document.getElementById('rPoem').innerHTML='<h5 style="font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:6px">签 诗</h5>'+esc(d.verse).replace(/\n/g,'<br>');
+  document.getElementById('rJie').innerHTML='<h5>解 曰</h5>'+esc(d.jie);
+  document.getElementById('rDuan').innerHTML='<h5>断 曰</h5>'+esc(d.duan);
+  res.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function goReport(){
+  const d=DATA.lessons[curKey]; if(!d)return;
+  const raw='【牙牌神数·第'+d.n+'课】'+d.combo+'\n总评：'+(d.motto||'')+'\n签诗：'+d.verse.replace(/\n/g,'')+'\n解曰：'+d.jie+'\n断曰：'+d.duan;
+  const firstSen=(d.jie||'').split(/[。；;]/)[0]||'';
+  const spoken='占得牙牌神数第'+d.n+'课，'+d.combo+'，'+(d.motto||'')+'。'+firstSen+'。';
+  const report={
+    module:'yapai',
+    summary:'掷牙牌得第'+d.n+'课「'+(d.motto||'')+'」——'+d.combo,
+    segments:[
+      {id:'seg1',title:'① 原文引用区（照录未改）',content:raw},
+      {id:'seg2',title:'② 白话导读区（解曰断曰为古人断语，照录）',content:'【解曰】'+d.jie+'\n【断曰】'+d.duan},
+      {id:'seg3',title:'③ 语音播报短句',content:spoken}
+    ],
+    canon:{note:'本课出自《牙牌神数》（清·岳庆山樵，文明书局1925年版，台图扫描本NTL-9900014378与华轩居士转录本互校28处）。',
+      items:[{book:'牙牌神数',title:'第'+d.n+'课 '+d.combo+' '+(d.motto||''),excerpt:d.verse.replace(/\n/g,'')}]}
+  };
+  try{sessionStorage.setItem('lastReport',JSON.stringify(report));}catch(e){}
+  location.href='report-interpret.html?module=yapai&name='+encodeURIComponent('缘主');
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>

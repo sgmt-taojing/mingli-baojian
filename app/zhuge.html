@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>诸葛测字 · 诸葛神数 · 命理宝鉴</title>
+<style>
+:root{--gold:#c9a84c;--gold-l:#e8cc7a;--bg:#0a0a0c;--card:#141416;--line:rgba(201,168,76,.22);--txt:#d8d2c4;--dim:#8a8478}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:"Songti SC","STSong",serif;min-height:100vh;padding-bottom:90px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px}
+.hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.hd a{color:var(--dim);text-decoration:none;font-size:13px}
+.hd h1{font-size:20px;color:var(--gold-l);font-weight:600;letter-spacing:2px}
+.badge{font-size:11px;color:var(--gold);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.yi{font-size:13px;color:var(--dim);line-height:1.9}
+.yi b{color:var(--gold);font-weight:600}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{flex:1;min-width:100px;padding:8px;border:1px solid var(--line);background:none;color:var(--dim);border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+.tabs button.on{color:var(--gold-l);border-color:var(--gold);background:rgba(201,168,76,.08)}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#8a6d2a,#c9a84c);color:#0a0a0c;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;font-family:inherit;margin-top:14px}
+.btn:active{transform:scale(.98)}
+/* 报字 */
+.zi-row{display:flex;justify-content:center;gap:12px;margin:10px 0}
+.zi-cell{text-align:center}
+.zi-cell input{width:74px;height:74px;border:1.5px solid var(--line);border-radius:12px;background:#0e0e10;color:var(--gold-l);font-size:34px;text-align:center;font-family:inherit}
+.zi-cell input:focus{outline:none;border-color:var(--gold)}
+.zi-cell select{width:74px;margin-top:8px;padding:6px;border:1px solid var(--line);border-radius:8px;background:#0e0e10;color:var(--txt);font-family:inherit;font-size:14px}
+.zi-cell .lb{display:block;font-size:11px;color:var(--dim);margin-top:6px}
+.calc{font-size:13px;color:var(--dim);text-align:center;line-height:2;min-height:22px}
+.calc b{color:var(--gold-l)}
+.manual{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+.manual input{width:110px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#0e0e10;color:var(--gold-l);font-size:18px;text-align:center;font-family:inherit}
+.manual input:focus{outline:none;border-color:var(--gold)}
+/* 结果 */
+.res h2{font-size:22px;color:var(--gold-l);letter-spacing:2px;margin-bottom:4px}
+.res .sub{font-size:13px;color:var(--dim);margin-bottom:12px;line-height:1.8}
+.res .sub span{margin-right:14px}
+.jx{display:inline-block;padding:1px 10px;border-radius:5px;font-size:13px;border:1px solid var(--gold);color:var(--gold-l)}
+.jx.xia{border-color:#8a4a3c;color:#d08a7a}
+.poem{font-size:16px;line-height:2.4;color:var(--gold-l);text-align:center;padding:10px 0}
+.sec{margin:12px 0;padding:12px 14px;background:rgba(201,168,76,.05);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-size:14px;line-height:2}
+.sec h5{font-size:12px;color:var(--gold);margin-bottom:4px;letter-spacing:2px}
+.disc{font-size:11px;color:#5a5548;text-align:center;line-height:1.8;margin-top:16px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd"><a href="index.html">← 返回大厅</a><h1>诸葛测字</h1><span class="badge">诸葛神数 · 三百八十四签</span></div>
+
+  <div class="card yi">
+    <b>占法（卷首）：</b>焚香敬神后，随意报出三个字，按繁体笔画各取个位，组成三位数；<b>超过三百八十四则累减三百八十四</b>，即为签号。诚心求签，一事一占。
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button id="tabZi" class="on" onclick="setMode('zi')">报字起签</button>
+      <button id="tabRand" onclick="setMode('rand')">随机求签</button>
+      <button id="tabManual" onclick="setMode('manual')">按号查签</button>
+    </div>
+
+    <div id="ziPane">
+      <div class="zi-row" id="ziRow"></div>
+      <div class="calc" id="calcLine">报三个字，并填入各自繁体笔画的个位数</div>
+      <button class="btn" onclick="byZi()">起 签</button>
+    </div>
+
+    <div id="randPane" class="hidden">
+      <div class="yi" style="text-align:center;padding:8px 0">静心默念所问，点击下方按钮，随机得签号（1-384）</div>
+      <button class="btn" onclick="byRand()">求 签</button>
+    </div>
+
+    <div id="manualPane" class="hidden">
+      <div class="manual">
+        <span style="color:var(--dim);font-size:14px">签号</span>
+        <input id="manualNo" type="number" min="1" max="384" placeholder="1-384">
+        <button class="btn" style="width:auto;margin:0;padding:10px 22px;letter-spacing:2px" onclick="lookupManual()">查 签</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card res hidden" id="result">
+    <h2 id="rName"></h2>
+    <div class="sub" id="rSub"></div>
+    <div class="poem" id="rPoem"></div>
+    <div class="sec" id="rJie1"></div>
+    <div class="sec hidden" id="rJie2"></div>
+    <button class="btn" onclick="goReport()">生成解读报告 →</button>
+  </div>
+
+  <div class="disc">本工具内容为诸葛神数民俗传本（世纪国学全文页与神巴巴两站互校，签诗校勘29处），仅供传统民俗文化研究参考，不作吉凶预测依据。</div>
+</div>
+
+<script src="js/mobile-nav.js?v=20261020a"></script>
+<script>
+'use strict';
+let DATA=null, curNo=null, curVia='';
+fetch('data/zhuge-384.json?v=20261021a').then(r=>r.json()).then(j=>{DATA=j;});
+
+// 报字三格
+(function(){
+  const row=document.getElementById('ziRow');
+  for(let i=0;i<3;i++){
+    const cell=document.createElement('div');cell.className='zi-cell';
+    let opts='';for(let d=0;d<=9;d++)opts+='<option value="'+d+'">'+d+'</option>';
+    cell.innerHTML='<input maxlength="1" id="zi'+i+'" placeholder="字"><br>'+
+      '<select id="zw'+i+'">'+opts+'</select><span class="lb">笔画个位</span>';
+    row.appendChild(cell);
+  }
+  ['zi0','zi1','zi2'].forEach((id,i)=>{
+    document.getElementById(id).addEventListener('input',ev=>{
+      if(ev.target.value && i<2)document.getElementById('zi'+(i+1)).focus();
+    });
+  });
+})();
+function setMode(m){
+  ['zi','rand','manual'].forEach(k=>{
+    document.getElementById('tab'+k[0].toUpperCase()+k.slice(1)).classList.toggle('on',m===k);
+    document.getElementById(k+'Pane').classList.toggle('hidden',m!==k);
+  });
+}
+function byZi(){
+  if(!DATA)return;
+  const chars=[0,1,2].map(i=>document.getElementById('zi'+i).value.trim());
+  const ds=[0,1,2].map(i=>parseInt(document.getElementById('zw'+i).value,10));
+  if(chars.some(c=>!c)){document.getElementById('calcLine').innerHTML='请先报出三个字';return;}
+  let num=ds[0]*100+ds[1]*10+ds[2];
+  let steps='「'+chars.join('·')+'」个位 '+ds.join('·')+' → '+num;
+  let no=num;
+  while(no>384)no-=384;
+  if(no!==num)steps+='，累减384 → <b>'+no+'</b>';
+  if(no===0){document.getElementById('calcLine').innerHTML='数为〇，依占法须祷告再占';return;}
+  document.getElementById('calcLine').innerHTML=steps;
+  curVia='报字「'+chars.join('')+'」起签';
+  show(no);
+}
+function byRand(){ if(!DATA)return; curVia='随机求签'; show(1+Math.floor(Math.random()*384)); }
+function lookupManual(){
+  const v=parseInt(document.getElementById('manualNo').value,10);
+  if(v>=1&&v<=384){curVia='按号查签';show(v);}
+}
+function show(no){
+  curNo=no;
+  const d=DATA[String(no)]; if(!d)return;
+  const res=document.getElementById('result');
+  res.classList.remove('hidden');
+  document.getElementById('rName').textContent='第'+no+'签';
+  const isXia=/下/.test(d.jixiong||'');
+  let sub='';
+  if(d.jixiong)sub+='<span class="jx'+(isXia?' xia':'')+'">'+d.jixiong+'</span>';
+  if(d.gongwei)sub+='<span>'+esc(d.gongwei)+'</span>';
+  sub+='<span>'+curVia+'</span>';
+  document.getElementById('rSub').innerHTML=sub;
+  document.getElementById('rPoem').innerHTML=esc(d.verse).replace(/[。！？]/g,m=>m+'<br>');
+  document.getElementById('rJie1').innerHTML='<h5>解 签</h5>'+esc(d.jie1);
+  const j2=document.getElementById('rJie2');
+  if(d.jie2){j2.classList.remove('hidden');j2.innerHTML='<h5>解签二 · 古文断语</h5>'+esc(d.jie2);}
+  else j2.classList.add('hidden');
+  res.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function goReport(){
+  const d=DATA[String(curNo)]; if(!d)return;
+  let raw='【诸葛神数·第'+curNo+'签】'+(d.jixiong||'')+(d.gongwei?'（'+d.gongwei+'）':'')+'\n签诗：'+d.verse+'\n解签：'+d.jie1;
+  if(d.jie2)raw+='\n解签二（古文断语）：'+d.jie2;
+  const firstSen=(d.jie1||'').split(/[。；;]/)[0]||'';
+  const spoken='占得诸葛神数第'+curNo+'签'+(d.jixiong?'，'+d.jixiong:'')+'。'+firstSen+'。';
+  const report={
+    module:'zhuge',
+    summary:'占得诸葛神数第'+curNo+'签——'+(d.jixiong||'')+'（'+curVia+'）',
+    segments:[
+      {id:'seg1',title:'① 原文引用区（照录未改）',content:raw},
+      {id:'seg2',title:'② 白话导读区（传本解语，照录）',content:d.jie1},
+      {id:'seg3',title:'③ 语音播报短句',content:spoken}
+    ],
+    canon:{note:'本签出自诸葛神数民俗传本，世纪国学全文页与神巴巴两站互校，签诗校勘29处。',
+      items:[{book:'诸葛神数',title:'第'+curNo+'签',excerpt:d.verse}]}
+  };
+  try{sessionStorage.setItem('lastReport',JSON.stringify(report));}catch(e){}
+  location.href='report-interpret.html?module=zhuge&name='+encodeURIComponent('缘主');
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>观音求签 · 观音灵签 · 命理宝鉴</title>
+<style>
+:root{--gold:#c9a84c;--gold-l:#e8cc7a;--bg:#0a0a0c;--card:#141416;--line:rgba(201,168,76,.22);--txt:#d8d2c4;--dim:#8a8478}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:"Songti SC","STSong",serif;min-height:100vh;padding-bottom:90px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px}
+.hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.hd a{color:var(--dim);text-decoration:none;font-size:13px}
+.hd h1{font-size:20px;color:var(--gold-l);font-weight:600;letter-spacing:2px}
+.badge{font-size:11px;color:var(--gold);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.yi{font-size:13px;color:var(--dim);line-height:1.9}
+.yi b{color:var(--gold);font-weight:600}
+/* 签筒 */
+.tube-zone{display:flex;flex-direction:column;align-items:center;padding:10px 0 4px}
+.tube{width:120px;height:150px;position:relative;background:linear-gradient(160deg,#3a2c14,#1c1508);border:1.5px solid var(--line);border-radius:14px 14px 20px 20px;overflow:visible}
+.tube::after{content:'觀音靈籤';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;color:var(--gold);font-size:15px;letter-spacing:6px;opacity:.85}
+.sticks{position:absolute;left:50%;bottom:78%;transform:translateX(-50%);display:flex;gap:3px}
+.sticks i{width:4px;height:52px;background:linear-gradient(#e8cc7a,#8a6d2a);border-radius:2px 2px 0 0;display:block}
+.tube.shake{animation:shake .55s ease-in-out 3}
+@keyframes shake{0%,100%{transform:rotate(0) translateY(0)}20%{transform:rotate(-7deg) translateY(-4px)}45%{transform:rotate(6deg) translateY(2px)}70%{transform:rotate(-5deg) translateY(-3px)}}
+.dropped{margin:14px auto 0;width:26px;height:120px;background:linear-gradient(#e8cc7a,#b8933f);border-radius:4px;display:none;align-items:flex-start;justify-content:center;color:#3a2c14;font-size:15px;font-weight:700;padding-top:10px;animation:drop .5s ease}
+@keyframes drop{from{transform:translateY(-46px);opacity:0}to{transform:translateY(0);opacity:1}}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#8a6d2a,#c9a84c);color:#0a0a0c;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;font-family:inherit;margin-top:14px}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.5}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;padding:8px;border:1px solid var(--line);background:none;color:var(--dim);border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+.tabs button.on{color:var(--gold-l);border-color:var(--gold);background:rgba(201,168,76,.08)}
+.manual{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 0}
+.manual input{width:110px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#0e0e10;color:var(--gold-l);font-size:18px;text-align:center;font-family:inherit}
+.manual input:focus{outline:none;border-color:var(--gold)}
+/* 结果 */
+.res h2{font-size:22px;color:var(--gold-l);letter-spacing:2px;margin-bottom:4px}
+.res .sub{font-size:13px;color:var(--dim);margin-bottom:12px;line-height:1.8}
+.res .sub span{margin-right:14px}
+.jx{display:inline-block;padding:1px 10px;border-radius:5px;font-size:13px;border:1px solid var(--gold);color:var(--gold-l)}
+.jx.xia{border-color:#8a4a3c;color:#d08a7a}
+.poem{font-size:16px;line-height:2.4;color:var(--gold-l);text-align:center;padding:10px 0}
+.sec{margin:12px 0;padding:12px 14px;background:rgba(201,168,76,.05);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-size:14px;line-height:2}
+.sec h5{font-size:12px;color:var(--gold);margin-bottom:4px;letter-spacing:2px}
+.disc{font-size:11px;color:#5a5548;text-align:center;line-height:1.8;margin-top:16px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd"><a href="index.html">← 返回大厅</a><h1>观音求签</h1><span class="badge">观音灵签 · 一百签</span></div>
+
+  <div class="card yi">
+    <b>求签仪轨：</b>先定一事，静心默念事由，再摇签筒——<b>一事一问，不反复占同一事</b>。签出后记下签号，依次读签诗、解曰与古人典故。
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button id="tabCast" class="on" onclick="setMode('cast')">摇筒求签</button>
+      <button id="tabManual" onclick="setMode('manual')">按号查签</button>
+    </div>
+
+    <div id="castPane">
+      <div class="tube-zone">
+        <div class="tube" id="tube"><div class="sticks" id="sticks"></div></div>
+        <div class="dropped" id="dropped"></div>
+      </div>
+      <button class="btn" id="castBtn" onclick="cast()">摇 签</button>
+    </div>
+
+    <div id="manualPane" class="hidden">
+      <div class="manual">
+        <span style="color:var(--dim);font-size:14px">签号</span>
+        <input id="manualNo" type="number" min="1" max="100" placeholder="1-100">
+        <button class="btn" style="width:auto;margin:0;padding:10px 22px;letter-spacing:2px" onclick="lookupManual()">查 签</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card res hidden" id="result">
+    <h2 id="rName"></h2>
+    <div class="sub" id="rSub"></div>
+    <div class="poem" id="rPoem"></div>
+    <div class="sec" id="rJie"></div>
+    <button class="btn" onclick="goReport()">生成解读报告 →</button>
+  </div>
+
+  <div class="disc">本工具内容为观音灵签民俗传本（网易全文页与观易堂两站互证，典故名全），仅供传统民俗文化研究参考，不作吉凶预测依据。</div>
+</div>
+
+<script src="js/mobile-nav.js?v=20261020a"></script>
+<script>
+'use strict';
+let DATA=null, curNo=null;
+const sticks=document.getElementById('sticks');
+for(let i=0;i<9;i++){const s=document.createElement('i');s.style.height=(44+Math.random()*14)+'px';sticks.appendChild(s);}
+fetch('data/guanyin-100.json?v=20261021a').then(r=>r.json()).then(j=>{DATA=j;});
+
+function setMode(m){
+  document.getElementById('tabCast').classList.toggle('on',m==='cast');
+  document.getElementById('tabManual').classList.toggle('on',m==='manual');
+  document.getElementById('castPane').classList.toggle('hidden',m!=='cast');
+  document.getElementById('manualPane').classList.toggle('hidden',m!=='manual');
+}
+function cast(){
+  if(!DATA)return;
+  const btn=document.getElementById('castBtn'), tube=document.getElementById('tube'), drop=document.getElementById('dropped');
+  btn.disabled=true; drop.style.display='none';
+  tube.classList.remove('shake'); void tube.offsetWidth; tube.classList.add('shake');
+  const no=1+Math.floor(Math.random()*100);
+  setTimeout(()=>{
+    drop.textContent=no; drop.style.display='flex';
+    btn.disabled=false;
+    show(no);
+  },1700);
+}
+function lookupManual(){
+  const v=parseInt(document.getElementById('manualNo').value,10);
+  if(v>=1&&v<=100) show(v);
+}
+function show(no){
+  curNo=no;
+  const d=DATA[String(no)]; if(!d)return;
+  const res=document.getElementById('result');
+  res.classList.remove('hidden');
+  document.getElementById('rName').textContent='第'+no+'签'+(d.gudian?' · '+d.gudian:'');
+  const isXia=/下/.test(d.jixiong);
+  let sub='<span class="jx'+(isXia?' xia':'')+'">'+d.jixiong+'</span>';
+  if(d.gudian)sub+='<span>古人典故：'+d.gudian+'</span>';
+  document.getElementById('rSub').innerHTML=sub;
+  document.getElementById('rPoem').innerHTML=esc(d.verse).replace(/[。！？]/g,m=>m+'<br>');
+  document.getElementById('rJie').innerHTML='<h5>解</h5>'+esc(d.jie);
+  res.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function goReport(){
+  const d=DATA[String(curNo)]; if(!d)return;
+  const raw='【观音灵签·第'+curNo+'签】'+d.jixiong+(d.gudian?'（古人典故：'+d.gudian+'）':'')+'\n签诗：'+d.verse+'\n'+d.jie;
+  const firstSen=(d.jie.replace(/【[^】]*】/g,'')).split(/[。；;]/)[0]||'';
+  const spoken='求得观音灵签第'+curNo+'签，'+d.jixiong+(d.gudian?'，典故'+d.gudian:'')+'。'+firstSen+'。';
+  const report={
+    module:'guanyin',
+    summary:'求得观音灵签第'+curNo+'签「'+(d.gudian||'')+'」——'+d.jixiong,
+    segments:[
+      {id:'seg1',title:'① 原文引用区（照录未改）',content:raw},
+      {id:'seg2',title:'② 白话导读区（传本解语，照录）',content:d.jie},
+      {id:'seg3',title:'③ 语音播报短句',content:spoken}
+    ],
+    canon:{note:'本签出自观音灵签民俗传本，网易全文页与观易堂两站互证。',
+      items:[{book:'观音灵签',title:'第'+curNo+'签 '+(d.gudian||''),excerpt:d.verse}]}
+  };
+  try{sessionStorage.setItem('lastReport',JSON.stringify(report));}catch(e){}
+  location.href='report-interpret.html?module=guanyin&name='+encodeURIComponent('缘主');
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
