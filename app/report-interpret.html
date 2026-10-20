@@ -271,6 +271,30 @@ window.addEventListener('DOMContentLoaded', function(){
   loadPaipanReport();
 });
 
+// R154-P4（2026-10-20）：报告头模块中文名映射——接力报告不再裸显 module id
+// 排盘类（起盘/起课/起卦）用「排盘报告」，咨询/文库类用「解读报告」
+var _REPORT_PAIPAN_MODS = { bazi:1, ziwei:1, qimen:1, liuyao:1, meihua:1, liuren:1, lingqi:1, yijing:1, zhouyi:1, taisui:1, sui:1, mobile:1, shouji:1, xingming:1, wuxing:1, zodiac:1, shengxiao:1, yanzhi:1, tianji:1 };
+var _REPORT_MODULE_NAMES = {
+  bazi:'八字排盘', ziwei:'紫微斗数', qimen:'奇门遁甲', liuyao:'六爻占卜', meihua:'梅花易数',
+  liuren:'大六壬', yijing:'周易', zhouyi:'周易', fengshui:'风水堪舆', zeri:'择日择吉',
+  huangli:'黄历宜忌', taisui:'太岁本命', yanzhi:'面相颜择', zhongyi:'中医养生',
+  wuxing:'五行分析', xingming:'姓名学', mobile:'号码磁场', zodiac:'生肖运程',
+  shengxiao:'生肖运程', mantra:'真言经典', jingdian:'经典文献', huajie:'化解指导',
+  classics:'典籍文库', faith:'民俗信仰', mingshi:'民俗信仰', lingqi:'灵棋经',
+  music:'五行音疗', lifeindex:'生命指数', lifeplan:'人生规划', caiyun:'财运分析',
+  shiye:'事业方向', ganqing:'感情婚姻', yunshi:'运势分析', tianji:'天纪',
+  freechat:'智能问答', shouji:'号码磁场', sui:'太岁本命'
+};
+function _reportModuleName(mod, isEn){
+  var zh = _REPORT_MODULE_NAMES[mod] || '';
+  if (isEn) return (mod || '').toUpperCase();
+  return zh || String(mod || '').toUpperCase();
+}
+function _reportKindLabel(mod, isEn){
+  if (isEn) return _REPORT_PAIPAN_MODS[mod] ? 'Chart Report' : 'Reading Report';
+  return _REPORT_PAIPAN_MODS[mod] ? '排盘报告' : '解读报告';
+}
+
 function loadPaipanReport(){
   try{
     var isEn = (typeof I18N !== 'undefined' && I18N.locale && !I18N.locale.startsWith('zh'));
@@ -288,7 +312,7 @@ function loadPaipanReport(){
       div.id = 'paipanReportPanel';
       div.className = 'paipan-report-panel';
       div.style.cssText = 'background:linear-gradient(135deg,rgba(255,180,77,.08),rgba(255,126,95,.05));border:1px solid rgba(255,180,77,.3);border-radius:12px;padding:20px;margin:20px 16px;color:#fff';
-      div.innerHTML = '<h2 style="color:#ffb44d;margin:0 0 12px">📜 '+(report.module||module).toUpperCase()+' · '+(isEn?'Report':'排盘报告')+'</h2>'+
+      div.innerHTML = '<h2 style="color:#ffb44d;margin:0 0 12px">📜 '+_reportModuleName(report.module||module, isEn)+' · '+_reportKindLabel(report.module||module, isEn)+'</h2>'+
         '<div id="paipanReportContent"></div>';
       container.insertBefore(div, container.firstChild);
       panel = div;
