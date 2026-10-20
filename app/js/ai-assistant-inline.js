@@ -25,7 +25,7 @@ const KB_SOURCES = [
   {name:'MEIHUA_KB', entryId:'meihua-model-v1', modelEntryCount:42, obj:()=>window.MEIHUA_KB, mods:['meihua','liuyao'], weight:0.9},
   {name:'LIUYAOO_KB', entryId:'liuyao-model-v1', modelEntryCount:20, obj:()=>window.LIUYAO_KB, mods:['liuyao','yijing'], weight:0.9},
   {name:'LIUREN_KB', entryId:'liuren-model-v1', modelEntryCount:30, obj:()=>window.LIUREN_KB, mods:['liuren'], weight:0.9},
-  {name:'LINGQI_KB', entryId:'lingqi-model-v1', modelEntryCount:202, obj:()=>window.LINGQI_KB, mods:['lingqi'], weight:0.9},
+  {name:'LINGQI_KB', entryId:'lingqi-model-v1', modelEntryCount:210, obj:()=>window.LINGQI_KB, mods:['lingqi'], weight:0.9},
   {name:'YIJING_KB', entryId:'yijing-model-v1', modelEntryCount:8, obj:()=>window.YIJING_KB, mods:['yijing','zhouyi'], weight:0.9},
   {name:'FENGSHUI_KB', entryId:'fengshui-model-v1', modelEntryCount:44, obj:()=>window.FENGSHUI_KB, mods:['fengshui','zeri','huangli'], weight:0.9},
   {name:'ZODIAC_KB', entryId:'zodiac-model-v1', modelEntryCount:94, obj:()=>window.ZODIAC_KB, mods:['zodiac','shengxiao','taisui','mobile'], weight:0.85},
@@ -41,6 +41,7 @@ const KB_SOURCES = [
   {name:'WUXING_KB', entryId:'wuxing-model-v1', modelEntryCount:19, obj:()=>window.WUXING_KB, mods:['wuxing','wuxingpeilian','bazi'], weight:0.9},
   {name:'XINGMING_KB', entryId:'xingming-model-v1', modelEntryCount:31, obj:()=>window.XINGMING_KB, mods:['xingming','sancai','wuge'], weight:0.85},
   {name:'ZERI_KB', entryId:'zeri-model-v1', modelEntryCount:42, obj:()=>window.ZERI_KB, mods:['zeri','zeri-zeri','huangli'], weight:0.85},
+  {name:'SHUSHU_KB', entryId:'shushu-model-v1', modelEntryCount:236, obj:()=>window.SHUSHU_KB, mods:['shushu','classics'], weight:0.85},
 ];
 
 function _kbScore(moduleId, data){
@@ -2156,7 +2157,7 @@ function _kbHitToReport(best){
   try{
     if(!best || !best.item) return;
     var p=_kbExtractParts(best.item);
-    var mod=(best.mods&&best.mods[0])||'freechat';
+    var mod=(best.item&&best.item.mod)||(best.mods&&best.mods[0])||'freechat';
     var rpt={
       module:mod,
       summary:'【'+best.source+' 命中 '+Math.round(best.score*100)+'%】'+p.title,
