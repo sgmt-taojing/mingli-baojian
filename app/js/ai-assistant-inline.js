@@ -748,6 +748,8 @@ async function send(pre){
   const q=(pre||box.value).trim();if(!q)return;
   box.value='';
   addUser(q);
+  // R57 修真：新提问即收起上一轮残留澄清卡（旧卡滞留会盖住新回答）
+  if(window._clarifyState==='awaiting_clarification' && typeof _dismissClarifyCard==='function') _dismissClarifyCard();
 
   if(state.module && !state.reporting){
     processAnswer(q);
@@ -2296,7 +2298,7 @@ async function callAI(q){
     // R477-C: 先走 orchestrate 端点（带主动澄清）
     try {
       var _acOrch = new AbortController();
-      var _toOrch = setTimeout(function(){ _acOrch.abort(); }, 12000);
+      var _toOrch = setTimeout(function(){ _acOrch.abort(); }, 20000);
       var orchRes = await fetch(API + '/api/ai/orchestrate', { signal: AbortSignal.timeout(15000),
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2360,6 +2362,27 @@ async function callAI(q){
           // R526: Agent 编排状态面板（Planner→Executor→Critic 可视化）
           try { _renderOrchestratePanel(orchPlan, orchData.data.results, orchData.data.final); } catch(_e) {}
           addAI(orchMeta + orchContent);
+          // R56-P2（2026-10-20）：服务端全库古籍命中 → 挂「生成完整报告」接力按钮（对齐客户端KB直答口径）
+          try{
+            var _kbHitRes = (orchData.data.results||[]).find(function(x){return x && x.agent==='kb_researcher' && x.hitEntry && x.hitEntry.entryId;});
+            if(_kbHitRes){
+              var _msgs2=chat.querySelectorAll('.msg.m-ai');
+              var _lastMsg2=_msgs2[_msgs2.length-1];
+              if(_lastMsg2){
+                var _row2=document.createElement('div');
+                _row2.style.cssText='margin-top:8px;display:flex;gap:8px';
+                var _rb2=document.createElement('button');
+                _rb2.textContent='📄 生成完整报告';
+                _rb2.setAttribute('aria-label','将命中条目送入报告解读中心生成完整三段式报告');
+                _rb2.style.cssText='padding:6px 14px;background:linear-gradient(135deg,#c9a84c,#a78bfa);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-size:13px';
+                var _he=_kbHitRes.hitEntry;
+                var _snap={source:'SERVER_KB', score:_he.score||0.8, item:{title:_he.title, content:_he.content, kw:''}, mods:[_he.module||'freechat']};
+                _rb2.onclick=function(){_kbHitToReport(_snap);};
+                _row2.appendChild(_rb2);
+                _lastMsg2.appendChild(_row2);
+              }
+            }
+          }catch(e){console.warn('[server-kb-report-btn]',e.message);}
           hist.push({role:'assistant', content: orchContent.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
           if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', orchScore, orchScore >= 0.7);
@@ -2385,7 +2408,7 @@ async function callAI(q){
     if(hist.length>20)hist=hist.slice(-20);
     window._clarifyState = 'answered';
     try{ _updateTopicCard(); }catch(e){console.warn("报告降级:",e.message);}
-  }catch(e){ try{ t.remove(); }catch(_){} addAI(local(q));
+  }catch(e){ try{ t.remove(); }catch(_){} addAI(localFallback(q));
     // 错误降级也计入分母
     if (typeof recordKbHit === 'function') {
       recordKbHit(state.module || 'freechat', 0, false);
@@ -2459,7 +2482,7 @@ async function callAIWithClarified(q){
     try{_updateTopicCard();}catch(e){console.warn("报告降级:",e.message);}
   }catch(e){
     try{t.remove();}catch(_){}
-    addAI(local(q));
+    addAI(localFallback(q));
     window._clarifyState='idle';
   }
 }
@@ -4634,7 +4657,7 @@ function _mobile(m,industry,purpose,duration,bazi){
   return r;
 }
 
-function local(text){
+function localFallback(text){
   const t=text.toLowerCase();
   if(/你好|您好|hi|hello/.test(t))return'您好！我是AI命理助手。请选择上方模块开始分析，或直接告诉我您想了解什么。';
   if(/谢谢|感谢/.test(t))return'不客气！还有其他问题可以继续问我。';
@@ -5822,4 +5845,14 @@ function _renderOrchestratePanel(plan, results, final) {
     if (typeof window.hciShowThinking === 'function') window.hciShowThinking(false);
     if (typeof window.hciShowConfidence === 'function') window.hciShowConfidence({ level: finalScore >= 0.7 ? '高' : (finalScore >= 0.4 ? '中' : '低'), score: finalScore });
   } catch(e) {}
+}
+
+/* R56-P3（2026-10-20）：localFallback 顶层桥接——原 local 定义被困 4588 行 IIFE 内
+   （该 IIFE 困住 28 个函数，疑为注释掉 localReport 签名后的历史遗留，拆弹另立档），
+   callAI 错误兜底路径调用即抛 "not defined"。此处顶层补定义，IIFE 内副本不动。 */
+function localFallback(text){
+  const t=String(text||'').toLowerCase();
+  if(/你好|您好|hi|hello/.test(t))return'您好！我是AI命理助手。请选择上方模块开始分析，或直接告诉我您想了解什么。';
+  if(/谢谢|感谢/.test(t))return'不客气！还有其他问题可以继续问我。';
+  return'请选择上方模块开始分析，或直接输入您想了解的内容。';
 }
