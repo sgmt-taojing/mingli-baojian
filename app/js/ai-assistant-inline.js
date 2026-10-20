@@ -4587,22 +4587,10 @@ function _nayin(ys,yb){
   var idx=((tg.indexOf(ys)*10+dz.indexOf(yb))%30+30)%30;
   return nayinMap[idx];
 }
-(function(modId,d){
+// R58 拆弹（2026-10-20）：原 L4590-5676 巨型 IIFE「(function(modId,d){...})('',[])」已拆解，
+// 28 个被困函数恢复顶层可见（openKBPanel/openFeedback/voice/toggleTTS 等 11 个 onclick 死按钮复活）。
+// 重复的 dg2str（与顶层 L3975 逐字一致）/localFallback（文件尾有更稳版）/esc（escape-html.js 全局版在用）已去重，保留更稳版本。
 // function localReport(modId,data){return _getUnifiedReport(modId,data);}
-
-function dg2str(zhi, dS){
-  var wxMap={'子':'水','丑':'土','寅':'木','卯':'木','辰':'土','巳':'火','午':'火','未':'土','申':'金','酉':'金','戌':'土','亥':'水'};
-  var dWx=({'甲':'木','乙':'木','丙':'火','丁':'火','戊':'土','己':'土','庚':'金','辛':'金','壬':'水','癸':'水'})[dS[0]];
-  var zWx=wxMap[zhi]||'—';
-  if(zWx===dWx)return '(与日干比和)';
-  if(({'金':'木','木':'土','土':'水','水':'火','火':'金'})[zWx]===dWx)return '(初传受日干克)';
-  if(({'金':'木','木':'土','土':'水','水':'火','火':'金'})[dWx]===zWx)return '(初传克日干)';
-  return '(中平)';
-}
-
-
-
-
 
 function _mobile(m,industry,purpose,duration,bazi){
   const BX={'天医':{codes:['13','31','68','86','49','94','27','72'],desc:'正财·婚姻·天赋·善良',rank:'吉',career:'金融/医疗/珠宝',affect:'财运亨通，婚姻美满，心地善良'},'生气':{codes:['14','41','67','76','39','93','28','82'],desc:'贵人·乐天·活力·随缘',rank:'吉',career:'服务/教育/公关',affect:'贵人多助，乐观向上，人缘极佳'},'延年':{codes:['19','91','78','87','34','43','26','62'],desc:'领导·专业·长寿·自我',rank:'吉',career:'管理/军警/政治',affect:'领导力强，事业有成，延年益寿'},'伏位':{codes:['11','22','88','99','66','77','33','44'],desc:'耐心·潜藏·等待·被动',rank:'中',career:'研究/财务/行政',affect:'性格稳重有耐心，但需主动出击'},'六煞':{codes:['16','61','47','74','38','83','29','92'],desc:'桃花·人际·情绪·敏感',rank:'中',career:'美容/娱乐/社交',affect:'异性缘好善于交际，但情绪波动大'},'五鬼':{codes:['18','81','79','97','36','63','24','42'],desc:'才华·叛逆·反复·火线',rank:'凶',career:'技术/艺术/创新',affect:'才华横溢但波折多，事业反复不定'},'绝命':{codes:['12','21','69','96','48','84','37','73'],desc:'投资·冲动·极端·大起大落',rank:'凶',career:'投资/创业/投机',affect:'敢拼敢闯但易破财，大起大落'},'祸害':{codes:['17','71','89','98','46','64','23','32'],desc:'口舌·是非·铁齿·固执',rank:'凶',career:'法律/辩论/销售',affect:'口才好但易招是非，性格固执'}};
@@ -4655,13 +4643,6 @@ function _mobile(m,industry,purpose,duration,bazi){
   r+='① 行业 ② 生辰 ③ 使用目的\n';
   r+='例：金融行业，1985年生，求财运';
   return r;
-}
-
-function localFallback(text){
-  const t=text.toLowerCase();
-  if(/你好|您好|hi|hello/.test(t))return'您好！我是AI命理助手。请选择上方模块开始分析，或直接告诉我您想了解什么。';
-  if(/谢谢|感谢/.test(t))return'不客气！还有其他问题可以继续问我。';
-  return'请选择上方模块开始分析，或直接输入您想了解的内容。';
 }
 
 function toggleTTS(){
@@ -5268,7 +5249,6 @@ function _stopMusicPlaylist(){
   if('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 /* 麦克风 UI 复位 */
-function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/━━━/g,'<b class="sec">━━━').replace(/━━━/g,'━━━</b>').replace(/\n/g,'<br>');}
 /* === 模块 KB 兜底报告库（P1-任务3：断网可用率 100%）===
  * music + lifeindex + lifeplan 三大模块独立可用，无需 AI 即可生成报告
  */
@@ -5672,7 +5652,6 @@ window._exportFullChat = function(fmt){
   });
   // 暴露给外部调用
   window.updateRBACBadge = updateBadge;
-})('',[]);
 })('',[]);
 
 /* ===== R520: Agent 推理链可视化 — 让用户看见 AI 的思考和工作过程 ===== */

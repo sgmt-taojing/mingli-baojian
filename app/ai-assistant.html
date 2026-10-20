@@ -301,7 +301,7 @@ if ('serviceWorker' in navigator) {
 <script src="js/vendor/iztro.min.js?v=2.6.0" defer></script>
 <script src="js/true-solar-local.js?v=20261016a" defer></script>
 <script src="js/ziwei-iztro-local.js?v=20261016c" defer></script>
-<script src="js/ai-assistant-inline.js?v=20261020k" defer></script>
+<script src="js/ai-assistant-inline.js?v=20261020m" defer></script>
 <script src="js/mobile-nav.js?v=20261020a" defer></script>
 <!-- R86 TODO 任务总线 -->
 <button class="todo-fab" id="todoFabBtn" onclick="openTodoDrawer()" aria-label="行动清单">表<span class="badge" id="todoBadge" hidden>0</span></button>
@@ -310,7 +310,9 @@ if ('serviceWorker' in navigator) {
   <div id="todoContainer"><span style="color:var(--paper3);font-size:12px">报告生成后自动提取...</span></div>
 </div>
 <script>
-(function(){
+// R58 修真（2026-10-20）：todo-bus.js 是 defer 加载，解析期执行本块时 TodoBus 必为 undefined →
+// 早退导致 FAB「行动清单」按钮永久失效。改为 DOMContentLoaded 后执行（defer 脚本先于该事件完成）。
+document.addEventListener('DOMContentLoaded', function(){
   if (typeof TodoBus === 'undefined') return;
   var fab = document.getElementById('todoFabBtn');
   var drawer = document.getElementById('todoDrawer');
@@ -362,7 +364,7 @@ if ('serviceWorker' in navigator) {
       closeTodoDrawer();
     }
   });
-})();
+});
 </script>
 
 <style>
