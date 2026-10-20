@@ -81,6 +81,7 @@ body{background:var(--bg);color:var(--txt);font-family:"Songti SC","STSong",seri
     <div class="tabs" id="verTabs" style="margin-top:4px">
       <button id="vSiku" class="on" onclick="showVer('siku')">四库净本</button>
       <button id="vOcr" onclick="showVer('ocr')">术数全书本</button>
+      <button id="vWiki" onclick="showVer('wiki')">维基文库本</button>
     </div>
     <div id="rBody"></div>
     <div class="poem hidden" id="rPoem"></div>
@@ -91,7 +92,7 @@ body{background:var(--bg);color:var(--txt);font-family:"Songti SC","STSong",seri
     <div class="none-note" id="emptyNote"></div>
   </div>
 
-  <div class="disc">本工具内容出自《灵棋经》（公有领域古籍），仅供传统民俗文化研究参考，不作吉凶预测依据。术数全书 OCR 本与四库全书本互校；阙课不补，以存本真。</div>
+  <div class="disc">本工具内容出自《灵棋经》（公有领域古籍），仅供传统民俗文化研究参考，不作吉凶预测依据。四库全书本、术数全书 OCR 本、维基文库本三版本互校，一百二十五课全存。</div>
 </div>
 
 <script src="js/mobile-nav.js?v=20261020a"></script>
@@ -108,7 +109,7 @@ for(let i=0;i<12;i++){
   d.className='piece'; d.textContent=kind; d.dataset.kind=kind;
   board.appendChild(d); pieces.push(d);
 }
-fetch('data/lingqi-125.json?v=20261020a').then(r=>r.json()).then(j=>{DATA=j;});
+fetch('data/lingqi-125.json?v=20261020b').then(r=>r.json()).then(j=>{DATA=j;});
 
 function setMode(m){
   document.getElementById('tabCast').classList.toggle('on',m==='cast');
@@ -164,27 +165,29 @@ function show(key){
     res.classList.add('hidden');emp.classList.remove('hidden');
     const [x,y,z]=key.split('-').map(n=>NUM[+n]);
     document.getElementById('emptyNote').innerHTML=
-      '课形「'+x+'上 '+y+'中 '+z+'下」在现存两版本中均阙如（全书一百二十五课，今存一百一十七课，阙课不补，以存本真）。<br>依占仪：宁心定志，可再占一课，或改日再问。';
+      '课形「'+x+'上 '+y+'中 '+z+'下」不在一百二十五课课形之内（或本课数据缺失）。<br>依占仪：宁心定志，可再占一课，或改日再问。';
     emp.scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
   emp.classList.add('hidden');res.classList.remove('hidden');
-  curVer=d.siku?'siku':'ocr';
+  curVer=d.siku?'siku':(d.ocr?'ocr':'wiki');
   document.getElementById('vSiku').style.display=d.siku?'':'none';
   document.getElementById('vOcr').style.display=d.ocr?'':'none';
+  document.getElementById('vWiki').style.display=d.wiki?'':'none';
   renderVer();
   res.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function renderVer(){
   const d=DATA[curKey]; if(!d)return;
-  const v=d[curVer]||d.siku||d.ocr;
+  const v=d[curVer]||d.siku||d.ocr||d.wiki;
   document.getElementById('vSiku').classList.toggle('on',curVer==='siku');
   document.getElementById('vOcr').classList.toggle('on',curVer==='ocr');
+  document.getElementById('vWiki').classList.toggle('on',curVer==='wiki');
   document.getElementById('rName').textContent=v.name;
   const shapeTxt=v.shape.replace(/([一二三四])上/,'$1上 ').replace(/([一二三四])中/,'$1中 ').replace(/([一二三四])下/,'$1下');
   let sub='<span>课形 '+shapeTxt+'</span><span>'+v.xiang+'</span>';
   if(v.gong)sub+='<span>'+v.gong.replace('/',' · ')+'</span>';
-  if(v.num)sub+='<span>四库第'+v.num+'课</span>';
+  if(v.num)sub+='<span>'+({siku:'四库第',wiki:'维基第'}[curVer]||'')+v.num+'课</span>';
   document.getElementById('rSub').innerHTML=sub;
   let html='';
   if(v.xiangyue)html+='<div class="sec"><h5>象 曰</h5>'+esc(v.xiangyue)+'</div>';
@@ -198,14 +201,15 @@ function showVer(v){curVer=v;renderVer();}
 /* R-LQ-RPT（2026-10-20）：一键接入报告解读中心——三段式（原文引用/白话导读/语音播报）+ 经典依据卡 */
 function goReport(){
   const d=DATA[curKey]; if(!d)return;
-  const v=d.siku||d.ocr, o=d.ocr;
+  const v=d.siku||d.ocr||d.wiki, o=d.ocr;
   const shapeTxt=v.shape.replace(/([一二三四])上/,'$1上 ').replace(/([一二三四])中/,'$1中 ').replace(/([一二三四])下/,'$1下');
-  // ①原文引用区：双版本照录
+  // ①原文引用区：三版本照录
   let raw='';
   if(d.siku) raw+='【四库全书本】'+(d.siku.num?'第'+d.siku.num+'课 ':'')+d.siku.name+'（'+d.siku.gong.replace('/',' · ')+'）\n课形 '+shapeTxt+'　'+d.siku.xiang+'\n象曰：'+d.siku.xiangyue+(d.siku.cike?'\n课断：'+d.siku.cike:'')+(d.siku.shiyue?'\n诗曰：'+d.siku.shiyue:'');
   if(d.ocr) raw+=(raw?'\n\n':'')+'【术数全书本】'+d.ocr.name+'\n象曰：'+d.ocr.xiangyue+(d.ocr.cike?'\n课断：'+d.ocr.cike:'')+(d.ocr.shiyue?'\n诗曰：'+d.ocr.shiyue:'');
-  // ②白话导读区：课断段为古人白话断语，照录不改写
-  const guide=(d.ocr&&d.ocr.cike)||v.cike||'（此课断语阙如）';
+  if(d.wiki) raw+=(raw?'\n\n':'')+'【维基文库本】'+(d.wiki.num?'第'+d.wiki.num+'课 ':'')+d.wiki.name+(d.wiki.gong?'（'+d.wiki.gong.replace('/',' · ')+'）':'')+'\n象曰：'+d.wiki.xiangyue+(d.wiki.shiyue?'\n诗曰：'+d.wiki.shiyue:'');
+  // ②白话导读区：课断段为古人白话断语，照录不改写；维基本无课断者录象曰
+  const guide=(d.ocr&&d.ocr.cike)||v.cike||v.xiangyue||'（此课断语阙如）';
   // ③语音播报短句：卦名+象+课断首句（原文摘句重组，不杜撰）
   const firstSen=(v.cike||v.xiangyue||'').split(/[。；;]/)[0]||'';
   const spoken='占得灵棋'+(v.num?'第'+v.num+'课':'一课')+'，'+v.name+'，'+v.xiang+'。'+firstSen+'。';
@@ -217,7 +221,7 @@ function goReport(){
       {id:'seg2',title:'② 白话导读区（课断为古人白话断语，照录）',content:guide},
       {id:'seg3',title:'③ 语音播报短句',content:spoken}
     ],
-    canon:{note:'本课出自《灵棋经》（旧题汉·东方朔撰），四库全书本与术数全书本互校；阙课不补，以存本真。',
+    canon:{note:'本课出自《灵棋经》（旧题汉·东方朔撰），四库全书本、术数全书本、维基文库本三版本互校。',
       items:[{book:'灵棋经',title:v.name+'（'+shapeTxt+'·'+v.xiang+'）',excerpt:v.xiangyue||v.cike||''}]}
   };
   try{sessionStorage.setItem('lastReport',JSON.stringify(report));}catch(e){}

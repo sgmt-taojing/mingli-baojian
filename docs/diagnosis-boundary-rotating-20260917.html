@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目边界与轮番开发诊断报告 · 命理宝鉴</title>
+<style>
+  :root{
+    --bg:#fafafa; --ink:#111; --muted:#6b6b6b; --line:#e2e2e0;
+    --accent:#1f5c8b; --accent-soft:#eef3f7; --ok:#2e6b46; --warn:#8a5a24;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Songti SC","Noto Serif SC",Georgia,serif;
+    font-size:16px; line-height:1.7;
+  }
+  .wrap{max-width:780px; margin:0 auto; padding:64px 28px 96px;}
+  .kicker{
+    font-family:"SF Mono",Menlo,monospace; font-size:11px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+  }
+  h1{font-size:33px; font-weight:600; line-height:1.25; letter-spacing:-.01em; margin:14px 0 10px;}
+  .lede{font-size:17px; color:var(--muted); margin-bottom:8px;}
+  .meta{
+    font-family:"SF Mono",Menlo,monospace; font-size:11.5px; color:var(--muted);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:10px 0; margin:26px 0 0; display:flex; gap:24px; flex-wrap:wrap;
+  }
+  h2{font-size:21px; font-weight:600; margin:56px 0 18px; padding-top:14px; border-top:1px solid var(--line);}
+  h2 .no{font-family:"SF Mono",Menlo,monospace; font-size:12px; color:var(--accent); margin-right:10px; font-weight:400;}
+  p{margin:0 0 14px;}
+  code{font-family:"SF Mono",Menlo,monospace; font-size:.86em; background:var(--accent-soft); padding:1px 5px; border-radius:2px;}
+  .verdict{margin:32px 0 0; padding:20px 22px; border:1px solid var(--line); border-left:3px solid var(--accent); background:#fff;}
+  .verdict .tag{font-family:"SF Mono",Menlo,monospace; font-size:11px; letter-spacing:.1em; color:var(--accent); display:block; margin-bottom:8px;}
+  .verdict p{margin:0; font-size:15.5px;}
+  table{width:100%; border-collapse:collapse; margin:18px 0 8px; font-size:14px;}
+  th{text-align:left; font-weight:550; font-size:12px; letter-spacing:.06em; color:var(--muted); border-bottom:1px solid var(--ink); padding:8px 10px 8px 0;}
+  td{border-bottom:1px solid var(--line); padding:10px 10px 10px 0; vertical-align:top;}
+  td.mono{font-family:"SF Mono",Menlo,monospace; font-size:12.5px; white-space:nowrap;}
+  .ok{color:var(--ok); font-weight:550;}
+  .warn{color:var(--warn); font-weight:550;}
+  .steps{margin:20px 0 0; list-style:none;}
+  .steps li{position:relative; padding:0 0 18px 34px;}
+  .steps li::before{
+    content:attr(data-n); position:absolute; left:0; top:1px;
+    font-family:"SF Mono",Menlo,monospace; font-size:11px;
+    width:22px; height:22px; line-height:22px; text-align:center;
+    border:1px solid var(--accent); color:var(--accent); border-radius:50%;
+  }
+  .steps b{font-weight:550;}
+  .steps .st{display:block; font-family:"SF Mono",Menlo,monospace; font-size:12px; color:var(--muted); margin-top:2px;}
+  .callout{margin:24px 0; padding:18px 20px; border:1px solid var(--line); background:#fff;}
+  .callout .tag{font-family:"SF Mono",Menlo,monospace; font-size:11px; letter-spacing:.1em; color:var(--accent); display:block; margin-bottom:8px;}
+  .callout p{margin:0 0 10px; font-size:15px;}
+  .callout p:last-child{margin:0;}
+  .foot{
+    margin-top:64px; padding-top:14px; border-top:1px solid var(--line);
+    font-family:"SF Mono",Menlo,monospace; font-size:11.5px; color:var(--muted);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Diagnostic Report · Boundary / Handover / Rotating Dev</div>
+  <h1>项目边界与轮番开发诊断报告</h1>
+  <p class="lede">命理宝鉴 · 边界检查全绿；Kimi 前期开发已盘点接管；轮番机制在运转（周期 #2 就绪）；独立诊断发现并修复一处巡检盲区。</p>
+  <div class="meta">
+    <span>日期 2026-09-17</span>
+    <span>执行方 AutoClaw（R797）</span>
+    <span>commit dae17ea6 已推送</span>
+  </div>
+
+  <h2><span class="no">01</span>边界检查（全部实测）</h2>
+  <table>
+    <tr><th>检查项</th><th>结果</th><th>说明</th></tr>
+    <tr><td>跨项目品牌词扫描</td><td class="ok">0 命中</td><td>cross-project-scan.py 全项目扫描</td></tr>
+    <tr><td>排盘边界回归</td><td class="ok">21/21 过</td><td>六爻世应/干支/六亲结构完整性断言</td></tr>
+    <tr><td>G24 参考域隔离</td><td class="ok">在岗</td><td>reference 35,763 条 + 常驻触发器守卫；命理域零医学口径混入</td></tr>
+    <tr><td>KB 写入五红线</td><td class="ok">全绿</td><td>主表=fts5=251,224；唯一写入口守卫在岗</td></tr>
+    <tr><td>服务端口</td><td class="ok">7/7 · 200</td><td>8900/8901/8911/8912/8913/8920/8960 实探</td></tr>
+    <tr><td>检索链路</td><td class="ok">命中</td><td>「害太岁」API 检索正常返回</td></tr>
+  </table>
+
+  <h2><span class="no">02</span>Kimi 前期开发盘点与接管</h2>
+  <p>Kimi 侧以任务书模式开发（G10–G26 系列，8/26–9/7），产物全部落地主项目并有 CHANGELOG 留证：G17R 检索域隔离、G21 能力发版 v1.2.0、G24 参考域标注、G25/G26 多轮补蒸馏等。训练盘克隆经 merge-base 法证确认无未同步代码；9/14 后其任务通道无新产出。今晨 R794–R796 已完成核查、接管宣言（<code>docs/AGENT-TAKEOVER-20260917.md</code>）与轮番协议，其任务书目录归档留作审计基准。</p>
+  <table>
+    <tr><th>轮值周期</th><th>driver</th><th>任务单</th><th>状态</th></tr>
+    <tr><td class="mono">#1</td><td>AutoClaw</td><td class="mono">WO-001 养生域KB起批+STALE清欠</td><td class="ok">已交付 · 复验全绿 · 待 Kimi/用户签署复核</td></tr>
+    <tr><td class="mono">#2</td><td>Kimi</td><td class="mono">WO-002 v9.2 BaziQA重评 + 四路大师蒸馏恢复</td><td class="warn">48h 时限 · 本轮已补素材新址证据</td></tr>
+  </table>
+  <p style="font-size:14px;color:var(--muted);">轮番规则：复核通过才轮转；reviewer 24h 未复核视为通过（可后补抽验）；48h 未交付自动轮转；KB 写入不因轮值放宽五红线；台账在 ROTATING-DEV-PROTOCOL.md 唯一记账。</p>
+
+  <h2><span class="no">03</span>独立诊断：发现并修复一处巡检盲区</h2>
+  <div class="verdict">
+    <span class="tag">FINDING · 已修</span>
+    <p>kb-quality-patrol 五红线全绿的同时，抽查发现 <b>18 条空标题 PDF 残渣行</b>（倪师合集/伤寒论/黄帝内经扫描件首页残渣）——title 或 content 为空，现有五条红线全部不覆盖。按「修一处是修一类」处理：巡检新增<b>红线 2b</b>（空壳行检测），守卫新增 <code>--purge-empty</code>（主表+fts5 双删、审计留证 logs/kb-purge-empty-audit.jsonl），执行清除 251,242→251,224，复验全绿。此后同类垃圾一旦落库，巡检当轮即报。</p>
+  </div>
+  <p>附带定性两件事：今晨出现的 <code>yidao.db.bak-mojibake-20260917</code>（3.4G）确认为 R792 乱码校正的回滚点，非异常；KB 域分布结构性失衡确认——tcm 系约 19 万条 vs 命理核心数万条、养生域仅 5 条，最大缺口在养生域与命理验证库扩充（已列入后续开发主线）。</p>
+
+  <h2><span class="no">04</span>后续开发主线（AutoClaw 接续 driver）</h2>
+  <ol class="steps">
+    <li data-n="1"><b>养生域 KB 持续扩批</b><span class="st">夜间蒸馏主题池节气养生已置首，五红线通道逐批入库（当前 5 条 → 目标首批 50+）</span></li>
+    <li data-n="2"><b>WO-002 复核待命</b><span class="st">Kimi 交付 v9.2 重评 + 四路大师恢复后，24h 内按清单复核签署，台账记账轮转</span></li>
+    <li data-n="3"><b>命理验证库扩充</b><span class="st">承接 R794 路线，验证条目与案例对照持续积累</span></li>
+  </ol>
+
+  <div class="foot">
+    <span>AutoClaw · 内部诊断报告</span>
+    <span>证据：KANBAN R797 · commit dae17ea6</span>
+  </div>
+</div>
+</body>
+</html>

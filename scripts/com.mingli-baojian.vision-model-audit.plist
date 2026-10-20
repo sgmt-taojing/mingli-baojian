@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.mingli-baojian.vision-model-audit</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/tom/kimi/projects/mingli-baojian/scripts/vision-model-audit.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>5</integer>
+        <key>Minute</key>
+        <integer>30</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/tom/kimi/projects/mingli-baojian/logs/vision-model-audit.stdout.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/tom/kimi/projects/mingli-baojian/logs/vision-model-audit.stderr.log</string>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/tom/kimi/projects/mingli-baojian</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>FACE_OCR_BASE</key>
+        <string>http://127.0.0.1:8913</string>
+        <key>API_V2_BASE</key>
+        <string>http://127.0.0.1:8920</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>KeepAlive</key>
+    <false/>
+</dict>
+</plist>
