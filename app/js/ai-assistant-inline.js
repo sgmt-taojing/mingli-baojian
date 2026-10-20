@@ -2131,10 +2131,10 @@ function _kbExtractParts(item){
     : '本条未附古人断语，原文照录如上；通俗讲解可继续追问 AI。';
   // ③语音播报短句：诗曰（课诗宜朗读）→ 象曰首句 → 正文首句，80 字内
   var sec3 = '';
-  if (poem) sec3 = poem.split('\n').slice(0,2).join('，');
+  if (poem) sec3 = poem.replace(/^[诗詩][曰日][:：]?[　\s]*\n?/, '').split('\n').filter(Boolean).map(function(l){return l.replace(/[，,．.。;；\s]+$/,'');}).slice(0,2).join('，');
   if (!sec3 && xiang) sec3 = xiang.split(/[。；;]/)[0];
   if (!sec3) sec3 = content.split(/[。；;\n]/).filter(Boolean)[0] || '';
-  sec3 = cap(sec3.replace(/^象[曰日][:：]?/,'').replace(/^[诗詩][曰日][:：]?/,''), 80);
+  sec3 = cap(sec3.replace(/^象[曰日][:：]?/,'').replace(/^[诗詩][曰日][:：]?/,''), 80).replace(/^[，,．.。;；\s]+/, '').replace(/[，,．。;；\s]+$/, '');
 
   // full：报告页用完整正文（去关键词尾行，直录 2500 字内）
   var full = content.replace(/\n*关键词[:：][\s\S]*$/, '').trim();

@@ -40,8 +40,8 @@ for i, (eid, title, content, keywords) in enumerate(rows):
     })
     for k in kw_list:
         add_kw(k, i)
-    # 卦名衍生词：大通卦→大通卦；课号：第一课 / 第1课
-    m = re.search(r'(第[一二三四五六七八九十百零〇]+课)\s*([^\s（(]+卦)', title or '')
+    # 卦名/课名衍生词：大通卦→大通卦、人事勢→人事勢；课号：第一课 / 第1课 / 第108课（维基本为阿拉伯数字）
+    m = re.search(r'(第[一二三四五六七八九十百零〇0-9]+课)\s*([^\s（(]+)', title or '')
     if m:
         add_kw(m.group(1), i)
         add_kw(m.group(2), i)
