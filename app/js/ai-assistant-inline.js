@@ -2087,6 +2087,61 @@ async function exportReportPDF(el){
   }
 }
 
+// R154-P2: KB 直答三段式（①原文引用 ②古人断语白话导读照录 ③语音播报短句），口径对齐报告解读中心
+// 铁律：全部照录条目原文，不改写不杜撰；无断语可录时诚实标注
+function _formatKbThreePart(item){
+  var content = (item && item.content) || '';
+  var title = (item && item.title) || '';
+  // 兼容 OCR 异体：象日/象曰、颜/顔、陈/陳、刘/劉、诗/詩
+  var MARKS = {
+    yan:  /[颜顔][曰日][:：]?/,
+    he:   /何[曰日][:：]?/,
+    chen: /[陈陳][曰日][:：]?/,
+    liu:  /[刘劉][曰日][:：]?/,
+    shi:  /[诗詩][曰日][:：]?/,
+    kw:   /关键词[:：]/
+  };
+  function grab(startRe, endMarkNames){
+    var m = content.match(startRe);
+    if (!m) return '';
+    var from = m.index;
+    var end = content.length;
+    var rest = content.slice(from);
+    for (var i = 0; i < endMarkNames.length; i++){
+      var mm = rest.slice(m[0].length).match(MARKS[endMarkNames[i]]);
+      if (mm) { var pos = from + m[0].length + mm.index; if (pos < end) end = pos; }
+    }
+    return content.slice(from, end);
+  }
+  function reflow(s){ return (s||'').split('\n').map(function(l){return l.replace(/^[　\s]+/,'');}).join('').trim(); }
+  function cap(s, n){ s=(s||'').trim(); return s.length>n ? s.slice(0,n)+'…' : s; }
+
+  var xiang = reflow(grab(/象[曰日][:：]?/, ['yan','he','chen','liu','shi','kw']));
+  var he    = reflow(grab(MARKS.he, ['chen','liu','shi','kw']));
+  var liu   = reflow(grab(MARKS.liu, ['shi','kw']));
+  var yan   = reflow(grab(MARKS.yan, ['he','chen','liu','shi','kw']));
+  var poemRaw = grab(MARKS.shi, ['kw']);
+  var poem  = poemRaw ? poemRaw.split('\n').map(function(l){return l.trim();}).filter(Boolean).join('\n') : '';
+
+  // ①原文引用区：象曰为核心经文；无则取条目开头直录
+  var sec1 = xiang ? cap(xiang, 500) : cap(content.replace(/\n{2,}/g,'\n'), 400);
+  // ②白话导读区：何曰（务实断语）→ 刘曰 → 颜曰 → 条目摘要 → 诚实标注
+  var sec2src = he || liu || yan || (item && item.summary) || '';
+  var sec2 = sec2src ? cap(sec2src, 400)
+    : '本条未附古人断语，原文照录如上；通俗讲解可继续追问 AI。';
+  // ③语音播报短句：诗曰（课诗宜朗读）→ 象曰首句 → 正文首句，80 字内
+  var sec3 = '';
+  if (poem) sec3 = poem.split('\n').slice(0,2).join('，');
+  if (!sec3 && xiang) sec3 = xiang.split(/[。；;]/)[0];
+  if (!sec3) sec3 = content.split(/[。；;\n]/).filter(Boolean)[0] || '';
+  sec3 = cap(sec3.replace(/^象[曰日][:：]?/,'').replace(/^[诗詩][曰日][:：]?/,''), 80);
+
+  return '①【原文引用区】\n《' + title + '》\n' + sec1 +
+    '\n\n②【白话导读区】（古人断语照录）\n' + sec2 +
+    '\n\n③【语音播报短句】\n「' + sec3 + '」' +
+    '\n\n【标注】本内容仅古籍研究参考记录。';
+}
+
 async function callAI(q){
   // R477-C: 多轮对话状态机 idle → awaiting_clarification → processing → answered → idle
   // R54: KB 快速通道 — freechat 提问先扫所有 KB，命中分 >= 0.7 直接朗读不调 AI
@@ -2099,7 +2154,7 @@ async function callAI(q){
         for (const src of KB_SOURCES) {
           const kb = src.obj();
           if (!kb) continue;
-          let hits = 0, snippet = '';
+          let hits = 0, snippet = '', hitItem = null;
           function walk(obj){
             if (typeof obj === 'string') {
               let m = 0; for (const kw of keywords) if (obj.indexOf(kw) >= 0) m++;
@@ -2128,15 +2183,23 @@ async function callAI(q){
             }
             if (ikStrong >= 1 && ikHits > hits && ikBest >= 0 && kb.items[ikBest]) {
               hits = ikHits;
+              hitItem = kb.items[ikBest];
               snippet = '【' + kb.items[ikBest].title + '】\n' + (kb.items[ikBest].content || '').substring(0, 1400);
             }
           }
           const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
-          if (score > best.score) best = {score: Math.round(score*100)/100, snippet, source: src.name, entryId: src.entryId || null};
+          if (score > best.score) best = {score: Math.round(score*100)/100, snippet, source: src.name, entryId: src.entryId || null, item: hitItem};
         }
         if (best.score >= 0.7 && best.snippet.length > 50) {
           const tag = '【🎯 KB 直答（' + best.source + ' · ' + best.entryId + ' · 命中分 ' + Math.round(best.score*100) + '%）】';
-          const fullReply = tag + '\n\n' + best.snippet.substring(0, 1200);
+          let fullReply;
+          if (best.item) {
+            // R154-P2: 结构化命中 → 三段式输出（口径对齐报告解读中心）
+            fullReply = tag + '\n\n' + _formatKbThreePart(best.item);
+            if (best.source === 'LINGQI_KB') fullReply += '\n\n💬 可继续追问课目细节，或输入「掷灵棋」开启起课。';
+          } else {
+            fullReply = tag + '\n\n' + best.snippet.substring(0, 1200);
+          }
           addAI(fullReply);
           hist.push({role:'assistant', content: fullReply.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
