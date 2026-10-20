@@ -49,6 +49,7 @@ h1{font-size:22px;color:var(--gold);border-bottom:2px solid var(--gold);padding-
   <label>批次 <input id="batch" style="width:110px"></label>
   <button onclick="loadQueue(0)">加载队列</button>
   <label><input type="checkbox" id="onlyPending" checked> 只看未裁决</label>
+  <label><input type="checkbox" id="orderConf"> 置信排序（高把握优先）</label>
   <div class="progress"><i id="pgFill" style="width:0%"></i><span id="pgText">—</span></div>
 </div>
 <div class="bar stats" id="statLine"></div>
@@ -92,7 +93,8 @@ function loadQueue(off){
   offset=off||0;
   var b=document.getElementById('batch').value.trim();
   var pend=document.getElementById('onlyPending').checked?'1':'0';
-  fetch(API+'/api/admin/kb-tag-review/queue?batch='+encodeURIComponent(b)+'&pending='+pend+'&limit=50&offset='+offset,{headers:{'Authorization':'Bearer '+token}})
+  var ord=document.getElementById('orderConf')&&document.getElementById('orderConf').checked?'&order=conf':'';
+  fetch(API+'/api/admin/kb-tag-review/queue?batch='+encodeURIComponent(b)+'&pending='+pend+'&limit=50&offset='+offset+ord,{headers:{'Authorization':'Bearer '+token}})
   .then(function(r){return r.json()}).then(function(d){
     var data=d.data||d;
     if(!data.rows){flash(data.message||d.error||'加载失败','#b71c1c');return}
@@ -119,6 +121,8 @@ function render(){
   document.getElementById('mModule').textContent=it.module||'—';
   document.getElementById('mEntry').textContent=it.entry_id;
   var r=document.getElementById('mRule');r.textContent='规则判：'+({ancient:'古籍原文',modern:'现代讲义',junk:'垃圾'})[it.rule_tag];r.className='pill rule '+it.rule_tag;
+  var confBadge={high:'🟢 高把握',mid:'🟡 中把握',low:'🔴 细读'}[it.conf]||'';
+  if(confBadge) r.textContent+='　'+confBadge;
   document.getElementById('mTitle').textContent=it.title||'(无标题)';
   document.getElementById('mContent').textContent=it.content||'(无正文)';
 }
