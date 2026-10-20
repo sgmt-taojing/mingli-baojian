@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掷灵棋 · 灵棋经课占 · 命理宝鉴</title>
+<style>
+:root{--gold:#c9a84c;--gold-l:#e8cc7a;--bg:#0a0a0c;--card:#141416;--line:rgba(201,168,76,.22);--txt:#d8d2c4;--dim:#8a8478}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:"Songti SC","STSong",serif;min-height:100vh;padding-bottom:90px}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px}
+.hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.hd a{color:var(--dim);text-decoration:none;font-size:13px}
+.hd h1{font-size:20px;color:var(--gold-l);font-weight:600;letter-spacing:2px}
+.badge{font-size:11px;color:var(--gold);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px}
+.yi{font-size:13px;color:var(--dim);line-height:1.9}
+.yi b{color:var(--gold);font-weight:600}
+/* 棋子 */
+.board{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:14px 0}
+.piece{aspect-ratio:1;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--gold-l);background:radial-gradient(circle at 35% 30%,#22221f,#101012);cursor:default;transition:transform .12s;user-select:none}
+.piece.up{border-color:var(--gold);color:#fff;background:radial-gradient(circle at 35% 30%,#3a3320,#1a1608);box-shadow:0 0 12px rgba(201,168,76,.35);font-weight:700}
+.piece.flip{animation:flip .5s ease}
+@keyframes flip{50%{transform:rotateX(90deg) scale(.86)}}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#8a6d2a,#c9a84c);color:#0a0a0c;font-size:16px;font-weight:700;letter-spacing:4px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--gold-l);font-weight:400;letter-spacing:1px;font-size:14px;padding:10px}
+.count{display:flex;justify-content:center;gap:26px;margin:12px 0;font-size:14px;color:var(--dim)}
+.count b{color:var(--gold-l);font-size:20px;margin-left:6px}
+/* 手动查课 */
+.manual{display:flex;gap:10px;margin:12px 0}
+.manual .col{flex:1;text-align:center}
+.manual .col h4{font-size:13px;color:var(--gold);margin-bottom:8px;font-weight:600}
+.numrow{display:flex;justify-content:center;gap:6px}
+.numrow button{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:none;color:var(--txt);cursor:pointer;font-size:14px;font-family:inherit}
+.numrow button.on{background:var(--gold);color:#0a0a0c;font-weight:700}
+/* 结果 */
+.res h2{font-size:22px;color:var(--gold-l);letter-spacing:3px;margin-bottom:4px}
+.res .sub{font-size:13px;color:var(--dim);margin-bottom:12px;line-height:1.8}
+.res .sub span{margin-right:14px}
+.sec{margin:12px 0;padding:12px 14px;background:rgba(201,168,76,.05);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;font-size:14px;line-height:2}
+.sec h5{font-size:12px;color:var(--gold);margin-bottom:4px;letter-spacing:2px}
+.poem{font-size:15px;line-height:2.2;color:var(--gold-l);text-align:center;padding:8px 0}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{flex:1;padding:8px;border:1px solid var(--line);background:none;color:var(--dim);border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+.tabs button.on{color:var(--gold-l);border-color:var(--gold);background:rgba(201,168,76,.08)}
+.none-note{text-align:center;color:var(--dim);font-size:13px;line-height:2;padding:18px 0}
+.disc{font-size:11px;color:#5a5548;text-align:center;line-height:1.8;margin-top:16px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd"><a href="index.html">← 返回大厅</a><h1>掷灵棋</h1><span class="badge">灵棋经 · 汉·东方朔</span></div>
+
+  <div class="card yi">
+    <b>占仪（《灵棋经》卷首）：</b>凡占，先须冠带，焚香静坐少顷，宁心定志，乃捧棋子……<b>心有所疑，一事一占</b>。十二棋子分刻上中下各四，合手掷之，以面向上的「上、中、下」各数成课，全书一百二十五课。
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button id="tabCast" class="on" onclick="setMode('cast')">掷棋起课</button>
+      <button id="tabManual" onclick="setMode('manual')">手动查课</button>
+    </div>
+
+    <div id="castPane">
+      <div class="board" id="board"></div>
+      <div class="count">上<b id="cUp">-</b> 中<b id="cMid">-</b> 下<b id="cDown">-</b></div>
+      <button class="btn" id="castBtn" onclick="cast()">掷 棋</button>
+    </div>
+
+    <div id="manualPane" class="hidden">
+      <div class="manual" id="manualCols"></div>
+      <button class="btn" onclick="lookupManual()">查 课</button>
+    </div>
+  </div>
+
+  <div class="card res hidden" id="result">
+    <h2 id="rName"></h2>
+    <div class="sub" id="rSub"></div>
+    <div class="tabs" id="verTabs" style="margin-top:4px">
+      <button id="vSiku" class="on" onclick="showVer('siku')">四库净本</button>
+      <button id="vOcr" onclick="showVer('ocr')">术数全书本</button>
+    </div>
+    <div id="rBody"></div>
+    <div class="poem hidden" id="rPoem"></div>
+  </div>
+
+  <div class="card hidden" id="emptyRes">
+    <div class="none-note" id="emptyNote"></div>
+  </div>
+
+  <div class="disc">本工具内容出自《灵棋经》（公有领域古籍），仅供传统民俗文化研究参考，不作吉凶预测依据。术数全书 OCR 本与四库全书本互校；阙课不补，以存本真。</div>
+</div>
+
+<script src="js/mobile-nav.js?v=20261020a"></script>
+<script>
+'use strict';
+let DATA=null, curKey=null, curVer='siku';
+const NUM=['零','一','二','三','四'];
+const board=document.getElementById('board');
+const pieces=[];
+// 12 棋子：4上 4中 4下
+for(let i=0;i<12;i++){
+  const kind=i<4?'上':i<8?'中':'下';
+  const d=document.createElement('div');
+  d.className='piece'; d.textContent=kind; d.dataset.kind=kind;
+  board.appendChild(d); pieces.push(d);
+}
+fetch('data/lingqi-125.json?v=20261020a').then(r=>r.json()).then(j=>{DATA=j;});
+
+function setMode(m){
+  document.getElementById('tabCast').classList.toggle('on',m==='cast');
+  document.getElementById('tabManual').classList.toggle('on',m==='manual');
+  document.getElementById('castPane').classList.toggle('hidden',m!=='cast');
+  document.getElementById('manualPane').classList.toggle('hidden',m!=='manual');
+}
+// 手动查课三列
+(function(){
+  const cols=document.getElementById('manualCols');
+  ['上','中','下'].forEach((k,ci)=>{
+    const col=document.createElement('div');col.className='col';
+    col.innerHTML='<h4>'+k+'</h4>';
+    const row=document.createElement('div');row.className='numrow';
+    for(let n=0;n<=4;n++){
+      const b=document.createElement('button');b.textContent=n;
+      if(n===0&&ci!==99)b.classList.add('on');
+      b.onclick=()=>{row.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');};
+      row.appendChild(b);
+    }
+    col.appendChild(row);cols.appendChild(col);
+  });
+})();
+function manualKey(){
+  const cols=document.querySelectorAll('#manualCols .col');
+  const v=[...cols].map(c=>{const b=c.querySelector('button.on');return b?+b.textContent:0;});
+  return v.join('-');
+}
+function cast(){
+  if(!DATA)return;
+  const btn=document.getElementById('castBtn');btn.disabled=true;
+  pieces.forEach(p=>{p.classList.remove('up');void p.offsetWidth;p.classList.add('flip');});
+  let up=0,mid=0,down=0;
+  setTimeout(()=>{
+    pieces.forEach(p=>{
+      const faceUp=Math.random()<0.5;
+      p.classList.toggle('up',faceUp);
+      if(faceUp){if(p.dataset.kind==='上')up++;else if(p.dataset.kind==='中')mid++;else down++;}
+    });
+    document.getElementById('cUp').textContent=up;
+    document.getElementById('cMid').textContent=mid;
+    document.getElementById('cDown').textContent=down;
+    btn.disabled=false;
+    show(up+'-'+mid+'-'+down);
+  },520);
+}
+function lookupManual(){ if(DATA) show(manualKey()); }
+function show(key){
+  curKey=key;
+  const d=DATA[key];
+  const res=document.getElementById('result'), emp=document.getElementById('emptyRes');
+  if(!d){
+    res.classList.add('hidden');emp.classList.remove('hidden');
+    const [x,y,z]=key.split('-').map(n=>NUM[+n]);
+    document.getElementById('emptyNote').innerHTML=
+      '课形「'+x+'上 '+y+'中 '+z+'下」在现存两版本中均阙如（全书一百二十五课，今存一百一十七课，阙课不补，以存本真）。<br>依占仪：宁心定志，可再占一课，或改日再问。';
+    emp.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  emp.classList.add('hidden');res.classList.remove('hidden');
+  curVer=d.siku?'siku':'ocr';
+  document.getElementById('vSiku').style.display=d.siku?'':'none';
+  document.getElementById('vOcr').style.display=d.ocr?'':'none';
+  renderVer();
+  res.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderVer(){
+  const d=DATA[curKey]; if(!d)return;
+  const v=d[curVer]||d.siku||d.ocr;
+  document.getElementById('vSiku').classList.toggle('on',curVer==='siku');
+  document.getElementById('vOcr').classList.toggle('on',curVer==='ocr');
+  document.getElementById('rName').textContent=v.name;
+  const shapeTxt=v.shape.replace(/([一二三四])上/,'$1上 ').replace(/([一二三四])中/,'$1中 ').replace(/([一二三四])下/,'$1下');
+  let sub='<span>课形 '+shapeTxt+'</span><span>'+v.xiang+'</span>';
+  if(v.gong)sub+='<span>'+v.gong.replace('/',' · ')+'</span>';
+  if(v.num)sub+='<span>四库第'+v.num+'课</span>';
+  document.getElementById('rSub').innerHTML=sub;
+  let html='';
+  if(v.xiangyue)html+='<div class="sec"><h5>象 曰</h5>'+esc(v.xiangyue)+'</div>';
+  if(v.cike)html+='<div class="sec"><h5>课 断</h5>'+esc(v.cike)+'</div>';
+  document.getElementById('rBody').innerHTML=html;
+  const poem=document.getElementById('rPoem');
+  if(v.shiyue){poem.classList.remove('hidden');poem.innerHTML='<h5 style="font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:6px">诗 曰</h5>'+esc(v.shiyue).replace(/[。！？]/g,m=>m+'<br>');}
+  else poem.classList.add('hidden');
+}
+function showVer(v){curVer=v;renderVer();}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>

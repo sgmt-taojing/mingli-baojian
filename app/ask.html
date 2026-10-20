@@ -216,6 +216,7 @@ const TOOLS = [
   { id:'meihua',  ico:'🌸', nm:'梅花易数', ds:'随问起卦 快速直断', need:'question' },
   { id:'qimen',   ico:'🧭', nm:'奇门遁甲', ds:'办事出行 抉择运筹', need:'question' },
   { id:'liuren',  ico:'📿', nm:'大六壬',   ds:'人事细节 来意揣度', need:'question' },
+  { id:'lingqi',  ico:'🎲', nm:'掷灵棋',   ds:'灵棋一课 直达课断', need:'question', page:'lingqi.html' },
   // 命理排盘：看一生格局
   { id:'bazi',    ico:'📜', nm:'八字命理', ds:'一生格局 性格天赋', need:'birth' },
   { id:'ziwei',   ico:'🌌', nm:'紫微斗数', ds:'十二宫全观 人生地图', need:'birth' },
@@ -297,6 +298,16 @@ document.querySelectorAll('.tool').forEach(el => {
 
 function selectTool(id, el) {
   state.tool = TOOLS.find(t => t.id === id);
+  // R-LQ: 独立法器页（掷灵棋等）不进聊天流，带问直达
+  if (state.tool && state.tool.page) {
+    const go = () => { location.href = state.tool.page; };
+    if (el) { document.querySelectorAll('.tool').forEach(x => x.classList.remove('sel')); el.classList.add('sel'); }
+    $('step2').classList.remove('hidden');
+    bot(`「${state.tool.nm}」是独立课占法器，净心专念所问之事，点此进入 →`);
+    $('chat').insertAdjacentHTML('beforeend', `<div class="bubble bot"><a href="${state.tool.page}" style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#8a6d2a,#c9a84c);color:#0a0a0c;border-radius:10px;text-decoration:none;font-weight:700;letter-spacing:2px">进入 ${esc(state.tool.nm)} →</a></div>`);
+    scrollChat();
+    return;
+  }
   document.querySelectorAll('.tool').forEach(x => x.classList.remove('sel'));
   el.classList.add('sel');
   $('step2').classList.remove('hidden');
