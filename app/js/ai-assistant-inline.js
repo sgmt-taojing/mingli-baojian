@@ -2089,7 +2089,7 @@ async function exportReportPDF(el){
 
 // R154-P2: KB 直答三段式（①原文引用 ②古人断语白话导读照录 ③语音播报短句），口径对齐报告解读中心
 // 铁律：全部照录条目原文，不改写不杜撰；无断语可录时诚实标注
-function _formatKbThreePart(item){
+function _kbExtractParts(item){
   var content = (item && item.content) || '';
   var title = (item && item.title) || '';
   // 兼容 OCR 异体：象日/象曰、颜/顔、陈/陳、刘/劉、诗/詩
@@ -2136,10 +2136,40 @@ function _formatKbThreePart(item){
   if (!sec3) sec3 = content.split(/[。；;\n]/).filter(Boolean)[0] || '';
   sec3 = cap(sec3.replace(/^象[曰日][:：]?/,'').replace(/^[诗詩][曰日][:：]?/,''), 80);
 
-  return '①【原文引用区】\n《' + title + '》\n' + sec1 +
-    '\n\n②【白话导读区】（古人断语照录）\n' + sec2 +
-    '\n\n③【语音播报短句】\n「' + sec3 + '」' +
+  // full：报告页用完整正文（去关键词尾行，直录 2500 字内）
+  var full = content.replace(/\n*关键词[:：][\s\S]*$/, '').trim();
+  if (full.length > 2500) full = full.slice(0, 2500) + '…';
+
+  return { title: title, sec1: sec1, sec2: sec2, sec3: sec3, full: full };
+}
+
+function _formatKbThreePart(item){
+  var p = _kbExtractParts(item);
+  return '①【原文引用区】\n《' + p.title + '》\n' + p.sec1 +
+    '\n\n②【白话导读区】（古人断语照录）\n' + p.sec2 +
+    '\n\n③【语音播报短句】\n「' + p.sec3 + '」' +
     '\n\n【标注】本内容仅古籍研究参考记录。';
+}
+
+// R154-P3: KB 直答 → 报告解读中心接力（sessionStorage.lastReport 契约）
+function _kbHitToReport(best){
+  try{
+    if(!best || !best.item) return;
+    var p=_kbExtractParts(best.item);
+    var mod=(best.mods&&best.mods[0])||'freechat';
+    var rpt={
+      module:mod,
+      summary:'【'+best.source+' 命中 '+Math.round(best.score*100)+'%】'+p.title,
+      segments:[
+        {id:'sec1',title:'① 原文引用区',content:p.full||p.sec1},
+        {id:'sec2',title:'② 白话导读区（古人断语照录）',content:p.sec2},
+        {id:'sec3',title:'③ 语音播报短句',content:'「'+p.sec3+'」'}
+      ],
+      canon:{note:'本条由 AI 助手 KB 直答接力生成，原文照录不改写。',items:[{book:best.source,title:p.title,excerpt:(p.sec1||'').slice(0,200)}]}
+    };
+    sessionStorage.setItem('lastReport', JSON.stringify(rpt));
+    location.href='report-interpret.html?module='+encodeURIComponent(mod)+'&name='+encodeURIComponent('缘主');
+  }catch(e){console.warn('[kb-report]',e.message);}
 }
 
 async function callAI(q){
@@ -2188,7 +2218,7 @@ async function callAI(q){
             }
           }
           const score = Math.min(1.0, (hits / Math.max(1, keywords.length)) * 1.5) * src.weight;
-          if (score > best.score) best = {score: Math.round(score*100)/100, snippet, source: src.name, entryId: src.entryId || null, item: hitItem};
+          if (score > best.score) best = {score: Math.round(score*100)/100, snippet, source: src.name, entryId: src.entryId || null, item: hitItem, mods: src.mods || null};
         }
         if (best.score >= 0.7 && best.snippet.length > 50) {
           const tag = '【🎯 KB 直答（' + best.source + ' · ' + best.entryId + ' · 命中分 ' + Math.round(best.score*100) + '%）】';
@@ -2201,6 +2231,25 @@ async function callAI(q){
             fullReply = tag + '\n\n' + best.snippet.substring(0, 1200);
           }
           addAI(fullReply);
+          // R154-P3: 结构化命中挂「生成完整报告」接力按钮 → report-interpret.html
+          if (best.item) {
+            try{
+              var _msgs=chat.querySelectorAll('.msg.m-ai');
+              var _lastMsg=_msgs[_msgs.length-1];
+              if(_lastMsg){
+                var _row=document.createElement('div');
+                _row.style.cssText='margin-top:8px;display:flex;gap:8px';
+                var _rbtn=document.createElement('button');
+                _rbtn.textContent='📄 生成完整报告';
+                _rbtn.setAttribute('aria-label','将该条目送入报告解读中心生成完整三段式报告');
+                _rbtn.style.cssText='padding:6px 14px;background:linear-gradient(135deg,#c9a84c,#a78bfa);border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-size:13px';
+                var _bestSnap={source:best.source,score:best.score,item:best.item,mods:best.mods};
+                _rbtn.onclick=function(){_kbHitToReport(_bestSnap);};
+                _row.appendChild(_rbtn);
+                _lastMsg.appendChild(_row);
+              }
+            }catch(e){console.warn('[kb-report-btn]',e.message);}
+          }
           hist.push({role:'assistant', content: fullReply.substring(0,500)});
           if (hist.length > 20) hist = hist.slice(-20);
           if (typeof recordKbHit === 'function') recordKbHit(state.module || 'freechat', best.score, true);
