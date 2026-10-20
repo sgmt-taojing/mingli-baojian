@@ -1,5 +1,6 @@
 
-const API = window.location.origin;
+// API 基址沿用页面内联全局（localhost→8920），此处仅兜底不重复声明（2026-10-20 修 const/var 冲突致整文件 SyntaxError）
+var API = (typeof API !== 'undefined') ? API : ((location.hostname === '127.0.0.1' || location.hostname === 'localhost') ? 'http://127.0.0.1:8920' : '');
 const AUTH_H = () => { const t = localStorage.getItem('admin_token')||localStorage.getItem('token')||''; return t ? {'Authorization':'Bearer '+t} : {}; };
 async function loadStats() {
   document.getElementById('statsPanel').style.display='block';

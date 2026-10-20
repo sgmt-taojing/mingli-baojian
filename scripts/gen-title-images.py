@@ -93,6 +93,7 @@ SETS = {
     'dt-gua64': ('六十四卦', '卦'),
     # ── ask 问事网格
     'ask-liuyao': ('六爻问卦', '爻'),
+    'ask-lingqi': ('掷灵棋', '棋'),
     'ask-meihua': ('梅花易数', '梅'),
     'ask-qimen': ('奇门遁甲', '奇'),
     'ask-liuren': ('大六壬', '壬'),
