@@ -48,8 +48,46 @@
 </div>
 <input  id="searchBox" class="search-box" placeholder="搜索 KB 条目..." style="display:none" aria-label="搜索 KB 条目...">
 <div id="statsPanel">
+  <div id="kbHealth" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <h3 style="color:#e8c87a;font-size:15px;margin:0">🩺 全库健康诊断</h3>
+      <span id="kbh-time" style="color:#7a8aab;font-size:11px"></span>
+      <button onclick="kbHealthLoad(true)" style="padding:3px 10px;border:1px solid rgba(201,168,76,.35);border-radius:6px;background:none;color:#c9a84c;font-size:11px;cursor:pointer">刷新</button>
+    </div>
+    <div id="kbh-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">诊断加载中…</div>
+    <div id="kbh-queues" style="margin-top:8px;color:#7a8aab;font-size:11px"></div>
+  </div>
   <div class="kb-grid" id="kbGrid">正在为您查阅典籍...</div>
 </div>
+<script>
+function kbHealthCard(label, value, sub, ok){
+  var color = ok===false ? '#e06c5b' : (ok===true ? '#7fc98a' : '#c9a84c');
+  return '<div style="border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:10px;background:rgba(0,0,0,.2)">' +
+    '<div style="font-size:11px;color:#7a8aab;letter-spacing:1px">'+label+'</div>' +
+    '<div style="font-size:20px;font-weight:700;color:'+color+';margin:4px 0">'+value+'</div>' +
+    (sub?'<div style="font-size:10px;color:#9a8a6a">'+sub+'</div>':'') + '</div>';
+}
+function kbHealthLoad(force){
+  var apiBase = (typeof API!=='undefined'&&API) ? API : ((location.hostname==='127.0.0.1'||location.hostname==='localhost') ? 'http://127.0.0.1:8920' : '');
+  fetch(apiBase+'/api/public/kb/health'+(force?'?t='+Date.now():'')).then(function(r){return r.json()}).then(function(d){
+    var h = d && d.data; if(!h || h.error){ document.getElementById('kbh-cards').textContent='诊断暂不可用'; return; }
+    var cards = '';
+    cards += kbHealthCard('正式库条目', h.formal_total.toLocaleString(), h.module_count+' 个模块', null);
+    cards += kbHealthCard('高信任 ≥0.9', (h.trust.ge09||0).toLocaleString(), '0.7-0.9: '+(h.trust.mid||0).toLocaleString(), null);
+    cards += kbHealthCard('低信任 <0.7', (h.trust.lt07||0).toLocaleString(), '蒸馏原始切片', null);
+    cards += kbHealthCard('FTS 索引', h.fts.rows.toLocaleString(), '正式库 '+h.formal_total.toLocaleString()+' 条', h.fts.aligned);
+    cards += kbHealthCard('FTS 对齐', h.fts.aligned?'✓ 已对齐':'✗ 有漂移', h.fts.dedup_watermark?'去重水位: '+String(h.fts.dedup_watermark).slice(0,28):'与正式库一致', h.fts.aligned);
+    cards += kbHealthCard('检疫区', h.queues.quarantine, '隔离条目', h.queues.quarantine<50);
+    document.getElementById('kbh-cards').innerHTML = cards;
+    var q = h.queues;
+    document.getElementById('kbh-queues').textContent =
+      '队列：staging 待办 '+q.kb_staging_pending+' / 共 '+q.kb_staging_total+' · staging_knowledge 待办 '+q.staging_knowledge_pending+' / 共 '+q.staging_knowledge_total +
+      (h.recent7d && h.recent7d.length ? ' · 近7日新增模块：'+h.recent7d.map(function(m){return m.module+'('+m.c+')'}).join('、') : ' · 近7日无新增');
+    document.getElementById('kbh-time').textContent = '更新于 ' + new Date(h.generated_at).toLocaleTimeString('zh-CN') + (h.cached?'（缓存）':'');
+  }).catch(function(){ document.getElementById('kbh-cards').textContent='诊断接口异常'; });
+}
+kbHealthLoad();
+</script>
 <div id="searchPanel" style="display:none"></div>
 <div id="hitsPanel" style="display:none"></div>
 

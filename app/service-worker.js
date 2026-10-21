@@ -9,8 +9,8 @@
 //   4. 静态资源 stale-while-revalidate 维持不变。
 // ================================================================
 
-const CACHE_NAME = 'mingli-baojian-v6-2026-08-30';
-const CACHE_RUNTIME = 'mingli-baojian-runtime-v5';
+const CACHE_NAME = 'mingli-baojian-v7-2026-10-21';
+const CACHE_RUNTIME = 'mingli-baojian-runtime-v6';
 const OFFLINE_URL = './offline.html';
 
 // 隐私红线：命中以下特征一律放行（不经 SW 缓存）
