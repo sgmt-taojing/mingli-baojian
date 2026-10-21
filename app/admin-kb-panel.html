@@ -51,9 +51,11 @@
   <div id="kbHealth" style="margin-bottom:16px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
       <h3 style="color:#e8c87a;font-size:15px;margin:0">🩺 全库健康诊断</h3>
+      <span id="kbh-badge" style="display:none;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700"></span>
       <span id="kbh-time" style="color:#7a8aab;font-size:11px"></span>
       <button onclick="kbHealthLoad(true)" style="padding:3px 10px;border:1px solid rgba(201,168,76,.35);border-radius:6px;background:none;color:#c9a84c;font-size:11px;cursor:pointer">刷新</button>
     </div>
+    <div id="kbh-alerts" style="margin-bottom:8px"></div>
     <div id="kbh-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px">诊断加载中…</div>
     <div id="kbh-queues" style="margin-top:8px;color:#7a8aab;font-size:11px"></div>
   </div>
@@ -79,6 +81,22 @@ function kbHealthLoad(force){
     cards += kbHealthCard('FTS 对齐', h.fts.aligned?'✓ 已对齐':'✗ 有漂移', h.fts.dedup_watermark?'去重水位: '+String(h.fts.dedup_watermark).slice(0,28):'与正式库一致', h.fts.aligned);
     cards += kbHealthCard('检疫区', h.queues.quarantine, '隔离条目', h.queues.quarantine<50);
     document.getElementById('kbh-cards').innerHTML = cards;
+    // 阈值告警条
+    var lvColor = { red:['#e06c5b','rgba(224,108,91,.15)'], yellow:['#e8c87a','rgba(232,200,122,.12)'], green:['#7fc98a','rgba(127,201,138,.10)'] };
+    var alertsHtml = '';
+    (h.alerts||[]).forEach(function(a){
+      var lc = lvColor[a.level]||lvColor.green;
+      alertsHtml += '<div style="border:1px solid '+lc[0]+';border-radius:8px;padding:6px 12px;margin-bottom:6px;background:'+lc[1]+';font-size:12px;color:#dfe6f2">' +
+        '<b style="color:'+lc[0]+'">'+(a.level==='red'?'🔴':a.level==='yellow'?'🟡':'🟢')+' '+a.code+'</b> · '+a.msg +
+        (a.action?'<span style="color:#9a8a6a"> → 处置：'+a.action+'</span>':'') + '</div>';
+    });
+    document.getElementById('kbh-alerts').innerHTML = alertsHtml;
+    var badge = document.getElementById('kbh-badge');
+    if (h.health_score){
+      var bc = lvColor[h.health_score]||lvColor.green;
+      badge.style.display='inline-block'; badge.style.color='#0a0a0c'; badge.style.background=bc[0];
+      badge.textContent = h.health_score==='red'?'需立即处理':(h.health_score==='yellow'?'有关注项':'健康');
+    }
     var q = h.queues;
     document.getElementById('kbh-queues').textContent =
       '队列：staging 待办 '+q.kb_staging_pending+' / 共 '+q.kb_staging_total+' · staging_knowledge 待办 '+q.staging_knowledge_pending+' / 共 '+q.staging_knowledge_total +
