@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""P8 · 洪范正文深化：只写 kb_formal，FTS 统一交 kb-sync-guard.py。
+"""P8/P9 · 洪范正文深化：只写 kb_formal，FTS 统一交 kb-sync-guard.py。
 
 按 entry_id 可重入更新；入库前做 (module, content) 查重。旧 P7 条目一并
-补 promoted_at/updated_at/tags，随后由正式守卫增量同步，修复其索引缺漏。
+补 promoted_at/updated_at/tags；P9 将蔡沈本扩至上中下全篇96条。
 """
 import datetime
 import hashlib
@@ -35,12 +35,12 @@ JOBS = [
          display='洪范九畴数解',
          note='明熊宗立；书目2条+八卷目录1条+卷二OCR四段1条+来源1条+卷二校勘台账1条；与蔡沈本、洛书数解严格分书'),
     dict(module='hongfan-huangji-neipian', prefix='HFNZ', category='数字术数', std_group='数字术数',
-         md='corpus/hongfan-huangji-neipian/hongfan-huangji-neipian-zhong-transcript.md', expected=32,
+         md='corpus/hongfan-huangji-neipian/hongfan-huangji-neipian-transcript.md', expected=96,
          src='hongfan-huangji-neipian:維基文庫《性理大全書（四庫全書本）》卷二十四(網絡校錄)',
          src_id='SRC-HONGFAN-HUANGJI-NEIPIAN-20261024',
-         src_desc='宋蔡沈《洪范皇极内篇中》：维基文库《性理大全书（四库全书本）》卷二十四网络校录，32个自然段，预留书影校验',
+         src_desc='宋蔡沈《洪范皇极内篇》上中下：维基文库《性理大全书（四库全书本）》卷二十四网络校录，全篇96条，预留书影校验',
          display='洪范皇极内篇（蔡沈）',
-         note='宋蔡沈；卷中32段网络校录，trust=0.8；疑字及图像替字留异文，不冒充书影定本；与熊宗立数解分书'),
+         note='宋蔡沈；上中下各32条网络校录，trust=0.8；下篇3194字长段无损主题切片；疑字及图像替字留异文，不冒充书影定本；与熊宗立数解分书'),
 ]
 PAT = re.compile(r'<!--ENTRY:([^|]+)\|([^|]+)\|([\d.]+)-->')
 

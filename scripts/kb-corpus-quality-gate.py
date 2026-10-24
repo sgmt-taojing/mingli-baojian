@@ -16,9 +16,18 @@ PAT = re.compile(r'<!--ENTRY:([^|]+)\|([^|]+)\|([\d.]+)-->')
 JOBS = [
     ('luoshu-shujie', 'LSSJ', 'corpus/luoshu-shujie/luoshu-shujie-transcript.md', 3, 'SRC-LUOSHU-SHUJIE-20261024'),
     ('hongfan-jiuchou-shujie', 'HFJC', 'corpus/hongfan-jiuchou-shujie/hongfan-jiuchou-shujie-transcript.md', 6, 'SRC-HONGFAN-JIUCHOU-20261024'),
-    ('hongfan-huangji-neipian', 'HFNZ', 'corpus/hongfan-huangji-neipian/hongfan-huangji-neipian-zhong-transcript.md', 32, 'SRC-HONGFAN-HUANGJI-NEIPIAN-20261024'),
+    ('hongfan-huangji-neipian', 'HFNZ', 'corpus/hongfan-huangji-neipian/hongfan-huangji-neipian-transcript.md', 96, 'SRC-HONGFAN-HUANGJI-NEIPIAN-20261024'),
 ]
 PROBES = [
+    ('hongfan-huangji-neipian', '洪範皇極內篇上'),
+    ('hongfan-huangji-neipian', '造化之為造化者'),
+    ('hongfan-huangji-neipian', '昔者天錫禹洪範九疇'),
+    ('hongfan-huangji-neipian', '鬼神者二氣之良能'),
+    ('hongfan-huangji-neipian', '洪範皇極內篇下'),
+    ('hongfan-huangji-neipian', '分天為九野'),
+    ('hongfan-huangji-neipian', '九章命算'),
+    ('hongfan-huangji-neipian', '筮者神之所為'),
+    ('hongfan-huangji-neipian', '一吉而九凶'),
     ('hongfan-huangji-neipian', '洪範皇極內篇中'),
     ('hongfan-huangji-neipian', '河圖體圓而用方'),
     ('hongfan-huangji-neipian', '非九不生'),
@@ -49,6 +58,15 @@ def parse(path, prefix):
 def main():
     failures = []
     report = {'target_modules': {}, 'global': {}, 'fts_probes': []}
+    # 下篇首自然段的无损切片必须能按序还原，防止检索切片造成原文脱漏。
+    transcript = (ROOT / 'corpus/hongfan-huangji-neipian/hongfan-huangji-neipian-transcript.md').read_text(encoding='utf-8')
+    sliced = sorted((int(n), text) for n, text in re.findall(r'<!--ENTRY:xia-(\d+)\|.*?-->.*?原文：([^\n]+)', transcript, re.S) if int(n) <= 27)
+    source = (ROOT / 'corpus/hongfan-huangji-neipian/hongfan-huangji-neipian-full-source.txt').read_text(encoding='utf-8')
+    natural = source.split('洪範皇極內篇下\n\n', 1)[1].strip().split('\n\n')[0]
+    lossless = len(sliced) == 27 and ''.join(text for _, text in sliced) == natural
+    report['lower_long_segment_lossless'] = lossless
+    if not lossless:
+        failures.append('下篇首自然段27片无法逐字还原')
     db = sqlite3.connect(DB, timeout=120)
     db.execute('PRAGMA busy_timeout=120000')
     for module, prefix, path, expected, src_id in JOBS:
