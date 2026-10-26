@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""P5/P11-P14 · 科仪补缺可重入入库：三教源流搜神大全／灵宝领教济度金书。
+"""P5/P11-P15 · 科仪补缺可重入入库：三教源流搜神大全／灵宝领教济度金书。
 
 只写 kb_formal；FTS 统一交 scripts/kb-sync-guard.py 维护。
-P14 补齐《灵宝领教济度金书》卷136-140及244-245同版识典源页七十七节正文。
+P14 补齐卷136-140及244-245七十七节；P15 续补卷271、274、316三十四节。
+三卷各守独立文字底本，道藏08书影仅作定位与抽核，不冒充全卷逐字校毕。
 """
 import datetime
 import hashlib
@@ -37,12 +38,15 @@ JOBS = [
               'corpus/jidu-jinshu/jidu-jinshu-juan139-transcript.md',
               'corpus/jidu-jinshu/jidu-jinshu-juan140-transcript.md',
               'corpus/jidu-jinshu/jidu-jinshu-juan244-transcript.md',
-              'corpus/jidu-jinshu/jidu-jinshu-juan245-transcript.md'], expected=80,
-         src='jidu-jinshu:daoinfo提要+道藏目錄詳註+識典DZ0466卷136-140及244-245(網絡轉錄)',
+              'corpus/jidu-jinshu/jidu-jinshu-juan245-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan271-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan274-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan316-transcript.md'], expected=114,
+         src='jidu-jinshu:daoinfo提要+道藏目錄詳註+識典DZ0466+古文典籍網+讀點古籍+道藏08書影定位(網絡轉錄)',
          src_id='SRC-JIDU-JINSHU-20261024',
-         src_desc='灵宝领教济度金书：书目版本、顺星礼斗卷次指引及卷136-140、244-245灯仪、三朝行道仪与醮仪识典转录',
+         src_desc='灵宝领教济度金书：书目版本、卷136-140及244-245灯仪醮仪、卷271/274/316符簡文檄正文；各卷独立来源并附道藏书影定位',
          display='灵宝领教济度金书',
-         note='宁全真授林灵真编320卷；目录3条+卷136正文14节+卷137正文9节+卷138正文13节+卷139正文12节+卷140正文5节+卷244正文14节+卷245正文10节，共80条；网络转录预留书影校验，符檄文檄与其余灯仪醮仪挂账',
+         note='宁全真授林灵真编320卷；目录3条+卷136正文14节+卷137正文9节+卷138正文13节+卷139正文12节+卷140正文5节+卷244正文14节+卷245正文10节+卷271正文8节+卷274正文7节+卷316正文19节，共114条；网络转录预留书影逐页校验，其余灯仪醮仪与符檄文檄挂账',
          probes={'overview': '"靈寶東華派"', 'shunxing-zhiyin': '"度星齋"', 'sources': '"涵芬樓"',
                  'juan136-fendeng-kaiyi': '"非陶三景之靈芒"', 'juan136-mingdeng-zhou': '"元始開圖"',
                  'juan136-fendeng-shouyi': '"太上散十方"', 'juan136-beidou-kaiyi': '"圓方剖粹"',
@@ -83,7 +87,25 @@ JOBS = [
                  'juan245-qishou-yaxian': '"黍稷非馨"', 'juan245-qishou-zhongxian': '"衛武入相"',
                  'juan245-qishou-songsheng': '"萬帝臨軒"', 'juan245-shouxing-kaiyi': '"壽星醮儀法事如式"',
                  'juan245-shouxing-chuxian': '"九天妤生韓君"', 'juan245-shouxing-yaxian': '"五福一曰壽"',
-                 'juan245-shouxing-zhongxian': '"視聽自民"', 'juan245-shouxing-songsheng': '"以實不以文"'}),
+                 'juan245-shouxing-zhongxian': '"視聽自民"', 'juan245-shouxing-songsheng': '"以實不以文"',
+                 'juan271-chishu-dongfang': '"東山神咒"', 'juan271-chishu-nanfang': '"南河水帝"',
+                 'juan271-chishu-zhongyang': '"黃上天元"', 'juan271-chishu-xifang': '"西山神咒"',
+                 'juan271-chishu-beifang': '"北山神咒"', 'juan271-wufang-zhenwen': '"天皇禀炁"',
+                 'juan271-zhuiyuan-zhufu': '"度六亲符"', 'juan271-shiyiyao-doufu': '"三十六步目"',
+                 'juan274-xuanji-jiee': '"解三災厄符"', 'juan274-yuzi-chuandu': '"北斗天關正八方"',
+                 'juan274-leiting-fuxi': '"虚精太華乾溟火文符"', 'juan274-leifa-fushi': '"神府散雲吐炁靂黑符"',
+                 'juan274-leizhen-jiangli': '"雷陣左領將軍王佐"', 'juan274-leibu-qisi': '"換陰成陽生貴子符"',
+                 'juan274-qilu-rangzai': '"右用桃板三尺"',
+                 'juan316-baoming-touci': '"拜断瘟保病朱"', 'juan316-baoming-zou-san': '"东方青灵始老九炁天君"',
+                 'juan316-baoming-santian': '"一臣切详某"', 'juan316-baoming-xuanshi-qiyao': '"太阳太丹炎光郁明上真道"',
+                 'juan316-baoming-shen-bengming': '"分野缠次迎灾送难"', 'juan316-baoming-die-chenghuang': '"如修瘟疫斋"',
+                 'juan316-qiyao-touci': '"致躔次之失序"', 'juan316-qiyao-zou-haotian': '"玉皇大天帝"',
+                 'juan316-qiyao-santian': '"一臣取今月某日肃建斋坛"', 'juan316-qiyao-sansheng-taiyang': '"泰玄都省主三天大圣都天大法天师"',
+                 'juan316-qiyao-liushi-bengming': '"九兹申请"', 'juan316-qiyao-sanshi-siyu': '"神首罗喉真君"',
+                 'juan316-qiyao-die-chenghuang': '"专为斋主，迎迓嘉祥"', 'juan316-xuanling-touci': '"崇建玄灵游玑妙斋"',
+                 'juan316-xuanling-beiji-jiuhuang': '"北斗汰尉阳明贪狼玉晨君"', 'juan316-xuanling-xuanshi-daode': '"斗申玄曹道德诸君"',
+                 'juan316-xuanling-liushi-zhusi': '"申六十甲子官君"', 'juan316-xuanling-die-chenghuang': '"即俾运很和"',
+                 'juan316-shejiao-shengmu': '"今具正筵"'}),
 ]
 PAT = re.compile(r'<!--ENTRY:([^|]+)\|([^|]+)\|([\d.]+)-->')
 
