@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""P5/P11-P13 · 科仪补缺可重入入库：三教源流搜神大全／灵宝领教济度金书。
+"""P5/P11-P14 · 科仪补缺可重入入库：三教源流搜神大全／灵宝领教济度金书。
 
 只写 kb_formal；FTS 统一交 scripts/kb-sync-guard.py 维护。
-P13 补齐《灵宝领教济度金书》卷136-140同版识典源页五十三节正文。
+P14 补齐《灵宝领教济度金书》卷136-140及244-245同版识典源页七十七节正文。
 """
 import datetime
 import hashlib
@@ -35,12 +35,14 @@ JOBS = [
               'corpus/jidu-jinshu/jidu-jinshu-juan137-transcript.md',
               'corpus/jidu-jinshu/jidu-jinshu-juan138-transcript.md',
               'corpus/jidu-jinshu/jidu-jinshu-juan139-transcript.md',
-              'corpus/jidu-jinshu/jidu-jinshu-juan140-transcript.md'], expected=56,
-         src='jidu-jinshu:daoinfo提要+道藏目錄詳註+識典DZ0466卷136-140(網絡轉錄)',
+              'corpus/jidu-jinshu/jidu-jinshu-juan140-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan244-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan245-transcript.md'], expected=80,
+         src='jidu-jinshu:daoinfo提要+道藏目錄詳註+識典DZ0466卷136-140及244-245(網絡轉錄)',
          src_id='SRC-JIDU-JINSHU-20261024',
-         src_desc='灵宝领教济度金书：书目版本、顺星礼斗卷次指引及卷136-140分灯、南北斗、十一列曜、周天灯仪与紫府送星醮仪识典转录',
+         src_desc='灵宝领教济度金书：书目版本、顺星礼斗卷次指引及卷136-140、244-245灯仪、三朝行道仪与醮仪识典转录',
          display='灵宝领教济度金书',
-         note='宁全真授林灵真编320卷；目录3条+卷136正文14节+卷137正文9节+卷138正文13节+卷139正文12节+卷140正文5节，共56条；网络转录预留书影校验，其余灯仪醮仪挂账',
+         note='宁全真授林灵真编320卷；目录3条+卷136正文14节+卷137正文9节+卷138正文13节+卷139正文12节+卷140正文5节+卷244正文14节+卷245正文10节，共80条；网络转录预留书影校验，符檄文檄与其余灯仪醮仪挂账',
          probes={'overview': '"靈寶東華派"', 'shunxing-zhiyin': '"度星齋"', 'sources': '"涵芬樓"',
                  'juan136-fendeng-kaiyi': '"非陶三景之靈芒"', 'juan136-mingdeng-zhou': '"元始開圖"',
                  'juan136-fendeng-shouyi': '"太上散十方"', 'juan136-beidou-kaiyi': '"圓方剖粹"',
@@ -69,7 +71,19 @@ JOBS = [
                  'juan139-shierchen': '"列舍周羅"', 'juan139-shouyi': '"並巳周圓"',
                  'juan140-kaiyi': '"五星高耀"', 'juan140-chuxian': '"臣聞函三"',
                  'juan140-yaxian': '"伏聞紫微拱"', 'juan140-zhongxian': '"觚稜月淡"',
-                 'juan140-songsheng': '"幽顯沾恩"'}),
+                 'juan140-songsheng': '"幽顯沾恩"',
+                 'juan244-zao-kaiyi': '"無侮老成"', 'juan244-zao-sannian': '"箕翼齊天"',
+                 'juan244-zao-qidao': '"八千歲爲春"', 'juan244-zao-fayuan': '"一念爲道"',
+                 'juan244-zao-shoujie': '"傳向來所啓"', 'juan244-wu-kaiyi': '"次舍輻周"',
+                 'juan244-wu-sannian': '"量契尊彝"', 'juan244-wu-qidao': '"曰艾曰耆"',
+                 'juan244-wu-fayuan': '"一願大道淡泊"', 'juan244-wu-shoujie': '"傳向來所啓速達"',
+                 'juan244-wan-kaiyi': '"疇原箕子"', 'juan244-wan-sannian': '"鼓吹百王"',
+                 'juan244-wan-qidao': '"茹芝避世"', 'juan244-wan-shouyi': '"傳臣向來所啓"',
+                 'juan245-qishou-kaiyi': '"蘋藻是陳"', 'juan245-qishou-chuxian': '"三洞流光"',
+                 'juan245-qishou-yaxian': '"黍稷非馨"', 'juan245-qishou-zhongxian': '"衛武入相"',
+                 'juan245-qishou-songsheng': '"萬帝臨軒"', 'juan245-shouxing-kaiyi': '"壽星醮儀法事如式"',
+                 'juan245-shouxing-chuxian': '"九天妤生韓君"', 'juan245-shouxing-yaxian': '"五福一曰壽"',
+                 'juan245-shouxing-zhongxian': '"視聽自民"', 'juan245-shouxing-songsheng': '"以實不以文"'}),
 ]
 PAT = re.compile(r'<!--ENTRY:([^|]+)\|([^|]+)\|([\d.]+)-->')
 
