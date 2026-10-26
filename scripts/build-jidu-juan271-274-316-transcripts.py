@@ -27,7 +27,7 @@ CONFIGS = [
         juan=274, label='二百七十四', marker='## 靈寶領教濟度金書卷之二百七十四首八\n\n',
         source='识典古籍 DZ0466', source_key='識典古籍 DZ0466',
         url='https://www.shidianguji.com/zh/book/DZ0466/chapter/1lp28xhb76nm7',
-        pages='PDF 第406—415页', ritual='璇玑解厄、七曜玄灵、传度雷霆与祈禳诸符',
+        pages='PDF 第406—416页', ritual='璇玑解厄、七曜玄灵、传度雷霆与祈禳诸符',
         category='符簡軌範品，璇璣齋、七曜齋、玄靈經懺、傳度及諸道場用',
         note='原字形、标点及疑似 OCR 照源页保留；卷尾作“卷之二百十四”，与卷首“二百七十四”并存，不静默改字；符图未转写为文字，待道藏书影逐页人工校验。',
         sections=[
@@ -43,7 +43,7 @@ CONFIGS = [
         juan=316, label='三百一十六', marker='## 卷之三百一十六\n\n',
         source='读点古籍', source_key='讀點古籍',
         url='https://www.dudianguji.com/book/1397/296a9cacab960.html',
-        pages='PDF 第779—788页', ritual='保命斋、七曜斋、玄灵游玑斋文檄',
+        pages='PDF 第779—789页', ritual='保命斋、七曜斋、玄灵游玑斋文檄',
         category='文檄發放品，保命齋、七曜齋、玄靈游璣齋用',
         note='原字形、标点、空格及疑似 OCR 照源页保留，包括“调t 理蛮限”与卷尾“济一度”等，不据他本静默补改，待道藏书影逐页人工校验。',
         sections=[
