@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""P5/P11 · 科仪补缺可重入入库：三教源流搜神大全／灵宝领教济度金书。
+"""P5/P11-P13 · 科仪补缺可重入入库：三教源流搜神大全／灵宝领教济度金书。
 
 只写 kb_formal；FTS 统一交 scripts/kb-sync-guard.py 维护。
-P11 新增《灵宝领教济度金书》卷139《周天灯仪》识典源页十二节正文。
+P13 补齐《灵宝领教济度金书》卷136-140同版识典源页五十三节正文。
 """
 import datetime
 import hashlib
@@ -31,14 +31,36 @@ JOBS = [
                  'yuanchen-kaozheng': '"王文卿"', 'sources': '"搜神廣記"'}),
     dict(module='jidu-jinshu', prefix='JD', category='科仪', std_group='科仪',
          mds=['corpus/jidu-jinshu/jidu-jinshu-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan136-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan137-transcript.md',
+              'corpus/jidu-jinshu/jidu-jinshu-juan138-transcript.md',
               'corpus/jidu-jinshu/jidu-jinshu-juan139-transcript.md',
-              'corpus/jidu-jinshu/jidu-jinshu-juan140-transcript.md'], expected=20,
-         src='jidu-jinshu:daoinfo提要+道藏目錄詳註+識典DZ0466卷139-140(網絡轉錄)',
+              'corpus/jidu-jinshu/jidu-jinshu-juan140-transcript.md'], expected=56,
+         src='jidu-jinshu:daoinfo提要+道藏目錄詳註+識典DZ0466卷136-140(網絡轉錄)',
          src_id='SRC-JIDU-JINSHU-20261024',
-         src_desc='灵宝领教济度金书：书目版本、顺星礼斗卷次指引及卷139-140周天灯仪、紫府送星醮仪识典转录',
+         src_desc='灵宝领教济度金书：书目版本、顺星礼斗卷次指引及卷136-140分灯、南北斗、十一列曜、周天灯仪与紫府送星醮仪识典转录',
          display='灵宝领教济度金书',
-         note='宁全真授林灵真编320卷；目录3条+卷139正文12节+卷140正文5节，共20条；网络转录预留书影校验，其余灯仪醮仪挂账',
+         note='宁全真授林灵真编320卷；目录3条+卷136正文14节+卷137正文9节+卷138正文13节+卷139正文12节+卷140正文5节，共56条；网络转录预留书影校验，其余灯仪醮仪挂账',
          probes={'overview': '"靈寶東華派"', 'shunxing-zhiyin': '"度星齋"', 'sources': '"涵芬樓"',
+                 'juan136-fendeng-kaiyi': '"非陶三景之靈芒"', 'juan136-mingdeng-zhou': '"元始開圖"',
+                 'juan136-fendeng-shouyi': '"太上散十方"', 'juan136-beidou-kaiyi': '"圓方剖粹"',
+                 'juan136-tanlang': '"北斗延生"', 'juan136-jumen': '"北斗度厄"',
+                 'juan136-lucun': '"北斗保命"', 'juan136-wenqu': '"北斗益筭"',
+                 'juan136-lianzhen': '"北斗消災"', 'juan136-wuqu': '"北斗扶衰"',
+                 'juan136-pojun': '"北斗散禍"', 'juan136-waifu': '"北斗洞明"',
+                 'juan136-neibi': '"北斗隱元"', 'juan136-beidou-shouyi': '"祈懺㫖宣於正一"',
+                 'juan137-kaiyi': '"慶雲蒙藹"', 'juan137-tianfu': '"南斗司命"',
+                 'juan137-tianxiang': '"南斗司録"', 'juan137-tianliang': '"南斗延壽"',
+                 'juan137-tiantong': '"南斗益筭"', 'juan137-tianshu': '"南斗度厄天樞尊靈"',
+                 'juan137-tianji': '"南斗上生"', 'juan137-dazhou': '"南斗火宫"',
+                 'juan137-shouyi': '"圓十三義象之經營"',
+                 'juan138-kaiyi': '"司天符而定十一之數"', 'juan138-taiyang': '"東望扶桑宫"',
+                 'juan138-taiyin': '"仰望顧八表"', 'juan138-suixing': '"歲星乘木德"',
+                 'juan138-yinghuo': '"芒角森龍鳳"', 'juan138-taibai': '"太白淩清漢"',
+                 'juan138-chenxing': '"妙哉扶五炁"', 'juan138-zhenxing': '"高穹符戊已"',
+                 'juan138-luohou': '"神首循黑道"', 'juan138-jidu': '"豹尾鎮星宫"',
+                 'juan138-ziqi': '"授制宗元帝"', 'juan138-yuebei': '"太陰光玉緯"',
+                 'juan138-shouyi': '"七緯四餘"',
                  'juan139-kaiyi': '"碧霧浮空"', 'juan139-sanyuan': '"玄象垂光"',
                  'juan139-riyue': '"陽精陰粹"', 'juan139-wude': '"五靈列位"',
                  'juan139-siyu': '"炁回四七"', 'juan139-nanbeidou': '"維北有斗"',
