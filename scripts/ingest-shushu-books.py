@@ -12,8 +12,10 @@ ingest-shushu-books.py — 《术数全书·上册》按部切分入库（2026-1
 切块：段落感知 ~2500 字/块；书眉行（仅书名/页码的行）剔除；trust=0.9（OCR）；
       fingerprint='SSS|部|md5' 幂等；kb_fts5 手动批量同步；kb_module_registry 注册。
 """
-import hashlib, re, sqlite3, time
+import hashlib, re, sqlite3, subprocess, sys
 from pathlib import Path
+from lib.kb_ingest import KBIngestor
+from yidao_safe import safe_close
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'server' / 'database' / 'yidao.db'
@@ -88,59 +90,35 @@ def main():
             all_entries.append((module, book, author, topic, i + 1, len(chunks), ch))
         print(f'{book}: {len(segs)} 块 → {len(chunks)} 条（{len(text)} 字）', flush=True)
 
-    ins = dup = 0
-    new_rows = []
-    for attempt in range(20):
-        try:
-            conn.execute('BEGIN IMMEDIATE')
-            for module, book, author, topic, i, n, ch in all_entries:
-                title = f'{book}·OCR第{i}/{n}节'
-                full = f'【术数全书·上册·{book}·第{i}/{n}节】（公有领域原典·{author}·Vision OCR）\n\n{ch}\n\n关键词：{book} {topic} 术数全书'
-                fp = FP_PREFIX + module + '|' + hashlib.md5(full.encode()).hexdigest()[:12]
-                if fp in fps:
-                    dup += 1
-                    continue
-                eid = 'KB-SSS-' + hashlib.md5((module + full).encode()).hexdigest()[:12]
-                conn.execute(
-                    """INSERT INTO kb_formal (entry_id, module, title, content, keywords, trust_score,
-                       access_level, status, domain, src_id, fingerprint, category, created_at)
-                       VALUES (?,?,?,?,?,0.9,'public','formal','mingli',?,?,'术数全书分部',datetime('now'))""",
-                    (eid, module, f'原典·{title}', full, f'{book},{topic},术数全书', 'shushu-quanshu:上册·' + book, fp))
-                fps.add(fp)
-                new_rows.append((eid, module, title, full, topic))
-                ins += 1
-            conn.commit()
-            break
-        except sqlite3.OperationalError as e:
-            conn.rollback()
-            if 'locked' in str(e).lower():
-                print(f'写锁被占，30s 后重试（{attempt+1}/20）…', flush=True)
-                time.sleep(30)
-            else:
-                raise
-    else:
-        raise SystemExit('FATAL: 写锁重试耗尽')
-    print(f'入库 {ins} 条，去重跳过 {dup} 条', flush=True)
-
-    if new_rows:
+    ing = KBIngestor(conn)
+    try:
         conn.execute('BEGIN IMMEDIATE')
-        conn.executemany(
-            "INSERT INTO kb_fts5 (entry_id, module, summary, content, tags, category) VALUES (?,?,?,?,?,?)",
-            [(eid, m, t, full, topic, '术数全书分部') for eid, m, t, full, topic in new_rows])
-        conn.commit()
-        print(f'FTS 同步 {len(new_rows)} 条', flush=True)
-
-    for module, book, author, marks, p0, p1, topic in BOOKS:
-        n = conn.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (module,)).fetchone()[0]
-        conn.execute(
-            """INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
-               VALUES (?,?,?,?,?,?,datetime('now','localtime'))
-               ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
-            (module, '典籍综合', book, 'mingli', n,
-             f'{author}；术数全书上册 Vision OCR 页{p0}-{p1} 分部切条；OCR 文本 trust 0.9'))
-    conn.commit()
+        for module, book, author, topic, i, n, ch in all_entries:
+            title = f'{book}·OCR第{i}/{n}节'
+            full = f'【术数全书·上册·{book}·第{i}/{n}节】（公有领域原典·{author}·Vision OCR）\n\n{ch}\n\n关键词：{book} {topic} 术数全书'
+            eid = 'KB-SSS-' + hashlib.md5((module + full).encode()).hexdigest()[:12]
+            kw = f'{book},{topic},术数全书'
+            ing.upsert(entry_id=eid, module=module, title=f'原典·{title}', content=full,
+                       keywords=kw, tags=kw, src_id='shushu-quanshu:上册·' + book,
+                       category='术数全书分部', trust=0.9, source='corpus-rebuild')
+        for module, book, author, marks, p0, p1, topic in BOOKS:
+            n = conn.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (module,)).fetchone()[0]
+            conn.execute(
+                """INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
+                   VALUES (?,?,?,?,?,?,datetime('now','localtime'))
+                   ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
+                (module, '典籍综合', book, 'mingli', n,
+                 f'{author}；术数全书上册 Vision OCR 页{p0}-{p1} 分部切条；OCR 文本 trust 0.9'))
+        ing.commit()
+    except Exception:
+        conn.rollback()
+        safe_close(conn)
+        raise
+    safe_close(conn)
+    print(ing.stats(), flush=True)
+    subprocess.run([sys.executable, str(ROOT / 'scripts/kb-sync-guard.py'), '--sync', '1'],
+                   cwd=ROOT, check=True)
     print('═══ 注册表已更新：', ', '.join(b[0] for b in BOOKS))
-    conn.close()
 
 
 if __name__ == '__main__':

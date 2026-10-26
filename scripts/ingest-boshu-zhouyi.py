@@ -3,9 +3,10 @@
 # P0 · 帛书周易对照入库（module: yijing-boshu）
 # 卦序按学术规则程序推导：上卦 乾艮坎震坤兑离巽 / 下卦 乾坤艮兑坎离震巽 / 自重卦提置组首
 # 校验点（多源一致）：1乾 2否 3遁 33坤 34泰 35谦 36临 38明夷 41兑 51晋 57巽 58小畜 63家人 64益
-import sqlite3, hashlib, datetime, json, sys
+import sqlite3, hashlib, datetime, json, sys, pathlib
 
-DB = 'server/database/yidao.db'
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+DB = str(ROOT / 'server/database/yidao.db')
 MODULE = 'yijing-boshu'
 NOW = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -184,31 +185,35 @@ entries.append(dict(
 
 关键词：帛书周易 校勘 来源 释文 马王堆汉墓帛书"""))
 
-# ---- 入库 ----
+# ---- 入库：统一正式通道，FTS 由守卫同步 ----
+import subprocess, sys
+from lib.kb_ingest import KBIngestor
+from yidao_safe import safe_close
+
 db = sqlite3.connect(DB, timeout=120)
 c = db.cursor()
+ing = KBIngestor(db)
 SRC = 'boshu-zhouyi:马王堆帛书本(台大卦序探微+公开对照辑录)'
-n = 0
+n = len(entries)
 for e in entries:
-    fp = 'BZ|' + hashlib.md5(e['tag'].encode()).hexdigest()[:12]
     kw = e['content'].split('关键词：')[-1].strip() if '关键词：' in e['content'] else ''
-    c.execute("""INSERT INTO kb_formal
-      (entry_id, module, title, content, src_id, category, keywords, summary, trust_score,
-       hit_count, access_level, status, created_at, fingerprint, authority, domain)
-      VALUES (?,?,?,?,?,?,?,?,?,0,'public','formal',?,?,'','mingli')""",
-      (eid(e['tag']), MODULE, e['title'], e['content'], SRC, '易卦-版本对照', kw, '', e['trust'], NOW, fp))
-    c.execute("INSERT INTO kb_fts5 (entry_id, module, summary, content, tags, category) VALUES (?,?,?,?,?,?)",
-              (eid(e['tag']), MODULE, '', e['content'], kw, '易卦-版本对照'))
-    n += 1
+    ing.upsert(entry_id=eid(e['tag']), module=MODULE, title=e['title'],
+               content=e['content'], src_id=SRC, category='易卦-版本对照',
+               keywords=kw, tags=kw, trust=e['trust'], source='corpus-rebuild')
 c.execute("""INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
   VALUES (?,?,?,?,?,?,?) ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
   (MODULE, '易卦', '帛书周易对照', 'mingli', n,
    '马王堆帛书本×通行本对照；卦序程序推导14校验点全合；异文辑录trust0.85待原释文校', NOW))
 c.execute("INSERT OR REPLACE INTO kb_src_registry (src_id, description, level, avg_trust, entry_count, created_at) VALUES (?,?,?,?,?,?)",
   ('SRC-BOSHU-ZHOUYI-20261021', '帛书周易对照：台大《周易卦序探微》+公开对照辑录', 'classic', 0.87, n, NOW))
+ing.commit()
 db.commit()
-print(f"入库 {n} 条，module={MODULE}")
-# 验证
-print("formal:", c.execute("SELECT COUNT(*) FROM kb_formal WHERE module=?", (MODULE,)).fetchone()[0])
-print("fts5:", c.execute("SELECT COUNT(*) FROM kb_fts5 WHERE module=?", (MODULE,)).fetchone()[0])
-db.close()
+safe_close(db)
+subprocess.run([sys.executable, str(ROOT / 'scripts/kb-sync-guard.py'), '--sync', '1'], cwd=ROOT, check=True)
+print(f"可重入语料 {n} 条，module={MODULE}；{ing.stats()}")
+db = sqlite3.connect(DB, timeout=120)
+try:
+    print("formal:", db.execute("SELECT COUNT(*) FROM kb_formal WHERE module=?", (MODULE,)).fetchone()[0])
+    print("fts5:", db.execute("SELECT COUNT(*) FROM kb_fts5 WHERE module=?", (MODULE,)).fetchone()[0])
+finally:
+    safe_close(db)

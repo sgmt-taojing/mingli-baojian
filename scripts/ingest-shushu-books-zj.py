@@ -13,8 +13,10 @@ ingest-shushu-books-zj.py — 《术数全书·中册》按部切分 + 珞禄子
 跳过：梦占逸旨（mengzhan 已 2302 条专库）、珞禄子 OCR（净本优先）。
 mandoku 清洗：去 # 头/<pb:>¶ 标记/¶ 符。
 """
-import hashlib, re, sqlite3, time
+import hashlib, re, sqlite3, subprocess, sys
 from pathlib import Path
+from lib.kb_ingest import KBIngestor
+from yidao_safe import safe_close
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'server' / 'database' / 'yidao.db'
@@ -120,59 +122,35 @@ def main():
                             0.95, 'kanripo:' + fn, '四库净本'))
         print(f'{title}: 净字 {len(clean)}', flush=True)
 
-    ins = dup = 0
-    new_rows = []
-    for attempt in range(20):
-        try:
-            conn.execute('BEGIN IMMEDIATE')
-            for module, book, author, topic, title, ch, trust, src, cat in entries:
-                full = f'【{book}·{title}】（公有领域原典·{author}）\n\n{ch}\n\n关键词：{book} {topic} {title}'
-                fp = 'SSZ|' + module + '|' + hashlib.md5(full.encode()).hexdigest()[:12]
-                if fp in fps:
-                    dup += 1
-                    continue
-                eid = 'KB-SSZ-' + hashlib.md5((module + full).encode()).hexdigest()[:12]
-                conn.execute(
-                    """INSERT INTO kb_formal (entry_id, module, title, content, keywords, trust_score,
-                       access_level, status, domain, src_id, fingerprint, category, created_at)
-                       VALUES (?,?,?,?,?,?,'public','formal','mingli',?,?,?,datetime('now'))""",
-                    (eid, module, f'原典·{title}', full, f'{book},{topic}', trust, src, fp, cat))
-                fps.add(fp)
-                new_rows.append((eid, module, title, full, topic, cat))
-                ins += 1
-            conn.commit()
-            break
-        except sqlite3.OperationalError as e:
-            conn.rollback()
-            if 'locked' in str(e).lower():
-                print(f'写锁被占，30s 后重试（{attempt+1}/20）…', flush=True)
-                time.sleep(30)
-            else:
-                raise
-    else:
-        raise SystemExit('FATAL: 写锁重试耗尽')
-    print(f'入库 {ins} 条，去重跳过 {dup} 条', flush=True)
-
-    if new_rows:
+    ing = KBIngestor(conn)
+    try:
         conn.execute('BEGIN IMMEDIATE')
-        conn.executemany(
-            "INSERT INTO kb_fts5 (entry_id, module, summary, content, tags, category) VALUES (?,?,?,?,?,?)",
-            [(eid, m, t, full, topic, cat) for eid, m, t, full, topic, cat in new_rows])
-        conn.commit()
-        print(f'FTS 同步 {len(new_rows)} 条', flush=True)
-
-    for module, book, author, p0, p1, topic in OCR_BOOKS + [
-            ('luoluzi', '珞禄子（消息赋注+指迷赋）', '宋徐子平等·命理', 0, 0, '命理')]:
-        n = conn.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (module,)).fetchone()[0]
-        conn.execute(
-            """INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
-               VALUES (?,?,?,?,?,?,datetime('now','localtime'))
-               ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
-            (module, '典籍综合', book, 'mingli', n,
-             f'{author}；' + (f'术数全书中册 OCR 页{p0}-{p1}' if p0 else 'Kanripo 四库净本 corpus/luoluzi')))
-    conn.commit()
+        for module, book, author, topic, title, ch, trust, src, cat in entries:
+            full = f'【{book}·{title}】（公有领域原典·{author}）\n\n{ch}\n\n关键词：{book} {topic} {title}'
+            eid = 'KB-SSZ-' + hashlib.md5((module + full).encode()).hexdigest()[:12]
+            kw = f'{book},{topic}'
+            ing.upsert(entry_id=eid, module=module, title=f'原典·{title}', content=full,
+                       keywords=kw, tags=kw, src_id=src, category=cat,
+                       trust=trust, source='corpus-rebuild')
+        for module, book, author, p0, p1, topic in OCR_BOOKS + [
+                ('luoluzi', '珞禄子（消息赋注+指迷赋）', '宋徐子平等·命理', 0, 0, '命理')]:
+            n = conn.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (module,)).fetchone()[0]
+            conn.execute(
+                """INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
+                   VALUES (?,?,?,?,?,?,datetime('now','localtime'))
+                   ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
+                (module, '典籍综合', book, 'mingli', n,
+                 f'{author}；' + (f'术数全书中册 OCR 页{p0}-{p1}' if p0 else 'Kanripo 四库净本 corpus/luoluzi')))
+        ing.commit()
+    except Exception:
+        conn.rollback()
+        safe_close(conn)
+        raise
+    safe_close(conn)
+    print(ing.stats(), flush=True)
+    subprocess.run([sys.executable, str(ROOT / 'scripts/kb-sync-guard.py'), '--sync', '1'],
+                   cwd=ROOT, check=True)
     print('═══ 注册表已更新 5 个模块')
-    conn.close()
 
 
 if __name__ == '__main__':

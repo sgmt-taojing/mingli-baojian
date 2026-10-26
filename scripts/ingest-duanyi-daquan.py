@@ -60,31 +60,19 @@ ids = [eid(entry['tag']) for entry in entries]
 assert len(ids) == len(set(ids)), '条目ID存在冲突'
 avg = round(sum(entry['trust'] for entry in entries) / len(entries), 4)
 
+from lib.kb_ingest import KBIngestor
+
 db = sqlite3.connect(DB, timeout=120)
 db.execute('PRAGMA busy_timeout=120000')
+ing = KBIngestor(db)
 try:
     db.execute('BEGIN IMMEDIATE')
     for entry in entries:
-        entry_id = eid(entry['tag'])
-        duplicate = db.execute(
-            'SELECT entry_id FROM kb_formal WHERE module=? AND content=? AND entry_id<>?',
-            (JOB['module'], entry['content'], entry_id)).fetchone()
-        assert duplicate is None, f"同文重复：{entry_id} 与 {duplicate[0]}"
-        fp = JOB['prefix'] + '|' + hashlib.md5(entry['tag'].encode()).hexdigest()[:12]
-        db.execute("""INSERT INTO kb_formal
-          (entry_id,module,title,content,src_id,category,keywords,summary,trust_score,
-           hit_count,tags,access_level,status,created_at,promoted_at,updated_at,
-           fingerprint,authority,domain)
-          VALUES (?,?,?,?,?,?,?,?,?,0,?,'public','formal',?,?,?,?,'','mingli')
-          ON CONFLICT(entry_id) DO UPDATE SET
-           module=excluded.module,title=excluded.title,content=excluded.content,
-           src_id=excluded.src_id,category=excluded.category,keywords=excluded.keywords,
-           summary='',trust_score=excluded.trust_score,tags=excluded.tags,
-           access_level='public',status='formal',promoted_at=excluded.promoted_at,
-           updated_at=excluded.updated_at,fingerprint=excluded.fingerprint,domain='mingli'""",
-          (entry_id, JOB['module'], entry['title'], entry['content'], JOB['src'],
-           JOB['category'], entry['keywords'], '', entry['trust'], entry['keywords'],
-           NOW, NOW, NOW, fp))
+        ing.upsert(
+            entry_id=eid(entry['tag']), module=JOB['module'], title=entry['title'],
+            content=entry['content'], src_id=JOB['src'], category=JOB['category'],
+            keywords=entry['keywords'], tags=entry['keywords'], trust=entry['trust'],
+            source='corpus-rebuild')
     count = len(entries)
     db.execute("""INSERT INTO kb_module_registry
       (module,std_group,display_name,domain,entry_count,note,updated_at)
@@ -99,6 +87,7 @@ try:
       ON CONFLICT(src_id) DO UPDATE SET description=excluded.description,
       level='classic',avg_trust=excluded.avg_trust,entry_count=excluded.entry_count""",
       (JOB['src_id'], JOB['src_desc'], avg, count, NOW))
+    ing.commit()
     db.commit()
 except Exception:
     db.rollback()

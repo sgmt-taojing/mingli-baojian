@@ -45,8 +45,13 @@ pat = re.compile(r'<!--ENTRY:([^|]+)\|([^|]+)\|([\d.]+)-->')
 def eid(prefix, tag):
     return f'KB-{prefix}-' + hashlib.md5(tag.encode()).hexdigest()[:12]
 
+import subprocess, sys
+from lib.kb_ingest import KBIngestor
+from yidao_safe import safe_close
+
 db = sqlite3.connect(DB, timeout=120)
 c = db.cursor()
+ing = KBIngestor(db)
 for job in JOBS:
     raw = (ROOT / job['md']).read_text(encoding='utf-8')
     marks = list(pat.finditer(raw))
@@ -57,28 +62,27 @@ for job in JOBS:
         assert body, f"{job['module']} 条目 {m.group(1)} 内容为空"
         entries.append(dict(tag=m.group(1).strip(), title=m.group(2).strip(),
                             trust=float(m.group(3)), content=body))
-    n = 0
+    n = len(entries)
     for e in entries:
-        fp = job['prefix'] + '|' + hashlib.md5(e['tag'].encode()).hexdigest()[:12]
         kw = e['content'].split('關鍵詞：')[-1].strip() if '關鍵詞：' in e['content'] else ''
-        c.execute("""INSERT INTO kb_formal
-          (entry_id, module, title, content, src_id, category, keywords, summary, trust_score,
-           hit_count, access_level, status, created_at, fingerprint, authority, domain)
-          VALUES (?,?,?,?,?,?,?,?,?,0,'public','formal',?,?,'','mingli')""",
-          (eid(job['prefix'], e['tag']), job['module'], e['title'], e['content'],
-           job['src'], job['category'], kw, '', e['trust'], NOW, fp))
-        c.execute("INSERT INTO kb_fts5 (entry_id, module, summary, content, tags, category) VALUES (?,?,?,?,?,?)",
-                  (eid(job['prefix'], e['tag']), job['module'], '', e['content'], kw, job['category']))
-        n += 1
+        ing.upsert(entry_id=eid(job['prefix'], e['tag']), module=job['module'], title=e['title'],
+                   content=e['content'], src_id=job['src'], category=job['category'],
+                   keywords=kw, tags=kw, trust=e['trust'], source='corpus-rebuild')
     c.execute("""INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
       VALUES (?,?,?,?,?,?,?) ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
       (job['module'], '择日', job['display'], 'mingli', n, job['note'], NOW))
     c.execute("INSERT OR REPLACE INTO kb_src_registry (src_id, description, level, avg_trust, entry_count, created_at) VALUES (?,?,?,?,?,?)",
       (job['src_id'], job['src_desc'], 'classic', job['avg'], n, NOW))
-    print(f"{job['module']}: 入库 {n} 条（{'、'.join(e['tag'] for e in entries)}）")
+    print(f"{job['module']}: 可重入语料 {n} 条（{'、'.join(e['tag'] for e in entries)}）")
+ing.commit()
 db.commit()
-for job in JOBS:
-    f = c.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (job['module'],)).fetchone()[0]
-    t = c.execute('SELECT COUNT(*) FROM kb_fts5 WHERE module=?', (job['module'],)).fetchone()[0]
-    print(f"{job['module']}: formal={f} fts5={t} {'OK' if f==t else 'MISMATCH!'}")
-db.close()
+safe_close(db)
+subprocess.run([sys.executable, str(ROOT / 'scripts/kb-sync-guard.py'), '--sync', '1'], cwd=ROOT, check=True)
+db = sqlite3.connect(DB, timeout=120)
+try:
+    for job in JOBS:
+        f = db.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (job['module'],)).fetchone()[0]
+        t = db.execute('SELECT COUNT(*) FROM kb_fts5 WHERE module=?', (job['module'],)).fetchone()[0]
+        print(f"{job['module']}: formal={f} fts5={t} {'OK' if f==t else 'MISMATCH!'}")
+finally:
+    safe_close(db)

@@ -13,8 +13,10 @@ ingest-lingqi.py — 《灵棋经》入 kb_formal（2026-10-20 · 第三十七�
   4. kb_module_registry 注册 lingqi → 卜筮 group
 已知残缺：全书 125 课，OCR 有效锚点 110 课，15 课 OCR 残损待校（绝不杜撰补齐）。
 """
-import hashlib, json, re, sqlite3, time
+import hashlib, re, sqlite3, subprocess, sys
 from pathlib import Path
+from lib.kb_ingest import KBIngestor
+from yidao_safe import safe_close
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'server' / 'database' / 'yidao.db'
@@ -83,60 +85,43 @@ def main():
         kw = f'灵棋经,{name[:-1]},{shape},{xiang.replace("之象","")},占卜,课占'
         entries.append((title, seg, kw))
 
-    ins = dup = 0
-    new_ids = []
-    for attempt in range(20):
-        try:
-            conn.execute('BEGIN IMMEDIATE')
-            for title, content, kw in entries:
-                full = f'【灵棋经·{title}】（公有领域原典·汉东方朔·术数全书本·Vision OCR）\n\n{content}\n\n关键词：灵棋经 占卜 {title}'
-                fp = FP_PREFIX + hashlib.md5(('lingqi' + full).encode()).hexdigest()[:12]
-                if fp in fps:
-                    dup += 1
-                    continue
-                eid = 'KB-LQJ-' + fp[4:]
-                conn.execute(
-                    """INSERT INTO kb_formal (entry_id, module, title, content, keywords, trust_score,
-                       access_level, status, domain, src_id, fingerprint, created_at)
-                       VALUES (?,?,?,?,?,0.9,'public','formal','mingli',?,?,datetime('now'))""",
-                    (eid, 'lingqi', f'原典·{title}', full, kw, SRC, fp))
-                fps.add(fp)
-                new_ids.append((eid, title, full, kw))
-                ins += 1
-            conn.commit()
-            break
-        except sqlite3.OperationalError as e:
-            conn.rollback()
-            if 'locked' in str(e).lower():
-                print(f'写锁被占，30s 后重试（{attempt+1}/20）…', flush=True)
-                time.sleep(30)
-            else:
-                raise
-    else:
-        raise SystemExit('FATAL: 写锁重试耗尽')
-    print(f'入库 {ins} 条，指纹去重跳过 {dup} 条', flush=True)
-
-    # FTS 批量同步（无触发器）
-    if new_ids:
+    ing = KBIngestor(conn)
+    try:
         conn.execute('BEGIN IMMEDIATE')
-        conn.executemany(
-            "INSERT INTO kb_fts5 (entry_id, module, summary, content, tags, category) VALUES (?,?,?,?,?,?)",
-            [(eid, 'lingqi', title, full, kw, '占卜') for eid, title, full, kw in new_ids])
-        conn.commit()
-        print(f'FTS 同步 {len(new_ids)} 条', flush=True)
-
-    # 模块注册表
-    note = f'汉东方朔·术数全书上册VisionOCR；全书125课，OCR有效{len(lessons)}课，{125-len(lessons)}课残损待校'
-    conn.execute(
-        """INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
-           VALUES ('lingqi','卜筮','灵棋经','mingli',?,?,datetime('now','localtime'))
-           ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
-        (len(entries), note))
-    conn.commit()
-    n = conn.execute("SELECT COUNT(*) FROM kb_formal WHERE module='lingqi'").fetchone()[0]
-    f = conn.execute("SELECT COUNT(*) FROM kb_fts5 WHERE module='lingqi'").fetchone()[0]
-    print(f'═══ lingqi 模块 kb_formal={n} 条，kb_fts5={f} 条')
-    conn.close()
+        for title, content, kw in entries:
+            full = f'【灵棋经·{title}】（公有领域原典·汉东方朔·术数全书本·Vision OCR）\n\n{content}\n\n关键词：灵棋经 占卜 {title}'
+            fp = FP_PREFIX + hashlib.md5(('lingqi' + full).encode()).hexdigest()[:12]
+            ing.upsert(entry_id='KB-LQJ-' + fp[4:], module='lingqi',
+                       title=f'原典·{title}', content=full, keywords=kw, tags=kw,
+                       src_id=SRC, category='占卜', trust=0.9, source='corpus-rebuild')
+        total = conn.execute("SELECT COUNT(*) FROM kb_formal WHERE module='lingqi'").fetchone()[0]
+        ocr = conn.execute("SELECT COUNT(*) FROM kb_formal WHERE module='lingqi' AND entry_id LIKE 'KB-LQJ-%'").fetchone()[0]
+        siku = conn.execute("SELECT COUNT(*) FROM kb_formal WHERE module='lingqi' AND entry_id LIKE 'KB-LQK-%'").fetchone()[0]
+        wiki = conn.execute("SELECT COUNT(*) FROM kb_formal WHERE module='lingqi' AND entry_id LIKE 'KB-LQW-%'").fetchone()[0]
+        note = (f'汉东方朔·三版本互校：OCR {ocr} 条、四库净本 {siku} 条、维基文库 {wiki} 条；'
+                f'OCR有效{len(lessons)}课，残缺处不杜撰')
+        conn.execute(
+            """INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
+               VALUES ('lingqi','卜筮','灵棋经','mingli',?,?,datetime('now','localtime'))
+               ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
+            (total, note))
+        ing.commit()
+    except Exception:
+        conn.rollback()
+        safe_close(conn)
+        raise
+    safe_close(conn)
+    print(ing.stats(), flush=True)
+    subprocess.run([sys.executable, str(ROOT / 'scripts/kb-sync-guard.py'), '--sync', '1'],
+                   cwd=ROOT, check=True)
+    conn = sqlite3.connect(str(DB), timeout=120)
+    try:
+        n = conn.execute("SELECT COUNT(*) FROM kb_formal WHERE module='lingqi'").fetchone()[0]
+        f = conn.execute("SELECT COUNT(*) FROM kb_fts5 WHERE module='lingqi'").fetchone()[0]
+        assert n == f, (n, f)
+        print(f'═══ lingqi 模块 kb_formal={n} 条，kb_fts5={f} 条')
+    finally:
+        safe_close(conn)
 
 
 if __name__ == '__main__':

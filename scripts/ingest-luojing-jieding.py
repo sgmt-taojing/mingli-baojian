@@ -27,29 +27,34 @@ print(f'解析 {len(entries)} 条：' + '、'.join(e['tag'] for e in entries))
 def eid(tag):
     return 'KB-LJ-' + hashlib.md5(tag.encode()).hexdigest()[:12]
 
+import subprocess
+from lib.kb_ingest import KBIngestor
+from yidao_safe import safe_close
+
 db = sqlite3.connect(DB, timeout=120)
 c = db.cursor()
+ing = KBIngestor(db)
 SRC = 'luojing-jieding:NLC511-13056616-69088上冊(AI目視轉錄·預留人工校驗)'
-n = 0
+n = len(entries)
 for e in entries:
-    fp = 'LJ|' + hashlib.md5(e['tag'].encode()).hexdigest()[:12]
     kw = e['content'].split('關鍵詞：')[-1].strip() if '關鍵詞：' in e['content'] else ''
-    c.execute("""INSERT INTO kb_formal
-      (entry_id, module, title, content, src_id, category, keywords, summary, trust_score,
-       hit_count, access_level, status, created_at, fingerprint, authority, domain)
-      VALUES (?,?,?,?,?,?,?,?,?,0,'public','formal',?,?,'','mingli')""",
-      (eid(e['tag']), MODULE, e['title'], e['content'], SRC, CATEGORY, kw, '', e['trust'], NOW, fp))
-    c.execute("INSERT INTO kb_fts5 (entry_id, module, summary, content, tags, category) VALUES (?,?,?,?,?,?)",
-              (eid(e['tag']), MODULE, '', e['content'], kw, CATEGORY))
-    n += 1
+    ing.upsert(entry_id=eid(e['tag']), module=MODULE, title=e['title'],
+               content=e['content'], src_id=SRC, category=CATEGORY,
+               keywords=kw, tags=kw, trust=e['trust'], source='corpus-rebuild')
 c.execute("""INSERT INTO kb_module_registry (module, std_group, display_name, domain, entry_count, note, updated_at)
   VALUES (?,?,?,?,?,?,?) ON CONFLICT(module) DO UPDATE SET entry_count=excluded.entry_count, note=excluded.note, updated_at=excluded.updated_at""",
   (MODULE, '阳宅', '罗经解定', 'mingli', n,
    '清胡国桢罗盘学专著；卷一括言+天池章全录；AI目视转录trust0.75预留人工校验；余卷OCR挂账', NOW))
 c.execute("INSERT OR REPLACE INTO kb_src_registry (src_id, description, level, avg_trust, entry_count, created_at) VALUES (?,?,?,?,?,?)",
   ('SRC-LUOJING-20261021', '罗经解定卷一：NLC511上册AI目视转录（括言+天池章）', 'classic', 0.77, n, NOW))
+ing.commit()
 db.commit()
-print(f'入库 {n} 条，module={MODULE}')
-print('formal:', c.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (MODULE,)).fetchone()[0])
-print('fts5:', c.execute('SELECT COUNT(*) FROM kb_fts5 WHERE module=?', (MODULE,)).fetchone()[0])
-db.close()
+safe_close(db)
+subprocess.run([sys.executable, str(ROOT / 'scripts/kb-sync-guard.py'), '--sync', '1'], cwd=ROOT, check=True)
+print(f'可重入语料 {n} 条，module={MODULE}；{ing.stats()}')
+db = sqlite3.connect(DB, timeout=120)
+try:
+    print('formal:', db.execute('SELECT COUNT(*) FROM kb_formal WHERE module=?', (MODULE,)).fetchone()[0])
+    print('fts5:', db.execute('SELECT COUNT(*) FROM kb_fts5 WHERE module=?', (MODULE,)).fetchone()[0])
+finally:
+    safe_close(db)

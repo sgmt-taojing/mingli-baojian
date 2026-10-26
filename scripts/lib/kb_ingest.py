@@ -55,6 +55,7 @@ class KBIngestor:
         self.batch_size = batch_size   # kb-sync-guard 长事务教训：每 200-500 行落一批
         self._pending = 0
         self.inserted = 0
+        self.updated = 0
         self.duplicates = 0
 
     def insert(self, *, entry_id: str, module: str, title: str, content: str,
@@ -78,7 +79,7 @@ class KBIngestor:
         if hit:
             self.duplicates += 1
             return False, 'duplicate'
-        tags_json = json.dumps(tags or [], ensure_ascii=False)
+        tags_json = tags if isinstance(tags, str) else json.dumps(tags or [], ensure_ascii=False)
         cur.execute(INSERT_SQL, (
             entry_id, module, title, content, src_id, category or module,
             keywords, summary, trust, source, fp, domain, tags_json, access_level))
@@ -88,10 +89,52 @@ class KBIngestor:
             self.commit()
         return True, 'inserted'
 
+    def upsert(self, *, entry_id: str, module: str, title: str, content: str,
+               category: str = None, keywords: str = '', summary: str = '',
+               src_id: str = None, tags=None, domain: str = 'mingli',
+               trust: float = 0.95, source: str = 'manual',
+               access_level: str = 'public'):
+        """按 entry_id 可重入写入；供持续校勘的语料构建脚本使用。
+
+        与 insert 共用同一正式字段、内容指纹和时间口径；同文落到其他
+        entry_id 时拒绝写入，避免静默制造重复。FTS 仍由统一守卫同步。
+        """
+        if domain not in ALLOWED_DOMAINS:
+            return False, f'bad-domain:{domain}'
+        cur = self.conn.cursor()
+        duplicate = cur.execute(
+            'SELECT entry_id FROM kb_formal WHERE content=? AND entry_id<>? LIMIT 1',
+            (content, entry_id)).fetchone()
+        if duplicate:
+            raise ValueError(f'同文重复：{entry_id} 与 {duplicate[0]}')
+        existed = cur.execute('SELECT 1 FROM kb_formal WHERE entry_id=?', (entry_id,)).fetchone()
+        fp = fingerprint_of(content)
+        tags_json = tags if isinstance(tags, str) else json.dumps(tags or [], ensure_ascii=False)
+        sql = INSERT_SQL + """
+            ON CONFLICT(entry_id) DO UPDATE SET
+              module=excluded.module,title=excluded.title,content=excluded.content,
+              src_id=excluded.src_id,category=excluded.category,keywords=excluded.keywords,
+              summary=excluded.summary,trust_score=excluded.trust_score,
+              promoted_at=excluded.promoted_at,promoted_from=excluded.promoted_from,
+              status='formal',fingerprint=excluded.fingerprint,domain=excluded.domain,
+              tags=excluded.tags,access_level=excluded.access_level,updated_at=excluded.updated_at"""
+        cur.execute(sql, (
+            entry_id, module, title, content, src_id, category or module,
+            keywords, summary, trust, source, fp, domain, tags_json, access_level))
+        self._pending += 1
+        if existed:
+            self.updated += 1
+        else:
+            self.inserted += 1
+        if self._pending >= self.batch_size:
+            self.commit()
+        return True, 'updated' if existed else 'inserted'
+
     def commit(self):
         if self._pending:
             self.conn.commit()
             self._pending = 0
 
     def stats(self) -> str:
-        return f'入库 {self.inserted} 条 · 幂等跳过 {self.duplicates} 条 · spec={SPEC_VERSION}'
+        return (f'入库 {self.inserted} 条 · 更新 {self.updated} 条 · '
+                f'幂等跳过 {self.duplicates} 条 · spec={SPEC_VERSION}')

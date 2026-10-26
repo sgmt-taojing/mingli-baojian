@@ -1,0 +1,43 @@
+
+> mingli-baojian@1.1.0 perf:budget
+> node scripts/bundle-budget-check.js
+
+
+═══ 命理宝鉴 · Bundle 预算校验 ═══
+
+总览: FAIL  |  HTML 192 个 / 4478KB  |  JS 177 个 / 3922KB  |  CSS 86 个 / 1161KB  |  全部 876 个 / 22421KB
+
+HTML: PASS (4478KB)
+
+JS: PASS (3922KB)
+  [WARN] ai-assistant-inline.js  449KB
+
+CSS: FAIL (1161KB)
+  [FAIL] divination-hub.css  194KB
+  [FAIL] divination-hub-inline.css  165KB
+  [FAIL] fengshui-inline.css  144KB
+  [WARN] eval-dashboard.css  58KB
+
+关键页:
+  ✅ index.html                           62KB / 200KB  (PASS)
+  ✅ divination-integrated.html           34KB / 200KB  (PASS)
+  ✅ ai-assistant.html                    39KB / 200KB  (PASS)
+  ✅ my-yuanzhu.html                      8KB / 200KB  (PASS)
+
+TOP 10 最大文件:
+     768KB  js/vendor/iztro.min.js
+     568KB  knowledge-models/shushu-model.js
+     449KB  js/ai-assistant-inline.js
+     323KB  divination-knowledge.html
+     321KB  knowledge-models/lingqi-model.js
+     319KB  docs/openapi.json
+     304KB  data/lingqi-125.json
+     298KB  knowledge-models/zhuge-model.js
+     194KB  css/divination-hub.css
+     190KB  assets/distill-pipeline.png
+
+═══ 修复建议 ═══
+  JS 大于 300KB: 1 个
+    措施: 代码分割 + 按需加载 + tree-shaking
+  app/ 总计 22421KB 超 10000KB
+    措施: 分页静态资源 + CDN 分发 + 图片压缩
