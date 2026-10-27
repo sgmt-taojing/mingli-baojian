@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""P10 · 《断易大全》版本目录与 Commons 本经验卦例可重入入库。
+"""P10 · 《断易大全》版本目录与 Commons 本书影正文可重入入库。
 
 只写 kb_formal；FTS 统一交 scripts/kb-sync-guard.py 维护。
 文本源：corpus/duanyi-daquan/duanyi-daquan-transcript.md
 条目标记：<!--ENTRY:tag|title|trust-->
 
-边界：5 条版本／目录条目与 16 条 Commons 书影正文使用独立来源注册；
+边界：5 条版本／目录条目与 20 条 Commons 书影正文使用独立来源注册；
 Commons 本不得混署为余兴国老二酉堂本，异本亦不得混排正文。
 """
 import datetime
@@ -25,15 +25,15 @@ from yidao_safe import safe_close
 
 JOB = dict(
     module='duanyi-daquan', prefix='DYDQ', category='易卦', std_group='易卦',
-    md='corpus/duanyi-daquan/duanyi-daquan-transcript.md', expected=21,
+    md='corpus/duanyi-daquan/duanyi-daquan-transcript.md', expected=25,
     src='duanyi-daquan:國圖鮑國強新入藏古籍札記(版本)+2012校釋本館藏目錄(目錄級)',
     src_id='SRC-DUANYI-DAQUAN-20261024',
     src_desc='断易大全：余兴国四卷本版本、四卷结构、异本消歧与全文挂账',
-    case_src='duanyi-daquan:Wikimedia Commons SSID-13319395完整書影(PDF64-68人工初校)',
+    case_src='duanyi-daquan:Wikimedia Commons SSID-13319395完整書影(PDF64-70人工初校)',
     case_src_id='SRC-DUANYI-DAQUAN-COMMONS-20261027',
-    case_src_desc='改良断易大全：Commons 书影卷一经验卦例十五条与论六神赋，版本独立，人工初校待异本对校',
+    case_src_desc='改良断易大全：Commons 书影卷一经验卦例十五条、论六神赋及六神定局歌赋等四篇，版本独立，人工初校待异本对校',
     display='断易大全',
-    note='版本与目录5条＋Commons书影正文16条（经验卦例15、论六神赋1）；版本分立，疑字与异本对校挂账',
+    note='版本与目录5条＋Commons书影正文20条（经验卦例15、论六神赋1、六神定局歌赋等4）；版本分立，夹注疑字与异本对校挂账',
 )
 PAT = re.compile(r'<!--ENTRY:([^|]+)\|([^|]+)\|([\d.]+)-->')
 
@@ -67,7 +67,7 @@ ids = [eid(entry['tag']) for entry in entries]
 assert len(ids) == len(set(ids)), '条目ID存在冲突'
 case_entries = [entry for entry in entries if is_scan_entry(entry)]
 base_entries = [entry for entry in entries if not is_scan_entry(entry)]
-assert len(base_entries) == 5 and len(case_entries) == 16, '来源分组应为 5＋16'
+assert len(base_entries) == 5 and len(case_entries) == 20, '来源分组应为 5＋20'
 source_groups = [
     (JOB['src_id'], JOB['src_desc'], JOB['src'], base_entries),
     (JOB['case_src_id'], JOB['case_src_desc'], JOB['case_src'], case_entries),
@@ -125,7 +125,7 @@ try:
     registry = db.execute('SELECT entry_count FROM kb_module_registry WHERE module=?', (JOB['module'],)).fetchone()[0]
     src_counts = [db.execute('SELECT entry_count FROM kb_src_registry WHERE src_id=?',
                              (src_id,)).fetchone()[0] for src_id, _d, _s, _g in source_groups]
-    assert src_counts == [5, 16], src_counts
+    assert src_counts == [5, 20], src_counts
     src = sum(src_counts)
     assert formal == fts == registry == src == n, (formal, fts, registry, src, n)
     for entry in entries:
