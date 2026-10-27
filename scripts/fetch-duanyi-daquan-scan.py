@@ -63,8 +63,12 @@ def main():
                 path.unlink(missing_ok=True)
                 error = result.stderr.decode('utf-8', 'replace').strip()
                 print(f'暂缺 {index + 1}：{error[-160:]}', flush=True)
-                # 明确尊重限流；其他网络错误也退避，不作紧密重试。
-                time.sleep(60 if '429' in error else 15)
+                # 收到 429 立即停止本轮，避免继续请求其余分段或进入第二遍。
+                if '429' in error:
+                    count = sum(valid_part(i, s, e) for i, (s, e) in enumerate(items))
+                    print(f'触发 HTTP 429，本轮停止；保留 {count}/{len(items)} 个有效分段。', flush=True)
+                    return 3
+                time.sleep(15)
             time.sleep(2)
         count = sum(valid_part(i, start, end) for i, (start, end) in enumerate(items))
         print(f'第 {pass_no} 轮：{count}/{len(items)} 个有效分段', flush=True)
