@@ -6,7 +6,7 @@
 文本源：corpus/duanyi-daquan/duanyi-daquan-transcript.md
 条目标记：<!--ENTRY:tag|title|trust-->
 
-边界：5 条版本／目录条目与 15 条 Commons 书影卦例使用独立来源注册；
+边界：5 条版本／目录条目与 16 条 Commons 书影正文使用独立来源注册；
 Commons 本不得混署为余兴国老二酉堂本，异本亦不得混排正文。
 """
 import datetime
@@ -25,21 +25,25 @@ from yidao_safe import safe_close
 
 JOB = dict(
     module='duanyi-daquan', prefix='DYDQ', category='易卦', std_group='易卦',
-    md='corpus/duanyi-daquan/duanyi-daquan-transcript.md', expected=20,
+    md='corpus/duanyi-daquan/duanyi-daquan-transcript.md', expected=21,
     src='duanyi-daquan:國圖鮑國強新入藏古籍札記(版本)+2012校釋本館藏目錄(目錄級)',
     src_id='SRC-DUANYI-DAQUAN-20261024',
     src_desc='断易大全：余兴国四卷本版本、四卷结构、异本消歧与全文挂账',
     case_src='duanyi-daquan:Wikimedia Commons SSID-13319395完整書影(PDF64-68人工初校)',
     case_src_id='SRC-DUANYI-DAQUAN-COMMONS-20261027',
-    case_src_desc='改良断易大全：Commons 完整书影卷一经验卦例十五条，版本独立，人工初校待异本对校',
+    case_src_desc='改良断易大全：Commons 书影卷一经验卦例十五条与论六神赋，版本独立，人工初校待异本对校',
     display='断易大全',
-    note='版本与目录5条＋Commons书影经验卦例15条；版本分立，卦例人工初校，疑字与异本对校挂账',
+    note='版本与目录5条＋Commons书影正文16条（经验卦例15、论六神赋1）；版本分立，疑字与异本对校挂账',
 )
 PAT = re.compile(r'<!--ENTRY:([^|]+)\|([^|]+)\|([\d.]+)-->')
 
 
 def eid(tag):
     return 'KB-DYDQ-' + hashlib.md5(tag.encode()).hexdigest()[:12]
+
+
+def is_scan_entry(entry):
+    return entry['tag'].startswith(('case-', 'text-'))
 
 
 def keywords(content):
@@ -61,9 +65,9 @@ for i, mark in enumerate(marks):
                         content=body, keywords=keywords(body)))
 ids = [eid(entry['tag']) for entry in entries]
 assert len(ids) == len(set(ids)), '条目ID存在冲突'
-case_entries = [entry for entry in entries if entry['tag'].startswith('case-')]
-base_entries = [entry for entry in entries if not entry['tag'].startswith('case-')]
-assert len(base_entries) == 5 and len(case_entries) == 15, '来源分组应为 5＋15'
+case_entries = [entry for entry in entries if is_scan_entry(entry)]
+base_entries = [entry for entry in entries if not is_scan_entry(entry)]
+assert len(base_entries) == 5 and len(case_entries) == 16, '来源分组应为 5＋16'
 source_groups = [
     (JOB['src_id'], JOB['src_desc'], JOB['src'], base_entries),
     (JOB['case_src_id'], JOB['case_src_desc'], JOB['case_src'], case_entries),
@@ -77,7 +81,7 @@ ing = KBIngestor(db)
 try:
     db.execute('BEGIN IMMEDIATE')
     for entry in entries:
-        src = JOB['case_src'] if entry['tag'].startswith('case-') else JOB['src']
+        src = JOB['case_src'] if is_scan_entry(entry) else JOB['src']
         ing.upsert(
             entry_id=eid(entry['tag']), module=JOB['module'], title=entry['title'],
             content=entry['content'], src_id=src, category=JOB['category'],
@@ -121,7 +125,7 @@ try:
     registry = db.execute('SELECT entry_count FROM kb_module_registry WHERE module=?', (JOB['module'],)).fetchone()[0]
     src_counts = [db.execute('SELECT entry_count FROM kb_src_registry WHERE src_id=?',
                              (src_id,)).fetchone()[0] for src_id, _d, _s, _g in source_groups]
-    assert src_counts == [5, 15], src_counts
+    assert src_counts == [5, 16], src_counts
     src = sum(src_counts)
     assert formal == fts == registry == src == n, (formal, fts, registry, src, n)
     for entry in entries:
@@ -139,7 +143,7 @@ try:
         assert formal_row[4] and formal_row[5], f'同步时间缺失：{entry_id}'
     # 不把 entry_id 普通过滤与 MATCH 混写：33 万行 FTS 上会退化为慢扫。
     probe_ids = {row[0] for row in db.execute(
-        "SELECT entry_id FROM kb_fts5 WHERE kb_fts5 MATCH ? LIMIT 20", ('"断易大全"',))}
+        "SELECT entry_id FROM kb_fts5 WHERE kb_fts5 MATCH ? LIMIT 40", ('"断易大全"',))}
     assert set(ids).issubset(probe_ids), f'检索探针未覆盖全部条目：{set(ids) - probe_ids}'
     print(f"{JOB['module']}: formal={formal} fts5={fts} registry={registry} src={src}；双表逐字一致；检索探针命中")
     # 全库 COUNT(kb_fts5) 同样是慢扫；专项验收不重复做全库扫描。
